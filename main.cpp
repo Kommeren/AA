@@ -8,6 +8,7 @@
 
 
 #include "local_search.hpp"
+#include "trivial_neighbour.hpp"
 
 
 int main() {
