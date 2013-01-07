@@ -10,25 +10,15 @@
  */
 
 
-#include <functional>
- 
-template <typename Iterator, typename Cond> class IteratorWithExclusion : public Iterator {
-    IteratorWithExclusion(Iterator i, Iterator end, const Cond & c) : m_i(i), m_end(end), m_c(c)  {}
 
-    void operator++() {
-        while(++m_i != m_end && c(*m_i)) {
-            ++m_i;
-        }
-    }
-    
-    Iterator m_i;
-    Iterator m_end;
-    const Cond & m_c;
-};
-    
+#include <boost/iterator/filter_iterator.hpp>
+
 template <typename Iterator, typename Element> class IteratorWithExcludedElement : 
-    public IteratorWithExclusion<Iterator, std::function<bool(Element)> > {
-    
-    IteratorWithExcludedElement(Iterator i, Iterator end, const Element & e) 
-        : IteratorWithExclusion<Iterator, std::function<bool(Element)> >(i, end, std::bind(std::equal_to<Element>(), e, std::placeholders::_1) )  {}
+    public boost::filter_iterator<std::function<bool(Element)>, Iterator> {
+public:
+    IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e) 
+        : boost::filter_iterator<std::function<bool(Element)>, Iterator >
+          (std::bind(std::not_equal_to<Element>(), e, std::placeholders::_1), i, end )  {}
 };
+
+

@@ -12,7 +12,7 @@ template <typename SolutionIterator, typename SolutionElement> class TrivialNeig
     typedef IteratorWithExcludedElement<SolutionIterator, SolutionElement> OutIter;
     public:
 
-        std::pair<OutIter, OutIter> getNeighbourhood(std::pair<SolutionIterator,SolutionIterator> sr, const SolutionElement &e) const {
-            return std::make_pair(OutIter(sr.first, sr.second, e), OutIter(sr.second, sr.second, e));        
+        std::pair<OutIter, OutIter> getNeighbourhood(SolutionIterator begin, SolutionIterator end, const SolutionElement &e) const {
+            return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));        
         }
 };
