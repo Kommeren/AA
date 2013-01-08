@@ -5,12 +5,6 @@
  *  *      Author: Piotr Wygocki
  *  */
 
-/*
- *  UNFINISHED !!! MISING OPERATORS!!! 
- */
-
-
-
 #include <boost/iterator/filter_iterator.hpp>
 
 template <typename Iterator, typename Element> class IteratorWithExcludedElement : 

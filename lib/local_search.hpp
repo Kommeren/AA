@@ -51,8 +51,8 @@ public:
 private:
     template <typename SolutionEl> bool checkSetsForSwap(const SolutionEl & r) {
             auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solutionRange, r);
-            auto findSucc = find_if(adjustmentSet.first, adjustmentSet.second, 
-                    std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, m_solutionRange, std::placeholders::_1)); 
+            auto findSucc = std::find_if(adjustmentSet.first, adjustmentSet.second, 
+                    std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, r, m_solutionRange, std::placeholders::_1)); 
             if(findSucc != adjustmentSet.second) {       
                 m_lastSearchSucceded = true;
                 m_swapFunctor.swap(m_solutionRange, *findSucc);

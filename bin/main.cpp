@@ -10,6 +10,7 @@
 
 #include "local_search.hpp"
 #include "trivial_neighbour.hpp"
+#include "cycle_manager.hpp"
 
 
 int main() {
@@ -21,5 +22,7 @@ int main() {
     f(2);
     std::cout << "t1" << std::endl << std::flush;
     std::copy(vExl.first, vExl.second, std::ostream_iterator<int>(std::cout, "\n"));
+
+    CycleManager<int> cm(vExl.first, vExl.second);
 
 }
