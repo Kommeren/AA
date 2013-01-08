@@ -55,7 +55,7 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
                 EdgeIterator() : m_cycleManager(NULL) ,m_idx(-1) {}
 
                 void operator++(){
-                    m_idx = m_cycleManager->m_successorMap[m_idx];
+                    m_idx = next(m_idx);
                     updateCurr();
 
                     if(m_idx == m_first) {
@@ -70,6 +70,7 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
                 void operator=(EdgeIterator ei) {
                     m_idx = ei.m_idx; 
                     m_first = ei.m_first;
+                    m_curr = ei.m_curr;
                     m_cycleManager = ei.m_cycleManager;
                 }               
 
@@ -79,9 +80,14 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
 
             private:
                 void updateCurr() {
-                    m_curr.first = m_cycleManager->m_mappingFromIdx[m_idx];
-                    m_curr.second = m_cycleManager->m_mappingFromIdx[m_cycleManager->m_successorMap[m_idx]];
+                    m_curr.first = m_cycleManager->fromIdx(m_idx);
+                    m_curr.second = m_cycleManager->fromIdx(next(m_idx));
                 }
+                
+                IdxT next(IdxT i) const {
+                    return m_cycleManager->m_successorMap[i];
+                }
+
                 const CycleManager * m_cycleManager;
                 IdxT m_idx;
                 IdxT m_first;
@@ -101,11 +107,11 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
         }
 
         void partialReverse(IdxT x, IdxT y) {
-            IdxT t_next = m_predecessorMap[x];
+            IdxT t_next = prev(x);
             IdxT t;
             do {
                 t = t_next;
-                t_next = m_predecessorMap[t];
+                t_next = prev(t);
                 link(x,t);
                 x = t;
             } while(t != y);
@@ -115,6 +121,18 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
             typename MappingToIdx::const_iterator i = m_mappingToIdx.find(ce);
             assert(i != m_mappingToIdx.end());
             return i->second;
+        }
+
+        IdxT next(IdxT i) const {
+            return m_successorMap[i];
+        }
+        
+        IdxT prev(IdxT i) const {
+            return m_predecessorMap[i];
+        }
+
+        CycleEl fromIdx(IdxT i) const {
+            return m_mappingFromIdx[i];
         }
 
         IdxT add(const CycleEl & el) {
