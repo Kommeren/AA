@@ -11,6 +11,9 @@
 #include <utility>
 #include <algorithm>
 
+namespace paal {
+namespace local_search {
+
 
 /*
  * LocalSearch wywoluje metode search ktora przeszukuje sasiedztwo kazdego punktu i sprawdza czy da sie udoskonalic rozwiazanie.
@@ -71,5 +74,8 @@ private:
     Swapper m_swapFunctor;
     bool m_lastSearchSucceded;
 };
+
+} // local_search
+} // paal
 
 #endif // __LOCAL_SEARCH__

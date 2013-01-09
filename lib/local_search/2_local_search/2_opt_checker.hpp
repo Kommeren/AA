@@ -1,3 +1,6 @@
+namespace paal {
+namespace local_search {
+namespace two_local_search {
 
 template <typename Metric> class CheckIfImprove2Opt {
     public:
@@ -11,3 +14,7 @@ template <typename Metric> class CheckIfImprove2Opt {
     private:
         Metric m_metric;
 };
+
+} //two_local_search
+} //local_search
+} //paal

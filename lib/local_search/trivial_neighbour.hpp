@@ -11,15 +11,21 @@
 #include <utility>
 #include "helpers/iterator_helpers.hpp"
 
+namespace paal {
+namespace local_search{
+
 
 struct TrivialNeigbourGetter {
-        template <typename SolutionIterator, typename SolutionElement> std::pair<IteratorWithExcludedElement<SolutionIterator, SolutionElement>, 
-                                                                                 IteratorWithExcludedElement<SolutionIterator, SolutionElement> > 
+        template <typename SolutionIterator, typename SolutionElement> std::pair<helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement>, 
+                                                                                 helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> > 
             
                 getNeighbourhood(SolutionIterator begin, SolutionIterator end, const SolutionElement &e) const {
-                    typedef IteratorWithExcludedElement<SolutionIterator, SolutionElement> OutIter;
+                    typedef helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> OutIter;
                     return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));        
                 }
 };
+
+} //local_search
+} //paal
 
 #endif // __TRIVIAL_NEIGHBOUR__

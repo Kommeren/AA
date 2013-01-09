@@ -3,6 +3,10 @@
 
 #include "data_structures/simple_cycle_manager.hpp"
 
+namespace paal {
+namespace local_search {
+namespace two_local_search {
+
 template < typename CycleManager> class TwoLocalSearchSwapper  {
     public:
         TwoLocalSearchSwapper(CycleManager & cm) : m_cycleManager(cm) {}
@@ -15,5 +19,8 @@ template < typename CycleManager> class TwoLocalSearchSwapper  {
         CycleManager & m_cycleManager;
 
 };
+} //two_local_search
+} //local_search
+} //paal
 
 #endif // __2_LOCAL_SEARCH_SWAPPER__

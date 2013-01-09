@@ -7,6 +7,9 @@
 #include <vector>
 #include <iterator>
 
+namespace paal {
+namespace data_structures {
+
 template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
@@ -169,5 +172,9 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
         SorsMap m_predecessorMap;
         SorsMap m_successorMap;
 };
+
+
+} //data_structures
+} //paal
 
 #endif // __SIMPLE_CYCLE_MANAGER__

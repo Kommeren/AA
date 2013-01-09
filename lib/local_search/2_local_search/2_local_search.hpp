@@ -8,12 +8,16 @@
 #include "local_search/2_local_search/2_opt_checker.hpp"
 #include "data_structures/simple_cycle_manager.hpp"
 
+namespace paal {
+namespace local_search {
+namespace two_local_search {
+
 
 template <typename SolutionElement, 
           typename Metric, 
           typename NeighbourGetter = TrivialNeigbourGetter,
           typename CheckIfImprove = CheckIfImprove2Opt<Metric> ,
-          typename CycleManager = SimpleCycleManager<SolutionElement> >
+          typename CycleManager = data_structures::SimpleCycleManager<SolutionElement> >
 
          class  TwoLocalSearchStep : 
              public LocalSearchStep<typename CycleManager::EdgeIterator, NeighbourGetter, 
@@ -29,6 +33,10 @@ template <typename SolutionElement,
                          : LocalSearchStepT(begin, end, ng, check, 
                                  TwoLocalSearchSwapper<CycleManager>(CycleManager(begin, end))) {}
              };
+
+} //two_local_search
+} //local_search
+} //paal
 
 #endif // __2_LOCAL_SEARCH__
 

@@ -14,6 +14,10 @@ std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;
 }
 
+using namespace paal;
+using namespace paal::local_search;
+using namespace paal::data_structures;
+
 int main() {
 
     std::vector<int> v = {1,2,3,4,5, 6, 7, 8, 9, 10};
