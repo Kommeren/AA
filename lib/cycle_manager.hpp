@@ -67,6 +67,10 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
                     return m_idx != ei.m_idx;
                 }               
                 
+                const CycleElPair * const operator->() const {
+                    return &m_curr;
+                }               
+
                 void operator=(EdgeIterator ei) {
                     m_idx = ei.m_idx; 
                     m_first = ei.m_first;
@@ -107,6 +111,8 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
         }
 
         void partialReverse(IdxT x, IdxT y) {
+            if(x == y)
+                return;
             IdxT t_next = prev(x);
             IdxT t;
             do {

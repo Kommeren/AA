@@ -9,6 +9,11 @@
 using std::string;
 using std::vector;
 
+struct T {
+    typedef typename vector<string>::iterator iter;
+    typedef std::pair<string, string> P;
+};
+
 class CheckSize {
 public:
     CheckSize(CycleManager<string> cm, size_t size) : m_cm(cm), m_size(size) {}
@@ -22,8 +27,7 @@ private:
 
 };
 
-class CheckAllSizes {
-        typedef typename vector<string>::iterator iter;
+class CheckAllSizes : public T {
     public:
         CheckAllSizes(iter begin) : m_begin(begin)  {}
         void operator()(iter end) {
@@ -35,17 +39,53 @@ class CheckAllSizes {
         iter m_begin;
 };
 
-BOOST_AUTO_TEST_CASE(iterator_size) 
-{
+template  <typename I> void  pe(I b, I e) {
+    std::cout << "Edges:" << std::endl;
+
+    for(;b != e; ++b) {
+        std::cout << b->first << "," << b->second << std::endl;
+    }
+
+}
+
+
+template <typename I1, typename I2> bool vecEquals(I1 b1, I1 e1, I2 b2, I2 e2) {
+    if(std::distance(b1, e1) != std::distance(b2, e2)) {
+        return false;
+    }
+    return std::equal(b1, e1 , b2);
+}
+
+template <typename El, typename Sol> 
+void checkSwap(T::iter b, T::iter e, T::P p1, T::P p2, const El & start, const Sol & sol) {
+    CycleManager<string> cm(b, e);
+    cm.swapEnds(p1, p2);
+    auto r = cm.getEdgeRange(start);
+    BOOST_CHECK(vecEquals(sol.begin(), sol.end(), r.first, r.second));
+}
+
+namespace {
     vector<string> v = {"1","2","3","4","5","6","7","8","9","10"};
-    typename vector<string>::iterator i = v.begin(); 
-    typename vector<string>::iterator end = v.end(); 
+}
+
+
+BOOST_AUTO_TEST_CASE(iterator_size) {
+    T::iter i = v.begin(); 
+    T::iter end = v.end(); 
     
     CheckAllSizes c(v.begin());
     for(; i!= end; ++i ) {
         c(i);
     }
+}
 
+BOOST_AUTO_TEST_CASE(swap_edges_3) {
+    std::vector<T::P> sol = {T::P("1","2"), T::P("2", "3"), T::P("3","1")};
+    checkSwap(v.begin(), v.begin() + 3, T::P("1","2"), T::P("2","3"), "1", sol);
+}
 
-
+BOOST_AUTO_TEST_CASE(swap_edges_4) {
+    std::vector<T::P> sol = {T::P("1","3"), T::P("3", "2"), T::P("2","4"), T::P("4", "1")};
+    checkSwap(v.begin(), v.begin() + 4, T::P("1","2"), T::P("3","4"), "1", sol);
+    
 }
