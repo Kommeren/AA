@@ -1,13 +1,17 @@
+
+#ifndef __SIMPLE_CYCLE_MANAGER__
+#define __SIMPLE_CYCLE_MANAGER__
+
 #include <assert.h>
 #include <map>
 #include <vector>
 #include <iterator>
 
-template <typename CycleEl, typename IdxT = int> class  CycleManager {
+template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
 
-        template <typename Iter> CycleManager(Iter begin, Iter end) {
+        template <typename Iter> SimpleCycleManager(Iter begin, Iter end) {
             if(begin == end) {
                 return;
             }
@@ -42,11 +46,16 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
         size_t size() const {
             return  m_predecessorMap.size(); 
         }
+        
+        CycleEl next(const CycleEl & ce) const {
+            return fromIdx(nextIdx(toIdx(ce)));
+        }
+        
 
         //TODO not finished
         class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair> {
             public:
-                EdgeIterator(const CycleManager & cm, CycleEl ce ) : 
+                EdgeIterator(const SimpleCycleManager & cm, CycleEl ce ) : 
                     m_cycleManager(&cm), m_idx(m_cycleManager->toIdx(ce)), m_first(m_idx) {
 
                     updateCurr();
@@ -55,7 +64,7 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
                 EdgeIterator() : m_cycleManager(NULL) ,m_idx(-1) {}
 
                 void operator++(){
-                    m_idx = next(m_idx);
+                    m_idx = nextIdx(m_idx);
                     updateCurr();
 
                     if(m_idx == m_first) {
@@ -85,14 +94,14 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
             private:
                 void updateCurr() {
                     m_curr.first = m_cycleManager->fromIdx(m_idx);
-                    m_curr.second = m_cycleManager->fromIdx(next(m_idx));
+                    m_curr.second = m_cycleManager->fromIdx(nextIdx(m_idx));
                 }
                 
-                IdxT next(IdxT i) const {
-                    return m_cycleManager->m_successorMap[i];
+                IdxT nextIdx(IdxT i) const {
+                    return m_cycleManager->nextIdx(i);
                 }
 
-                const CycleManager * m_cycleManager;
+                const SimpleCycleManager * m_cycleManager;
                 IdxT m_idx;
                 IdxT m_first;
                 CycleElPair m_curr;
@@ -113,11 +122,11 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
         void partialReverse(IdxT x, IdxT y) {
             if(x == y)
                 return;
-            IdxT t_next = prev(x);
+            IdxT t_next = prevIdx(x);
             IdxT t;
             do {
                 t = t_next;
-                t_next = prev(t);
+                t_next = prevIdx(t);
                 link(x,t);
                 x = t;
             } while(t != y);
@@ -129,11 +138,11 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
             return i->second;
         }
 
-        IdxT next(IdxT i) const {
+        IdxT nextIdx(IdxT i) const {
             return m_successorMap[i];
         }
         
-        IdxT prev(IdxT i) const {
+        IdxT prevIdx(IdxT i) const {
             return m_predecessorMap[i];
         }
 
@@ -160,3 +169,5 @@ template <typename CycleEl, typename IdxT = int> class  CycleManager {
         SorsMap m_predecessorMap;
         SorsMap m_successorMap;
 };
+
+#endif // __SIMPLE_CYCLE_MANAGER__

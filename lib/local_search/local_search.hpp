@@ -5,9 +5,11 @@
  *  *      Author: Piotr Wygocki
  *  */
 
+#ifndef __LOCAL_SEARCH__
+#define __LOCAL_SEARCH__
+
 #include <utility>
 #include <algorithm>
-
 
 
 /*
@@ -30,39 +32,44 @@
  */
 
 
-template <typename SolutionIter, typename NeighbourGetter, typename CheckIfImprove, typename Swapper> class LocalSearch {
+template <typename SolutionIter, typename NeighbourGetter, typename CheckIfImprove, typename Swapper> class LocalSearchStep {
 public:
     typedef std::pair<SolutionIter, SolutionIter> SolIterRange;
 //    typedef std::pair<bool, SolIterRange> BoolAndRange;
          
-    LocalSearch(SolIterRange solutionRange, NeighbourGetter && ng, CheckIfImprove && check, Swapper && swap) :
-     m_solutionRange(solutionRange), m_neighbourGetterFunctor(ng), m_checkFunctor(check), m_swapFunctor(swap), m_lastSearchSucceded(false) {}
+    LocalSearchStep(SolutionIter solutionBegin ,SolutionIter solutionEnd
+            , NeighbourGetter && ng, CheckIfImprove && check, Swapper && swap) :
+     m_solutionBegin(solutionBegin), m_solutionEnd(solutionEnd), m_neighbourGetterFunctor(ng), 
+     m_checkFunctor(check), m_swapFunctor(swap), m_lastSearchSucceded(false) {}
 
     bool search() {
         m_lastSearchSucceded = false;
-        std::find_if(m_solutionRange.first, m_solutionRange.last, checkSetsForSwap);
+        std::find_if(m_solutionBegin, m_solutionEnd, checkSetsForSwap);
         return m_lastSearchSucceded;
     }
 
     SolIterRange getSolution() const {
-        return m_solutionRange;
+        return SolIterRange(m_solutionBegin, m_solutionEnd);
     }
 
 private:
     template <typename SolutionEl> bool checkSetsForSwap(const SolutionEl & r) {
-            auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solutionRange, r);
+            auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solutionBegin, m_solutionEnd, r);
             auto findSucc = std::find_if(adjustmentSet.first, adjustmentSet.second, 
-                    std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, r, m_solutionRange, std::placeholders::_1)); 
+                    std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, r, m_solutionBegin, m_solutionEnd, std::placeholders::_1)); 
             if(findSucc != adjustmentSet.second) {       
                 m_lastSearchSucceded = true;
-                m_swapFunctor.swap(m_solutionRange, *findSucc);
+                tie(m_solutionBegin, m_solutionEnd) = m_swapFunctor.swap(m_solutionBegin, m_solutionEnd, r, *findSucc);
             }
             return m_lastSearchSucceded;
     }
 
-    SolIterRange m_solutionRange;
+    SolutionIter m_solutionBegin;
+    SolIterRange m_solutionEnd;
     NeighbourGetter m_neighbourGetterFunctor;
     CheckIfImprove m_checkFunctor;
     Swapper m_swapFunctor;
     bool m_lastSearchSucceded;
 };
+
+#endif // __LOCAL_SEARCH__
