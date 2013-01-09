@@ -28,8 +28,8 @@ template <typename SolutionElement,
 
                  public:
 
-                     template <typename SolutionIter>  TwoLocalSearchStep(SolutionIter begin, SolutionIter end, NeighbourGetter && ng, 
-                             CheckIfImprove && check) 
+                     template <typename SolutionIter>  TwoLocalSearchStep(SolutionIter begin, SolutionIter end, NeighbourGetter && ng = TrivialNeigbourGetter(), 
+                             CheckIfImprove && check = CheckIfImprove2Opt<Metric>()) 
                          : LocalSearchStepT(begin, end, ng, check, 
                                  TwoLocalSearchSwapper<CycleManager>(CycleManager(begin, end))) {}
              };
