@@ -4,7 +4,7 @@
 
 #include "local_search/local_search.hpp"
 #include "local_search/trivial_neighbour.hpp"
-#include "local_search/2_local_search/2_local_search_swapper.hpp"
+#include "local_search/2_local_search/2_local_search_updater.hpp"
 #include "local_search/2_local_search/2_opt_checker.hpp"
 #include "data_structures/simple_cycle_manager.hpp"
 
@@ -28,9 +28,9 @@ template <typename SolutionElement,
 
                  public:
 
-                     template <typename SolutionIter>  TwoLocalSearchStep(SolutionIter begin, SolutionIter end, NeighbourGetter && ng = TrivialNeigbourGetter(), 
+                     template <typename SolutionIter>  TwoLocalSearchStep(Solution && sol, NeighbourGetter && ng = TrivialNeigbourGetter(), 
                              CheckIfImprove && check = CheckIfImprove2Opt<Metric>()) 
-                         : LocalSearchStepT(begin, end, ng, check, 
+                         : LocalSearchStepT(sol, ng, check, 
                                  TwoLocalSearchSwapper<CycleManager>(CycleManager(begin, end))) {}
              };
 
