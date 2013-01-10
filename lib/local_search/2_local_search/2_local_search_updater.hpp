@@ -7,7 +7,7 @@ namespace two_local_search {
 
 template < typename CycleManager> class TwoLocalSearchUpdater  {
     public:
-        TwoLocalSearchSwapper(CycleManager & cm) : m_cycleManager(cm) {}
+        TwoLocalSearchUpdater(CycleManager & cm) : m_cycleManager(cm) {}
         template <typename SolutionElement, typename SolutionRange> 
             void update(SolutionRange sr, const SolutionElement & se, const SolutionElement & ae) {
             m_cycleManager.swapEnds(se, ae);

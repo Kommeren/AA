@@ -5,7 +5,7 @@
 #include "local_search/local_search.hpp"
 #include "local_search/trivial_neighbour.hpp"
 #include "local_search/2_local_search/2_local_search_updater.hpp"
-#include "local_search/2_local_search/2_opt_checker.hpp"
+#include "local_search/2_local_search/2_local_search_checker.hpp"
 #include "data_structures/simple_cycle_manager.hpp"
 
 namespace paal {
@@ -21,17 +21,17 @@ template <typename SolutionElement,
 
          class  TwoLocalSearchStep : 
              public LocalSearchStep<typename CycleManager::EdgeIterator, NeighbourGetter, 
-                CheckIfImprove, TwoLocalSearchSwapper<CycleManager> >  {
+                CheckIfImprove, TwoLocalSearchUpdater<CycleManager> >  {
 
                 typedef LocalSearchStep<typename CycleManager::EdgeIterator, NeighbourGetter, 
-                    CheckIfImprove, TwoLocalSearchSwapper<CycleManager> > LocalSearchStepT;
+                    CheckIfImprove, TwoLocalSearchUpdater<CycleManager> > LocalSearchStepT;
 
                  public:
 
-                     template <typename SolutionIter>  TwoLocalSearchStep(Solution && sol, NeighbourGetter && ng = TrivialNeigbourGetter(), 
+                     template <typename Solution>  TwoLocalSearchStep(Solution && sol, NeighbourGetter && ng = TrivialNeigbourGetter(), 
                              CheckIfImprove && check = CheckIfImprove2Opt<Metric>()) 
                          : LocalSearchStepT(sol, ng, check, 
-                                 TwoLocalSearchSwapper<CycleManager>(CycleManager(begin, end))) {}
+                                 TwoLocalSearchUpdater<CycleManager>(CycleManager(sol.begin(), sol.end()))) {}
              };
 
 } //two_local_search
