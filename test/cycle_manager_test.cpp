@@ -59,9 +59,9 @@ template <typename I1, typename I2> bool vecEquals(I1 b1, I1 e1, I2 b2, I2 e2) {
 }
 
 template <typename El, typename Sol> 
-void checkSwap(T::iter b, T::iter e, T::P p1, T::P p2, const El & start, const Sol & sol) {
+void checkSwap(T::iter b, T::iter e, const El & p1, const  El & p2, const El & start, const Sol & sol) {
     SimpleCycleManager<string> cm(b, e);
-    cm.swapEnds(p1, p2);
+    cm.flip(p1, p2);
     auto r = cm.getEdgeRange(start);
     BOOST_CHECK(vecEquals(sol.begin(), sol.end(), r.first, r.second));
 }
@@ -83,11 +83,11 @@ BOOST_AUTO_TEST_CASE(iterator_size) {
 
 BOOST_AUTO_TEST_CASE(swap_edges_3) {
     std::vector<T::P> sol = {T::P("1","2"), T::P("2", "3"), T::P("3","1")};
-    checkSwap(v.begin(), v.begin() + 3, T::P("1","2"), T::P("2","3"), "1", sol);
+    checkSwap(v.begin(), v.begin() + 3, "2", "2", "1", sol);
 }
 
 BOOST_AUTO_TEST_CASE(swap_edges_4) {
     std::vector<T::P> sol = {T::P("1","3"), T::P("3", "2"), T::P("2","4"), T::P("4", "1")};
-    checkSwap(v.begin(), v.begin() + 4, T::P("1","2"), T::P("3","4"), "1", sol);
+    checkSwap(v.begin(), v.begin() + 4, "2", "3", "1", sol);
     
 }

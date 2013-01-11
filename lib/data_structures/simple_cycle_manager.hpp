@@ -10,6 +10,8 @@
 namespace paal {
 namespace data_structures {
 
+
+//TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
 template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
@@ -33,12 +35,13 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
             }
             link(prevIdx, firstIdx);
         }
-
-        void swapEnds(const CycleElPair & p1, const CycleElPair & p2 ) {
-            IdxT b1 = m_mappingToIdx[p1.first];
-            IdxT e1 = m_mappingToIdx[p1.second];
-            IdxT b2 = m_mappingToIdx[p2.first];
-            IdxT e2 = m_mappingToIdx[p2.second];
+        
+        //after flip the order will be reversed, ie it will be from end  to begin
+        void flip(const CycleEl & begin, const CycleEl & end) {
+            IdxT e1 = toIdx(begin);
+            IdxT b1 = prevIdx(e1);
+            IdxT b2 = toIdx(end);
+            IdxT e2 = nextIdx(b2);
 
             partialReverse(b2, e1);
             link(b1, b2);
