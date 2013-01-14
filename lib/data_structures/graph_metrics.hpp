@@ -15,7 +15,6 @@ template <typename Graph> struct GraphMetricTraits {
 };
 
 
-
 template <typename Distance/*, typename Vertex*/> class MetricBase {
     public:
         MetricBase(int N) : m_matrix(boost::extents[N][N]) { }
@@ -37,8 +36,8 @@ namespace metric_fillers {
     
     template <> class GraphMericFillerImpl<graph_type::Sparse> {
         public:
-        template <typename DistanceMap, typename Graph, typename ResultMatrics> 
-        void fillMatrix(const Graph & g, const DistanceMap & dm, ResultMatrics & rm)  {
+        template <typename Graph, typename ResultMatrics> 
+        void fillMatrix(const Graph & g, ResultMatrics & rm)  {
 	    boost::johnson_all_pairs_shortest_paths(g, rm); 
         }
     };
@@ -52,13 +51,13 @@ namespace metric_fillers {
 // GraphTypeTag could be sparse, dense, large ...
 template <typename Graph, typename Distance/*, typename VertexType*/, 
           typename GraphFiller = metric_fillers::GraphMericFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag > > 
-    class  GraphMetric : public MetricBase<Distance>, public GraphFiller {
+    class  GraphMetric : public MetricBase</*typename property_traits<DistancePropertyMap>::value_type*/Distance>, public GraphFiller {
           typedef   MetricBase<Distance/*, typename boost::graph_traits<Graph>::vertex_descriptor*/> GMBase;
 
         public:
-            template <typename DistanceMap> GraphMetric(const Graph & g, const DistanceMap & dm)  
+            GraphMetric(const Graph & g)  
                 : GMBase(boost::num_vertices(g)) {
-                fillMatrix(g, dm, GMBase::m_matrix);
+                fillMatrix(g, GMBase::m_matrix);
             }
 };
 

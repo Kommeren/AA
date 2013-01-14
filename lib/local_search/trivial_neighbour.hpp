@@ -16,11 +16,18 @@ namespace local_search{
 
 
 struct TrivialNeigbourGetter {
-        template <typename SolutionIterator, typename SolutionElement> std::pair<helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement>, 
-                                                                                 helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> > 
+        template <typename SolutionElement, typename Solution> 
+//                            std::pair<helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement>, 
+//                                      helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> > 
+                            
+                              std::pair<helpers::IteratorWithExcludedElement<decltype(Solution().cbegin()), SolutionElement>, 
+                                        helpers::IteratorWithExcludedElement<decltype(Solution().cbegin()), SolutionElement> > 
             
-                getNeighbourhood(SolutionIterator begin, SolutionIterator end, const SolutionElement &e) const {
+                getNeighbourhood(const Solution & sol, const SolutionElement &e) const {
+                    typedef decltype(Solution().cbegin()) SolutionIterator;
                     typedef helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> OutIter;
+                    SolutionIterator begin = sol.begin();
+                    SolutionIterator end = sol.end();
                     return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));        
                 }
 };

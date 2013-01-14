@@ -11,15 +11,15 @@ template < typename CycleManager> class TwoLocalSearchContainer  {
         typedef typename CycleManager::EdgeIterator Iterator;
         TwoLocalSearchContainer(CycleManager & cm) : m_cycleManager(cm) {}
 
-        Iterator begin() const {
-            return m_cycleManager.getEdgesRange().first;
+        Iterator cbegin() const {
+            return m_cycleManager.getEdgeRange().first;
         }
         
-        Iterator end() const {
-            return m_cycleManager.getEdgesRange().second;
+        Iterator cend() const {
+            return m_cycleManager.getEdgeRange().second;
         }
 
-        CycleManager & m_cycleManager;
+        const CycleManager & m_cycleManager;
 };
 
 

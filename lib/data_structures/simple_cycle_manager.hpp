@@ -115,8 +115,12 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
         
         typedef std::pair<EdgeIterator, EdgeIterator> EdgeIteratorRange;
         
-        EdgeIteratorRange getEdgeRange(const CycleEl & el) {
+        EdgeIteratorRange getEdgeRange(const CycleEl & el) const {
             return EdgeIteratorRange(EdgeIterator(*this, el), EdgeIterator());
+        }
+        
+        EdgeIteratorRange getEdgeRange() const {
+            return getEdgeRange(fromIdx(0));
         }
 
     private:

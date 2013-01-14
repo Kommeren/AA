@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <iterator>
+#include <algorithm>
 
 #include "local_search/2_local_search/2_local_search.hpp"
 #include "data_structures/graph_metrics.hpp"
@@ -17,16 +18,15 @@ std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
 
 using namespace paal;
 using namespace paal::local_search;
+using namespace paal::local_search::two_local_search;
 using namespace paal::data_structures;
 using namespace boost;
 
 int main() {
 
     std::vector<int> v = {1,2,3,4,5, 6, 7, 8, 9, 10};
-    auto vExl = TrivialNeigbourGetter().getNeighbourhood(v.begin(), v.end(), 4); 
+    auto vExl = TrivialNeigbourGetter().getNeighbourhood(v, 4); 
     std::cout << (vExl.first == vExl.second) << std::endl << std::flush;
-    auto f = std::function<bool(int)>(std::bind(std::equal_to<int>(), 4, std::placeholders::_1));
-    f(2);
     std::cout << "t1" << std::endl << std::flush;
     std::copy(vExl.first, vExl.second, std::ostream_iterator<int>(std::cout, "\n"));
 
@@ -64,14 +64,18 @@ int main() {
     int num_arcs = sizeof(edge_array) / sizeof(Edge);
     
     graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
-    property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, g);
+//    property_map<graph_t, edge_weight_t>::type weightmap = get(edge_weight, g);
 
-    GraphMetric<graph_t, int> gm(g,weightmap);
+    typedef GraphMetric<graph_t, int> GraphMT;
+    GraphMT gm(g);
 
     std::cout << "odl: " << gm(A,B) << std::endl;
     std::cout << "odl: " << gm(C,B) << std::endl;
-
-
-
-
+    
+    std::vector<int> ver = {A, B, C, D, E};
+    
+    std::random_shuffle(ver.begin(), ver.end());
+    std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, "\n"));
+    TwoLocalSearchStep<int, GraphMT> ls(ver, gm);
+    ls.search();
 }
