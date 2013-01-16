@@ -11,10 +11,10 @@ namespace paal {
 namespace helpers {
 
 template <typename Iterator, typename Element> class IteratorWithExcludedElement : 
-    public boost::filter_iterator<std::function<bool(Element)>, Iterator> {
+    public boost::filter_iterator<std::function<bool(const Element &)>, Iterator> {
 public:
     IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e) 
-        : boost::filter_iterator<std::function<bool(Element)>, Iterator >
+        : boost::filter_iterator<std::function<bool(const Element &)>, Iterator >
           (std::bind(std::not_equal_to<Element>(), e, std::placeholders::_1), i, end )  {}
 };
 

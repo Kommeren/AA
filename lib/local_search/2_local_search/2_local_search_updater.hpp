@@ -8,9 +8,10 @@ namespace two_local_search {
 class TwoLocalSearchUpdater  {
     public:
         TwoLocalSearchUpdater() {}
-        template <typename SolutionElement, typename Solution> 
-            void update(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
-            s.swapEnds(se, ae);
+
+            template <typename SolutionElement, typename Solution> 
+        void update(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
+            s.getCycleManager().flip(se.second, ae.first);
         }
 };
 

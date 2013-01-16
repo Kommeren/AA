@@ -14,11 +14,11 @@ namespace local_search {
 namespace two_local_search {
 
 
-template <typename SolutionElement, 
+template <typename VertexType, 
           typename Metric, 
-          typename NeighbourGetter = TrivialNeigbourGetter,
           typename CheckIfImprove = CheckIfImprove2Opt<Metric> ,
-          typename CycleManager = data_structures::SimpleCycleManager<SolutionElement> >
+          typename CycleManager = data_structures::SimpleCycleManager<VertexType>,
+          typename NeighbourGetter = TrivialNeigbourGetter>
 
          class  TwoLocalSearchStep : 
              public LocalSearchStep<TwoLocalSearchContainer<CycleManager>, NeighbourGetter, 
@@ -27,10 +27,10 @@ template <typename SolutionElement,
                 typedef LocalSearchStep<TwoLocalSearchContainer<CycleManager> , NeighbourGetter, 
                     CheckIfImprove, TwoLocalSearchUpdater > LocalSearchStepT;
 
-                 public:
+                public:
 
-                //INAPPROPRIATE ORDER  could be invalid
-                template <typename Solution>  
+                    //TODO INAPPROPRIATE ORDER  could be invalid
+                    template <typename Solution>  
                      TwoLocalSearchStep(Solution & sol, Metric & m
                              , NeighbourGetter ng = NeighbourGetter()) 
                         :      LocalSearchStepT(m_cycleAdapter, ng, 
@@ -38,7 +38,11 @@ template <typename SolutionElement,
                                 m_cycleManager(sol.begin(), sol.end()),
                                 m_cycleAdapter(m_cycleManager) {}
 
-                 private:
+                    CycleManager & getCycle() {
+                        return m_cycleManager;
+                    }
+
+                private:
                     CycleManager  m_cycleManager;
                     TwoLocalSearchContainer<CycleManager> m_cycleAdapter;
              };

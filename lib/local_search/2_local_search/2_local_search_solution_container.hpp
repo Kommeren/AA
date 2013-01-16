@@ -19,7 +19,12 @@ template < typename CycleManager> class TwoLocalSearchContainer  {
             return m_cycleManager.getEdgeRange().second;
         }
 
-        const CycleManager & m_cycleManager;
+        CycleManager & getCycleManager() {
+            return m_cycleManager;
+        }
+    private:
+
+        CycleManager & m_cycleManager;
 };
 
 

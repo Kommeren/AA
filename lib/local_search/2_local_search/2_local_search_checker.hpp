@@ -6,7 +6,7 @@ template <typename Metric> class CheckIfImprove2Opt {
     public:
         CheckIfImprove2Opt(const Metric & m) : m_metric(m) {}
 
-        template <typename SolutionRange, typename SolutionElement> int checkIfImproved(const SolutionElement & sel, const SolutionRange & sRange, const SolutionElement &adjustEl) {
+        template <typename Solution, typename SolutionElement> int checkIfImproved(const SolutionElement & sel, const Solution & s, const SolutionElement &adjustEl) {
            return m_metric(sel.first, sel.second) + m_metric(adjustEl.first, adjustEl.second) - 
                m_metric(sel.first, adjustEl.first) - m_metric(sel.second, adjustEl.second);
         }

@@ -15,6 +15,7 @@ namespace data_structures {
 template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
+        typedef CycleEl CycleElement;
 
         template <typename Iter> SimpleCycleManager(Iter begin, Iter end) {
             if(begin == end) {
@@ -59,7 +60,8 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
         
 
         //TODO not finished
-        class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair> {
+        class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair, 
+                                    ptrdiff_t, CycleElPair *, const CycleElPair &> {
             public:
                 EdgeIterator(const SimpleCycleManager & cm, CycleEl ce ) : 
                     m_cycleManager(&cm), m_idx(m_cycleManager->toIdx(ce)), m_first(m_idx) {
@@ -79,7 +81,11 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
                 }
 
                 bool operator!=(EdgeIterator ei) const {
-                    return m_idx != ei.m_idx;
+                    return !operator==(ei);
+                }               
+                
+                bool operator==(EdgeIterator ei) const {
+                    return m_idx == ei.m_idx;
                 }               
                 
                 const CycleElPair * const operator->() const {
@@ -96,7 +102,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
                 const CycleElPair & operator*() const {
                     return m_curr;
                 }
-
+                
             private:
                 void updateCurr() {
                     m_curr.first = m_cycleManager->fromIdx(m_idx);

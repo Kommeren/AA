@@ -38,36 +38,45 @@ namespace local_search {
 
 template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> class LocalSearchStep {
     
+    typedef decltype(std::declval<Solution>().cbegin()) SolutionIterator;
+    typedef typename std::decay<decltype(*std::declval<SolutionIterator>())>::type SolutionElement;
+    typedef decltype(std::declval<NeighbourGetter>().getNeighbourhood(
+                                std::declval<Solution>(),
+                               std::declval<SolutionElement>()
+                                ).first) UpdateIterator;
+    typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
+    
 public:
     typedef LocalSearchStep<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
     LocalSearchStep(Solution & solution, const  NeighbourGetter & ng, 
             const CheckIfImprove & check, const SolutionUpdater & solutionUpdater) :
      m_solution(solution), m_neighbourGetterFunctor(ng), 
      m_checkFunctor(check), m_solutionUpdaterFunctor(solutionUpdater), m_lastSearchSucceded(false) {}
+        
 
     bool search() {
-        typedef typename std::remove_reference<decltype(*m_solution.cbegin())>::type ConstSolutionElement;
-        typedef typename std::remove_const<ConstSolutionElement>::type SolutionElement;
         m_lastSearchSucceded = false;
-//        std::cout << typeid(SolutionElement()).name() << std::endl;
 
-        auto check = std::bind(std::mem_fun(&self::checkSetsForSwap<SolutionElement>), this, std::placeholders::_1);
+        auto check = std::bind(std::mem_fun(&self::checkSetsForSwap), this, std::placeholders::_1);
         std::find_if(m_solution.cbegin(), m_solution.cend(), check);
         
         return m_lastSearchSucceded;
     }
 
 private:
-    template <typename SolutionEl> bool checkSetsForSwap(const SolutionEl & r) {
-//            auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution, r);
-//            auto findSucc = std::find_if(adjustmentSet.first, adjustmentSet.second, 
-//                    std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, r, m_solution, std::placeholders::_1)); 
- //           if(findSucc != adjustmentSet.second) {       
-  //              m_lastSearchSucceded = true;
-   //             m_solutionUpdaterFunctor.update(m_solution, r, *findSucc);
-    //        }
-//           std::bind(std::mem_fun(&CheckIfImprove::checkIfImproved), m_checkFunctor, r, m_solution, std::placeholders::_1)(*(adjustmentSet.first)); 
-            return m_lastSearchSucceded;
+    bool checkSetsForSwap(const SolutionElement & r) {
+         
+        auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution, r);
+        auto update = adjustmentSet.first;
+
+        for(;!m_lastSearchSucceded && update != adjustmentSet.second; ++update) {
+            if(m_checkFunctor.checkIfImproved(r, m_solution, *update) > 0) {
+                m_lastSearchSucceded = true;
+                m_solutionUpdaterFunctor.update(m_solution, r, *update);
+            }
+        }
+          
+        return m_lastSearchSucceded;
     }
 
     Solution & m_solution;

@@ -15,16 +15,17 @@ template <typename Graph> struct GraphMetricTraits {
 };
 
 
-template <typename Distance/*, typename Vertex*/> class MetricBase {
+template <typename DistanceTypeParam> class MetricBase {
     public:
+        typedef DistanceTypeParam DistanceType;
         MetricBase(int N) : m_matrix(boost::extents[N][N]) { }
-        template <typename Vertex> Distance operator()(const Vertex & v, const Vertex & w) {
+        template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
             return m_matrix[v][w];
         }
 
     protected:
         static const int DIM_NR = 2;
-        typedef boost::multi_array<Distance, DIM_NR> matrix_type; 
+        typedef boost::multi_array<DistanceType, DIM_NR> matrix_type; 
         matrix_type m_matrix;
 };
 
@@ -49,10 +50,10 @@ namespace metric_fillers {
 
 // GENERIC
 // GraphTypeTag could be sparse, dense, large ...
-template <typename Graph, typename Distance/*, typename VertexType*/, 
+template <typename Graph, typename DistanceType/*, typename VertexType*/, 
           typename GraphFiller = metric_fillers::GraphMericFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag > > 
-    class  GraphMetric : public MetricBase</*typename property_traits<DistancePropertyMap>::value_type*/Distance>, public GraphFiller {
-          typedef   MetricBase<Distance/*, typename boost::graph_traits<Graph>::vertex_descriptor*/> GMBase;
+    class  GraphMetric : public MetricBase</*typename property_traits<DistanceTypePropertyMap>::value_type*/DistanceType>, public GraphFiller {
+          typedef   MetricBase<DistanceType/*, typename boost::graph_traits<Graph>::vertex_descriptor*/> GMBase;
 
         public:
             GraphMetric(const Graph & g)  
