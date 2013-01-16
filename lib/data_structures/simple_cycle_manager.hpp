@@ -71,13 +71,15 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
                 
                 EdgeIterator() : m_cycleManager(NULL) ,m_idx(-1) {}
 
-                void operator++(){
+                EdgeIterator & operator++(){
                     m_idx = nextIdx(m_idx);
                     updateCurr();
 
                     if(m_idx == m_first) {
                         m_idx = -1;    
                     }
+
+                    return *this;
                 }
 
                 bool operator!=(EdgeIterator ei) const {

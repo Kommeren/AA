@@ -21,10 +21,10 @@ template <typename VertexType,
           typename NeighbourGetter = TrivialNeigbourGetter>
 
          class  TwoLocalSearchStep : 
-             public LocalSearchStep<TwoLocalSearchContainer<CycleManager>, NeighbourGetter, 
+             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager>, NeighbourGetter, 
                 CheckIfImprove, TwoLocalSearchUpdater >  {
 
-                typedef LocalSearchStep<TwoLocalSearchContainer<CycleManager> , NeighbourGetter, 
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager> , NeighbourGetter, 
                     CheckIfImprove, TwoLocalSearchUpdater > LocalSearchStepT;
 
                 public:

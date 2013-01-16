@@ -33,10 +33,15 @@ namespace local_search {
  * CheckIfImprove - musi miec metode checkIfImproved bioraca dane  rozwiazanie i ulepszenie ktora sprawdza czy dzieki danemu ulepszeniu da sie poprawic aktualne rozwiazanie
  *
  * SolutionUpdater - ma metode update bioraca dane rozwiazanie i nakladajace na nie odpowiednie ulepszenie
+ *
+ * 
  */
 
 
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> class LocalSearchStep {
+class ChooseFirstBetter;
+class SteepestSlope;
+
+template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = ChooseFirstBetter> class LocalSearchStepMultiSolution {
     
     typedef decltype(std::declval<Solution>().cbegin()) SolutionIterator;
     typedef typename std::decay<decltype(*std::declval<SolutionIterator>())>::type SolutionElement;
@@ -47,12 +52,11 @@ template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, 
     typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
     
 public:
-    typedef LocalSearchStep<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
-    LocalSearchStep(Solution & solution, const  NeighbourGetter & ng, 
+    typedef LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
+    LocalSearchStepMultiSolution(Solution & solution, const  NeighbourGetter & ng, 
             const CheckIfImprove & check, const SolutionUpdater & solutionUpdater) :
      m_solution(solution), m_neighbourGetterFunctor(ng), 
      m_checkFunctor(check), m_solutionUpdaterFunctor(solutionUpdater), m_lastSearchSucceded(false) {}
-        
 
     bool search() {
         m_lastSearchSucceded = false;
@@ -67,14 +71,14 @@ private:
     bool checkSetsForSwap(const SolutionElement & r) {
          
         auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution, r);
-        auto update = adjustmentSet.first;
 
-        for(;!m_lastSearchSucceded && update != adjustmentSet.second; ++update) {
-            if(m_checkFunctor.checkIfImproved(r, m_solution, *update) > 0) {
+        std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
+            if(m_checkFunctor.checkIfImproved(r, m_solution, update) > 0) {
                 m_lastSearchSucceded = true;
-                m_solutionUpdaterFunctor.update(m_solution, r, *update);
+                m_solutionUpdaterFunctor.update(m_solution, r, update);
             }
-        }
+            return m_lastSearchSucceded;
+        });
           
         return m_lastSearchSucceded;
     }
@@ -84,6 +88,10 @@ private:
     CheckIfImprove m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
     bool m_lastSearchSucceded;
+};
+
+template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> class LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater, SteepestSlope> {
+    //TODO implement
 };
 
 } // local_search

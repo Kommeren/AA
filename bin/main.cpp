@@ -11,7 +11,7 @@
 
 #include "local_search/2_local_search/2_local_search.hpp"
 #include "data_structures/graph_metrics.hpp"
-#include "simple_algo/cycle_length.hpp"
+#include "simple_algo/cycle_algo.hpp"
 
 std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;
@@ -109,19 +109,19 @@ int main() {
     std::vector<int> ver = {A, B, C, D, E};
 
     std::random_shuffle(ver.begin(), ver.end());
+    std::random_shuffle(ver.begin(), ver.end());
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
     TwoLocalSearchStep<int, GraphMT> ls(ver, gm);
     auto const & cman = ls.getCycle();
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
+    simple_algo::print(cman, std::cout);
     ls.search();
-    auto range = cman.getEdgeRange();
-    for(;range.first != range.second; ++range.first) {
-        std::cout << *range.first << " : ";
-    }
+    simple_algo::print(cman, std::cout);
     std::cout << std::endl;
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
     std::cout << "Wynik: " <<  ls.search() << std::endl;
+    simple_algo::print(cman, std::cout);
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
 //    typename GraphMT::DistanceType d;
 }
