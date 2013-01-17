@@ -21,8 +21,8 @@ template <typename VertexType,
           typename NeighbourGetter = TrivialNeigbourGetter>
 
          class  TwoLocalSearchStep : 
-             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager>, NeighbourGetter, 
-                CheckIfImprove, TwoLocalSearchUpdater >  {
+             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager>, 
+                        NeighbourGetter, CheckIfImprove, TwoLocalSearchUpdater >  {
 
                 typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager> , NeighbourGetter, 
                     CheckIfImprove, TwoLocalSearchUpdater > LocalSearchStepT;
@@ -30,12 +30,12 @@ template <typename VertexType,
                 public:
 
                     //TODO INAPPROPRIATE ORDER  could be invalid
-                    template <typename Solution>  
-                     TwoLocalSearchStep(Solution & sol, Metric & m
+                    template <typename SolutionIter>  
+                     TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, Metric & m
                              , NeighbourGetter ng = NeighbourGetter()) 
                         :      LocalSearchStepT(m_cycleAdapter, ng, 
                                  CheckIfImprove(m), TwoLocalSearchUpdater()),
-                                m_cycleManager(sol.begin(), sol.end()),
+                                m_cycleManager(solBegin, solEnd),
                                 m_cycleAdapter(m_cycleManager) {}
 
                     CycleManager & getCycle() {

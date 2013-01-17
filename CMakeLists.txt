@@ -24,11 +24,15 @@ include_directories(${Boost_INCLUDE_DIRS})
 link_directories(${Boost_LIBRARY_DIRS})
 
 include_directories (${SOURCE_DIR})
+include_directories (${TEST_DIR})
+
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 #include_directories (${BOOST_DIR})
 
 add_executable (main  ${BIN_DIR}/main.cpp)
-add_executable (test  ${TEST_DIR}/cycle_manager_test.cpp)
+add_executable (test_cycle  ${TEST_DIR}/cycle_manager_test.cpp)
+add_executable (test_2_local_search  ${TEST_DIR}/2_local_search/2_local_search_long_tests.cpp)
 # Link the executable to the Hello library.
 target_link_libraries (main) 
-target_link_libraries (test ${Boost_LIBRARIES}) 
+target_link_libraries (test_cycle ${Boost_LIBRARIES}) 
+target_link_libraries (test_2_local_search ${Boost_LIBRARIES}) 

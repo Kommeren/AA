@@ -42,16 +42,6 @@ void fn(std::vector<int> v,  std::pair<int, int> i) {
     XXX bi;
     boost::filter_iterator<XXX, typename  CM::EdgeIterator >   ou(bi, begin, end ) ;
     *ou;
-    
-    
-//    std::vector<> cm(v.begin(), v.end());
-
- /*   typename  CM::EdgeIterator  begin, end;
-    std::cout << typeid(*begin).name() << std::endl;
-    tie(begin, end) = cm.getEdgeRange();
-
-    XXX bi;
-    boost::filter_iterator<XXX, typename  CM::EdgeIterator >   ou(bi, begin, end ) ;*/
 }
 
 int main() {
@@ -112,7 +102,7 @@ int main() {
     std::random_shuffle(ver.begin(), ver.end());
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
-    TwoLocalSearchStep<int, GraphMT> ls(ver, gm);
+    TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), gm);
     auto const & cman = ls.getCycle();
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
     simple_algo::print(cman, std::cout);
