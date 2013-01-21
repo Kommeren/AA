@@ -2,7 +2,7 @@
 #ifndef __SIMPLE_CYCLE_MANAGER__
 #define __SIMPLE_CYCLE_MANAGER__
 
-#include <assert.h>
+#include <cassert>
 #include <map>
 #include <vector>
 #include <iterator>
@@ -12,12 +12,12 @@ namespace data_structures {
 
 
 //TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
-template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
+template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
         typedef CycleEl CycleElement;
 
-        template <typename Iter> SimpleCycleManager(Iter begin, Iter end) {
+        template <typename Iter> SimpleCycleImpl(Iter begin, Iter end) {
             if(begin == end) {
                 return;
             }
@@ -61,7 +61,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
         class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair, 
                                     ptrdiff_t, CycleElPair *, const CycleElPair &> {
             public:
-                EdgeIterator(const SimpleCycleManager & cm, CycleEl ce ) : 
+                EdgeIterator(const SimpleCycleImpl & cm, CycleEl ce ) : 
                     m_cycleManager(&cm), m_idx(m_cycleManager->toIdx(ce)), m_first(m_idx) {
 
                     updateCurr();
@@ -119,7 +119,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
                     return m_cycleManager->nextIdx(i);
                 }
 
-                const SimpleCycleManager * m_cycleManager;
+                const SimpleCycleImpl * m_cycleManager;
                 IdxT m_idx;
                 IdxT m_first;
                 CycleElPair m_curr;
@@ -191,6 +191,14 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
         SorsMap m_predecessorMap;
         SorsMap m_successorMap;
 };
+
+template <typename CycleEl> class  SimpleCycle : 
+    public SimpleCycleImpl<CycleEl> {
+        public:
+//        using SimpleCycleImpl<CycleEl>::SimpleCycleImpl;
+        template <typename Iter> SimpleCycle(Iter begin, Iter end) : SimpleCycleImpl<CycleEl>(begin, end) {}
+};
+
 
 
 } //data_structures

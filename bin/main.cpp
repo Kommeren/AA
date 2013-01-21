@@ -31,7 +31,7 @@ struct XXX {
 
 void fn(std::vector<int> v,  std::pair<int, int> i) {
     typedef std::pair<int, int> SolutionElement;
-    typedef data_structures::SimpleCycleManager<int> CM;
+    typedef data_structures::SimpleCycle<int> CM;
     CM cm(v.begin(), v.end());
 
     typename  CM::EdgeIterator  begin, end;
@@ -54,7 +54,7 @@ int main() {
     std::cout << "t1" << std::endl << std::flush;
     std::copy(vExl.first, vExl.second, std::ostream_iterator<int>(std::cout, "\n"));
 
-    SimpleCycleManager<int> cm(vExl.first, vExl.second);
+    SimpleCycle<int> cm(vExl.first, vExl.second);
     auto r = cm.getEdgeRange(2);
     for(;r.first != r.second; ++r.first) {
         std::cout << *r.first << std::endl;

@@ -18,13 +18,13 @@ struct T {
 
 class CheckSize {
 public:
-    CheckSize(SimpleCycleManager<string> cm, size_t size) : m_cm(cm), m_size(size) {}
+    CheckSize(SimpleCycle<string> cm, size_t size) : m_cm(cm), m_size(size) {}
     void operator()(const string & s) {
         auto r = m_cm.getEdgeRange(s);    
         BOOST_CHECK_EQUAL(m_size, size_t(std::distance(r.first, r.second)));        
     }
 private:
-    SimpleCycleManager<string> m_cm;
+    SimpleCycle<string> m_cm;
     size_t m_size;
 
 };
@@ -33,7 +33,7 @@ class CheckAllSizes : public T {
     public:
         CheckAllSizes(iter begin) : m_begin(begin)  {}
         void operator()(iter end) {
-            SimpleCycleManager<string> cm(m_begin, end);
+            SimpleCycle<string> cm(m_begin, end);
             std::for_each(m_begin, end, CheckSize(cm, end - m_begin));
         }
 
@@ -60,7 +60,7 @@ template <typename I1, typename I2> bool vecEquals(I1 b1, I1 e1, I2 b2, I2 e2) {
 
 template <typename El, typename Sol> 
 void checkSwap(T::iter b, T::iter e, const El & p1, const  El & p2, const El & start, const Sol & sol) {
-    SimpleCycleManager<string> cm(b, e);
+    SimpleCycle<string> cm(b, e);
     cm.flip(p1, p2);
     auto r = cm.getEdgeRange(start);
     BOOST_CHECK(vecEquals(sol.begin(), sol.end(), r.first, r.second));

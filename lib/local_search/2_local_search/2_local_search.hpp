@@ -13,19 +13,20 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-
 template <typename VertexType, 
           typename Metric, 
           typename NeighbourGetter = TrivialNeigbourGetter,
-          template <class> CheckIfImprove = CheckIfImprove2Opt,
-          template <class> Cycle = data_structures::SimpleCycle>
+          template <class> class CheckIfImprove = CheckIfImprove2Opt,
+          template <class> class Cycle = data_structures::SimpleCycle>
 
          class  TwoLocalSearchStep : 
-             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
-                        NeighbourGetter, CheckIfImprove, TwoLocalSearchUpdater >  {
+             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle<VertexType>>, 
+                        NeighbourGetter, CheckIfImprove<Metric>, TwoLocalSearchUpdater >  {
 
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighbourGetter, 
-                    CheckIfImprove, TwoLocalSearchUpdater > LocalSearchStepT;
+               
+                typedef Cycle<VertexType> CycleT;
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleT> , NeighbourGetter, 
+                    CheckIfImprove<Metric>, TwoLocalSearchUpdater > LocalSearchStepT;
 
                 public:
 
@@ -38,13 +39,13 @@ template <typename VertexType,
                                 m_cycleManager(solBegin, solEnd),
                                 m_cycleAdapter(m_cycleManager) {}
 
-                    Cycle & getCycle() {
+                    CycleT & getCycle() {
                         return m_cycleManager;
                     }
 
                 private:
-                    Cycle<VertexType>  m_cycleManager;
-                    TwoLocalSearchContainer<Cycle> m_cycleAdapter;
+                    CycleT m_cycleManager;
+                    TwoLocalSearchContainer<CycleT> m_cycleAdapter;
              };
 
 } //two_local_search
