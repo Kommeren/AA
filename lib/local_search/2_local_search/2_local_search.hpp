@@ -16,35 +16,35 @@ namespace two_local_search {
 
 template <typename VertexType, 
           typename Metric, 
-          typename CheckIfImprove = CheckIfImprove2Opt<Metric> ,
-          typename CycleManager = data_structures::SimpleCycleManager<VertexType>,
-          typename NeighbourGetter = TrivialNeigbourGetter>
+          typename NeighbourGetter = TrivialNeigbourGetter,
+          template <class> CheckIfImprove = CheckIfImprove2Opt,
+          template <class> Cycle = data_structures::SimpleCycle>
 
          class  TwoLocalSearchStep : 
-             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager>, 
+             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
                         NeighbourGetter, CheckIfImprove, TwoLocalSearchUpdater >  {
 
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleManager> , NeighbourGetter, 
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighbourGetter, 
                     CheckIfImprove, TwoLocalSearchUpdater > LocalSearchStepT;
 
                 public:
 
-                    //TODO INAPPROPRIATE ORDER  could be invalid
+                    //TODO CHECK INAPPROPRIATE ORDER  could be invalid
                     template <typename SolutionIter>  
                      TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, Metric & m
                              , NeighbourGetter ng = NeighbourGetter()) 
                         :      LocalSearchStepT(m_cycleAdapter, ng, 
-                                 CheckIfImprove(m), TwoLocalSearchUpdater()),
+                                 CheckIfImprove<Metric>(m), TwoLocalSearchUpdater()),
                                 m_cycleManager(solBegin, solEnd),
                                 m_cycleAdapter(m_cycleManager) {}
 
-                    CycleManager & getCycle() {
+                    Cycle & getCycle() {
                         return m_cycleManager;
                     }
 
                 private:
-                    CycleManager  m_cycleManager;
-                    TwoLocalSearchContainer<CycleManager> m_cycleAdapter;
+                    Cycle<VertexType>  m_cycleManager;
+                    TwoLocalSearchContainer<Cycle> m_cycleAdapter;
              };
 
 } //two_local_search

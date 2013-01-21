@@ -58,8 +58,6 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
             return fromIdx(nextIdx(toIdx(ce)));
         }
         
-
-        //TODO not finished
         class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair, 
                                     ptrdiff_t, CycleElPair *, const CycleElPair &> {
             public:
@@ -80,6 +78,12 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleManager {
                     }
 
                     return *this;
+                }
+                
+                EdgeIterator operator++(int){
+                    EdgeIterator i(*this);
+                    operator++();
+                    return i;
                 }
 
                 bool operator!=(EdgeIterator ei) const {

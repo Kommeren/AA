@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "local_search_concepts.hpp"
+
 namespace paal {
 namespace local_search {
 
@@ -37,20 +39,24 @@ namespace local_search {
  * 
  */
 
+namespace search_startegies {
+    class ChooseFirstBetter;
+    class SteepestSlope;
+}
 
-class ChooseFirstBetter;
-class SteepestSlope;
-
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = ChooseFirstBetter> 
+template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = search_startegies::ChooseFirstBetter> 
     class LocalSearchStepMultiSolution {
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighbourGetter<NeighbourGetter, Solution>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiCheckIfImprove<CheckIfImprove, Solution, NeighbourGetter>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolutionUpdater<SolutionUpdater, Solution, NeighbourGetter>));
+      static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
+                    std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
     
-    typedef decltype(std::declval<Solution>().cbegin()) SolutionIterator;
-    typedef typename std::decay<decltype(*std::declval<SolutionIterator>())>::type SolutionElement;
-    typedef decltype(std::declval<NeighbourGetter>().getNeighbourhood(
-                                std::declval<Solution>(),
-                               std::declval<SolutionElement>()
-                                ).first) UpdateIterator;
-    typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
+    typedef typename local_search_concepts::
+        MultiSolution<Solution>::Element SolutionElement;
+    typedef typename local_search_concepts::
+        MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement UpdateElement;
     
 public:
     typedef LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
@@ -62,19 +68,19 @@ public:
     bool search() {
         m_lastSearchSucceded = false;
 
-        auto check = std::bind(std::mem_fun(&self::checkSetsForSwap), this, std::placeholders::_1);
+        auto check = std::bind(std::mem_fun(&self::checkForUpdate), this, std::placeholders::_1);
         std::find_if(m_solution.cbegin(), m_solution.cend(), check);
         
         return m_lastSearchSucceded;
     }
 
 private:
-    bool checkSetsForSwap(const SolutionElement & r) {
+    bool checkForUpdate(const SolutionElement & r) {
          
         auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution, r);
 
         std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
-            if(m_checkFunctor.checkIfImproved(r, m_solution, update) > 0) {
+            if(m_checkFunctor.checkIfImproved(m_solution, r, update) > 0) {
                 m_lastSearchSucceded = true;
                 m_solutionUpdaterFunctor.update(m_solution, r, update);
             }
@@ -91,7 +97,8 @@ private:
     bool m_lastSearchSucceded;
 };
 
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> class LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater, SteepestSlope> {
+template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> 
+class LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater, search_startegies::SteepestSlope> {
     //TODO implement
 };
 
