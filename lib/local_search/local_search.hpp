@@ -41,7 +41,8 @@ namespace local_search {
 class ChooseFirstBetter;
 class SteepestSlope;
 
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = ChooseFirstBetter> class LocalSearchStepMultiSolution {
+template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = ChooseFirstBetter> 
+    class LocalSearchStepMultiSolution {
     
     typedef decltype(std::declval<Solution>().cbegin()) SolutionIterator;
     typedef typename std::decay<decltype(*std::declval<SolutionIterator>())>::type SolutionElement;
