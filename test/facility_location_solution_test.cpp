@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "local_search/facility_location/facility_location_solution.hpp"
+#include "utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
 
@@ -28,4 +29,19 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     BOOST_CHECK(uch.find(1) != uch.end());
     BOOST_CHECK(uch.find(4) != uch.end());
     BOOST_CHECK(uch.find(5) != uch.end());
+}
+
+
+BOOST_AUTO_TEST_CASE(FacilityLocationSolutionWithClientAssignmentsTest) {
+    typedef SampleGraphsMetrics SGM;
+    auto gm = SGM::getGraph();
+    std::vector<int> fcosts{7,8};
+    auto cost = [&](int i){ return fcosts[i];};
+
+    typedef FacilityLocationSolutionWithClientsAssignment
+        <int, decltype(gm), decltype(cost)> Sol;
+    typedef typename Sol::FacilitiesSet FSet;
+    Sol sol(FSet{}, FSet{SGM::A,SGM::B}, 
+            FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
+
 }

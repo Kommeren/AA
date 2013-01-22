@@ -59,14 +59,14 @@ class FacilityLocationSolutionWithClientsAssignment :
                                  const ClientsSet & clients,
                                  Metric & m,
                                  FacilityCost & c) :
-            base(chosen, unchosen), m_clients(clients), m_metric(m) {
+            base(chosen, unchosen), m_clients(clients), m_metric(m), m_facCosts(c) {
                 for(VertexType f : m_chosenFacilities) {
                     addFacility(f);
                 }
             }
 
         Dist dist(VertexType v) {
-            return m_metric(v, m_clientsToFac[v]);
+            return m_metric(v, clientToFac(v));
         }
         
         Dist addFacility(VertexType f) {
@@ -94,6 +94,12 @@ class FacilityLocationSolutionWithClientsAssignment :
 
     private:
 
+        VertexType clientToFac(VertexType v) const {
+            auto i = m_clientsToFac.find(v);
+            assert(i != m_clientsToFac.end());
+            return i->first;
+        }
+
         template <typename Filter> Dist adjustClient(VertexType v, Filter filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d;
@@ -112,13 +118,14 @@ class FacilityLocationSolutionWithClientsAssignment :
 
         void assign(VertexType v, VertexType f) {
             auto prev = m_clientsToFac[v];
-            m_clientsToFac[v] = f;
-            m_facToClients.insert(std::make_pair(f, v));
-            m_facToClients.erase(std::make_pair(f, prev));
+            m_facToClients.erase(prev);
+            m_clientsToFac[v] = 
+                m_facToClients.insert(std::make_pair(f, v));
         }
 
-        typedef std::map<VertexType, VertexType>      ClientsToFacilities;
         typedef std::multimap<VertexType, VertexType> FacilitiesToClients;
+        typedef std::map<VertexType, 
+                typename FacilitiesToClients::iterator> ClientsToFacilities;
         
         ClientsToFacilities m_clientsToFac;
         FacilitiesToClients m_facToClients;
