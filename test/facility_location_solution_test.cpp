@@ -41,7 +41,13 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionWithClientAssignmentsTest) {
     typedef FacilityLocationSolutionWithClientsAssignment
         <int, decltype(gm), decltype(cost)> Sol;
     typedef typename Sol::FacilitiesSet FSet;
-    Sol sol(FSet{}, FSet{SGM::A,SGM::B}, 
+    Sol sol(FSet{SGM::A,SGM::B}, FSet{},
             FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
+
+    std::cout << "A " << sol.addFacility(SGM::A) << std::endl;
+    std::cout << "A + B "<< sol.addFacility(SGM::B) << std::endl;
+    std::cout << "B "<< sol.remFacility(SGM::A) << std::endl;
+    std::cout << "A + B "<< sol.addFacility(SGM::A) << std::endl;
+    std::cout << "B "<< sol.remFacility(SGM::B) << std::endl;
 
 }

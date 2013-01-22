@@ -54,12 +54,13 @@ class FacilityLocationSolutionWithClientsAssignment :
         using base::m_chosenFacilities;
         using base::m_unchosenFacilities;
 
-        FacilityLocationSolutionWithClientsAssignment(const FacilitiesSet & chosen, 
+        FacilityLocationSolutionWithClientsAssignment(
                                  const FacilitiesSet & unchosen,
+                                 const FacilitiesSet & chosen, 
                                  const ClientsSet & clients,
                                  Metric & m,
                                  FacilityCost & c) :
-            base(chosen, unchosen), m_clients(clients), m_metric(m), m_facCosts(c) {
+            base(unchosen, chosen), m_clients(clients), m_metric(m), m_facCosts(c) {
                 for(VertexType f : m_chosenFacilities) {
                     addFacility(f);
                 }
@@ -68,39 +69,55 @@ class FacilityLocationSolutionWithClientsAssignment :
         Dist dist(VertexType v) {
             return m_metric(v, clientToFac(v));
         }
-        
+       
+        // returns diff between new cost and old cost
         Dist addFacility(VertexType f) {
             Dist cost = m_facCosts(f);
             base::add(f);
-            for(VertexType v: m_clients) {
-                Dist d = m_metric(v,f) - dist(v);
-                if(d < 0) {
-                    cost += d;
-                    assign(v,f);
+           
+            //first facility
+            if(m_chosenFacilities.size() == 1) {
+                m_clientsToFac.clear();
+                m_facToClients.clear();
+                for(VertexType v : m_clients) {
+                    m_clientsToFac[v] = 
+                        m_facToClients.insert(std::make_pair(f, v));
+                    cost += m_metric(v,f); 
+                }
+                
+                //could be too tricky
+                cost = -cost;
+                
+            } else {
+                for(VertexType v: m_clients) {
+                    Dist d = m_metric(v,f) - dist(v);
+                    if(d < 0) {
+                        cost += d;
+                        assign(v,f);
+                    }
                 }
             }
             return cost;
         }
         
+        // returns diff between new cost and old cost
         Dist remFacility(VertexType f) {
-            Dist cost = -_facCosts(f);
-            std::for_each(m_facToClients.lower_bound(f), m_facToClients.upper_bound(f), [&](VertexType v) {
-                cost += m_facCosts(v);
-                cost -= adjustClient(v,std::bind(std::not_equal_to<VertexType>(), f, std::placeholders::_1));
+            Dist cost = -m_facCosts(f);
+            auto op = std::bind(std::not_equal_to<VertexType>(), f, std::placeholders::_1);
+            std::for_each(m_facToClients.lower_bound(f), m_facToClients.upper_bound(f), [&](const std::pair<VertexType,VertexType> & v) {
+                    std::cout << "d " << cost << " "<< f << std::endl;
+                cost -= this->dist(v.second);
+                    std::cout << "d1 " << cost << std::endl;
+                cost += this->adjustClient(v.second, op);
+                    std::cout << "d2 " << cost << std::endl;
             });
             base::remove(f);
             return cost;
         }
 
     private:
-
-        VertexType clientToFac(VertexType v) const {
-            auto i = m_clientsToFac.find(v);
-            assert(i != m_clientsToFac.end());
-            return i->first;
-        }
-
-        template <typename Filter> Dist adjustClient(VertexType v, Filter filter = [](VertexType v){return true;}) {
+        
+        Dist adjustClient(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d;
             for(VertexType f : m_chosenFacilities) {
@@ -114,6 +131,12 @@ class FacilityLocationSolutionWithClientsAssignment :
             }
             assert(!init);
             return d; 
+        }
+
+        VertexType clientToFac(VertexType v) const {
+            auto i = m_clientsToFac.find(v);
+            assert(i != m_clientsToFac.end());
+            return i->first;
         }
 
         void assign(VertexType v, VertexType f) {
