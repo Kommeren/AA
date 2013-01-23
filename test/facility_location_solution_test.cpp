@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE cycle_manager
 
 #include <boost/test/unit_test.hpp>
-#include "local_search/facility_location/facility_location_solution.hpp"
+#include "data_structures/facility_location_solution.hpp"
 #include "utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
