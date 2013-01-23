@@ -66,9 +66,6 @@ class FacilityLocationSolutionWithClientsAssignment :
                 }
             }
 
-        Dist dist(VertexType v) {
-            return m_metric(v, clientToFac(v));
-        }
        
         // returns diff between new cost and old cost
         Dist addFacility(VertexType f) {
@@ -104,29 +101,34 @@ class FacilityLocationSolutionWithClientsAssignment :
         Dist remFacility(VertexType f) {
             Dist cost = -m_facCosts(f);
             auto op = std::bind(std::not_equal_to<VertexType>(), f, std::placeholders::_1);
-            std::for_each(m_facToClients.lower_bound(f), m_facToClients.upper_bound(f), [&](const std::pair<VertexType,VertexType> & v) {
-                    std::cout << "d " << cost << " "<< f << std::endl;
-                cost -= this->dist(v.second);
-                    std::cout << "d1 " << cost << std::endl;
-                cost += this->adjustClient(v.second, op);
-                    std::cout << "d2 " << cost << std::endl;
-            });
+            auto begin = m_facToClients.lower_bound(f);
+            auto end = m_facToClients.upper_bound(f);
+            for(;begin != end; ) {
+                auto v = begin->second;
+                //using the fact that this is a map 
+                //(with other containers you have to be carefull cause of iter invalidation)
+                ++begin;
+                cost -= dist(v);
+                cost += adjustClient(v, op);
+            }
             base::remove(f);
             return cost;
         }
 
     private:
         
+        Dist dist(VertexType v) {
+            return m_metric(v, clientToFac(v));
+        }
+        
         Dist adjustClient(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d;
             for(VertexType f : m_chosenFacilities) {
-                if(filter(f)) {
-                    if(init || m_metric(v,f) < d) {
-                        assign(v,f);
-                        d = m_metric(v,f);
-                        init = false;
-                    }
+                if(filter(f) &&  (init || m_metric(v,f) < d)) {
+                    assign(v,f);
+                    d = m_metric(v,f);
+                    init = false;
                 }
             }
             assert(!init);
@@ -136,7 +138,7 @@ class FacilityLocationSolutionWithClientsAssignment :
         VertexType clientToFac(VertexType v) const {
             auto i = m_clientsToFac.find(v);
             assert(i != m_clientsToFac.end());
-            return i->first;
+            return i->second->first;
         }
 
         void assign(VertexType v, VertexType f) {

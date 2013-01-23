@@ -44,10 +44,18 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionWithClientAssignmentsTest) {
     Sol sol(FSet{SGM::A,SGM::B}, FSet{},
             FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
 
-    std::cout << "A " << sol.addFacility(SGM::A) << std::endl;
-    std::cout << "A + B "<< sol.addFacility(SGM::B) << std::endl;
-    std::cout << "B "<< sol.remFacility(SGM::A) << std::endl;
-    std::cout << "A + B "<< sol.addFacility(SGM::A) << std::endl;
-    std::cout << "B "<< sol.remFacility(SGM::B) << std::endl;
+/*    for(int i : {SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}) {
+        std::cout << i << "," << gm(int(SGM::A), i) << std::endl;
+    }
+    
+    for(int i : {SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}) {
+        std::cout << i << "," << gm(int(SGM::B), i) << std::endl;
+    }*/
+
+    sol.addFacility(SGM::A);
+    auto ab_min_a = sol.addFacility(SGM::B);
+    auto b_min_ab = sol.remFacility(SGM::A);
+    BOOST_CHECK_EQUAL(sol.addFacility(SGM::A), -b_min_ab );
+    BOOST_CHECK_EQUAL(sol.remFacility(SGM::B), -ab_min_a);
 
 }
