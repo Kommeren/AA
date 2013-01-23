@@ -27,16 +27,26 @@ include_directories (${SOURCE_DIR})
 include_directories (${TEST_DIR})
 
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
-#include_directories (${BOOST_DIR})
+
+file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
+
+message(${test_bins})
 
 add_executable (main  ${BIN_DIR}/main.cpp)
-add_executable (test_cycle  ${TEST_DIR}/cycle_manager_test.cpp)
-add_executable (test_fcs  ${TEST_DIR}/facility_location_solution_test.cpp)
-add_executable (test_2_local_search  ${TEST_DIR}/2_local_search/2_local_search_long_tests.cpp)
-add_executable (test_metric  ${TEST_DIR}/metric_test.cpp)
-# Link the executable to the Hello library.
 target_link_libraries (main) 
-target_link_libraries (test_cycle ${Boost_LIBRARIES}) 
-target_link_libraries (test_fcs ${Boost_LIBRARIES}) 
-target_link_libraries (test_2_local_search ${Boost_LIBRARIES}) 
-target_link_libraries (test_metric ${Boost_LIBRARIES}) 
+
+foreach(t ${test_bins})
+    get_filename_component(n ${t} NAME_WE)
+    message("adding test file" : ${n})
+    add_executable(${n} ${t})
+    target_link_libraries (${n} ${Boost_LIBRARIES}) 
+endforeach()
+#add_executable (test_cycle  ${TEST_DIR}/cycle_manager_test.cpp)
+#add_executable (test_fcs  ${TEST_DIR}/facility_location_solution_test.cpp)
+#add_executable (test_2_local_search  ${TEST_DIR}/2_local_search/2_local_search_long_tests.cpp)
+#add_executable (test_metric  ${TEST_DIR}/metric_test.cpp)
+
+#target_link_libraries (test_cycle ${Boost_LIBRARIES}) 
+#target_link_libraries (test_fcs ${Boost_LIBRARIES}) 
+#target_link_libraries (test_2_local_search ${Boost_LIBRARIES}) 
+#target_link_libraries (test_metric ${Boost_LIBRARIES}) 

@@ -1,11 +1,13 @@
 #include <set>
+#include "facility_location_update_element.hpp"
+#include "facility_location_solution.hpp"
 
 namespace paal {
 namespace local_search {
 namespace facility_location {
     
 
-template <typename VertexType,
+/*template <typename VertexType,
          typename Metric, 
          typename FacilityCosts,
           typename NeighbourGetter = TrivialNeigbourGetter,
@@ -23,7 +25,7 @@ class FacilityLocationLocalSearch : public LocalSearchStepMultiSolution<TwoLocal
 
 
 
-};
+};*/
 
 };
 };
