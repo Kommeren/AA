@@ -11,7 +11,11 @@
 
 #include "local_search/2_local_search/2_local_search.hpp"
 #include "data_structures/graph_metrics.hpp"
+#include "data_structures/facility_location_solution.hpp"
 #include "simple_algo/cycle_algo.hpp"
+#include "local_search/facility_location/facility_location_solution_adapter.hpp"
+#include "local_search/facility_location/facility_location_neighbour_getter.hpp"
+#include <boost/iterator/transform_iterator.hpp>
 
 std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;
@@ -114,4 +118,21 @@ int main() {
     simple_algo::print(cman, std::cout);
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
 //    typename GraphMT::DistanceType d;
+    std::vector<int> fcosts{7,8};
+    auto cost = [&](int i){ return fcosts[i];};
+    typedef FacilityLocationSolutionWithClientsAssignment
+        <int, decltype(gm), decltype(cost)> Sol;
+    typedef typename Sol::FacilitiesSet FSet;
+    Sol sol(FSet{A,B}, FSet{},
+            FSet{A,B,C,D,E}, gm, cost);
+
+    FacilityLocationSolutionAdapter<Sol> sa(sol);
+    sa.cbegin();
+    auto transformChosen = [](int v){ return std::make_pair(v,1);};
+    auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
+    auto transformChosen2 = [](int v){ return std::make_pair(v,1);};
+    std::cout<< typeid(transformUnchosen).name() << std::endl;
+    std::cout<< typeid(transformChosen).name() << std::endl;
+    std::cout<< typeid(transformChosen2).name() << std::endl;
+
 }

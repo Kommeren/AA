@@ -4,7 +4,7 @@
 #include "data_structures/facility_location_solution.hpp"
 #include "utils/sample_graph.hpp"
 
-using namespace paal::local_search::facility_location;
+using namespace paal::data_structures;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     typedef FacilityLocationSolution<int> FCS;

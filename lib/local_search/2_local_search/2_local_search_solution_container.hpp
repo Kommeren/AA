@@ -6,25 +6,25 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template < typename CycleManager> class TwoLocalSearchContainer  {
+template < typename Cycle> class TwoLocalSearchContainer  {
     public:
-        typedef typename CycleManager::EdgeIterator Iterator;
-        TwoLocalSearchContainer(CycleManager & cm) : m_cycleManager(cm) {}
+        typedef typename Cycle::EdgeIterator Iterator;
+        TwoLocalSearchContainer(Cycle & cm) : m_cycle(cm) {}
 
         Iterator cbegin() const {
-            return m_cycleManager.getEdgeRange().first;
+            return m_cycle.getEdgeRange().first;
         }
         
         Iterator cend() const {
-            return m_cycleManager.getEdgeRange().second;
+            return m_cycle.getEdgeRange().second;
         }
 
-        CycleManager & getCycleManager() {
-            return m_cycleManager;
+        Cycle & getCycle() {
+            return m_cycle;
         }
     private:
 
-        CycleManager & m_cycleManager;
+        Cycle & m_cycle;
 };
 
 

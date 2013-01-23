@@ -1,5 +1,6 @@
 #include <set>
 #include "facility_location_update_element.hpp"
+#include "facility_location_solution_adapter.hpp"
 #include "data_structures/facility_location_solution.hpp"
 
 namespace paal {
