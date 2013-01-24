@@ -1,3 +1,11 @@
+#ifndef __FC_SOLUTION_ELEMENT__
+#define __FC_SOLUTION_ELEMENT__
+
+
+namespace paal {
+namespace local_search {
+namespace facility_location {
+
 enum is_chosen { CHOSEN, UNCHOSEN};
 
 template <typename T> class SolutionElement {
@@ -17,3 +25,10 @@ private:
     T m_elem;    
 };
 
+
+}
+}
+}
+
+
+#endif //__FC_SOLUTION_ELEMENT__

@@ -16,6 +16,7 @@
 #include "local_search/facility_location/facility_location_solution_adapter.hpp"
 #include "local_search/facility_location/facility_location_neighbour_getter.hpp"
 #include <boost/iterator/transform_iterator.hpp>
+#include "helpers/type_functions.hpp"
 
 std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;
@@ -23,6 +24,7 @@ std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
 
 using namespace paal;
 using namespace paal::local_search;
+using namespace paal::local_search::facility_location;
 using namespace paal::local_search::two_local_search;
 using namespace paal::data_structures;
 using namespace boost;
@@ -128,11 +130,26 @@ int main() {
 
     FacilityLocationSolutionAdapter<Sol> sa(sol);
     sa.cbegin();
+    FacilityLocationNeighbourGetter<int> FLNG;
+    FLNG.getNeighbourhood(sa, SolutionElement<int>(CHOSEN, A));
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
     auto transformChosen2 = [](int v){ return std::make_pair(v,1);};
     std::cout<< typeid(transformUnchosen).name() << std::endl;
     std::cout<< typeid(transformChosen).name() << std::endl;
     std::cout<< typeid(transformChosen2).name() << std::endl;
+
+    typedef typename SolToElem<const std::set<int>>::type t;
+    std::set<int> set;
+    typedef typename IterToElem<decltype(set.begin())>::type T;
+    typedef typename IterToElem<decltype(std::declval<std::set<int>>().begin())>::type type; 
+    bool has = has_begin<const std::set<int>>::value;
+    std::cout<< has << std::endl;
+
+//    static char f(check<R (C::*)(), &C::begin>*);
+    std::cout << typeid(&std::set<int>::begin).name() << std::endl;
+    typedef decltype(std::declval<std::set<int>>().begin()) Ret;
+    Ret(std::set<int>::*f)() const;
+    std::cout << typeid(f).name() << std::endl;
 
 }

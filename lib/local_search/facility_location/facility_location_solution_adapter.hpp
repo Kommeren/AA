@@ -1,7 +1,12 @@
 #include "facility_location_solution_element.hpp"
+#include "helpers/type_functions.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>
+
+namespace paal {
+namespace local_search {
+namespace facility_location {
 
 template <typename FacilityLocationSolution> class FacilityLocationSolutionAdapter {
 public:
@@ -9,8 +14,10 @@ public:
 
     typedef typename FacilityLocationSolution::VertexType VertexType;
     typedef SolutionElement<VertexType> SolElemT;
-    typedef decltype(std::declval<FacilityLocationSolution>().getChosenFacilities().begin()) ChosenIter;
-    typedef decltype(std::declval<FacilityLocationSolution>().getUnchosenFacilities().begin()) UnchosenIter;
+    typedef decltype(std::declval<FacilityLocationSolution>().getChosenFacilities()) ChosenType;
+    typedef decltype(std::declval<FacilityLocationSolution>().getUnchosenFacilities()) UnchosenType;
+    typedef typename SolToIter<ChosenType>::type ChosenIter;
+    typedef typename SolToIter<UnchosenType>::type UnchosenIter;
     typedef std::function<SolElemT(VertexType)> TransFunct;
     typedef boost::transform_iterator<TransFunct, ChosenIter> ChosenTIter;
     typedef boost::transform_iterator<TransFunct, UnchosenIter> UnchosenTIter;
@@ -56,4 +63,10 @@ public:
 private:
     FacilityLocationSolution & m_sol;    
 };
+
+} //facility_location
+} // local_search
+} // paal
+
+
 
