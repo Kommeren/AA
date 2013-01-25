@@ -60,10 +60,11 @@ template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, 
     
 public:
     typedef LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
-    LocalSearchStepMultiSolution(Solution & solution, const  NeighbourGetter & ng, 
-            const CheckIfImprove & check, const SolutionUpdater & solutionUpdater) :
-     m_solution(solution), m_neighbourGetterFunctor(ng), 
-     m_checkFunctor(check), m_solutionUpdaterFunctor(solutionUpdater), m_lastSearchSucceded(false) {}
+
+    LocalSearchStepMultiSolution(Solution solution, NeighbourGetter ng, 
+                                 CheckIfImprove check, SolutionUpdater solutionUpdater) :
+     m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
+     m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
 
     bool search() {
         m_lastSearchSucceded = false;
@@ -90,7 +91,7 @@ private:
         return m_lastSearchSucceded;
     }
 
-    Solution & m_solution;
+    Solution m_solution;
     NeighbourGetter m_neighbourGetterFunctor;
     CheckIfImprove m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;

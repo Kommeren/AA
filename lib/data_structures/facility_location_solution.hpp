@@ -11,8 +11,8 @@ class FacilityLocationSolution {
         typedef Vertex VertexType;
         typedef std::set<Vertex> FacilitiesSet;
 
-        FacilityLocationSolution(const FacilitiesSet & unchosen, const FacilitiesSet & chosen = FacilitiesSet()) :
-            m_chosenFacilities(chosen), m_unchosenFacilities(unchosen) {}
+        FacilityLocationSolution(FacilitiesSet unchosen, FacilitiesSet chosen = FacilitiesSet()) :
+            m_chosenFacilities(std::move(chosen)), m_unchosenFacilities(std::move(unchosen)) {}
 
         const FacilitiesSet & getChosenFacilities() { 
             return m_chosenFacilities;
@@ -55,12 +55,12 @@ class FacilityLocationSolutionWithClientsAssignment :
         using base::m_unchosenFacilities;
 
         FacilityLocationSolutionWithClientsAssignment(
-                                 const FacilitiesSet & unchosen,
-                                 const FacilitiesSet & chosen, 
-                                 const ClientsSet & clients,
+                                 FacilitiesSet unchosen,
+                                 FacilitiesSet chosen, 
+                                 ClientsSet clients,
                                  Metric & m,
                                  FacilityCost & c) :
-            base(unchosen, chosen), m_clients(clients), m_metric(m), m_facCosts(c) {
+            base(std::move(unchosen), std::move(chosen)), m_clients(std::move(clients)), m_metric(m), m_facCosts(c) {
                 for(Vertex f : m_chosenFacilities) {
                     addFacility(f);
                 }

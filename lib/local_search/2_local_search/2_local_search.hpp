@@ -30,22 +30,21 @@ template <typename VertexType,
 
                 public:
 
-                    //TODO CHECK INAPPROPRIATE ORDER  could be invalid
                     template <typename SolutionIter>  
-                     TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, Metric & m
-                             , NeighbourGetter ng = NeighbourGetter()) 
-                        :      LocalSearchStepT(m_cycleAdapter, ng, 
+                     TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
+                                        Metric & m, 
+                                        NeighbourGetter && ng = NeighbourGetter()) 
+
+                        :      LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
                                  CheckIfImprove<Metric>(m), TwoLocalSearchUpdater()),
-                                m_cycleManager(solBegin, solEnd),
-                                m_cycleAdapter(m_cycleManager) {}
+                                m_cycle(solBegin, solEnd) {}
 
                     CycleT & getCycle() {
-                        return m_cycleManager;
+                        return m_cycle;
                     }
 
                 private:
-                    CycleT m_cycleManager;
-                    TwoLocalSearchContainer<CycleT> m_cycleAdapter;
+                    CycleT m_cycle;
              };
 
 } //two_local_search

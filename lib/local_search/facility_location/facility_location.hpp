@@ -5,31 +5,63 @@
 #include "facility_location_neighbour_getter.hpp"
 #include "facility_location_checker.hpp"
 #include "facility_location_updater.hpp"
+#include "local_search/local_search.hpp"
 
 namespace paal {
 namespace local_search {
 namespace facility_location {
     
 
-/*template <typename VertexType,
+template <typename VertexType,
          typename Metric, 
          typename FacilityCosts,
-          typename NeighbourGetter = TrivialNeigbourGetter,
-          template <class> class CheckIfImprove = CheckIfImprove2Opt,
-          template <class> class Cycle = data_structures::SimpleCycle>
-class FacilityLocationLocalSearch : public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle<VertexType>>, 
-        NeighbourGetter, CheckIfImprove<Metric>, TwoLocalSearchUpdater >  {
+          template <class> class NeighbourGetter = FacilityLocationNeighbourGetter,
+          template <class> class CheckIfImprove = FacilityLocationChecker,
+          template <class> class Update = FacilityLocationUpdater,
+          template <class,class,class> class FacilityLocationSolution 
+              = data_structures::FacilityLocationSolutionWithClientsAssignment>
+class FacilityLocationLocalSearchStep : 
+    public LocalSearchStepMultiSolution<
+            FacilityLocationSolutionAdapter<
+               FacilityLocationSolution<VertexType, 
+                                        Metric, 
+                                        FacilityCosts>
+                                       >, 
+            NeighbourGetter<VertexType>, 
+            CheckIfImprove<VertexType>, 
+            Update<VertexType> >  {
     
-//#            typedef LocalSearchStepMultiSolution<>
+    typedef FacilityLocationSolution<VertexType, 
+                                     Metric, 
+                                     FacilityCosts>
+                                       FLSolution;
+    
+    typedef FacilityLocationSolutionAdapter<
+               FLSolution> FLSolutionAdapter;
+    
+    typedef LocalSearchStepMultiSolution<
+            FLSolutionAdapter,
+            NeighbourGetter<VertexType>, 
+            CheckIfImprove<VertexType>, 
+            Update<VertexType> >  base;
 
-            FacilityLocationLocalSearch(std::set<VertexType> chosenFacilities, std::set<VertexType> unchosenFacilities, 
-                    std::vector<VertexType> clients, FacilityCosts facilitiesCosts, Metric m) : 
-                    
-                    
+    template <typename ChosenCol, typename UnchosenCol, typename ClientsCol> 
+        FacilityLocationLocalSearchStep(ChosenCol  chosenFacilities, UnchosenCol  unchosenFacilities, 
+                                    ClientsCol  clients, FacilityCosts & facilitiesCosts, Metric & m, 
+                                    NeighbourGetter<VertexType> ng = NeighbourGetter<VertexType>(),
+                                    CheckIfImprove<VertexType> ch = CheckIfImprove<VertexType>(),
+                                    Update<VertexType> u = Update<VertexType>()) :
 
+                                        base(FLSolutionAdapter(m_fls), std::move(ng), std::move(ch), std::move(u)),
+                                        m_fls(std::move(unchosenFacilities), 
+                                              std::move(chosenFacilities), 
+                                              std::move(clients), 
+                                              m, facilitiesCosts) {}
+            
 
-
-};*/
+    private:
+        FLSolution  m_fls;
+};
 
 };
 };
