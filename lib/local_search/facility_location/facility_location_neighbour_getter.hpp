@@ -42,7 +42,7 @@ public:
             //the update of UNCHOSEN is just adding him to solution
             m_add.set(el.getElem());
             m_currSol.push_back(UpdateElement(&m_add));
-            return std::make_pair(m_currSol.cbegin(), m_currSol.cend()); 
+            return std::make_pair(m_currSol.begin(), m_currSol.end()); 
         } else {
             assert(el.getIsChosen() == CHOSEN); 
             //the update of CHOSEN could be remove or swap with some unchosen
@@ -51,10 +51,10 @@ public:
 
             U<VertexType> uchToUE(el.getElem());
 
-            auto remRange = std::make_pair(m_currSol.cbegin(), m_currSol.cend());
+            auto remRange = std::make_pair(m_currSol.begin(), m_currSol.end());
             auto & uch = FCS.getUnchosenFacilities();
             typedef boost::transform_iterator<U<VertexType>, decltype(uch.begin()), const UpdateElement &> TransIter;
-            auto swapRange = std::make_pair(TransIter(uch.cbegin(), uchToUE), TransIter(uch.cend(), uchToUE)); 
+            auto swapRange = std::make_pair(TransIter(uch.begin(), uchToUE), TransIter(uch.end(), uchToUE)); 
 
             auto ret = boost::join(remRange, swapRange); 
             

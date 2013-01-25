@@ -45,13 +45,13 @@ public:
         return boost::join(rch, ruch);
     }
     
-     SolutionIterator cbegin() const {
+     SolutionIterator begin() const {
         auto & ch = m_sol.getChosenFacilities();
         auto & uch = m_sol.getUnchosenFacilities();
         return boost::begin(getRange(ch.begin(), ch.end(), uch.begin(), uch.end()));
     }
     
-    SolutionIterator cend() const {
+    SolutionIterator end() const {
         auto & ch = m_sol.getChosenFacilities();
         auto & uch = m_sol.getUnchosenFacilities();
         return boost::end(getRange(ch.begin(), ch.end(), uch.begin(), uch.end()));

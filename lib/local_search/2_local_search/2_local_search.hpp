@@ -6,7 +6,7 @@
 #include "local_search/trivial_neighbour.hpp"
 #include "local_search/2_local_search/2_local_search_updater.hpp"
 #include "local_search/2_local_search/2_local_search_checker.hpp"
-#include "local_search/2_local_search/2_local_search_solution_container.hpp"
+#include "local_search/2_local_search/2_local_search_solution_adapter.hpp"
 #include "data_structures/simple_cycle_manager.hpp"
 
 namespace paal {
@@ -33,7 +33,7 @@ template <typename VertexType,
                     template <typename SolutionIter>  
                      TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
                                         Metric & m, 
-                                        NeighbourGetter && ng = NeighbourGetter()) 
+                                        NeighbourGetter ng = NeighbourGetter()) 
 
                         :      LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
                                  CheckIfImprove<Metric>(m), TwoLocalSearchUpdater()),

@@ -1,23 +1,23 @@
 #include <boost/concept_check.hpp>
 #include <type_traits>
+#include "helpers/type_functions.hpp"
 
 namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
-//TODO irterator is const iterator (it is better to remove this dependancy )
 template <typename X>
 class MultiSolution  {
     private:
-        typedef decltype(std::declval<X>().cend()) IterTypeEnd;
+        typedef decltype(std::declval<X>().end()) IterTypeEnd;
     public:
-        typedef decltype(std::declval<X>().cbegin()) IterType;
+        typedef decltype(std::declval<X>().begin()) IterType;
         typedef typename std::decay<decltype(*std::declval<IterType>())>::type Element;
-        static_assert(std::is_same<IterType, IterTypeEnd>::value, "cbegin type != cend type");
+        static_assert(std::is_same<IterType, IterTypeEnd>::value, "begin type != end type");
         BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
         BOOST_CONCEPT_USAGE(MultiSolution) {
-            x.cbegin();
-            x.cend();
+            x.begin();
+            x.end();
         }
 
     private:
@@ -31,8 +31,8 @@ class  MultiNeighbourGetter {
     private:
         typedef typename MultiSolution<Solution>::Element SolutionElement;
         typedef decltype(std::declval<X>().getNeighbourhood(
-                                std::declval<Solution>(),
-                                std::declval<SolutionElement>()
+                                std::declval<Solution &>(),
+                                std::declval<SolutionElement&>()
                                 ).first) UpdateIterator;
     
     public:

@@ -4,15 +4,15 @@ namespace two_local_search {
 
 template <typename Metric> class CheckIfImprove2Opt {
     public:
-        CheckIfImprove2Opt(const Metric & m) : m_metric(m) {}
+        CheckIfImprove2Opt(Metric & m) : m_metric(m) {}
 
-        template <typename Solution, typename SolutionElement> int checkIfImproved(const Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
+        template <typename Solution, typename SolutionElement> int checkIfImproved(Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
            return m_metric(sel.first, sel.second) + m_metric(adjustEl.first, adjustEl.second) - 
                m_metric(sel.first, adjustEl.first) - m_metric(sel.second, adjustEl.second);
         }
 
     private:
-        const Metric & m_metric;
+        Metric & m_metric;
 };
 
 } //two_local_search

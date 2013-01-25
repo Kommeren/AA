@@ -129,7 +129,7 @@ int main() {
             FSet{A,B,C,D,E}, gm, cost);
 
     FacilityLocationSolutionAdapter<Sol> sa(sol);
-    sa.cbegin();
+    sa.begin();
     FacilityLocationNeighbourGetter<int> FLNG;
     FLNG.getNeighbourhood(sa, SolutionElement<int>(CHOSEN, A));
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
@@ -151,5 +151,10 @@ int main() {
     typedef decltype(std::declval<std::set<int>>().begin()) Ret;
     Ret(std::set<int>::*f)() const;
     std::cout << typeid(f).name() << std::endl;
+
+//    std::cout << "HAS_MEMBER" << HAS_MEMBER(std::set<int>, begin) << std::endl;
+    std::cout  << "HAS_MEMBER" <<  "bu" <<std::endl;
+//
+     
 
 }

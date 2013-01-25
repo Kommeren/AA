@@ -70,10 +70,12 @@ public:
         m_lastSearchSucceded = false;
 
         auto check = std::bind(std::mem_fun(&self::checkForUpdate), this, std::placeholders::_1);
-        std::find_if(m_solution.cbegin(), m_solution.cend(), check);
+        std::find_if(m_solution.begin(), m_solution.end(), check);
         
         return m_lastSearchSucceded;
     }
+
+
 
 private:
     bool checkForUpdate(const SolutionElement & r) {
