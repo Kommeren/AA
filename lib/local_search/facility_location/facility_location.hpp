@@ -4,6 +4,7 @@
 #include "data_structures/facility_location_solution.hpp"
 #include "facility_location_neighbour_getter.hpp"
 #include "facility_location_checker.hpp"
+#include "facility_location_updater.hpp"
 
 namespace paal {
 namespace local_search {

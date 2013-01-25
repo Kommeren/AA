@@ -1,39 +1,31 @@
-
 namespace paal {
 namespace local_search {
 namespace facility_location {
 
-template <typename VertexType> class FacilityLocationChecker {
+template <typename VertexType> class FacilityLocationUpdater {
 public:
-        template <class Solution, class UpdateElement> 
-    int checkIfImproved(Solution & s, 
+        template <typename Solution, typename UpdateElement> 
+    void update(Solution & s, 
             const  typename SolToElem<decltype(std::declval<Solution>().getFacilityLocationSolution())>::type & se,  //SolutionElement 
             const UpdateElement & ue) {
         auto FLS = s.getFacilityLocationSolution();
-        int ret;
         switch (ue.getImpl()->getType()) {
             case REMOVE :
                 auto r = static_cast<Remove<VertexType> *>(ue.getImpl());
-                ret = FLS.remFacility(r->get());
-                FLS.addFacility(r->get());
+                FLS.remFacility(r->get());
                 break;
             case ADD:
                 auto a = static_cast<Add<VertexType> *>(ue.getImpl());
-                ret = FLS.addFacility(a->get());
-                FLS.remFacility(a->get());
+                FLS.addFacility(a->get());
                 break;
             case SWAP:
                 auto s = static_cast<Remove<VertexType> *>(ue.getImpl());
-                ret = FLS.addFacility(s->getTo());
-                ret += FLS.remFacility(s->getFrom());
-                FLS.addFacility(s->getFrom());
-                FLS.remFacility(s->getTo());
+                FLS.addFacility(s->getTo());
+                FLS.remFacility(s->getFrom());
                 break;
             default:
                 assert(false);
         }
-        return -ret;
-
     }
 };
 
