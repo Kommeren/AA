@@ -12,6 +12,8 @@ namespace data_structures {
 
 
 //TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
+//
+//TODO MOVE CONSTRUCTORS
 template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
@@ -37,7 +39,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
             link(prevIdx, firstIdx);
         }
         
-        //after flip the order will be reversed, ie it will be from end  to begin
+        //after flip the order will be reversed, ie it will be from 'end'  to 'begin'
         void flip(const CycleEl & begin, const CycleEl & end) {
             IdxT e1 = toIdx(begin);
             IdxT b1 = prevIdx(e1);

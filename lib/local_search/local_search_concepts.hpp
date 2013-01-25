@@ -6,75 +6,50 @@ namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
-template <typename X>
-class MultiSolution  {
-    private:
-        typedef decltype(std::declval<X>().end()) IterTypeEnd;
-    public:
-        typedef decltype(std::declval<X>().begin()) IterType;
-        typedef typename std::decay<decltype(*std::declval<IterType>())>::type Element;
-        static_assert(std::is_same<IterType, IterTypeEnd>::value, "begin type != end type");
-        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
-        BOOST_CONCEPT_USAGE(MultiSolution) {
-            x.begin();
-            x.end();
-        }
-
-    private:
-
-        X x;
-};
-
-
 template <typename X, typename Solution> 
-class  MultiNeighbourGetter {
+class  NeighbourGetter {
     private:
-        typedef typename MultiSolution<Solution>::Element SolutionElement;
         typedef decltype(std::declval<X>().getNeighbourhood(
-                                std::declval<Solution &>(),
-                                std::declval<SolutionElement&>()
+                                std::declval<Solution &>()
                                 ).first) UpdateIterator;
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
-        BOOST_CONCEPT_USAGE(MultiNeighbourGetter) {
-            x.getNeighbourhood(s, e);
+        BOOST_CONCEPT_USAGE(NeighbourGetter) {
+            x.getNeighbourhood(s);
         }
 
     private:
 
         X x;
         Solution s;
-        SolutionElement e;
 };
 
-template <typename X, typename Solution, typename NeighbourGetter> class MultiCheckIfImprove {
+template <typename X, typename Solution, typename NeighbourGetterT> class CheckIfImprove {
     public:
-        BOOST_CONCEPT_USAGE(MultiCheckIfImprove) {
-            x.checkIfImproved(s, e, u);
+        BOOST_CONCEPT_USAGE(CheckIfImprove) {
+            x.checkIfImproved(s, u);
         }
     
      private:
 
         X x;
         Solution s;
-        typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement u;
+        typename NeighbourGetter<NeighbourGetterT, Solution>::UpdateElement u;
 };
 
 
-template <typename X, typename Solution, typename NeighbourGetter> class MultiSolutionUpdater {
+template <typename X, typename Solution, typename NeighbourGetterT> class SolutionUpdater {
     public:
-        BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
-            x.update(s, e, u);
+        BOOST_CONCEPT_USAGE(SolutionUpdater) {
+            x.update(s, u);
         }
     
      private:
 
         X x;
         Solution s;
-        typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement u;
+        typename NeighbourGetter<NeighbourGetterT, Solution>::UpdateElement u;
 };
 
 } // local_search_concepts

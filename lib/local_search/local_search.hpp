@@ -13,6 +13,7 @@
 #include <functional>
 
 #include "local_search_concepts.hpp"
+#include "local_search_multi_solution_concepts.hpp"
 
 namespace paal {
 namespace local_search {
@@ -44,8 +45,56 @@ namespace search_startegies {
     class SteepestSlope;
 }
 
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater, typename SearchStrategy = search_startegies::ChooseFirstBetter> 
-    class LocalSearchStepMultiSolution {
+
+template <typename Solution, 
+          typename NeighbourGetter, 
+          typename CheckIfImprove, 
+          typename SolutionUpdater, 
+          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
+
+class LocalSearchStep {
+    BOOST_CONCEPT_ASSERT((local_search_concepts::NeighbourGetter<NeighbourGetter, Solution>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::CheckIfImprove<CheckIfImprove, Solution, NeighbourGetter>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::SolutionUpdater<SolutionUpdater, Solution, NeighbourGetter>));
+    static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
+                  std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
+    
+    typedef typename local_search_concepts::
+        NeighbourGetter<NeighbourGetter, Solution>::UpdateElement UpdateElement;
+public:
+        LocalSearchStep(Solution solution, NeighbourGetter ng, 
+                                     CheckIfImprove check, SolutionUpdater solutionUpdater) :
+            m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
+            m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
+
+        bool search() {
+            auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution);
+
+            std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
+                if(m_checkFunctor.checkIfImproved(m_solution, update) > 0) {
+                    m_lastSearchSucceded = true;
+                    m_solutionUpdaterFunctor.update(m_solution, update);
+                }   
+                return m_lastSearchSucceded;
+            });
+            return m_lastSearchSucceded;
+        }
+   
+private:
+    Solution m_solution;
+    NeighbourGetter m_neighbourGetterFunctor;
+    CheckIfImprove m_checkFunctor;
+    SolutionUpdater m_solutionUpdaterFunctor;
+    bool m_lastSearchSucceded;
+};
+
+template <typename Solution, 
+          typename NeighbourGetter, 
+          typename CheckIfImprove, 
+          typename SolutionUpdater, 
+          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
+
+class LocalSearchStepMultiSolution {
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighbourGetter<NeighbourGetter, Solution>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiCheckIfImprove<CheckIfImprove, Solution, NeighbourGetter>));
@@ -74,8 +123,6 @@ public:
         
         return m_lastSearchSucceded;
     }
-
-
 
 private:
     bool checkForUpdate(const SolutionElement & r) {
