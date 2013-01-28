@@ -30,11 +30,15 @@ class FacilityLocationLocalSearchStep :
             NeighbourhoodGetter<VertexType>, 
             ImproveChecker<VertexType>, 
             Update<VertexType> >  {
+    public:
     
     typedef FacilityLocationSolution<VertexType, 
                                      Metric, 
                                      FacilityCosts>
                                        FLSolution;
+
+    typedef typename FLSolution::FacilitiesSet FacilitiesSet;
+    typedef typename FLSolution::ClientsSet ClientsSet;
     
     typedef FacilityLocationSolutionAdapter<
                FLSolution> FLSolutionAdapter;

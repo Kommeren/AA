@@ -33,9 +33,9 @@ public:
     //Due to the memory optimization at one moment only one UpdateElement is valid
     typedef SolutionElement<VertexType> SolEl;
     template <typename Solution> std::pair<Iter, Iter>
-        gethood(Solution &s, const SolEl & el) {
+        get(Solution &s, const SolEl & el) {
 
-        auto FCS =  s.getFacilityLocationSolution(); 
+        auto FCS =  s.get(); 
         m_currSol.clear();
 
         if(el.getIsChosen() == UNCHOSEN) {

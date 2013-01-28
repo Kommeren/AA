@@ -9,14 +9,14 @@ namespace local_search_concepts {
 template <typename X, typename Solution> 
 class  NeighbourhoodGetter {
     private:
-        typedef decltype(std::declval<X>().gethood(
+        typedef decltype(std::declval<X>().get(
                                 std::declval<Solution &>()
                                 ).first) UpdateIterator;
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
         BOOST_CONCEPT_USAGE(NeighbourhoodGetter) {
-            x.gethood(s);
+            x.get(s);
         }
 
     private:

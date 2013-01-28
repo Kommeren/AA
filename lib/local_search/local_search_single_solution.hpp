@@ -45,7 +45,7 @@ public:
             m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
 
         bool search() {
-            auto adjustmentSet = m_neighbourGetterFunctor.gethood(m_solution);
+            auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution);
 
             std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
                 if(m_checkFunctor.gain(m_solution, update) > 0) {

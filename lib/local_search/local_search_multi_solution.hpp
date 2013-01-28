@@ -59,6 +59,7 @@ public:
         return m_lastSearchSucceded;
     }
 
+    // TODO it is not optional :)
     typename std::enable_if<has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
         return m_solution.get();
     }
@@ -72,7 +73,7 @@ public:
 private:
     bool checkForUpdate(const SolutionElement & r) {
          
-        auto adjustmentSet = m_neighbourGetterFunctor.gethood(m_solution, r);
+        auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution, r);
 
         std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
             if(m_checkFunctor.gain(m_solution, r, update) > 0) {

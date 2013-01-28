@@ -11,7 +11,7 @@ class AbstractUpdate {
 protected:
     virtual ~AbstractUpdate() {}
 public:
-    virtual UpdateType getType() = 0;
+    virtual UpdateType getType() const = 0;
 };
 
 template <typename T> class Swap : public AbstractUpdate {
@@ -19,7 +19,7 @@ public:
     Swap(T from, T to) : m_from(from), m_to(to) {}
     Swap() {}
 
-    UpdateType getType() {
+    UpdateType getType() const {
         return SWAP;
     }
 
@@ -65,7 +65,7 @@ private:
 template <typename T> struct Remove : public RemAdd<T> {
     Remove(T t) : RemAdd<T>(t) {}
     Remove() {}
-    UpdateType getType() {
+    UpdateType getType() const {
         return REMOVE;
     }
 };
@@ -73,7 +73,7 @@ template <typename T> struct Remove : public RemAdd<T> {
 template <typename T> struct Add : public RemAdd<T> {
     Add(T t) : RemAdd<T>(t) {}
     Add() {}
-    UpdateType getType() {
+    UpdateType getType() const {
         return ADD;
     }
 };
@@ -82,7 +82,7 @@ class UpdateElement {
 public:
     template <typename T> UpdateElement(T * t) : m_impl(t) {}
 
-    AbstractUpdate * getImpl() {
+    const AbstractUpdate * getImpl() const {
         return m_impl;
     }
 

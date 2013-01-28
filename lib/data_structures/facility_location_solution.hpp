@@ -50,6 +50,7 @@ class FacilityLocationSolutionWithClientsAssignment :
         using base::VertexType;
         typedef typename Metric::DistanceType Dist;
         typedef typename base::FacilitiesSet FacilitiesSet;
+        //TODO change to vector
         typedef FacilitiesSet ClientsSet;
         using base::m_chosenFacilities;
         using base::m_unchosenFacilities;

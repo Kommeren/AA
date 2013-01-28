@@ -14,7 +14,8 @@ class MultiSolution  {
         typedef decltype(std::declval<X>().begin()) IterType;
         typedef typename std::decay<decltype(*std::declval<IterType>())>::type Element;
         static_assert(std::is_same<IterType, IterTypeEnd>::value, "begin type != end type");
-        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
+        //TODO problem with boost_join
+//        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
         BOOST_CONCEPT_USAGE(MultiSolution) {
             x.begin();
             x.end();
@@ -30,7 +31,7 @@ template <typename X, typename Solution>
 class  MultiNeighbourhoodGetter {
     private:
         typedef typename MultiSolution<Solution>::Element SolutionElement;
-        typedef decltype(std::declval<X>().gethood(
+        typedef decltype(std::declval<X>().get(
                                 std::declval<Solution &>(),
                                 std::declval<SolutionElement&>()
                                 ).first) UpdateIterator;
@@ -38,7 +39,7 @@ class  MultiNeighbourhoodGetter {
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
         BOOST_CONCEPT_USAGE(MultiNeighbourhoodGetter) {
-            x.gethood(s, e);
+            x.get(s, e);
         }
 
     private:
