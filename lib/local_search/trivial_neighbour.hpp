@@ -21,7 +21,7 @@ struct TrivialNeigbourGetter {
                           std::pair<helpers::IteratorWithExcludedElement<typename SolToIter<Solution>::type, SolutionElement>, 
                                     helpers::IteratorWithExcludedElement<typename SolToIter<Solution>::type, SolutionElement> > 
             
-            getNeighbourhood(Solution & sol, const SolutionElement &e) {
+            gethood(Solution & sol, const SolutionElement &e) {
                 typedef typename SolToIter<Solution>::type SolutionIterator;
                 typedef helpers::IteratorWithExcludedElement<SolutionIterator, SolutionElement> OutIter;
                 SolutionIterator begin = sol.begin();

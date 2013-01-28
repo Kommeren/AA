@@ -15,28 +15,28 @@ namespace two_local_search {
 
 template <typename VertexType, 
           typename Metric, 
-          typename NeighbourGetter = TrivialNeigbourGetter,
-          template <class> class CheckIfImprove = CheckIfImprove2Opt,
+          typename NeighbourhoodGetter = TrivialNeigbourGetter,
+          template <class> class ImproveChecker = ImproveChecker2Opt,
           template <class> class Cycle = data_structures::SimpleCycle>
 
          class  TwoLocalSearchStep : 
              public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle<VertexType>>, 
-                        NeighbourGetter, CheckIfImprove<Metric>, TwoLocalSearchUpdater >  {
+                        NeighbourhoodGetter, ImproveChecker<Metric>, TwoLocalSearchUpdater >  {
 
                
                 typedef Cycle<VertexType> CycleT;
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleT> , NeighbourGetter, 
-                    CheckIfImprove<Metric>, TwoLocalSearchUpdater > LocalSearchStepT;
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleT> , NeighbourhoodGetter, 
+                    ImproveChecker<Metric>, TwoLocalSearchUpdater > LocalSearchStepT;
 
                 public:
 
                     template <typename SolutionIter>  
                      TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
                                         Metric & m, 
-                                        NeighbourGetter ng = NeighbourGetter()) 
+                                        NeighbourhoodGetter ng = NeighbourhoodGetter()) 
 
                         :      LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
-                                 CheckIfImprove<Metric>(m), TwoLocalSearchUpdater()),
+                                 ImproveChecker<Metric>(m), TwoLocalSearchUpdater()),
                                 m_cycle(solBegin, solEnd) {}
 
                     CycleT & getCycle() {

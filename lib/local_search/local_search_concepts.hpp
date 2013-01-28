@@ -7,16 +7,16 @@ namespace local_search {
 namespace local_search_concepts {
 
 template <typename X, typename Solution> 
-class  NeighbourGetter {
+class  NeighbourhoodGetter {
     private:
-        typedef decltype(std::declval<X>().getNeighbourhood(
+        typedef decltype(std::declval<X>().gethood(
                                 std::declval<Solution &>()
                                 ).first) UpdateIterator;
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
-        BOOST_CONCEPT_USAGE(NeighbourGetter) {
-            x.getNeighbourhood(s);
+        BOOST_CONCEPT_USAGE(NeighbourhoodGetter) {
+            x.gethood(s);
         }
 
     private:
@@ -25,21 +25,21 @@ class  NeighbourGetter {
         Solution s;
 };
 
-template <typename X, typename Solution, typename NeighbourGetterT> class CheckIfImprove {
+template <typename X, typename Solution, typename NeighbourhoodGetterT> class ImproveChecker {
     public:
-        BOOST_CONCEPT_USAGE(CheckIfImprove) {
-            x.checkIfImproved(s, u);
+        BOOST_CONCEPT_USAGE(ImproveChecker) {
+            x.gain(s, u);
         }
     
      private:
 
         X x;
         Solution s;
-        typename NeighbourGetter<NeighbourGetterT, Solution>::UpdateElement u;
+        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::UpdateElement u;
 };
 
 
-template <typename X, typename Solution, typename NeighbourGetterT> class SolutionUpdater {
+template <typename X, typename Solution, typename NeighbourhoodGetterT> class SolutionUpdater {
     public:
         BOOST_CONCEPT_USAGE(SolutionUpdater) {
             x.update(s, u);
@@ -49,7 +49,7 @@ template <typename X, typename Solution, typename NeighbourGetterT> class Soluti
 
         X x;
         Solution s;
-        typename NeighbourGetter<NeighbourGetterT, Solution>::UpdateElement u;
+        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::UpdateElement u;
 };
 
 } // local_search_concepts

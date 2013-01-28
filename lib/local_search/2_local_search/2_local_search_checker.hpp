@@ -2,11 +2,11 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename Metric> class CheckIfImprove2Opt {
+template <typename Metric> class ImproveChecker2Opt {
     public:
-        CheckIfImprove2Opt(Metric & m) : m_metric(m) {}
+        ImproveChecker2Opt(Metric & m) : m_metric(m) {}
 
-        template <typename Solution, typename SolutionElement> int checkIfImproved(Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
+        template <typename Solution, typename SolutionElement> int gain(Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
            return m_metric(sel.first, sel.second) + m_metric(adjustEl.first, adjustEl.second) - 
                m_metric(sel.first, adjustEl.first) - m_metric(sel.second, adjustEl.second);
         }

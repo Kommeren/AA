@@ -27,18 +27,18 @@ class MultiSolution  {
 
 
 template <typename X, typename Solution> 
-class  MultiNeighbourGetter {
+class  MultiNeighbourhoodGetter {
     private:
         typedef typename MultiSolution<Solution>::Element SolutionElement;
-        typedef decltype(std::declval<X>().getNeighbourhood(
+        typedef decltype(std::declval<X>().gethood(
                                 std::declval<Solution &>(),
                                 std::declval<SolutionElement&>()
                                 ).first) UpdateIterator;
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
-        BOOST_CONCEPT_USAGE(MultiNeighbourGetter) {
-            x.getNeighbourhood(s, e);
+        BOOST_CONCEPT_USAGE(MultiNeighbourhoodGetter) {
+            x.gethood(s, e);
         }
 
     private:
@@ -48,10 +48,10 @@ class  MultiNeighbourGetter {
         SolutionElement e;
 };
 
-template <typename X, typename Solution, typename NeighbourGetter> class MultiCheckIfImprove {
+template <typename X, typename Solution, typename NeighbourhoodGetter> class MultiImproveChecker {
     public:
-        BOOST_CONCEPT_USAGE(MultiCheckIfImprove) {
-            x.checkIfImproved(s, e, u);
+        BOOST_CONCEPT_USAGE(MultiImproveChecker) {
+            x.gain(s, e, u);
         }
     
      private:
@@ -59,11 +59,11 @@ template <typename X, typename Solution, typename NeighbourGetter> class MultiCh
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement u;
+        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement u;
 };
 
 
-template <typename X, typename Solution, typename NeighbourGetter> class MultiSolutionUpdater {
+template <typename X, typename Solution, typename NeighbourhoodGetter> class MultiSolutionUpdater {
     public:
         BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
             x.update(s, e, u);
@@ -74,7 +74,7 @@ template <typename X, typename Solution, typename NeighbourGetter> class MultiSo
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement u;
+        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement u;
 };
 
 } // local_search_concepts

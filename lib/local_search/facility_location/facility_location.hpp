@@ -15,8 +15,8 @@ namespace facility_location {
 template <typename VertexType,
          typename Metric, 
          typename FacilityCosts,
-          template <class> class NeighbourGetter = FacilityLocationNeighbourGetter,
-          template <class> class CheckIfImprove = FacilityLocationChecker,
+          template <class> class NeighbourhoodGetter = FacilityLocationNeighbourhoodGetter,
+          template <class> class ImproveChecker = FacilityLocationChecker,
           template <class> class Update = FacilityLocationUpdater,
           template <class,class,class> class FacilityLocationSolution 
               = data_structures::FacilityLocationSolutionWithClientsAssignment>
@@ -27,8 +27,8 @@ class FacilityLocationLocalSearchStep :
                                         Metric, 
                                         FacilityCosts>
                                        >, 
-            NeighbourGetter<VertexType>, 
-            CheckIfImprove<VertexType>, 
+            NeighbourhoodGetter<VertexType>, 
+            ImproveChecker<VertexType>, 
             Update<VertexType> >  {
     
     typedef FacilityLocationSolution<VertexType, 
@@ -41,15 +41,15 @@ class FacilityLocationLocalSearchStep :
     
     typedef LocalSearchStepMultiSolution<
             FLSolutionAdapter,
-            NeighbourGetter<VertexType>, 
-            CheckIfImprove<VertexType>, 
+            NeighbourhoodGetter<VertexType>, 
+            ImproveChecker<VertexType>, 
             Update<VertexType> >  base;
 
     template <typename ChosenCol, typename UnchosenCol, typename ClientsCol> 
         FacilityLocationLocalSearchStep(ChosenCol  chosenFacilities, UnchosenCol  unchosenFacilities, 
                                     ClientsCol  clients, FacilityCosts & facilitiesCosts, Metric & m, 
-                                    NeighbourGetter<VertexType> ng = NeighbourGetter<VertexType>(),
-                                    CheckIfImprove<VertexType> ch = CheckIfImprove<VertexType>(),
+                                    NeighbourhoodGetter<VertexType> ng = NeighbourhoodGetter<VertexType>(),
+                                    ImproveChecker<VertexType> ch = ImproveChecker<VertexType>(),
                                     Update<VertexType> u = Update<VertexType>()) :
 
                                         base(FLSolutionAdapter(m_fls), std::move(ng), std::move(ch), std::move(u)),

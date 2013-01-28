@@ -6,7 +6,7 @@ namespace facility_location {
 template <typename VertexType> class FacilityLocationChecker {
 public:
         template <class Solution, class UpdateElement> 
-    int checkIfImproved(Solution & s, 
+    int gain(Solution & s, 
             const  typename SolToElem<decltype(std::declval<Solution>().getFacilityLocationSolution())>::type & se,  //SolutionElement 
             const UpdateElement & ue) {
         auto FLS = s.getFacilityLocationSolution();

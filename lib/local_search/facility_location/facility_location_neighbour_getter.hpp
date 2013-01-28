@@ -24,7 +24,7 @@ private:
 };
 
 
-template <typename VertexType> class FacilityLocationNeighbourGetter {
+template <typename VertexType> class FacilityLocationNeighbourhoodGetter {
 public: 
        
     //TODO we shouldn't use detail..
@@ -33,7 +33,7 @@ public:
     //Due to the memory optimization at one moment only one UpdateElement is valid
     typedef SolutionElement<VertexType> SolEl;
     template <typename Solution> std::pair<Iter, Iter>
-        getNeighbourhood(Solution &s, const SolEl & el) {
+        gethood(Solution &s, const SolEl & el) {
 
         auto FCS =  s.getFacilityLocationSolution(); 
         m_currSol.clear();

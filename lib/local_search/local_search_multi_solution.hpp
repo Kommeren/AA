@@ -30,9 +30,9 @@ namespace local_search {
  * Wejscie : 
  * SolIterRange - rozwiaznie wejsciowe
  *
- * NeighbourGetter - musi miec metode getNeighbourhood() bioracy aktualna trase i element rozwiazania, zwracajaca pare iteratorow symbolizujaca zbior ulepszen. 
+ * NeighbourhoodGetter - musi miec metode gethood() bioracy aktualna trase i element rozwiazania, zwracajaca pare iteratorow symbolizujaca zbior ulepszen. 
  *
- * CheckIfImprove - musi miec metode checkIfImproved bioraca dane  rozwiazanie i ulepszenie ktora sprawdza czy dzieki danemu ulepszeniu da sie poprawic aktualne rozwiazanie
+ * ImproveChecker - musi miec metode gain bioraca dane  rozwiazanie i ulepszenie ktora sprawdza czy dzieki danemu ulepszeniu da sie poprawic aktualne rozwiazanie
  *
  * SolutionUpdater - ma metode update bioraca dane rozwiazanie i nakladajace na nie odpowiednie ulepszenie
  *
@@ -46,29 +46,29 @@ namespace search_startegies {
 
 
 template <typename Solution, 
-          typename NeighbourGetter, 
-          typename CheckIfImprove, 
+          typename NeighbourhoodGetter, 
+          typename ImproveChecker, 
           typename SolutionUpdater, 
           typename SearchStrategy = search_startegies::ChooseFirstBetter> 
 
 class LocalSearchStepMultiSolution {
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighbourGetter<NeighbourGetter, Solution>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiCheckIfImprove<CheckIfImprove, Solution, NeighbourGetter>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolutionUpdater<SolutionUpdater, Solution, NeighbourGetter>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiImproveChecker<ImproveChecker, Solution, NeighbourhoodGetter>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolutionUpdater<SolutionUpdater, Solution, NeighbourhoodGetter>));
       static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
                     std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
     
     typedef typename local_search_concepts::
         MultiSolution<Solution>::Element SolutionElement;
     typedef typename local_search_concepts::
-        MultiNeighbourGetter<NeighbourGetter, Solution>::UpdateElement UpdateElement;
+        MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement UpdateElement;
     
 public:
-    typedef LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater>  self;
+    typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater>  self;
 
-    LocalSearchStepMultiSolution(Solution solution, NeighbourGetter ng, 
-                                 CheckIfImprove check, SolutionUpdater solutionUpdater) :
+    LocalSearchStepMultiSolution(Solution solution, NeighbourhoodGetter ng, 
+                                 ImproveChecker check, SolutionUpdater solutionUpdater) :
      m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
      m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
 
@@ -84,10 +84,10 @@ public:
 private:
     bool checkForUpdate(const SolutionElement & r) {
          
-        auto adjustmentSet = m_neighbourGetterFunctor.getNeighbourhood(m_solution, r);
+        auto adjustmentSet = m_neighbourGetterFunctor.gethood(m_solution, r);
 
         std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
-            if(m_checkFunctor.checkIfImproved(m_solution, r, update) > 0) {
+            if(m_checkFunctor.gain(m_solution, r, update) > 0) {
                 m_lastSearchSucceded = true;
                 m_solutionUpdaterFunctor.update(m_solution, r, update);
             }
@@ -98,14 +98,14 @@ private:
     }
 
     Solution m_solution;
-    NeighbourGetter m_neighbourGetterFunctor;
-    CheckIfImprove m_checkFunctor;
+    NeighbourhoodGetter m_neighbourGetterFunctor;
+    ImproveChecker m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
     bool m_lastSearchSucceded;
 };
 
-template <typename Solution, typename NeighbourGetter, typename CheckIfImprove, typename SolutionUpdater> 
-class LocalSearchStepMultiSolution<Solution, NeighbourGetter, CheckIfImprove, SolutionUpdater, search_startegies::SteepestSlope> {
+template <typename Solution, typename NeighbourhoodGetter, typename ImproveChecker, typename SolutionUpdater> 
+class LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, search_startegies::SteepestSlope> {
     //TODO implement
 };
 

@@ -53,7 +53,7 @@ void fn(std::vector<int> v,  std::pair<int, int> i) {
 int main() {
 
     std::vector<int> v = {1,2,3,4,5, 6, 7, 8, 9, 10};
-    auto vExl = TrivialNeigbourGetter().getNeighbourhood(v, 4);
+    auto vExl = TrivialNeigbourGetter().gethood(v, 4);
     vExl.first != vExl.second;
     fn(v, std::make_pair(4, 5));
     std::cout << (vExl.first == vExl.second) << std::endl << std::flush;
@@ -130,8 +130,8 @@ int main() {
 
     FacilityLocationSolutionAdapter<Sol> sa(sol);
     sa.begin();
-    FacilityLocationNeighbourGetter<int> FLNG;
-    FLNG.getNeighbourhood(sa, SolutionElement<int>(CHOSEN, A));
+    FacilityLocationNeighbourhoodGetter<int> FLNG;
+    FLNG.gethood(sa, SolutionElement<int>(CHOSEN, A));
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
     auto transformChosen2 = [](int v){ return std::make_pair(v,1);};
