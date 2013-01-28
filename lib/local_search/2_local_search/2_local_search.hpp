@@ -2,7 +2,7 @@
 #ifndef __2_LOCAL_SEARCH__
 #define __2_LOCAL_SEARCH__
 
-#include "local_search/local_search.hpp"
+#include "local_search/local_search_multi_solution.hpp"
 #include "local_search/trivial_neighbour.hpp"
 #include "local_search/2_local_search/2_local_search_updater.hpp"
 #include "local_search/2_local_search/2_local_search_checker.hpp"
