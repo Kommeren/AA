@@ -33,15 +33,23 @@ template <typename VertexType,
                     template <typename SolutionIter>  
                      TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
                                         Metric & m, 
-                                        NeighbourhoodGetter ng = NeighbourhoodGetter()) 
+                                        ImproveChecker<Metric> ich,
+                                        NeighbourhoodGetter ng = NeighbourhoodGetter()
+                                        ) 
 
-                        :      LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
-                                 ImproveChecker<Metric>(m), TwoLocalSearchUpdater()),
-                                m_cycle(solBegin, solEnd) {}
+                        : LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
+                                                std::move(ich), TwoLocalSearchUpdater()),
+                                                m_cycle(solBegin, solEnd) {}
+                    
+                     TwoLocalSearchStep(Cycle<VertexType> c, 
+                                        Metric & m, 
+                                        ImproveChecker<Metric> ich,
+                                        NeighbourhoodGetter ng = NeighbourhoodGetter()
+                                        ) 
 
-                    CycleT & getCycle() {
-                        return m_cycle;
-                    }
+                        :   LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
+                                                std::move(ich), TwoLocalSearchUpdater()),
+                                                m_cycle(std::move(c)) {}
 
                 private:
                     CycleT m_cycle;

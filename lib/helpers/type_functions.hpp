@@ -27,6 +27,7 @@ class has_##member {  \
 
 HAS_MEMBER_CLASS(begin)
 HAS_MEMBER_CLASS(cbegin)
+HAS_MEMBER_CLASS(get)
 
 template <typename Iter> struct IterToElem {
     typedef typename std::decay<decltype(*std::declval<Iter>())>::type type; 

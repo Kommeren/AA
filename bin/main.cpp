@@ -108,8 +108,9 @@ int main() {
     std::random_shuffle(ver.begin(), ver.end());
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
-    TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), gm);
-    auto const & cman = ls.getCycle();
+    ImproveChecker2Opt<GraphMT> checker(gm);
+    TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), gm, checker);
+    auto const & cman = ls.getSolution();
     std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
     simple_algo::print(cman, std::cout);
     ls.search();

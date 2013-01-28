@@ -17,28 +17,6 @@
 namespace paal {
 namespace local_search {
 
-
-/*
- * LocalSearch wywoluje metode search ktora przeszukuje sasiedztwo kazdego punktu i sprawdza czy da sie udoskonalic rozwiazanie.
- *
- * Zakladamy, ze rozwiazanie ma metody begin() i end()  oznaczajaca odpowiednio poczatek i koniec rozwiazania, (??? byc moze za malo ogolne ???)
- * w przypadku TSP byl by to poczatek i koniec listy wierzcholkow (ewentualnie krawedzi) w sciezce komiwojazera, w drzewie steinera byla by to lista  krawedzi drzewa, w FL lista fabryk. Oczywiscie moze to byc iterator po czymkkolwiek na przyklad po kolejncyhparach krawedzie z cyklu...
- *
- * W sasiedztwie kazdego elementu rozwiazania (to sasiedztwo w szzcegolnym przypadku moze byc oczywiscie calym grafem) szukamy ulepszen tego rozwiazania. W najprostrzym wariancie TSP bedzie to po prostu zbior wszystkich krawedzi z optymalnej sciezki
- *
- *
- * Wejscie : 
- * SolIterRange - rozwiaznie wejsciowe
- *
- * NeighbourhoodGetter - musi miec metode gethood() bioracy aktualna trase i element rozwiazania, zwracajaca pare iteratorow symbolizujaca zbior ulepszen. 
- *
- * ImproveChecker - musi miec metode gain bioraca dane  rozwiazanie i ulepszenie ktora sprawdza czy dzieki danemu ulepszeniu da sie poprawic aktualne rozwiazanie
- *
- * SolutionUpdater - ma metode update bioraca dane rozwiazanie i nakladajace na nie odpowiednie ulepszenie
- *
- * 
- */
-
 namespace search_startegies {
     class ChooseFirstBetter;
     class SteepestSlope;
@@ -80,6 +58,16 @@ public:
         
         return m_lastSearchSucceded;
     }
+
+    typename std::enable_if<has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
+        return m_solution.get();
+    }
+    
+    
+    //TODO doesn't work
+/*    std::enable_if<!has_get<Solution>::value, Solution &> getSolution() {
+        return m_solution;
+    }*/
 
 private:
     bool checkForUpdate(const SolutionElement & r) {

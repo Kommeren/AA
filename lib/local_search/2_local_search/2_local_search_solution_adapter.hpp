@@ -19,7 +19,7 @@ template < typename Cycle> class TwoLocalSearchContainer  {
             return m_cycle.getEdgeRange().second;
         }
 
-        Cycle & getCycle() {
+        Cycle & get() {
             return m_cycle;
         }
     private:

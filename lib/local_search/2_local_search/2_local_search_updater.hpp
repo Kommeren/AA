@@ -11,7 +11,7 @@ class TwoLocalSearchUpdater  {
 
             template <typename SolutionElement, typename Solution> 
         void update(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
-            s.getCycle().flip(se.second, ae.first);
+            s.get().flip(se.second, ae.first);
         }
 };
 
