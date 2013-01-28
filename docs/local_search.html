@@ -161,7 +161,8 @@ Concepts:
     MultiSolutionArchetype {
         SolutionElementIterator begin();
         SolutionElementIterator end();
-        InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution
+        InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
+                             // The inner solution type isInnerSolution
     }
     <li> <i>MultiNeighborhoodGetter</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
@@ -260,7 +261,6 @@ In order to present 2-opt we need to introduce some concept and types.
         DistanceType operator()(VertexType,VertexType);
     }
 </pre> 
-</ol>
 
 <li>  Cycle need to have fulfill the interface: 
 <pre>
