@@ -40,7 +40,7 @@ class LocalSearchStepMultiSolution {
     typedef typename local_search_concepts::
         MultiSolution<Solution>::Element SolutionElement;
     typedef typename local_search_concepts::
-        MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement UpdateElement;
+        MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
     
 public:
     typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater>  self;
@@ -75,7 +75,7 @@ private:
          
         auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution, r);
 
-        std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
+        std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const Update & update) {
             if(m_checkFunctor.gain(m_solution, r, update) > 0) {
                 m_lastSearchSucceded = true;
                 m_solutionUpdaterFunctor.update(m_solution, r, update);

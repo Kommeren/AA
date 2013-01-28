@@ -4,24 +4,24 @@ namespace facility_location {
 
 template <typename VertexType> class FacilityLocationUpdater {
 public:
-        template <typename Solution, typename UpdateElement> 
+        template <typename Solution, typename Update> 
     void update(Solution & s, 
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
-            const UpdateElement & ue) {
+            const Update & u) {
         auto FLS = s.get();
-        switch (ue.getImpl()->getType()) {
+        switch (u.getImpl()->getType()) {
             case REMOVE : {
-                auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());
+                auto r = static_cast<const Remove<VertexType> *>(u.getImpl());
                 FLS.remFacility(r->get());
                 break;
             }
             case ADD: {
-                auto a = static_cast<const Add<VertexType> *>(ue.getImpl());
+                auto a = static_cast<const Add<VertexType> *>(u.getImpl());
                 FLS.addFacility(a->get());
                 break;
             }
             case SWAP: {
-                auto s = static_cast<const Swap<VertexType> *>(ue.getImpl());
+                auto s = static_cast<const Swap<VertexType> *>(u.getImpl());
                 FLS.addFacility(s->getTo());
                 FLS.remFacility(s->getFrom());
                 break;

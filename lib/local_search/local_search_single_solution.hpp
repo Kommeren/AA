@@ -37,7 +37,7 @@ class LocalSearchStep {
                   std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
     
     typedef typename local_search_concepts::
-        NeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement UpdateElement;
+        NeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
 public:
         LocalSearchStep(Solution solution, NeighbourhoodGetter ng, 
                                      ImproveChecker check, SolutionUpdater solutionUpdater) :
@@ -47,7 +47,7 @@ public:
         bool search() {
             auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution);
 
-            std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const UpdateElement & update) {
+            std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const Update & update) {
                 if(m_checkFunctor.gain(m_solution, update) > 0) {
                     m_lastSearchSucceded = true;
                     m_solutionUpdaterFunctor.update(m_solution, update);

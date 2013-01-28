@@ -78,9 +78,9 @@ template <typename T> struct Add : public RemAdd<T> {
     }
 };
 
-class UpdateElement {
+class Update {
 public:
-    template <typename T> UpdateElement(T * t) : m_impl(t) {}
+    template <typename T> Update(T * t) : m_impl(t) {}
 
     const AbstractUpdate * getImpl() const {
         return m_impl;

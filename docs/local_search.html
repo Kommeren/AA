@@ -64,9 +64,9 @@ In this cases it is more convenient to proceed in the following way:<br>
  local_search() 
  {
      x -> random_solution(X) 
-     for_each(element of x)
+     for_each(Element e of x)
      {
-      for_each(Update u in N(element)) 
+      for_each(Update u in N(e)) 
       { 
          if(gain(apply u on x) > 0) 
          {
@@ -79,34 +79,35 @@ In this cases it is more convenient to proceed in the following way:<br>
 </pre>
 </font>
 <br>
-We implemented this algorithm schema and we find extremely useful! <br>
-We will refer to this schema as LocalSearchMultiSolution. Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
+We find this algorithm schema  extremely useful in our implementation! <br>
+We will refer to this schema as LocalSearchMultiSolution. <br>
+Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 <h3> LOCAL SEARCH INTERFACE </h3>
 <h4> LOCAL SEARCH SINGLE SOLUTION </h4>
 
 In order to present the LS interface we need to introduce several concepts.<br>
-Note that <i>Solution</i> is the solution type and <i>UpdateElement</i> is the type of single update. <br>
-<i>UpdateElementIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the updates collection. <br><br>
+Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of single update. <br>
+<i>UpdateIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the updates collection. <br><br>
 
 Concepts:
 <ol>
     <li> <i>NeighborhoodGetter</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
     NeighborhoodGetterArchetype {
-        UpdateElementIteratorsRange get(Solution & s)
+        UpdateIteratorsRange get(Solution & s)
     }
     </pre>
     <li> <i>ImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     ImproveCheckerArchetype {
-        int gain(Solution & s, const UpdateElement & update);
+        int gain(Solution & s, const Update & update);
     }
     </pre>
-    <li> <i>SolutionUpdater</i> is a concept class responsible for updating the solution with the UpdateElement.
+    <li> <i>SolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     SolutionUdaterArchetype {
-        int update(Solution & s, const UpdateElement & update);
+        int update(Solution & s, const Update & update);
     }
     </pre>
 
@@ -126,7 +127,7 @@ template &lttypename Solution,
                         // Search strategy, descibes LS search strategy. For ow we are planning two strategies:
                         // ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
                         // SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
-          //note there is no UpdateElement here because it can be deduced    <font color="red"> maybe it should be contained... </font>
+          //note there is no Update here because it can be deduced    <font color="red"> maybe it should be contained... </font>
 class LocalSearchStep { // <font color="red"> now we present only one step of the algorithm, later on we plan to add one more layer </font> 
 public:
    LocalSearchStep(Solution solution, 
@@ -165,19 +166,19 @@ Concepts:
     <li> <i>MultiNeighborhoodGetter</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
     MultiNeighborhoodGetterArchetype {
-        UpdateElementIteratorsRange get(Solution & s, const SolutionElement &)
+        UpdateIteratorsRange get(Solution & s, const SolutionElement &)
     }
     </pre>
     <li> <i>MultiImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     MultiImproveCheckerArchetype {
-        int gain(Solution & s, const SolutionElement &, const UpdateElement & update);
+        int gain(Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
-    <li> <i>MultiSolutionUpdater</i> is a concept class responsible for updating the solution with the UpdateElement.
+    <li> <i>MultiSolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     MultiSolutionUdaterArchetype {
-        int update(Solution & s, const SolutionElement &, const UpdateElement & update);
+        int update(Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
 
@@ -197,7 +198,7 @@ template &lttypename MultiSolution,
                         // Search strategy, describes LS search strategy. For now we are planning two strategies:
                         // ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
                         // SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
-          //note there is no UpdateElement and SolutionElement here because they can be deduced    <font color="red"> maybe it should be contained... </font>
+          //note there is no Update and SolutionElement here because they can be deduced    <font color="red"> maybe it should be contained... </font>
 class LocalSearchStepMultiSolution { // <font color="red"> now we present only one step of the algorithm, later on we plan to add one more layer </font> 
    
 public:

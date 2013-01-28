@@ -37,7 +37,7 @@ class  MultiNeighbourhoodGetter {
                                 ).first) UpdateIterator;
     
     public:
-        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
+        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
         BOOST_CONCEPT_USAGE(MultiNeighbourhoodGetter) {
             x.get(s, e);
         }
@@ -60,7 +60,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetter> class Mul
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement u;
+        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update u;
 };
 
 
@@ -75,7 +75,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetter> class Mul
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::UpdateElement u;
+        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update u;
 };
 
 } // local_search_concepts

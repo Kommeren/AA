@@ -5,10 +5,10 @@ namespace facility_location {
 
 template <typename VertexType> class FacilityLocationChecker {
 public:
-        template <class Solution, class UpdateElement> 
+        template <class Solution, class Update> 
     int gain(Solution & s, 
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
-            const UpdateElement & ue) {
+            const Update & ue) {
         auto FLS = s.get();
         int ret;
         switch (ue.getImpl()->getType()) {

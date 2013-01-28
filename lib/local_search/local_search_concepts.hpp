@@ -14,7 +14,7 @@ class  NeighbourhoodGetter {
                                 ).first) UpdateIterator;
     
     public:
-        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type UpdateElement;
+        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
         BOOST_CONCEPT_USAGE(NeighbourhoodGetter) {
             x.get(s);
         }
@@ -35,7 +35,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetterT> class Im
 
         X x;
         Solution s;
-        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::UpdateElement u;
+        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::Update u;
 };
 
 
@@ -49,7 +49,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetterT> class So
 
         X x;
         Solution s;
-        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::UpdateElement u;
+        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::Update u;
 };
 
 } // local_search_concepts
