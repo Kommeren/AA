@@ -8,7 +8,7 @@ public:
     void update(Solution & s, 
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & u) {
-        auto FLS = s.get();
+        auto & FLS = s.get();
         switch (u.getImpl()->getType()) {
             case REMOVE : {
                 auto r = static_cast<const Remove<VertexType> *>(u.getImpl());

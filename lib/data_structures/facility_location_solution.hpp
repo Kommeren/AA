@@ -101,16 +101,27 @@ class FacilityLocationSolutionWithClientsAssignment :
         // returns diff between new cost and old cost
         Dist remFacility(Vertex f) {
             Dist cost = -m_facCosts(f);
-            auto op = std::bind(std::not_equal_to<Vertex>(), f, std::placeholders::_1);
-            auto begin = m_facToClients.lower_bound(f);
-            auto end = m_facToClients.upper_bound(f);
-            for(;begin != end; ) {
-                auto v = begin->second;
-                //using the fact that this is a map 
-                //(with other containers you have to be carefull cause of iter invalidation)
-                ++begin;
-                cost -= dist(v);
-                cost += adjustClient(v, op);
+            if(m_chosenFacilities.size() == 1) {
+                //could be to tricky...
+                cost = Dist();
+                for(Vertex v : m_clients) {
+                    cost += dist(v);
+                }
+                m_clientsToFac.clear();
+                m_facToClients.clear();
+            } else {
+
+                auto op = std::bind(std::not_equal_to<Vertex>(), f, std::placeholders::_1);
+                auto begin = m_facToClients.lower_bound(f);
+                auto end = m_facToClients.upper_bound(f);
+                for(;begin != end; ) {
+                    auto v = begin->second;
+                    //using the fact that this is a map 
+                    //(with other containers you have to be carefull cause of iter invalidation)
+                    ++begin;
+                    cost -= dist(v);
+                    cost += adjustClient(v, op);
+                }
             }
             base::remove(f);
             return cost;

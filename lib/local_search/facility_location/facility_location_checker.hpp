@@ -9,7 +9,7 @@ public:
     int gain(Solution & s, 
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & ue) {
-        auto FLS = s.get();
+        auto & FLS = s.get();
         int ret;
         switch (ue.getImpl()->getType()) {
             case REMOVE : {

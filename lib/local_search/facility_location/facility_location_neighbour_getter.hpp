@@ -35,7 +35,7 @@ public:
     template <typename Solution> std::pair<Iter, Iter>
         get(Solution &s, const SolEl & el) {
 
-        auto FCS =  s.get(); 
+        auto & FCS =  s.get(); 
         m_currSol.clear();
 
         if(el.getIsChosen() == UNCHOSEN) {

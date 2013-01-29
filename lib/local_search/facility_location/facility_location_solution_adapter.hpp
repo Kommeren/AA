@@ -37,11 +37,11 @@ public:
         TransFunct transformChosen = [](VertexType v){ return SolElemT(CHOSEN ,v);};
         TransFunct transformUnchosen = [](VertexType v){ return SolElemT(UNCHOSEN, v);};
         
-        ChosenTIter chBegin(chb);
-        ChosenTIter chEnd(che);
+        ChosenTIter chBegin(chb, transformChosen);
+        ChosenTIter chEnd(che, transformChosen);
 
-        UnchosenTIter uchBegin(uchb);
-        UnchosenTIter uchEnd(uche);
+        UnchosenTIter uchBegin(uchb, transformUnchosen);
+        UnchosenTIter uchEnd(uche, transformUnchosen);
 
         ChosenTIterRange rch(chBegin, chEnd);
         UnchosenTIterRange ruch(uchBegin, uchEnd);

@@ -20,10 +20,19 @@ public:
         return m_elem;
     }
 
+    bool operator==(const SolutionElement & se) const {
+        return m_isChosen == se.m_isChosen && m_elem == se.m_elem;
+    }
+
 private:
     is_chosen m_isChosen;
     T m_elem;    
 };
+
+template <typename stream, typename T> stream & operator<<(stream & o, const SolutionElement<T> & se) {
+    o << se.getIsChosen() << "," << se.getElem() << " ";
+    return o;
+}
 
 
 }
