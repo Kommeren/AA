@@ -10,26 +10,27 @@ public:
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & ue) {
         auto & FLS = s.get();
+        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
         int ret;
         switch (ue.getImpl()->getType()) {
             case REMOVE : {
                 auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());
-                ret = FLS.remFacility(r->get());
-                FLS.addFacility(r->get());
+                ret = FLS.invokeOnCopy(&FLS_T::remFacility, r->get());
+                FLS.invokeOnCopy(&FLS_T::addFacility, r->get());
                 break;
             }
             case ADD: {
                 auto a = static_cast<const Add<VertexType> *>(ue.getImpl());
-                ret = FLS.addFacility(a->get());
-                FLS.remFacility(a->get());
+                ret = FLS.invokeOnCopy(&FLS_T::addFacility, a->get());
+                FLS.invokeOnCopy(&FLS_T::remFacility, a->get());
                 break;
             }
             case SWAP: {
                 auto s = static_cast<const Swap<VertexType> *>(ue.getImpl());
-                ret = FLS.addFacility(s->getTo());
-                ret += FLS.remFacility(s->getFrom());
-                FLS.addFacility(s->getFrom());
-                FLS.remFacility(s->getTo());
+                ret  = FLS.invokeOnCopy(&FLS_T::addFacility, s->getTo());
+                ret += FLS.invokeOnCopy(&FLS_T::remFacility, s->getFrom());
+                FLS.invokeOnCopy(&FLS_T::addFacility, s->getFrom());
+                FLS.invokeOnCopy(&FLS_T::remFacility, s->getTo());
                 break;
             }
             default: {

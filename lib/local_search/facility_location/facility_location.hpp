@@ -56,15 +56,13 @@ class FacilityLocationLocalSearchStep :
                                     ImproveChecker<VertexType> ch = ImproveChecker<VertexType>(),
                                     Update<VertexType> u = Update<VertexType>()) :
 
-                                        base(FLSolutionAdapter(m_fls), std::move(ng), std::move(ch), std::move(u)),
-                                        m_fls(std::move(unchosenFacilities), 
-                                              std::move(chosenFacilities), 
-                                              std::move(clients), 
-                                              m, facilitiesCosts) {}
-            
-
-    private:
-        FLSolution  m_fls;
+                                        base(FLSolutionAdapter(
+                                                  FLSolution(std::move(unchosenFacilities), 
+                                                      std::move(chosenFacilities), 
+                                                      std::move(clients), 
+                                                      m, 
+                                                      facilitiesCosts)), 
+                                                std::move(ng), std::move(ch), std::move(u)) {}
 };
 
 };

@@ -1,4 +1,6 @@
 #include "facility_location_update_element.hpp"
+#include "helpers/iterator_helpers.hpp"
+#include "helpers/type_functions.hpp"
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/detail/any_iterator.hpp>
 
@@ -9,7 +11,16 @@ namespace facility_location {
 template <typename VertexType> class U {
 public:
     U(VertexType v) : m_u(&m_sw), m_from(v) {}
+
     U() : m_u(&m_sw) {}
+    
+    U(const U & u) : m_u(&m_sw),  m_from(u.m_from) { 
+    }
+    
+    U & operator=(const U & u)  { 
+        m_from = u.m_from;
+        return *this;
+    }
 
     const Update & operator()(VertexType v) const {
         m_sw.setFrom(m_from); 
@@ -35,8 +46,9 @@ public:
     template <typename Solution> std::pair<Iter, Iter>
         get(Solution &s, const SolEl & el) {
 
-        auto & FCS =  s.get(); 
+        auto & FCS = s.get(); 
         m_currSol.clear();
+        auto e = el.getElem();
 
         if(el.getIsChosen() == UNCHOSEN) {
             //the update of UNCHOSEN is just adding him to solution
@@ -45,16 +57,21 @@ public:
             return std::make_pair(m_currSol.begin(), m_currSol.end()); 
         } else {
             assert(el.getIsChosen() == CHOSEN); 
+        
             //the update of CHOSEN could be remove or swap with some unchosen
-            m_rem.set(el.getElem());
+            m_rem.set(e);
             m_currSol.push_back(Update(&m_rem));
 
-            U<VertexType> uchToUE(el.getElem());
+            U<VertexType> uchToUE(e);
 
             auto remRange = std::make_pair(m_currSol.begin(), m_currSol.end());
-            auto & uch = FCS.getUnchosenFacilities();
-            typedef boost::transform_iterator<U<VertexType>, decltype(uch.begin()), const Update &> TransIter;
-            auto swapRange = std::make_pair(TransIter(uch.begin(), uchToUE), TransIter(uch.end(), uchToUE)); 
+            auto const & uch = FCS->getUnchosenFacilities();
+
+            typedef boost::transform_iterator<U<VertexType>, 
+                     decltype(uch.begin()), const Update &> TransIter;
+
+            auto swapRange = std::make_pair(TransIter(uch.begin(), uchToUE), 
+                                            TransIter(uch.end()  , uchToUE)); 
 
             auto ret = boost::join(remRange, swapRange); 
             

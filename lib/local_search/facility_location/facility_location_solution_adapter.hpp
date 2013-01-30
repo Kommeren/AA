@@ -1,5 +1,6 @@
 #include "facility_location_solution_element.hpp"
 #include "helpers/type_functions.hpp"
+#include "helpers/object_with_copy.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>
@@ -9,8 +10,10 @@ namespace local_search {
 namespace facility_location {
 
 template <typename FacilityLocationSolution> class FacilityLocationSolutionAdapter {
+    typedef FacilityLocationSolution FLS;
 public:
-    FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) : m_sol(sol) {}
+    typedef ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;;    
+    FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : m_sol(std::move(sol)) {}
 
     typedef typename FacilityLocationSolution::VertexType VertexType;
     typedef SolutionElement<VertexType> SolElemT;
@@ -27,8 +30,11 @@ public:
     typedef typename boost::range_iterator<Range>::type SolutionIterator;
 
     Range getRange() const {
-        auto ch = m_sol.getChosenFacilities();
-        auto uch = m_sol.getUnchosenFacilities();
+        //TODO examine why doesn't work
+        //auto const &  ch = m_sol.invoke(&FLS::getChosenFacilities);
+        //auto const &  uch = m_sol.invoke(&FLS::getUnchosenFacilities);
+        auto const &  ch = m_sol->getChosenFacilities();
+        auto const &  uch = m_sol->getUnchosenFacilities();
         ChosenIter chb = ch.begin();
         ChosenIter che = ch.end();
         UnchosenIter uchb = uch.begin();
@@ -57,11 +63,12 @@ public:
         return boost::end(getRange());
     }
 
-    FacilityLocationSolution & get() {
+    FacilityLocationSolutionWithCopy & get() {
         return m_sol;
     }
+    
 private:
-    FacilityLocationSolution & m_sol;    
+    FacilityLocationSolutionWithCopy m_sol;    
 };
 
 } //facility_location

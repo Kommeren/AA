@@ -1,8 +1,10 @@
-#define BOOST_TEST_MODULE facility_location_solution_adapter
+#define BOOST_TEST_MODULE cycle_manager
+#include <iterator>
 
 #include <boost/test/unit_test.hpp>
 #include "data_structures/facility_location_solution.hpp"
 #include "local_search/facility_location/facility_location_solution_adapter.hpp"
+#include "local_search/facility_location/facility_location_neighbour_getter.hpp"
 #include "utils/sample_graph.hpp"
 
 
@@ -18,31 +20,20 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
 
     typedef FacilityLocationSolutionWithClientsAssignment
         <int, decltype(gm), decltype(cost)> Sol;
-    
     typedef typename Sol::FacilitiesSet FSet;
-    Sol sol(FSet{SGM::A,SGM::B}, FSet{},
+    Sol sol(FSet{SGM::B}, FSet{SGM::A},
             FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
 
-   FacilityLocationSolutionAdapter<Sol> sa(std::move(sol));  
-   auto b = sa.begin();
-   auto e = sa.end();
-   BOOST_CHECK_EQUAL(*b, SolutionElement<int>(UNCHOSEN, SGM::A));
-   BOOST_CHECK(b != e);
-   BOOST_CHECK_EQUAL(*(++b), SolutionElement<int>(UNCHOSEN, SGM::B));
-   BOOST_CHECK(b != e);
+   FacilityLocationSolutionAdapter<Sol> sa(sol);  
+   FacilityLocationNeighbourhoodGetter<int> ng;
+   auto r = ng.get(sa, SolutionElement<int>(CHOSEN, SGM::A));
+   auto b = r.first;
+   auto e = r.second;
+   BOOST_CHECK_EQUAL(std::distance(b, e), 2);
+
+   BOOST_CHECK(b!=e);
+   BOOST_CHECK_EQUAL(b->getImpl()->getType(), REMOVE);
+   BOOST_CHECK(++b!=e);
+   BOOST_CHECK_EQUAL(b->getImpl()->getType(), SWAP);
    BOOST_CHECK(++b == e);
-
-   auto & realSol = sa.get(); 
-
-   realSol.invoke(&Sol::addFacility,SGM::A);
-   
-   b = sa.begin();
-   e = sa.end();
-   BOOST_CHECK_EQUAL(*b, SolutionElement<int>(CHOSEN, SGM::A));
-   BOOST_CHECK(b != e);
-   BOOST_CHECK_EQUAL(*(++b), SolutionElement<int>(UNCHOSEN, SGM::B));
-   BOOST_CHECK(b != e);
-   BOOST_CHECK(++b == e);
-
-
 }

@@ -14,11 +14,11 @@ class FacilityLocationSolution {
         FacilityLocationSolution(FacilitiesSet unchosen, FacilitiesSet chosen = FacilitiesSet()) :
             m_chosenFacilities(std::move(chosen)), m_unchosenFacilities(std::move(unchosen)) {}
 
-        const FacilitiesSet & getChosenFacilities() { 
+        const FacilitiesSet & getChosenFacilities() const { 
             return m_chosenFacilities;
         }
 
-        const FacilitiesSet & getUnchosenFacilities() {
+        const FacilitiesSet & getUnchosenFacilities() const {
             return m_unchosenFacilities;    
         }
 
@@ -57,11 +57,11 @@ class FacilityLocationSolutionWithClientsAssignment :
 
         FacilityLocationSolutionWithClientsAssignment(
                                  FacilitiesSet unchosen,
-                                 FacilitiesSet chosen, 
+                                 const FacilitiesSet & chosen, 
                                  ClientsSet clients,
                                  Metric & m,
                                  FacilityCost & c) :
-            base(std::move(unchosen), std::move(chosen)), m_clients(std::move(clients)), m_metric(m), m_facCosts(c) {
+            base(std::move(unchosen)), m_clients(std::move(clients)), m_metric(m), m_facCosts(c) {
                 for(Vertex f : m_chosenFacilities) {
                     addFacility(f);
                 }

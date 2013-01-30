@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     FLLS  ls(FLLS::FacilitiesSet{}, FLLS::FacilitiesSet{0,1}, FLLS::ClientsSet{0,1,2,3,4}, cost, gm);
     BOOST_CHECK(ls.search());
     auto & s = ls.getSolution();
-    auto & ch = s.getChosenFacilities();
+    auto const & ch = s->getChosenFacilities();
     
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;
