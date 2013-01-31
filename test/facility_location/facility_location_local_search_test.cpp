@@ -14,10 +14,14 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     auto gm = SGM::getGraph();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
+    
+    typedef paal::data_structures::FacilityLocationSolutionWithClientsAssignment
+        <int, decltype(gm), decltype(cost)> FLS;
 
-    typedef FacilityLocationLocalSearchStep<int, decltype(gm), decltype(cost)> FLLS;
+    FLS fls(FLS::FacilitiesSet{0,1}, FLS::FacilitiesSet{}, 
+                FLS::ClientsSet{0,1,2,3,4}, gm, cost);
 
-    FLLS  ls(FLLS::FacilitiesSet{}, FLLS::FacilitiesSet{0,1}, FLLS::ClientsSet{0,1,2,3,4}, cost, gm);
+    FacilityLocationLocalSearchStep<FLS>  ls(fls);
     BOOST_CHECK(ls.search());
     auto & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();

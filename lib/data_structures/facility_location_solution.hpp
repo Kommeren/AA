@@ -2,6 +2,9 @@
 #include <map>
 #include <cassert>
 
+#ifndef __FACILITY_LOCATION_SOLUTION__
+#define __FACILITY_LOCATION_SOLUTION__
+
 namespace paal {
 namespace data_structures {
 
@@ -171,5 +174,8 @@ class FacilityLocationSolutionWithClientsAssignment :
         FacilityCost & m_facCosts;
 };
 
+
 };
 };
+
+#endif //__FACILITY_LOCATION_SOLUTION__

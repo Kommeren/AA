@@ -12,57 +12,34 @@ namespace local_search {
 namespace facility_location {
     
 
-template <typename VertexType,
-         typename Metric, 
-         typename FacilityCosts,
-          template <class> class NeighbourhoodGetter = FacilityLocationNeighbourhoodGetter,
-          template <class> class ImproveChecker = FacilityLocationChecker,
-          template <class> class Update = FacilityLocationUpdater,
-          template <class,class,class> class FacilityLocationSolution 
-              = data_structures::FacilityLocationSolutionWithClientsAssignment>
+template <typename FacilityLocationSolution,
+          typename NeighbourhoodGetter = FacilityLocationNeighbourhoodGetter<typename FacilityLocationSolution::VertexType>,
+          typename ImproveChecker      = FacilityLocationChecker            <typename FacilityLocationSolution::VertexType>,
+          typename Updater             = FacilityLocationUpdater            <typename FacilityLocationSolution::VertexType>>
+
 class FacilityLocationLocalSearchStep : 
     public LocalSearchStepMultiSolution<
-            FacilityLocationSolutionAdapter<
-               FacilityLocationSolution<VertexType, 
-                                        Metric, 
-                                        FacilityCosts>
-                                       >, 
-            NeighbourhoodGetter<VertexType>, 
-            ImproveChecker<VertexType>, 
-            Update<VertexType> >  {
-    public:
-    
-    typedef FacilityLocationSolution<VertexType, 
-                                     Metric, 
-                                     FacilityCosts>
-                                       FLSolution;
+               FacilityLocationSolutionAdapter<FacilityLocationSolution>, 
+               NeighbourhoodGetter, 
+               ImproveChecker, 
+               Updater>  {
 
-    typedef typename FLSolution::FacilitiesSet FacilitiesSet;
-    typedef typename FLSolution::ClientsSet ClientsSet;
-    
-    typedef FacilityLocationSolutionAdapter<
-               FLSolution> FLSolutionAdapter;
+public:
+    typedef FacilityLocationSolutionAdapter<FacilityLocationSolution> FLSolutionAdapter;
     
     typedef LocalSearchStepMultiSolution<
-            FLSolutionAdapter,
-            NeighbourhoodGetter<VertexType>, 
-            ImproveChecker<VertexType>, 
-            Update<VertexType> >  base;
+                FLSolutionAdapter,
+                NeighbourhoodGetter, 
+                ImproveChecker, 
+                Updater >  base;
 
-    template <typename ChosenCol, typename UnchosenCol, typename ClientsCol> 
-        FacilityLocationLocalSearchStep(ChosenCol  chosenFacilities, UnchosenCol  unchosenFacilities, 
-                                    ClientsCol  clients, FacilityCosts & facilitiesCosts, Metric & m, 
-                                    NeighbourhoodGetter<VertexType> ng = NeighbourhoodGetter<VertexType>(),
-                                    ImproveChecker<VertexType> ch = ImproveChecker<VertexType>(),
-                                    Update<VertexType> u = Update<VertexType>()) :
+        FacilityLocationLocalSearchStep(FacilityLocationSolution fls, 
+                                    NeighbourhoodGetter ng = NeighbourhoodGetter(),
+                                    ImproveChecker ch = ImproveChecker(),
+                                    Updater u = Updater()) :
 
-                                        base(FLSolutionAdapter(
-                                                  FLSolution(std::move(unchosenFacilities), 
-                                                      std::move(chosenFacilities), 
-                                                      std::move(clients), 
-                                                      m, 
-                                                      facilitiesCosts)), 
-                                                std::move(ng), std::move(ch), std::move(u)) {}
+                                        base(FLSolutionAdapter(std::move(fls)), std::move(ng), 
+                                                               std::move(ch), std::move(u)) {}
 };
 
 };
