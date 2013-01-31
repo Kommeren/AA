@@ -25,15 +25,15 @@ class has_##member {  \
         static  const bool value = (sizeof(f<typename std::decay<T>::type>(0)) == sizeof(char));\
 }; 
 
-HAS_MEMBER_CLASS(begin)
-HAS_MEMBER_CLASS(cbegin)
+//HAS_MEMBER_CLASS(begin)
+//HAS_MEMBER_CLASS(cbegin)
 HAS_MEMBER_CLASS(get)
 
 template <typename Iter> struct IterToElem {
     typedef typename std::decay<decltype(*std::declval<Iter>())>::type type; 
 };
 
-template <typename Solution, typename Enable = void> struct SolToIter;
+/*template <typename Solution, typename Enable = void> struct SolToIter;
 
 
 template <typename Solution> struct SolToIter<Solution, 
@@ -44,7 +44,15 @@ template <typename Solution> struct SolToIter<Solution,
 template <typename Solution> struct SolToIter<Solution, 
          typename std::enable_if< has_cbegin<Solution>::value && ! has_begin<Solution>::value >::type > {
   typedef decltype(std::declval<Solution>().cbegin()) type; 
-  };
+  };*/
+
+template <typename Solution> struct SolToIter {
+    typedef decltype(std::declval<Solution>().begin()) type; 
+};
+
+template <typename Solution> struct SolToConstIter {
+    typedef decltype(std::declval<const Solution>().begin()) type; 
+};
 
 
 template <typename Solution> struct SolToElem {

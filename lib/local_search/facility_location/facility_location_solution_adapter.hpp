@@ -67,6 +67,10 @@ public:
         return m_sol;
     }
     
+    const FacilityLocationSolutionWithCopy & get() const {
+        return m_sol;
+    }
+    
 private:
     FacilityLocationSolutionWithCopy m_sol;    
 };

@@ -109,17 +109,17 @@ int main() {
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
     ImproveChecker2Opt<GraphMT> checker(gm);
-    TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), gm, checker);
-    auto const & cman = ls.getSolution();
-    std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-    simple_algo::print(cman, std::cout);
-    ls.search();
-    simple_algo::print(cman, std::cout);
-    std::cout << std::endl;
-    std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-    std::cout << "Wynik: " <<  ls.search() << std::endl;
-    simple_algo::print(cman, std::cout);
-    std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
+    //TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), checker);
+    //auto const & cman = ls.getSolution();
+    //std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
+    //simple_algo::print(cman, std::cout);
+    //ls.search();
+    //simple_algo::print(cman, std::cout);
+    //std::cout << std::endl;
+    ///std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
+    //std::cout << "Wynik: " <<  ls.search() << std::endl;
+    //simple_algo::print(cman, std::cout);
+    //std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
 //    typename GraphMT::DistanceType d;
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
@@ -144,8 +144,6 @@ int main() {
     std::set<int> set;
     typedef typename IterToElem<decltype(set.begin())>::type T;
     typedef typename IterToElem<decltype(std::declval<std::set<int>>().begin())>::type type; 
-    bool has = has_begin<const std::set<int>>::value;
-    std::cout<< has << std::endl;
 
 //    static char f(check<R (C::*)(), &C::begin>*);
     std::cout << typeid(&std::set<int>::begin).name() << std::endl;

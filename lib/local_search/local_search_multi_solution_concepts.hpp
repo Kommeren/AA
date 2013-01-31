@@ -6,12 +6,15 @@ namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
+
+//TODO checking if the method get const object dosn't work in this framework!
+//we have to find some workaround
 template <typename X>
 class MultiSolution  {
     private:
-        typedef decltype(std::declval<X>().end()) IterTypeEnd;
+        typedef decltype(std::declval<const X>().end()) IterTypeEnd;
     public:
-        typedef decltype(std::declval<X>().begin()) IterType;
+        typedef decltype(std::declval<const X>().begin()) IterType;
         typedef typename std::decay<decltype(*std::declval<IterType>())>::type Element;
         static_assert(std::is_same<IterType, IterTypeEnd>::value, "begin type != end type");
         //TODO problem with boost_join
@@ -32,8 +35,8 @@ class  MultiNeighbourhoodGetter {
     private:
         typedef typename MultiSolution<Solution>::Element SolutionElement;
         typedef decltype(std::declval<X>().get(
-                                std::declval<Solution &>(),
-                                std::declval<SolutionElement&>()
+                                std::declval<const Solution &>(),
+                                std::declval<const SolutionElement&>()
                                 ).first) UpdateIterator;
     
     public:
@@ -45,7 +48,7 @@ class  MultiNeighbourhoodGetter {
     private:
 
         X x;
-        Solution s;
+        Solution  s;
         SolutionElement e;
 };
 

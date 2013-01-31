@@ -6,10 +6,10 @@ namespace facility_location {
 template <typename VertexType> class FacilityLocationChecker {
 public:
         template <class Solution, class Update> 
-    int gain(Solution & s, 
+    int gain(const Solution & s, 
             const  typename SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & ue) {
-        auto & FLS = s.get();
+        auto const & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
         int ret;
         switch (ue.getImpl()->getType()) {

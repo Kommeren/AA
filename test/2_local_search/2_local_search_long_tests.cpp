@@ -28,8 +28,10 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         std::iota(v.begin(), v.end(), 0);
 
         std::random_shuffle(v.begin(), v.end());
+        data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
         ImproveChecker2Opt<tsp::TSPLIB_Matrix> ch(mtx);
-        TwoLocalSearchStep<int, tsp::TSPLIB_Matrix> ls(v.begin(), v.end(), mtx, ch);
+        paal::local_search::TrivialNeigbourGetter ng;
+        auto ls = make_TwoLocalSearchStep(std::move(cycle), ch, ng);
         auto const & cman = ls.getSolution();
         std::cout << "Graph:\t" << g.filename << std::endl;
         std::cout << "Length before\t" << simple_algo::getLength(mtx, cman) << std::endl;

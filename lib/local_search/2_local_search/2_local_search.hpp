@@ -13,47 +13,45 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename VertexType, 
-          typename Metric, 
-          typename NeighbourhoodGetter = TrivialNeigbourGetter,
-          template <class> class ImproveChecker = ImproveChecker2Opt,
-          template <class> class Cycle = data_structures::SimpleCycle>
+
+template <typename Cycle,
+          typename ImproveChecker, 
+          typename NeighbourhoodGetter = TrivialNeigbourGetter>
 
          class  TwoLocalSearchStep : 
-             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle<VertexType>>, 
-                        NeighbourhoodGetter, ImproveChecker<Metric>, TwoLocalSearchUpdater >  {
-
+             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
+                        NeighbourhoodGetter, ImproveChecker, TwoLocalSearchUpdater >  {
                
-                typedef Cycle<VertexType> CycleT;
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleT> , NeighbourhoodGetter, 
-                    ImproveChecker<Metric>, TwoLocalSearchUpdater > LocalSearchStepT;
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighbourhoodGetter, 
+                            ImproveChecker, TwoLocalSearchUpdater > LocalSearchStepT;
 
                 public:
 
-                    template <typename SolutionIter>  
-                     TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
-                                        Metric & m, 
-                                        ImproveChecker<Metric> ich,
-                                        NeighbourhoodGetter ng = NeighbourhoodGetter()
-                                        ) 
+                     TwoLocalSearchStep(Cycle c, 
+                                        ImproveChecker ich, 
+                                        NeighbourhoodGetter ng = NeighbourhoodGetter()) 
 
-                        : LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
-                                                std::move(ich), TwoLocalSearchUpdater()),
-                                                m_cycle(solBegin, solEnd) {}
-                    
-                     TwoLocalSearchStep(Cycle<VertexType> c, 
-                                        Metric & m, 
-                                        ImproveChecker<Metric> ich,
-                                        NeighbourhoodGetter ng = NeighbourhoodGetter()
-                                        ) 
-
-                        :   LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
+                        :   LocalSearchStepT(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(ng), 
                                                 std::move(ich), TwoLocalSearchUpdater()),
                                                 m_cycle(std::move(c)) {}
 
                 private:
-                    CycleT m_cycle;
+                    Cycle m_cycle;
              };
+
+
+template <typename Cycle,
+          typename ImproveChecker, 
+          typename NeighbourhoodGetter>
+
+TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>  
+
+    make_TwoLocalSearchStep(Cycle c, ImproveChecker ich, 
+            NeighbourhoodGetter ng = TrivialNeigbourGetter()) {
+
+    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>(c, ich, ng);
+}
+
 
 } //two_local_search
 } //local_search

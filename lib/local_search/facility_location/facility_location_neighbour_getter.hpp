@@ -44,9 +44,9 @@ public:
     //Due to the memory optimization at one moment only one Update is valid
     typedef SolutionElement<VertexType> SolEl;
     template <typename Solution> std::pair<Iter, Iter>
-        get(Solution &s, const SolEl & el) {
+        get(const Solution &s, const SolEl & el) {
 
-        auto & FCS = s.get(); 
+        auto const & FCS = s.get(); 
         m_currSol.clear();
         auto e = el.getElem();
 
