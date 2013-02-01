@@ -1,3 +1,10 @@
+/**
+ * @file graph_metrics.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 #include "boost/multi_array.hpp"
 

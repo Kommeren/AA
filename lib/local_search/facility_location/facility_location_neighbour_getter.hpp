@@ -1,3 +1,10 @@
+/**
+ * @file facility_location_neighbour_getter.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include "facility_location_update_element.hpp"
 #include "helpers/iterator_helpers.hpp"
 #include "helpers/type_functions.hpp"

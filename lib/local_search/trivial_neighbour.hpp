@@ -1,9 +1,10 @@
-/*
- *  * trivial_neighbour.hpp
- *  *
- *  *  Created on: 03-01-2013
- *  *      Author: Piotr Wygocki
- *  */
+/**
+ * @file trivial_neighbour.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 
 #ifndef __TRIVIAL_NEIGHBOUR__
 #define __TRIVIAL_NEIGHBOUR__

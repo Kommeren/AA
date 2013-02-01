@@ -1,5 +1,11 @@
+/**
+ * @file cycle_algo.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <algorithm>
-
 
 namespace paal {
 namespace simple_algo {

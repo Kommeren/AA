@@ -1,3 +1,10 @@
+/**
+ * @file simple_cycle_manager.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 
 #ifndef __SIMPLE_CYCLE_MANAGER__
 #define __SIMPLE_CYCLE_MANAGER__

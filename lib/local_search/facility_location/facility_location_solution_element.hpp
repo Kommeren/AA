@@ -1,3 +1,10 @@
+/**
+ * @file facility_location_solution_element.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #ifndef __FC_SOLUTION_ELEMENT__
 #define __FC_SOLUTION_ELEMENT__
 

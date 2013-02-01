@@ -1,9 +1,10 @@
-/*
- *  * local_search.hpp
- *  *
- *  *  Created on: 03-01-2013
- *  *      Author: Piotr Wygocki
- *  */
+/**
+ * @file local_search_single_solution.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 
 #ifndef __LOCAL_SEARCH_SINGLE_SOLUTION__
 #define __LOCAL_SEARCH_SINGLE_SOLUTION__

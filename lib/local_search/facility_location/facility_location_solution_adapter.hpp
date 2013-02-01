@@ -1,3 +1,10 @@
+/**
+ * @file facility_location_solution_adapter.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include "facility_location_solution_element.hpp"
 #include "helpers/type_functions.hpp"
 #include "helpers/object_with_copy.hpp"

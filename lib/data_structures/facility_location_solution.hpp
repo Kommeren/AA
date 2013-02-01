@@ -1,3 +1,10 @@
+/**
+ * @file facility_location_solution.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <set>
 #include <map>
 #include <cassert>

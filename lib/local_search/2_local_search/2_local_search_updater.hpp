@@ -1,3 +1,10 @@
+/**
+ * @file 2_local_search_updater.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #ifndef __2_LOCAL_SEARCH_SWAPPER__
 #define __2_LOCAL_SEARCH_SWAPPER__
 

@@ -1,3 +1,10 @@
+/**
+ * @file type_functions.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #ifndef __TYPE_FUNCITONS__
 #define __TYPE_FUNCITONS__
 

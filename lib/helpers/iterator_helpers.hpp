@@ -1,9 +1,10 @@
-/*
- *  * iterator_helpers.hpp
- *  *
- *  *  Created on: 03-01-2013
- *  *      Author: Piotr Wygocki
- *  */
+/**
+ * @file iterator_helpers.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 
 #include <boost/iterator/filter_iterator.hpp>
 

@@ -1,3 +1,10 @@
+/**
+ * @file local_search_multi_solution_concepts.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <boost/concept_check.hpp>
 #include <type_traits>
 #include "helpers/type_functions.hpp"
