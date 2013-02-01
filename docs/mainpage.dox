@@ -1,0 +1,61 @@
+/*! \mainpage This is the Practical Approximation Algorithms library. 
+ 
+  \section Introduction
+    The PAAl is a header-only, general library consisting of general algorithms, <br>
+    data structures and several complete solution for the various optimization problems.
+ 
+  \section Installation
+   There is no need to install anything because the PAAl is header only. <br>
+   All you have to do is to download the library and include appropriate headers.<br>
+
+   Only, if you'd like to develop the library you must compile the unit test.
+
+   \section get_repo Get Repository
+
+    In order to download repository please run the following command:
+    
+    <B>    git clone git://siekiera.mimuw.edu.pl/paal.git/ </B>
+
+
+
+
+  \section Contents
+    The library consists of several sublibraries
+    <ol>
+    <li>\ref local_search
+    </ol>
+
+  \section general_design General Design  
+   
+  The library is divided into the three layers:
+   
+  <pre>
+   ___________________________________________________________________________________________________
+  
+      ALGORITHMS  - eg. LocalSearch. The algorithms are written in very general way.
+      The are delegating the specific tasks to the algorithm helpers.
+  ___________________________________________________________________________________________________
+  
+      ALGORITHMS COMPONENTS - eg. NeighborhoodGetter, SolutionUpdater.
+      This are the brics  working on specific data structures concepts.
+  ___________________________________________________________________________________________________
+  
+      DATA_STRUCTURES - e.g. Metric, Cycle. The data structure used by algorithm helpers. 
+  ___________________________________________________________________________________________________
+  
+  </pre>
+  <br>
+  Our library is delivering default implementations of components from each layer. <br>
+  The strength of this design is that the user is allowed to change components from each layer. <br><br>
+  
+  For example the user can easily swap the implementation of the NeighborhoodGetter to provide his own way of searching the neighborhood. <br>
+  Also note that the same algorithm helpers that are used by local search can be used to produced the simulated annealing algorithm. <br>
+  If the user want to swap implementation of the metric to use specific properties of his topology is not the problem at all! <br>
+  
+
+
+  \section  Testing
+
+  //TODO
+ 
+*/

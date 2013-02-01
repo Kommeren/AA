@@ -23,6 +23,15 @@ namespace search_startegies {
 }
 
 
+/**
+ * @brief Taka klasa
+ *
+ * @tparam Solution
+ * @tparam NeighbourhoodGetter
+ * @tparam ImproveChecker
+ * @tparam SolutionUpdater
+ * @tparam SearchStrategy
+ */
 template <typename Solution, 
           typename NeighbourhoodGetter, 
           typename ImproveChecker, 
