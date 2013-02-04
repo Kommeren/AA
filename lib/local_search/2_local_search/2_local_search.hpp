@@ -65,8 +65,8 @@ template <typename Cycle,
  */
 template <typename Cycle,
           typename ImproveChecker, 
-          typename NeighborhoodGetter,
-          typename StopCondition>
+          typename NeighborhoodGetter = TrivialNeigborGetter,
+          typename StopCondition = TrivialStopConditionMultiSolution>
 
 TwoLocalSearchStep<Cycle, ImproveChecker, NeighborhoodGetter, StopCondition>  
 
