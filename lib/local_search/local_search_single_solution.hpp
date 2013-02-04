@@ -43,12 +43,14 @@ class LocalSearchStep {
         NeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
 public:
         LocalSearchStep(Solution solution, NeighbourhoodGetter ng, 
-                                     ImproveChecker check, SolutionUpdater solutionUpdater, StopCondition sc) :
+                        ImproveChecker check, SolutionUpdater solutionUpdater, 
+                        StopCondition sc = StopCondition()) :
             m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
-            m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater))
-            m_stopConditionFunctor(swtd::move(sc)), m_lastSearchSucceded(false) {}
+            m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)),
+            m_stopConditionFunctor(std::move(sc)), m_lastSearchSucceded(false) {}
 
         bool search() {
+            m_lastSearchSucceded = false;
             auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution);
 
             std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const Update & update) {
@@ -56,7 +58,7 @@ public:
                     m_lastSearchSucceded = true;
                     m_solutionUpdaterFunctor.update(m_solution, update);
                 } else {
-                    if(m_stopConditionFunctor.stop()) {
+                    if(m_stopConditionFunctor.stop(m_solution, update)) {
                         return false;
                     }
 
@@ -64,6 +66,10 @@ public:
                 return m_lastSearchSucceded;
             });
             return m_lastSearchSucceded;
+        }
+
+        Solution & getSolution() {
+            return m_solution;
         }
    
 private:
