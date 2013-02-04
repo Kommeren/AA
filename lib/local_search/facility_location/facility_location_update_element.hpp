@@ -52,10 +52,10 @@ private:
 };
 
 
-template <typename T> class RemAdd : public AbstractUpdate {
+template <typename T> class RemoveAndAddBase : public AbstractUpdate {
 public:
-    RemAdd(T t) : m_t(t) {}
-    RemAdd() {}
+    RemoveAndAddBase(T t) : m_t(t) {}
+    RemoveAndAddBase() {}
 
     T get() const {
         return m_t;
@@ -69,16 +69,16 @@ private:
     T m_t;
 };
 
-template <typename T> struct Remove : public RemAdd<T> {
-    Remove(T t) : RemAdd<T>(t) {}
+template <typename T> struct Remove : public RemoveAndAddBase<T> {
+    Remove(T t) : RemoveAndAddBase<T>(t) {}
     Remove() {}
     UpdateType getType() const {
         return REMOVE;
     }
 };
 
-template <typename T> struct Add : public RemAdd<T> {
-    Add(T t) : RemAdd<T>(t) {}
+template <typename T> struct Add : public RemoveAndAddBase<T> {
+    Add(T t) : RemoveAndAddBase<T>(t) {}
     Add() {}
     UpdateType getType() const {
         return ADD;

@@ -15,16 +15,16 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-template <typename VertexType> class U {
+template <typename VertexType> class VertexToSwapUpdate {
 public:
-    U(VertexType v) : m_u(&m_sw), m_from(v) {}
+    VertexToSwapUpdate(VertexType v) : m_u(&m_sw), m_from(v) {}
 
-    U() : m_u(&m_sw) {}
+    VertexToSwapUpdate() : m_u(&m_sw) {}
     
-    U(const U & u) : m_u(&m_sw),  m_from(u.m_from) { 
+    VertexToSwapUpdate(const VertexToSwapUpdate & u) : m_u(&m_sw),  m_from(u.m_from) { 
     }
     
-    U & operator=(const U & u)  { 
+    VertexToSwapUpdate & operator=(const VertexToSwapUpdate & u)  { 
         m_from = u.m_from;
         return *this;
     }
@@ -69,12 +69,12 @@ public:
             m_rem.set(e);
             m_currSol.push_back(Update(&m_rem));
 
-            U<VertexType> uchToUE(e);
+            VertexToSwapUpdate<VertexType> uchToUE(e);
 
             auto remRange = std::make_pair(m_currSol.begin(), m_currSol.end());
             auto const & uch = FCS->getUnchosenFacilities();
 
-            typedef boost::transform_iterator<U<VertexType>, 
+            typedef boost::transform_iterator<VertexToSwapUpdate<VertexType>, 
                      decltype(uch.begin()), const Update &> TransIter;
 
             auto swapRange = std::make_pair(TransIter(uch.begin(), uchToUE), 
