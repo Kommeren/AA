@@ -38,7 +38,7 @@ class MultiSolution  {
 
 
 template <typename X, typename Solution> 
-class  MultiNeighbourhoodGetter {
+class  MultiNeighborhoodGetter {
     private:
         typedef typename MultiSolution<Solution>::Element SolutionElement;
         typedef decltype(std::declval<X>().get(
@@ -48,7 +48,7 @@ class  MultiNeighbourhoodGetter {
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
-        BOOST_CONCEPT_USAGE(MultiNeighbourhoodGetter) {
+        BOOST_CONCEPT_USAGE(MultiNeighborhoodGetter) {
             x.get(s, e);
         }
 
@@ -59,7 +59,7 @@ class  MultiNeighbourhoodGetter {
         SolutionElement e;
 };
 
-template <typename X, typename Solution, typename NeighbourhoodGetter> class MultiImproveChecker {
+template <typename X, typename Solution, typename NeighborhoodGetter> class MultiImproveChecker {
     public:
         BOOST_CONCEPT_USAGE(MultiImproveChecker) {
             x.gain(s, e, u);
@@ -70,11 +70,11 @@ template <typename X, typename Solution, typename NeighbourhoodGetter> class Mul
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update u;
+        typename MultiNeighborhoodGetter<NeighborhoodGetter, Solution>::Update u;
 };
 
 
-template <typename X, typename Solution, typename NeighbourhoodGetter> class MultiSolutionUpdater {
+template <typename X, typename Solution, typename NeighborhoodGetter> class MultiSolutionUpdater {
     public:
         BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
             x.update(s, e, u);
@@ -85,7 +85,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetter> class Mul
         X x;
         Solution s;
         typename MultiSolution<Solution>::Element e;
-        typename MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update u;
+        typename MultiNeighborhoodGetter<NeighborhoodGetter, Solution>::Update u;
 };
 
 } // local_search_concepts

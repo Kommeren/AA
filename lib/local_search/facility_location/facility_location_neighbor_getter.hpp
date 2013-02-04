@@ -1,5 +1,5 @@
 /**
- * @file facility_location_neighbour_getter.hpp
+ * @file facility_location_neighbor_getter.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -42,7 +42,7 @@ private:
 };
 
 
-template <typename VertexType> class FacilityLocationNeighbourhoodGetter {
+template <typename VertexType> class FacilityLocationNeighborhoodGetter {
 public: 
        
     //TODO we shouldn't use detail..

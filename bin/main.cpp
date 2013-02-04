@@ -14,7 +14,7 @@
 #include "data_structures/facility_location_solution.hpp"
 #include "simple_algo/cycle_algo.hpp"
 #include "local_search/facility_location/facility_location_solution_adapter.hpp"
-#include "local_search/facility_location/facility_location_neighbour_getter.hpp"
+#include "local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include <boost/iterator/transform_iterator.hpp>
 #include "helpers/type_functions.hpp"
 
@@ -53,7 +53,7 @@ void fn(std::vector<int> v,  std::pair<int, int> i) {
 int main() {
 
     std::vector<int> v = {1,2,3,4,5, 6, 7, 8, 9, 10};
-    auto vExl = TrivialNeigbourGetter().get(v, 4);
+    auto vExl = TrivialNeigborGetter().get(v, 4);
     vExl.first != vExl.second;
     fn(v, std::make_pair(4, 5));
     std::cout << (vExl.first == vExl.second) << std::endl << std::flush;
@@ -131,7 +131,7 @@ int main() {
 
     FacilityLocationSolutionAdapter<Sol> sa(sol);
     sa.begin();
-    FacilityLocationNeighbourhoodGetter<int> FLNG;
+    FacilityLocationNeighborhoodGetter<int> FLNG;
     FLNG.get(sa, SolutionElement<int>(CHOSEN, A));
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};

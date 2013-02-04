@@ -4,7 +4,7 @@
 #include <boost/test/unit_test.hpp>
 #include "data_structures/facility_location_solution.hpp"
 #include "local_search/facility_location/facility_location_solution_adapter.hpp"
-#include "local_search/facility_location/facility_location_neighbour_getter.hpp"
+#include "local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include "utils/sample_graph.hpp"
 
 
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
             FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
 
    FacilityLocationSolutionAdapter<Sol> sa(sol);  
-   FacilityLocationNeighbourhoodGetter<int> ng;
+   FacilityLocationNeighborhoodGetter<int> ng;
    auto r = ng.get(sa, SolutionElement<int>(CHOSEN, SGM::A));
    auto b = r.first;
    auto e = r.second;

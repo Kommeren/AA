@@ -26,32 +26,32 @@ namespace search_startegies {
 
 
 template <typename Solution, 
-          typename NeighbourhoodGetter, 
+          typename NeighborhoodGetter, 
           typename ImproveChecker, 
           typename SolutionUpdater,
           typename StopCondition = TrivialStopCondition,
           typename SearchStrategy = search_startegies::ChooseFirstBetter> 
 
 class LocalSearchStep {
-    BOOST_CONCEPT_ASSERT((local_search_concepts::NeighbourhoodGetter<NeighbourhoodGetter, Solution>));
-    BOOST_CONCEPT_ASSERT((local_search_concepts::ImproveChecker<ImproveChecker, Solution, NeighbourhoodGetter>));
-    BOOST_CONCEPT_ASSERT((local_search_concepts::SolutionUpdater<SolutionUpdater, Solution, NeighbourhoodGetter>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::NeighborhoodGetter<NeighborhoodGetter, Solution>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::ImproveChecker<ImproveChecker, Solution, NeighborhoodGetter>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::SolutionUpdater<SolutionUpdater, Solution, NeighborhoodGetter>));
     static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
                   std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
     
     typedef typename local_search_concepts::
-        NeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
+        NeighborhoodGetter<NeighborhoodGetter, Solution>::Update Update;
 public:
-        LocalSearchStep(Solution solution, NeighbourhoodGetter ng, 
+        LocalSearchStep(Solution solution, NeighborhoodGetter ng, 
                         ImproveChecker check, SolutionUpdater solutionUpdater, 
                         StopCondition sc = StopCondition()) :
-            m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
+            m_solution(std::move(solution)), m_neighborGetterFunctor(std::move(ng)), 
             m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)),
             m_stopConditionFunctor(std::move(sc)), m_lastSearchSucceded(false) {}
 
         bool search() {
             m_lastSearchSucceded = false;
-            auto adjustmentSet = m_neighbourGetterFunctor.get(m_solution);
+            auto adjustmentSet = m_neighborGetterFunctor.get(m_solution);
 
             std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const Update & update) {
                 if(m_checkFunctor.gain(m_solution, update) > 0) {
@@ -74,15 +74,15 @@ public:
    
 private:
     Solution m_solution;
-    NeighbourhoodGetter m_neighbourGetterFunctor;
+    NeighborhoodGetter m_neighborGetterFunctor;
     ImproveChecker m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
     StopCondition m_stopConditionFunctor;
     bool m_lastSearchSucceded;
 };
 
-template <typename Solution, typename NeighbourhoodGetter, typename ImproveChecker, typename SolutionUpdater> 
-class LocalSearchStep<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, search_startegies::SteepestSlope> {
+template <typename Solution, typename NeighborhoodGetter, typename ImproveChecker, typename SolutionUpdater> 
+class LocalSearchStep<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, search_startegies::SteepestSlope> {
     //TODO implement
 };
 

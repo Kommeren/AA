@@ -1,13 +1,13 @@
 /**
- * @file trivial_neighbour.hpp
+ * @file trivial_neighbor.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
  */
 
-#ifndef __TRIVIAL_NEIGHBOUR__
-#define __TRIVIAL_NEIGHBOUR__
+#ifndef __TRIVIAL_NEIGHBOR__
+#define __TRIVIAL_NEIGHBOR__
 
 #include <utility>
 #include "helpers/iterator_helpers.hpp"
@@ -17,7 +17,7 @@ namespace paal {
 namespace local_search{
 
 
-struct TrivialNeigbourGetter {
+struct TrivialNeigborGetter {
     template <typename SolutionElement, typename Solution> 
                           std::pair<helpers::IteratorWithExcludedElement<typename SolToConstIter<Solution>::type, SolutionElement>, 
                                     helpers::IteratorWithExcludedElement<typename SolToConstIter<Solution>::type, SolutionElement> > 
@@ -34,4 +34,4 @@ struct TrivialNeigbourGetter {
 } //local_search
 } //paal
 
-#endif // __TRIVIAL_NEIGHBOUR__
+#endif // __TRIVIAL_NEIGHBOR__

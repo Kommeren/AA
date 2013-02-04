@@ -10,7 +10,7 @@
 #define __2_LOCAL_SEARCH__
 
 #include "local_search/local_search_multi_solution.hpp"
-#include "local_search/trivial_neighbour.hpp"
+#include "local_search/trivial_neighbor.hpp"
 #include "local_search/2_local_search/2_local_search_updater.hpp"
 #include "local_search/2_local_search/2_local_search_checker.hpp"
 #include "local_search/2_local_search/2_local_search_solution_adapter.hpp"
@@ -23,21 +23,21 @@ namespace two_local_search {
 
 template <typename Cycle,
           typename ImproveChecker, 
-          typename NeighbourhoodGetter = TrivialNeigbourGetter, 
+          typename NeighborhoodGetter = TrivialNeigborGetter, 
           typename StopCondition = TrivialStopConditionMultiSolution>
 
          class  TwoLocalSearchStep : 
              public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
-                        NeighbourhoodGetter, ImproveChecker, TwoLocalSearchUpdater, StopCondition>  {
+                        NeighborhoodGetter, ImproveChecker, TwoLocalSearchUpdater, StopCondition>  {
                
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighbourhoodGetter, 
+                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighborhoodGetter, 
                             ImproveChecker, TwoLocalSearchUpdater, StopCondition > LocalSearchStepT;
 
                 public:
 
                      TwoLocalSearchStep(Cycle c, 
                                         ImproveChecker ich, 
-                                        NeighbourhoodGetter ng = NeighbourhoodGetter(),
+                                        NeighborhoodGetter ng = NeighborhoodGetter(),
                                         StopCondition sc = TrivialStopConditionMultiSolution()) 
 
                         :   LocalSearchStepT(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(ng), 
@@ -56,7 +56,7 @@ template <typename Cycle,
  *
  * @tparam Cycle
  * @tparam ImproveChecker
- * @tparam NeighbourhoodGetter
+ * @tparam NeighborhoodGetter
  * @param c
  * @param ich
  * @param ng
@@ -65,16 +65,16 @@ template <typename Cycle,
  */
 template <typename Cycle,
           typename ImproveChecker, 
-          typename NeighbourhoodGetter,
+          typename NeighborhoodGetter,
           typename StopCondition>
 
-TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter, StopCondition>  
+TwoLocalSearchStep<Cycle, ImproveChecker, NeighborhoodGetter, StopCondition>  
 
     make_TwoLocalSearchStep(Cycle c, ImproveChecker ich, 
-            NeighbourhoodGetter ng = TrivialNeigbourGetter(),
+            NeighborhoodGetter ng = TrivialNeigborGetter(),
             StopCondition sc = TrivialStopConditionMultiSolution()) {
 
-    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>(c, ich, ng, sc);
+    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighborhoodGetter>(c, ich, ng, sc);
 }
 
 

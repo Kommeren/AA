@@ -14,7 +14,7 @@ namespace local_search {
 namespace local_search_concepts {
 
 template <typename X, typename Solution> 
-class  NeighbourhoodGetter {
+class  NeighborhoodGetter {
     private:
         typedef decltype(std::declval<X>().get(
                                 std::declval<Solution &>()
@@ -22,7 +22,7 @@ class  NeighbourhoodGetter {
     
     public:
         typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
-        BOOST_CONCEPT_USAGE(NeighbourhoodGetter) {
+        BOOST_CONCEPT_USAGE(NeighborhoodGetter) {
             x.get(s);
         }
 
@@ -32,7 +32,7 @@ class  NeighbourhoodGetter {
         Solution s;
 };
 
-template <typename X, typename Solution, typename NeighbourhoodGetterT> class ImproveChecker {
+template <typename X, typename Solution, typename NeighborhoodGetterT> class ImproveChecker {
     public:
         BOOST_CONCEPT_USAGE(ImproveChecker) {
             x.gain(s, u);
@@ -42,11 +42,11 @@ template <typename X, typename Solution, typename NeighbourhoodGetterT> class Im
 
         X x;
         Solution s;
-        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::Update u;
+        typename NeighborhoodGetter<NeighborhoodGetterT, Solution>::Update u;
 };
 
 
-template <typename X, typename Solution, typename NeighbourhoodGetterT> class SolutionUpdater {
+template <typename X, typename Solution, typename NeighborhoodGetterT> class SolutionUpdater {
     public:
         BOOST_CONCEPT_USAGE(SolutionUpdater) {
             x.update(s, u);
@@ -56,7 +56,7 @@ template <typename X, typename Solution, typename NeighbourhoodGetterT> class So
 
         X x;
         Solution s;
-        typename NeighbourhoodGetter<NeighbourhoodGetterT, Solution>::Update u;
+        typename NeighborhoodGetter<NeighborhoodGetterT, Solution>::Update u;
 };
 
 } // local_search_concepts
