@@ -139,13 +139,13 @@ Concepts:
     <li> <i>MultiNeighborhoodGetter</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
     MultiNeighborhoodGetterArchetype {
-        UpdateIteratorsRange get(Solution & s, const SolutionElement &)
+        UpdateIteratorsRange get(const Solution & s, const SolutionElement &)
     }
     </pre>
     <li> <i>MultiImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     MultiImproveCheckerArchetype {
-        int gain(Solution & s, const SolutionElement &, const Update & update);
+        int gain(const Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
     <li> <i>MultiSolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
