@@ -10,8 +10,7 @@
 
    Only, if you'd like to develop the library you must compile the unit test.
 
-   \section get_repo Get Repository
-
+  \section get_repo Get Repository
     In order to download repository please run the following command:
     
     <B>    git clone git://siekiera.mimuw.edu.pl/paal.git/ </B>
