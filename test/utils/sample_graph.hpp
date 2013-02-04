@@ -11,9 +11,7 @@ struct SampleGraphsMetrics {
     typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
     enum nodes { A, B, C, D, E };
 
-
-
-    static GraphMT getGraph(){
+    static GraphMT getGraphMetric() {
         const int num_nodes = 5;
         Edge edge_array[] = { Edge(A, C), Edge(B, B), Edge(B, D), Edge(B, E),
             Edge(C, B), Edge(C, D), Edge(D, E), Edge(E, A), Edge(E, B)
@@ -25,6 +23,8 @@ struct SampleGraphsMetrics {
 
         return GraphMT(g);
     }
+
+    static int getSize() { return 5;}
 
 };
 

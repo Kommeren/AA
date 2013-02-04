@@ -5,7 +5,7 @@
 
 BOOST_AUTO_TEST_CASE(MetricTest) {
     typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraph();
+    auto gm = SGM::getGraphMetric();
 
     BOOST_CHECK(gm(SGM::A,SGM::B) == 2);
     BOOST_CHECK(gm(SGM::C,SGM::B) == 3);

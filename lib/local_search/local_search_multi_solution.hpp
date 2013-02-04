@@ -24,20 +24,27 @@ namespace search_startegies {
 
 
 /**
- * @brief Taka klasa
+ * @class LocalSearchStepMultiSolution
+ * @brief General class for local search on the multi solution. Note there is no Update type here because it can be deduced.
  *
  * @tparam Solution
  * @tparam NeighbourhoodGetter
  * @tparam ImproveChecker
  * @tparam SolutionUpdater
  * @tparam SearchStrategy
+           Search strategy descibes LS search strategy. For ow we are planning two strategies: 
+           <ul>
+           <li>ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
+           <li>SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
+           </ul>
  */
+
 template <typename Solution, 
           typename NeighbourhoodGetter, 
           typename ImproveChecker, 
           typename SolutionUpdater, 
-          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
-
+          typename SearchStrategy = search_startegies::ChooseFirstBetter
+          >
 class LocalSearchStepMultiSolution {
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>));
@@ -51,14 +58,28 @@ class LocalSearchStepMultiSolution {
     typedef typename local_search_concepts::
         MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
     
+    typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, SearchStrategy>  self;
+    
 public:
-    typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater>  self;
 
+    /**
+     * @brief costam 
+     *
+     * @param solution
+     * @param ng
+     * @param check
+     * @param solutionUpdater
+     */
     LocalSearchStepMultiSolution(Solution solution, NeighbourhoodGetter ng, 
                                  ImproveChecker check, SolutionUpdater solutionUpdater) :
      m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
      m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
 
+    /**
+     * @brief tata 
+     *
+     * @return 
+     */
     bool search() {
         m_lastSearchSucceded = false;
 

@@ -31,7 +31,6 @@ This algorithm can be repeated and the best local optimum is presented. <br><br>
 
 Let us write the pseudo code for this operation:  <br><br>
 
-<font size=4>
 <pre>
  local_search() 
  {
@@ -46,7 +45,6 @@ Let us write the pseudo code for this operation:  <br><br>
      return x
  }
 </pre>
-</font>
 
 Note that we are working on updates (not on the full solution). This idea is going to be used in the c++ code. <br> 
 The reason of this is the fact that usually the updates are much lighter than the full solutions. <br>
@@ -56,7 +54,6 @@ In many cases for such solutions we search the neighborhood of each solution ele
 <br>
 In this cases it is more convenient to proceed in the following way:<br>
 
-<font size=4>
 <pre>
  local_search() 
  {
@@ -74,14 +71,13 @@ In this cases it is more convenient to proceed in the following way:<br>
      return x
  }
 </pre>
-</font>
 <br>
 We find this algorithm schema  extremely useful in our implementation! <br>
 We will refer to this schema as LocalSearchMultiSolution. <br>
 Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 \section local_search_interface  LOCAL SEARCH INTERFACE 
-\subsection loacl_search_multi LOCAL SEARCH SINGLE SOLUTION 
+\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION 
 
 In order to present the LS interface we need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of single update. <br>
@@ -110,40 +106,10 @@ Concepts:
 
 </ol>
 
-
-Now we present the interface of the LS algorithm
-
-<font size=4>
-<pre>
-
-template &lttypename Solution, 
-          typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater, 
-          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
-                        // Search strategy, descibes LS search strategy. For ow we are planning two strategies:
-                        // ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
-                        // SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
-          //note there is no Update here because it can be deduced    <font color="red"> maybe it should be contained... </font>
-class LocalSearchStep { // <font color="red"> now we present only one step of the algorithm, later on we plan to add one more layer </font> 
-public:
-   LocalSearchStep(Solution solution, 
-                   NeighborhoodGetter ng, 
-                   ImproveChecker check, 
-                   SolutionUpdater solutionUpdater); 
-    
-    bool search(); // performing one step of the search
-    Solution & getSolution();
-};
-
-</pre>
-</font>
-<br>
+Now we can introduce the paal::local_search::LocalSearchStep interface.
 
 
-\include local_search_multi_solution.hpp
-
-<h4> LOCAL SEARCH MULTI SOLUTION </h4>
+\subsection local_search_multi LOCAL SEARCH MULTI SOLUTION 
 
 The interface and conceptes of the  LocalSearchMultiSolution are ver simmilar to the LocalSearchSingleSolution ones.<br>
 
@@ -184,37 +150,13 @@ Concepts:
 </ol>
 
 
-Now we present the interface of the LSMultiSolution algorithm
+Now we present the paal::local_search::LocalSearchStepMultiSolution inteface.
 
-<font size=4>
-<pre>
-
-template &lttypename MultiSolution, 
-          typename MultiNeighborhoodGetter, 
-          typename MultiImproveChecker, 
-          typename MultiSolutionUpdater, 
-          typename MultiSearchStrategy = search_startegies::ChooseFirstBetter> 
-                        // Search strategy, describes LS search strategy. For now we are planning two strategies:
-                        // ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
-                        // SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
-          //note there is no Update and SolutionElement here because they can be deduced    <font color="red"> maybe it should be contained... </font>
-class LocalSearchStepMultiSolution { // <font color="red"> now we present only one step of the algorithm, later on we plan to add one more layer </font> 
-   
-public:
-   LocalSearchStep(MultiSolution solution, 
-                   MultiNeighborhoodGetter ng, 
-                   MultiImproveChecker check, 
-                   MultiSolutionUpdater solutionUpdater); 
-    
-    bool search();// performing one step of the search
-    InnerSolution & getSolution(); // is here only if MultiSolution has get member function.
-};
 
 </pre>
-</font>
 <br>
 
-<h3> 2-opt FOR TSP </h3>
+\section two_opt 2-opt FOR TSP 
 
 Now we can draw for you interface and the example implementation and usage of 2_local_search for TSP. <br><br>
 
@@ -242,105 +184,14 @@ Now we can present implementattion of 2-local-search. <br>
 Note that in the main algorithm we had to define only constructors.<br>
 The rest is done by base class LocalSearchMultiSolution and the implemented helpers.
 
-<font size=4>
-<pre>
-template &lttypename VertexType, 
-           typename Metric, //<font color="red"> to consistent it should be the template as well </font>
-           typename NeighborhoodGetter = TrivialNeigbourGetter,
-           template <class> class ImproveChecker = ImproveChecker2Opt,
-           template <class> class Cycle = data_structures::SimpleCycle>
- 
-          class  TwoLocalSearchStep : 
-              public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle<VertexType>>, 
-                         NeighborhoodGetter, ImproveChecker<Metric>, TwoLocalSearchUpdater >  {
- 
-                
-                 typedef Cycle<VertexType> CycleT;
-                 typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<CycleT> , NeighborhoodGetter, 
-                     ImproveChecker<Metric>, TwoLocalSearchUpdater > LocalSearchStepT;
- 
-                 public:
- 
-                     template <typename SolutionIter>  
-                      TwoLocalSearchStep(SolutionIter solBegin, SolutionIter solEnd, 
-                                         Metric & m, 
-                                         ImproveChecker<Metric> ich,
-                                         NeighborhoodGetter ng = NeighborhoodGetter()
-                                         ) 
- 
-                         : LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
-                                                 std::move(ich), TwoLocalSearchUpdater()),
-                                                 m_cycle(solBegin, solEnd) {}
-                     
-                      TwoLocalSearchStep(Cycle<VertexType> c, 
-                                         Metric & m, 
-                                         ImproveChecker<Metric> ich,
-                                         NeighborhoodGetter ng = NeighborhoodGetter()
-                                         ) 
- 
-                        :   LocalSearchStepT(TwoLocalSearchContainer<CycleT>(m_cycle), std::move(ng), 
-                                             std::move(ich), TwoLocalSearchUpdater()),
-                                             m_cycle(std::move(c)) {}
-                                      
-         private:
-            CycleT m_cycle;
-};     
-</pre>
-</font>
+\include 2_local_search.hpp
 
 Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
 
-<font size=4>
-<pre>
-      //assume that graph_t g is some graph from boost graph library
-
-      typedef GraphMetric&ltgraph_t, int> GraphMT;
-      GraphMT gm(g); // gm is a graph metric for graph g
-
-      //create random solution <font color="red">// This is going to be contained in the library!</font>
-      std::vector&ltint> ver = {A, B, C, D, E};
-      std::random_shuffle(ver.begin(), ver.end()); 
-
-      //creating of local search
-      ImproveChecker2Opt&ltGraphMT> checker(gm);
-      TwoLocalSearchStep&ltint, GraphMT> ls(ver.begin(), ver.end(), gm, checker);
-      auto const & cman = ls.getSolution();
-
-      //printing 
-      std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-      simple_algo::print(cman, std::cout);
-
-      //search
-      ls.search();
-
-      //printing after search
-      simple_algo::print(cman, std::cout);
-      std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-
-</pre>
-</font>
+\snippet 2_local_search_test.cpp Two Local Search Example
 
 Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
-
-
-</body>
-
-
-</html>
  
- \tableofcontents
- Leading text.
- \section sec An example section2
- This page contains the subsections \ref subsection1 and \ref subsection2.
- For more info see page \ref page2.
- \subsection subsection1 The first subsection
- Text.
- \subsection subsection2 The second subsection
- More text.
- */
-
- /*! \page page2 Another page
- Even more info.
- */
+*/
 #include "local_search_single_solution.hpp"
 #include "local_search_multi_solution.hpp"

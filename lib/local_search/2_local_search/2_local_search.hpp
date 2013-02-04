@@ -47,6 +47,20 @@ template <typename Cycle,
              };
 
 
+
+/**
+ * @brief make template function for TwoLocalSearchStep, just to avoid providing type names in template.
+ *
+ *
+ * @tparam Cycle
+ * @tparam ImproveChecker
+ * @tparam NeighbourhoodGetter
+ * @param c
+ * @param ich
+ * @param ng
+ *
+ * @return 
+ */
 template <typename Cycle,
           typename ImproveChecker, 
           typename NeighbourhoodGetter>
