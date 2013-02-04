@@ -23,23 +23,25 @@ namespace two_local_search {
 
 template <typename Cycle,
           typename ImproveChecker, 
-          typename NeighbourhoodGetter = TrivialNeigbourGetter>
+          typename NeighbourhoodGetter = TrivialNeigbourGetter, 
+          typename StopCondition = TrivialStopConditionMultiSolution>
 
          class  TwoLocalSearchStep : 
              public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
-                        NeighbourhoodGetter, ImproveChecker, TwoLocalSearchUpdater >  {
+                        NeighbourhoodGetter, ImproveChecker, TwoLocalSearchUpdater, StopCondition>  {
                
                 typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighbourhoodGetter, 
-                            ImproveChecker, TwoLocalSearchUpdater > LocalSearchStepT;
+                            ImproveChecker, TwoLocalSearchUpdater, StopCondition > LocalSearchStepT;
 
                 public:
 
                      TwoLocalSearchStep(Cycle c, 
                                         ImproveChecker ich, 
-                                        NeighbourhoodGetter ng = NeighbourhoodGetter()) 
+                                        NeighbourhoodGetter ng = NeighbourhoodGetter(),
+                                        StopCondition sc = TrivialStopConditionMultiSolution()) 
 
                         :   LocalSearchStepT(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(ng), 
-                                                std::move(ich), TwoLocalSearchUpdater()),
+                                                std::move(ich), TwoLocalSearchUpdater(), std::move(sc)),
                                                 m_cycle(std::move(c)) {}
 
                 private:
@@ -63,14 +65,16 @@ template <typename Cycle,
  */
 template <typename Cycle,
           typename ImproveChecker, 
-          typename NeighbourhoodGetter>
+          typename NeighbourhoodGetter,
+          typename StopCondition>
 
-TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>  
+TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter, StopCondition>  
 
     make_TwoLocalSearchStep(Cycle c, ImproveChecker ich, 
-            NeighbourhoodGetter ng = TrivialNeigbourGetter()) {
+            NeighbourhoodGetter ng = TrivialNeigbourGetter(),
+            StopCondition sc = TrivialStopConditionMultiSolution()) {
 
-    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>(c, ich, ng);
+    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighbourhoodGetter>(c, ich, ng, sc);
 }
 
 

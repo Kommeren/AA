@@ -32,7 +32,8 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
    //creating local search
    ImproveChecker2Opt<decltype(gm)> ch(gm);
    paal::local_search::TrivialNeigbourGetter ng;
-   auto ls = make_TwoLocalSearchStep(std::move(cycle), ch, ng);
+   paal::local_search::TrivialStopConditionMultiSolution sc;
+   auto ls = make_TwoLocalSearchStep(std::move(cycle), ch, ng, sc);
 
    //printing 
    auto const & cman = ls.getSolution();

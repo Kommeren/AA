@@ -34,7 +34,8 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         //creating local search
         ImproveChecker2Opt<tsp::TSPLIB_Matrix> ch(mtx);
         paal::local_search::TrivialNeigbourGetter ng;
-        auto ls = make_TwoLocalSearchStep(std::move(cycle), ch, ng);
+        paal::local_search::TrivialStopConditionMultiSolution sc;
+        auto ls = make_TwoLocalSearchStep(std::move(cycle), ch, ng, sc);
 
         //printing 
         auto const & cman = ls.getSolution();

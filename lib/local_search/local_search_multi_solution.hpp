@@ -13,6 +13,7 @@
 #include <functional>
 
 #include "local_search_multi_solution_concepts.hpp"
+#include "trivial_stop_condition_multi_solution.hpp"
 
 namespace paal {
 namespace local_search {
@@ -31,6 +32,7 @@ namespace search_startegies {
  * @tparam NeighbourhoodGetter
  * @tparam ImproveChecker
  * @tparam SolutionUpdater
+ * @tparam StopCondition
  * @tparam SearchStrategy
            Search strategy descibes LS search strategy. For ow we are planning two strategies: 
            <ul>
@@ -43,6 +45,7 @@ template <typename Solution,
           typename NeighbourhoodGetter, 
           typename ImproveChecker, 
           typename SolutionUpdater, 
+          typename StopCondition = TrivialStopConditionMultiSolution,
           typename SearchStrategy = search_startegies::ChooseFirstBetter
           >
 class LocalSearchStepMultiSolution {
@@ -58,7 +61,7 @@ class LocalSearchStepMultiSolution {
     typedef typename local_search_concepts::
         MultiNeighbourhoodGetter<NeighbourhoodGetter, Solution>::Update Update;
     
-    typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, SearchStrategy>  self;
+    typedef LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, SearchStrategy>  self;
     
 public:
 
@@ -69,11 +72,14 @@ public:
      * @param ng
      * @param check
      * @param solutionUpdater
+     * @param sc
      */
     LocalSearchStepMultiSolution(Solution solution, NeighbourhoodGetter ng, 
-                                 ImproveChecker check, SolutionUpdater solutionUpdater) :
+                                 ImproveChecker check, SolutionUpdater solutionUpdater,
+                                 StopCondition sc = TrivialStopConditionMultiSolution()) :
      m_solution(std::move(solution)), m_neighbourGetterFunctor(std::move(ng)), 
-     m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), m_lastSearchSucceded(false) {}
+     m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), 
+     m_stopConditionFunctor(std::move(sc)),  m_lastSearchSucceded(false), m_stop(false) {}
 
     /**
      * @brief tata 
@@ -109,22 +115,28 @@ private:
             if(m_checkFunctor.gain(m_solution, r, update) > 0) {
                 m_lastSearchSucceded = true;
                 m_solutionUpdaterFunctor.update(m_solution, r, update);
+            } else {
+                if(m_stopConditionFunctor.stop(m_solution, r, update)) {
+                m_stop = true;
+                }
             }
-            return m_lastSearchSucceded;
+            return m_lastSearchSucceded && !m_stop;
         });
           
-        return m_lastSearchSucceded;
+        return m_lastSearchSucceded && !m_stop;
     }
 
     Solution m_solution;
     NeighbourhoodGetter m_neighbourGetterFunctor;
     ImproveChecker m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
+    StopCondition m_stopConditionFunctor;
     bool m_lastSearchSucceded;
+    bool m_stop;
 };
 
-template <typename Solution, typename NeighbourhoodGetter, typename ImproveChecker, typename SolutionUpdater> 
-class LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, search_startegies::SteepestSlope> {
+template <typename Solution, typename NeighbourhoodGetter, typename ImproveChecker, typename SolutionUpdater, typename StopCondition> 
+class LocalSearchStepMultiSolution<Solution, NeighbourhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_startegies::SteepestSlope> {
     //TODO implement
 };
 

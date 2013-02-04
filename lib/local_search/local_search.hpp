@@ -88,13 +88,13 @@ Concepts:
     <li> <i>NeighborhoodGetter</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
     NeighborhoodGetterArchetype {
-        UpdateIteratorsRange get(Solution & s)
+        UpdateIteratorsRange get(const Solution & s)
     }
     </pre>
     <li> <i>ImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     ImproveCheckerArchetype {
-        int gain(Solution & s, const Update & update);
+        int gain(const Solution & s, const Update & update);
     }
     </pre>
     <li> <i>SolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
@@ -103,6 +103,14 @@ Concepts:
         int update(Solution & s, const Update & update);
     }
     </pre>
+    
+    <li> <i>StopCondition</i> is a concept class responsible for stop condition.
+    <pre>
+    StopCondition {
+        bool stop(const Solution & s, const Update & update);
+    }
+    </pre>
+
 
 </ol>
 
@@ -144,6 +152,13 @@ Concepts:
     <pre>
     MultiSolutionUdaterArchetype {
         int update(Solution & s, const SolutionElement &, const Update & update);
+    }
+    </pre>
+    
+    <li> <i>MultiStopCondition</i> is a concept class responsible for stop condition.
+    <pre>
+    StopCondition {
+        bool stop(const Solution & s, const SolutionElement & se, const Update & update);
     }
     </pre>
 
