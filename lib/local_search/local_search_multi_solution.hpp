@@ -88,6 +88,7 @@ public:
      */
     bool search() {
         m_lastSearchSucceded = false;
+        m_stop = false;
 
         auto check = std::bind(std::mem_fun(&self::checkForUpdate), this, std::placeholders::_1);
         std::find_if(m_solution.begin(), m_solution.end(), check);
@@ -117,13 +118,13 @@ private:
                 m_solutionUpdaterFunctor.update(m_solution, r, update);
             } else {
                 if(m_stopConditionFunctor.stop(m_solution, r, update)) {
-                m_stop = true;
+                    m_stop = true;
                 }
             }
-            return m_lastSearchSucceded && !m_stop;
+            return m_lastSearchSucceded || m_stop;
         });
           
-        return m_lastSearchSucceded && !m_stop;
+        return m_lastSearchSucceded || m_stop;
     }
 
     Solution m_solution;
