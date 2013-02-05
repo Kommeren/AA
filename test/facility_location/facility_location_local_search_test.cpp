@@ -15,13 +15,14 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
     
-    typedef paal::data_structures::FacilityLocationSolutionWithClientsAssignment
-        <int, decltype(gm), decltype(cost)> FLS;
+    typedef paal::data_structures::Voronoi<int, decltype(gm)> VorType;
+    typedef paal::data_structures::FacilityLocationSolution
+        <decltype(cost), VorType> Sol;
+    typedef typename VorType::GeneratorsSet FSet;
+    VorType voronoi( FSet{},   FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
 
-    FLS fls(FLS::FacilitiesSet{0,1}, FLS::FacilitiesSet{}, 
-                FLS::ClientsSet{0,1,2,3,4}, gm, cost);
-
-    FacilityLocationLocalSearchStep<FLS>  ls(fls);
+    FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
+        ls(voronoi, cost, FSet{SGM::A, SGM::B});
     BOOST_CHECK(ls.search());
     auto & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();

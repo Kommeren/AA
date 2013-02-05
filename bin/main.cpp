@@ -121,18 +121,6 @@ int main() {
     //simple_algo::print(cman, std::cout);
     //std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
 //    typename GraphMT::DistanceType d;
-    std::vector<int> fcosts{7,8};
-    auto cost = [&](int i){ return fcosts[i];};
-    typedef FacilityLocationSolutionWithClientsAssignment
-        <int, decltype(gm), decltype(cost)> Sol;
-    typedef typename Sol::FacilitiesSet FSet;
-    Sol sol(FSet{A,B}, FSet{},
-            FSet{A,B,C,D,E}, gm, cost);
-
-    FacilityLocationSolutionAdapter<Sol> sa(sol);
-    sa.begin();
-    FacilityLocationNeighborhoodGetter<int> FLNG;
-    FLNG.get(sa, SolutionElement<int>(CHOSEN, A));
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
     auto transformChosen2 = [](int v){ return std::make_pair(v,1);};

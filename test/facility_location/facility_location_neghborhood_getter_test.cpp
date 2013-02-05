@@ -18,11 +18,11 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
 
-    typedef FacilityLocationSolutionWithClientsAssignment
-        <int, decltype(gm), decltype(cost)> Sol;
-    typedef typename Sol::FacilitiesSet FSet;
-    Sol sol(FSet{SGM::B}, FSet{SGM::A},
-            FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cost);
+    typedef Voronoi<int, decltype(gm)> VorType;
+    typedef typename VorType::GeneratorsSet FSet;
+    VorType voronoi(FSet{SGM::A}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E} , gm);
+    typedef FacilityLocationSolution<decltype(cost), VorType> Sol;
+    Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
 
    FacilityLocationSolutionAdapter<Sol> sa(sol);  
    FacilityLocationNeighborhoodGetter<int> ng;

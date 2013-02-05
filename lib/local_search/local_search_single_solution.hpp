@@ -122,7 +122,6 @@ public:
              std::move(sc)) {}
 
     bool search() {
-        bool lastSearchSucceded = false;
         int max = INT_MIN;
         auto adjustmentSet = this->m_neighborGetterFunctor.get(this->m_solution);
         auto b = adjustmentSet.first;
