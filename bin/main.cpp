@@ -27,6 +27,7 @@ using namespace paal::local_search;
 using namespace paal::local_search::facility_location;
 using namespace paal::local_search::two_local_search;
 using namespace paal::data_structures;
+using namespace paal::helpers;
 using namespace boost;
 
 struct XXX {
@@ -109,18 +110,6 @@ int main() {
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
     ImproveChecker2Opt<GraphMT> checker(gm);
-    //TwoLocalSearchStep<int, GraphMT> ls(ver.begin(), ver.end(), checker);
-    //auto const & cman = ls.getSolution();
-    //std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-    //simple_algo::print(cman, std::cout);
-    //ls.search();
-    //simple_algo::print(cman, std::cout);
-    //std::cout << std::endl;
-    ///std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-    //std::cout << "Wynik: " <<  ls.search() << std::endl;
-    //simple_algo::print(cman, std::cout);
-    //std::cout << "Length " << simple_algo::getLength(gm, cman) << std::endl;
-//    typename GraphMT::DistanceType d;
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
     auto transformChosen2 = [](int v){ return std::make_pair(v,1);};
@@ -129,7 +118,7 @@ int main() {
     std::cout<< typeid(transformChosen2).name() << std::endl;
 
     typedef typename SolToElem<const std::set<int>>::type t;
-    std::set<int> set;
+    std::set<int> set{7,8,9,1};
     typedef typename IterToElem<decltype(set.begin())>::type T;
     typedef typename IterToElem<decltype(std::declval<std::set<int>>().begin())>::type type; 
 
@@ -141,7 +130,8 @@ int main() {
 
 //    std::cout << "HAS_MEMBER" << HAS_MEMBER(std::set<int>, begin) << std::endl;
     std::cout  << "HAS_MEMBER" <<  "bu" <<std::endl;
-//
+
+    typename kTuple<int, 10>::type ktup;
      
 
 }

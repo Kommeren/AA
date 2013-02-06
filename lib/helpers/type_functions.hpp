@@ -66,4 +66,14 @@ template <typename Solution> struct SolToElem {
   typedef typename IterToElem<typename SolToIter<Solution>::type>::type type; 
   };
 
+
+template <typename T, int k> struct kTuple {
+    typedef decltype(std::tuple_cat(std::declval<std::tuple<T>>(), 
+                                    std::declval<typename  kTuple<T, k-1>::type>())) type; 
+};
+
+template <typename T> struct kTuple<T, 1> {
+    typedef std::tuple<T> type;
+};
+
 #endif //__TYPE_FUNCITONS__
