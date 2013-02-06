@@ -29,27 +29,20 @@ public:
 };
 
 
-namespace detail {
-template <typename Iterator,int k> class SubsetsIteratorHelper : 
-    public std::iterator<std::forward_iterator_tag, 
-                         std::pair<typename kTuple<typename IterToElem<Iterator>::type, k>::type, Iterator>,
-                         ptrdiff_t,
-                         std::pair<typename kTuple<typename IterToElem<Iterator>::type, k>::type, Iterator> *,
-                         const std::pair<typename kTuple<typename IterToElem<Iterator>::type, k>::type, Iterator> &>,
-    private SubsetsIteratorHelper<Iterator, k-1>{
+template <typename Iterator,int k> class SubsetsIterator : 
+    private SubsetsIterator<Iterator, k-1>{
     
 public:
     typedef typename IterToElem<Iterator>::type Element;
     typedef typename kTuple<Element, k>::type SubsetType; 
-    typedef std::pair<SubsetType, Iterator> ReturnType;
-    typedef SubsetsIteratorHelper<Iterator, k-1> base;
+    typedef SubsetsIterator<Iterator, k-1> base;
     typedef std::iterator<std::forward_iterator_tag, 
-                         ReturnType,
+                         SubsetType,
                          ptrdiff_t,
-                         ReturnType *,
-                         const ReturnType &> IterBase;
+                         SubsetType *,
+                         const SubsetType &> IterBase;
 
-    //this is horrible!!!
+    //couldn't be done by inheritance from itarator
     typedef typename IterBase::iterator_category iterator_category;
     typedef typename IterBase::value_type        value_type;
     typedef typename IterBase::difference_type   difference_type;
@@ -58,16 +51,16 @@ public:
     using base::m_end;
 
 
-    SubsetsIteratorHelper(Iterator begin, Iterator end ) : 
+    SubsetsIterator(Iterator begin, Iterator end ) : 
         base(begin, end), m_begin(base::m_begin) {
         ++m_begin;
 
         updateCurr();
     }
     
-    SubsetsIteratorHelper()  {}
+    SubsetsIterator()  {}
 
-    SubsetsIteratorHelper & operator++(){
+    SubsetsIterator & operator++(){
         ++m_begin;
         while(m_begin == m_end) {
             base::operator++();
@@ -79,49 +72,49 @@ public:
         return *this;
     }
     
-    SubsetsIteratorHelper operator++(int){
-        SubsetsIteratorHelper i(*this);
+    SubsetsIterator operator++(int){
+        SubsetsIterator i(*this);
         operator++();
         return i;
     }
 
-    bool operator!=(SubsetsIteratorHelper ei) const {
+    bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
     }               
     
-    bool operator==(const SubsetsIteratorHelper & ei) const {
+    bool operator==(const SubsetsIterator & ei) const {
         return (m_begin == ei.m_begin && base::operator==(ei)) ||
                (m_begin == m_end && ei.m_begin == m_end);
     }               
     
-    const ReturnType * const operator->() const {
+    const SubsetType * const operator->() const {
         return &m_return;
     }               
 
-    void operator=(SubsetsIteratorHelper ei) {
+    void operator=(SubsetsIterator ei) {
         base::operator=(ei);
         m_begin = ei.m_begin; 
         m_end = ei.m_end;
         m_return = ei.m_return;
     }               
 
-    const ReturnType & operator*() const {
+    const SubsetType & operator*() const {
         return m_return;
     }
     
 private:
     void updateCurr() {
         if(m_begin != m_end) {
-            m_return = ReturnType(std::tuple_cat(base::operator*().first, std::tuple<Element>(*m_begin)), m_begin);
+            m_return = std::tuple_cat(base::operator*(), std::tuple<Element>(*m_begin));
         }
     }
     
-    ReturnType m_return;
+    SubsetType m_return;
 protected:    
     Iterator m_begin;
 };
 
-template <typename Iterator> class SubsetsIteratorHelper<Iterator, 1> : 
+template <typename Iterator> class SubsetsIterator<Iterator, 1> : 
     public std::iterator<std::forward_iterator_tag, 
                          std::pair<std::tuple<typename IterToElem<Iterator>::type>, Iterator>,
                          ptrdiff_t, 
@@ -130,87 +123,61 @@ template <typename Iterator> class SubsetsIteratorHelper<Iterator, 1> :
 public:    
     typedef typename IterToElem<Iterator>::type Element;
     typedef std::tuple<Element> SubsetType;
-    typedef std::pair<SubsetType, Iterator> ReturnType;
 
-    SubsetsIteratorHelper(Iterator begin, Iterator end ) : 
+    SubsetsIterator(Iterator begin, Iterator end ) : 
         m_begin(begin), m_end(end) {
 
         updateCurr();
     }
     
-    SubsetsIteratorHelper()  {}
+    SubsetsIterator()  {}
 
-    SubsetsIteratorHelper & operator++(){
+    SubsetsIterator & operator++(){
         ++m_begin;
         updateCurr();
 
         return *this;
     }
     
-    SubsetsIteratorHelper operator++(int){
-        SubsetsIteratorHelper i(*this);
+    SubsetsIterator operator++(int){
+        SubsetsIterator i(*this);
         operator++();
         return i;
     }
 
-    bool operator!=(SubsetsIteratorHelper ei) const {
+    bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
     }               
     
-    bool operator==(SubsetsIteratorHelper ei) const {
+    bool operator==(SubsetsIterator ei) const {
         return m_begin == ei.m_begin;
     }               
     
-    const ReturnType * const operator->() const {
+    const SubsetType * const operator->() const {
         return &m_return;
     }               
 
-    void operator=(SubsetsIteratorHelper ei) {
+    void operator=(SubsetsIterator ei) {
         m_begin = ei.m_begin; 
         m_end = ei.m_end;
         m_return = ei.m_return;
     }               
 
-    const ReturnType & operator*() const {
+    const SubsetType & operator*() const {
         return m_return;
     }
     
 private:
     void updateCurr() {
         if(m_begin != m_end) {
-            m_return = ReturnType(SubsetType(*m_begin), m_begin);
+            m_return = SubsetType(*m_begin);
         }
     }
-    ReturnType m_return;
+    SubsetType m_return;
 protected:    
     Iterator m_begin;
     Iterator m_end;
 };
-
-template <typename Pair> struct GetFirst{
-    auto operator()(const Pair & p) const -> const decltype(p.first) & {
-        return p.first;
-    }
-};
-}
-
-//minor TODO it can be done more efficient in direct way 
-template <typename Iterator, int k> class SubsetsIterator : 
-    public boost::transform_iterator< detail::GetFirst < std::pair<typename kTuple<typename IterToElem<Iterator>::type, k>::type, Iterator> >,
-                                      detail::SubsetsIteratorHelper<Iterator, k>,
-                                      const typename kTuple<typename IterToElem<Iterator>::type, k>::type &> {
-
-    typedef typename IterToElem<Iterator>::type Element;
-    typedef typename kTuple<Element, k>::type KTuple;
-    typedef std::pair<KTuple, Iterator> HelperResPair;
-    typedef detail::SubsetsIteratorHelper<Iterator, k> Helper;
-    typedef boost::transform_iterator< detail::GetFirst <HelperResPair>,
-                                      Helper,
-                                      const KTuple &> Trans;
-public:
-    SubsetsIterator(Iterator begin, Iterator end) :Trans(Helper(begin, end), detail::GetFirst<HelperResPair>()) {}
-};
-
 
 } //helpers
 } //paal
