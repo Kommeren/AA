@@ -12,23 +12,30 @@
 #ifndef __VORONOI__
 #define __VORONOI__
 
+#include <boost/range/adaptor/map.hpp>
+
 namespace paal {
 namespace data_structures {
 
 
 template <typename Vertex, typename Metric>
-class Voronoi { 
+class Voronoi {
+    typedef std::multimap<Vertex, Vertex> GeneratorsToVertices;
+    
     public:
         typedef Vertex VertexType;
         typedef std::set<Vertex> GeneratorsSet;
         typedef typename Metric::DistanceType Dist;
         //TODO change to vector
         typedef GeneratorsSet Vertices;
+        typedef typename GeneratorsToVertices::const_iterator VerticesForGeneratorIter;
+     //   typedef decltype( boost::make_transform_iterator(
+       //           std::declval<VerticesForGeneratorPairIter>, helpers::choose_second<VertexType, VertexType>())) VerticesForGeneratorIter;
 
         Voronoi(const GeneratorsSet & generators, 
                Vertices vertices,
                const Metric & m) :
-            m_vertices(std::move(vertices)), m_generators(generators), m_metric(m) {
+            m_vertices(std::move(vertices)), m_metric(m) {
                 for(Vertex f : generators) {
                     addGenerator(f);
                 }
@@ -97,6 +104,19 @@ class Voronoi {
         const GeneratorsSet & getGenerators() const {
             return m_generators;
         }
+        
+        const Vertices & getVertices() const {
+            return m_vertices;
+        }
+
+            decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values) 
+        getVerticesForGenerator(Vertex g) const {
+           
+            auto l = m_generatorsToVertices.lower_bound(g);
+            auto u = m_generatorsToVertices.upper_bound(g);
+
+            return std::make_pair(l, u) | boost::adaptors::map_values;
+        }
 
     private:
         
@@ -131,7 +151,6 @@ class Voronoi {
                 m_generatorsToVertices.insert(std::make_pair(f, v));
         }
 
-        typedef std::multimap<Vertex, Vertex> GeneratorsToVertices;
         typedef std::map<Vertex, 
                 typename GeneratorsToVertices::iterator> VerticesToGenerators;
         

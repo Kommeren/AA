@@ -5,6 +5,9 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#ifndef GRAPH_METRICS_HPP
+#define GRAPH_METRICS_HPP
+
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 #include "boost/multi_array.hpp"
 
@@ -25,6 +28,7 @@ template <typename Graph> struct GraphMetricTraits {
 template <typename DistanceTypeParam> class MetricBase {
     public:
         typedef DistanceTypeParam DistanceType;
+        typedef int VertexType;
         MetricBase(int N) : m_matrix(boost::extents[N][N]) { }
         template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
             return m_matrix[v][w];
@@ -91,3 +95,5 @@ template <typename OutEdgeList,
 
 } //data_structures
 } //paal
+
+#endif //GRAPH_METRICS_HPP

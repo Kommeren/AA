@@ -1,5 +1,5 @@
 /**
- * @file local_search.hpp
+ * @file local_search.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

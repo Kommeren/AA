@@ -28,7 +28,13 @@ public:
     IteratorWithExcludedElement() {} 
 };
 
+/*template <typename T, typename V> auto choose_second() 
+    -> decltype(std::bind(&std::pair<T, V>::second, std::placeholders::_1)) {
 
+    return std::bind(&std::pair<T, V>::second, std::placeholders::_1);
+}*/
+
+//minor TODO could be more efficient in direct array of iterators inmplementation
 template <typename Iterator,int k> class SubsetsIterator : 
     private SubsetsIterator<Iterator, k-1>{
     
