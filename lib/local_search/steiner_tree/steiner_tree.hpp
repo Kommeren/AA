@@ -1,14 +1,15 @@
 #include <map>
 
 #include <boost/range/join.hpp>
+#include <boost/graph/adjacency_list.hpp>
 
 #include "helpers/iterator_helpers.hpp"
+#include "helpers/metric_to_bgl.hpp"
 #include "data_structures/voronoi.hpp"
 
 namespace paal {
 namespace local_search {
 namespace steiner_tree {
-
 
 template <typename Metric, typename Voronoi> 
 class SteinerTree {
@@ -22,6 +23,8 @@ public:
 //    typedef std::map<ThreeTuple, int> IndexToThreeSubsets;
     typedef std::map<ThreeTuple, Dist> ThreeSubsetsDists;
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, 
+                boost::property<boost::edge_weight_t, Dist> > GraphType;
     
     SteinerTree(const Metric & m) : m_metric(m) {}
 
@@ -55,6 +58,16 @@ public:
             });
             subsDists[subset] = this->dist(nearestVertex[subset], subset);
         });
+
+        auto g = metricToBGL(m_metric, terminalsBegin, terminalsEnd);
+        GraphType spanning_tree;
+        int N = boost::num_vertices(g);
+        std::vector<VertexType> pm(N);
+        boost::prim_minimum_spanning_tree(g, &pm[0]);
+        for(VertexType from = 0; from != N; ++from){
+            boost::add_edge(from, pm[from], spanning_tree);
+        }
+        
     }
 private:
 
