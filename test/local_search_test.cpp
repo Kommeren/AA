@@ -51,7 +51,7 @@ struct SU {
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search
-   LocalSearchStep<int, NG, CII, SU> ls(0, NG(), CII(), SU());
+   LocalSearchStep<int, NG, CII, SU> ls;
 
    //printing 
    auto const & s = ls.getSolution();

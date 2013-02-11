@@ -79,8 +79,8 @@ class LocalSearchStep : public LocalSearchStepBase<Solution, NeighborhoodGetter,
                                     ImproveChecker, SolutionUpdater, 
                                     StopCondition> base;
 public:
-        LocalSearchStep(Solution solution, NeighborhoodGetter ng, 
-                        ImproveChecker check, SolutionUpdater solutionUpdater, 
+        LocalSearchStep(Solution solution = Solution(), NeighborhoodGetter ng = NeighborhoodGetter(), 
+                        ImproveChecker check = ImproveChecker(), SolutionUpdater solutionUpdater = SolutionUpdater(), 
                         StopCondition sc = StopCondition()) :
             base(std::move(solution), std::move(ng), 
                  std::move(check), std::move(solutionUpdater),
@@ -116,8 +116,8 @@ class LocalSearchStep<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpda
                                 ImproveChecker, SolutionUpdater, 
                                 StopCondition> base;
 public:
-    LocalSearchStep(Solution solution, NeighborhoodGetter ng, 
-                    ImproveChecker check, SolutionUpdater solutionUpdater, 
+    LocalSearchStep(Solution solution = Solution(), NeighborhoodGetter ng = NeighborhoodGetter(), 
+                    ImproveChecker check = ImproveChecker(), SolutionUpdater solutionUpdater = SolutionUpdater(), 
                     StopCondition sc = StopCondition()) :
         base(std::move(solution), std::move(ng), 
              std::move(check), std::move(solutionUpdater),
