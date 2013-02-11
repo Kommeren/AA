@@ -33,6 +33,13 @@ template <typename DistanceTypeParam> class MetricBase {
         template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
             return m_matrix[v][w];
         }
+        
+        template <typename Vertex> MetricBase<DistanceType> & set(const Vertex & v, const Vertex & w, DistanceType d)  {
+            m_matrix[v][w] = d;
+            return *this;
+        }
+
+
 
     protected:
         static const int DIM_NR = 2;
