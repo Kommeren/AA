@@ -19,7 +19,7 @@
 namespace paal {
 namespace local_search {
 
-namespace search_startegies {
+namespace search_strategies {
     class ChooseFirstBetter;
     class SteepestSlope;
 }
@@ -67,14 +67,14 @@ template <typename Solution,
           typename ImproveChecker, 
           typename SolutionUpdater,
           typename StopCondition = TrivialStopCondition,
-          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
+          typename SearchStrategy = search_strategies::ChooseFirstBetter> 
 
 class LocalSearchStep : public LocalSearchStepBase<Solution, NeighborhoodGetter, 
                                                    ImproveChecker, SolutionUpdater, 
                                                    StopCondition> {
     
-        static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
-                      std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
+        static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
+                      std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
         typedef LocalSearchStepBase<Solution, NeighborhoodGetter, 
                                     ImproveChecker, SolutionUpdater, 
                                     StopCondition> base;
@@ -108,7 +108,7 @@ public:
 
 template <typename Solution, typename NeighborhoodGetter, 
           typename ImproveChecker, typename SolutionUpdater, typename StopCondition> 
-class LocalSearchStep<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_startegies::SteepestSlope> 
+class LocalSearchStep<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_strategies::SteepestSlope> 
         : public LocalSearchStepBase<Solution, NeighborhoodGetter, 
                                 ImproveChecker, SolutionUpdater, 
                                 StopCondition>  {

@@ -18,7 +18,7 @@
 namespace paal {
 namespace local_search {
 
-namespace search_startegies {
+namespace search_strategies {
     class ChooseFirstBetter;
     class SteepestSlope;
 }
@@ -46,15 +46,15 @@ template <typename Solution,
           typename ImproveChecker, 
           typename SolutionUpdater, 
           typename StopCondition = TrivialStopConditionMultiSolution,
-          typename SearchStrategy = search_startegies::ChooseFirstBetter
+          typename SearchStrategy = search_strategies::ChooseFirstBetter
           >
 class LocalSearchStepMultiSolution {
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighborhoodGetter<NeighborhoodGetter, Solution>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiImproveChecker<ImproveChecker, Solution, NeighborhoodGetter>));
       BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolutionUpdater<SolutionUpdater, Solution, NeighborhoodGetter>));
-      static_assert(std::is_same<SearchStrategy, search_startegies::ChooseFirstBetter>::value || 
-                    std::is_same<SearchStrategy, search_startegies::SteepestSlope>::value, "Wrong search strategy");
+      static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
+                    std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
     
     typedef typename local_search_concepts::
         MultiSolution<Solution>::Element SolutionElement;
@@ -137,7 +137,7 @@ private:
 };
 
 template <typename Solution, typename NeighborhoodGetter, typename ImproveChecker, typename SolutionUpdater, typename StopCondition> 
-class LocalSearchStepMultiSolution<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_startegies::SteepestSlope> {
+class LocalSearchStepMultiSolution<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_strategies::SteepestSlope> {
     //TODO implement
 };
 

@@ -7,8 +7,10 @@
 
 #include "helpers/iterator_helpers.hpp"
 #include "helpers/metric_to_bgl.hpp"
+#include "helpers/functors_to_paal_functors.hpp"
 #include "data_structures/voronoi.hpp"
 #include "data_structures/graph_metrics.hpp"
+#include "local_search/local_search.hpp"
 
 namespace paal {
 namespace local_search {
@@ -41,6 +43,7 @@ public:
         auto const & terminals = m_voronoi.getGenerators();
         auto const & vertices = m_voronoi.getVertices();
         typedef decltype(terminals.begin()) TerminalIterator;
+        typedef decltype(vertices.begin()) SteinerIterator;
         typedef helpers::SubsetsIterator<TerminalIterator, SUSBSET_SIZE> ThreeSubsetsIter;
         //ThreeSubsetsToIndex subToIndex;
         ThreeSubsetsDists subsDists;
@@ -55,7 +58,7 @@ public:
         ThreeSubsetsIter subBegin(terminalsBegin, terminalsEnd);
         ThreeSubsetsIter subEnd(terminalsEnd, terminalsEnd);
         
-        //finding nearest vertex to subseet
+        //finding nearest vertex to subset
         std::for_each(subBegin, subEnd, [&](const ThreeTuple & subset) {
             //TODO awfull coding, need to be changed to loop
             auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
@@ -73,6 +76,18 @@ public:
         auto g = metricToBGL(m_metric, terminalsBegin, terminalsEnd);
         
         findSave(g);
+        //INCOMPLETE!!!
+        auto obj_fun = [&](const ThreeTuple & t){return subsDists[t];};
+        auto ng = [&](const ThreeTuple & t){
+            return helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminalsBegin, terminalsEnd);
+        };
+        typedef FunctToNeigh<decltype(ng)> NG; 
+        
+        local_search::LocalSearchFunctionStep<ThreeTuple, NG, decltype(obj_fun),
+            TrivialSolutionUpdater, TrivialStopCondition, search_strategies::SteepestSlope> 
+                ls(*ThreeSubsetsIter(terminalsBegin, terminalsEnd), NG(ng), obj_fun);
+
+        ls.search();
         return res; 
     }
 private:

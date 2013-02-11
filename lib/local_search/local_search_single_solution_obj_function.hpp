@@ -38,7 +38,7 @@ template <typename Solution,
           typename ObjectiveFunction, 
           typename SolutionUpdater = TrivialSolutionUpdater,
           typename StopCondition = TrivialStopCondition,
-          typename SearchStrategy = search_startegies::ChooseFirstBetter> 
+          typename SearchStrategy = search_strategies::ChooseFirstBetter> 
 
 class LocalSearchFunctionStep : 
     public LocalSearchStep<

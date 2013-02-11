@@ -13,7 +13,7 @@
  * @brief We assume that update is a new solution
  */
 struct TrivialSolutionUpdater {
-    template <typename Solution> void update(Solution & s, const Solution & u) {
+    template <typename Solution> void update(Solution & s, const Solution & u) const {
         s = u;
     }
 };

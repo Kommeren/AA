@@ -185,6 +185,13 @@ protected:
     Iterator m_end;
 };
 
+template <typename Iterator,int k> 
+std::pair<SubsetsIterator<Iterator, k>, SubsetsIterator<Iterator, k>>
+make_SubsetsIteratorrange(Iterator b, Iterator e)  {
+     typedef SubsetsIterator<Iterator, k> SI;
+     return std::make_pair(SI(b,e), SI(e,e));
+}
+
 } //helpers
 } //paal
 
