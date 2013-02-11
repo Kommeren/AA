@@ -12,14 +12,15 @@
 #include "trivial_solution_updater.hpp"
 
 namespace paal {
+namespace local_search {
 
 namespace detail {
-    template <typename F, typename Solution, typename Update, typename SolutionUpdater> class Fun2Check {
-            typedef decltype(std::declval<F>().value(std::declval<Solution>(),std::declval<Update>())) Dist;
+    template <typename F, typename Solution, typename SolutionUpdater> class Fun2Check {
+            typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
         public:
-            Fun2Check(F f, const SolutionUpdater & su) : std::move(f), m_solutionUpdaterFunctor(su) {}
+            Fun2Check(F f, const SolutionUpdater & su) : m_f(std::move(f)), m_solutionUpdaterFunctor(su) {}
 
-            Dist gain(const Solution &s , const Update &u) {
+            template <typename Update> Dist gain(const Solution &s , const Update &u) {
                 Solution newS(s);
                 m_solutionUpdaterFunctor.update(newS, u);
                 return m_f(newS) - m_f(s);
@@ -40,28 +41,22 @@ template <typename Solution,
           typename SearchStrategy = search_startegies::ChooseFirstBetter> 
 
 class LocalSearchFunctionStep : 
-    public LocalSearchStepBase<
+    public LocalSearchStep<
                 Solution, 
                 NeighborhoodGetter, 
                 detail::Fun2Check< 
                     ObjectiveFunction, 
                     Solution, 
-                    typename local_search_concepts::NeighborhoodGetter<
-                        NeighborhoodGetter, Solution>::Update, 
                     SolutionUpdater>, 
                 SolutionUpdater, 
                 StopCondition,
                 SearchStrategy> {
                     
-
-    typedef typename local_search_concepts::NeighborhoodGetter<
-         NeighborhoodGetter, Solution>::Update Update;
     typedef detail::Fun2Check< 
                     ObjectiveFunction, 
                     Solution, 
-                    Update, 
                     SolutionUpdater> UpdateChecker;
-    typedef LocalSearchStepBase<
+    typedef LocalSearchStep<
                 Solution, 
                 NeighborhoodGetter,
                 UpdateChecker,
@@ -69,14 +64,15 @@ class LocalSearchFunctionStep :
                 StopCondition,
                 SearchStrategy> base;
     public:
-    LocalSearchFunctionStep(Solution s, NeighborhoodGetter n, ObjectiveFunction f, 
-                            SolutionUpdater su, StopCondition sc, SearchStrategy ss) :  
+    LocalSearchFunctionStep(Solution s = Solution(), NeighborhoodGetter n = NeighborhoodGetter(), ObjectiveFunction f = ObjectiveFunction(), 
+                            SolutionUpdater su = SolutionUpdater(), StopCondition sc = StopCondition()) :  
         base(std::move(s), std::move(n), 
         UpdateChecker(std::move(f), base::m_solutionUpdaterFunctor), 
-        std::move(su), std::move(sc), std:move(ss)) {} 
+        std::move(su), std::move(sc)) {} 
 
 };
 
+} //local_search
 } //paal
 
 #endif /* LOCAL_SEARCH_SINGLE_SOLUTION_OBJ_FUNCTION_HPP */

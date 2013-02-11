@@ -209,4 +209,5 @@ Although the basic usage is very simple, the sophisticated user can still easily
  
 */
 #include "local_search_single_solution.hpp"
+#include "local_search_single_solution_obj_function.hpp"
 #include "local_search_multi_solution.hpp"
