@@ -24,6 +24,8 @@ namespace search_startegies {
     class SteepestSlope;
 }
 
+
+
 template <typename Solution, 
           typename NeighborhoodGetter, 
           typename ImproveChecker, 

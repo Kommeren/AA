@@ -28,6 +28,7 @@ public:
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
     typedef boost::property<boost::edge_index_t, int,boost::property<boost::edge_weight_t, Dist>>  EdgeProp;
     typedef boost::subgraph<boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, boost::no_property, EdgeProp>> GraphType;
+    typedef std::vector<VertexType> ResultSteinerVertices;
 
 //    typedef GraphType GraphType;
     
@@ -36,7 +37,7 @@ public:
             m_findSaveMatrtix(N) {}
 
 
-    void getSteinerTree() {
+    ResultSteinerVertices getSteinerTree() {
         auto const & terminals = m_voronoi.getGenerators();
         auto const & vertices = m_voronoi.getVertices();
         typedef decltype(terminals.begin()) TerminalIterator;
@@ -44,6 +45,7 @@ public:
         //ThreeSubsetsToIndex subToIndex;
         ThreeSubsetsDists subsDists;
         NearstByThreeSubsets nearestVertex;
+        ResultSteinerVertices res;
 
         auto terminalsBegin = terminals.begin();
         auto terminalsEnd   = terminals.end();
@@ -71,7 +73,7 @@ public:
         auto g = metricToBGL(m_metric, terminalsBegin, terminalsEnd);
         
         findSave(g);
-        
+        return res; 
     }
 private:
     typedef typename AdjacencyMatrix<Metric>::type AMatrix;
