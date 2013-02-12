@@ -7,7 +7,7 @@
 
 BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetric();
+    auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
 

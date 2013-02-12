@@ -18,13 +18,13 @@
 
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetric();
+    auto gm = SGM::getGraphMetricMedium();
     typedef decltype(gm) Metric;
     
     typedef paal::data_structures::Voronoi<int, Metric> VoronoiT;
     typedef typename VoronoiT::GeneratorsSet FSet;
-    VoronoiT voronoi(FSet{SGM::A, SGM::B},
-            FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C},
+            FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E, SGM::F, SGM::G, SGM::H}, gm);
 
     paal::local_search::steiner_tree::SteinerTree<Metric, VoronoiT> st(gm, voronoi);
     st.getSteinerTree(); 

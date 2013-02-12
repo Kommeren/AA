@@ -14,7 +14,7 @@ using namespace paal::local_search::facility_location;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetric();
+    auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
 

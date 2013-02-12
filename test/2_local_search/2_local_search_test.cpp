@@ -20,8 +20,8 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
 //! [Two Local Search Example]
    //sample data
    typedef  SampleGraphsMetrics SGM;
-   auto gm = SGM::getGraphMetric();
-   const int size = SGM::getSize();
+   auto gm = SGM::getGraphMetricSmall();
+   const int size = gm.size();
    std::vector<int> v(size);
    std::iota(v.begin(), v.end(), 0);
 

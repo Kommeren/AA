@@ -9,9 +9,9 @@ struct SampleGraphsMetrics {
 //    typedef boost::graph_traits < graph_t >::edge_descriptor edge_descriptor;
     typedef std::pair<int, int> Edge;
     typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
-    enum nodes { A, B, C, D, E };
+    enum nodes { A, B, C, D, E, F, G, H };
 
-    static GraphMT getGraphMetric() {
+    static GraphMT getGraphMetricSmall() {
         const int num_nodes = 5;
         Edge edge_array[] = { Edge(A, C), Edge(B, B), Edge(B, D), Edge(B, E),
             Edge(C, B), Edge(C, D), Edge(D, E), Edge(E, A), Edge(E, B)
@@ -23,8 +23,21 @@ struct SampleGraphsMetrics {
 
         return GraphMT(g);
     }
+    
+    static GraphMT getGraphMetricMedium() {
+        const int num_nodes = 8;
+        Edge edge_array[] = { Edge(A, C), Edge(A, F), Edge(B, E), Edge(B, G),
+                              Edge(B, H), Edge(C, E), Edge(C, G), Edge(C, H), 
+                              Edge(D, E), Edge(D, G), Edge(D, H), Edge(F, H)
+        };
+        int weights[] = { 4, 2, 1, 2, 7, 3, 1, 8, 1, 3, 4, 10, 1 };
+        int num_arcs = sizeof(edge_array) / sizeof(Edge);
 
-    static int getSize() { return 5;}
+        graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return GraphMT(g);
+    } 
+
 
 };
 

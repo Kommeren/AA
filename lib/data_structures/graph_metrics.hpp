@@ -39,6 +39,9 @@ template <typename DistanceTypeParam> class MetricBase {
             return *this;
         }
 
+        int size() const {
+            return m_matrix.size();
+        }
 
 
     protected:

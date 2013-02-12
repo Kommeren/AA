@@ -9,7 +9,7 @@ using namespace paal::data_structures;
 
 BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetric();
+    auto gm = SGM::getGraphMetricSmall();
 
     typedef Voronoi<int, decltype(gm)> Voronoi;
     typedef typename Voronoi::GeneratorsSet FSet;

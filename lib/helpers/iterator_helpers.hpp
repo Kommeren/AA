@@ -59,7 +59,9 @@ public:
 
     SubsetsIterator(Iterator begin, Iterator end ) : 
         base(begin, end), m_begin(base::m_begin) {
-        ++m_begin;
+        if(m_begin != m_end) {
+            ++m_begin;
+        }
 
         updateCurr();
     }
@@ -71,6 +73,9 @@ public:
         while(m_begin == m_end) {
             base::operator++();
             m_begin = base::m_begin;
+            if(m_begin == m_end) {
+                return *this;
+            }
             ++m_begin;
         }
         updateCurr();
@@ -139,7 +144,9 @@ public:
     SubsetsIterator()  {}
 
     SubsetsIterator & operator++(){
+        assert(m_begin != m_end);
         ++m_begin;
+    
         updateCurr();
 
         return *this;
@@ -184,6 +191,7 @@ protected:
     Iterator m_begin;
     Iterator m_end;
 };
+
 
 template <typename Iterator,int k> 
 std::pair<SubsetsIterator<Iterator, k>, SubsetsIterator<Iterator, k>>

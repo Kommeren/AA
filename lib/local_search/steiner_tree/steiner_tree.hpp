@@ -1,9 +1,11 @@
 #include <map>
+#include <stack>
 
 #include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/subgraph.hpp>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
 
 #include "helpers/iterator_helpers.hpp"
 #include "helpers/metric_to_bgl.hpp"
@@ -28,7 +30,7 @@ public:
 //    typedef std::map<ThreeTuple, int> IndexToThreeSubsets;
     typedef std::map<ThreeTuple, Dist> ThreeSubsetsDists;
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
-    typedef boost::property<boost::edge_index_t, int,boost::property<boost::edge_weight_t, Dist>>  EdgeProp;
+    typedef boost::property<boost::edge_index_t, int, boost::property<boost::edge_weight_t, Dist>>  EdgeProp;
     typedef boost::subgraph<boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, boost::no_property, EdgeProp>> GraphType;
     typedef std::vector<VertexType> ResultSteinerVertices;
 
@@ -36,7 +38,7 @@ public:
     
     SteinerTree(const Metric & m, const Voronoi & voronoi) : 
         m_metric(m), m_voronoi(voronoi), N(std::distance(voronoi.getGenerators().begin(), voronoi.getGenerators().end())), 
-            m_findSaveMatrtix(N) {}
+            m_save(N) {}
 
 
     ResultSteinerVertices getSteinerTree() {
@@ -52,14 +54,13 @@ public:
 
         auto terminalsBegin = terminals.begin();
         auto terminalsEnd   = terminals.end();
-        auto steinerBegin   = vertices.begin();
-        auto steinerEnd     = vertices.end();
 
         ThreeSubsetsIter subBegin(terminalsBegin, terminalsEnd);
         ThreeSubsetsIter subEnd(terminalsEnd, terminalsEnd);
         
         //finding nearest vertex to subset
         std::for_each(subBegin, subEnd, [&](const ThreeTuple & subset) {
+            std::cout << std::get<0>(subset) << std::endl;
             //TODO awfull coding, need to be changed to loop
             auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
             auto vRange2 =  m_voronoi.getVerticesForGenerator(std::get<1>(subset));
@@ -76,11 +77,18 @@ public:
         auto g = metricToBGL(m_metric, terminalsBegin, terminalsEnd);
         
         findSave(g);
-        //INCOMPLETE!!!
-        auto obj_fun = [&](const ThreeTuple & t){return subsDists[t];};
+        
+        auto obj_fun = [&](const ThreeTuple & t){
+            auto const  & m = m_save;
+            VertexType a,b,c;
+            std::tie(a, b, c) = t;
+            return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - subsDists[t];
+        };
+
         auto ng = [&](const ThreeTuple & t){
             return helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminalsBegin, terminalsEnd);
         };
+
         typedef FunctToNeigh<decltype(ng)> NG; 
         
         local_search::LocalSearchFunctionStep<ThreeTuple, NG, decltype(obj_fun),
@@ -88,10 +96,22 @@ public:
                 ls(*ThreeSubsetsIter(terminalsBegin, terminalsEnd), NG(ng), obj_fun);
 
         ls.search();
+
         return res; 
     }
 private:
     typedef typename AdjacencyMatrix<Metric>::type AMatrix;
+    typedef boost::graph_traits<GraphType> gtraits;
+    typedef typename gtraits::edge_iterator geIter;
+    typedef typename gtraits::edge_descriptor Edge; 
+
+    VertexType max3(VertexType a, VertexType b, VertexType c) {
+        return std::max(std::max(a,b),c);
+    }
+    
+    VertexType min3(VertexType a, VertexType b, VertexType c) {
+        return std::min(std::min(a,b),c);
+    }
 
     //minor TODO could by more general somewhere
     Dist dist(VertexType v, const ThreeTuple & tup) {
@@ -102,73 +122,94 @@ private:
 
     GraphType getSpanningTree(const AMatrix & g) {
         //spanning tree to vector
-      //  std::cout << N <<std::endl;
         std::vector<VertexType> pm(N, -7);
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         
         //vector to GraphType
         GraphType spanningTree(N);
         for(VertexType from = 0; from < N; ++from){
-    //        std::cout << from << " ," << pm[from] << std::endl;
             if(from != pm[from]) {
-                boost::add_edge(from, pm[from], 
-                    EdgeProp(from, m_metric(from,pm[from])), spanningTree);
+                bool succ =boost::add_edge(from, pm[from], 
+                    EdgeProp(from, m_metric(from,pm[from])), spanningTree).second;
+                assert(succ);
             }
         }
         return spanningTree;
     }
     
-    void findSave(const AMatrix & g) {
-        auto spanningTree = getSpanningTree(g);
-        findSaveInner(spanningTree);
-    }
-
-    void findSaveInner(GraphType & spanningTree) {
-        int n = boost::num_vertices(spanningTree);
-        if(n == 1) {   
-            return;
-        }
-        typedef typename boost::graph_traits<GraphType>::edge_descriptor Edge; 
-        auto eRange = boost::edges(spanningTree);
-        assert(eRange.first != eRange.second);
-        auto const  & weight_map = boost::get(boost::edge_weight, spanningTree);
-        auto maxEl = std::max_element(eRange.first, eRange.second, [&](Edge e, Edge f){
+        template <typename WeightMap, typename EdgeRange> 
+    Edge maxEdge(EdgeRange range, const WeightMap & weight_map) const {
+        assert(range.first != range.second);
+        return *std::max_element(range.first, range.second, [&](Edge e, Edge f){
             return boost::get(weight_map, e) < 
                    boost::get(weight_map, f);
         });
-        Dist maxDist = boost::get(weight_map, *maxEl);
+    }
+
+    void createSubgraphs(GraphType & g, GraphType & G1, GraphType & G2) {
+        int n = boost::num_vertices(g);
         std::vector<VertexType> comps(n);
-        boost::remove_edge(*maxEl, spanningTree);
-        boost::connected_components(spanningTree, &comps[0]);
+        boost::connected_components(g, &comps[0]);
         int c1 = comps[0];
         int c2 = -1;
-        GraphType G1 = spanningTree.create_subgraph();
-        GraphType G2 = spanningTree.create_subgraph();
         
         for(int i = 0; i < n; ++i) {
             if(comps[i] == c1) {
-                add_vertex(i, G1);
+                add_vertex(g.local_to_global(i), G1);
             } else {
                 assert(c2 == -1 || comps[i] == c2);
                 c2 = comps[i];
-                add_vertex(i, G2);
+                add_vertex(g.local_to_global(i), G2);
             }
         }
-        auto vertices1 = boost::vertices(G1); 
-        auto vertices2 = boost::vertices(G2);
-        std::for_each(vertices1.first, vertices1.second, [&](VertexType v){
-            std::for_each(vertices2.first, vertices2.second, [&](VertexType w){
-                m_findSaveMatrtix.set(v, w, maxDist);
+    }
+
+    void updateSave(const GraphType & G1, const GraphType & G2, Dist maxDist) {
+        auto v1 = vertices(G1);
+        auto v2 = vertices(G2);
+        std::for_each(v1.first, v1.second, [&](VertexType v){
+            std::for_each(v2.first, v2.second, [&](VertexType w){
+                m_save.set(G1.local_to_global(v), G2.local_to_global(w), maxDist);
             });
         });
-        findSaveInner(G1);
-        findSaveInner(G2);
+    }
+
+    void findSave(const AMatrix & am) {
+        auto spanningTree = getSpanningTree(am);
+        
+        std::stack<GraphType *> s;
+        s.push(&spanningTree);
+
+        while(!s.empty()) {
+            //TODO delete children at once
+            GraphType & g = *s.top();
+            s.pop();
+            int n = boost::num_vertices(g);
+       //     std::cout << n << std::endl;
+            if(n == 1) {   
+                continue;
+            }
+            auto eRange = boost::edges(g);
+            assert(eRange.first != eRange.second);
+            auto const  & weight_map = boost::get(boost::edge_weight, g);
+            Edge maxEl = maxEdge(eRange, weight_map);
+            Dist maxDist = boost::get(weight_map, maxEl);
+            boost::remove_edge(maxEl, g);
+            GraphType & G1 = g.create_subgraph();
+            GraphType & G2 = g.create_subgraph();
+            createSubgraphs(g, G1, G2);
+    
+            updateSave(G1, G2, maxDist);
+
+            s.push(&G1);
+            s.push(&G2);
+        }
     }
 
     const Metric & m_metric;
     const Voronoi & m_voronoi;
     int N;
-    data_structures::MetricBase<Dist> m_findSaveMatrtix;
+    data_structures::MetricBase<Dist> m_save;
 };
 
 } // steiner_tree
