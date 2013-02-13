@@ -8,6 +8,7 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
 #include "helpers/iterator_helpers.hpp"
+#include "helpers/subset_iterator.hpp"
 #include "helpers/metric_to_bgl.hpp"
 #include "helpers/functors_to_paal_functors.hpp"
 #include "data_structures/voronoi.hpp"
@@ -93,7 +94,7 @@ private:
         auto subRange = helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminals.begin(), terminals.end());
         
         //finding nearest vertex to subset
-        std::for_each(subRange.first, subRange.second, [&](const ThreeTuple & subset) {
+        for(const ThreeTuple & subset : helpers::make_range(subRange)) {
             std::cout << std::get<0>(subset) << std::endl;
             //TODO awfull coding, need to be changed to loop
             auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
@@ -106,7 +107,7 @@ private:
                 return this->dist(v1, subset) < this->dist(v2, subset);
             });
             subsDists[subset] = this->dist(nearestVertex[subset], subset);
-        });
+        }
     }
 
     VertexType max3(VertexType a, VertexType b, VertexType c) {
