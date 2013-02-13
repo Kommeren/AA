@@ -11,7 +11,7 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
-    typedef Voronoi<int, decltype(gm)> Voronoi;
+    typedef Voronoi<decltype(gm)> Voronoi;
     typedef typename Voronoi::GeneratorsSet FSet;
     Voronoi voronoi(FSet{},
             FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);

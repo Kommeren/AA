@@ -21,9 +21,9 @@ namespace facility_location {
 
 template <typename Voronoi,
           typename FacilityCost,
-          typename NeighborhoodGetter = FacilityLocationNeighborhoodGetter<typename Voronoi::VertexType>,
-          typename ImproveChecker      = FacilityLocationChecker          <typename Voronoi::VertexType>,
-          typename Updater             = FacilityLocationUpdater          <typename Voronoi::VertexType>>
+          typename NeighborhoodGetter  = FacilityLocationNeighborhoodGetter<typename Voronoi::VertexType>,
+          typename ImproveChecker      = FacilityLocationChecker           <typename Voronoi::VertexType>,
+          typename Updater             = FacilityLocationUpdater           <typename Voronoi::VertexType>>
 
 class FacilityLocationLocalSearchStep : 
     public LocalSearchStepMultiSolution<
@@ -44,13 +44,13 @@ public:
                 Updater >  base;
 
         FacilityLocationLocalSearchStep(Voronoi voronoi,
-                                        FacilityCost cost,
+                                        const FacilityCost & cost,
                                         typename FLSolution::UnchosenFacilitiesSet uch,
                                         NeighborhoodGetter ng = NeighborhoodGetter(),
                                         ImproveChecker ch = ImproveChecker(),
                                         Updater u = Updater()) :
 
-                                        base(FLSolutionAdapter(FLSolution(std::move(voronoi), std::move(uch), std::move(cost))), 
+                                        base(FLSolutionAdapter(FLSolution(std::move(voronoi), std::move(uch), cost)), 
                                                                 std::move(ng), std::move(ch), std::move(u)) {}
 };
 

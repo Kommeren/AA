@@ -19,7 +19,8 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     std::for_each(vbegin, vend, [&](VertexType v){
         std::for_each(vbegin, vend, [&](VertexType w){
             if(v < w) {
-                bool succ = boost::add_edge(v, w, boost::property<boost::edge_weight_t, Dist>(m(v,w)), g).second;
+                bool succ = boost::add_edge(v, w, 
+                        boost::property<boost::edge_weight_t, Dist>(m(v,w)), g).second;
                 assert(succ);
             }
         });     

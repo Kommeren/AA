@@ -18,32 +18,29 @@ namespace paal {
 namespace data_structures {
 
 
-template <typename Vertex, typename Metric>
+template <typename Metric>
 class Voronoi {
-    typedef std::multimap<Vertex, Vertex> GeneratorsToVertices;
-    
     public:
-        typedef Vertex VertexType;
-        typedef std::set<Vertex> GeneratorsSet;
+        typedef typename Metric::VertexType VertexType;    
+        typedef std::multimap<VertexType, VertexType> GeneratorsToVertices;
+        typedef std::set<VertexType> GeneratorsSet;
         typedef typename Metric::DistanceType Dist;
         //TODO change to vector
         typedef GeneratorsSet Vertices;
         typedef typename GeneratorsToVertices::const_iterator VerticesForGeneratorIter;
-     //   typedef decltype( boost::make_transform_iterator(
-       //           std::declval<VerticesForGeneratorPairIter>, helpers::choose_second<VertexType, VertexType>())) VerticesForGeneratorIter;
 
         Voronoi(const GeneratorsSet & generators, 
                Vertices vertices,
-               const Metric & m) :
-            m_vertices(std::move(vertices)), m_metric(m) {
-                for(Vertex f : generators) {
+               const Metric & m, Dist costOfNoGenerator = INT_MAX) :
+            m_vertices(std::move(vertices)), m_metric(m), m_costOfNoGenerator(costOfNoGenerator) {
+                for(VertexType f : generators) {
                     addGenerator(f);
                 }
             }
 
        
         // returns diff between new cost and old cost
-        Dist addGenerator(Vertex f) {
+        Dist addGenerator(VertexType f) {
             Dist cost = Dist();
             m_generators.insert(f);
            
@@ -51,17 +48,16 @@ class Voronoi {
             if(m_generators.size() == 1) {
                 m_verticesToGenerators.clear();
                 m_generatorsToVertices.clear();
-                for(Vertex v : m_vertices) {
+                for(VertexType v : m_vertices) {
                     m_verticesToGenerators[v] = 
                         m_generatorsToVertices.insert(std::make_pair(f, v));
                     cost += m_metric(v,f); 
                 }
                 
-                //could be too tricky
-                cost = -cost;
+                cost = cost - m_costOfNoGenerator;
                 
             } else {
-                for(Vertex v: m_vertices) {
+                for(VertexType v: m_vertices) {
                     Dist d = m_metric(v,f) - dist(v);
                     if(d < 0) {
                         cost += d;
@@ -73,28 +69,26 @@ class Voronoi {
         }
         
         // returns diff between new cost and old cost
-        Dist remGenerator(Vertex f) {
+        Dist remGenerator(VertexType f) {
             Dist cost = Dist();
             if(m_generators.size() == 1) {
-                //could be to tricky...
-                cost = Dist();
-                for(Vertex v : m_vertices) {
-                    cost += dist(v);
+                cost = m_costOfNoGenerator;
+                for(VertexType v : m_vertices) {
+                    cost -= dist(v);
                 }
                 m_verticesToGenerators.clear();
                 m_generatorsToVertices.clear();
             } else {
-
-                auto op = std::bind(std::not_equal_to<Vertex>(), f, std::placeholders::_1);
+                auto op = std::bind(std::not_equal_to<VertexType>(), f, std::placeholders::_1);
                 auto begin = m_generatorsToVertices.lower_bound(f);
                 auto end = m_generatorsToVertices.upper_bound(f);
                 for(;begin != end; ) {
                     auto v = begin->second;
-                    //using the generatorst that this is a map 
+                    //using the fact that generators is a map 
                     //(with other containers you have to be carefull cause of iter invalidation)
                     ++begin;
                     cost -= dist(v);
-                    cost += adjustVertex(v, op);
+                    cost += adjustVertexType(v, op);
                 }
             }
             m_generators.erase(f);
@@ -110,7 +104,7 @@ class Voronoi {
         }
 
             decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values) 
-        getVerticesForGenerator(Vertex g) const {
+        getVerticesForGenerator(VertexType g) const {
            
             auto l = m_generatorsToVertices.lower_bound(g);
             auto u = m_generatorsToVertices.upper_bound(g);
@@ -120,14 +114,14 @@ class Voronoi {
 
     private:
         
-        Dist dist(Vertex v) {
+        Dist dist(VertexType v) {
             return m_metric(v, vertexToGenerators(v));
         }
         
-        Dist adjustVertex(Vertex v, std::function<bool(Vertex)> filter = [](Vertex v){return true;}) {
+        Dist adjustVertexType(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d = Dist();
-            for(Vertex f : m_generators) {
+            for(VertexType f : m_generators) {
                 if(filter(f) &&  (init || m_metric(v,f) < d)) {
                     assign(v,f);
                     d = m_metric(v,f);
@@ -138,20 +132,20 @@ class Voronoi {
             return d; 
         }
 
-        Vertex vertexToGenerators(Vertex v) const {
+        VertexType vertexToGenerators(VertexType v) const {
             auto i = m_verticesToGenerators.find(v);
             assert(i != m_verticesToGenerators.end());
             return i->second->first;
         }
 
-        void assign(Vertex v, Vertex f) {
+        void assign(VertexType v, VertexType f) {
             auto prev = m_verticesToGenerators[v];
             m_generatorsToVertices.erase(prev);
             m_verticesToGenerators[v] = 
                 m_generatorsToVertices.insert(std::make_pair(f, v));
         }
 
-        typedef std::map<Vertex, 
+        typedef std::map<VertexType, 
                 typename GeneratorsToVertices::iterator> VerticesToGenerators;
         
         VerticesToGenerators m_verticesToGenerators;
@@ -160,6 +154,7 @@ class Voronoi {
         GeneratorsSet m_generators;
 
         const Metric & m_metric;
+        const Dist m_costOfNoGenerator;
 };
 
 

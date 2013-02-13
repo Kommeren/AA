@@ -28,7 +28,7 @@ include_directories (${TEST_DIR})
 
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
-set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Release)
 
 file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
 

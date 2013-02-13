@@ -15,7 +15,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
     
-    typedef paal::data_structures::Voronoi<int, decltype(gm)> VorType;
+    typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
     typedef paal::data_structures::FacilityLocationSolution
         <decltype(cost), VorType> Sol;
     typedef typename VorType::GeneratorsSet FSet;
@@ -23,6 +23,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
 
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
         ls(voronoi, cost, FSet{SGM::A, SGM::B});
+
+    std::cout <<"cost(0) = " << cost(0) << std::endl;
     BOOST_CHECK(ls.search());
     auto & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();

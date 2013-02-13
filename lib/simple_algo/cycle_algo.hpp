@@ -28,11 +28,10 @@ template <typename CycleManager, typename Stream> void print(const CycleManager 
     auto edges = cm.getEdgeRange();
     typedef typename CycleManager::CycleElement El;
 
-    std::for_each(edges.first, edges.second, [&]
-            (const std::pair<El, El> & p)->void { 
-                    o <<  "(" << p.first << "," << p.second << ")->";
-                }
-            );    
+    for(const std::pair<El, El> & p : helpers::make_range(edges)){ 
+        o <<  "(" << p.first << "," << p.second << ")->";
+    }
+        
     o << endl;
 }
 

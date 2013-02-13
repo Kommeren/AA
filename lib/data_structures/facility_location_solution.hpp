@@ -17,7 +17,7 @@
 namespace paal {
 namespace data_structures {
 
-template <typename FacilityCost, typename VoronoiType>
+template <typename FacilityCost, typename VoronoiType/*, typename VoronoiType::DistanceType NO_FACILITY_COST = INT_MAX*/>
 class FacilityLocationSolution { 
     public:
         typedef typename VoronoiType::VertexType VertexType;
@@ -29,12 +29,20 @@ class FacilityLocationSolution {
                                  UnchosenFacilitiesSet uf,
                                  const FacilityCost & c) :
             m_voronoi(std::move(voronoi)), m_unchosenFacilities(std::move(uf)), m_facCosts(c) {}
+        
+        FacilityLocationSolution(const FacilityLocationSolution & fls) :
+            m_voronoi(fls.m_voronoi), m_unchosenFacilities(fls.m_unchosenFacilities), m_facCosts(fls.m_facCosts) {}
+        
+        FacilityLocationSolution(FacilityLocationSolution && fls) :
+            m_voronoi(std::move(fls.m_voronoi)), m_unchosenFacilities(std::move(fls.m_unchosenFacilities)), m_facCosts(fls.m_facCosts) {}
+
 
        
         // returns diff between new cost and old cost
         Dist addFacility(VertexType f) {
             assert(m_unchosenFacilities.find(f) != m_unchosenFacilities.end());
             m_unchosenFacilities.erase(f);
+
             return  m_facCosts(f) + m_voronoi.addGenerator(f);
         }
         
@@ -42,6 +50,7 @@ class FacilityLocationSolution {
         Dist remFacility(VertexType f) {
             assert(m_unchosenFacilities.find(f) == m_unchosenFacilities.end());
             m_unchosenFacilities.insert(f);
+
             return -m_facCosts(f) + m_voronoi.remGenerator(f);
         }
 

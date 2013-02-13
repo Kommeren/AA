@@ -15,6 +15,7 @@
 
 #include "local_search_concepts.hpp"
 #include "trivial_stop_condition.hpp"
+#include "helpers/iterator_helpers.hpp"
 
 namespace paal {
 namespace local_search {
@@ -85,24 +86,22 @@ public:
             base(std::move(solution), std::move(ng), 
                  std::move(check), std::move(solutionUpdater),
                  std::move(sc)) {}
+        typedef typename base::Update Update;
 
         bool search() {
-            bool lastSearchSucceded = false;
             auto adjustmentSet = this->m_neighborGetterFunctor.get(this->m_solution);
 
-            std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const typename base::Update & update) {
+            for(const Update & update : helpers::make_range(adjustmentSet)) {
                 if(this->m_checkFunctor.gain(this->m_solution, update) > 0) {
-                    lastSearchSucceded = true;
                     this->m_solutionUpdaterFunctor.update(this->m_solution, update);
+                    return true;
                 } else {
                     if(this->m_stopConditionFunctor.stop(this->m_solution, update)) {
-                        return true;
+                        break;
                     }
-
                 }
-                return lastSearchSucceded;
-            });
-            return lastSearchSucceded;
+            }
+            return false;
         }
 };
 

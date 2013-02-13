@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
     
-    typedef Voronoi<int, decltype(gm)> VorType;
+    typedef Voronoi<decltype(gm)> VorType;
     typedef typename VorType::GeneratorsSet FSet;
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E} , gm);
 

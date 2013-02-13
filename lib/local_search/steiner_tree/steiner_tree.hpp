@@ -63,7 +63,8 @@ public:
             auto const  & m = m_save;
             VertexType a,b,c;
             std::tie(a, b, c) = t;
-            assert(a == b || b == c || c == a);
+            
+            assert(m(a,b) == m(b,c) || m(b,c) == m(c, a) || m(c,a) == m(a,b));
             return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - subsDists[t];
         };
 
@@ -172,11 +173,14 @@ private:
     void updateSave(const GraphType & G1, const GraphType & G2, Dist maxDist) {
         auto v1 = vertices(G1);
         auto v2 = vertices(G2);
-        std::for_each(v1.first, v1.second, [&](VertexType v){
-            std::for_each(v2.first, v2.second, [&](VertexType w){
-                m_save.set(G1.local_to_global(v), G2.local_to_global(w), maxDist);
-            });
-        });
+        for(VertexType v : helpers::make_range(v1)) {
+            for(VertexType w : helpers::make_range(v2)) {
+                auto vg = G1.local_to_global(v);
+                auto wg = G2.local_to_global(w);
+                m_save.set(vg, wg, maxDist);
+                m_save.set(wg, vg, maxDist);
+            }
+        }
     }
 
     void findSave(const AMatrix & am) {
