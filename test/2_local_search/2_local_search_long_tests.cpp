@@ -8,6 +8,7 @@
 #include "TSPLIB/TSPLIB.h"
 #include "local_search/2_local_search/2_local_search.hpp"
 #include "simple_algo/cycle_algo.hpp"
+#include "utils/logger.hpp"
 
 using std::string;
 using std::vector;
@@ -36,14 +37,17 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         auto ls = make_TwoLocalSearchStep(std::move(cycle), ch);
 
         //printing 
+
+#ifdef LOGGER_ON
         auto const & cman = ls.getSolution();
-        std::cout << "Graph:\t" << g.filename << std::endl;
-        std::cout << "Length before\t" << simple_algo::getLength(mtx, cman) << std::endl;
+        LOG("Graph:\t" << g.filename);
+        LOG("Length before\t" << simple_algo::getLength(mtx, cman));
         int i = 0;
+#endif
 
         //search
         while(ls.search()) {
-            std::cout << "Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman) << std::endl;
+            LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
         }
    }
 

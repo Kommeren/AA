@@ -14,6 +14,7 @@
 #include <string>
 
 #include "local_search/local_search.hpp"
+#include "utils/logger.hpp"
 
 using std::string;
 using std::vector;
@@ -53,15 +54,17 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search
    LocalSearchStep<int, NG, CII, SU> ls;
 
-   //printing 
+   //printing
    auto const & s = ls.getSolution();
-   std::cout << "f("<< s <<") \t" << f(s)  << std::endl;
+   LOG("f("<< s <<") \t" << f(s));
+#ifdef LOGGER_ON
    int i = 0;
+#endif
 
    //search
    while(ls.search()) {
        //printing
-       std::cout << "f("<< s <<") \t" << f(s)  << " after " << ++i << std::endl;
+       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
    }
    BOOST_CHECK_EQUAL(s, 6);
 }
@@ -73,13 +76,15 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
 
    //printing 
    auto const & s = ls.getSolution();
-   std::cout << "f("<< s <<") \t" << f(s)  << std::endl;
+   LOG("f("<< s <<") \t" << f(s));
+#ifdef LOGGER_ON
    int i = 0;
+#endif
 
    //search
    while(ls.search()) {
        //printing
-       std::cout << "f("<< s <<") \t" << f(s)  << " after " << ++i << std::endl;
+       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
    }
    BOOST_CHECK_EQUAL(s, 6);
 }

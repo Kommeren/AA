@@ -5,6 +5,7 @@
 #include <boost/test/unit_test.hpp>
 #include "local_search/facility_location/facility_location.hpp"
 #include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
 
 using namespace paal::local_search::facility_location;
 
@@ -24,13 +25,14 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
         ls(voronoi, cost, FSet{SGM::A, SGM::B});
 
-    std::cout <<"cost(0) = " << cost(0) << std::endl;
+    LOG("cost(0) = " << cost(0));
     BOOST_CHECK(ls.search());
+#ifdef LOGGER_ON 
     auto & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();
-    
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
-    std::cout << std::endl;
+#endif
+    LOG();
     BOOST_CHECK(!ls.search());
     
 }

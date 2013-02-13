@@ -14,6 +14,9 @@
 #include <string>
 
 #include "local_search/local_search.hpp"
+#include "utils/logger.hpp"
+
+//#define VERBOSE 
 
 using std::string;
 using std::vector;
@@ -53,13 +56,16 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
 
    //printing 
    auto const & s = ls.getSolution();
-   std::cout << "f("<< s <<") \t" << f(s)  << std::endl;
+   LOG("f("<< s <<") \t" << f(s));
+
+#ifdef LOGGER_ON
    int i = 0;
+#endif
 
    //search
    while(ls.search()) {
        //printing
-       std::cout << "f("<< s <<") \t" << f(s)  << " after " << ++i << std::endl;
+       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
    }
    BOOST_CHECK_EQUAL(s, 6);
 }

@@ -18,9 +18,9 @@
 using std::vector;
 
 template <typename T> void printTuple3(T t) {
-    std::cout  << std::get<0>(t) << ",";
-    std::cout  << std::get<1>(t) << ",";
-    std::cout  << std::get<2>(t) << std::endl;
+    LOG(std::get<0>(t) << "," << 
+        std::get<1>(t) << "," << 
+        std::get<2>(t));
 }
 
 typedef typename std::vector<int>::iterator It;

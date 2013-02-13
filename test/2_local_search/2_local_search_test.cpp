@@ -9,6 +9,7 @@
 #include "local_search/2_local_search/2_local_search.hpp"
 #include "simple_algo/cycle_algo.hpp"
 #include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
 
 using std::string;
 using std::vector;
@@ -33,16 +34,18 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
    ImproveChecker2Opt<decltype(gm)> ch(gm);
    auto ls = make_TwoLocalSearchStep(std::move(cycle), ch);
 
-   //printing 
+   //printing
+#ifdef LOGGER_ON
    auto const & cman = ls.getSolution();
-   std::cout << "Length \t" << simple_algo::getLength(gm, cman) << std::endl;
+   LOG("Length \t" << simple_algo::getLength(gm, cman));
    int i = 0;
+#endif
 
    //search
    while(ls.search()) {
        //printing
-       std::cout << "Length after\t" << i++ << ": " 
-                 << simple_algo::getLength(gm, cman) << std::endl;
+       LOG("Length after\t" << i++ << ": " 
+                 << simple_algo::getLength(gm, cman));
    }
 //! [Two Local Search Example]
 }

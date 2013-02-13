@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "data_structures/simple_cycle_manager.hpp"
+#include "utils/logger.hpp"
 
 #include <vector>
 #include <string>
@@ -42,10 +43,10 @@ class CheckAllSizes : public T {
 };
 
 template  <typename I> void  pe(I b, I e) {
-    std::cout << "Edges:" << std::endl;
+    LOG("Edges:");
 
     for(;b != e; ++b) {
-        std::cout << b->first << "," << b->second << std::endl;
+        LOG(b->first << "," << b->second);
     }
 
 }

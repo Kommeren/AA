@@ -96,7 +96,6 @@ private:
         
         //finding nearest vertex to subset
         for(const ThreeTuple & subset : helpers::make_range(subRange)) {
-            std::cout << std::get<0>(subset) << std::endl;
             //TODO awfull coding, need to be changed to loop
             auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
             auto vRange2 =  m_voronoi.getVerticesForGenerator(std::get<1>(subset));
@@ -194,7 +193,6 @@ private:
             GraphType & g = *s.top();
             s.pop();
             int n = boost::num_vertices(g);
-       //     std::cout << n << std::endl;
             if(n == 1) {   
                 continue;
             }

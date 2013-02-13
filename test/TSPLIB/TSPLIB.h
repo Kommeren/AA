@@ -172,7 +172,6 @@ namespace tsp
         {
             std::getline(is,header,':');
             std::stringstream ss(header); ss >> header;
-            //std::cout << format("[%]\n",header);
             return is;
         }
 

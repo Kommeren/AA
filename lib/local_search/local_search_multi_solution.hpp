@@ -14,6 +14,7 @@
 
 #include "local_search_multi_solution_concepts.hpp"
 #include "trivial_stop_condition_multi_solution.hpp"
+#include "helpers/iterator_helpers.hpp"
 
 namespace paal {
 namespace local_search {
@@ -79,7 +80,7 @@ public:
                                  StopCondition sc = TrivialStopConditionMultiSolution()) :
      m_solution(std::move(solution)), m_neighborGetterFunctor(std::move(ng)), 
      m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), 
-     m_stopConditionFunctor(std::move(sc)),  m_lastSearchSucceded(false), m_stop(false) {}
+     m_stopConditionFunctor(std::move(sc)) {}
 
     /**
      * @brief tata 
@@ -87,13 +88,20 @@ public:
      * @return 
      */
     bool search() {
-        m_lastSearchSucceded = false;
-        m_stop = false;
 
-        auto check = std::bind(std::mem_fun(&self::checkForUpdate), this, std::placeholders::_1);
-        std::find_if(m_solution.begin(), m_solution.end(), check);
-        
-        return m_lastSearchSucceded;
+        for(const SolutionElement & r : m_solution) {
+            auto adjustmentSet = m_neighborGetterFunctor.get(m_solution, r);
+            for(const Update & update : helpers::make_range(adjustmentSet)) {
+                if(m_checkFunctor.gain(m_solution, r, update) > 0) {
+                    m_solutionUpdaterFunctor.update(m_solution, r, update);
+                    return true;
+                } else if(m_stopConditionFunctor.stop(m_solution, r, update)) {
+                    return false;
+                }
+            }
+        }
+          
+        return false;
     }
 
     // TODO it is not optional :)
@@ -108,32 +116,12 @@ public:
     }*/
 
 private:
-    bool checkForUpdate(const SolutionElement & r) {
-         
-        auto adjustmentSet = m_neighborGetterFunctor.get(m_solution, r);
-
-        std::find_if(adjustmentSet.first, adjustmentSet.second, [&](const Update & update) {
-            if(m_checkFunctor.gain(m_solution, r, update) > 0) {
-                m_lastSearchSucceded = true;
-                m_solutionUpdaterFunctor.update(m_solution, r, update);
-            } else {
-                if(m_stopConditionFunctor.stop(m_solution, r, update)) {
-                    m_stop = true;
-                }
-            }
-            return m_lastSearchSucceded || m_stop;
-        });
-          
-        return m_lastSearchSucceded || m_stop;
-    }
 
     Solution m_solution;
     NeighborhoodGetter m_neighborGetterFunctor;
     ImproveChecker m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
     StopCondition m_stopConditionFunctor;
-    bool m_lastSearchSucceded;
-    bool m_stop;
 };
 
 template <typename Solution, typename NeighborhoodGetter, typename ImproveChecker, typename SolutionUpdater, typename StopCondition> 
