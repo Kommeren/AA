@@ -33,6 +33,7 @@ public:
     typedef boost::property<boost::edge_index_t, int, boost::property<boost::edge_weight_t, Dist>>  EdgeProp;
     typedef boost::subgraph<boost::adjacency_list<boost::listS, boost::vecS, boost::undirectedS, boost::no_property, EdgeProp>> GraphType;
     typedef std::vector<VertexType> ResultSteinerVertices;
+    typedef decltype(std::declval<Voronoi>().getGenerators().begin()) TerminalIterator;
 
 //    typedef GraphType GraphType;
     
@@ -44,7 +45,6 @@ public:
     ResultSteinerVertices getSteinerTree() {
         auto const & terminals = m_voronoi.getGenerators();
         auto const & vertices = m_voronoi.getVertices();
-        typedef decltype(terminals.begin()) TerminalIterator;
         typedef decltype(vertices.begin()) SteinerIterator;
         typedef helpers::SubsetsIterator<TerminalIterator, SUSBSET_SIZE> ThreeSubsetsIter;
         //ThreeSubsetsToIndex subToIndex;
@@ -52,14 +52,48 @@ public:
         NearstByThreeSubsets nearestVertex;
         ResultSteinerVertices res;
 
-        auto terminalsBegin = terminals.begin();
-        auto terminalsEnd   = terminals.end();
+        fillSubDists(subsDists, nearestVertex);
 
-        ThreeSubsetsIter subBegin(terminalsBegin, terminalsEnd);
-        ThreeSubsetsIter subEnd(terminalsEnd, terminalsEnd);
+        auto g = metricToBGL(m_metric, terminals.begin(), terminals.end());
+        
+        findSave(g);
+        
+        auto obj_fun = [&](const ThreeTuple & t){
+            auto const  & m = m_save;
+            VertexType a,b,c;
+            std::tie(a, b, c) = t;
+            assert(a == b || b == c || c == a);
+            return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - subsDists[t];
+        };
+
+        auto ng = [&](const ThreeTuple & t){
+            return helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminals.begin(), terminals.end());
+        };
+
+        typedef FunctToNeigh<decltype(ng)> NG; 
+        
+        local_search::LocalSearchFunctionStep<ThreeTuple, NG, decltype(obj_fun),
+            TrivialSolutionUpdater, TrivialStopCondition, search_strategies::SteepestSlope> 
+                ls(*ThreeSubsetsIter(terminals.begin(), terminals.end()), NG(ng), obj_fun);
+
+        ls.search();
+
+        return res; 
+    }
+private:
+    typedef typename AdjacencyMatrix<Metric>::type AMatrix;
+    typedef boost::graph_traits<GraphType> gtraits;
+    typedef typename gtraits::edge_iterator geIter;
+    typedef typename gtraits::edge_descriptor Edge;
+
+    void fillSubDists(ThreeSubsetsDists & subsDists,
+                      NearstByThreeSubsets & nearestVertex) {
+        auto const & terminals = m_voronoi.getGenerators();
+
+        auto subRange = helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminals.begin(), terminals.end());
         
         //finding nearest vertex to subset
-        std::for_each(subBegin, subEnd, [&](const ThreeTuple & subset) {
+        std::for_each(subRange.first, subRange.second, [&](const ThreeTuple & subset) {
             std::cout << std::get<0>(subset) << std::endl;
             //TODO awfull coding, need to be changed to loop
             auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
@@ -73,37 +107,7 @@ public:
             });
             subsDists[subset] = this->dist(nearestVertex[subset], subset);
         });
-
-        auto g = metricToBGL(m_metric, terminalsBegin, terminalsEnd);
-        
-        findSave(g);
-        
-        auto obj_fun = [&](const ThreeTuple & t){
-            auto const  & m = m_save;
-            VertexType a,b,c;
-            std::tie(a, b, c) = t;
-            return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - subsDists[t];
-        };
-
-        auto ng = [&](const ThreeTuple & t){
-            return helpers::make_SubsetsIteratorrange<TerminalIterator, SUSBSET_SIZE>(terminalsBegin, terminalsEnd);
-        };
-
-        typedef FunctToNeigh<decltype(ng)> NG; 
-        
-        local_search::LocalSearchFunctionStep<ThreeTuple, NG, decltype(obj_fun),
-            TrivialSolutionUpdater, TrivialStopCondition, search_strategies::SteepestSlope> 
-                ls(*ThreeSubsetsIter(terminalsBegin, terminalsEnd), NG(ng), obj_fun);
-
-        ls.search();
-
-        return res; 
     }
-private:
-    typedef typename AdjacencyMatrix<Metric>::type AMatrix;
-    typedef boost::graph_traits<GraphType> gtraits;
-    typedef typename gtraits::edge_iterator geIter;
-    typedef typename gtraits::edge_descriptor Edge; 
 
     VertexType max3(VertexType a, VertexType b, VertexType c) {
         return std::max(std::max(a,b),c);

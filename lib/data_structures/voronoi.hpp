@@ -126,7 +126,7 @@ class Voronoi {
         
         Dist adjustVertex(Vertex v, std::function<bool(Vertex)> filter = [](Vertex v){return true;}) {
             bool init = true;
-            Dist d;
+            Dist d = Dist();
             for(Vertex f : m_generators) {
                 if(filter(f) &&  (init || m_metric(v,f) < d)) {
                     assign(v,f);
