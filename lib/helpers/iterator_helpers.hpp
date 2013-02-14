@@ -46,8 +46,13 @@ Iter end(const range<Iter> & p ) {
 }
 
 template<typename T>
-range<T> make_range(std::pair<T, T> & t ) {
+range<T> make_range(const std::pair<T, T> & t ) {
     return range<T>(t);
+}
+
+template<typename T>
+range<T> make_range(T b, T e) {
+    return range<T>(std::make_pair(b, e));
 }
 
 

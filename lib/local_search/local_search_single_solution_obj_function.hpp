@@ -28,6 +28,7 @@ namespace detail {
 
 
         private:
+
             F m_f;
             const SolutionUpdater & m_solutionUpdaterFunctor;
     };

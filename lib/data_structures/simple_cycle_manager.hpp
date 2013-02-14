@@ -14,6 +14,8 @@
 #include <vector>
 #include <iterator>
 
+#include "helpers/bimap.hpp"
+
 namespace paal {
 namespace data_structures {
 
@@ -164,9 +166,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
         }
 
         IdxT toIdx(const CycleEl & ce) const {
-            typename MappingToIdx::const_iterator i = m_mappingToIdx.find(ce);
-            assert(i != m_mappingToIdx.end());
-            return i->second;
+            return m_cycleIdx.getIdx(ce);
         }
 
         IdxT nextIdx(IdxT i) const {
@@ -177,26 +177,20 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
             return m_predecessorMap[i];
         }
 
-        CycleEl fromIdx(IdxT i) const {
-            return m_mappingFromIdx[i];
+        const CycleEl & fromIdx(IdxT i) const {
+            return m_cycleIdx.getVal(i);
         }
 
         IdxT add(const CycleEl & el) {
-            assert(m_mappingToIdx.find(el) == m_mappingToIdx.end());
-            IdxT idx = size();
             m_predecessorMap.push_back(-1);
             m_successorMap.push_back(-1);
-            m_mappingFromIdx.push_back(el);
-            m_mappingToIdx[el] = idx;
-            return idx;
+            return m_cycleIdx.add(el);
         }
         
-        typedef std::vector<IdxT> SorsMap;
-        typedef std::map<CycleEl, IdxT> MappingToIdx;
-        typedef std::vector<CycleEl> MappingFromIdx;
+        helpers::BiMap<CycleEl, IdxT> m_cycleIdx;
 
-        MappingToIdx m_mappingToIdx;
-        MappingFromIdx m_mappingFromIdx;
+        typedef std::vector<IdxT> SorsMap;
+
         SorsMap m_predecessorMap;
         SorsMap m_successorMap;
 };

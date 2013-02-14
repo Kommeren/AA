@@ -24,13 +24,29 @@ struct SampleGraphsMetrics {
         return GraphMT(g);
     }
     
+    static GraphMT getGraphMetricSteiner() {
+        const int num_nodes = 5;
+        Edge edge_array[] = { Edge(A, B), Edge(B, C), Edge(C, D), Edge(D, A),
+                              Edge(A, E), Edge(B, E), Edge(C, E), Edge(D, E)
+        };
+        int weights[] = { 2, 2, 2, 2, 
+                          1, 1, 1, 1 };
+        int num_arcs = sizeof(edge_array) / sizeof(Edge);
+
+        graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return GraphMT(g);
+    } 
+    
     static GraphMT getGraphMetricMedium() {
         const int num_nodes = 8;
         Edge edge_array[] = { Edge(A, C), Edge(A, F), Edge(B, E), Edge(B, G),
                               Edge(B, H), Edge(C, E), Edge(C, G), Edge(C, H), 
                               Edge(D, E), Edge(D, G), Edge(D, H), Edge(F, H)
         };
-        int weights[] = { 4, 2, 1, 2, 7, 3, 1, 8, 1, 3, 4, 10, 1 };
+        int weights[] = { 4, 2, 1, 2, 
+                          7, 3, 1, 8, 
+                          1, 3, 4, 10 };
         int num_arcs = sizeof(edge_array) / sizeof(Edge);
 
         graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
