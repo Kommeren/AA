@@ -11,6 +11,9 @@
 #include <type_traits>
 #include <utility>
 
+namespace paal {
+namespace helpers {
+
 #define HAS_MEMBER_CLASS(member) \
 template <typename T> \
 class has_##member {  \
@@ -75,5 +78,8 @@ template <typename T, int k> struct kTuple {
 template <typename T> struct kTuple<T, 1> {
     typedef std::tuple<T> type;
 };
+
+} //helpers
+} //paal
 
 #endif //__TYPE_FUNCITONS__

@@ -5,8 +5,6 @@
 
 struct SampleGraphsMetrics {
     typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, boost::property < boost::edge_weight_t, int > > graph_t;
-//    typedef boost::graph_traits < graph_t >::vertex_descriptor vertex_descriptor;
-//    typedef boost::graph_traits < graph_t >::edge_descriptor edge_descriptor;
     typedef std::pair<int, int> Edge;
     typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
     enum nodes { A, B, C, D, E, F, G, H };

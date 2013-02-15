@@ -9,7 +9,9 @@
 #define GRAPH_METRICS_HPP
 
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
-#include "boost/multi_array.hpp"
+#include <boost/multi_array.hpp>
+
+#include "basic_metrics.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -25,30 +27,6 @@ template <typename Graph> struct GraphMetricTraits {
 };
 
 
-template <typename DistanceTypeParam> class MetricBase {
-    public:
-        typedef DistanceTypeParam DistanceType;
-        typedef int VertexType;
-        MetricBase(int N) : m_matrix(boost::extents[N][N]) { }
-        template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
-            return m_matrix[v][w];
-        }
-        
-        template <typename Vertex> MetricBase<DistanceType> & set(const Vertex & v, const Vertex & w, DistanceType d)  {
-            m_matrix[v][w] = d;
-            return *this;
-        }
-
-        int size() const {
-            return m_matrix.size();
-        }
-
-
-    protected:
-        static const int DIM_NR = 2;
-        typedef boost::multi_array<DistanceType, DIM_NR> matrix_type; 
-        matrix_type m_matrix;
-};
 
 //impplementation of different startegies of computing metric
 namespace metric_fillers {
@@ -73,8 +51,8 @@ namespace metric_fillers {
 // GraphTypeTag could be sparse, dense, large ...
 template <typename Graph, typename DistanceType/*, typename VertexType*/, 
           typename GraphFiller = metric_fillers::GraphMericFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag > > 
-    class  GraphMetric : public MetricBase</*typename property_traits<DistanceTypePropertyMap>::value_type*/DistanceType>, public GraphFiller {
-          typedef   MetricBase<DistanceType/*, typename boost::graph_traits<Graph>::vertex_descriptor*/> GMBase;
+    class  GraphMetric : public ArrayMetric</*typename property_traits<DistanceTypePropertyMap>::value_type*/DistanceType>, public GraphFiller {
+          typedef   ArrayMetric<DistanceType/*, typename boost::graph_traits<Graph>::vertex_descriptor*/> GMBase;
 
         public:
             GraphMetric(const Graph & g)  

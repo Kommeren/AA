@@ -26,8 +26,8 @@ public:
     typedef SolutionElement<VertexType> SolElemT;
     typedef decltype(std::declval<FacilityLocationSolution>().getChosenFacilities()) ChosenType;
     typedef decltype(std::declval<FacilityLocationSolution>().getUnchosenFacilities()) UnchosenType;
-    typedef typename SolToIter<ChosenType>::type ChosenIter;
-    typedef typename SolToIter<UnchosenType>::type UnchosenIter;
+    typedef typename helpers::SolToIter<ChosenType>::type ChosenIter;
+    typedef typename helpers::SolToIter<UnchosenType>::type UnchosenIter;
     typedef std::function<SolElemT(VertexType)> TransFunct;
     typedef boost::transform_iterator<TransFunct, ChosenIter> ChosenTIter;
     typedef boost::transform_iterator<TransFunct, UnchosenIter> UnchosenTIter;

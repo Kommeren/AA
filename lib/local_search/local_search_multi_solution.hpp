@@ -105,7 +105,7 @@ public:
     }
 
     // TODO it is not optional :)
-    typename std::enable_if<has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
+    typename std::enable_if<helpers::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
         return m_solution.get();
     }
     

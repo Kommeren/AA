@@ -30,7 +30,7 @@ public:
     typedef typename Metric::VertexType VertexType;
     static const int SUSBSET_SIZE = 3;
 
-    typedef typename kTuple<VertexType, SUSBSET_SIZE>::type ThreeTuple;
+    typedef typename helpers::kTuple<VertexType, SUSBSET_SIZE>::type ThreeTuple;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     SteinerTree(const Metric & m, const Voronoi & voronoi) : 
@@ -80,7 +80,7 @@ public:
         return res; 
     }
 private:
-    //Spanjning tree types
+    //Spanning tree types
     typedef boost::property<boost::edge_index_t, int, boost::property<boost::edge_weight_t, Dist>>  SpanningTreeEdgeProp;
     typedef boost::subgraph<boost::adjacency_list<boost::listS, boost::vecS, 
                 boost::undirectedS, boost::no_property, SpanningTreeEdgeProp>> SpanningTree;
@@ -170,16 +170,20 @@ private:
         return std::min(std::min(a,b),c);
     }
 
+    Dist dist(VertexType steinerPoint, VertexType terminalIdx) {
+        return   m_metric(steinerPoint, m_tIdx.getVal(terminalIdx));
+    }
+
     //minor TODO could by more general somewhere
-    Dist dist(VertexType v, const ThreeTuple & tup) {
-        return   m_metric(v, m_tIdx.getVal(std::get<0>(tup)))
-               + m_metric(v, m_tIdx.getVal(std::get<1>(tup)))
-               + m_metric(v, m_tIdx.getVal(std::get<2>(tup)));
+    Dist dist(VertexType steinerPoint, const ThreeTuple & tup) {
+        return   dist(steinerPoint, std::get<0>(tup))
+               + dist(steinerPoint, std::get<1>(tup))
+               + dist(steinerPoint, std::get<2>(tup));
     }
 
     SpanningTree getSpanningTree(const AMatrix & g) {
         //spanning tree to vector
-        std::vector<VertexType> pm(N, -7);
+        std::vector<VertexType> pm(N);
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         
         //vector to SpanningTree
@@ -270,7 +274,7 @@ private:
     ThreeSubsetsDists m_subsDists;
     NearstByThreeSubsets m_nearestVertex;
     int N;
-    data_structures::MetricBase<Dist> m_save;
+    data_structures::ArrayMetric<Dist> m_save;
     helpers::BiMap<VertexType> m_tIdx;
     helpers::MetricOnIdx<Metric> m_idxMetric;
 };

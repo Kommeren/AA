@@ -14,7 +14,7 @@ template <typename VertexType> class FacilityLocationChecker {
 public:
         template <class Solution, class Update> 
     int gain(const Solution & s, 
-            const  typename SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename helpers::SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & ue) {
         auto const & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
