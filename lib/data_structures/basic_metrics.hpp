@@ -7,6 +7,9 @@
  */
 #ifndef BASIC_METRICS_HPP
 #define BASIC_METRICS_HPP 
+
+#include <boost/multi_array.hpp>
+
 namespace paal {
 namespace data_structures {
 

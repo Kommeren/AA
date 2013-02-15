@@ -61,6 +61,10 @@ class FacilityLocationSolution {
         const ChosenFacilitiesSet & getChosenFacilities() const {
             return m_voronoi.getGenerators();
         }
+        
+        const VoronoiType & getVoronoi() const {
+            return m_voronoi;
+        }
 
     private:
 

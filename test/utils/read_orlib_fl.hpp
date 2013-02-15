@@ -13,7 +13,7 @@
 
 namespace paal {
 
-data_structures::ArrayMetric<float> readORLIB_FC(std::istream & ist, std::vector<float> & facCosts, std::vector<int> facCap,
+data_structures::ArrayMetric<double> readORLIB_FL(std::istream & ist, std::vector<double> & facCosts, std::vector<int> facCap,
                        std::vector<int> demands,
                        boost::integer_range<int> & fac,
                        boost::integer_range<int> & clients ) { 
@@ -23,7 +23,7 @@ data_structures::ArrayMetric<float> readORLIB_FC(std::istream & ist, std::vector
     fac =     boost::irange(0, F);
     clients = boost::irange(F, N + F);
     
-    data_structures::ArrayMetric<float> m(N + F);
+    data_structures::ArrayMetric<double> m(N + F);
     demands.resize(N);
     facCosts.resize(F);
     facCap.resize(F);
@@ -31,19 +31,19 @@ data_structures::ArrayMetric<float> readORLIB_FC(std::istream & ist, std::vector
         ist >> facCap[i] >> facCosts[i];
     }
     
-    float l;
+    double l;
     for(int i : boost::irange(0,N)) {
         ist >> demands[i];    
         for(int j : boost::irange(0,F)) {
             ist >> l;
             m.set(i+F, j, l);
             m.set(j, i+F, l);
-            LOG(i+F << " "<< j << " " << l);
+    //        LOG(i+F << " "<< j << " " << l);
         }
     }
 
 
-    LOG_COPY(facCosts.begin(), facCosts.end());
+    //LOG_COPY(facCosts.begin(), facCosts.end());
     return m;   
 }
 

@@ -9,7 +9,6 @@
 #define GRAPH_METRICS_HPP
 
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
-#include <boost/multi_array.hpp>
 
 #include "basic_metrics.hpp"
 
