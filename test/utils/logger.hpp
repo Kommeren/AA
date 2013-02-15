@@ -8,19 +8,18 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-//#include "helpers/type_functions.hpp"
-
-#define LOGGER_ON
+//#define LOGGER_ON
 
 #ifdef LOGGER_ON
-#include <iostream>
+#       include <iostream>
+#       include "helpers/type_functions.hpp"
 #       define LOG(x) std::cout<< x <<std::endl
 #       define LOG_COPY(b, e) \
             std::copy(b, e, std::ostream_iterator<typename paal::helpers::IterToElem<decltype(b)>::type>(std::cout, "\n"));\
             LOG("")
 #else
 #       define LOG(x)
-#       define LOG_COPY(x)
+#       define LOG_COPY(b, e)
 #endif
 
 
