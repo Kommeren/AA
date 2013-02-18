@@ -1,5 +1,5 @@
 include(const.cmake)
-set(SOURCE_DIR ${PROJECT_DIR}/lib) 
+set(SOURCE_DIR ${PROJECT_DIR}/include/paal) 
 set(BIN_DIR ${PROJECT_DIR}/bin) 
 set(TEST_DIR ${PROJECT_DIR}/test) 
 cmake_minimum_required(VERSION 2.8)
