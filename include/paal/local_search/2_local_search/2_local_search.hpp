@@ -9,12 +9,12 @@
 #ifndef __2_LOCAL_SEARCH__
 #define __2_LOCAL_SEARCH__
 
-#include "local_search/local_search_multi_solution.hpp"
-#include "local_search/trivial_neighbor.hpp"
-#include "local_search/2_local_search/2_local_search_updater.hpp"
-#include "local_search/2_local_search/2_local_search_checker.hpp"
-#include "local_search/2_local_search/2_local_search_solution_adapter.hpp"
-#include "data_structures/simple_cycle_manager.hpp"
+#include "paal/local_search/local_search_multi_solution.hpp"
+#include "paal/local_search/trivial_neighbor.hpp"
+#include "paal/local_search/2_local_search/2_local_search_updater.hpp"
+#include "paal/local_search/2_local_search/2_local_search_checker.hpp"
+#include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
+#include "paal/data_structures/simple_cycle_manager.hpp"
 
 namespace paal {
 namespace local_search {

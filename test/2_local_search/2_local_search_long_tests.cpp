@@ -6,8 +6,8 @@
 #include <string>
 
 #include "TSPLIB/TSPLIB.h"
-#include "local_search/2_local_search/2_local_search.hpp"
-#include "simple_algo/cycle_algo.hpp"
+#include "paal/local_search/2_local_search/2_local_search.hpp"
+#include "paal/simple_algo/cycle_algo.hpp"
 #include "utils/logger.hpp"
 
 using std::string;

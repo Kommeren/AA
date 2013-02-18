@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE cycle_manager
 
 #include <boost/test/unit_test.hpp>
-#include "data_structures/voronoi.hpp"
+#include "paal/data_structures/voronoi.hpp"
 #include "utils/sample_graph.hpp"
 
 using namespace paal::data_structures;

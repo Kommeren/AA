@@ -3,7 +3,7 @@
 #include <iterator>
 
 #include <boost/test/unit_test.hpp>
-#include "local_search/facility_location/facility_location.hpp"
+#include "paal/local_search/facility_location/facility_location.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/logger.hpp"
 

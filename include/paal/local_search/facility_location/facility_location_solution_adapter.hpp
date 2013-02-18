@@ -6,8 +6,8 @@
  * @date 2013-02-01
  */
 #include "facility_location_solution_element.hpp"
-#include "helpers/type_functions.hpp"
-#include "helpers/object_with_copy.hpp"
+#include "paal/helpers/type_functions.hpp"
+#include "paal/helpers/object_with_copy.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>

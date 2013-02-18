@@ -7,7 +7,7 @@
  */
 #include <boost/concept_check.hpp>
 #include <type_traits>
-#include "helpers/type_functions.hpp"
+#include "paal/helpers/type_functions.hpp"
 
 namespace paal {
 namespace local_search {

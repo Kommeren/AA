@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "local_search/local_search.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "utils/logger.hpp"
 
 //#define VERBOSE 

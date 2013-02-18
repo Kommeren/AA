@@ -9,14 +9,15 @@
 #include <iterator>
 #include <algorithm>
 
-#include "local_search/2_local_search/2_local_search.hpp"
-#include "data_structures/graph_metrics.hpp"
-#include "data_structures/facility_location_solution.hpp"
-#include "simple_algo/cycle_algo.hpp"
-#include "local_search/facility_location/facility_location_solution_adapter.hpp"
-#include "local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include <boost/iterator/transform_iterator.hpp>
-#include "helpers/type_functions.hpp"
+
+#include "paal/local_search/2_local_search/2_local_search.hpp"
+#include "paal/data_structures/graph_metrics.hpp"
+#include "paal/data_structures/facility_location_solution.hpp"
+#include "paal/simple_algo/cycle_algo.hpp"
+#include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
+#include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
+#include "paal/helpers/type_functions.hpp"
 
 std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;

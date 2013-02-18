@@ -9,7 +9,7 @@
 #include <map>
 #include <cassert>
 
-#include "data_structures/voronoi.hpp"
+#include "paal/data_structures/voronoi.hpp"
 
 #ifndef __FACILITY_LOCATION_SOLUTION__
 #define __FACILITY_LOCATION_SOLUTION__

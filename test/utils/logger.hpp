@@ -12,7 +12,7 @@
 
 #ifdef LOGGER_ON
 #       include <iostream>
-#       include "helpers/type_functions.hpp"
+#       include "paal/helpers/type_functions.hpp"
 #       define LOG(x) std::cout<< x <<std::endl
 #       define LOG_COPY(b, e) \
             std::copy(b, e, std::ostream_iterator<typename paal::helpers::IterToElem<decltype(b)>::type>(std::cout, "\n"));\

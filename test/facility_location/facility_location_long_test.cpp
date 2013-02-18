@@ -16,10 +16,10 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 
-#include "local_search/facility_location/facility_location.hpp"
+#include "paal/local_search/facility_location/facility_location.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
-#include "simple_algo/fl_algo.hpp"
+#include "paal/simple_algo/fl_algo.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;

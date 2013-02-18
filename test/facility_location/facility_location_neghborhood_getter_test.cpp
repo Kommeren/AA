@@ -2,9 +2,9 @@
 #include <iterator>
 
 #include <boost/test/unit_test.hpp>
-#include "data_structures/facility_location_solution.hpp"
-#include "local_search/facility_location/facility_location_solution_adapter.hpp"
-#include "local_search/facility_location/facility_location_neighbor_getter.hpp"
+#include "paal/data_structures/facility_location_solution.hpp"
+#include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
+#include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include "utils/sample_graph.hpp"
 
 

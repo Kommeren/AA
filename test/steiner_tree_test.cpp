@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include "local_search/steiner_tree/steiner_tree.hpp"
+#include "paal/local_search/steiner_tree/steiner_tree.hpp"
 #include "utils/sample_graph.hpp"
 
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {

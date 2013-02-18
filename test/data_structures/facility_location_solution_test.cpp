@@ -1,8 +1,8 @@
 #define BOOST_TEST_MODULE cycle_manager
 
 #include <boost/test/unit_test.hpp>
-#include "data_structures/facility_location_solution.hpp"
-#include "data_structures/voronoi.hpp"
+#include "paal/data_structures/facility_location_solution.hpp"
+#include "paal/data_structures/voronoi.hpp"
 #include "utils/sample_graph.hpp"
 
 BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {

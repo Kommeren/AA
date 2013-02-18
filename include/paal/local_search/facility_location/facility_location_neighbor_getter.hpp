@@ -6,8 +6,8 @@
  * @date 2013-02-01
  */
 #include "facility_location_update_element.hpp"
-#include "helpers/iterator_helpers.hpp"
-#include "helpers/type_functions.hpp"
+#include "paal/helpers/iterator_helpers.hpp"
+#include "paal/helpers/type_functions.hpp"
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/range/detail/any_iterator.hpp>
 

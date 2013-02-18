@@ -14,7 +14,7 @@
 #include <vector>
 #include <iterator>
 
-#include "helpers/bimap.hpp"
+#include "paal/helpers/bimap.hpp"
 
 namespace paal {
 namespace data_structures {

@@ -14,7 +14,7 @@
 
 #include "local_search_multi_solution_concepts.hpp"
 #include "trivial_stop_condition_multi_solution.hpp"
-#include "helpers/iterator_helpers.hpp"
+#include "paal/helpers/iterator_helpers.hpp"
 
 namespace paal {
 namespace local_search {

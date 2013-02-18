@@ -8,11 +8,11 @@
 #include <set>
 #include "facility_location_update_element.hpp"
 #include "facility_location_solution_adapter.hpp"
-#include "data_structures/facility_location_solution.hpp"
+#include "paal/data_structures/facility_location_solution.hpp"
 #include "facility_location_neighbor_getter.hpp"
 #include "facility_location_checker.hpp"
 #include "facility_location_updater.hpp"
-#include "local_search/local_search_multi_solution.hpp"
+#include "paal/local_search/local_search_multi_solution.hpp"
 
 namespace paal {
 namespace local_search {

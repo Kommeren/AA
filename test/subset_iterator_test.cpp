@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "helpers/subset_iterator.hpp"
+#include "paal/helpers/subset_iterator.hpp"
 
 using std::vector;
 

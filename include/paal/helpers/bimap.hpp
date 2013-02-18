@@ -19,7 +19,7 @@
 #include <iostream>
 #include <string>*/
 
-#include "helpers/iterator_helpers.hpp"
+#include "paal/helpers/iterator_helpers.hpp"
 
 namespace paal {
 namespace helpers {

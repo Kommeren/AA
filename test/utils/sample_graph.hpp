@@ -1,4 +1,4 @@
-#include "data_structures/graph_metrics.hpp"
+#include "paal/data_structures/graph_metrics.hpp"
 
 #ifndef __SAMPLE_GRAPH_METRICS__
 #define __SAMPLE_GRAPH_METRICS__

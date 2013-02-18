@@ -8,16 +8,16 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/irange.hpp>
 
-#include "helpers/iterator_helpers.hpp"
-#include "helpers/subset_iterator.hpp"
-#include "helpers/metric_to_bgl.hpp"
-#include "helpers/functors_to_paal_functors.hpp"
-#include "helpers/bimap.hpp"
-#include "helpers/metric_on_idx.hpp"
+#include "paal/helpers/iterator_helpers.hpp"
+#include "paal/helpers/subset_iterator.hpp"
+#include "paal/helpers/metric_to_bgl.hpp"
+#include "paal/helpers/functors_to_paal_functors.hpp"
+#include "paal/helpers/bimap.hpp"
+#include "paal/helpers/metric_on_idx.hpp"
 
-#include "data_structures/voronoi.hpp"
-#include "data_structures/graph_metrics.hpp"
-#include "local_search/local_search.hpp"
+#include "paal/data_structures/voronoi.hpp"
+#include "paal/data_structures/graph_metrics.hpp"
+#include "paal/local_search/local_search.hpp"
 
 namespace paal {
 namespace local_search {
