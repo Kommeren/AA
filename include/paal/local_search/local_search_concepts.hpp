@@ -9,65 +9,52 @@
 #include <type_traits>
 
 #include "search_components.hpp"
+#include "search_traits.hpp"
 
 namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  NeighborhoodGetter {
-    private:
-    
+class  ConceptsBase {
+    protected:
+        X x;
+        Solution s;
+        typename Update<SearchComponents, Solution>::type u;
+};
+
+
+template <typename X, typename Solution, typename SearchComponents> 
+class  NeighborhoodGetter : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(NeighborhoodGetter) {
-            x.get(s);
+            this->x.get(this->s);
         }
-
-    private:
-
-        X x;
-        Solution s;
-        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
-template <typename X, typename Solution, typename SearchComponents> class ImproveChecker {
+template <typename X, typename Solution, typename SearchComponents> 
+class ImproveChecker : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(ImproveChecker) {
-            x.gain(s, u);
+            this->x.gain(this->s, this->u);
         }
-    
-     private:
-
-        X x;
-        Solution s;
-        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
 
-template <typename X, typename Solution, typename SearchComponents> class SolutionUpdater {
+template <typename X, typename Solution, typename SearchComponents> 
+class SolutionUpdater : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(SolutionUpdater) {
-            x.update(s, u);
+            this->x.update(this->s, this->u);
         }
-    
-     private:
-
-        X x;
-        Solution s;
-        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
-template <typename X, typename Solution, typename SearchComponents> class StopCondition {
+template <typename X, typename Solution, typename SearchComponents> 
+class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(StopCondition) {
-            x.stop(s, u);
+            this->x.stop(this->s, this->u);
         }
-    
-     private:
-
-        X x;
-        Solution s;
-        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
 template <typename X, typename Solution> 

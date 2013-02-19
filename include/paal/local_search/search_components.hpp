@@ -56,23 +56,6 @@ private:
     StopCondition m_stopConditionFunctor;
 };
 
-template <typename SearchComponents> 
-struct SearchComponentsTraits {
-    typedef puretype(std::declval<SearchComponents>().getNeighborhoodGetter()) NeighborhoodGetter; 
-    typedef puretype(std::declval<SearchComponents>().getImproveChecker()) ImproveChecker; 
-    typedef puretype(std::declval<SearchComponents>().getSolutionUpdater()) SolutionUpdater; 
-    typedef puretype(std::declval<SearchComponents>().getStopCondition()) StopCondition; 
-    template <typename Solution> struct UpdateTraits {
-        typedef decltype(std::declval<NeighborhoodGetter>().get(
-                                std::declval<Solution &>()
-                                ).first) UpdateIterator;
-        typedef typename helpers::IterToElem<UpdateIterator>::type Update;
-
-    };
-
-};
-
-
 } //local_search
 } //paal
 #endif /* SEARCH_COMPONENTS_HPP */

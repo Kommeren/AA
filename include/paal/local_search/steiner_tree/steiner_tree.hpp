@@ -47,7 +47,6 @@ public:
 
         fillSubDists();
 
-
         auto ti = boost::irange<int>(0, N);
         AMatrix g = metricToBGL(m_idxMetric, ti.begin(), ti.end());
         

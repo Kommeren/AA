@@ -30,7 +30,6 @@ template <typename Solution,
 
 class LocalSearchStepBase {
     BOOST_CONCEPT_ASSERT((local_search_concepts::SearchComponents<SearchComponents, Solution>));
-    typedef SearchComponentsTraits<SearchComponents> Traits;
 protected:
     LocalSearchStepBase(Solution solution, SearchComponents searchComponents) :
         m_solution(std::move(solution)), m_searchComponents(std::move(searchComponents)) {}
@@ -39,7 +38,7 @@ protected:
     SearchComponents m_searchComponents;
 
 public:
-    typedef typename Traits::template UpdateTraits<Solution>::Update Update;
+    typedef typename  Update<SearchComponents, Solution>::type Update;
     
     Solution & getSolution() {
         return m_solution;
