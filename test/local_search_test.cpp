@@ -49,10 +49,11 @@ struct SU {
     }
 };
 
+typedef  SearchComponents<NG, CII, SU> SearchComp;
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search
-   LocalSearchStep<int, NG, CII, SU> ls;
+   LocalSearchStep<int, SearchComp> ls;
 
    //printing
    auto const & s = ls.getSolution();
@@ -72,7 +73,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
 BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
    //creating local search
-   LocalSearchStep<int, NG, CII, SU, TrivialStopCondition, search_strategies::SteepestSlope> ls(0, NG(), CII(), SU());
+   LocalSearchStep<int, SearchComp, search_strategies::SteepestSlope> ls;
 
    //printing 
    auto const & s = ls.getSolution();

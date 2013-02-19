@@ -10,6 +10,8 @@
 
 #include <type_traits>
 #include <utility>
+#include <tuple>
+
 
 namespace paal {
 namespace helpers {
@@ -39,8 +41,11 @@ class has_##member {  \
 //HAS_MEMBER_CLASS(cbegin)
 HAS_MEMBER_CLASS(get)
 
+#define puretype(t)  typename std::decay<decltype(t)>::type 
+
+
 template <typename Iter> struct IterToElem {
-    typedef typename std::decay<decltype(*std::declval<Iter>())>::type type; 
+    typedef puretype(*std::declval<Iter>()) type; 
 };
 
 /*template <typename Solution, typename Enable = void> struct SolToIter;

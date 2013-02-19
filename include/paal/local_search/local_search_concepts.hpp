@@ -7,21 +7,18 @@
  */
 #include <boost/concept_check.hpp>
 #include <type_traits>
-#include "paal/helpers/type_functions.hpp"
+
+#include "search_components.hpp"
 
 namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
-template <typename X, typename Solution> 
+template <typename X, typename Solution, typename SearchComponents> 
 class  NeighborhoodGetter {
     private:
-        typedef decltype(std::declval<X>().get(
-                                std::declval<Solution &>()
-                                ).first) UpdateIterator;
     
     public:
-        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
         BOOST_CONCEPT_USAGE(NeighborhoodGetter) {
             x.get(s);
         }
@@ -30,9 +27,10 @@ class  NeighborhoodGetter {
 
         X x;
         Solution s;
+        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
-template <typename X, typename Solution, typename NeighborhoodGetterT> class ImproveChecker {
+template <typename X, typename Solution, typename SearchComponents> class ImproveChecker {
     public:
         BOOST_CONCEPT_USAGE(ImproveChecker) {
             x.gain(s, u);
@@ -42,11 +40,11 @@ template <typename X, typename Solution, typename NeighborhoodGetterT> class Imp
 
         X x;
         Solution s;
-        typename NeighborhoodGetter<NeighborhoodGetterT, Solution>::Update u;
+        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
 };
 
 
-template <typename X, typename Solution, typename NeighborhoodGetterT> class SolutionUpdater {
+template <typename X, typename Solution, typename SearchComponents> class SolutionUpdater {
     public:
         BOOST_CONCEPT_USAGE(SolutionUpdater) {
             x.update(s, u);
@@ -56,7 +54,34 @@ template <typename X, typename Solution, typename NeighborhoodGetterT> class Sol
 
         X x;
         Solution s;
-        typename NeighborhoodGetter<NeighborhoodGetterT, Solution>::Update u;
+        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
+};
+
+template <typename X, typename Solution, typename SearchComponents> class StopCondition {
+    public:
+        BOOST_CONCEPT_USAGE(StopCondition) {
+            x.stop(s, u);
+        }
+    
+     private:
+
+        X x;
+        Solution s;
+        typename SearchComponentsTraits<SearchComponents>::template UpdateTraits<Solution>::Update u;
+};
+
+template <typename X, typename Solution> 
+class SearchComponents {
+    typedef SearchComponentsTraits<X> Traits; 
+    typedef typename Traits::NeighborhoodGetter NG;
+    typedef typename Traits::ImproveChecker IC;
+    typedef typename Traits::SolutionUpdater SU;
+    typedef typename Traits::StopCondition SC;
+public:
+    BOOST_CONCEPT_ASSERT((NeighborhoodGetter<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((ImproveChecker<IC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((SolutionUpdater<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((StopCondition<SC, Solution, X>));
 };
 
 } // local_search_concepts

@@ -10,6 +10,7 @@
 
 #include "local_search_single_solution.hpp"
 #include "trivial_solution_updater.hpp"
+#include "search_ocj_func_components.hpp"
 
 namespace paal {
 namespace local_search {
@@ -26,51 +27,64 @@ namespace detail {
                 return m_f(newS) - m_f(s);
             }
 
-
         private:
 
             F m_f;
             const SolutionUpdater & m_solutionUpdaterFunctor;
     };
+
+    template <typename SearchObjFunctionComponents, typename Solution>
+    class SearchObjFunctionComponentsToSearchComponents {
+    private:
+        typedef SearchObjFunctionComponentsTraits<
+                    SearchObjFunctionComponents> traits; 
+    public:
+        typedef detail::Fun2Check< 
+                        typename traits::ObjectiveFunction, 
+                        Solution, 
+                        typename traits::SolutionUpdater> ImproveCheckerType;
+        typedef SearchComponents<
+                    typename traits::NeighborhoodGetter, 
+                             ImproveCheckerType,
+                    typename traits::SolutionUpdater, 
+                    typename traits::StopCondition>  type;
+    };
 }
 
-template <typename Solution, 
-          typename NeighborhoodGetter, 
-          typename ObjectiveFunction, 
-          typename SolutionUpdater = TrivialSolutionUpdater,
-          typename StopCondition = TrivialStopCondition,
+
+//TODO concepts !!!
+template <typename Solution,
+          typename SearchObjFunctionComponents,
           typename SearchStrategy = search_strategies::ChooseFirstBetter> 
 
 class LocalSearchFunctionStep : 
     public LocalSearchStep<
-                Solution, 
-                NeighborhoodGetter, 
-                detail::Fun2Check< 
-                    ObjectiveFunction, 
-                    Solution, 
-                    SolutionUpdater>, 
-                SolutionUpdater, 
-                StopCondition,
-                SearchStrategy> {
-                    
-    typedef detail::Fun2Check< 
-                    ObjectiveFunction, 
-                    Solution, 
-                    SolutionUpdater> UpdateChecker;
+                Solution,
+                typename detail::SearchObjFunctionComponentsToSearchComponents<
+                    SearchObjFunctionComponents,
+                    Solution>::type,
+                SearchStrategy
+                > {
+    typedef detail::SearchObjFunctionComponentsToSearchComponents<
+        SearchObjFunctionComponents, Solution> Convert;
+    typedef typename Convert::type SearchComponents;
+    typedef typename Convert::ImproveCheckerType ImproveChecker;
     typedef LocalSearchStep<
                 Solution, 
-                NeighborhoodGetter,
-                UpdateChecker,
-                SolutionUpdater, 
-                StopCondition,
+                SearchComponents,
                 SearchStrategy> base;
     public:
-    LocalSearchFunctionStep(Solution s = Solution(), NeighborhoodGetter n = NeighborhoodGetter(), ObjectiveFunction f = ObjectiveFunction(), 
-                            SolutionUpdater su = SolutionUpdater(), StopCondition sc = StopCondition()) :  
-        base(std::move(s), std::move(n), 
-        UpdateChecker(std::move(f), base::m_solutionUpdaterFunctor), 
-        std::move(su), std::move(sc)) {} 
-
+    LocalSearchFunctionStep(Solution sol = Solution(), 
+            SearchObjFunctionComponents s = SearchObjFunctionComponents()) :  
+        base(std::move(sol), 
+             SearchComponents
+                   (
+                    std::move(s.getNeighborhoodGetter()),
+                    ImproveChecker(std::move(s.getObjectiveFunction()), base::m_searchComponents.getSolutionUpdater()),
+                    std::move(s.getSolutionUpdater()),
+                    std::move(s.getStopCondition())
+                   )
+            ) {} 
 };
 
 } //local_search

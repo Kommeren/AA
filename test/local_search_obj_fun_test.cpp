@@ -51,7 +51,8 @@ struct SU {
 
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
    //creating local search
-   LocalSearchFunctionStep<int, NG, F, SU> ls;
+   typedef  SearchObjFunctionComponents<NG, F, SU> SearchComp;
+   LocalSearchFunctionStep<int, SearchComp> ls;
 #ifdef LOGGER_ON
    F f;
 #endif

@@ -58,11 +58,13 @@ public:
         };
 
         typedef FunctToNeigh<decltype(ng)> NG; 
-        
-        typedef local_search::LocalSearchFunctionStep<ThreeTuple, NG, decltype(obj_fun),
-              TrivialSolutionUpdater, TrivialStopCondition, search_strategies::SteepestSlope>  LS;
 
-        LS ls(ThreeTuple(), NG(ng), obj_fun);
+        typedef SearchObjFunctionComponents<NG, decltype(obj_fun)> SearchOFComponents;
+        SearchOFComponents sc(NG(ng), obj_fun);
+        typedef local_search::LocalSearchFunctionStep<ThreeTuple, 
+                    SearchOFComponents, search_strategies::SteepestSlope>  LS;
+
+        LS ls(ThreeTuple(), sc);
 
         while(true) {
         
