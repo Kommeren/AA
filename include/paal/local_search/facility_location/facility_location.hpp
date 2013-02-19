@@ -17,21 +17,25 @@
 namespace paal {
 namespace local_search {
 namespace facility_location {
+
+template <typename VertexType> 
+struct DefaultFLComponents {
+    typedef MultiSearchComponents<
+                FacilityLocationNeighborhoodGetter<VertexType>,
+                FacilityLocationChecker           <VertexType>,
+                FacilityLocationUpdater           <VertexType>> type;
+};
     
 
 template <typename Voronoi,
           typename FacilityCost,
-          typename NeighborhoodGetter  = FacilityLocationNeighborhoodGetter<typename Voronoi::VertexType>,
-          typename ImproveChecker      = FacilityLocationChecker           <typename Voronoi::VertexType>,
-          typename Updater             = FacilityLocationUpdater           <typename Voronoi::VertexType>>
+          typename MultiSearchComponents = typename DefaultFLComponents<typename Voronoi::VertexType>::type>
 
 class FacilityLocationLocalSearchStep : 
     public LocalSearchStepMultiSolution<
                FacilityLocationSolutionAdapter<
                     data_structures::FacilityLocationSolution<FacilityCost, Voronoi>>, 
-               NeighborhoodGetter, 
-               ImproveChecker, 
-               Updater>  {
+               MultiSearchComponents>  {
 
 public:
     typedef data_structures::FacilityLocationSolution<FacilityCost, Voronoi> FLSolution;
@@ -39,19 +43,16 @@ public:
     
     typedef LocalSearchStepMultiSolution<
                 FLSolutionAdapter,
-                NeighborhoodGetter, 
-                ImproveChecker, 
-                Updater >  base;
+                MultiSearchComponents>  base;
 
-        FacilityLocationLocalSearchStep(Voronoi voronoi,
-                                        const FacilityCost & cost,
-                                        typename FLSolution::UnchosenFacilitiesSet uch,
-                                        NeighborhoodGetter ng = NeighborhoodGetter(),
-                                        ImproveChecker ch = ImproveChecker(),
-                                        Updater u = Updater()) :
+    FacilityLocationLocalSearchStep(
+            Voronoi voronoi,
+            const FacilityCost & cost,
+            typename FLSolution::UnchosenFacilitiesSet uch,
+            MultiSearchComponents sc = MultiSearchComponents()) :
 
-                                        base(FLSolutionAdapter(FLSolution(std::move(voronoi), std::move(uch), cost)), 
-                                                                std::move(ng), std::move(ch), std::move(u)) {}
+                base(FLSolutionAdapter(FLSolution(std::move(voronoi), std::move(uch), cost)), 
+                                       std::move(sc)) {}
 };
 
 };

@@ -8,6 +8,8 @@
 #include <boost/concept_check.hpp>
 #include <type_traits>
 #include "paal/helpers/type_functions.hpp"
+#include "search_components.hpp"
+#include "search_traits.hpp"
 
 namespace paal {
 namespace local_search {
@@ -36,56 +38,62 @@ class MultiSolution  {
         X x;
 };
 
-
-template <typename X, typename Solution> 
-class  MultiNeighborhoodGetter {
-    private:
-        typedef typename MultiSolution<Solution>::Element SolutionElement;
-        typedef decltype(std::declval<X>().get(
-                                std::declval<const Solution &>(),
-                                std::declval<const SolutionElement&>()
-                                ).first) UpdateIterator;
-    
-    public:
-        typedef typename std::decay<decltype(*std::declval<UpdateIterator>())>::type Update;
-        BOOST_CONCEPT_USAGE(MultiNeighborhoodGetter) {
-            x.get(s, e);
-        }
-
-    private:
-
-        X x;
-        Solution  s;
-        SolutionElement e;
+template <typename X, typename Solution, typename SearchComponents> 
+class MultiConceptsBase {
+    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
+    typedef typename helpers::SolToElem<Solution>::type SolutionElement;
+protected:
+    X x;
+    Solution  s;
+    SolutionElement e;
+    Update u;
 };
 
-template <typename X, typename Solution, typename NeighborhoodGetter> class MultiImproveChecker {
+template <typename X, typename Solution, typename SearchComponents> 
+class  MultiNeighborhoodGetter : public MultiConceptsBase<X, Solution, SearchComponents> {
+    public:
+        BOOST_CONCEPT_USAGE(MultiNeighborhoodGetter) {
+            this->x.get(this->s, this->e);
+        }
+};
+
+template <typename X, typename Solution, typename SearchComponents> 
+class MultiImproveChecker : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiImproveChecker) {
-            x.gain(s, e, u);
+            this->x.gain(this->s, this->e, this->u);
         }
-    
-     private:
-
-        X x;
-        Solution s;
-        typename MultiSolution<Solution>::Element e;
-        typename MultiNeighborhoodGetter<NeighborhoodGetter, Solution>::Update u;
 };
 
 
-template <typename X, typename Solution, typename NeighborhoodGetter> class MultiSolutionUpdater {
+template <typename X, typename Solution, typename SearchComponents> 
+class MultiSolutionUpdater : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
-            x.update(s, e, u);
+            this->x.update(this->s,this-> e, this->u);
         }
-    
-     private:
+};
 
-        X x;
-        Solution s;
-        typename MultiSolution<Solution>::Element e;
-        typename MultiNeighborhoodGetter<NeighborhoodGetter, Solution>::Update u;
+template <typename X, typename Solution, typename SearchComponents> 
+class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponents>{
+    public:
+        BOOST_CONCEPT_USAGE(MultiStopCondition) {
+            this->x.stop(this->s,this-> e, this->u);
+        }
+};
+
+template <typename X, typename Solution> 
+class MultiSearchComponents {
+    typedef SearchComponentsTraits<X> Traits; 
+    typedef typename Traits::NeighborhoodGetter NG;
+    typedef typename Traits::ImproveChecker IC;
+    typedef typename Traits::SolutionUpdater SU;
+    typedef typename Traits::StopCondition SC;
+public:
+    BOOST_CONCEPT_ASSERT((MultiNeighborhoodGetter<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiImproveChecker<IC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiSolutionUpdater<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiStopCondition<SC, Solution, X>));
 };
 
 } // local_search_concepts

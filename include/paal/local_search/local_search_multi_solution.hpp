@@ -43,26 +43,16 @@ namespace search_strategies {
  */
 
 template <typename Solution, 
-          typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater, 
-          typename StopCondition = TrivialStopConditionMultiSolution,
-          typename SearchStrategy = search_strategies::ChooseFirstBetter
-          >
+          typename MultiSearchComponents,
+          typename SearchStrategy = search_strategies::ChooseFirstBetter>
 class LocalSearchStepMultiSolution {
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolution<Solution>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiNeighborhoodGetter<NeighborhoodGetter, Solution>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiImproveChecker<ImproveChecker, Solution, NeighborhoodGetter>));
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSolutionUpdater<SolutionUpdater, Solution, NeighborhoodGetter>));
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
+      
       static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
                     std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
     
-    typedef typename local_search_concepts::
-        MultiSolution<Solution>::Element SolutionElement;
-    typedef typename local_search_concepts::
-        MultiNeighborhoodGetter<NeighborhoodGetter, Solution>::Update Update;
-    
-    typedef LocalSearchStepMultiSolution<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, SearchStrategy>  self;
+    typedef typename helpers::SolToElem<Solution>::type SolutionElement;
+    typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
     
 public:
 
@@ -75,12 +65,8 @@ public:
      * @param solutionUpdater
      * @param sc
      */
-    LocalSearchStepMultiSolution(Solution solution, NeighborhoodGetter ng, 
-                                 ImproveChecker check, SolutionUpdater solutionUpdater,
-                                 StopCondition sc = TrivialStopConditionMultiSolution()) :
-     m_solution(std::move(solution)), m_neighborGetterFunctor(std::move(ng)), 
-     m_checkFunctor(std::move(check)), m_solutionUpdaterFunctor(std::move(solutionUpdater)), 
-     m_stopConditionFunctor(std::move(sc)) {}
+    LocalSearchStepMultiSolution(Solution solution, MultiSearchComponents sc) : 
+        m_solution(std::move(solution)), m_searchComponents(std::move(sc)) {}
 
     /**
      * @brief tata 
@@ -90,12 +76,12 @@ public:
     bool search() {
 
         for(const SolutionElement & r : m_solution) {
-            auto adjustmentSet = m_neighborGetterFunctor.get(m_solution, r);
+            auto adjustmentSet = m_searchComponents.getNeighborhoodGetter().get(m_solution, r);
             for(const Update & update : helpers::make_range(adjustmentSet)) {
-                if(m_checkFunctor.gain(m_solution, r, update) > 0) {
-                    m_solutionUpdaterFunctor.update(m_solution, r, update);
+                if(m_searchComponents.getImproveChecker().gain(m_solution, r, update) > 0) {
+                    m_searchComponents.getSolutionUpdater().update(m_solution, r, update);
                     return true;
-                } else if(m_stopConditionFunctor.stop(m_solution, r, update)) {
+                } else if(m_searchComponents.getStopCondition().stop(m_solution, r, update)) {
                     return false;
                 }
             }
@@ -118,14 +104,11 @@ public:
 private:
 
     Solution m_solution;
-    NeighborhoodGetter m_neighborGetterFunctor;
-    ImproveChecker m_checkFunctor;
-    SolutionUpdater m_solutionUpdaterFunctor;
-    StopCondition m_stopConditionFunctor;
+    MultiSearchComponents m_searchComponents;
 };
 
-template <typename Solution, typename NeighborhoodGetter, typename ImproveChecker, typename SolutionUpdater, typename StopCondition> 
-class LocalSearchStepMultiSolution<Solution, NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition, search_strategies::SteepestSlope> {
+template <typename Solution, typename SearchComponents> 
+class LocalSearchStepMultiSolution<Solution, SearchComponents, search_strategies::SteepestSlope> {
     //TODO implement
 };
 

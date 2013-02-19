@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
    data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
 
    //creating local search
-   ImproveChecker2Opt<decltype(gm)> ch(gm);
-   auto ls = make_TwoLocalSearchStep(std::move(cycle), ch);
+   auto lsc = getDefaultTwoLocalComponents(gm);
+   auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(cycle, lsc);
 
    //printing
 #ifdef LOGGER_ON

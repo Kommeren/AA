@@ -9,6 +9,7 @@
 #define SEARCH_COMPONENTS_HPP 
 
 #include "trivial_stop_condition.hpp"
+#include "trivial_stop_condition_multi_solution.hpp"
 #include "paal/helpers/type_functions.hpp"
 
 namespace paal {
@@ -54,6 +55,29 @@ private:
     ImproveChecker m_checkFunctor;
     SolutionUpdater m_solutionUpdaterFunctor;
     StopCondition m_stopConditionFunctor;
+};
+
+template <typename NeighborhoodGetter, 
+          typename ImproveChecker, 
+          typename SolutionUpdater,
+          typename StopCondition = TrivialStopConditionMultiSolution> 
+class MultiSearchComponents : 
+    public SearchComponents<
+                NeighborhoodGetter, 
+                ImproveChecker, 
+                SolutionUpdater, 
+                StopCondition> {
+    typedef SearchComponents<
+                NeighborhoodGetter, 
+                ImproveChecker, 
+                SolutionUpdater, 
+                StopCondition> base;
+public:
+    MultiSearchComponents(
+            NeighborhoodGetter ng = NeighborhoodGetter(),
+            ImproveChecker ch = ImproveChecker(),
+            SolutionUpdater su = SolutionUpdater(),
+            StopCondition sc = StopCondition()) : base(std::move(ng), std::move(ch), std::move(su), std::move(sc)) {}
 };
 
 } //local_search

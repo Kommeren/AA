@@ -31,6 +31,20 @@ public:
 
 };
 
+template <typename SearchComponents, typename Solution> 
+class MultiUpdate {
+    typedef typename SearchComponentsTraits<
+                SearchComponents>::NeighborhoodGetter NG;
+    typedef typename helpers::SolToElem<Solution>::type Element;
+    typedef decltype(std::declval<NG>().get(
+                                std::declval<Solution &>(),
+                                std::declval<Element &>()
+                                ).first) UpdateIterator;
+public:
+   typedef typename helpers::IterToElem<UpdateIterator>::type type;
+
+};
+
 } // local_search
 } // paal
 #endif /* SEARCH_TRAITS_HPP */

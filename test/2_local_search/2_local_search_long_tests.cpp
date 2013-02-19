@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
 
         //creating local search
-        ImproveChecker2Opt<tsp::TSPLIB_Matrix> ch(mtx);
-        auto ls = make_TwoLocalSearchStep(std::move(cycle), ch);
+        auto lsc = getDefaultTwoLocalComponents(mtx);
+        auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(cycle, lsc);
 
         //printing 
 

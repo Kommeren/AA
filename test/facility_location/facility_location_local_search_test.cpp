@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     typedef paal::data_structures::FacilityLocationSolution
         <decltype(cost), VorType> Sol;
     typedef typename VorType::GeneratorsSet FSet;
-    VorType voronoi( FSet{},   FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
 
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
         ls(voronoi, cost, FSet{SGM::A, SGM::B});

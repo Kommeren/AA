@@ -21,40 +21,51 @@ namespace local_search {
 namespace two_local_search {
 
 
-template <typename Cycle,
-          typename ImproveChecker, 
+template <typename ImproveChecker, 
           typename NeighborhoodGetter = TrivialNeigborGetter, 
-          typename StopCondition = TrivialStopConditionMultiSolution>
+          typename StopCondition = TrivialStopConditionMultiSolution> 
+class TwoLocalComponents : 
+    public MultiSearchComponents<
+            NeighborhoodGetter, 
+            ImproveChecker, 
+            TwoLocalSearchUpdater, 
+            StopCondition> {
 
-         class  TwoLocalSearchStep : 
-             public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, 
-                        NeighborhoodGetter, ImproveChecker, TwoLocalSearchUpdater, StopCondition>  {
-               
-                typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , NeighborhoodGetter, 
-                            ImproveChecker, TwoLocalSearchUpdater, StopCondition > LocalSearchStepT;
-
-                public:
-
-                     TwoLocalSearchStep(Cycle c, 
-                                        ImproveChecker ich, 
-                                        NeighborhoodGetter ng = NeighborhoodGetter(),
-                                        StopCondition sc = TrivialStopConditionMultiSolution()) 
-
-                        :   LocalSearchStepT(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(ng), 
-                                                std::move(ich), TwoLocalSearchUpdater(), std::move(sc)),
-                                                m_cycle(std::move(c)) {}
-
-                private:
-                    Cycle m_cycle;
-             };
+    typedef MultiSearchComponents<
+            NeighborhoodGetter, 
+            ImproveChecker, 
+            TwoLocalSearchUpdater, 
+            StopCondition> base; 
+public : 
+    TwoLocalComponents(ImproveChecker ic = ImproveChecker(), 
+                       NeighborhoodGetter ng = NeighborhoodGetter(), 
+                       StopCondition sc = StopCondition()) : 
+            base(std::move(ng), std::move(ic), TwoLocalSearchUpdater(), std::move(sc)) {}
+};
 
 
+//TODO check cycle concept
+template <typename Cycle,
+          typename SearchComponents>
+
+class  TwoLocalSearchStep : 
+    public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, SearchComponents>  {
+  
+   typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , SearchComponents> base;
+
+   public:
+
+        TwoLocalSearchStep(Cycle c, SearchComponents sc) 
+           : base(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(sc)), m_cycle(std::move(c)) {}
+
+   private:
+       Cycle m_cycle;
+};
 
 /**
- * @brief make template function for TwoLocalSearchStep, just to avoid providing type names in template.
+ * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
  *
  *
- * @tparam Cycle
  * @tparam ImproveChecker
  * @tparam NeighborhoodGetter
  * @param c
@@ -63,18 +74,24 @@ template <typename Cycle,
  *
  * @return 
  */
-template <typename Cycle,
-          typename ImproveChecker, 
+template <typename ImproveChecker, 
           typename NeighborhoodGetter = TrivialNeigborGetter,
           typename StopCondition = TrivialStopConditionMultiSolution>
 
-TwoLocalSearchStep<Cycle, ImproveChecker, NeighborhoodGetter, StopCondition>  
+TwoLocalComponents<ImproveChecker, NeighborhoodGetter, StopCondition>  
 
-    make_TwoLocalSearchStep(Cycle c, ImproveChecker ich, 
+    make_TwoLocalSearchCOmponents(ImproveChecker ch, 
             NeighborhoodGetter ng = TrivialNeigborGetter(),
             StopCondition sc = TrivialStopConditionMultiSolution()) {
 
-    return TwoLocalSearchStep<Cycle, ImproveChecker, NeighborhoodGetter>(c, ich, ng, sc);
+    return TwoLocalComponents<ImproveChecker, NeighborhoodGetter, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
+}
+
+
+template <typename Metric>
+decltype(make_TwoLocalSearchCOmponents(ImproveChecker2Opt<Metric>(std::declval<Metric>())))
+getDefaultTwoLocalComponents(const Metric & m) {
+    return make_TwoLocalSearchCOmponents(ImproveChecker2Opt<Metric>(m));
 }
 
 
