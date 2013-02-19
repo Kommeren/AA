@@ -1,0 +1,6 @@
+*.swp
+build
+build_debug
+html
+latex
+const.cmake
