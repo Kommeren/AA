@@ -1,13 +1,13 @@
 /**
- * @file simple_cycle_manager.hpp
+ * @file simple_cycle.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
  */
 
-#ifndef __SIMPLE_CYCLE_MANAGER__
-#define __SIMPLE_CYCLE_MANAGER__
+#ifndef SIMPLE_CYCLE_HPP
+#define SIMPLE_CYCLE_HPP 
 
 #include <cassert>
 #include <map>
@@ -73,12 +73,12 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
                                     ptrdiff_t, CycleElPair *, const CycleElPair &> {
             public:
                 EdgeIterator(const SimpleCycle & cm, CycleEl ce ) : 
-                    m_cycleManager(&cm), m_idx(m_cycleManager->toIdx(ce)), m_first(m_idx) {
+                    m_cycle(&cm), m_idx(m_cycle->toIdx(ce)), m_first(m_idx) {
 
                     updateCurr();
                 }
                 
-                EdgeIterator() : m_cycleManager(NULL) ,m_idx(-1) {}
+                EdgeIterator() : m_cycle(NULL) ,m_idx(-1) {}
 
                 EdgeIterator & operator++(){
                     m_idx = nextIdx(m_idx);
@@ -113,7 +113,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
                     m_idx = ei.m_idx; 
                     m_first = ei.m_first;
                     m_curr = ei.m_curr;
-                    m_cycleManager = ei.m_cycleManager;
+                    m_cycle = ei.m_cycle;
                 }               
 
                 const CycleElPair & operator*() const {
@@ -122,15 +122,15 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
                 
             private:
                 void updateCurr() {
-                    m_curr.first = m_cycleManager->fromIdx(m_idx);
-                    m_curr.second = m_cycleManager->fromIdx(nextIdx(m_idx));
+                    m_curr.first = m_cycle->fromIdx(m_idx);
+                    m_curr.second = m_cycle->fromIdx(nextIdx(m_idx));
                 }
                 
                 IdxT nextIdx(IdxT i) const {
-                    return m_cycleManager->nextIdx(i);
+                    return m_cycle->nextIdx(i);
                 }
 
-                const SimpleCycle * m_cycleManager;
+                const SimpleCycle * m_cycle;
                 IdxT m_idx;
                 IdxT m_first;
                 CycleElPair m_curr;
@@ -207,4 +207,4 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
 } //data_structures
 } //paal
 
-#endif // __SIMPLE_CYCLE_MANAGER__
+#endif /* SIMPLE_CYCLE_HPP */

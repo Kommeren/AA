@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE cycle_manager
+#define BOOST_TEST_MODULE facility_location
 
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location_solution.hpp"

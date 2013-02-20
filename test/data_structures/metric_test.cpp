@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE cycle_manager
+#define BOOST_TEST_MODULE metric
 
 #include <boost/test/unit_test.hpp>
 #include "utils/sample_graph.hpp"

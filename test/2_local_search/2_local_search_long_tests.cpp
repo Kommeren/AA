@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE cycle_manager
+#define BOOST_TEST_MODULE two_local_search_long
 
 #include <boost/test/unit_test.hpp>
 

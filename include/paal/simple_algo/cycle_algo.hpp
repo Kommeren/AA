@@ -11,8 +11,8 @@ namespace paal {
 namespace simple_algo {
 
 
-template <typename Metric, typename CycleManager> typename Metric::DistanceType getLength(const Metric & m, const CycleManager & cm) {
-    typedef typename CycleManager::CycleElement El;
+template <typename Metric, typename Cycle> typename Metric::DistanceType getLength(const Metric & m, const Cycle & cm) {
+    typedef typename Cycle::CycleElement El;
     typedef typename Metric::DistanceType Dist;
     
     auto edges = cm.getEdgeRange();
@@ -24,9 +24,9 @@ template <typename Metric, typename CycleManager> typename Metric::DistanceType 
 }
 
 
-template <typename CycleManager, typename Stream> void print(const CycleManager & cm, Stream & o, const  std::string & endl = "\n") {
+template <typename Cycle, typename Stream> void print(const Cycle & cm, Stream & o, const  std::string & endl = "\n") {
     auto edges = cm.getEdgeRange();
-    typedef typename CycleManager::CycleElement El;
+    typedef typename Cycle::CycleElement El;
 
     for(const std::pair<El, El> & p : helpers::make_range(edges)){ 
         o <<  "(" << p.first << "," << p.second << ")->";

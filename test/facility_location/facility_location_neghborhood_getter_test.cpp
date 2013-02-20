@@ -1,4 +1,4 @@
-#define BOOST_TEST_MODULE cycle_manager
+define BOOST_TEST_MODULE fl_neighborhood
 #include <iterator>
 
 #include <boost/test/unit_test.hpp>
