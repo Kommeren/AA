@@ -15,9 +15,9 @@ namespace facility_location {
 
 enum is_chosen { CHOSEN, UNCHOSEN};
 
-template <typename T> class SolutionElement {
+template <typename T> class Facility {
 public:
-    SolutionElement(is_chosen ic, T e) : m_isChosen(ic), m_elem(e) {}
+    Facility(is_chosen ic, T e) : m_isChosen(ic), m_elem(e) {}
 
     is_chosen getIsChosen() const {
         return m_isChosen;
@@ -27,7 +27,7 @@ public:
         return m_elem;
     }
 
-    bool operator==(const SolutionElement & se) const {
+    bool operator==(const Facility & se) const {
         return m_isChosen == se.m_isChosen && m_elem == se.m_elem;
     }
 
@@ -36,7 +36,7 @@ private:
     T m_elem;    
 };
 
-template <typename stream, typename T> stream & operator<<(stream & o, const SolutionElement<T> & se) {
+template <typename stream, typename T> stream & operator<<(stream & o, const Facility<T> & se) {
     o << se.getIsChosen() << "," << se.getElem() << " ";
     return o;
 }

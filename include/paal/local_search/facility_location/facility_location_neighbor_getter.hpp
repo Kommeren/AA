@@ -49,9 +49,9 @@ public:
     typedef boost::range_detail::any_iterator<Update, boost::forward_traversal_tag, const Update &, std::ptrdiff_t> Iter;
 
     //Due to the memory optimization at one moment only one Update is valid
-    typedef SolutionElement<VertexType> SolEl;
+    typedef Facility<VertexType> Fac;
     template <typename Solution> std::pair<Iter, Iter>
-        get(const Solution &s, const SolEl & el) {
+        get(const Solution &s, const Fac & el) {
 
         auto const & FCS = s.get(); 
         m_currSol.clear();
