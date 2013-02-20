@@ -21,8 +21,10 @@ class CheckSize {
 public:
     CheckSize(SimpleCycle<string> cm, size_t size) : m_cm(cm), m_size(size) {}
     void operator()(const string & s) {
-        auto r = m_cm.getEdgeRange(s);    
-        BOOST_CHECK_EQUAL(m_size, size_t(std::distance(r.first, r.second)));        
+        auto re = m_cm.getEdgeRange(s);    
+        auto rv = m_cm.getVerticesRange(s);    
+        BOOST_CHECK_EQUAL(m_size, size_t(std::distance(re.first, re.second)));        
+        BOOST_CHECK_EQUAL(m_size, size_t(std::distance(rv.first, rv.second)));        
     }
 private:
     SimpleCycle<string> m_cm;
@@ -90,5 +92,4 @@ BOOST_AUTO_TEST_CASE(swap_edges_3) {
 BOOST_AUTO_TEST_CASE(swap_edges_4) {
     std::vector<T::P> sol = {T::P("1","3"), T::P("3", "2"), T::P("2","4"), T::P("4", "1")};
     checkSwap(v.begin(), v.begin() + 4, "2", "3", "1", sol);
-    
 }

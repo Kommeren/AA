@@ -8,6 +8,7 @@
 #ifndef __2_LOCAL_SEARCH_CONTAINER__
 #define __2_LOCAL_SEARCH_CONTAINER__
 
+#include "paal/helpers/vertex_to_edge_iterator.hpp"
 
 namespace paal {
 namespace local_search {
@@ -15,15 +16,17 @@ namespace two_local_search {
 
 template < typename Cycle> class TwoLocalSearchContainer  {
     public:
-        typedef typename Cycle::EdgeIterator Iterator;
+        typedef typename Cycle::VertexIterator VertexIterator;
+        typedef helpers::VertexToEdgeIterator<VertexIterator> Iterator;
         TwoLocalSearchContainer(Cycle & cm) : m_cycle(cm) {}
 
         Iterator begin() const {
-            return m_cycle.getEdgeRange().first;
+            return helpers::make_VertexToEdgeIterator(m_cycle.getVerticesRange());
         }
         
         Iterator end() const {
-            return m_cycle.getEdgeRange().second;
+            auto end =  m_cycle.getVerticesRange().second;
+            return helpers::make_VertexToEdgeIterator(end, end);
         }
 
         Cycle & get() {
