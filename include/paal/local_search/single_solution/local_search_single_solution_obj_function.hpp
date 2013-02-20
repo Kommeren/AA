@@ -10,7 +10,7 @@
 
 #include "local_search_single_solution.hpp"
 #include "trivial_solution_updater.hpp"
-#include "search_ocj_func_components.hpp"
+#include "search_obj_func_components.hpp"
 
 namespace paal {
 namespace local_search {

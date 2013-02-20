@@ -6,11 +6,14 @@
  * @date 2013-02-01
  */
 
+//TODO change all defines
 #ifndef __2_LOCAL_SEARCH__
 #define __2_LOCAL_SEARCH__
 
-#include "paal/local_search/local_search_multi_solution.hpp"
-#include "paal/local_search/trivial_neighbor.hpp"
+#include "paal/local_search/multi_solution/trivial_neighbor.hpp"
+#include "paal/local_search/multi_solution/trivial_stop_condition_multi_solution.hpp"
+#include "paal/local_search/search_components.hpp"
+#include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
 #include "paal/local_search/2_local_search/2_local_search_updater.hpp"
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
@@ -18,7 +21,6 @@
 namespace paal {
 namespace local_search {
 namespace two_local_search {
-
 
 template <typename ImproveChecker, 
           typename NeighborhoodGetter = TrivialNeigborGetter, 

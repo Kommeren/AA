@@ -8,8 +8,8 @@
 #include <boost/concept_check.hpp>
 #include <type_traits>
 
-#include "search_components.hpp"
-#include "search_traits.hpp"
+#include "paal/local_search/search_components.hpp"
+#include "paal/local_search/search_traits.hpp"
 
 namespace paal {
 namespace local_search {

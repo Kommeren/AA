@@ -1,5 +1,5 @@
 /**
- * @file local_search_multi_solution.hpp
+ * @file local_search_multi_solution/trivial_neighbor.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

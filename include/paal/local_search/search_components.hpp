@@ -1,5 +1,5 @@
 /**
- * @file search_components.hpp
+ * @file paal/local_search/search_components.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -8,8 +8,8 @@
 #ifndef SEARCH_COMPONENTS_HPP
 #define SEARCH_COMPONENTS_HPP 
 
-#include "trivial_stop_condition.hpp"
-#include "trivial_stop_condition_multi_solution.hpp"
+#include "paal/local_search/single_solution/trivial_stop_condition.hpp"
+#include "paal/local_search/multi_solution/trivial_stop_condition_multi_solution.hpp"
 #include "paal/helpers/type_functions.hpp"
 
 namespace paal {

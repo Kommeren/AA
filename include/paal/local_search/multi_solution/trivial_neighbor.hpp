@@ -1,5 +1,5 @@
 /**
- * @file trivial_neighbor.hpp
+ * @file multi_solution/trivial_neighbor.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

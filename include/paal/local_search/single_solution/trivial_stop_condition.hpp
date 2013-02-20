@@ -1,5 +1,5 @@
 /**
- * @file trivial_stop_condition.hpp
+ * @file paal/local_search/single_solution/trivial_stop_condition.hpp
  * @brief trivial stop condition
  * @author Piotr Wygocki
  * @version 1.0

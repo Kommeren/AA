@@ -208,6 +208,6 @@ Basic usage of this algorithm is extremely simple and elegant. <br> We are using
 Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
  
 */
-#include "local_search_single_solution.hpp"
-#include "local_search_single_solution_obj_function.hpp"
-#include "local_search_multi_solution.hpp"
+#include "single_solution/local_search_single_solution.hpp"
+#include "single_solution/local_search_single_solution_obj_function.hpp"
+#include "multi_solution/local_search_multi_solution.hpp"

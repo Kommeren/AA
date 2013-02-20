@@ -1,5 +1,5 @@
 /**
- * @file search_traits.hpp
+ * @file paal/local_search/search_traits.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
