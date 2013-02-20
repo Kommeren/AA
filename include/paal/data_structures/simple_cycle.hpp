@@ -23,12 +23,12 @@ namespace data_structures {
 //TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
 //
 //TODO MOVE CONSTRUCTORS
-template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
+template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
     public:
         typedef std::pair<CycleEl, CycleEl> CycleElPair;
         typedef CycleEl CycleElement;
 
-        template <typename Iter> SimpleCycleImpl(Iter begin, Iter end) {
+        template <typename Iter> SimpleCycle(Iter begin, Iter end) {
             if(begin == end) {
                 return;
             }
@@ -72,7 +72,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
         class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair, 
                                     ptrdiff_t, CycleElPair *, const CycleElPair &> {
             public:
-                EdgeIterator(const SimpleCycleImpl & cm, CycleEl ce ) : 
+                EdgeIterator(const SimpleCycle & cm, CycleEl ce ) : 
                     m_cycleManager(&cm), m_idx(m_cycleManager->toIdx(ce)), m_first(m_idx) {
 
                     updateCurr();
@@ -130,7 +130,7 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
                     return m_cycleManager->nextIdx(i);
                 }
 
-                const SimpleCycleImpl * m_cycleManager;
+                const SimpleCycle * m_cycleManager;
                 IdxT m_idx;
                 IdxT m_first;
                 CycleElPair m_curr;
@@ -195,12 +195,12 @@ template <typename CycleEl, typename IdxT = int> class  SimpleCycleImpl {
         SorsMap m_successorMap;
 };
 
-template <typename CycleEl> class  SimpleCycle : 
+/*template <typename CycleEl> class  SimpleCycle : 
     public SimpleCycleImpl<CycleEl> {
         public:
 //        using SimpleCycleImpl<CycleEl>::SimpleCycleImpl;
         template <typename Iter> SimpleCycle(Iter begin, Iter end) : SimpleCycleImpl<CycleEl>(begin, end) {}
-};
+};*/
 
 
 

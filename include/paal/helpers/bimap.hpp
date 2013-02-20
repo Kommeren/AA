@@ -24,46 +24,6 @@
 namespace paal {
 namespace helpers {
 
-/*namespace bmi = boost::multi_index;
-
-// tags for accessing both sides of a bidirectional map 
-
-struct from{};
-struct to{};
-
-// The class template bidirectional_map wraps the specification
-// of a bidirectional map based on multi_index_container.
-//
-
-template<typename FromType,typename ToType>
-struct bidirectional_map {
-
-    struct value_type {
-        value_type(const FromType& first_,const ToType& second_):
-            first(first_),second(second_)
-        {}
-
-        FromType first;
-        ToType   second;
-    };
-
-
-    // A bidirectional map can be simulated as a multi_index_container
-    // of pairs of (FromType,ToType) with two unique indices, one
-    // for each member of the pair.
-    //
-
-    typedef bmi::multi_index_container<
-        value_type,
-        bmi::indexed_by<
-            bmi::ordered_unique<
-            bmi::tag<from>, bmi::member<value_type,FromType, &value_type::first > >,
-        bmi::ordered_unique<
-            bmi::tag<to>,   bmi::member<value_type,ToType,   &value_type::second> > >
-                       > type;
-
-};*/
-
 
 //minor TODO write specification when T is integral (copy instead of reference)
 template <typename T, typename Idx = int> class BiMap {
@@ -101,6 +61,39 @@ public:
 private:
     std::vector<T> m_idToT;
     std::map<T,Idx> m_tToID;
+};
+
+template <typename T, typename Idx = int> class BiMapOfConsecutive {
+public:
+    static_assert(std::is_integral<T>::value, "Type T has to be integral");
+    BiMapOfConsecutive() {}
+
+    template <typename Iter> BiMapOfConsecutive(Iter b, Iter e) {
+        if(b == e)
+            return;
+        size_t size = *max_element(b, e);
+        m_idToT.resize(size);
+        std::copy(b, e, m_idToT.begin());
+        for(size_t i = 0; i < size; ++i) {
+            m_tToID[m_idToT[i]] = i;
+        }
+    }
+
+    Idx getIdx(const T & t) const {
+        return m_tToID[t];
+    }
+
+    const T & getVal(Idx i) const {
+        return m_idToT[i];
+    }
+    
+    size_t size() const {
+        return  m_idToT.size(); 
+    }
+
+private:
+    std::vector<T>   m_idToT;
+    std::vector<Idx> m_tToID;
 };
 
 }
