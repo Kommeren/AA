@@ -64,6 +64,8 @@ private:
 };
 
 template <typename T, typename Idx = int> class BiMapOfConsecutive {
+    //TODO mayby it should be passed but only on debug
+    static const Idx INVALID_IDX = -1;
 public:
     static_assert(std::is_integral<T>::value, "Type T has to be integral");
     BiMapOfConsecutive() {}
@@ -73,9 +75,12 @@ public:
             return;
         size_t size = *max_element(b, e);
         m_idToT.resize(size);
+        m_tToID.resize(size, INVALID_IDX);
         std::copy(b, e, m_idToT.begin());
         for(size_t i = 0; i < size; ++i) {
-            m_tToID[m_idToT[i]] = i;
+            Idx & idx = m_tToID[m_idToT[i]]; 
+            assert(m_idToT[i] < size && idx == INVALID_IDX);
+            idx = i;
         }
     }
 

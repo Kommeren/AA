@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE cycle_manager
 
 #include <boost/test/unit_test.hpp>
-#include "paal/data_structures/simple_cycle_manager.hpp"
+#include "paal/data_structures/simple_cycle.hpp"
 #include "utils/logger.hpp"
 
 #include <vector>
