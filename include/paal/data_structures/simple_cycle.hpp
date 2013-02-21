@@ -128,15 +128,25 @@ public:
     
     typedef std::pair<VertexIterator, VertexIterator> VertexIteratorRange;
     
+    VertexIterator vbegin(const CycleEl & el) const {
+        return VertexIterator(*this, el);
+    }
+    
+    VertexIterator vbegin() const {
+        return vbegin(fromIdx(0));
+    }
+    
+    VertexIterator vend() const {
+        return VertexIterator();
+    }
+    
     VertexIteratorRange getVerticesRange(const CycleEl & el) const {
-        return VertexIteratorRange(VertexIterator(*this, el), VertexIterator());
+        return VertexIteratorRange(vbegin(el), vend());
     }
     
     VertexIteratorRange getVerticesRange() const {
         return getVerticesRange(fromIdx(0));
     }
-
-    
     
     class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair,
                                 ptrdiff_t, CycleElPair *, const CycleElPair &> {

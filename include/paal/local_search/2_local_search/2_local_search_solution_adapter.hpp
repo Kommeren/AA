@@ -21,11 +21,11 @@ template < typename Cycle> class TwoLocalSearchContainer  {
         TwoLocalSearchContainer(Cycle & cm) : m_cycle(cm) {}
 
         Iterator begin() const {
-            return helpers::make_VertexToEdgeIterator(m_cycle.getVerticesRange());
+            return helpers::make_VertexToEdgeIterator(m_cycle.vbegin(), m_cycle.vend());
         }
         
         Iterator end() const {
-            auto end =  m_cycle.getVerticesRange().second;
+            auto end =  m_cycle.vend();
             return helpers::make_VertexToEdgeIterator(end, end);
         }
 
