@@ -21,8 +21,8 @@ std::string path = "test/TSPLIB/TSPLIB/symmetrical";
 
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
-   tsp::TSPLIB_Directory dir(path);
-   tsp::TSPLIB_Matrix mtx;
+   read_tsplib::TSPLIB_Directory dir(path);
+   read_tsplib::TSPLIB_Matrix mtx;
    for(auto &g : dir.graphs)  {   
         g.load(mtx);
         auto size = mtx.size1();
