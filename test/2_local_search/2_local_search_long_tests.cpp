@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "TSPLIB/TSPLIB.h"
+#include "utils/read_tsplib.h"
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/simple_algo/cycle_algo.hpp"
 #include "utils/logger.hpp"
