@@ -17,14 +17,14 @@ template <typename DistanceTypeParam> class ArrayMetric {
     public:
         typedef DistanceTypeParam DistanceType;
         typedef int VertexType;
-        ArrayMetric(int N) : m_matrix(boost::extents[N][N]) { }
-        template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
+        ArrayMetric(int N = 0) : m_matrix(boost::extents[N][N]) { }
+        
+        template <typename Vertex> const DistanceType & operator()(const Vertex & v, const Vertex & w) const {
             return m_matrix[v][w];
         }
         
-        template <typename Vertex> ArrayMetric<DistanceType> & set(const Vertex & v, const Vertex & w, DistanceType d)  {
-            m_matrix[v][w] = d;
-            return *this;
+        template <typename Vertex> DistanceType & operator()(const Vertex & v, const Vertex & w) {
+            return m_matrix[v][w];
         }
 
         int size() const {

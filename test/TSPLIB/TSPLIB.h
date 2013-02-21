@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "Matrix.h"
+#include "paal/data_structures/basic_metrics.hpp"
 
 #include "format.h"
 
@@ -23,6 +23,7 @@ namespace tsp
     struct TSPLIB_Matrix
     {
         typedef long long DistanceType;
+        typedef paal::data_structures::ArrayMetric<int> Metric;
         TSPLIB_Matrix() : size_(0) {}
         typedef double value_type;
         typedef int (*Dist)(double,double);
@@ -36,19 +37,18 @@ namespace tsp
         static int att_dist(double xd, double yd)
         { return ceil(sqrt((xd*xd+yd*yd)/10)); }
 
-        void resize(size_t _size, size_t _size2, Dist _dist = 0)
+        void resize(size_t _size, Dist _dist = 0)
         {
             if((dist_ = _dist))
             {
-                assert(_size==_size2);
                 X.reset(new double[_size]);
                 //badalloc below will invalidate the object
                 Y.reset(new double[_size]);
-                mtx.resize(0,0);
+                mtx = Metric(0);
             }
             else
             {
-                mtx.resize(_size,_size2);
+                mtx = Metric(_size);
                 X.reset();
                 Y.reset();
             }
@@ -60,7 +60,7 @@ namespace tsp
 
         Dist dist_;
         size_t size_;
-        DynMatrix<int> mtx; 
+        Metric mtx; 
         std::unique_ptr<double[]> X,Y;
     };
 
@@ -113,7 +113,7 @@ namespace tsp
                 {
                     expect_header(is,"EDGE_WEIGHT_FORMAT");
                     std::string ewf; assert(is >> ewf);
-                    m.resize(n,n);
+                    m.resize(n);
                     expect(is,"EDGE_WEIGHT_SECTION");
                     if(ewf=="FULL_MATRIX")
                         for(size_t i=0; i<n; ++i) for(size_t j=0; j<n; ++j)
@@ -140,15 +140,15 @@ namespace tsp
                     for(size_t i=0; i<n; ++i) assert(is >> _ >> X[i] >> Y[i]);
                     for(double &x : X) x = geo_rad(x);
                     for(double &y : Y) y = geo_rad(y);
-                    m.resize(n,n);
+                    m.resize(n);
                     for(size_t i=0; i<n; ++i) for(size_t j=i; j<n; ++j)
                         m.mtx(i,j) = m.mtx(j,i) = geo_dist(Y[i],X[i],Y[j],X[j]);
                 }
                 else
                 {
-                    if(ewt=="EUC_2D") m.resize(n,n,m.eucl_dist);
-                    else if(ewt=="CEIL_2D") m.resize(n,n,m.ceil_dist);
-                    else if(ewt=="ATT") m.resize(n,n,m.att_dist);
+                    if(ewt=="EUC_2D") m.resize(n,m.eucl_dist);
+                    else if(ewt=="CEIL_2D") m.resize(n,m.ceil_dist);
+                    else if(ewt=="ATT") m.resize(n,m.att_dist);
                     else throw std::runtime_error(
                             format("EDGE_WEIGHT_TYPE % is unimplemented",ewt));
                     expect(is,"NODE_COORD_SECTION");

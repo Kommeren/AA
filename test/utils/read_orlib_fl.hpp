@@ -36,8 +36,8 @@ data_structures::ArrayMetric<double> readORLIB_FL(std::istream & ist, std::vecto
         ist >> demands[i];    
         for(int j : boost::irange(0,F)) {
             ist >> l;
-            m.set(i+F, j, l);
-            m.set(j, i+F, l);
+            m(i+F, j) = l;
+            m(j, i+F) = l;
     //        LOG(i+F << " "<< j << " " << l);
         }
     }

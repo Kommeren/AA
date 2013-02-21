@@ -233,8 +233,8 @@ private:
             for(VertexType w : helpers::make_range(v2)) {
                 auto vg = G1.local_to_global(v);
                 auto wg = G2.local_to_global(w);
-                m_save.set(vg, wg, maxDist);
-                m_save.set(wg, vg, maxDist);
+                m_save(vg, wg) =  maxDist;
+                m_save(wg, vg) =  maxDist;
             }
         }
     }
