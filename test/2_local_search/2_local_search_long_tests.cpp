@@ -17,7 +17,7 @@ using namespace  paal::local_search::two_local_search;
 using namespace  paal;
 
 
-std::string path = "test/TSPLIB/symmetrical";
+std::string path = "test/data/TSPLIB/symmetrical";
 
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {

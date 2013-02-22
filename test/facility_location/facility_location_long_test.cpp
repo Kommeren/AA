@@ -30,7 +30,8 @@ bool le(double x, double y) {
 }
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
-    std::ifstream is_test_cases("test/FL_ORLIB/uncapopt.txt");
+    std::string testDir = "test/data/FL_ORLIB/";
+    std::ifstream is_test_cases(testDir + "uncapopt.txt");
 
     while(is_test_cases.good()) {
         std::string fname;
@@ -42,7 +43,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         LOG("TEST " << fname);
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
-        std::ifstream ifs("test/FL_ORLIB/cases/" + fname);
+        std::ifstream ifs(testDir + "/cases/" + fname);
         std::vector<double> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;

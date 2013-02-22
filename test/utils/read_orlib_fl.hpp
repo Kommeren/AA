@@ -13,8 +13,8 @@
 
 namespace paal {
 
-data_structures::ArrayMetric<double> readORLIB_FL(std::istream & ist, std::vector<double> & facCosts, std::vector<int> facCap,
-                       std::vector<int> demands,
+data_structures::ArrayMetric<double> readORLIB_FL(std::istream & ist, std::vector<double> & facCosts, std::vector<int> & facCap,
+                       std::vector<int> & demands,
                        boost::integer_range<int> & fac,
                        boost::integer_range<int> & clients ) { 
     int N, F;

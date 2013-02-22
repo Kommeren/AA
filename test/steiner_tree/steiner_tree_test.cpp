@@ -9,9 +9,6 @@
 #define BOOST_TEST_MODULE metric_to_bgl_mst_test
 
 #include <boost/test/unit_test.hpp>
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
-
-#include <vector>
 
 #include "paal/local_search/steiner_tree/steiner_tree.hpp"
 #include "utils/sample_graph.hpp"
@@ -27,5 +24,4 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
 
     paal::local_search::steiner_tree::SteinerTree<Metric, VoronoiT> st(gm, voronoi);
     st.getSteinerTree(); 
-   //BOOST_CHECK_EQUAL(s, 6);
 }
