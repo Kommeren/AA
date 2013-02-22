@@ -47,7 +47,10 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         VoronoiT voronoi(FSet(terminals.begin(), terminals.end()),
                          FSet(steinerPoints.begin(), steinerPoints.end()), m);
         paal::local_search::steiner_tree::SteinerTree<Metric, VoronoiT> st(m, voronoi);
-        st.getSteinerTree(); 
+        std::vector<int> selectedSteinerPoints = st.getSteinerTree(); 
+
+
+//        AMatrix g = metricToBGL(m_terminalId, ti.begin(), ti.end());
     }
     
 

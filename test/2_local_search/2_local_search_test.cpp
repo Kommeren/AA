@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
 
    //creating local search
    auto lsc = getDefaultTwoLocalComponents(gm);
-   auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(cycle, lsc);
+   auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
 
    //printing
 #ifdef LOGGER_ON

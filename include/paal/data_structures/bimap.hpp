@@ -22,7 +22,7 @@
 #include "paal/helpers/iterator_helpers.hpp"
 
 namespace paal {
-namespace helpers {
+namespace data_structures {
 
 
 //minor TODO write specification when T is integral (copy instead of reference)
@@ -32,9 +32,19 @@ public:
     BiMap() {}
 
     template <typename Iter> BiMap(Iter b, Iter e) {
-        for(const T & t : make_range(b,e)) {
+        for(const T & t : helpers::make_range(b,e)) {
             add(t);
         }
+    }
+    
+    BiMap(BiMap && bm) : 
+        m_idToT(std::move(bm.m_idToT)), 
+        m_tToID(std::move(bm.m_tToID)) {
+    }
+    
+    BiMap(const BiMap & bm) : 
+        m_idToT(bm.m_idToT), 
+        m_tToID(bm.m_tToID) {
     }
 
     Idx getIdx(const T & t) const {
@@ -101,6 +111,6 @@ private:
     std::vector<Idx> m_tToID;
 };
 
-}
-}
+} //data_structures
+} //paal
 #endif /* BIMAP_HPP */

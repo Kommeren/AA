@@ -14,15 +14,13 @@
 #include <vector>
 #include <iterator>
 
-#include "paal/helpers/bimap.hpp"
+#include "paal/data_structures/bimap.hpp"
 
 namespace paal {
 namespace data_structures {
 
 
 //TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
-//
-//TODO MOVE CONSTRUCTORS
 template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
 public:
     typedef std::pair<CycleEl, CycleEl> CycleElPair;
@@ -47,7 +45,16 @@ public:
         }
         link(prevIdx, firstIdx);
     }
-    
+    SimpleCycle(SimpleCycle && sc) : 
+        m_cycleIdx(std::move(sc.m_cycleIdx)),
+        m_predecessorMap(std::move(sc.m_predecessorMap)),
+        m_successorMap(std::move(sc.m_successorMap))   { }
+   
+    SimpleCycle(const SimpleCycle & sc) : 
+        m_cycleIdx(sc.m_cycleIdx),
+        m_predecessorMap(sc.m_predecessorMap),
+        m_successorMap(sc.m_successorMap)   { }
+
     //after flip the order will be reversed, ie it will be from 'end'  to 'begin'
     void flip(const CycleEl & begin, const CycleEl & end) {
         IdxT e1 = toIdx(begin);
@@ -266,7 +273,7 @@ private:
         return m_cycleIdx.add(el);
     }
     
-    helpers::BiMap<CycleEl, IdxT> m_cycleIdx;
+    BiMap<CycleEl, IdxT> m_cycleIdx;
 
     typedef std::vector<IdxT> SorsMap;
 

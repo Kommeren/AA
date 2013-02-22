@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //creating local search
         auto lsc = getDefaultTwoLocalComponents(mtx);
-        auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(cycle, lsc);
+        auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
 
         //printing 
 

@@ -12,7 +12,6 @@
 #include "paal/helpers/subset_iterator.hpp"
 #include "paal/helpers/metric_to_bgl.hpp"
 #include "paal/helpers/functors_to_paal_functors.hpp"
-#include "paal/helpers/bimap.hpp"
 #include "paal/helpers/metric_on_idx.hpp"
 
 #include "paal/data_structures/voronoi.hpp"
@@ -33,9 +32,15 @@ public:
     typedef typename helpers::kTuple<VertexType, SUSBSET_SIZE>::type ThreeTuple;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
+    /**
+     * @brief 
+     *
+     * @param m we only use this metric for distances  (Steiner, Terminal) and (Terminal, Terminal)
+     * @param voronoi
+     */
     SteinerTree(const Metric & m, const Voronoi & voronoi) : 
         m_metric(m), m_voronoi(voronoi), N(std::distance(voronoi.getGenerators().begin(), voronoi.getGenerators().end())), 
-            m_save(N), m_tIdx(voronoi.getGenerators().begin(), voronoi.getGenerators().end()), m_idxMetric(m_metric, m_tIdx) {}
+            m_save(N), m_tIdx(voronoi.getGenerators().begin(), voronoi.getGenerators().end()), m_terminalIdxMetric(m_metric, m_tIdx) {}
 
 
     ResultSteinerVertices getSteinerTree() {
@@ -48,7 +53,7 @@ public:
         fillSubDists();
 
         auto ti = boost::irange<int>(0, N);
-        AMatrix g = metricToBGL(m_idxMetric, ti.begin(), ti.end());
+        AMatrix g = metricToBGL(m_terminalIdxMetric, ti.begin(), ti.end());
         
         auto obj_fun = std::bind(std::mem_fun(&SteinerTree::gain), this, std::placeholders::_1);
 
@@ -89,7 +94,7 @@ private:
     typedef typename gtraits::edge_descriptor SEdge;
     
     //Adjeny Matrix types
-    typedef typename AdjacencyMatrix<Metric>::type AMatrix;
+    typedef typename helpers::AdjacencyMatrix<Metric>::type AMatrix;
     typedef boost::graph_traits<AMatrix> mtraits;
     typedef typename mtraits::edge_descriptor MEdge;
    
@@ -192,7 +197,7 @@ private:
         for(VertexType from = 0; from < N; ++from){
             if(from != pm[from]) {
                 bool succ =boost::add_edge(from, pm[from], 
-                    SpanningTreeEdgeProp(from, m_idxMetric(from,pm[from])), spanningTree).second;
+                    SpanningTreeEdgeProp(from, m_terminalIdxMetric(from,pm[from])), spanningTree).second;
                 assert(succ);
             }
         }
@@ -276,8 +281,8 @@ private:
     NearstByThreeSubsets m_nearestVertex;
     int N;
     data_structures::ArrayMetric<Dist> m_save;
-    helpers::BiMap<VertexType> m_tIdx;
-    helpers::MetricOnIdx<Metric> m_idxMetric;
+    data_structures::BiMap<VertexType> m_tIdx;
+    helpers::MetricOnIdx<Metric> m_terminalIdxMetric;
 };
 
 } // steiner_tree
