@@ -8,15 +8,31 @@
 #ifndef FUNCTORS_TO_PAAL_FUNCTORS_HPP
 #define FUNCTORS_TO_PAAL_FUNCTORS_HPP 
 
-//TODO write makro
-template <typename F> class FunctToNeigh {
-    public:
-        FunctToNeigh(const F & f) : m_f(f) {}
-        template <typename Solution> auto get(const Solution &s) -> decltype(std::declval<F>()(s)) {
-            return m_f(s);
-        }
-    private:
-        const F & m_f;
-};
+#include <utility>
+
+namespace paal {
+namespace helpers {
+
+#define FUNCT_TO(className, memberName) \
+template <typename F> class FunctTo##className {\
+    public:\
+        FunctTo##className(const F & f) : m_f(f) {}\
+        template <typename... Args> auto  \
+            memberName(Args&&... args) \
+                -> decltype(std::declval<F>()(std::forward<Args>(args)...)) {\
+            return m_f(std::forward<Args>(args)...);\
+        }\
+    private:\
+        const F & m_f;\
+};\
+
+
+FUNCT_TO(NeighborhoodGetter, get)
+FUNCT_TO(ImproveChecker, gain)
+FUNCT_TO(SolutionUpdater, update)
+FUNCT_TO(StopCondition, stop)
+
+}
+}
 
 #endif /* FUNCTORS_TO_PAAL_FUNCTORS_HPP */

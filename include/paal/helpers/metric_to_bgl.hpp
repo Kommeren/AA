@@ -28,15 +28,16 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     typedef typename Metric::VertexType VertexType;
     typedef typename Metric::DistanceType Dist;
     Graph g(N);
-    std::for_each(vbegin, vend, [&](VertexType v){
-        std::for_each(vbegin, vend, [&](VertexType w){
+    auto r = make_range(vbegin, vend);
+    for(VertexType v : r){
+        for(VertexType w : r){
             if(v < w) {
                 bool succ = boost::add_edge(v, w, 
                         boost::property<boost::edge_weight_t, Dist>(m(v,w)), g).second;
                 assert(succ);
             }
-        });     
-    });
+        }
+    }
     return g;
 }
  
@@ -47,7 +48,9 @@ metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
     typedef typename Metric::VertexType VertexType;
     idx = data_structures::BiMap<VertexType>(vbegin, vend); 
     MetricOnIdx<Metric> idxMetric(m, idx);
-    return metricToBGL(idxMetric, vbegin, vend);
+    std::function<int(VertexType)> trans = [&](VertexType v) {return idx.getIdx(v);};
+    return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans), 
+                                  boost::make_transform_iterator(vend, trans));
 }
 
 } //helpers

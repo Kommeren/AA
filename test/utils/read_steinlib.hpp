@@ -44,6 +44,7 @@ GraphMT readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::vecto
     goToSection(is, "Graph");
     int N, E, T;
     N = readInt(is, "Nodes");
+    ++N; // Nodes are nubered form 1 in STEINLIB
     E = readInt(is, "Edges");
 
     steinerPoints.resize(N);

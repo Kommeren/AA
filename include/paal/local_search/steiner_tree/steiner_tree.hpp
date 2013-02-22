@@ -12,7 +12,7 @@
 #include "paal/helpers/subset_iterator.hpp"
 #include "paal/helpers/metric_to_bgl.hpp"
 #include "paal/helpers/functors_to_paal_functors.hpp"
-#include "paal/helpers/metric_on_idx.hpp"
+#include "paal/helpers/contract_bgl_adjaceny_matrix.hpp"
 
 #include "paal/data_structures/voronoi.hpp"
 #include "paal/data_structures/graph_metrics.hpp"
@@ -24,12 +24,13 @@ namespace steiner_tree {
 
 template <typename Metric, typename Voronoi> 
 class SteinerTree {
+    typedef int Idx;
 public:
     typedef typename Metric::DistanceType Dist;
     typedef typename Metric::VertexType VertexType;
     static const int SUSBSET_SIZE = 3;
 
-    typedef typename helpers::kTuple<VertexType, SUSBSET_SIZE>::type ThreeTuple;
+    typedef typename helpers::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     /**
@@ -40,48 +41,81 @@ public:
      */
     SteinerTree(const Metric & m, const Voronoi & voronoi) : 
         m_metric(m), m_voronoi(voronoi), N(std::distance(voronoi.getGenerators().begin(), voronoi.getGenerators().end())), 
-            m_save(N), m_tIdx(voronoi.getGenerators().begin(), voronoi.getGenerators().end()), m_terminalIdxMetric(m_metric, m_tIdx) {}
+            m_save(N)  {}
 
 
-    ResultSteinerVertices getSteinerTree() {
+    ResultSteinerVertices getResultSteinerVertices() {
         ResultSteinerVertices res;
         
         if(m_voronoi.getVertices().empty()) {
             return res;
         }
 
-        fillSubDists();
 
         auto ti = boost::irange<int>(0, N);
-        AMatrix g = metricToBGL(m_terminalIdxMetric, ti.begin(), ti.end());
         
-        auto obj_fun = std::bind(std::mem_fun(&SteinerTree::gain), this, std::placeholders::_1);
 
-        auto ng = [&](const ThreeTuple & t){
+        auto ng = [&](const AMatrix & t){
             return this->makeThreeSubsetRange(ti.begin(), ti.end());
         };
+        
+        auto obj_fun = [&](const AMatrix & m, const ThreeTuple &t) {return this->gain(t);};
 
-        typedef FunctToNeigh<decltype(ng)> NG; 
+        auto su = [&](AMatrix & m, const ThreeTuple & t) {
+            this->contract(m, t);
+            res.push_back(m_nearestVertex[t]);
+        };
 
-        typedef SearchObjFunctionComponents<NG, decltype(obj_fun)> SearchOFComponents;
-        SearchOFComponents sc(NG(ng), obj_fun);
-        typedef local_search::LocalSearchFunctionStep<ThreeTuple, 
-                    SearchOFComponents, search_strategies::SteepestSlope>  LS;
+        typedef helpers::FunctToNeighborhoodGetter<decltype(ng)> NG; 
+        typedef helpers::FunctToImproveChecker<decltype(obj_fun)> IC; 
+        typedef helpers::FunctToSolutionUpdater<decltype(su)> SU; 
 
-        LS ls(ThreeTuple(), sc);
+        typedef SearchComponents<NG, IC, SU> SC;
+        SC sc{NG(ng), IC(obj_fun), SU(su)};
+        typedef local_search::LocalSearchStep<AMatrix, 
+                    SC, search_strategies::SteepestSlope>  LS;
+        LS ls(helpers::metricToBGLWithIndex(
+                        m_metric, 
+                        m_voronoi.getGenerators().begin(), 
+                        m_voronoi.getGenerators().end(), 
+                        m_tIdx) , sc);
+        
+        fillSubDists();
 
         while(true) {
         
-            findSave(g);
+            findSave(ls.getSolution());
 
             //TODO not optimal because of logharitmic gain
-            if(!ls.search())
+            if(!ls.search()) {
                 break;
+            }
 
-            const ThreeTuple & best = ls.getSolution();
-            contract(best, g);   
-            res.push_back(m_nearestVertex[best]);
+            /*const ThreeTuple & best = ls.getSolution();
+            auto const  & m = m_save;
+            VertexType a,b,c;
+            std::tie(a, b, c) = best;
+        
+            std::cout <<" GAIN " << gain(best) << std::endl;
+            std::cout <<" a " << a << " b " << b << " c " << c << std::endl;
+            std::cout <<" max3 " << this->max3(m(a, b), m(b, c), m(c,a)) << " min3 " << this->min3(m(a, b), m(b, c), m(c,a)) << " subdists " << m_subsDists[best] << " nearest " << m_nearestVertex[best] << std::endl;
+            auto const & weight_map = boost::get(boost::edge_weight, am);
+            std::cout << "(a,b) "  << weight_map[boost::edge(a, b, am).first]  <<std::endl;
+            std::cout << "(b,c) "  << weight_map[boost::edge(b, c, am).first]  <<std::endl;
+            std::cout << "(c,a) "  << weight_map[boost::edge(c, a, am).first]  <<std::endl;
+            contract(best);   
+            std::cout << "(a,b) "  << weight_map[boost::edge(a, b, am).first]  <<std::endl;
+            std::cout << "(b,c) "  << weight_map[boost::edge(b, c, am).first]  <<std::endl;
+            std::cout << "(c,a) "  << weight_map[boost::edge(c, a, am).first]  <<std::endl;
+            std::cout << "(b,a) "  << weight_map[boost::edge(b, a, am).first]  <<std::endl;
+            std::cout << "(c,b) "  << weight_map[boost::edge(c, b, am).first]  <<std::endl;
+            std::cout << "(a,c) "  << weight_map[boost::edge(a, c, am).first]  <<std::endl;*/
+//            res.push_back(m_nearestVertex[best]);
         }
+
+        std::sort(res.begin(), res.end());
+        auto newEnd = std::unique(res.begin(), res.end());
+        res.resize(std::distance(res.begin(), newEnd));
 
         return res; 
     }
@@ -108,31 +142,9 @@ private:
         return helpers::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE>(b,e);
     }
 
-    void contract(const ThreeTuple & t, AMatrix & m) {
-        contract(std::get<0>(t), std::get<1>(t), m);
-        contract(std::get<1>(t), std::get<2>(t), m);
-    }
-   
-
-    //TODO put outside
-    void contract(VertexType v, VertexType w, AMatrix & m) {
-        auto const & weight_map = boost::get(boost::edge_weight, m);
-        weight_map[boost::edge(v, w, m).first] = 0;
-        for(const MEdge & e : helpers::make_range(boost::out_edges(v, m))) {
-            MEdge  f = boost::edge(w, boost::target(e, m), m).first;
-            auto & we = weight_map[e];
-            auto & wf = weight_map[f];
-            we = std::min(we, wf);
-            wf = we;
-
-            // TODO hide  checkking
-            auto  teste = boost::edge(boost::target(e, m), w, m).first;
-            auto  testf = boost::edge(boost::target(e, m), v, m).first;
-            auto wte = weight_map[teste];
-            auto wtf = weight_map[testf];
-            assert(wte == wtf && wte == we);
-
-        }
+    void contract(AMatrix & am ,const ThreeTuple & t) {
+        helpers::contract(am, std::get<0>(t), std::get<1>(t));
+        helpers::contract(am, std::get<1>(t), std::get<2>(t));
     }
         
     Dist gain(const ThreeTuple & t){
@@ -176,7 +188,7 @@ private:
         return std::min(std::min(a,b),c);
     }
 
-    Dist dist(VertexType steinerPoint, VertexType terminalIdx) {
+    Dist dist(VertexType steinerPoint, Idx terminalIdx) {
         return   m_metric(steinerPoint, m_tIdx.getVal(terminalIdx));
     }
 
@@ -187,20 +199,29 @@ private:
                + dist(steinerPoint, std::get<2>(tup));
     }
 
-    SpanningTree getSpanningTree(const AMatrix & g) {
-        //spanning tree to vector
+    /**
+     * @brief Costructs spanning tree from curent am
+     *
+     * @return 
+     */
+    SpanningTree getSpanningTree(const AMatrix & am) {
+        //compute spanning tree and write it to  vector
         std::vector<VertexType> pm(N);
-        boost::prim_minimum_spanning_tree(g, &pm[0]);
+        boost::prim_minimum_spanning_tree(am, &pm[0]);
         
-        //vector to SpanningTree
+        //transform vector intto SpanningTree object
+        auto const  & weight_map = boost::get(boost::edge_weight, am);
         SpanningTree spanningTree(N);
+//        std::cout << "Drzewo : " << std::endl;
         for(VertexType from = 0; from < N; ++from){
+  //          std::cout << from << " "<< pm[from] << std::endl;
             if(from != pm[from]) {
                 bool succ =boost::add_edge(from, pm[from], 
-                    SpanningTreeEdgeProp(from, m_terminalIdxMetric(from,pm[from])), spanningTree).second;
+                    SpanningTreeEdgeProp(from, boost::get(weight_map, boost::edge(from, pm[from], am).first)), spanningTree).second;
                 assert(succ);
             }
         }
+//        std::cout << "End " << std::endl;
         return spanningTree;
     }
     
@@ -282,7 +303,6 @@ private:
     int N;
     data_structures::ArrayMetric<Dist> m_save;
     data_structures::BiMap<VertexType> m_tIdx;
-    helpers::MetricOnIdx<Metric> m_terminalIdxMetric;
 };
 
 } // steiner_tree

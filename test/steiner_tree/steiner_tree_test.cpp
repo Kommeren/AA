@@ -10,6 +10,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include "utils/logger.hpp"
+
 #include "paal/local_search/steiner_tree/steiner_tree.hpp"
 #include "utils/sample_graph.hpp"
 
@@ -23,5 +25,5 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);
 
     paal::local_search::steiner_tree::SteinerTree<Metric, VoronoiT> st(gm, voronoi);
-    st.getSteinerTree(); 
+    st.getResultSteinerVertices(); 
 }
