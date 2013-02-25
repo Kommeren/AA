@@ -9,6 +9,7 @@
 #define BASIC_METRICS_HPP 
 
 #include <boost/multi_array.hpp>
+#include <array>
 
 namespace paal {
 namespace data_structures {
@@ -29,6 +30,14 @@ template <typename DistanceTypeParam> class ArrayMetric {
 
         int size() const {
             return m_matrix.size();
+        }
+
+        ArrayMetric & operator=(const ArrayMetric & am) {
+            auto shape = am.m_matrix.shape();
+            std::vector<size_t> dim(shape, shape + DIM_NR);
+            m_matrix.resize(dim);
+            m_matrix = am.m_matrix;
+            return *this; 
         }
 
 
