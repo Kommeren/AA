@@ -90,6 +90,10 @@ public:
         return false;
     }
 
+    MultiSearchComponents & getSearchComponents() {
+        return m_searchComponents;
+    }
+
     // TODO it is not optional :)
     typename std::enable_if<helpers::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
         return m_solution.get();

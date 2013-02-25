@@ -40,15 +40,29 @@ public:
         return m_checkFunctor;
     } 
     
-     SolutionUpdater   & getSolutionUpdater()    {
+    SolutionUpdater   &  getSolutionUpdater()    {
         return m_solutionUpdaterFunctor;
     } 
-
     
     StopCondition      & getStopCondition()      {
         return m_stopConditionFunctor;
     } 
 
+    void setNeighborhoodGetter(NeighborhoodGetter ng) {
+        m_neighborGetterFunctor = std::move(ng);
+    } 
+    
+    void setImproveChecker(ImproveChecker ic)     {
+        m_checkFunctor = std::move(ic);
+    } 
+    
+    void setSolutionUpdater(SolutionUpdater su)    {
+        m_solutionUpdaterFunctor = std::move(su);
+    } 
+    
+    void setStopCondition(StopCondition sc)      {
+        m_stopConditionFunctor = std::move(sc);
+    } 
 
 private:
     NeighborhoodGetter m_neighborGetterFunctor;
@@ -79,6 +93,19 @@ public:
             SolutionUpdater su = SolutionUpdater(),
             StopCondition sc = StopCondition()) : base(std::move(ng), std::move(ch), std::move(su), std::move(sc)) {}
 };
+
+template <typename NeighborhoodGetter, 
+          typename ImproveChecker, 
+          typename SolutionUpdater,
+          typename StopCondition = TrivialStopCondition>
+SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>
+ make_SearchComponents(NeighborhoodGetter ng = NeighborhoodGetter(), 
+                            ImproveChecker ic = ImproveChecker(), 
+                            SolutionUpdater su = SolutionUpdater(), 
+                            StopCondition sc = StopCondition()) {
+    return SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>(
+                    std::move(ng), std::move(ic), std::move(su), std::move(sc));
+}
 
 } //local_search
 } //paal

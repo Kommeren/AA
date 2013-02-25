@@ -79,9 +79,8 @@ template<typename ...Args>
     }
 
 struct TSPLIB_Directory {
-    TSPLIB_Directory(const std::string &dir)
-    {
-        std::ifstream index((dir+"/index").c_str()); assert(index);
+    TSPLIB_Directory(const std::string &dir, const std::string & indexFName = "/index") {
+        std::ifstream index(dir+indexFName); assert(index);
         double optimal_fitness;
         std::string header;
         while(get_header(index,header) >> optimal_fitness)
@@ -89,8 +88,7 @@ struct TSPLIB_Directory {
                     Graph(dir+"/"+header+".tsp", optimal_fitness));
     }
 
-    struct Graph
-    {
+    struct Graph {
         Graph(){}
         Graph(const std::string &_filename, double _optimal_fitness) :
             filename(_filename), optimal_fitness(_optimal_fitness) {}
