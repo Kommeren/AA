@@ -7,6 +7,7 @@
 #include <boost/graph/subgraph.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/iterator/zip_iterator.hpp>
 
 #include "paal/helpers/iterator_helpers.hpp"
 #include "paal/helpers/subset_iterator.hpp"
@@ -31,6 +32,7 @@ public:
     static const int SUSBSET_SIZE = 3;
 
     typedef typename helpers::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
+    typedef boost::tuple<const ThreeTuple &, Dist> Update;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     /**
@@ -46,24 +48,24 @@ public:
 
     ResultSteinerVertices getResultSteinerVertices() {
         ResultSteinerVertices res;
-        
+
         if(m_voronoi.getVertices().empty()) {
             return res;
         }
 
-
         auto ti = boost::irange<int>(0, N);
-        
 
         auto ng = [&](const AMatrix & t){
-            return this->makeThreeSubsetRange(ti.begin(), ti.end());
+            auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
+            return std::make_pair(boost::make_zip_iterator(boost::make_tuple(subsets.first, m_subsDists.begin())), 
+                                  boost::make_zip_iterator(boost::make_tuple(subsets.second, m_subsDists.end())));
         };
         
-        auto obj_fun = [&](const AMatrix & m, const ThreeTuple &t) {return this->gain(t);};
+        auto obj_fun = [&](const AMatrix & m, const Update &t) {return this->gain(t);};
 
-        auto su = [&](AMatrix & m, const ThreeTuple & t) {
-            this->contract(m, t);
-            res.push_back(m_nearestVertex[t]);
+        auto su = [&](AMatrix & m, const Update & t) {
+            this->contract(m, boost::get<0>(t));
+            res.push_back(m_nearestVertex[boost::get<0>(t)]);
         };
 
         typedef helpers::FunctToNeighborhoodGetter<decltype(ng)> NG; 
@@ -83,40 +85,14 @@ public:
         fillSubDists();
 
         while(true) {
-        
             findSave(ls.getSolution());
 
-            //TODO not optimal because of logharitmic gain
             if(!ls.search()) {
                 break;
             }
-
-            /*const ThreeTuple & best = ls.getSolution();
-            auto const  & m = m_save;
-            VertexType a,b,c;
-            std::tie(a, b, c) = best;
-        
-            std::cout <<" GAIN " << gain(best) << std::endl;
-            std::cout <<" a " << a << " b " << b << " c " << c << std::endl;
-            std::cout <<" max3 " << this->max3(m(a, b), m(b, c), m(c,a)) << " min3 " << this->min3(m(a, b), m(b, c), m(c,a)) << " subdists " << m_subsDists[best] << " nearest " << m_nearestVertex[best] << std::endl;
-            auto const & weight_map = boost::get(boost::edge_weight, am);
-            std::cout << "(a,b) "  << weight_map[boost::edge(a, b, am).first]  <<std::endl;
-            std::cout << "(b,c) "  << weight_map[boost::edge(b, c, am).first]  <<std::endl;
-            std::cout << "(c,a) "  << weight_map[boost::edge(c, a, am).first]  <<std::endl;
-            contract(best);   
-            std::cout << "(a,b) "  << weight_map[boost::edge(a, b, am).first]  <<std::endl;
-            std::cout << "(b,c) "  << weight_map[boost::edge(b, c, am).first]  <<std::endl;
-            std::cout << "(c,a) "  << weight_map[boost::edge(c, a, am).first]  <<std::endl;
-            std::cout << "(b,a) "  << weight_map[boost::edge(b, a, am).first]  <<std::endl;
-            std::cout << "(c,b) "  << weight_map[boost::edge(c, b, am).first]  <<std::endl;
-            std::cout << "(a,c) "  << weight_map[boost::edge(a, c, am).first]  <<std::endl;*/
-//            res.push_back(m_nearestVertex[best]);
         }
 
-        std::sort(res.begin(), res.end());
-        auto newEnd = std::unique(res.begin(), res.end());
-        res.resize(std::distance(res.begin(), newEnd));
-
+        uniqueRes(res);
         return res; 
     }
 private:
@@ -133,7 +109,7 @@ private:
     typedef typename mtraits::edge_descriptor MEdge;
    
     //other types
-    typedef std::map<ThreeTuple, Dist> ThreeSubsetsDists;
+    typedef std::vector<Dist> ThreeSubsetsDists;
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
 
         template <typename Iter> std::pair<helpers::SubsetsIterator<Iter,SUSBSET_SIZE>, 
@@ -142,24 +118,31 @@ private:
         return helpers::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE>(b,e);
     }
 
+    void uniqueRes(ResultSteinerVertices & res) {
+        std::sort(res.begin(), res.end());
+        auto newEnd = std::unique(res.begin(), res.end());
+        res.resize(std::distance(res.begin(), newEnd));
+    }
+
     void contract(AMatrix & am ,const ThreeTuple & t) {
         helpers::contract(am, std::get<0>(t), std::get<1>(t));
         helpers::contract(am, std::get<1>(t), std::get<2>(t));
     }
         
-    Dist gain(const ThreeTuple & t){
+    Dist gain(const Update & t){
         auto const  & m = m_save;
         VertexType a,b,c;
-        std::tie(a, b, c) = t;
+        std::tie(a, b, c) = boost::get<0>(t);
         
         assert(m(a,b) == m(b,c) || m(b,c) == m(c, a) || m(c,a) == m(a,b));
-        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - m_subsDists[t];
+        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - boost::get<1>(t);
     }
 
     void fillSubDists() {
         auto ti = boost::irange<int>(0, N);
 
         auto subRange = makeThreeSubsetRange(ti.begin(), ti.end());
+        m_subsDists.reserve(std::distance(subRange.first, subRange.second));
         
         //finding nearest vertex to subset
         for(const ThreeTuple & subset : helpers::make_range(subRange)) {
@@ -176,7 +159,7 @@ private:
                     return this->dist(v1, subset) < this->dist(v2, subset);
                 });
             }
-            m_subsDists[subset] = this->dist(m_nearestVertex[subset], subset);
+            m_subsDists.push_back(this->dist(m_nearestVertex[subset], subset));
         }
     }
 

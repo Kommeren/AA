@@ -65,6 +65,8 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
             res += idxM(i, pm[i]);
         }
         LOG("RES " << res);
+
+        LOG("APPROXIMATION_RATIO:" << double(res) / double(opt));
     }
 
    //BOOST_CHECK_EQUAL(s, 6);
