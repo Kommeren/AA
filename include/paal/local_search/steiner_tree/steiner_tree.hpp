@@ -8,6 +8,7 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/iterator/zip_iterator.hpp>
+#include <boost/range/any_range.hpp>
 
 #include "paal/helpers/iterator_helpers.hpp"
 #include "paal/helpers/subset_iterator.hpp"
@@ -147,9 +148,12 @@ private:
         //finding nearest vertex to subset
         for(const ThreeTuple & subset : helpers::make_range(subRange)) {
             //TODO awfull coding, need to be changed to loop
-            auto vRange1 =  m_voronoi.getVerticesForGenerator(std::get<0>(subset));
-            auto vRange2 =  m_voronoi.getVerticesForGenerator(std::get<1>(subset));
-            auto vRange3 =  m_voronoi.getVerticesForGenerator(std::get<2>(subset));
+            //There is possible problem, one point could be in two Voronoi regions
+            //In our implementation the poin will be in exactly o0ne region and there 
+            //it will not be contained in the range
+            auto vRange1 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<0>(subset)));
+            auto vRange2 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<1>(subset)));
+            auto vRange3 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<2>(subset)));
             auto range = boost::join(boost::join(vRange1, vRange2), vRange3);
             
             if(boost::empty(range)) {
