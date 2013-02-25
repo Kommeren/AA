@@ -65,7 +65,6 @@ public:
         partialReverse(b2, e1);
         link(b1, b2);
         link(e1, e2);
-        
     }
 
     size_t size() const {
@@ -232,7 +231,7 @@ public:
         return getEdgeRange(fromIdx(0));
     }
 
-private:
+protected:
     void link(IdxT x, IdxT y) {
         m_successorMap[x] = y;
         m_predecessorMap[y] = x;
@@ -281,12 +280,28 @@ private:
     SorsMap m_successorMap;
 };
 
-/*template <typename CycleEl> class  SimpleCycle : 
-    public SimpleCycleImpl<CycleEl> {
-        public:
-//        using SimpleCycleImpl<CycleEl>::SimpleCycleImpl;
-        template <typename Iter> SimpleCycle(Iter begin, Iter end) : SimpleCycleImpl<CycleEl>(begin, end) {}
-};*/
+template <typename CycleEl, typename IdxT = int> 
+class  SimpleCycleStartFromLastChange : public SimpleCycle<CycleEl, IdxT> {
+    typedef SimpleCycle<CycleEl, IdxT> base;
+public:
+    template <typename Iter>
+    SimpleCycleStartFromLastChange(Iter b, Iter e) :
+        base(b,e), m_lastId(0) {}
+
+    void flip(const CycleEl & begin, const CycleEl & end) {
+        IdxT e1 = toIdx(begin);
+        m_lastId = prevIdx(e1);
+        base::flip(begin, end);
+    }
+    
+    typename base::VertexIterator vbegin() const {
+        return vbegin(fromIdx(m_lastId));
+    }
+
+private:
+    IdxT m_lastId;
+    
+};
 
 
 
