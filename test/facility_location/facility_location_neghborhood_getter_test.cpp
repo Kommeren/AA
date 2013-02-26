@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
 
    FacilityLocationSolutionAdapter<Sol> sa(sol);  
-   FacilityLocationNeighborhoodGetter<int> ng;
+   FacilityLocationGetNeighborhood<int> ng;
    auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
    auto b = r.first;
    auto e = r.second;

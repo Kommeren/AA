@@ -111,7 +111,7 @@ int main() {
     std::random_shuffle(ver.begin(), ver.end());
     std::copy(ver.begin(), ver.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
-    ImproveChecker2Opt<GraphMT> checker(gm);
+    Gain2Opt<GraphMT> checker(gm);
     auto transformChosen = [](int v){ return std::make_pair(v,1);};
     auto transformUnchosen = [](int v){ return std::make_pair(v,2);};
     auto transformChosen2 = [](int v){ return std::make_pair(v,1);};

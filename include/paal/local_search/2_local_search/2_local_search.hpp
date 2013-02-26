@@ -22,24 +22,24 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename ImproveChecker, 
-          typename NeighborhoodGetter = TrivialNeigborGetter, 
+template <typename Gain, 
+          typename GetNeighborhood = TrivialNeigborGetter, 
           typename StopCondition = TrivialStopConditionMultiSolution> 
 class TwoLocalComponents : 
     public MultiSearchComponents<
-            NeighborhoodGetter, 
-            ImproveChecker, 
+            GetNeighborhood, 
+            Gain, 
             TwoLocalSearchUpdater, 
             StopCondition> {
 
     typedef MultiSearchComponents<
-            NeighborhoodGetter, 
-            ImproveChecker, 
+            GetNeighborhood, 
+            Gain, 
             TwoLocalSearchUpdater, 
             StopCondition> base; 
 public : 
-    TwoLocalComponents(ImproveChecker ic = ImproveChecker(), 
-                       NeighborhoodGetter ng = NeighborhoodGetter(), 
+    TwoLocalComponents(Gain ic = Gain(), 
+                       GetNeighborhood ng = GetNeighborhood(), 
                        StopCondition sc = StopCondition()) : 
             base(std::move(ng), std::move(ic), TwoLocalSearchUpdater(), std::move(sc)) {}
 };
@@ -67,32 +67,32 @@ class  TwoLocalSearchStep :
  * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
  *
  *
- * @tparam ImproveChecker
- * @tparam NeighborhoodGetter
+ * @tparam Gain
+ * @tparam GetNeighborhood
  * @param c
  * @param ich
  * @param ng
  *
  * @return 
  */
-template <typename ImproveChecker, 
-          typename NeighborhoodGetter = TrivialNeigborGetter,
+template <typename Gain, 
+          typename GetNeighborhood = TrivialNeigborGetter,
           typename StopCondition = TrivialStopConditionMultiSolution>
 
-TwoLocalComponents<ImproveChecker, NeighborhoodGetter, StopCondition>  
+TwoLocalComponents<Gain, GetNeighborhood, StopCondition>  
 
-    make_TwoLocalSearchCOmponents(ImproveChecker ch, 
-            NeighborhoodGetter ng = TrivialNeigborGetter(),
+    make_TwoLocalSearchCOmponents(Gain ch, 
+            GetNeighborhood ng = TrivialNeigborGetter(),
             StopCondition sc = TrivialStopConditionMultiSolution()) {
 
-    return TwoLocalComponents<ImproveChecker, NeighborhoodGetter, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
+    return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }
 
 
 template <typename Metric>
-decltype(make_TwoLocalSearchCOmponents(ImproveChecker2Opt<Metric>(std::declval<Metric>())))
+decltype(make_TwoLocalSearchCOmponents(Gain2Opt<Metric>(std::declval<Metric>())))
 getDefaultTwoLocalComponents(const Metric & m) {
-    return make_TwoLocalSearchCOmponents(ImproveChecker2Opt<Metric>(m));
+    return make_TwoLocalSearchCOmponents(Gain2Opt<Metric>(m));
 }
 
 

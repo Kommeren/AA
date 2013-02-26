@@ -30,9 +30,9 @@ namespace search_strategies {
  * @brief General class for local search on the multi solution. Note there is no Update type here because it can be deduced.
  *
  * @tparam Solution
- * @tparam NeighborhoodGetter
- * @tparam ImproveChecker
- * @tparam SolutionUpdater
+ * @tparam GetNeighborhood
+ * @tparam Gain
+ * @tparam UpdateSolution
  * @tparam StopCondition
  * @tparam SearchStrategy
            Search strategy descibes LS search strategy. For ow we are planning two strategies: 
@@ -76,12 +76,12 @@ public:
     bool search() {
 
         for(const SolutionElement & r : m_solution) {
-            auto adjustmentSet = m_searchComponents.getNeighborhoodGetter()(m_solution, r);
+            auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution, r);
             for(const Update & update : helpers::make_range(adjustmentSet)) {
-                if(m_searchComponents.getImproveChecker()(m_solution, r, update) > 0) {
-                    m_searchComponents.getSolutionUpdater()(m_solution, r, update);
+                if(m_searchComponents.gain()(m_solution, r, update) > 0) {
+                    m_searchComponents.updateSolution()(m_solution, r, update);
                     return true;
-                } else if(m_searchComponents.getStopCondition()(m_solution, r, update)) {
+                } else if(m_searchComponents.stopCondition()(m_solution, r, update)) {
                     return false;
                 }
             }

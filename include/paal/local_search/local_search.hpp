@@ -85,19 +85,19 @@ Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of 
 
 Concepts:
 <ol>
-    <li> <i>NeighborhoodGetter</i>  is a concept class responsible for getting the neighborhood of the current solution  
+    <li> <i>GetNeighborhood</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
-    NeighborhoodGetterArchetype {
+    GetNeighborhoodArchetype {
         UpdateIteratorsRange get(const Solution & s)
     }
     </pre>
-    <li> <i>ImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
+    <li> <i>Gain</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
-    ImproveCheckerArchetype {
+    GainArchetype {
         int gain(const Solution & s, const Update & update);
     }
     </pre>
-    <li> <i>SolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
+    <li> <i>UpdateSolution</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     SolutionUdaterArchetype {
         int update(Solution & s, const Update & update);
@@ -136,19 +136,19 @@ Concepts:
         InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
                              // The inner solution type isInnerSolution
     }
-    <li> <i>MultiNeighborhoodGetter</i>  is a concept class responisble for getting the neighborhood of the current solution  
+    <li> <i>MultiGetNeighborhood</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
-    MultiNeighborhoodGetterArchetype {
+    MultiGetNeighborhoodArchetype {
         UpdateIteratorsRange get(const Solution & s, const SolutionElement &)
     }
     </pre>
-    <li> <i>MultiImproveChecker</i> is a concept class responsible for checking if the specific update element improve the solution.
+    <li> <i>MultiGain</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
-    MultiImproveCheckerArchetype {
+    MultiGainArchetype {
         int gain(const Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
-    <li> <i>MultiSolutionUpdater</i> is a concept class responsible for updating the solution with the Update.
+    <li> <i>MultiUpdateSolution</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     MultiSolutionUdaterArchetype {
         int update(Solution & s, const SolutionElement &, const Update & update);

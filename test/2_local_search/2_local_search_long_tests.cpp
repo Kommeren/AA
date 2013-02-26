@@ -73,10 +73,10 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 
         //creating local search
         auto lsc = getDefaultTwoLocalComponents(mtx);
-        typedef ImproveCheckerCutSmallImproves<puretype(lsc.getImproveChecker()), int> CIC;
+        typedef GainCutSmallImproves<puretype(lsc.gain()), int> CIC;
         double epsilon = 0.001;
-        CIC  cut(std::move(lsc.getImproveChecker()), startLen, epsilon);
-        auto cutLsc = swapImproveChecker(lsc, std::move(cut));
+        CIC  cut(std::move(lsc.gain()), startLen, epsilon);
+        auto cutLsc = swapGain(lsc, std::move(cut));
         auto lsCut = TwoLocalSearchStep<decltype(cycle), decltype(cutLsc)>(std::move(cycle), std::move(cutLsc));
 
 #ifdef LOGGER_ON
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         for(int j = 0; j < 20; ++j) {
             epsilon /= 2;
             LOG("epsilon = " << epsilon);
-            lsCut.getSearchComponents().getImproveChecker().setEpsilon(epsilon);
+            lsCut.getSearchComponents().gain().setEpsilon(epsilon);
             while(lsCut.search()) {
                 LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
             }
@@ -99,7 +99,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         
         LOG("Normal search at the end");
         auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
-        lsCut.getSearchComponents().getImproveChecker().setEpsilon(epsilon);
+        lsCut.getSearchComponents().gain().setEpsilon(epsilon);
         while(lsCut.search()) {
             LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
         }

@@ -27,9 +27,9 @@ template <typename F> class FunctTo##className {\
 };\
 
 
-FUNCT_TO(NeighborhoodGetter, get)
-FUNCT_TO(ImproveChecker, gain)
-FUNCT_TO(SolutionUpdater, update)
+FUNCT_TO(GetNeighborhood, get)
+FUNCT_TO(Gain, gain)
+FUNCT_TO(UpdateSolution, update)
 FUNCT_TO(StopCondition, stop)
 
 }

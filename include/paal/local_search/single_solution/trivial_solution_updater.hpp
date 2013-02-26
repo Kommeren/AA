@@ -12,7 +12,7 @@
 /**
  * @brief We assume that operator() is a new solution
  */
-struct TrivialSolutionUpdater {
+struct TrivialUpdateSolution {
     template <typename Solution> void operator()(Solution & s, const Solution & u) const {
         s = u;
     }

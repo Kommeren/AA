@@ -16,15 +16,15 @@ namespace paal {
 namespace local_search {
 
 //TODO constructors
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition = TrivialStopCondition> 
 class SearchComponents {
 public:
-    SearchComponents(NeighborhoodGetter ng = NeighborhoodGetter(), 
-                     ImproveChecker ch = ImproveChecker(), 
-                     SolutionUpdater su = SolutionUpdater(), 
+    SearchComponents(GetNeighborhood ng = GetNeighborhood(), 
+                     Gain ch = Gain(), 
+                     UpdateSolution su = UpdateSolution(), 
                      StopCondition sc = StopCondition()) :
             m_neighborGetterFunctor(std::move(ng)), 
             m_checkFunctor(std::move(ch)), 
@@ -32,31 +32,31 @@ public:
             m_stopConditionFunctor(std::move(sc)) {}
     
 
-    NeighborhoodGetter & getNeighborhoodGetter() {
+    GetNeighborhood & getNeighborhood() {
         return m_neighborGetterFunctor;
     } 
     
-    ImproveChecker     & getImproveChecker()     {
+    Gain     & gain()     {
         return m_checkFunctor;
     } 
     
-    SolutionUpdater   &  getSolutionUpdater()    {
+    UpdateSolution   &  updateSolution()    {
         return m_solutionUpdaterFunctor;
     } 
     
-    StopCondition      & getStopCondition()      {
+    StopCondition      & stopCondition()      {
         return m_stopConditionFunctor;
     } 
 
-    void setNeighborhoodGetter(NeighborhoodGetter ng) {
+    void setGetNeighborhood(GetNeighborhood ng) {
         m_neighborGetterFunctor = std::move(ng);
     } 
     
-    void setImproveChecker(ImproveChecker ic)     {
+    void setGain(Gain ic)     {
         m_checkFunctor = std::move(ic);
     } 
     
-    void setSolutionUpdater(SolutionUpdater su)    {
+    void setUpdateSolution(UpdateSolution su)    {
         m_solutionUpdaterFunctor = std::move(su);
     } 
     
@@ -65,145 +65,145 @@ public:
     } 
 
 private:
-    NeighborhoodGetter m_neighborGetterFunctor;
-    ImproveChecker m_checkFunctor;
-    SolutionUpdater m_solutionUpdaterFunctor;
+    GetNeighborhood m_neighborGetterFunctor;
+    Gain m_checkFunctor;
+    UpdateSolution m_solutionUpdaterFunctor;
     StopCondition m_stopConditionFunctor;
 };
 
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition = TrivialStopConditionMultiSolution> 
 class MultiSearchComponents : 
     public SearchComponents<
-                NeighborhoodGetter, 
-                ImproveChecker, 
-                SolutionUpdater, 
+                GetNeighborhood, 
+                Gain, 
+                UpdateSolution, 
                 StopCondition> {
     typedef SearchComponents<
-                NeighborhoodGetter, 
-                ImproveChecker, 
-                SolutionUpdater, 
+                GetNeighborhood, 
+                Gain, 
+                UpdateSolution, 
                 StopCondition> base;
 public:
     MultiSearchComponents(
-            NeighborhoodGetter ng = NeighborhoodGetter(),
-            ImproveChecker ch = ImproveChecker(),
-            SolutionUpdater su = SolutionUpdater(),
+            GetNeighborhood ng = GetNeighborhood(),
+            Gain ch = Gain(),
+            UpdateSolution su = UpdateSolution(),
             StopCondition sc = StopCondition()) : base(std::move(ng), std::move(ch), std::move(su), std::move(sc)) {}
 };
 
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition = TrivialStopCondition>
-SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>
- make_SearchComponents(NeighborhoodGetter ng = NeighborhoodGetter(), 
-                            ImproveChecker ic = ImproveChecker(), 
-                            SolutionUpdater su = SolutionUpdater(), 
+SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>
+ make_SearchComponents(GetNeighborhood ng = GetNeighborhood(), 
+                            Gain ic = Gain(), 
+                            UpdateSolution su = UpdateSolution(), 
                             StopCondition sc = StopCondition()) {
-    return SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>(
+    return SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>(
                     std::move(ng), std::move(ic), std::move(su), std::move(sc));
 }
 
-template <typename SearchComponents, typename NewNeighborhoodGetter> 
-struct SwapNeighborhoodGetter {};
+template <typename SearchComponents, typename NewGetNeighborhood> 
+struct SwapGetNeighborhood {};
 
 /**
- * @brief type of SearchComponents with swapped NeighborhoodGetter
+ * @brief type of SearchComponents with swapped GetNeighborhood
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewNeighborhoodGetter> 
-struct SwapNeighborhoodGetter<SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>, NewNeighborhoodGetter> {
-    typedef SearchComponents<NewNeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> type;
+          typename NewGetNeighborhood> 
+struct SwapGetNeighborhood<SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>, NewGetNeighborhood> {
+    typedef SearchComponents<NewGetNeighborhood, Gain, UpdateSolution, StopCondition> type;
 };
 
 
 /**
- * @brief Swaps NeighborhoodGetter in the SearchComponents 
+ * @brief Swaps GetNeighborhood in the SearchComponents 
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewNeighborhoodGetter> 
-SearchComponents<NewNeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> 
-swapNeighborhoodGetter(SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> sc, 
-                   NewNeighborhoodGetter ng) {
+          typename NewGetNeighborhood> 
+SearchComponents<NewGetNeighborhood, Gain, UpdateSolution, StopCondition> 
+swapGetNeighborhood(SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition> sc, 
+                   NewGetNeighborhood ng) {
     return make_SearchComponents(std::move(ng), 
-                                 std::move(sc.getImproveChecker()), 
-                                 std::move(sc.getSolutionUpdater()),
-                                 std::move(sc.getStopCondition()));
+                                 std::move(sc.gain()), 
+                                 std::move(sc.updateSolution()),
+                                 std::move(sc.stopCondition()));
 }
 
-template <typename SearchComponents, typename NewImproveChecker> 
-struct SwapImproveChecker {};
+template <typename SearchComponents, typename NewGain> 
+struct SwapGain {};
 
 /**
  * @brief type of SearchComponents with swapped Improvechecker
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewImproveChecker> 
-struct SwapImproveChecker<SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>, NewImproveChecker> {
-    typedef SearchComponents<NeighborhoodGetter, NewImproveChecker, SolutionUpdater, StopCondition> type;
+          typename NewGain> 
+struct SwapGain<SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>, NewGain> {
+    typedef SearchComponents<GetNeighborhood, NewGain, UpdateSolution, StopCondition> type;
 };
 
 
 /**
  * @brief Swaps Improve checker in the SearchComponents 
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewImproveChecker> 
-SearchComponents<NeighborhoodGetter, NewImproveChecker, SolutionUpdater, StopCondition> 
-swapImproveChecker(SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> sc, 
-                   NewImproveChecker ic) {
-    return make_SearchComponents(std::move(sc.getNeighborhoodGetter()), 
+          typename NewGain> 
+SearchComponents<GetNeighborhood, NewGain, UpdateSolution, StopCondition> 
+swapGain(SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition> sc, 
+                   NewGain ic) {
+    return make_SearchComponents(std::move(sc.getNeighborhood()), 
                                  std::move(ic), 
-                                 std::move(sc.getSolutionUpdater()),
-                                 std::move(sc.getStopCondition()));
+                                 std::move(sc.updateSolution()),
+                                 std::move(sc.stopCondition()));
 }
 
-template <typename SearchComponents, typename NewSolutionUpdater> 
-struct SwapSolutionUpdater {};
+template <typename SearchComponents, typename NewUpdateSolution> 
+struct SwapUpdateSolution {};
 
 /**
- * @brief type of SearchComponents with swapped SolutionUpdater
+ * @brief type of SearchComponents with swapped UpdateSolution
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewSolutionUpdater> 
-struct SwapSolutionUpdater<SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>, NewSolutionUpdater> {
-    typedef SearchComponents<NeighborhoodGetter, ImproveChecker, NewSolutionUpdater, StopCondition> type;
+          typename NewUpdateSolution> 
+struct SwapUpdateSolution<SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>, NewUpdateSolution> {
+    typedef SearchComponents<GetNeighborhood, Gain, NewUpdateSolution, StopCondition> type;
 };
 
 
 /**
- * @brief Swaps SolutionUpdater in the SearchComponents 
+ * @brief Swaps UpdateSolution in the SearchComponents 
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
-          typename NewSolutionUpdater> 
-SearchComponents<NeighborhoodGetter, ImproveChecker, NewSolutionUpdater, StopCondition> 
-swapSolutionUpdater(SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> sc, 
-                   NewSolutionUpdater su) {
-    return make_SearchComponents(std::move(sc.getNeighborhoodGetter()), 
-                                 std::move(sc.getImproveChecker()), 
+          typename NewUpdateSolution> 
+SearchComponents<GetNeighborhood, Gain, NewUpdateSolution, StopCondition> 
+swapUpdateSolution(SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition> sc, 
+                   NewUpdateSolution su) {
+    return make_SearchComponents(std::move(sc.getNeighborhood()), 
+                                 std::move(sc.gain()), 
                                  std::move(su),
-                                 std::move(sc.getStopCondition()));
+                                 std::move(sc.stopCondition()));
 }
 
 
@@ -211,32 +211,32 @@ template <typename SearchComponents, typename NewStopCondition>
 struct SwapStopCondition {};
 
 /**
- * @brief type of SearchComponents with swapped SolutionUpdater
+ * @brief type of SearchComponents with swapped UpdateSolution
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
           typename NewStopCondition> 
-struct SwapStopCondition<SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition>, NewStopCondition> {
-    typedef SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, NewStopCondition> type;
+struct SwapStopCondition<SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>, NewStopCondition> {
+    typedef SearchComponents<GetNeighborhood, Gain, UpdateSolution, NewStopCondition> type;
 };
 
 
 /**
- * @brief Swaps SolutionUpdater in the SearchComponents 
+ * @brief Swaps UpdateSolution in the SearchComponents 
  */
-template <typename NeighborhoodGetter, 
-          typename ImproveChecker, 
-          typename SolutionUpdater,
+template <typename GetNeighborhood, 
+          typename Gain, 
+          typename UpdateSolution,
           typename StopCondition,
           typename NewStopCondition> 
-SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, NewStopCondition> 
-swapStopCondition(SearchComponents<NeighborhoodGetter, ImproveChecker, SolutionUpdater, StopCondition> sc, 
+SearchComponents<GetNeighborhood, Gain, UpdateSolution, NewStopCondition> 
+swapStopCondition(SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition> sc, 
                    NewStopCondition stop) {
-    return make_SearchComponents(std::move(sc.getNeighborhoodGetter()), 
-                                 std::move(sc.getImproveChecker()), 
-                                 std::move(sc.getStopCondition()),
+    return make_SearchComponents(std::move(sc.getNeighborhood()), 
+                                 std::move(sc.gain()), 
+                                 std::move(sc.stopCondition()),
                                  std::move(stop));
 }
 

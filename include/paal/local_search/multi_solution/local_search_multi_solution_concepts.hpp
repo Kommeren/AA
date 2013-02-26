@@ -50,26 +50,26 @@ protected:
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  MultiNeighborhoodGetter : public MultiConceptsBase<X, Solution, SearchComponents> {
+class  MultiGetNeighborhood : public MultiConceptsBase<X, Solution, SearchComponents> {
     public:
-        BOOST_CONCEPT_USAGE(MultiNeighborhoodGetter) {
+        BOOST_CONCEPT_USAGE(MultiGetNeighborhood) {
             this->x(this->s, this->e);
         }
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiImproveChecker : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiGain : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(MultiImproveChecker) {
+        BOOST_CONCEPT_USAGE(MultiGain) {
             this->x(this->s, this->e, this->u);
         }
 };
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiSolutionUpdater : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiUpdateSolution : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
+        BOOST_CONCEPT_USAGE(MultiUpdateSolution) {
             this->x(this->s,this-> e, this->u);
         }
 };
@@ -85,14 +85,14 @@ class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponent
 template <typename X, typename Solution> 
 class MultiSearchComponents {
     typedef SearchComponentsTraits<X> Traits; 
-    typedef typename Traits::NeighborhoodGetter NG;
-    typedef typename Traits::ImproveChecker IC;
-    typedef typename Traits::SolutionUpdater SU;
+    typedef typename Traits::GetNeighborhood NG;
+    typedef typename Traits::Gain IC;
+    typedef typename Traits::UpdateSolution SU;
     typedef typename Traits::StopCondition SC;
 public:
-    BOOST_CONCEPT_ASSERT((MultiNeighborhoodGetter<NG, Solution, X>));
-    BOOST_CONCEPT_ASSERT((MultiImproveChecker<IC, Solution, X>));
-    BOOST_CONCEPT_ASSERT((MultiSolutionUpdater<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiGetNeighborhood<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiGain<IC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiUpdateSolution<SU, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiStopCondition<SC, Solution, X>));
 };
 

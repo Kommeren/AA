@@ -42,7 +42,7 @@ private:
 };
 
 
-template <typename VertexType> class FacilityLocationNeighborhoodGetter {
+template <typename VertexType> class FacilityLocationGetNeighborhood {
 public: 
        
     //TODO we shouldn't use detail..

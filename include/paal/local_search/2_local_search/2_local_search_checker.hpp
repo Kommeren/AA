@@ -9,9 +9,9 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename Metric> class ImproveChecker2Opt {
+template <typename Metric> class Gain2Opt {
     public:
-        ImproveChecker2Opt(const Metric & m) : m_metric(m) {}
+        Gain2Opt(const Metric & m) : m_metric(m) {}
 
         template <typename Solution, typename SolutionElement> int operator()(const Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
            return m_metric(sel.first, sel.second) + m_metric(adjustEl.first, adjustEl.second) - 

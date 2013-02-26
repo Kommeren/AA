@@ -21,7 +21,7 @@ namespace facility_location {
 template <typename VertexType> 
 struct DefaultFLComponents {
     typedef MultiSearchComponents<
-                FacilityLocationNeighborhoodGetter<VertexType>,
+                FacilityLocationGetNeighborhood<VertexType>,
                 FacilityLocationChecker           <VertexType>,
                 FacilityLocationUpdater           <VertexType>> type;
 };

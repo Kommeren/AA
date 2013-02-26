@@ -13,16 +13,16 @@ namespace local_search {
 
 template <typename SearchComponents> 
 struct SearchComponentsTraits {
-    typedef puretype(std::declval<SearchComponents>().getNeighborhoodGetter()) NeighborhoodGetter; 
-    typedef puretype(std::declval<SearchComponents>().getImproveChecker()) ImproveChecker; 
-    typedef puretype(std::declval<SearchComponents>().getSolutionUpdater()) SolutionUpdater; 
-    typedef puretype(std::declval<SearchComponents>().getStopCondition()) StopCondition; 
+    typedef puretype(std::declval<SearchComponents>().getNeighborhood()) GetNeighborhood; 
+    typedef puretype(std::declval<SearchComponents>().gain()) Gain; 
+    typedef puretype(std::declval<SearchComponents>().updateSolution()) UpdateSolution; 
+    typedef puretype(std::declval<SearchComponents>().stopCondition()) StopCondition; 
 };
 
 template <typename SearchComponents, typename Solution> 
 class Update {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::NeighborhoodGetter NG;
+                SearchComponents>::GetNeighborhood NG;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>()
                                 ).first) UpdateIterator;
@@ -34,7 +34,7 @@ public:
 template <typename SearchComponents, typename Solution> 
 class MultiUpdate {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::NeighborhoodGetter NG;
+                SearchComponents>::GetNeighborhood NG;
     typedef typename helpers::SolToElem<Solution>::type Element;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>(),

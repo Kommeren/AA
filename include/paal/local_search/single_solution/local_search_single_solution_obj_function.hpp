@@ -16,10 +16,10 @@ namespace paal {
 namespace local_search {
 
 namespace detail {
-    template <typename F, typename Solution, typename SolutionUpdater> class Fun2Check {
+    template <typename F, typename Solution, typename UpdateSolution> class Fun2Check {
             typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
         public:
-            Fun2Check(F f, const SolutionUpdater & su) : m_f(std::move(f)), m_solutionUpdaterFunctor(su) {}
+            Fun2Check(F f, const UpdateSolution & su) : m_f(std::move(f)), m_solutionUpdaterFunctor(su) {}
 
             template <typename Update> Dist operator()(const Solution &s , const Update &u) {
                 Solution newS(s);
@@ -30,7 +30,7 @@ namespace detail {
         private:
 
             F m_f;
-            const SolutionUpdater & m_solutionUpdaterFunctor;
+            const UpdateSolution & m_solutionUpdaterFunctor;
     };
 
     template <typename SearchObjFunctionComponents, typename Solution>
@@ -42,11 +42,11 @@ namespace detail {
         typedef detail::Fun2Check< 
                         typename traits::ObjectiveFunction, 
                         Solution, 
-                        typename traits::SolutionUpdater> ImproveCheckerType;
+                        typename traits::UpdateSolution> GainType;
         typedef SearchComponents<
-                    typename traits::NeighborhoodGetter, 
-                             ImproveCheckerType,
-                    typename traits::SolutionUpdater, 
+                    typename traits::GetNeighborhood, 
+                             GainType,
+                    typename traits::UpdateSolution, 
                     typename traits::StopCondition>  type;
     };
 }
@@ -68,7 +68,7 @@ class LocalSearchFunctionStep :
     typedef detail::SearchObjFunctionComponentsToSearchComponents<
         SearchObjFunctionComponents, Solution> Convert;
     typedef typename Convert::type SearchComponents;
-    typedef typename Convert::ImproveCheckerType ImproveChecker;
+    typedef typename Convert::GainType Gain;
     typedef LocalSearchStep<
                 Solution, 
                 SearchComponents,
@@ -79,10 +79,10 @@ class LocalSearchFunctionStep :
         base(std::move(sol), 
              SearchComponents
                    (
-                    std::move(s.getNeighborhoodGetter()),
-                    ImproveChecker(std::move(s.getObjectiveFunction()), base::m_searchComponents.getSolutionUpdater()),
-                    std::move(s.getSolutionUpdater()),
-                    std::move(s.getStopCondition())
+                    std::move(s.getNeighborhood()),
+                    Gain(std::move(s.getObjectiveFunction()), base::m_searchComponents.updateSolution()),
+                    std::move(s.updateSolution()),
+                    std::move(s.stopCondition())
                    )
             ) {} 
 };

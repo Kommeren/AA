@@ -25,26 +25,26 @@ class  ConceptsBase {
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  NeighborhoodGetter : protected ConceptsBase<X, Solution, SearchComponents> {
+class  GetNeighborhood : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
-        BOOST_CONCEPT_USAGE(NeighborhoodGetter) {
+        BOOST_CONCEPT_USAGE(GetNeighborhood) {
             this->x(this->s);
         }
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class ImproveChecker : protected ConceptsBase<X, Solution, SearchComponents> {
+class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
-        BOOST_CONCEPT_USAGE(ImproveChecker) {
+        BOOST_CONCEPT_USAGE(Gain) {
             this->x(this->s, this->u);
         }
 };
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class SolutionUpdater : protected ConceptsBase<X, Solution, SearchComponents>{
+class UpdateSolution : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(SolutionUpdater) {
+        BOOST_CONCEPT_USAGE(UpdateSolution) {
             this->x(this->s, this->u);
         }
 };
@@ -60,14 +60,14 @@ class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
 template <typename X, typename Solution> 
 class SearchComponents {
     typedef SearchComponentsTraits<X> Traits; 
-    typedef typename Traits::NeighborhoodGetter NG;
-    typedef typename Traits::ImproveChecker IC;
-    typedef typename Traits::SolutionUpdater SU;
+    typedef typename Traits::GetNeighborhood NG;
+    typedef typename Traits::Gain IC;
+    typedef typename Traits::UpdateSolution SU;
     typedef typename Traits::StopCondition SC;
 public:
-    BOOST_CONCEPT_ASSERT((NeighborhoodGetter<NG, Solution, X>));
-    BOOST_CONCEPT_ASSERT((ImproveChecker<IC, Solution, X>));
-    BOOST_CONCEPT_ASSERT((SolutionUpdater<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((GetNeighborhood<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((Gain<IC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((UpdateSolution<SU, Solution, X>));
     BOOST_CONCEPT_ASSERT((StopCondition<SC, Solution, X>));
 };
 

@@ -13,15 +13,15 @@ namespace local_search {
 
 //TODO constructors
 template <
-          typename NeighborhoodGetter, 
+          typename GetNeighborhood, 
           typename ObjectiveFunction, 
-          typename SolutionUpdater = TrivialSolutionUpdater,
+          typename UpdateSolution = TrivialUpdateSolution,
           typename StopCondition = TrivialStopCondition> 
 class SearchObjFunctionComponents {
 public:
-    SearchObjFunctionComponents(NeighborhoodGetter ng = NeighborhoodGetter(), 
+    SearchObjFunctionComponents(GetNeighborhood ng = GetNeighborhood(), 
                      ObjectiveFunction of = ObjectiveFunction(), 
-                     SolutionUpdater su = SolutionUpdater(), 
+                     UpdateSolution su = UpdateSolution(), 
                      StopCondition sc = StopCondition()) :
             m_neighborGetterFunctor(std::move(ng)), 
             m_objectiveFunction(std::move(of)), 
@@ -29,7 +29,7 @@ public:
             m_stopConditionFunctor(std::move(sc)) {}
     
 
-    NeighborhoodGetter & getNeighborhoodGetter() {
+    GetNeighborhood & getNeighborhood() {
         return m_neighborGetterFunctor;
     } 
     
@@ -37,29 +37,29 @@ public:
         return m_objectiveFunction;
     } 
     
-    SolutionUpdater    & getSolutionUpdater()    {
+    UpdateSolution    & updateSolution()    {
         return m_solutionUpdaterFunctor;
     } 
 
     
-    StopCondition      & getStopCondition()      {
+    StopCondition      & stopCondition()      {
         return m_stopConditionFunctor;
     } 
 
 
 private:
-    NeighborhoodGetter m_neighborGetterFunctor;
+    GetNeighborhood m_neighborGetterFunctor;
     ObjectiveFunction m_objectiveFunction;
-    SolutionUpdater m_solutionUpdaterFunctor;
+    UpdateSolution m_solutionUpdaterFunctor;
     StopCondition m_stopConditionFunctor;
 };
 
 template <typename SearchObjFunctionComponents> 
 struct SearchObjFunctionComponentsTraits {
-    typedef puretype(std::declval<SearchObjFunctionComponents>().getNeighborhoodGetter()) NeighborhoodGetter; 
+    typedef puretype(std::declval<SearchObjFunctionComponents>().getNeighborhood()) GetNeighborhood; 
     typedef puretype(std::declval<SearchObjFunctionComponents>().getObjectiveFunction()) ObjectiveFunction; 
-    typedef puretype(std::declval<SearchObjFunctionComponents>().getSolutionUpdater()) SolutionUpdater; 
-    typedef puretype(std::declval<SearchObjFunctionComponents>().getStopCondition()) StopCondition; 
+    typedef puretype(std::declval<SearchObjFunctionComponents>().updateSolution()) UpdateSolution; 
+    typedef puretype(std::declval<SearchObjFunctionComponents>().stopCondition()) StopCondition; 
 };
 
 } //local_search
