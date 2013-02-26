@@ -295,7 +295,7 @@ public:
     }
     
     typename base::VertexIterator vbegin() const {
-        return vbegin(fromIdx(m_lastId));
+        return base::vbegin(fromIdx(m_lastId));
     }
 
 private:
