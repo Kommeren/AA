@@ -56,7 +56,7 @@ void fn(std::vector<int> v,  std::pair<int, int> i) {
 int main() {
 
     std::vector<int> v = {1,2,3,4,5, 6, 7, 8, 9, 10};
-    auto vExl = TrivialNeigborGetter().get(v, 4);
+    auto vExl = TrivialNeigborGetter()(v, 4);
     vExl.first != vExl.second;
     fn(v, std::make_pair(4, 5));
     std::cout << (vExl.first == vExl.second) << std::endl << std::flush;

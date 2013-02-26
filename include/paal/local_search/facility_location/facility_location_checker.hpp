@@ -13,7 +13,7 @@ namespace facility_location {
 template <typename VertexType> class FacilityLocationChecker {
 public:
         template <class Solution, class Update> 
-    int gain(const Solution & s, 
+    int operator()(const Solution & s, 
             const  typename helpers::SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & ue) {
         auto const & FLS = s.get();

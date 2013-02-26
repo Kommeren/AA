@@ -26,7 +26,7 @@ public:
      * @return always true
      */
     template <typename Solution, typename Update>
-    bool stop(const Solution &, const Update &) {
+    bool operator()(const Solution &, const Update &) {
         return false;
     }
 };

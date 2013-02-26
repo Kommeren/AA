@@ -12,7 +12,7 @@ namespace facility_location {
 template <typename VertexType> class FacilityLocationUpdater {
 public:
         template <typename Solution, typename Update> 
-    void update(Solution & s, 
+    void operator()(Solution & s, 
             const  typename helpers::SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & u) {
         auto & FLS = s.get();

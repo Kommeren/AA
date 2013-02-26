@@ -36,14 +36,14 @@ public:
 
     NG() : neighb{10, -10, 1, -1} {}
 
-    std::pair<Iter, Iter> get(int x) const {
+    std::pair<Iter, Iter> operator()(int x) const {
         return std::make_pair(neighb.begin(), neighb.end());
     }
 };
 
 
 struct SU {
-    void update(int & s, int u) const {
+    void operator()(int & s, int u) const {
         s = s + u;
     }
 };

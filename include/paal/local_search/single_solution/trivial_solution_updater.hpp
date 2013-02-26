@@ -1,5 +1,5 @@
 /**
- * @file trivial_solution_updater.hpp
+ * @file trivial_solution_operator()r.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -10,10 +10,10 @@
 
 
 /**
- * @brief We assume that update is a new solution
+ * @brief We assume that operator() is a new solution
  */
 struct TrivialSolutionUpdater {
-    template <typename Solution> void update(Solution & s, const Solution & u) const {
+    template <typename Solution> void operator()(Solution & s, const Solution & u) const {
         s = u;
     }
 };

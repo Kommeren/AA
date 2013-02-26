@@ -62,14 +62,14 @@ public:
         typedef typename base::Update Update;
 
         bool search() {
-            auto adjustmentSet = this->m_searchComponents.getNeighborhoodGetter().get(this->m_solution);
+            auto adjustmentSet = this->m_searchComponents.getNeighborhoodGetter()(this->m_solution);
 
             for(const Update & update : helpers::make_range(adjustmentSet)) {
-                if(this->m_searchComponents.getImproveChecker().gain(this->m_solution, update) > 0) {
-                    this->m_searchComponents.getSolutionUpdater().update(this->m_solution, update);
+                if(this->m_searchComponents.getImproveChecker()(this->m_solution, update) > 0) {
+                    this->m_searchComponents.getSolutionUpdater()(this->m_solution, update);
                     return true;
                 } else {
-                    if(this->m_searchComponents.getStopCondition().stop(this->m_solution, update)) {
+                    if(this->m_searchComponents.getStopCondition()(this->m_solution, update)) {
                         break;
                     }
                 }
@@ -88,23 +88,23 @@ public:
 
     bool search() {
         int max = INT_MIN;
-        auto adjustmentSet = this->m_searchComponents.getNeighborhoodGetter().get(this->m_solution);
+        auto adjustmentSet = this->m_searchComponents.getNeighborhoodGetter()(this->m_solution);
         auto curr = adjustmentSet.first;
         auto best = curr;
 
         for(;curr !=  adjustmentSet.second; ++curr) {
-            int gain = this->m_searchComponents.getImproveChecker().gain(this->m_solution, *curr);
+            int gain = this->m_searchComponents.getImproveChecker()(this->m_solution, *curr);
             if(gain > max) {
                 best = curr;
                 max = gain;
             } else {
-                if(this->m_searchComponents.getStopCondition().stop(this->m_solution, *curr)) {
+                if(this->m_searchComponents.getStopCondition()(this->m_solution, *curr)) {
                     break;
                 }
             }
         }
         if(max > 0) {
-            this->m_searchComponents.getSolutionUpdater().update(this->m_solution, *best);
+            this->m_searchComponents.getSolutionUpdater()(this->m_solution, *best);
         }
         return max > 0;
     }

@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
 
    FacilityLocationSolutionAdapter<Sol> sa(sol);  
    FacilityLocationNeighborhoodGetter<int> ng;
-   auto r = ng.get(sa, Facility<int>(CHOSEN, SGM::A));
+   auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
    auto b = r.first;
    auto e = r.second;
    BOOST_CHECK_EQUAL(std::distance(b, e), 2);

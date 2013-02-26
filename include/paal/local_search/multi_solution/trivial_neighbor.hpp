@@ -22,7 +22,7 @@ struct TrivialNeigborGetter {
                           std::pair<helpers::IteratorWithExcludedElement<typename helpers::SolToConstIter<Solution>::type>, 
                                     helpers::IteratorWithExcludedElement<typename helpers::SolToConstIter<Solution>::type> > 
             
-            get(const Solution & sol, const SolutionElement &e) {
+            operator()(const Solution & sol, const SolutionElement &e) {
                 typedef typename helpers::SolToConstIter<Solution>::type SolutionIterator;
                 typedef helpers::IteratorWithExcludedElement<SolutionIterator> OutIter;
                 SolutionIterator begin = sol.begin();

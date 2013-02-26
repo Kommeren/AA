@@ -76,12 +76,12 @@ public:
     bool search() {
 
         for(const SolutionElement & r : m_solution) {
-            auto adjustmentSet = m_searchComponents.getNeighborhoodGetter().get(m_solution, r);
+            auto adjustmentSet = m_searchComponents.getNeighborhoodGetter()(m_solution, r);
             for(const Update & update : helpers::make_range(adjustmentSet)) {
-                if(m_searchComponents.getImproveChecker().gain(m_solution, r, update) > 0) {
-                    m_searchComponents.getSolutionUpdater().update(m_solution, r, update);
+                if(m_searchComponents.getImproveChecker()(m_solution, r, update) > 0) {
+                    m_searchComponents.getSolutionUpdater()(m_solution, r, update);
                     return true;
-                } else if(m_searchComponents.getStopCondition().stop(m_solution, r, update)) {
+                } else if(m_searchComponents.getStopCondition()(m_solution, r, update)) {
                     return false;
                 }
             }

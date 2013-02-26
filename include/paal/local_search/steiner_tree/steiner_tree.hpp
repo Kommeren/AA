@@ -69,14 +69,10 @@ public:
             res.push_back(m_nearestVertex[boost::get<0>(t)]);
         };
 
-        typedef helpers::FunctToNeighborhoodGetter<decltype(ng)> NG; 
-        typedef helpers::FunctToImproveChecker<decltype(obj_fun)> IC; 
-        typedef helpers::FunctToSolutionUpdater<decltype(su)> SU; 
+        auto sc = make_SearchComponents(ng, obj_fun, su);
 
-        typedef SearchComponents<NG, IC, SU> SC;
-        SC sc{NG(ng), IC(obj_fun), SU(su)};
         typedef local_search::LocalSearchStep<AMatrix, 
-                    SC, search_strategies::SteepestSlope>  LS;
+                    decltype(sc), search_strategies::SteepestSlope>  LS;
         LS ls(helpers::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 

@@ -1,5 +1,5 @@
 /**
- * @file 2_local_search_updater.hpp
+ * @file 2_local_search_operator()r.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -17,7 +17,7 @@ class TwoLocalSearchUpdater  {
         TwoLocalSearchUpdater() {}
 
             template <typename SolutionElement, typename Solution> 
-        void update(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
+        void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
             s.get().flip(se.second, ae.first);
         }
 };

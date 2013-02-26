@@ -28,7 +28,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class  NeighborhoodGetter : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(NeighborhoodGetter) {
-            this->x.get(this->s);
+            this->x(this->s);
         }
 };
 
@@ -36,7 +36,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class ImproveChecker : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(ImproveChecker) {
-            this->x.gain(this->s, this->u);
+            this->x(this->s, this->u);
         }
 };
 
@@ -45,7 +45,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class SolutionUpdater : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(SolutionUpdater) {
-            this->x.update(this->s, this->u);
+            this->x(this->s, this->u);
         }
 };
 
@@ -53,7 +53,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(StopCondition) {
-            this->x.stop(this->s, this->u);
+            this->x(this->s, this->u);
         }
 };
 

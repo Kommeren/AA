@@ -21,9 +21,9 @@ namespace detail {
         public:
             Fun2Check(F f, const SolutionUpdater & su) : m_f(std::move(f)), m_solutionUpdaterFunctor(su) {}
 
-            template <typename Update> Dist gain(const Solution &s , const Update &u) {
+            template <typename Update> Dist operator()(const Solution &s , const Update &u) {
                 Solution newS(s);
-                m_solutionUpdaterFunctor.update(newS, u);
+                m_solutionUpdaterFunctor(newS, u);
                 return m_f(newS) - m_f(s);
             }
 

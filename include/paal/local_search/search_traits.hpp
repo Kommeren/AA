@@ -23,7 +23,7 @@ template <typename SearchComponents, typename Solution>
 class Update {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::NeighborhoodGetter NG;
-    typedef decltype(std::declval<NG>().get(
+    typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>()
                                 ).first) UpdateIterator;
 public:
@@ -36,7 +36,7 @@ class MultiUpdate {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::NeighborhoodGetter NG;
     typedef typename helpers::SolToElem<Solution>::type Element;
-    typedef decltype(std::declval<NG>().get(
+    typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>(),
                                 std::declval<Element &>()
                                 ).first) UpdateIterator;

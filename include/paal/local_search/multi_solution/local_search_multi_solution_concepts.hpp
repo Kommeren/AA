@@ -53,7 +53,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class  MultiNeighborhoodGetter : public MultiConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(MultiNeighborhoodGetter) {
-            this->x.get(this->s, this->e);
+            this->x(this->s, this->e);
         }
 };
 
@@ -61,7 +61,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiImproveChecker : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiImproveChecker) {
-            this->x.gain(this->s, this->e, this->u);
+            this->x(this->s, this->e, this->u);
         }
 };
 
@@ -70,7 +70,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiSolutionUpdater : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiSolutionUpdater) {
-            this->x.update(this->s,this-> e, this->u);
+            this->x(this->s,this-> e, this->u);
         }
 };
 
@@ -78,7 +78,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiStopCondition) {
-            this->x.stop(this->s,this-> e, this->u);
+            this->x(this->s,this-> e, this->u);
         }
 };
 

@@ -51,7 +51,7 @@ public:
     //Due to the memory optimization at one moment only one Update is valid
     typedef Facility<VertexType> Fac;
     template <typename Solution> std::pair<Iter, Iter>
-        get(const Solution &s, const Fac & el) {
+        operator()(const Solution &s, const Fac & el) {
 
         auto const & FCS = s.get(); 
         m_currSol.clear();
