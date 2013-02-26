@@ -88,28 +88,38 @@ Concepts:
     <li> <i>GetNeighborhood</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
     GetNeighborhoodArchetype {
-        UpdateIteratorsRange get(const Solution & s)
+        UpdateIteratorsRange operator()(const Solution & s)
     }
     </pre>
     <li> <i>Gain</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     GainArchetype {
-        int gain(const Solution & s, const Update & update);
+        int operator()(const Solution & s, const Update & update);
     }
     </pre>
     <li> <i>UpdateSolution</i> is a concept class responsible for updating the solution with the Update.
     <pre>
-    SolutionUdaterArchetype {
-        int update(Solution & s, const Update & update);
+    UpdateSolutionArchetype {
+        int operator()(Solution & s, const Update & update);
     }
     </pre>
     
     <li> <i>StopCondition</i> is a concept class responsible for stop condition.
     <pre>
-    StopCondition {
-        bool stop(const Solution & s, const Update & update);
+    StopConditionArchetype {
+        bool operator()(const Solution & s, const Update & update);
     }
     </pre>
+    <li> <i>SearchComponents</i>All of the previous concepts are grouped togheter into one class.
+    <pre>
+    SearchComponentsArchetype {
+        GetNeighborhood & getNeighborhood();
+        Gain & gain();
+        UpdateSolution & updateSolution();
+        StopCondition & stopCondition();
+    }
+    </pre>
+    
 
 
 </ol>
@@ -130,43 +140,50 @@ Concepts:
 <ol>
     <li> <i>MultiSolution</i>  is a concept class representing the  solution  
     <pre>
-    MultiSolutionArchetype {
-        SolutionElementIterator begin();
+    MultiSolutionArchetype  begin();
         SolutionElementIterator end();
         InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
-                             // The inner solution type isInnerSolution
+                             // The inner solution type is InnerSolution
     }
     <li> <i>MultiGetNeighborhood</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
     MultiGetNeighborhoodArchetype {
-        UpdateIteratorsRange get(const Solution & s, const SolutionElement &)
+        UpdateIteratorsRange operator()(const Solution & s, const SolutionElement &)
     }
     </pre>
     <li> <i>MultiGain</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
     MultiGainArchetype {
-        int gain(const Solution & s, const SolutionElement &, const Update & update);
+        int operator()(const Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
     <li> <i>MultiUpdateSolution</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     MultiSolutionUdaterArchetype {
-        int update(Solution & s, const SolutionElement &, const Update & update);
+        int operator()(Solution & s, const SolutionElement &, const Update & update);
     }
     </pre>
     
     <li> <i>MultiStopCondition</i> is a concept class responsible for stop condition.
     <pre>
     StopCondition {
-        bool stop(const Solution & s, const SolutionElement & se, const Update & update);
+        bool operator()(const Solution & s, const SolutionElement & se, const Update & update);
+    }
+    </pre>
+    
+    <li> <i>MultiSearchComponents</i>All of the previous concepts are grouped togheter into one class.
+    <pre>
+    MultiSearchComponentsArchetype {
+        MultiGetNeighborhood & getNeighborhood();
+        MultiGain & gain();
+        MultiUpdateSolution & updateSolution();
+        MultiStopCondition & stopCondition();
     }
     </pre>
 
 </ol>
 
-
 Now we present the paal::local_search::LocalSearchStepMultiSolution inteface.
-
 
 </pre>
 <br>
@@ -186,11 +203,13 @@ In order to present 2-opt we need to introduce some concept and types.
     }
 </pre> 
 
-<li>  Cycle need to have fulfill the interface: 
+<li>  Cycle need to fulfill the interface: 
 <pre>
     CycleArchetype {
         void flip(VertexType,VertexType);
-        EdgeIteratorRange getEdgesRange();
+        vbegin(VertexType v);
+        vbegin();
+        vend();
     }
 </pre> 
 </ol>

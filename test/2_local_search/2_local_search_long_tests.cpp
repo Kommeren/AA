@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //create random solution 
         std::random_shuffle(v.begin(), v.end());
-        data_structures::SimpleCycleStartFromLastChange<int> cycle(v.begin(), v.end());
+        data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
 
         //creating local search
         auto lsc = getDefaultTwoLocalComponents(mtx);
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 
         //create random solution 
         std::random_shuffle(v.begin(), v.end());
-        data_structures::SimpleCycleStartFromLastChange<int> cycle(v.begin(), v.end());
+        data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
         int startLen = simple_algo::getLength(mtx, cycle);
 
         //creating local search

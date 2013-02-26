@@ -20,15 +20,25 @@ class  ConceptsBase {
     protected:
         X x;
         Solution s;
-        typename Update<SearchComponents, Solution>::type u;
+        typedef typename Update<SearchComponents, Solution>::type Update;
+        Update u;
 };
 
+//avoid unused variable warning
+template <typename T>
+int use(const T & t);
 
 template <typename X, typename Solution, typename SearchComponents> 
 class  GetNeighborhood : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(GetNeighborhood) {
-            this->x(this->s);
+            auto i = this->x(this->s);
+            auto b = i.first;
+            auto e = i.second;
+            for(auto x = b; x != e; ++x) {
+                const typename ConceptsBase<X,Solution,SearchComponents>::Update & u = *x;
+                use(u);
+            }
         }
 };
 
@@ -36,7 +46,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(Gain) {
-            this->x(this->s, this->u);
+            int i = this->x(this->s, this->u);          
+            use(i);
         }
 };
 
@@ -53,7 +64,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(StopCondition) {
-            this->x(this->s, this->u);
+            bool b = this->x(this->s, this->u);
+            use(b);
         }
 };
 

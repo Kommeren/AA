@@ -15,6 +15,9 @@ namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
+//avoid unused variable warning
+template <typename T>
+int use(const T & t);
 
 //TODO checking if the method get const object dosn't work in this framework!
 //we have to find some workaround
@@ -40,9 +43,9 @@ class MultiSolution  {
 
 template <typename X, typename Solution, typename SearchComponents> 
 class MultiConceptsBase {
-    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
     typedef typename helpers::SolToElem<Solution>::type SolutionElement;
 protected:
+    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
     X x;
     Solution  s;
     SolutionElement e;
@@ -53,7 +56,13 @@ template <typename X, typename Solution, typename SearchComponents>
 class  MultiGetNeighborhood : public MultiConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(MultiGetNeighborhood) {
-            this->x(this->s, this->e);
+            auto i = this->x(this->s, this->e);
+            auto b = i.first;
+            auto e = i.second;
+            for(auto x = b; x != e; ++x) {
+                const typename MultiConceptsBase<X,Solution,SearchComponents>::Update & u = *x;
+                use(u);
+            }
         }
 };
 
@@ -61,7 +70,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiGain : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiGain) {
-            this->x(this->s, this->e, this->u);
+            int i = this->x(this->s, this->e, this->u);
+            use(i);
         }
 };
 
@@ -78,7 +88,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiStopCondition) {
-            this->x(this->s,this-> e, this->u);
+            bool b = this->x(this->s,this-> e, this->u);
+            use(b);
         }
 };
 

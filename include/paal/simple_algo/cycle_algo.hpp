@@ -6,17 +6,20 @@
  * @date 2013-02-01
  */
 #include <algorithm>
+#include "paal/data_structures/cycle_traits.hpp"
+#include "paal/helpers/vertex_to_edge_iterator.hpp"
 
 namespace paal {
 namespace simple_algo {
 
 
 template <typename Metric, typename Cycle> typename Metric::DistanceType getLength(const Metric & m, const Cycle & cm) {
-    typedef typename Cycle::CycleElement El;
+    typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
     typedef typename Metric::DistanceType Dist;
     
-    auto edges = cm.getEdgeRange();
-    return std::accumulate(edges.first, edges.second, Dist(), [&m]
+    auto ebegin = helpers::make_VertexToEdgeIterator(cm.vbegin(), cm.vend());
+    auto eend = helpers::make_VertexToEdgeIterator(cm.vend(), cm.vend());
+    return std::accumulate(ebegin, eend, Dist(), [&m]
             (Dist a, const std::pair<El, El> & p)->Dist { 
                 return a + m(p.first, p.second);
                 }
@@ -25,10 +28,11 @@ template <typename Metric, typename Cycle> typename Metric::DistanceType getLeng
 
 
 template <typename Cycle, typename Stream> void print(const Cycle & cm, Stream & o, const  std::string & endl = "\n") {
-    auto edges = cm.getEdgeRange();
-    typedef typename Cycle::CycleElement El;
+    auto ebegin = helpers::make_VertexToEdgeIterator(cm.vbegin(), cm.vend());
+    auto eend = helpers::make_VertexToEdgeIterator(cm.vend(), cm.vend());
+    typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
 
-    for(const std::pair<El, El> & p : helpers::make_range(edges)){ 
+    for(const std::pair<El, El> & p : helpers::make_range(ebegin, eend)){ 
         o <<  "(" << p.first << "," << p.second << ")->";
     }
         

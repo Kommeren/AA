@@ -17,6 +17,7 @@
 #include "paal/local_search/2_local_search/2_local_search_updater.hpp"
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
+#include "paal/data_structures/cycle_start_from_last_change.hpp"
 
 namespace paal {
 namespace local_search {
@@ -50,17 +51,20 @@ template <typename Cycle,
           typename SearchComponents>
 
 class  TwoLocalSearchStep : 
-    public LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle>, SearchComponents>  {
+   public LocalSearchStepMultiSolution<TwoLocalSearchAdapter<data_structures::CycleStartFromLastChange<Cycle>>, SearchComponents>  {
   
-   typedef LocalSearchStepMultiSolution<TwoLocalSearchContainer<Cycle> , SearchComponents> base;
+   typedef data_structures::CycleStartFromLastChange<Cycle> CycleWrap;
+   typedef TwoLocalSearchAdapter<CycleWrap> CycleAdapt;
+   typedef LocalSearchStepMultiSolution<CycleAdapt, SearchComponents> base;
 
    public:
 
         TwoLocalSearchStep(Cycle c, SearchComponents sc) 
-           : base(TwoLocalSearchContainer<Cycle>(m_cycle), std::move(sc)), m_cycle(std::move(c)) {}
+           : base(CycleAdapt(m_cycleS), std::move(sc)), m_cycle(std::move(c)), m_cycleS(m_cycle) {}
 
    private:
        Cycle m_cycle;
+       CycleWrap m_cycleS;
 };
 
 /**
@@ -81,7 +85,7 @@ template <typename Gain,
 
 TwoLocalComponents<Gain, GetNeighborhood, StopCondition>  
 
-    make_TwoLocalSearchCOmponents(Gain ch, 
+    make_TwoLocalSearchComponents(Gain ch, 
             GetNeighborhood ng = TrivialNeigborGetter(),
             StopCondition sc = TrivialStopConditionMultiSolution()) {
 
@@ -90,9 +94,9 @@ TwoLocalComponents<Gain, GetNeighborhood, StopCondition>
 
 
 template <typename Metric>
-decltype(make_TwoLocalSearchCOmponents(Gain2Opt<Metric>(std::declval<Metric>())))
+decltype(make_TwoLocalSearchComponents(Gain2Opt<Metric>(std::declval<Metric>())))
 getDefaultTwoLocalComponents(const Metric & m) {
-    return make_TwoLocalSearchCOmponents(Gain2Opt<Metric>(m));
+    return make_TwoLocalSearchComponents(Gain2Opt<Metric>(m));
 }
 
 

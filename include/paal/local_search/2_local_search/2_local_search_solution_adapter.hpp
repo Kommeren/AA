@@ -14,11 +14,11 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template < typename Cycle> class TwoLocalSearchContainer  {
+template < typename Cycle> class TwoLocalSearchAdapter  {
     public:
         typedef typename Cycle::VertexIterator VertexIterator;
         typedef helpers::VertexToEdgeIterator<VertexIterator> Iterator;
-        TwoLocalSearchContainer(Cycle & cm) : m_cycle(cm) {}
+        TwoLocalSearchAdapter(Cycle & cm) : m_cycle(cm) {}
 
         Iterator begin() const {
             return helpers::make_VertexToEdgeIterator(m_cycle.vbegin(), m_cycle.vend());
