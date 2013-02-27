@@ -11,8 +11,8 @@
 
 #include "paal/data_structures/voronoi.hpp"
 
-#ifndef __FACILITY_LOCATION_SOLUTION__
-#define __FACILITY_LOCATION_SOLUTION__
+#ifndef FACILITY_LOCATION_SOLUTION_HPP
+#define FACILITY_LOCATION_SOLUTION_HPP
 
 namespace paal {
 namespace data_structures {
@@ -77,4 +77,4 @@ class FacilityLocationSolution {
 };
 };
 
-#endif //__FACILITY_LOCATION_SOLUTION__
+#endif //FACILITY_LOCATION_SOLUTION_HPP

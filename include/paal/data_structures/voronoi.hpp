@@ -9,8 +9,8 @@
 #include <map>
 #include <cassert>
 
-#ifndef __VORONOI__
-#define __VORONOI__
+#ifndef VORONOI_HPP
+#define VORONOI_HPP
 
 #include <boost/range/adaptor/map.hpp>
 
@@ -161,4 +161,4 @@ class Voronoi {
 };
 };
 
-#endif //__VORONOI__
+#endif //VORONOI_HPP

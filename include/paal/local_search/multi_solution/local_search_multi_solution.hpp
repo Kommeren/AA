@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef __LOCAL_SEARCH_MULTI_SOLUTION__
-#define __LOCAL_SEARCH_MULTI_SOLUTION__
+#ifndef LOCAL_SEARCH_MULTI_SOLUTION_HPP
+#define LOCAL_SEARCH_MULTI_SOLUTION_HPP
 
 #include <utility>
 #include <algorithm>
@@ -119,4 +119,4 @@ class LocalSearchStepMultiSolution<Solution, SearchComponents, search_strategies
 } // local_search
 } // paal
 
-#endif // __LOCAL_SEARCH_MULTI_SOLUTION__
+#endif // LOCAL_SEARCH_MULTI_SOLUTION_HPP

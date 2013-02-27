@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef  __FC_UPDATE_ELEMENT__
-#define __FC_UPDATE_ELEMENT__
+#ifndef  FACILITY_LOCATION_UPDATE_ELEMENT_HPP
+#define FACILITY_LOCATION_UPDATE_ELEMENT_HPP
 
 namespace paal {
 namespace local_search {
@@ -103,4 +103,4 @@ private:
 } //paal
 
 
-#endif // __FC_UPDATE_ELEMENT__
+#endif // FACILITY_LOCATION_UPDATE_ELEMENT_HPP

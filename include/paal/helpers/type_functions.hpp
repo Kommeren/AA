@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef __TYPE_FUNCITONS__
-#define __TYPE_FUNCITONS__
+#ifndef TYPE_FUNCTIONS_HPP
+#define TYPE_FUNCTIONS_HPP
 
 #include <type_traits>
 #include <utility>
@@ -87,4 +87,4 @@ template <typename T> struct kTuple<T, 1> {
 } //helpers
 } //paal
 
-#endif //__TYPE_FUNCITONS__
+#endif //TYPE_FUNCTIONS_HPP

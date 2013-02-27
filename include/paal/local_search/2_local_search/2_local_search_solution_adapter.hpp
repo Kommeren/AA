@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef __2_LOCAL_SEARCH_CONTAINER__
-#define __2_LOCAL_SEARCH_CONTAINER__
+#ifndef 2_LOCAL_SEARCH_SOLUTION_ADAPTER_HPP
+#define 2_LOCAL_SEARCH_SOLUTION_ADAPTER_HPP
 
 #include "paal/helpers/vertex_to_edge_iterator.hpp"
 
@@ -46,4 +46,4 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
 } //local_search
 } //paal
 
-#endif // __2_LOCAL_SEARCH_CONTAINER__
+#endif // 2_LOCAL_SEARCH_SOLUTION_ADAPTER_HPP

@@ -6,8 +6,8 @@
  * @date 2013-02-01
  */
 
-#ifndef __TRIVIAL_NEIGHBOR__
-#define __TRIVIAL_NEIGHBOR__
+#ifndef TRIVIAL_NEIGHBOR_HPP
+#define TRIVIAL_NEIGHBOR_HPP
 
 #include <utility>
 #include "paal/helpers/iterator_helpers.hpp"
@@ -34,4 +34,4 @@ struct TrivialNeigborGetter {
 } //local_search
 } //paal
 
-#endif // __TRIVIAL_NEIGHBOR__
+#endif // TRIVIAL_NEIGHBOR_HPP

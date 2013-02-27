@@ -11,8 +11,8 @@
 
 #include "type_functions.hpp"
 
-#ifndef __ITERATOR_HELPERS__
-#define __ITERATOR_HELPERS__
+#ifndef ITERATOR_HELPERS_HPP
+#define ITERATOR_HELPERS_HPP
 
 namespace paal {
 namespace helpers {
@@ -59,5 +59,5 @@ range<T> make_range(T b, T e) {
 } //helpers
 } //paal
 
-#endif // __ITERATOR_HELPERS__
+#endif // ITERATOR_HELPERS_HPP
 

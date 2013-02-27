@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef __2_LOCAL_SEARCH_SWAPPER__
-#define __2_LOCAL_SEARCH_SWAPPER__
+#ifndef 2_LOCAL_SEARCH_UPDATER_HPP
+#define 2_LOCAL_SEARCH_UPDATER_HPP
 
 namespace paal {
 namespace local_search {
@@ -26,4 +26,4 @@ class TwoLocalSearchUpdater  {
 } //local_search
 } //paal
 
-#endif // __2_LOCAL_SEARCH_SWAPPER__
+#endif // 2_LOCAL_SEARCH_UPDATER_HPP

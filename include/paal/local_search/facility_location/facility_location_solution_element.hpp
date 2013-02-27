@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef __FC_SOLUTION_ELEMENT__
-#define __FC_SOLUTION_ELEMENT__
+#ifndef FACILITY_LOCATION_SOLUTION_ELEMENT_HPP
+#define FACILITY_LOCATION_SOLUTION_ELEMENT_HPP
 
 
 namespace paal {
@@ -47,4 +47,4 @@ template <typename stream, typename T> stream & operator<<(stream & o, const Fac
 }
 
 
-#endif //__FC_SOLUTION_ELEMENT__
+#endif //FACILITY_LOCATION_SOLUTION_ELEMENT_HPP

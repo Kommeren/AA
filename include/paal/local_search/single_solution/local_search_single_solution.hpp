@@ -6,8 +6,8 @@
  * @date 2013-02-01
  */
 
-#ifndef __LOCAL_SEARCH_SINGLE_SOLUTION__
-#define __LOCAL_SEARCH_SINGLE_SOLUTION__
+#ifndef LOCAL_SEARCH_SINGLE_SOLUTION_HPP
+#define LOCAL_SEARCH_SINGLE_SOLUTION_HPP
 
 #include <utility>
 #include <algorithm>
@@ -113,4 +113,4 @@ public:
 } // local_search
 } // paal
 
-#endif // __LOCAL_SEARCH_SINGLE_SOLUTION__
+#endif // LOCAL_SEARCH_SINGLE_SOLUTION_HPP
