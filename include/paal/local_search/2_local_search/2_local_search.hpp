@@ -6,9 +6,8 @@
  * @date 2013-02-01
  */
 
-//TODO change all defines
-#ifndef 2_LOCAL_SEARCH_HPP
-#define 2_LOCAL_SEARCH_HPP
+#ifndef TWO_LOCAL_SEARCH_HPP
+#define TWO_LOCAL_SEARCH_HPP
 
 #include "paal/local_search/multi_solution/trivial_neighbor.hpp"
 #include "paal/local_search/multi_solution/trivial_stop_condition_multi_solution.hpp"
@@ -104,5 +103,5 @@ getDefaultTwoLocalComponents(const Metric & m) {
 } //local_search
 } //paal
 
-#endif // 2_LOCAL_SEARCH_HPP
+#endif // TWO_LOCAL_SEARCH_HPP
 
