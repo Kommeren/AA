@@ -29,7 +29,11 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
             return helpers::make_VertexToEdgeIterator(end, end);
         }
 
-        Cycle & get() {
+        decltype(std::declval<Cycle>().getCycle()) get()  {
+            return m_cycle.getCycle();
+        }
+        
+        Cycle & getWrap() {
             return m_cycle;
         }
     private:

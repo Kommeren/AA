@@ -23,11 +23,15 @@ std::string path = "test/data/TSPLIB/symmetrical/";
 
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
-   read_tsplib::TSPLIB_Directory dir(path);
-   read_tsplib::TSPLIB_Matrix mtx;
-   for(auto &g : dir.graphs)  {   
+    read_tsplib::TSPLIB_Directory dir(path);
+    read_tsplib::TSPLIB_Matrix mtx;
+    std::string fname;
+    float opt;
+    while(dir.getGraph(fname ,opt))  {  
+        std::ifstream is(fname);
+        read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
-        auto size = mtx.size1();
+        auto size = mtx.size();
         std::vector<int> v(size);
         std::iota(v.begin(), v.end(), 0);
 
@@ -42,7 +46,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 #ifdef LOGGER_ON
         //printing 
         auto const & cman = ls.getSolution();
-        LOG("Graph:\t" << g.filename);
+        LOG("Graph:\t" << fname);
         LOG("Length before\t" << simple_algo::getLength(mtx, cman));
         int i = 0;
 #endif
@@ -51,7 +55,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         while(ls.search()) {
             LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
         }
-   }
+    }
 }
 
 using paal::local_search::SearchComponents;
@@ -60,9 +64,13 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     const string indexFName = "index.long";
     read_tsplib::TSPLIB_Directory dir(path + "/long/", indexFName);
     read_tsplib::TSPLIB_Matrix mtx;
-    for(auto &g : dir.graphs)  {   
+    std::string fname;
+    float opt;
+    while(dir.getGraph(fname ,opt))  {   
+        std::ifstream is(fname);
+        read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
-        auto size = mtx.size1();
+        auto size = mtx.size();
         std::vector<int> v(size);
         std::iota(v.begin(), v.end(), 0);
 
@@ -82,7 +90,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 #ifdef LOGGER_ON
         //printing 
         auto const & cman = lsCut.getSolution();
-        LOG("Graph:\t" << g.filename);
+        LOG("Graph:\t" << fname);
         LOG("Length before\t" << simple_algo::getLength(mtx, cman));
         int i = 0;
 #endif
@@ -96,11 +104,10 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
                 LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
             }
         }
-        
+
         LOG("Normal search at the end");
-        auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
-        lsCut.getSearchComponents().gain().setEpsilon(epsilon);
-        while(lsCut.search()) {
+        auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(lsCut.getSolution()), std::move(lsc));
+        while(ls.search()) {
             LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
         }
     }
