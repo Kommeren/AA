@@ -45,6 +45,30 @@ public:
 
 };
 
+template <typename SearchComponents, typename Solution> 
+class Fitness {
+    typedef typename SearchComponentsTraits<
+                SearchComponents>::Gain Gain;
+    typedef typename Update<SearchComponents, Solution>::type Update;
+public:
+    typedef decltype(std::declval<Gain>()(
+                        std::declval<Solution &>(), std::declval<Update &>())
+                    ) type;
+};
+
+
+template <typename SearchComponents, typename Solution> 
+class MultiFitness {
+    typedef typename SearchComponentsTraits<
+                SearchComponents>::Gain Gain;
+    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
+    typedef typename utils::SolToElem<Solution>::type SolutionElement;
+public:
+    typedef decltype(std::declval<Gain>()(
+                        std::declval<Solution &>(), std::declval<SolutionElement>(), std::declval<Update &>())
+                    ) type;
+};
+
 } // local_search
 } // paal
 #endif /* SEARCH_TRAITS_HPP */

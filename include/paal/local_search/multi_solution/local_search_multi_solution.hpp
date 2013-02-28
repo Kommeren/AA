@@ -14,7 +14,8 @@
 
 #include "local_search_multi_solution_concepts.hpp"
 #include "trivial_stop_condition_multi_solution.hpp"
-#include "paal/utils/iterator_utils.hpp"
+#include "paal/local_search/search_traits.hpp"
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace local_search {
@@ -24,64 +25,74 @@ namespace search_strategies {
     class SteepestSlope;
 }
 
+template <typename Solution, 
+          typename MultiSearchComponents>
+class LocalSearchStepMultiSolutionBase {
+      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
+protected:    
+    typedef typename utils::SolToElem<Solution>::type SolutionElement;
+    typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
 
-/**
- * @class LocalSearchStepMultiSolution
- * @brief General class for local search on the multi solution. Note there is no Update type here because it can be deduced.
- *
- * @tparam Solution
- * @tparam GetNeighborhood
- * @tparam Gain
- * @tparam UpdateSolution
- * @tparam StopCondition
- * @tparam SearchStrategy
-           Search strategy descibes LS search strategy. For ow we are planning two strategies: 
-           <ul>
-           <li>ChooseFirstBetter -> The algorithm chooses the first update with the positive gain
-           <li>SteepestSlope     -> The algorithm chooses the update with the largest gain and update if positive.
-           </ul>
- */
+    LocalSearchStepMultiSolutionBase(Solution solution = Solution(), MultiSearchComponents sc = MultiSearchComponents()) : 
+        m_solution(std::move(solution)), m_searchComponents(std::move(sc)) {}
+
+public:
+
+    MultiSearchComponents & getSearchComponents() {
+        return m_searchComponents;
+    }
+
+    template <typename DummySolution = Solution>
+    typename std::enable_if<utils::has_get<DummySolution>::value, decltype(std::declval<DummySolution>().get()) &>::type getSolution() {
+        static_assert(std::is_same<DummySolution, Solution>::value, "Don't specialize DummySolution");
+        return m_solution.get();
+    }
+    
+    
+    template <typename DummySolution = Solution>
+    typename std::enable_if<!utils::has_get<DummySolution>::value, DummySolution &>::type getSolution() {
+        static_assert(std::is_same<DummySolution, Solution>::value, "Don't specialize DummySolution");
+        return m_solution;
+    }
+
+protected:
+
+    Solution m_solution;
+    MultiSearchComponents m_searchComponents;
+};
 
 template <typename Solution, 
           typename MultiSearchComponents,
           typename SearchStrategy = search_strategies::ChooseFirstBetter>
-class LocalSearchStepMultiSolution {
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
+class LocalSearchStepMultiSolution : 
+        public LocalSearchStepMultiSolutionBase<Solution, MultiSearchComponents> {
       
-      static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
+    typedef LocalSearchStepMultiSolutionBase<Solution, MultiSearchComponents> base;
+    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
                     std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
-    
-    typedef typename utils::SolToElem<Solution>::type SolutionElement;
-    typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
-    
 public:
 
-    /**
-     * @brief costam 
-     *
-     * @param solution
-     * @param ng
-     * @param check
-     * @param solutionUpdater
-     * @param sc
-     */
-    LocalSearchStepMultiSolution(Solution solution, MultiSearchComponents sc) : 
-        m_solution(std::move(solution)), m_searchComponents(std::move(sc)) {}
+    LocalSearchStepMultiSolution(Solution solution = Solution(), MultiSearchComponents sc = MultiSearchComponents()) : 
+        base(std::move(solution), std::move(sc)) {}
+
+    typedef typename  base::SolutionElement SolutionElement;
+    typedef typename  base::Update Update;
+    using base::m_solution;
 
     /**
-     * @brief tata 
+     * @brief tries to improve the solution using local search 
      *
-     * @return 
+     * @return true if the solution is improved false otherwise 
      */
     bool search() {
 
         for(const SolutionElement & r : m_solution) {
-            auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution, r);
+            auto adjustmentSet = this->m_searchComponents.getNeighborhood()(m_solution, r);
             for(const Update & update : utils::make_range(adjustmentSet)) {
-                if(m_searchComponents.gain()(m_solution, r, update) > 0) {
-                    m_searchComponents.updateSolution()(m_solution, r, update);
+                if(this->m_searchComponents.gain()(m_solution, r, update) > 0) {
+                    this->m_searchComponents.updateSolution()(m_solution, r, update);
                     return true;
-                } else if(m_searchComponents.stopCondition()(m_solution, r, update)) {
+                } else if(this->m_searchComponents.stopCondition()(m_solution, r, update)) {
                     return false;
                 }
             }
@@ -89,31 +100,56 @@ public:
           
         return false;
     }
-
-    MultiSearchComponents & getSearchComponents() {
-        return m_searchComponents;
-    }
-
-    // TODO it is not optional :)
-    typename std::enable_if<utils::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
-        return m_solution.get();
-    }
-    
-    
-    //TODO doesn't work
-/*    std::enable_if<!has_get<Solution>::value, Solution &> getSolution() {
-        return m_solution;
-    }*/
-
-private:
-
-    Solution m_solution;
-    MultiSearchComponents m_searchComponents;
 };
 
-template <typename Solution, typename SearchComponents> 
-class LocalSearchStepMultiSolution<Solution, SearchComponents, search_strategies::SteepestSlope> {
-    //TODO implement
+template <typename Solution, typename MultiSearchComponents> 
+class LocalSearchStepMultiSolution<Solution, MultiSearchComponents, search_strategies::SteepestSlope> : 
+        public LocalSearchStepMultiSolutionBase<Solution, MultiSearchComponents> {      
+
+    typedef LocalSearchStepMultiSolutionBase<Solution, MultiSearchComponents> base;
+public:
+
+    LocalSearchStepMultiSolution(Solution solution = Solution(), MultiSearchComponents sc = MultiSearchComponents()) : 
+        base(std::move(solution), std::move(sc)) {}
+
+    typedef typename base::SolutionElement SolutionElement;
+    typedef typename base::Update Update;
+    typedef typename MultiFitness<MultiSearchComponents, Solution>::type Fitness;
+    using base::m_solution;
+
+    /**
+     * @brief tries to improve the solution using local search 
+     *
+     * @return true if the solution is improved false otherwise 
+     */
+    bool search() {
+        Fitness max = -1;
+        bool stop = false;
+        auto currSE = m_solution.begin();
+        auto endSE =  m_solution.end();
+        auto bestSE = currSE;
+        Update bestUpdate;
+        for(;currSE != endSE && !stop; ++currSE) {
+            auto adjustmentSet = this->m_searchComponents.getNeighborhood()(m_solution, *currSE);
+            auto currUpdate = adjustmentSet.first;
+            for(;currUpdate !=  adjustmentSet.second && !stop; ++currUpdate) {
+                Fitness gain = this->m_searchComponents.gain()(m_solution, *currSE, *currUpdate); 
+                
+                if(gain > max) {
+                    bestSE = currSE;
+                    bestUpdate = *currUpdate;
+                    max = gain;
+                } 
+                stop = this->m_searchComponents.stopCondition()(m_solution, *currSE, *currUpdate);
+            }
+        }
+
+        if(max > 0) {
+            this->m_searchComponents.updateSolution()(m_solution, *bestSE, bestUpdate);
+        }
+          
+        return max > 0;
+    }
 };
 
 } // local_search
