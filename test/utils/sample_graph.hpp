@@ -1,7 +1,7 @@
-#include "paal/data_structures/graph_metrics.hpp"
-
 #ifndef SAMPLE_GRAPH_HPP
 #define SAMPLE_GRAPH_HPP
+
+#include "paal/data_structures/metric/graph_metrics.hpp"
 
 struct SampleGraphsMetrics {
     typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, boost::property < boost::edge_weight_t, int > > graph_t;

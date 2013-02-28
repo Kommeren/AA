@@ -12,10 +12,10 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
-#include "paal/data_structures/graph_metrics.hpp"
+#include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/data_structures/facility_location_solution.hpp"
-#include "paal/data_structures/simple_cycle.hpp"
-#include "paal/simple_algo/cycle_algo.hpp"
+#include "paal/data_structures/cycle/simple_cycle.hpp"
+#include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 #include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include "paal/helpers/type_functions.hpp"

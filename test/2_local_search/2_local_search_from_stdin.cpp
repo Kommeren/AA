@@ -6,8 +6,8 @@
 #include <string>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
-#include "paal/simple_algo/cycle_algo.hpp"
-#include "paal/data_structures/simple_cycle.hpp"
+#include "paal/data_structures/cycle/cycle_algo.hpp"
+#include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/local_search/components.hpp"
 
 #include "utils/logger.hpp"

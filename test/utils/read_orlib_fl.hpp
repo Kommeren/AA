@@ -8,7 +8,7 @@
 #ifndef READ_ORLIB_FC_HPP
 #define READ_ORLIB_FC_HPP
 
-#include "paal/data_structures/basic_metrics.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 #include "utils/logger.hpp"
 
 namespace paal {

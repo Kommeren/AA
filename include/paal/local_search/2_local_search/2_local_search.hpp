@@ -16,7 +16,7 @@
 #include "paal/local_search/2_local_search/2_local_search_updater.hpp"
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
-#include "paal/data_structures/cycle_start_from_last_change.hpp"
+#include "paal/data_structures/cycle/cycle_start_from_last_change.hpp"
 
 namespace paal {
 namespace local_search {

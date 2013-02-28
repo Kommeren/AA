@@ -25,31 +25,31 @@ int f(int x) {
     return -x*x + 12 * x -27;
 }
 
-struct NG {
+struct GetNeigh {
     typedef typename std::vector<int>::const_iterator Iter;
     const std::vector<int> neighb;
 public:
 
-    NG() : neighb{10, -10, 1, -1} {}
+    GetNeigh() : neighb{10, -10, 1, -1} {}
 
     std::pair<Iter, Iter> operator()(int x) {
         return std::make_pair(neighb.begin(), neighb.end());
     }
 };
 
-struct CII {
+struct Gain {
     int operator()(int s, int u) {
         return f(s + u) - f(s);
     }
 };
 
-struct SU {
+struct UpdateSolution {
     void operator()(int & s, int u) {
         s = s + u;
     }
 };
 
-typedef  SearchComponents<NG, CII, SU> SearchComp;
+typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search

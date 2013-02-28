@@ -17,7 +17,7 @@
 #include "paal/helpers/contract_bgl_adjaceny_matrix.hpp"
 
 #include "paal/data_structures/voronoi.hpp"
-#include "paal/data_structures/graph_metrics.hpp"
+#include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search.hpp"
 
 namespace paal {
