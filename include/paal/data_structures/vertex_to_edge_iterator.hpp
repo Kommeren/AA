@@ -8,7 +8,7 @@
 #ifndef VERTEXTOEDNGEITERATOR_HPP
 #define VERTEXTOEDNGEITERATOR_HPP 
 
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -16,7 +16,7 @@ namespace data_structures {
 template <typename VertexIterator>
 class VertexToEdgeIterator  {
 public:
-    typedef typename helpers::IterToElem<VertexIterator>::type Vertex;
+    typedef typename utils::IterToElem<VertexIterator>::type Vertex;
     typedef std::pair<Vertex, Vertex> Edge;
 
     typedef std::forward_iterator_tag iterator_category;

@@ -19,7 +19,7 @@
 #include <iostream>
 #include <string>*/
 
-#include "paal/helpers/iterator_helpers.hpp"
+#include "paal/utils/iterator_utils.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -32,7 +32,7 @@ public:
     BiMap() {}
 
     template <typename Iter> BiMap(Iter b, Iter e) {
-        for(const T & t : helpers::make_range(b,e)) {
+        for(const T & t : utils::make_range(b,e)) {
             add(t);
         }
     }

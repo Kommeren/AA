@@ -12,7 +12,7 @@
 #include "paal/data_structures/bimap.hpp"
 
 namespace paal {
-namespace helpers {
+namespace utils {
 
 template <typename Metric>
 class MetricOnIdx {

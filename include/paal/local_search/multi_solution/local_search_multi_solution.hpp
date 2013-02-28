@@ -14,7 +14,7 @@
 
 #include "local_search_multi_solution_concepts.hpp"
 #include "trivial_stop_condition_multi_solution.hpp"
-#include "paal/helpers/iterator_helpers.hpp"
+#include "paal/utils/iterator_utils.hpp"
 
 namespace paal {
 namespace local_search {
@@ -51,7 +51,7 @@ class LocalSearchStepMultiSolution {
       static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
                     std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
     
-    typedef typename helpers::SolToElem<Solution>::type SolutionElement;
+    typedef typename utils::SolToElem<Solution>::type SolutionElement;
     typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
     
 public:
@@ -77,7 +77,7 @@ public:
 
         for(const SolutionElement & r : m_solution) {
             auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution, r);
-            for(const Update & update : helpers::make_range(adjustmentSet)) {
+            for(const Update & update : utils::make_range(adjustmentSet)) {
                 if(m_searchComponents.gain()(m_solution, r, update) > 0) {
                     m_searchComponents.updateSolution()(m_solution, r, update);
                     return true;
@@ -95,7 +95,7 @@ public:
     }
 
     // TODO it is not optional :)
-    typename std::enable_if<helpers::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
+    typename std::enable_if<utils::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type getSolution() {
         return m_solution.get();
     }
     

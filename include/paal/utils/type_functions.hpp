@@ -14,7 +14,7 @@
 
 
 namespace paal {
-namespace helpers {
+namespace utils {
 
 #define HAS_MEMBER_CLASS(member) \
 template <typename T> \
@@ -84,7 +84,7 @@ template <typename T> struct kTuple<T, 1> {
     typedef std::tuple<T> type;
 };
 
-} //helpers
+} //utils
 } //paal
 
 #endif //TYPE_FUNCTIONS_HPP

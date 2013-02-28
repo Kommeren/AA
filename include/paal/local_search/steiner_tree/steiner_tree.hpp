@@ -10,9 +10,8 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/range/any_range.hpp>
 
-#include "paal/helpers/iterator_helpers.hpp"
-#include "paal/helpers/functors_to_paal_functors.hpp"
-#include "paal/helpers/contract_bgl_adjaceny_matrix.hpp"
+#include "paal/utils/iterator_utils.hpp"
+#include "paal/utils/contract_bgl_adjaceny_matrix.hpp"
 
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
@@ -32,7 +31,7 @@ public:
     typedef typename Metric::VertexType VertexType;
     static const int SUSBSET_SIZE = 3;
 
-    typedef typename helpers::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
+    typedef typename utils::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
     typedef boost::tuple<const ThreeTuple &, Dist> Update;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
@@ -73,7 +72,7 @@ public:
 
         typedef local_search::LocalSearchStep<AMatrix, 
                     decltype(sc), search_strategies::SteepestSlope>  LS;
-        LS ls(helpers::metricToBGLWithIndex(
+        LS ls(utils::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 
                         m_voronoi.getGenerators().end(), 
@@ -101,7 +100,7 @@ private:
     typedef typename gtraits::edge_descriptor SEdge;
     
     //Adjeny Matrix types
-    typedef typename helpers::AdjacencyMatrix<Metric>::type AMatrix;
+    typedef typename utils::AdjacencyMatrix<Metric>::type AMatrix;
     typedef boost::graph_traits<AMatrix> mtraits;
     typedef typename mtraits::edge_descriptor MEdge;
    
@@ -122,8 +121,8 @@ private:
     }
 
     void contract(AMatrix & am ,const ThreeTuple & t) {
-        helpers::contract(am, std::get<0>(t), std::get<1>(t));
-        helpers::contract(am, std::get<1>(t), std::get<2>(t));
+        utils::contract(am, std::get<0>(t), std::get<1>(t));
+        utils::contract(am, std::get<1>(t), std::get<2>(t));
     }
         
     Dist gain(const Update & t){
@@ -142,7 +141,7 @@ private:
         m_subsDists.reserve(std::distance(subRange.first, subRange.second));
         
         //finding nearest vertex to subset
-        for(const ThreeTuple & subset : helpers::make_range(subRange)) {
+        for(const ThreeTuple & subset : utils::make_range(subRange)) {
             //TODO awfull coding, need to be changed to loop
             //There is possible problem, one point could be in two Voronoi regions
             //In our implementation the poin will be in exactly o0ne region and there 
@@ -238,8 +237,8 @@ private:
     void updateSave(const SpanningTree & G1, const SpanningTree & G2, Dist maxDist) {
         auto v1 = vertices(G1);
         auto v2 = vertices(G2);
-        for(VertexType v : helpers::make_range(v1)) {
-            for(VertexType w : helpers::make_range(v2)) {
+        for(VertexType v : utils::make_range(v1)) {
+            for(VertexType w : utils::make_range(v2)) {
                 auto vg = G1.local_to_global(v);
                 auto wg = G2.local_to_global(w);
                 m_save(vg, wg) =  maxDist;

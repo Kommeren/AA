@@ -8,7 +8,7 @@
 #ifndef CYCLE_TRAITS_HPP
 #define CYCLE_TRAITS_HPP 
 
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -16,7 +16,7 @@ namespace data_structures {
 template <typename Cycle>
 struct CycleTraits {
     typedef decltype(std::declval<Cycle>().vbegin()) VertexIterator;
-    typedef typename helpers::IterToElem<VertexIterator>::type CycleElem;
+    typedef typename utils::IterToElem<VertexIterator>::type CycleElem;
 };
 
 }

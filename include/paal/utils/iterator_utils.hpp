@@ -1,5 +1,5 @@
 /**
- * @file iterator_helpers.hpp
+ * @file iterator_utils.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -15,7 +15,7 @@
 #define ITERATOR_HELPERS_HPP
 
 namespace paal {
-namespace helpers {
+namespace utils {
 
 template <typename Iterator> class IteratorWithExcludedElement : 
     public boost::filter_iterator<std::function<bool(const typename IterToElem<Iterator>::type &)>, Iterator> {
@@ -56,7 +56,7 @@ range<T> make_range(T b, T e) {
 }
 
 
-} //helpers
+} //utils
 } //paal
 
 #endif // ITERATOR_HELPERS_HPP

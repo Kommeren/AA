@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         auto resRange = boost::join(terminals, selectedSteinerPoints);
         LOG_COPY_DEL(boost::begin(resRange), boost::end(resRange), ",");
         paal::data_structures::BiMap<int> idx;
-        auto g = paal::helpers::metricToBGLWithIndex(m, boost::begin(resRange), boost::end(resRange), idx);
+        auto g = paal::utils::metricToBGLWithIndex(m, boost::begin(resRange), boost::end(resRange), idx);
         std::vector<int> pm(resRange.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
-        paal::helpers::MetricOnIdx<Metric> idxM(m, idx);
+        paal::utils::MetricOnIdx<Metric> idxM(m, idx);
         int res(0);
         for(int i : boost::irange(0, int(pm.size()))) {
             res += idxM(i, pm[i]);

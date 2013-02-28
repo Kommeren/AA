@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <functional>
 
-#include "paal/helpers/iterator_helpers.hpp"
+#include "paal/utils/iterator_utils.hpp"
 #include "local_search_concepts.hpp"
 
 namespace paal {
@@ -64,7 +64,7 @@ public:
         bool search() {
             auto adjustmentSet = this->m_searchComponents.getNeighborhood()(this->m_solution);
 
-            for(const Update & update : helpers::make_range(adjustmentSet)) {
+            for(const Update & update : utils::make_range(adjustmentSet)) {
                 if(this->m_searchComponents.gain()(this->m_solution, update) > 0) {
                     this->m_searchComponents.updateSolution()(this->m_solution, update);
                     return true;

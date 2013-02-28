@@ -7,7 +7,7 @@
  */
 #include <boost/concept_check.hpp>
 #include <type_traits>
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/search_traits.hpp"
 
@@ -43,7 +43,7 @@ class MultiSolution  {
 
 template <typename X, typename Solution, typename SearchComponents> 
 class MultiConceptsBase {
-    typedef typename helpers::SolToElem<Solution>::type SolutionElement;
+    typedef typename utils::SolToElem<Solution>::type SolutionElement;
 protected:
     typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
     X x;

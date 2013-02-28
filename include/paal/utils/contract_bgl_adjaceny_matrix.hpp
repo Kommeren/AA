@@ -11,7 +11,7 @@
 #include <boost/graph/adjacency_matrix.hpp>
 
 namespace paal {
-namespace helpers {
+namespace utils {
 
 //template <typename Idx, typename... Args>
 //On gcc 4.6 I get sorry unimplemented ... !!!
@@ -32,7 +32,7 @@ boost::adjacency_matrix<Directed,
     typedef typename mtraits::edge_descriptor MEdge;
     auto const & weight_map = boost::get(boost::edge_weight, amatrix);
     weight_map[boost::edge(v, w, amatrix).first] = 0;
-    for(const MEdge & e : helpers::make_range(boost::out_edges(v, amatrix))) {
+    for(const MEdge & e : utils::make_range(boost::out_edges(v, amatrix))) {
         MEdge  f = boost::edge(w, boost::target(e, amatrix), amatrix).first;
         auto & we = weight_map[e];
         auto & wf = weight_map[f];

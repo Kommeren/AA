@@ -216,7 +216,7 @@ In order to present 2-opt we need to introduce some concept and types.
 
 Now we can present implementattion of 2-local-search. <br>
 Note that in the main algorithm we had to define only constructors.<br>
-The rest is done by base class LocalSearchMultiSolution and the implemented helpers.
+The rest is done by base class LocalSearchMultiSolution and the implemented utils.
 
 \include 2_local_search.hpp
 

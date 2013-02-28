@@ -9,7 +9,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 
 #ifndef SUBSET_ITERATOR_HPP
 #define SUBSET_ITERATOR_HPP
@@ -22,8 +22,8 @@ template <typename Iterator,int k> class SubsetsIterator :
     private SubsetsIterator<Iterator, k-1>{
     
 public:
-    typedef typename helpers::IterToElem<Iterator>::type Element;
-    typedef typename helpers::kTuple<Element, k>::type SubsetType; 
+    typedef typename utils::IterToElem<Iterator>::type Element;
+    typedef typename utils::kTuple<Element, k>::type SubsetType; 
     typedef SubsetsIterator<Iterator, k-1> base;
     typedef std::iterator<std::forward_iterator_tag, 
                          SubsetType,
@@ -110,12 +110,12 @@ protected:
 
 template <typename Iterator> class SubsetsIterator<Iterator, 1> : 
     public std::iterator<std::forward_iterator_tag, 
-                         std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator>,
+                         std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator>,
                          ptrdiff_t, 
-                         std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator> *,
-                         const std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator> &> {
+                         std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator> *,
+                         const std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator> &> {
 public:    
-    typedef typename helpers::IterToElem<Iterator>::type Element;
+    typedef typename utils::IterToElem<Iterator>::type Element;
     typedef std::tuple<Element> SubsetType;
 
     SubsetsIterator(Iterator begin, Iterator end ) : 

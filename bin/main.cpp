@@ -18,7 +18,7 @@
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 #include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 
 std::ostream& operator<< (std::ostream &o, const std::pair<int, int> &p) {
     return o << p.first << ',' << p.second;
@@ -29,7 +29,7 @@ using namespace paal::local_search;
 using namespace paal::local_search::facility_location;
 using namespace paal::local_search::two_local_search;
 using namespace paal::data_structures;
-using namespace paal::helpers;
+using namespace paal::utils;
 using namespace boost;
 
 struct XXX {

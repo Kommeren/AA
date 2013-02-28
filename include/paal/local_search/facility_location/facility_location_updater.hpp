@@ -13,7 +13,7 @@ template <typename VertexType> class FacilityLocationUpdater {
 public:
         template <typename Solution, typename Update> 
     void operator()(Solution & s, 
-            const  typename helpers::SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
             const Update & u) {
         auto & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;

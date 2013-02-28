@@ -4,7 +4,7 @@
 #include "paal/data_structures/metric/metric_on_idx.hpp"
 
 namespace paal {
-namespace helpers {
+namespace utils {
 //TODO it would be nice to adapt Matrix + something to bgl
     
 template <typename Metric>  struct AdjacencyMatrix {
@@ -53,5 +53,5 @@ metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
                                   boost::make_transform_iterator(vend, trans));
 }
 
-} //helpers
+} //utils
 } //paal

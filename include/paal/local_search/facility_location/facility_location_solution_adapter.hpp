@@ -6,7 +6,7 @@
  * @date 2013-02-01
  */
 #include "facility_location_solution_element.hpp"
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/object_with_copy.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
@@ -28,7 +28,7 @@ private:
     typedef std::function<Fac(VertexType)> TransFunct;
     template <typename Col> 
     struct Traits {
-        typedef typename helpers::SolToIter<Col>::type ColIter;
+        typedef typename utils::SolToIter<Col>::type ColIter;
         typedef boost::transform_iterator<TransFunct, ColIter> ColTIter;
         typedef std::pair<ColTIter, ColTIter> ColTIterRange;
     };

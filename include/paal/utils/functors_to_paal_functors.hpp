@@ -11,7 +11,7 @@
 #include <utility>
 
 namespace paal {
-namespace helpers {
+namespace utils {
 
 #define FUNCT_TO(className, memberName) \
 template <typename F> class FunctTo##className {\

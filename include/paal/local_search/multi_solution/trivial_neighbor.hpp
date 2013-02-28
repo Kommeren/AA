@@ -10,8 +10,8 @@
 #define TRIVIAL_NEIGHBOR_HPP
 
 #include <utility>
-#include "paal/helpers/iterator_helpers.hpp"
-#include "paal/helpers/type_functions.hpp"
+#include "paal/utils/iterator_utils.hpp"
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace local_search{
@@ -19,12 +19,12 @@ namespace local_search{
 
 struct TrivialNeigborGetter {
     template <typename SolutionElement, typename Solution> 
-                          std::pair<helpers::IteratorWithExcludedElement<typename helpers::SolToConstIter<Solution>::type>, 
-                                    helpers::IteratorWithExcludedElement<typename helpers::SolToConstIter<Solution>::type> > 
+                          std::pair<utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type>, 
+                                    utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type> > 
             
             operator()(const Solution & sol, const SolutionElement &e) {
-                typedef typename helpers::SolToConstIter<Solution>::type SolutionIterator;
-                typedef helpers::IteratorWithExcludedElement<SolutionIterator> OutIter;
+                typedef typename utils::SolToConstIter<Solution>::type SolutionIterator;
+                typedef utils::IteratorWithExcludedElement<SolutionIterator> OutIter;
                 SolutionIterator begin = sol.begin();
                 SolutionIterator end = sol.end();
                 return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));        
