@@ -10,13 +10,13 @@
 
 #include "paal/helpers/type_functions.hpp"
 
-namespace  paal {
-namespace helpers {
+namespace paal {
+namespace data_structures {
 
 template <typename VertexIterator>
 class VertexToEdgeIterator  {
 public:
-    typedef typename IterToElem<VertexIterator>::type Vertex;
+    typedef typename helpers::IterToElem<VertexIterator>::type Vertex;
     typedef std::pair<Vertex, Vertex> Edge;
 
     typedef std::forward_iterator_tag iterator_category;
@@ -100,8 +100,8 @@ make_VertexToEdgeIterator(std::pair<VertexIterator, VertexIterator> r) {
     return VertexToEdgeIterator<VertexIterator>(r.first, r.second);
 }
 
+}//data_structures
 }//paal
-}//helpers
 
 
 #endif /* VERTEXTOEDNGEITERATOR_HPP */

@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE cycle
 
 #include <boost/test/unit_test.hpp>
-#include "paal/helpers/vertex_to_edge_iterator.hpp"
+#include "paal/data_structures/vertex_to_edge_iterator.hpp"
 #include "utils/logger.hpp"
 
 #include <vector>
@@ -10,7 +10,7 @@
 using std::string;
 using std::vector;
 
-using namespace paal::helpers;
+using namespace paal::data_structures;
 
 struct T {
     typedef typename vector<string>::iterator iter;

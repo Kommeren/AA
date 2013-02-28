@@ -6,7 +6,9 @@
  * @date 2013-02-22
  */
 #ifndef CONTRACT_BGL_ADJACENY_MATRIX_HPP
-#define CONTRACT_BGL_ADJACENY_MATRIX_HPP 
+#define CONTRACT_BGL_ADJACENY_MATRIX_HPP
+
+#include <boost/graph/adjacency_matrix.hpp>
 
 namespace paal {
 namespace helpers {

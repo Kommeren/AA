@@ -9,21 +9,21 @@
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
-#include "type_functions.hpp"
+#include "paal/helpers/type_functions.hpp"
 
 #ifndef SUBSET_ITERATOR_HPP
 #define SUBSET_ITERATOR_HPP
 
 namespace paal {
-namespace helpers {
+namespace data_structures {
 
 //minor TODO could be more efficient in direct array of iterators inmplementation
 template <typename Iterator,int k> class SubsetsIterator : 
     private SubsetsIterator<Iterator, k-1>{
     
 public:
-    typedef typename IterToElem<Iterator>::type Element;
-    typedef typename kTuple<Element, k>::type SubsetType; 
+    typedef typename helpers::IterToElem<Iterator>::type Element;
+    typedef typename helpers::kTuple<Element, k>::type SubsetType; 
     typedef SubsetsIterator<Iterator, k-1> base;
     typedef std::iterator<std::forward_iterator_tag, 
                          SubsetType,
@@ -110,12 +110,12 @@ protected:
 
 template <typename Iterator> class SubsetsIterator<Iterator, 1> : 
     public std::iterator<std::forward_iterator_tag, 
-                         std::pair<std::tuple<typename IterToElem<Iterator>::type>, Iterator>,
+                         std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator>,
                          ptrdiff_t, 
-                         std::pair<std::tuple<typename IterToElem<Iterator>::type>, Iterator> *,
-                         const std::pair<std::tuple<typename IterToElem<Iterator>::type>, Iterator> &> {
+                         std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator> *,
+                         const std::pair<std::tuple<typename helpers::IterToElem<Iterator>::type>, Iterator> &> {
 public:    
-    typedef typename IterToElem<Iterator>::type Element;
+    typedef typename helpers::IterToElem<Iterator>::type Element;
     typedef std::tuple<Element> SubsetType;
 
     SubsetsIterator(Iterator begin, Iterator end ) : 
@@ -183,7 +183,7 @@ make_SubsetsIteratorrange(Iterator b, Iterator e)  {
      return std::make_pair(SI(b,e), SI(e,e));
 }
 
-} //helpers
+} //data_structures
 } //paal
 
 #endif // SUBSET_ITERATOR_HPP

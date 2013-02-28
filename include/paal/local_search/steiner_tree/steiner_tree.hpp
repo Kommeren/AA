@@ -11,11 +11,11 @@
 #include <boost/range/any_range.hpp>
 
 #include "paal/helpers/iterator_helpers.hpp"
-#include "paal/helpers/subset_iterator.hpp"
-#include "paal/helpers/metric_to_bgl.hpp"
 #include "paal/helpers/functors_to_paal_functors.hpp"
 #include "paal/helpers/contract_bgl_adjaceny_matrix.hpp"
 
+#include "paal/data_structures/subset_iterator.hpp"
+#include "paal/data_structures/metric/metric_to_bgl.hpp"
 #include "paal/data_structures/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search.hpp"
@@ -109,10 +109,10 @@ private:
     typedef std::vector<Dist> ThreeSubsetsDists;
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
 
-        template <typename Iter> std::pair<helpers::SubsetsIterator<Iter,SUSBSET_SIZE>, 
-                                           helpers::SubsetsIterator<Iter,SUSBSET_SIZE>>        
+        template <typename Iter> std::pair<data_structures::SubsetsIterator<Iter,SUSBSET_SIZE>, 
+                                           data_structures::SubsetsIterator<Iter,SUSBSET_SIZE>>        
     makeThreeSubsetRange(Iter b, Iter e) {
-        return helpers::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE>(b,e);
+        return data_structures::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE>(b,e);
     }
 
     void uniqueRes(ResultSteinerVertices & res) {

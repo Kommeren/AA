@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "paal/helpers/subset_iterator.hpp"
+#include "paal/data_structures/subset_iterator.hpp"
 
 using std::vector;
 
@@ -27,7 +27,7 @@ typedef typename std::vector<int>::iterator It;
 vector<int> v{1,2,3,4,5,6,7};
 
 BOOST_AUTO_TEST_CASE(subset_iterator_test) {
-    auto r =  paal::helpers::make_SubsetsIteratorrange<It, 3>(v.begin(), v.end());
+    auto r =  paal::data_structures::make_SubsetsIteratorrange<It, 3>(v.begin(), v.end());
     typedef std::tuple<int, int, int> tup;
     BOOST_CHECK_EQUAL(std::get<0>(*r.first), 1);
     BOOST_CHECK_EQUAL(std::get<1>(*r.first), 2);
@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(subset_iterator_test) {
 }
 
 void testDist(int i, int res) {
-    auto r =  paal::helpers::make_SubsetsIteratorrange<It, 3>(v.begin(), v.begin() + i);
+    auto r =  paal::data_structures::make_SubsetsIteratorrange<It, 3>(v.begin(), v.begin() + i);
     BOOST_CHECK_EQUAL(distance(r.first, r.second), res);
 }
 

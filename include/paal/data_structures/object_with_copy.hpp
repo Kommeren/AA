@@ -5,6 +5,10 @@
  * @version 1.0
  * @date 2013-02-01
  */
+
+namespace paal {
+namespace data_structures {
+
 template <typename T> class ObjectWithCopy {
 public:
     typedef T ObjectType;
@@ -39,4 +43,7 @@ private:
     mutable T m_copy;
 
 };
+
+} //data_structures
+} //paal
 

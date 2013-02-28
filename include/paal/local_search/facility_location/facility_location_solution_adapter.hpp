@@ -7,7 +7,7 @@
  */
 #include "facility_location_solution_element.hpp"
 #include "paal/helpers/type_functions.hpp"
-#include "paal/helpers/object_with_copy.hpp"
+#include "paal/data_structures/object_with_copy.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>
@@ -35,7 +35,7 @@ private:
     typedef typename Traits<Chosen>::ColTIter ChosenTIter;
     typedef typename Traits<Unchosen>::ColTIter UnchosenTIter;
 public:
-    typedef ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;;    
+    typedef data_structures::ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;;    
     FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : m_sol(std::move(sol)) {}
 
     typedef boost::joined_range<typename Traits<Chosen>::ColTIterRange, 
