@@ -13,7 +13,7 @@
 
 namespace paal {
 namespace local_search {
-namespace local_search_concepts {
+namespace concepts {
 
 template <typename X, typename Solution, typename SearchComponents> 
 class  ConceptsBase {
@@ -83,7 +83,7 @@ public:
     BOOST_CONCEPT_ASSERT((StopCondition<SC, Solution, X>));
 };
 
-} // local_search_concepts
+} // concepts
 } // local_search
 } //paal
  

@@ -17,6 +17,7 @@
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
 #include "paal/data_structures/cycle/cycle_start_from_last_change.hpp"
+#include "paal/data_structures/cycle/cycle_concept.hpp"
 
 namespace paal {
 namespace local_search {
@@ -45,23 +46,24 @@ public :
 };
 
 
-//TODO check cycle concept
 template <typename Cycle,
           typename SearchComponents>
 
 class  TwoLocalSearchStep : 
    public LocalSearchStepMultiSolution<TwoLocalSearchAdapter<data_structures::CycleStartFromLastChange<Cycle>>, SearchComponents>  {
-  
-   typedef data_structures::CycleStartFromLastChange<Cycle> CycleWrap;
-   typedef TwoLocalSearchAdapter<CycleWrap> CycleAdapt;
-   typedef LocalSearchStepMultiSolution<CycleAdapt, SearchComponents> base;
 
-   public:
+    BOOST_CONCEPT_ASSERT((data_structures::concepts::Cycle<Cycle>));
+  
+    typedef data_structures::CycleStartFromLastChange<Cycle> CycleWrap;
+    typedef TwoLocalSearchAdapter<CycleWrap> CycleAdapt;
+    typedef LocalSearchStepMultiSolution<CycleAdapt, SearchComponents> base;
+
+    public:
 
         TwoLocalSearchStep(Cycle c, SearchComponents sc) 
            : base(CycleAdapt(m_cycleS), std::move(sc)), m_cycle(std::move(c)), m_cycleS(m_cycle) {}
 
-   private:
+    private:
        Cycle m_cycle;
        CycleWrap m_cycleS;
 };

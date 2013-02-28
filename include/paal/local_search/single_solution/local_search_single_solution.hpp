@@ -29,7 +29,7 @@ template <typename Solution,
           typename SearchComponents> 
 
 class LocalSearchStepBase {
-    BOOST_CONCEPT_ASSERT((local_search_concepts::SearchComponents<SearchComponents, Solution>));
+    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
 protected:
     LocalSearchStepBase(Solution solution, SearchComponents searchComponents) :
         m_solution(std::move(solution)), m_searchComponents(std::move(searchComponents)) {}
