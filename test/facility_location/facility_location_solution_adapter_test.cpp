@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE facility_location_solution_adapter
 
 #include <boost/test/unit_test.hpp>
-#include "paal/data_structures/facility_location_solution.hpp"
+#include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/voronoi.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 #include "utils/sample_graph.hpp"

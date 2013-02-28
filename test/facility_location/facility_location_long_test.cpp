@@ -19,7 +19,7 @@
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
-#include "paal/simple_algo/fl_algo.hpp"
+#include "paal/data_structures/facility_location/fl_algo.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;

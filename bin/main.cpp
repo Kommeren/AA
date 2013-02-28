@@ -13,7 +13,7 @@
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
-#include "paal/data_structures/facility_location_solution.hpp"
+#include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
