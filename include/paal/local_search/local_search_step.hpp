@@ -95,17 +95,20 @@ In the more general case one can check some additional stop condition and perfor
     class PostSearchActionArchetype {
         void operator()(Solution &);
     }
-    
+</pre>
+The PostSearchAction functor is invoked after each succesfull search step.
+<pre>
     class GlobalStopConditionArchetype {
         bool operator()(Solution &);
     }
 </pre>
+The GlobalStopCondition is checked after each succesfull search step.
 
 Now we introduce the search function interface:
 <pre>
 template <typename LocalSearchStep, 
           typename PostSearchAction = utils::DoNothingFunctor,
-          typename GlobalStopCondition = TrivialGlobalStopCondition>
+          typename GlobalStopCondition = utils::ReturnFalseFunctor>
 bool search(LocalSearchStep & lss, 
             PostSearchAction psa = utils::DoNothingFunctor(),
             GlobalStopCondition gsc = utils::ReturnFalseFunctor());
@@ -113,7 +116,7 @@ bool search(LocalSearchStep & lss,
 
 \subsection local_search_single LOCAL SEARCH SINGLE SOLUTION STEP
 
-In order to present the LS interface we need to introduce several concepts.<br>
+In order to present the local search step interface we need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of single update. <br>
 <i>UpdateIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the updates collection. <br><br>
 
@@ -124,6 +127,7 @@ Concepts:
     GetNeighborhoodArchetype {
         UpdateIteratorsRange operator()(const Solution & s)
     }
+    </li>
     </pre>
     <li> <i>Gain</i> is a concept class responsible for checking if the specific update element improve the solution.
     <pre>
@@ -131,6 +135,7 @@ Concepts:
         int operator()(const Solution & s, const Update & update);
     }
     </pre>
+    </li>
     <li> <i>UpdateSolution</i> is a concept class responsible for updating the solution with the Update.
     <pre>
     UpdateSolutionArchetype {
@@ -138,12 +143,14 @@ Concepts:
     }
     </pre>
     
+    </li>
     <li> <i>StopCondition</i> is a concept class responsible for stop condition.
     <pre>
     StopConditionArchetype {
         bool operator()(const Solution & s, const Update & update);
     }
     </pre>
+    </li>
     <li> <i>SearchComponents</i>All of the previous concepts are grouped togheter into one class.
     <pre>
     SearchComponentsArchetype {
@@ -153,9 +160,7 @@ Concepts:
         StopCondition & stopCondition();
     }
     </pre>
-    
-
-
+    </li>
 </ol>
 
 Now we can introduce the paal::local_search::LocalSearchStep interface.
@@ -168,9 +173,9 @@ In this problem solution is just a integral and update is also a number which de
 So new potential solution is just old solution plus the update.
 We start with defining search components, that is:
 <ol>
-<li> GetNeighborhood functor
-<li> Gain functor
-<li> UpdateSolution functor
+<li> GetNeighborhood functor </li>
+<li> Gain functor </li>
+<li> UpdateSolution functor </li>
 </ol>
 Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
 
@@ -196,7 +201,9 @@ Concepts:
         SolutionElementIterator end();
         InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
                              // The inner solution type is InnerSolution
+                             // If this member fuction is provided, the LocalSearchStep getSolution() returns InnerSolution.
     }
+    </pre>
     <li> <i>MultiGetNeighborhood</i>  is a concept class responisble for getting the neighborhood of the current solution  
     <pre>
     MultiGetNeighborhoodArchetype {
@@ -235,10 +242,27 @@ Concepts:
 
 </ol>
 
-Now we present the paal::local_search::LocalSearchStepMultiSolution inteface.
+Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface.
 
-</pre>
-<br>
+\subsubsection Example
+full example: local_search_multi_solution_example.cpp
+
+In this example we are going to maximize function<br> x1*x2 + x2*x3 + x3*x1 -3*x1*x2*x3<br> for  x1, x2, x3 in <0,1> interval.<br> 
+In this problem solution is just a float vector, solution element is float and update is also a float which denotes the new value for solution element.
+We start with defining search components, that is:
+<ol>
+<li> GetNeighborhood functor
+<li> Gain functor
+<li> UpdateSolution functor
+</ol>
+Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
+
+\snippet local_search_multi_solution_example.cpp Local Search Components Example
+
+After we've defined components we run LS.
+
+\snippet local_search_multi_solution_example.cpp Local Search Example
+
 
 \section two_opt 2-opt FOR TSP 
 
@@ -279,28 +303,7 @@ Basic usage of this algorithm is extremely simple and elegant. <br> We are using
 Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
  
 */
-#include "single_solution/local_search_single_solution.hpp"
-#include "single_solution/local_search_single_solution_obj_function.hpp"
-#include "multi_solution/local_search_multi_solution.hpp"
+#include "single_solution_step/local_search_single_solution.hpp"
+#include "single_solution_step/local_search_single_solution_obj_function.hpp"
+#include "multi_solution_step/local_search_multi_solution.hpp"
 
-#include "paal/utils/do_notihng_functor.hpp"
-
-namespace paal {
-namespace local_search {
-
-template <typename LocalSearchStep, 
-          typename PostSearchAction = utils::DoNothingFunctor,
-          typename GlobalStopCondition = utils::ReturnFalseFunctor>
-bool search(LocalSearchStep & lss, 
-            PostSearchAction psa = utils::DoNothingFunctor(),
-            GlobalStopCondition gsc = utils::ReturnFalseFunctor()) {
-    bool ret = false;  
-    while(lss.search() && !gsc(lss.getSolution())) {
-        ret = true;
-        psa(lss.getSolution());
-    }
-    return ret;
-}
-
-}
-}

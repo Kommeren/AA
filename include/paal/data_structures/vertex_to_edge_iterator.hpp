@@ -1,12 +1,12 @@
 /**
- * @file VertexToEdngeIterator.hpp
+ * @file vertex_to_edge_iterator.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-20
  */
-#ifndef VERTEXTOEDNGEITERATOR_HPP
-#define VERTEXTOEDNGEITERATOR_HPP 
+#ifndef VERTEX_TO_EDGE_ITERATOR_HPP
+#define VERTEX_TO_EDGE_ITERATOR_HPP 
 
 #include "paal/utils/type_functions.hpp"
 
@@ -104,4 +104,4 @@ make_VertexToEdgeIterator(std::pair<VertexIterator, VertexIterator> r) {
 }//paal
 
 
-#endif /* VERTEXTOEDNGEITERATOR_HPP */
+#endif /* VERTEX_TO_EDGE_ITERATOR_HPP */

@@ -1,5 +1,5 @@
 /**
- * @file 2_local_search_operator()r.hpp
+ * @file 2_local_search_updater.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

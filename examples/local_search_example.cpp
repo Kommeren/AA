@@ -1,19 +1,15 @@
 /**
- * @file local_search.cpp
- * @brief 
+ * @file local_search_example.cpp
+ * @brief local search example 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE local_search_test
-
-#include <boost/test/unit_test.hpp>
-
 #include <vector>
+#include <iostream>
 
 #include "paal/local_search/local_search_step.hpp"
-#include "utils/logger.hpp"
 
 using namespace  paal::local_search;
 using namespace  paal;
@@ -48,41 +44,18 @@ struct UpdateSolution {
 };
 
 typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
-   
-ON_LOG(int i = 0);
-auto logAction = [&](int s) {
-   LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
-};
 
 //! [Local Search Components Example]
 
-BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+int main() {
 //! [Local Search Example]
    //creating local search
    LocalSearchStep<int, SearchComp> ls;
 
-   //printing
-   int & solution = ls.getSolution();
-   LOG("f("<< solution <<") \t" << f(solution));
-
    //search
-   BOOST_CHECK(search(ls, logAction));
+   search(ls);
+   std::cout << "Local search solution: " <<  ls.getSolution() << std::endl;
 //! [Local Search Example]
-   BOOST_CHECK_EQUAL(solution, 6);
+  return 0; 
 }
 
-
-BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
-   //creating local search
-   LocalSearchStep<int, SearchComp, search_strategies::SteepestSlope> ls;
-
-   //printing 
-   auto const & s = ls.getSolution();
-   LOG("f("<< s <<") \t" << f(s));
-   ON_LOG(i = 0);
-   
-   //search
-   BOOST_CHECK(search(ls, logAction));
-
-   BOOST_CHECK_EQUAL(s, 6);
-}

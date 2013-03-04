@@ -1,5 +1,5 @@
 /**
- * @file trivial_solution_operator()r.hpp
+ * @file trivial_solution_updater.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

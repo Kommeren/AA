@@ -14,6 +14,7 @@
 #include <functional>
 
 #include "paal/utils/iterator_utils.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "local_search_concepts.hpp"
 
 namespace paal {

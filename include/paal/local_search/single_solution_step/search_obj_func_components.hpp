@@ -1,5 +1,5 @@
 /**
- * @file search_ocj_func_components.hpp
+ * @file search_obj_func_components.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

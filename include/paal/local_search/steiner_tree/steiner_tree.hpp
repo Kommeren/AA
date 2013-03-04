@@ -17,7 +17,7 @@
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
 #include "paal/data_structures/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
-#include "paal/local_search/local_search.hpp"
+#include "paal/local_search/local_search_step.hpp"
 
 namespace paal {
 namespace local_search {

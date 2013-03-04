@@ -1,5 +1,5 @@
 /**
- * @file local_search_multi_solution/trivial_neighbor.hpp
+ * @file local_search_multi_solution.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -13,6 +13,7 @@
 #include <functional>
 
 #include "local_search_multi_solution_concepts.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_traits.hpp"
 #include "paal/utils/type_functions.hpp"
 
@@ -69,6 +70,7 @@ class LocalSearchStepMultiSolution :
     typedef LocalSearchStepMultiSolutionBase<Solution, MultiSearchComponents> base;
     static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
                     std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
+    typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
 public:
 
     LocalSearchStepMultiSolution(Solution solution = Solution(), MultiSearchComponents sc = MultiSearchComponents()) : 
@@ -85,7 +87,7 @@ public:
      */
     bool search() {
 
-        for(const SolutionElement & r : m_solution) {
+        for(SolElementRef r : m_solution) {
             auto adjustmentSet = this->m_searchComponents.getNeighborhood()(m_solution, r);
             for(const Update & update : utils::make_range(adjustmentSet)) {
                 if(this->m_searchComponents.gain()(m_solution, r, update) > 0) {

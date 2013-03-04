@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#include <functional>
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
