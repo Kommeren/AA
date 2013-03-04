@@ -16,7 +16,7 @@ template <
           typename GetNeighborhood, 
           typename ObjectiveFunction, 
           typename UpdateSolution = TrivialUpdateSolution,
-          typename StopCondition = TrivialStopCondition> 
+          typename StopCondition = utils::ReturnFalseFunctor> 
 class SearchObjFunctionComponents {
 public:
     SearchObjFunctionComponents(GetNeighborhood ng = GetNeighborhood(), 

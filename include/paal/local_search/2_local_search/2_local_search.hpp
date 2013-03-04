@@ -10,7 +10,6 @@
 #define TWO_LOCAL_SEARCH_HPP
 
 #include "paal/local_search/multi_solution/trivial_neighbor.hpp"
-#include "paal/local_search/multi_solution/trivial_stop_condition_multi_solution.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
 #include "paal/local_search/2_local_search/2_local_search_updater.hpp"
@@ -25,7 +24,7 @@ namespace two_local_search {
 
 template <typename Gain, 
           typename GetNeighborhood = TrivialNeigborGetter, 
-          typename StopCondition = TrivialStopConditionMultiSolution> 
+          typename StopCondition = utils::ReturnFalseFunctor> 
 class TwoLocalComponents : 
     public MultiSearchComponents<
             GetNeighborhood, 
@@ -82,13 +81,13 @@ class  TwoLocalSearchStep :
  */
 template <typename Gain, 
           typename GetNeighborhood = TrivialNeigborGetter,
-          typename StopCondition = TrivialStopConditionMultiSolution>
+          typename StopCondition = utils::ReturnFalseFunctor>
 
 TwoLocalComponents<Gain, GetNeighborhood, StopCondition>  
 
     make_TwoLocalSearchComponents(Gain ch, 
             GetNeighborhood ng = TrivialNeigborGetter(),
-            StopCondition sc = TrivialStopConditionMultiSolution()) {
+            StopCondition sc = utils::ReturnFalseFunctor()) {
 
     return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }

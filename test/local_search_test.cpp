@@ -51,6 +51,11 @@ struct UpdateSolution {
 };
 
 typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+   
+ON_LOG(int i = 0);
+auto logAction = [&](int s) {
+   LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
+};
 
 //! [Local Search Components Example]
 
@@ -60,15 +65,11 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    LocalSearchStep<int, SearchComp> ls;
 
    //printing
-   int solution = ls.getSolution();
+   int & solution = ls.getSolution();
    LOG("f("<< solution <<") \t" << f(solution));
-   ON_LOG(int i = 0);
 
    //search
-   while(ls.search()) {
-       //printing
-       LOG("f("<< solution <<") \t" << f(solution)  << " after " << ++i);
-   }
+   BOOST_CHECK(search(ls, logAction));
 //! [Local Search Example]
    BOOST_CHECK_EQUAL(solution, 6);
 }
@@ -81,14 +82,10 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
    //printing 
    auto const & s = ls.getSolution();
    LOG("f("<< s <<") \t" << f(s));
-#ifdef LOGGER_ON
-   int i = 0;
-#endif
-
+   ON_LOG(i = 0);
+   
    //search
-   while(ls.search()) {
-       //printing
-       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
-   }
+   BOOST_CHECK(search(ls, logAction));
+
    BOOST_CHECK_EQUAL(s, 6);
 }

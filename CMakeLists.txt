@@ -2,6 +2,7 @@ include(const.cmake)
 set(SOURCE_DIR ${PROJECT_DIR}/include) 
 set(BIN_DIR ${PROJECT_DIR}/bin) 
 set(TEST_DIR ${PROJECT_DIR}/test) 
+set(EXAMPLE_DIR ${PROJECT_DIR}/examples) 
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -31,6 +32,7 @@ ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK)
 #set(CMAKE_BUILD_TYPE Release)
 
 file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
+file(GLOB_RECURSE example_bins "${EXAMPLE_DIR}/*.cpp")
 
 message(${test_bins})
 
@@ -39,7 +41,14 @@ target_link_libraries (main)
 
 foreach(t ${test_bins})
     get_filename_component(n ${t} NAME_WE)
-    message("adding test file" : ${n})
+    message("adding test " : ${n})
+    add_executable(${n} ${t})
+    target_link_libraries (${n} ${Boost_LIBRARIES}) 
+endforeach()
+
+foreach(t ${example_bins})
+    get_filename_component(n ${t} NAME_WE)
+    message("adding examaple " : ${n})
     add_executable(${n} ${t})
     target_link_libraries (${n} ${Boost_LIBRARIES}) 
 endforeach()

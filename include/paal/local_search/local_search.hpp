@@ -76,8 +76,42 @@ We find this algorithm schema  extremely useful in our implementation! <br>
 We will refer to this schema as LocalSearchMultiSolution. <br>
 Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
-\section local_search_interface  LOCAL SEARCH INTERFACE 
-\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION 
+\section local_search_interface  LOCAL SEARCH INTERFACE
+Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we anderstend one lookup of the neighborhood. The lookup is finished by one update if the better solution is found.
+So the LocalSearchStep archepyte is of the form:
+<pre>
+   class LocalSearchStepArchetype {
+       //perform one step of local search
+       bool search();
+
+       //get solution
+       Solution & getSolution();
+   }
+</pre>
+
+The LocalSearchStep is actually the core of the design. In the simplest variant, if we've  got th LocalSearchStep, all we have to do is to run search as long as it's  returning true.
+In the more general case one can check some additional stop condition and perform some operations between the local search steps. In order to make it possible we introduce two additional concepts:
+<pre>
+    class PostSearchActionArchetype {
+        void operator()(Solution &);
+    }
+    
+    class GlobalStopConditionArchetype {
+        bool operator()(Solution &);
+    }
+</pre>
+
+Now we introduce the search function interface:
+<pre>
+template <typename LocalSearchStep, 
+          typename PostSearchAction = utils::DoNothingFunctor,
+          typename GlobalStopCondition = TrivialGlobalStopCondition>
+bool search(LocalSearchStep & lss, 
+            PostSearchAction psa = utils::DoNothingFunctor(),
+            GlobalStopCondition gsc = utils::ReturnFalseFunctor());
+</pre>
+
+\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION STEP
 
 In order to present the LS interface we need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of single update. <br>
@@ -127,6 +161,7 @@ Concepts:
 Now we can introduce the paal::local_search::LocalSearchStep interface.
 
 \subsubsection Example
+full example: local_search_example.cpp
 
 In this example we are going to maximize function -x^2 + 12x -27 for integral x. 
 In this problem solution is just a integral and update is also a number which denotes the shift on the solution.
@@ -139,11 +174,11 @@ We start with defining search components, that is:
 </ol>
 Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
 
-\snippet local_search_test.cpp Local Search Components Example
+\snippet local_search_example.cpp Local Search Components Example
 
 After we've defined components we run LS.
 
-\snippet local_search_test.cpp Local Search Example
+\snippet local_search_example.cpp Local Search Example
 
 \subsection local_search_multi LOCAL SEARCH MULTI SOLUTION 
 
@@ -247,3 +282,25 @@ Although the basic usage is very simple, the sophisticated user can still easily
 #include "single_solution/local_search_single_solution.hpp"
 #include "single_solution/local_search_single_solution_obj_function.hpp"
 #include "multi_solution/local_search_multi_solution.hpp"
+
+#include "paal/utils/do_notihng_functor.hpp"
+
+namespace paal {
+namespace local_search {
+
+template <typename LocalSearchStep, 
+          typename PostSearchAction = utils::DoNothingFunctor,
+          typename GlobalStopCondition = utils::ReturnFalseFunctor>
+bool search(LocalSearchStep & lss, 
+            PostSearchAction psa = utils::DoNothingFunctor(),
+            GlobalStopCondition gsc = utils::ReturnFalseFunctor()) {
+    bool ret = false;  
+    while(lss.search() && !gsc(lss.getSolution())) {
+        ret = true;
+        psa(lss.getSolution());
+    }
+    return ret;
+}
+
+}
+}

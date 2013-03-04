@@ -8,9 +8,8 @@
 #ifndef SEARCH_COMPONENTS_HPP
 #define SEARCH_COMPONENTS_HPP 
 
-#include "paal/local_search/single_solution/trivial_stop_condition.hpp"
-#include "paal/local_search/multi_solution/trivial_stop_condition_multi_solution.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/do_notihng_functor.hpp"
 
 namespace paal {
 namespace local_search {
@@ -19,7 +18,7 @@ namespace local_search {
 template <typename GetNeighborhood, 
           typename Gain, 
           typename UpdateSolution,
-          typename StopCondition = TrivialStopCondition> 
+          typename StopCondition = utils::ReturnFalseFunctor> 
 class SearchComponents {
 public:
     SearchComponents(GetNeighborhood ng = GetNeighborhood(), 
@@ -74,7 +73,7 @@ private:
 template <typename GetNeighborhood, 
           typename Gain, 
           typename UpdateSolution,
-          typename StopCondition = TrivialStopConditionMultiSolution> 
+          typename StopCondition = utils::ReturnFalseFunctor> 
 class MultiSearchComponents : 
     public SearchComponents<
                 GetNeighborhood, 
@@ -97,7 +96,7 @@ public:
 template <typename GetNeighborhood, 
           typename Gain, 
           typename UpdateSolution,
-          typename StopCondition = TrivialStopCondition>
+          typename StopCondition = utils::ReturnFalseFunctor>
 SearchComponents<GetNeighborhood, Gain, UpdateSolution, StopCondition>
  make_SearchComponents(GetNeighborhood ng = GetNeighborhood(), 
                             Gain ic = Gain(), 
