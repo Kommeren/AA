@@ -271,30 +271,10 @@ Now we can draw for you interface and the example implementation and usage of 2_
 In order to present 2-opt we need to introduce some concept and types. 
 
 <ol>
-<li> VertexType - denotes type of the TSP vertex.
-<li> Metric need to have fulfill the interface: 
-<pre>
-    MetricArchetype {
-        DistanceType operator()(VertexType,VertexType);
-    }
-</pre> 
-
-<li>  Cycle need to fulfill the interface: 
-<pre>
-    CycleArchetype {
-        void flip(VertexType,VertexType);
-        vbegin(VertexType v);
-        vbegin();
-        vend();
-    }
-</pre> 
-</ol>
 
 Now we can present implementattion of 2-local-search. <br>
 Note that in the main algorithm we had to define only constructors.<br>
 The rest is done by base class LocalSearchMultiSolution and the implemented utils.
-
-\include 2_local_search.hpp
 
 Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
 

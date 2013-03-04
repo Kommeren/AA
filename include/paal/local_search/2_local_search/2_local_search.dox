@@ -1,3 +1,13 @@
 /*! \page two_local_search 2 Local Search For TSP
-costam
+\section two_opt 2-opt FOR TSP 
+
+Now we can draw for you interface and the example implementation and usage of 2_local_search for TSP. <br><br>
+
+Two local search uses \ref metric concept and \ref cycle concept. 
+
+Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
+
+\snippet 2_local_search_example.cpp Two Local Search Example
+
+Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
 */
