@@ -6,7 +6,7 @@
  * @date 2013-02-01
  */
 
-/*! \page local_search Local Search The PAAl.Local Search  Library
+/*! \page local_search Local Search
 Index:
 <ul>
     <li> \ref Preliminaries - containing preliminaries to Local Search and our interpretation of it.
@@ -303,6 +303,8 @@ Basic usage of this algorithm is extremely simple and elegant. <br> We are using
 Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
  
 */
+
+
 #include "single_solution_step/local_search_single_solution.hpp"
 #include "single_solution_step/local_search_single_solution_obj_function.hpp"
 #include "multi_solution_step/local_search_multi_solution.hpp"

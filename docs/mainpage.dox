@@ -20,9 +20,26 @@
 
   \section Contents
     The library consists of several sublibraries
-    <ol>
-    <li>\ref local_search
-    </ol>
+    <ul> 
+    <li> Algorithms
+        <ul>
+        <li>\ref local_search
+            <ul>
+            <li>\ref two_local_search
+            <li>\ref uncapaciated facility location
+        </ul>
+        <li> miscellaneous
+            <ul>
+            <li>\ref steiner_tree
+            </ul>
+        </ul>
+    <li> Data Structures
+        <ul>
+        <li>\ref metric
+        <li>\ref cycle
+        <li>\ref object_with_copy
+        </ul>
+    </ul>
 
   \section general_design General Design  
    
