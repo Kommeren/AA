@@ -262,25 +262,6 @@ Note that we don't define StopCondition i.e. we're using default TrivialStopCond
 After we've defined components we run LS.
 
 \snippet local_search_multi_solution_example.cpp Local Search Example
-
-
-\section two_opt 2-opt FOR TSP 
-
-Now we can draw for you interface and the example implementation and usage of 2_local_search for TSP. <br><br>
-
-In order to present 2-opt we need to introduce some concept and types. 
-
-<ol>
-
-Now we can present implementattion of 2-local-search. <br>
-Note that in the main algorithm we had to define only constructors.<br>
-The rest is done by base class LocalSearchMultiSolution and the implemented utils.
-
-Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
-
-\snippet 2_local_search_test.cpp Two Local Search Example
-
-Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br><br><br><br><br><br>
  
 */
 
