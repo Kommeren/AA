@@ -21,6 +21,7 @@ using std::vector;
 using namespace  paal::local_search;
 using namespace  paal;
 
+//! [Local Search Components Example]
 int f(int x) {
     return -x*x + 12 * x -27;
 }
@@ -51,23 +52,25 @@ struct UpdateSolution {
 
 typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
 
+//! [Local Search Components Example]
+
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+//! [Local Search Example]
    //creating local search
    LocalSearchStep<int, SearchComp> ls;
 
    //printing
-   auto const & s = ls.getSolution();
-   LOG("f("<< s <<") \t" << f(s));
-#ifdef LOGGER_ON
-   int i = 0;
-#endif
+   int solution = ls.getSolution();
+   LOG("f("<< solution <<") \t" << f(solution));
+   ON_LOG(int i = 0);
 
    //search
    while(ls.search()) {
        //printing
-       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
+       LOG("f("<< solution <<") \t" << f(solution)  << " after " << ++i);
    }
-   BOOST_CHECK_EQUAL(s, 6);
+//! [Local Search Example]
+   BOOST_CHECK_EQUAL(solution, 6);
 }
 
 

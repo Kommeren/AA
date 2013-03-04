@@ -126,11 +126,28 @@ Concepts:
 
 Now we can introduce the paal::local_search::LocalSearchStep interface.
 
+\subsubsection Example
+
+In this example we are going to maximize function -x^2 + 12x -27 for integral x. 
+In this problem solution is just a integral and update is also a number which denotes the shift on the solution.
+So new potential solution is just old solution plus the update.
+We start with defining search components, that is:
+<ol>
+<li> GetNeighborhood functor
+<li> Gain functor
+<li> UpdateSolution functor
+</ol>
+Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
+
+\snippet local_search_test.cpp Local Search Components Example
+
+After we've defined components we run LS.
+
+\snippet local_search_test.cpp Local Search Example
 
 \subsection local_search_multi LOCAL SEARCH MULTI SOLUTION 
 
-The interface and conceptes of the  LocalSearchMultiSolution are ver simmilar to the LocalSearchSingleSolution ones.<br>
-
+The interface and conceptes of the  LocalSearchMultiSolution are very simmilar to the LocalSearchSingleSolution ones.<br>
 
 <br>
 Note that <i>SolutionElement</i> is the type of the specific element of the solution. <br>

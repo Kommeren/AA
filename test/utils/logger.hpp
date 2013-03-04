@@ -14,6 +14,7 @@
 #       include <iostream>
 #       include "paal/utils/type_functions.hpp"
 #       define LOG(x) std::cout<< x <<std::endl
+#       define ON_LOG(x) x
 #       define LOG_COPY(b, e) \
             std::copy(b, e, std::ostream_iterator<typename paal::utils::IterToElem<decltype(b)>::type>(std::cout, "\n"));\
             LOG("")
@@ -22,6 +23,7 @@
             LOG("")
 #else
 #       define LOG(x)
+#       define ON_LOG(x)
 #       define LOG_COPY(b, e)
 #       define LOG_COPY_DEL(b, e, del)
 #endif

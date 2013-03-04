@@ -28,15 +28,16 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
 
    //create random solution 
    std::random_shuffle(v.begin(), v.end());
-   data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
+   typedef data_structures::SimpleCycle<int> Cycle;
+   Cycle cycle(v.begin(), v.end());
 
    //creating local search
    auto lsc = getDefaultTwoLocalComponents(gm);
-   auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
+   TwoLocalSearchStep<decltype(cycle), decltype(lsc)> ls(std::move(cycle), std::move(lsc));
 
    //printing
 #ifdef LOGGER_ON
-   auto const & cman = ls.getSolution();
+   const Cycle & cman = ls.getSolution();
    LOG("Length \t" << simple_algo::getLength(gm, cman));
    int i = 0;
 #endif
@@ -45,7 +46,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
    while(ls.search()) {
        //printing
        LOG("Length after\t" << i++ << ": " 
-                 << simple_algo::getLength(gm, cman));
+             << simple_algo::getLength(gm, cman));
    }
 //! [Two Local Search Example]
 }
