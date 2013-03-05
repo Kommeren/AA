@@ -4,13 +4,13 @@ Cycle need to fulfill the interface:
 <pre>
     CycleArchetype {
         void flip(VertexType,VertexType);
-        vbegin(VertexType v);
-        vbegin();
-        vend();
+        VertexIterator vbegin(VertexType v);
+        VertexIterator vbegin();
+        VertexIterator vend();
     }
 </pre> 
 <br>
-CycleElem type is provided through paal::data_structures::CycleTraits and is detected automatically.
+CycleElem and VertexIterator types are provided through paal::data_structures::CycleTraits and are detected automatically.
 \section implementation Impelmentation
 Library provide only one very simple implementation of cycle that is paal::data_structures::SimpleCycle.
 

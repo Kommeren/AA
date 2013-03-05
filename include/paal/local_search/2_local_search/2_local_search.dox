@@ -1,7 +1,7 @@
 /*! \page two_local_search 2 Local Search For TSP
 \section two_opt 2-opt FOR TSP 
-
-Now we can draw for you interface and the example implementation and usage of 2_local_search for TSP. <br><br>
+This page contains description of paal::local_search::two_local_search::TwoLocalSearchStep for TSP. <br>
+paal::local_search::two_local_search::TwoLocalSearchStep is model of LocalSearchStepMultiSolution see \ref local_search_multi  <br>
 
 Two local search uses \ref metric concept and \ref cycle concept. 
 
