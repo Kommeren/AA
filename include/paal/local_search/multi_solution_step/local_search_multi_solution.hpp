@@ -25,10 +25,25 @@ namespace search_strategies {
     class SteepestSlope;
 }
 
+namespace detail {
+    template <typename Solution>
+    typename std::enable_if<utils::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type 
+    getSolution(Solution & s) {
+        return s.get();
+    }
+    
+    
+    template <typename Solution>
+    typename std::enable_if<!utils::has_get<Solution>::value, Solution &>::type 
+    getSolution(Solution & s) {
+        return s;
+    }
+}
+
 template <typename Solution, 
           typename MultiSearchComponents>
 class LocalSearchStepMultiSolutionBase {
-      BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
+    BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
 protected:    
     typedef typename utils::SolToElem<Solution>::type SolutionElement;
     typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
@@ -42,17 +57,8 @@ public:
         return m_searchComponents;
     }
 
-    template <typename DummySolution = Solution>
-    typename std::enable_if<utils::has_get<DummySolution>::value, decltype(std::declval<DummySolution>().get()) &>::type getSolution() {
-        static_assert(std::is_same<DummySolution, Solution>::value, "Don't specialize DummySolution");
-        return m_solution.get();
-    }
-    
-    
-    template <typename DummySolution = Solution>
-    typename std::enable_if<!utils::has_get<DummySolution>::value, DummySolution &>::type getSolution() {
-        static_assert(std::is_same<DummySolution, Solution>::value, "Don't specialize DummySolution");
-        return m_solution;
+    decltype(detail::getSolution(std::declval<Solution &>())) getSolution() {
+        return detail::getSolution(m_solution);
     }
 
 protected:
