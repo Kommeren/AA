@@ -6,40 +6,88 @@
  * @date 2013-02-01
  */
 
+
 namespace paal {
 namespace data_structures {
 
-template <typename T> class ObjectWithCopy {
+/**
+ * @class ObjectWithCopy
+ * @brief keeps object and its copy. Invoke all the member functions on both: object and its copy.
+ *        If you want to invoke member function on both objects, you run the  ObjectWithCopy::invoke.
+ *        If you want to run member function only on the copy you run ObjectWithCopy::invokeOnCopy.
+ *
+ * @tparam T type of the contain object
+ */
+template <typename T> 
+class ObjectWithCopy {
 public:
     typedef T ObjectType;
 
     ObjectWithCopy(T t) : m_obj(std::move(t)), m_copy(m_obj) {}
 
+    /**
+     * @brief invokes member function on object and copy
+     *
+     * @param f - pointer to member function of T
+     * @param args - arguments for f
+     *
+     * @tparam F type of pointer to  member function
+     * @tparam Args... types of member function arguments
+     *
+     * @return the same as f
+     */
     // if you use *. in decltype instead of -> you get
     // "sorry, unimplemented: mangling dotstar_expr" :)
     template <typename F, typename... Args> 
-        auto invoke(F f, Args... args) 
-            -> decltype(((std::declval<T*>())->*(f))(args...)) {
+    typename utils::ReturnType<T, F, Args...>::type
+    invoke(F f, Args... args) { 
         (m_copy.*(f))(args...);
         return (m_obj.*(f))(args...);
     }
     
+    /**
+     * @brief invokes member function on copy
+     *
+     * @param f - pointer to member function of T
+     * @param args - arguments for f
+     *
+     * @tparam F type of pointer to  member function
+     * @tparam Args... types of member function arguments
+     *
+     * @return the same as f
+     */
     template <typename F, typename... Args> 
-        auto invokeOnCopy(F f, Args... args) const
-            -> decltype(((std::declval<T*>())->*(f))(args...)) {
+    typename utils::ReturnType<T, F, Args...>::type
+    invokeOnCopy(F f, Args... args) const {
         return (m_copy.*(f))(args...);
     }
 
+    /**
+     * @brief easier way for invoking const member functions
+     *
+     * @return T*
+     */
     const T * operator->() const {
         return &m_obj;
     }
 
+    /**
+     * @brief getter for inner object
+     *
+     * @return member object
+     */
     T & getObj() {
         return m_obj;
     }
 
 private:
+    /**
+     * @brief Object
+     */
     T m_obj;
+    /**
+     * @brief Copy of the object
+     */
     mutable T m_copy;
 
 };

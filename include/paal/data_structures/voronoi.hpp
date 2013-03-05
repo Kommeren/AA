@@ -5,12 +5,15 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#ifndef VORONOI_HPP
+#define VORONOI_HPP
+
+
 #include <set>
 #include <map>
 #include <cassert>
+#include <climits>
 
-#ifndef VORONOI_HPP
-#define VORONOI_HPP
 
 #include <boost/range/adaptor/map.hpp>
 

@@ -25,7 +25,7 @@
         <ul>
         <li>\ref local_search
             <ul>
-            <li>\ref two_local_search
+            <li>\ref paal::local_search::two_local_search::TwoLocalSearchStep
             <li>\ref uncapaciated facility location
         </ul>
         <li> miscellaneous
@@ -33,11 +33,19 @@
             <li>\ref steiner_tree
             </ul>
         </ul>
-    <li> Data Structures
+    <li> Concepts
         <ul>
         <li>\ref metric
         <li>\ref cycle
-        <li>\ref object_with_copy
+        </ul>
+    <li> Data Structures
+        <ul>
+        <li>\ref paal::data_structures::GraphMetric
+        <li>\ref paal::data_structures::ArrayMetric
+        <li>\ref paal::data_structures::SimpleCycle
+        <li>\ref paal::data_structures::ObjectWithCopy
+        <li>\ref paal::data_structures::FacilityLocationSolution
+        <li>\ref paal::data_structures::Voronoi
         </ul>
     </ul>
 

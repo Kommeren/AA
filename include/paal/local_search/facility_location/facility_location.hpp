@@ -18,15 +18,32 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
+/**
+ * @class DefaultFLComponents 
+ * @brief Model of MultiSearchComponents with default multi search components for facility location.
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType> 
 struct DefaultFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetNeighborhood<VertexType>,
-                FacilityLocationChecker           <VertexType>,
-                FacilityLocationUpdater           <VertexType>> type;
+                FacilityLocationChecker        <VertexType>,
+                FacilityLocationUpdater        <VertexType>> type;
 };
-    
 
+/**
+ * @class FacilityLocationLocalSearchStep
+ * @brief this is model of LocalSearchStepMultiSolution concept.
+ * Use DefaultFLComponents for default search components.
+ * TODO describe return type
+ * example: 
+    \snippet facility_location_example.cpp FL Search Example
+ *
+ * @tparam Voronoi
+ * @tparam FacilityCost
+ * @tparam MultiSearchComponents
+ */
 template <typename Voronoi,
           typename FacilityCost,
           typename MultiSearchComponents = typename DefaultFLComponents<typename Voronoi::VertexType>::type>

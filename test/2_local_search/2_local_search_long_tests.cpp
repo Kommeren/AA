@@ -43,13 +43,11 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         auto lsc = getDefaultTwoLocalComponents(mtx);
         auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
 
-#ifdef LOGGER_ON
         //printing 
-        auto const & cman = ls.getSolution();
+        ON_LOG(auto const & cman = ls.getSolution());
         LOG("Graph:\t" << fname);
         LOG("Length before\t" << simple_algo::getLength(mtx, cman));
-        int i = 0;
-#endif
+        ON_LOG(int i = 0);
 
         //search
         while(ls.search()) {

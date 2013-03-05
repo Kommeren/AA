@@ -11,12 +11,10 @@
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
-#include <string>
 
 #include "paal/local_search/local_search_step.hpp"
 #include "utils/logger.hpp"
 
-//#define VERBOSE 
 
 using std::string;
 using std::vector;
@@ -29,9 +27,10 @@ struct F {
     }
 };
 
-struct NG {
-    typedef typename std::vector<int>::const_iterator Iter;
-    const std::vector<int> neighb;
+class NG {
+    typedef const std::vector<int> Neighb;
+    Neighb neighb;
+    typedef typename Neighb::const_iterator Iter;
 public:
 
     NG() : neighb{10, -10, 1, -1} {}
@@ -41,36 +40,27 @@ public:
     }
 };
 
-
 struct SU {
     void operator()(int & s, int u) const {
         s = s + u;
     }
 };
 
-
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
-   //creating local search
-   typedef  SearchObjFunctionComponents<NG, F, SU> SearchComp;
-   LocalSearchFunctionStep<int, SearchComp> ls;
-#ifdef LOGGER_ON
-   F f;
-#endif
+    //creating local search
+    typedef  SearchObjFunctionComponents<NG, F, SU> SearchComp;
+    LocalSearchFunctionStep<int, SearchComp> ls;
+    ON_LOG(F f);
 
-   //printing 
-   auto const & s = ls.getSolution();
-   LOG("f("<< s <<") \t" << f(s));
+    //printing 
+    int s = ls.getSolution();
+    LOG("f("<< s <<") \t" << f(s));
+    ON_LOG(int i = 0);
 
-#ifdef LOGGER_ON
-   int i = 0;
-#endif
-
-   //search
-   while(ls.search()) {
-       //printing
-       LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
-   }
-   BOOST_CHECK_EQUAL(s, 6);
+    //search
+    search(ls, [&](int s) {
+        //printing
+        LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
+        });
+    BOOST_CHECK_EQUAL(s, 6);
 }
-
-

@@ -89,18 +89,16 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
     LOG("f(");
     LOG_COPY_DEL(s.begin(), s.end(), ","); 
     LOG(") \t" << f(s));
-#ifdef LOGGER_ON
-    int i = 0;
-#endif
+    ON_LOG(int i = 0);
 
     //search
-    while(ls.search()) {
+    local_search::search(ls, [&](const Solution & s) {
         //printing
         LOG("f(");
         LOG_COPY_DEL(s.begin(), s.end(), ","); 
         LOG(") \t" << f(s) << " after " << i++ );
-    }
-    /*   BOOST_CHECK_EQUAL(s, 6);*/
+    });
+    BOOST_CHECK_EQUAL(f(s), 1.);
 }
 
 
@@ -108,23 +106,22 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
     //creating local search
     Solution initSol(DIM, 0);
     fillRand(initSol);
-    local_search::LocalSearchStepMultiSolution<Solution, SearchComp, local_search::search_strategies::SteepestSlope> ls(initSol);
+    local_search::LocalSearchStepMultiSolution<Solution, SearchComp, 
+                    local_search::search_strategies::SteepestSlope> ls(initSol);
 
     //printing 
     auto const & s = ls.getSolution();
     LOG("f(");
     LOG_COPY_DEL(s.begin(), s.end(), ","); 
     LOG(") \t" << f(s));
-#ifdef LOGGER_ON
-    int i = 0;
-#endif
+    ON_LOG(int i = 0);
 
     //search
-    while(ls.search()) {
+    local_search::search(ls, [&](const Solution & s) {
         //printing
         LOG("f(");
         LOG_COPY_DEL(s.begin(), s.end(), ","); 
         LOG(") \t" << f(s) << " after " << i++ );
-    }
-    //   BOOST_CHECK_EQUAL(s, 6);
+    });
+    BOOST_CHECK_EQUAL(f(s), 1.);
 }

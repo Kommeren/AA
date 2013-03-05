@@ -1,36 +1,38 @@
-#define BOOST_TEST_MODULE facility_location_local_search
 
-#include <iterator>
-
-#include <boost/test/unit_test.hpp>
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
 
 using namespace paal::local_search::facility_location;
 
-BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
-    
+int main() {
+    // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
     
+    //define voronoi 
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
-    typedef paal::data_structures::FacilityLocationSolution
-        <decltype(cost), VorType> Sol;
+    typedef paal::data_structures::ObjectWithCopy<paal::data_structures::FacilityLocationSolution
+        <decltype(cost), VorType>> Sol;
     typedef typename VorType::GeneratorsSet FSet;
+
+    //create voronoi with current
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
 
+    //create facility location local searhc step
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
         ls(voronoi, cost, FSet{SGM::A, SGM::B});
 
-    LOG("cost(0) = " << cost(0));
-    BOOST_CHECK(ls.search());
-    ON_LOG(auto & s = ls.getSolution());
-    ON_LOG(auto const & ch = s->getChosenFacilities());
+    //search 
+    search(ls);
+
+    //print result
+    Sol & s = ls.getSolution();
+    auto const & ch = s->getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
-    LOG("");
-    BOOST_CHECK(!ls.search());
+    std::cout << std::endl;
+
+    return true;
     
 }

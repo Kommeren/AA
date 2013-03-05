@@ -18,7 +18,6 @@
 using namespace  paal::local_search;
 using namespace  paal;
 
-//! [Local Search Components Example]
 int f(int x) {
     return -x*x + 12 * x -27;
 }
@@ -54,10 +53,8 @@ auto logAction = [&](int s) {
    LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
 };
 
-//! [Local Search Components Example]
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
-//! [Local Search Example]
    //creating local search
    LocalSearchStep<int, SearchComp> ls;
 
@@ -67,7 +64,6 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
    //search
    BOOST_CHECK(search(ls, logAction));
-//! [Local Search Example]
    BOOST_CHECK_EQUAL(solution, 6);
 }
 

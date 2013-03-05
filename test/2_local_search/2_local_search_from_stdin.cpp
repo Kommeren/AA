@@ -13,7 +13,6 @@
 #include "utils/logger.hpp"
 #include "utils/read_tsplib.h"
 
-using std::string;
 using std::vector;
 using namespace paal::local_search::two_local_search;
 using namespace paal;
@@ -31,28 +30,28 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
     //create random solution 
     std::random_shuffle(v.begin(), v.end());
-    data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
+    typedef data_structures::SimpleCycle<int> Cycle;
+    Cycle cycle(v.begin(), v.end());
 
     //creating local search
     auto lsc = getDefaultTwoLocalComponents(mtx);
     auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
 
-#ifdef LOGGER_ON
     //printing 
-    auto const & cman = ls.getSolution();
-    LOG("Length before\t" << simple_algo::getLength(mtx, cman));
-    int i = 0;
-#endif
+    ON_LOG(auto const & c = ls.getSolution());
+    LOG("Length before\t" << simple_algo::getLength(mtx, c));
+    ON_LOG(int i = 0);
 
     //search
-    while(ls.search()) {
-        LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
-    }
+    search(ls, [&](const Cycle & c) {
+        LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, c));
+    });
 
 }
 
 using paal::local_search::SearchComponents;
 
+//TODO probably optimization does not optimize...
 BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     read_tsplib::TSPLIB_Directory::Graph graph(std::cin);
     read_tsplib::TSPLIB_Matrix mtx;

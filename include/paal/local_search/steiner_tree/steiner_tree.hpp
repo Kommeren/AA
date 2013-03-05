@@ -80,13 +80,8 @@ public:
         
         fillSubDists();
 
-        while(true) {
-            findSave(ls.getSolution());
-
-            if(!ls.search()) {
-                break;
-            }
-        }
+        findSave(ls.getSolution());
+        local_search::search(ls, [&](AMatrix & a){this->findSave(a);});
 
         uniqueRes(res);
         return res; 

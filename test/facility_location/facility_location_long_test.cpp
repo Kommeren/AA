@@ -50,7 +50,6 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_FL(ifs, facCost, facCap, demands, fac, clients);
-
     
         auto cost = [&](int i){ return facCost[i];};
     
@@ -64,14 +63,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(voronoi, cost, FSet(fac.begin(), fac.end()));
 
-#ifdef LOGGER_ON
-        auto & s = ls.getSolution().getObj();
-//        auto const & ch = s.getChosenFacilities();
-#endif
-        while(ls.search()) {
-//            LOG_COPY_DEL(ch.begin(), ch.end(), ",");
-//            LOG(std::setprecision(20) <<  "cost " << simple_algo::getFLCost(metric, cost, s));
-        }
+        ON_LOG(auto & s = ls.getSolution().getObj());
+
+        search(ls);
         double c = simple_algo::getFLCost(metric, cost, s);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
