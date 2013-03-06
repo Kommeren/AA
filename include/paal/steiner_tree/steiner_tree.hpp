@@ -15,12 +15,11 @@
 
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
-#include "paal/data_structures/voronoi.hpp"
+#include "paal/data_structures/voronoi/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search_step.hpp"
 
 namespace paal {
-namespace local_search {
 namespace steiner_tree {
 
 template <typename Metric, typename Voronoi> 
@@ -68,10 +67,10 @@ public:
             res.push_back(m_nearestVertex[boost::get<0>(t)]);
         };
 
-        auto sc = make_SearchComponents(ng, obj_fun, su);
+        auto sc = local_search::make_SearchComponents(ng, obj_fun, su);
 
         typedef local_search::LocalSearchStep<AMatrix, 
-                    decltype(sc), search_strategies::SteepestSlope>  LS;
+                    decltype(sc), local_search::search_strategies::SteepestSlope>  LS;
         LS ls(utils::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 
@@ -189,16 +188,13 @@ private:
         //transform vector intto SpanningTree object
         auto const  & weight_map = boost::get(boost::edge_weight, am);
         SpanningTree spanningTree(N);
-//        std::cout << "Drzewo : " << std::endl;
         for(VertexType from = 0; from < N; ++from){
-  //          std::cout << from << " "<< pm[from] << std::endl;
             if(from != pm[from]) {
                 bool succ =boost::add_edge(from, pm[from], 
                     SpanningTreeEdgeProp(from, boost::get(weight_map, boost::edge(from, pm[from], am).first)), spanningTree).second;
                 assert(succ);
             }
         }
-//        std::cout << "End " << std::endl;
         return spanningTree;
     }
     
@@ -283,5 +279,4 @@ private:
 };
 
 } // steiner_tree
-} //local_search
 } //paal

@@ -34,11 +34,17 @@ struct DefaultFLComponents {
 
 /**
  * @class FacilityLocationLocalSearchStep
- * @brief this is model of LocalSearchStepMultiSolution concept.
+ * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.
  * Use DefaultFLComponents for default search components.
- * TODO describe return type
+ *
+ * The FacilityLocationLocalSearchStep takes as constructor parameter  data_structures::FacilityLocationSolution.
+ * <b> WARNING </b>
+ * getSolution of the FacilityLocationLocalSearchStep returns type ObjectWithCopy<FacilityLocationSolution>.
+ * If you want to perform search, then change the solution object and continue local search you should perform all the operations on ObjectWithCopy. <br>
  * example: 
     \snippet facility_location_example.cpp FL Search Example
+ *
+ * full example is facility_location_example.cpp
  *
  * @tparam Voronoi
  * @tparam FacilityCost
@@ -63,12 +69,9 @@ public:
                 MultiSearchComponents>  base;
 
     FacilityLocationLocalSearchStep(
-            Voronoi voronoi,
-            const FacilityCost & cost,
-            typename FLSolution::UnchosenFacilitiesSet uch,
+            FLSolution fls,
             MultiSearchComponents sc = MultiSearchComponents()) :
-
-                base(FLSolutionAdapter(FLSolution(std::move(voronoi), std::move(uch), cost)), 
+                base(FLSolutionAdapter(std::move(fls)), 
                                        std::move(sc)) {}
 };
 

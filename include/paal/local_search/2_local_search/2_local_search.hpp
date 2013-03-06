@@ -23,18 +23,18 @@ namespace local_search {
 namespace two_local_search {
 
 /**
-* @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Update type is pair of vertices.
-*       See \ref local_search. There are three ways to provide search components
-*       <ul>
-*       <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
-*       <li> use TwoLocalComponents to provide your own search Componnts
-*       <li> write your own implementation of MultiSearchComponents
-*       </ul>
-Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
+ @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Update type is pair of vertices.
+ See \ref local_search. There are three ways to provide search components
+ <ul>
+       <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
+       <li> use TwoLocalComponents to provide your own search Componnts
+       <li> write your own implementation of MultiSearchComponents
+ </ul>
+ Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
 
-\snippet 2_local_search_example.cpp Two Local Search Example
+ \snippet 2_local_search_example.cpp Two Local Search Example
 
-Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br>
+ Although the basic usage is very simple, the sophisticated user can still easily change default parameters and exchange them with his ones. <br>
 *
 * @tparam Cycle input cycle, hast to be model of the  \ref cycle concept
 * @tparam SearchComponents this is model MultiSearchComponents

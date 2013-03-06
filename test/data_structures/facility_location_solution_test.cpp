@@ -2,7 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
-#include "paal/data_structures/voronoi.hpp"
+#include "paal/data_structures/voronoi/voronoi.hpp"
 #include "utils/sample_graph.hpp"
 
 BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {

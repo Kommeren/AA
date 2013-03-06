@@ -21,9 +21,10 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
         <decltype(cost), VorType> Sol;
     typedef typename VorType::GeneratorsSet FSet;
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    Sol sol(std::move(voronoi),FSet{SGM::A, SGM::B}, cost );
 
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
-        ls(voronoi, cost, FSet{SGM::A, SGM::B});
+        ls(std::move(sol));
 
     LOG("cost(0) = " << cost(0));
     BOOST_CHECK(ls.search());

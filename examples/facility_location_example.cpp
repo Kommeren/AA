@@ -5,33 +5,37 @@
 using namespace paal::local_search::facility_location;
 
 int main() {
+//! [FL Search Example]
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
     
-    //define voronoi 
+    //define voronoi and solution
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
-    typedef paal::data_structures::ObjectWithCopy<paal::data_structures::FacilityLocationSolution
-        <decltype(cost), VorType>> Sol;
+    typedef paal::data_structures::FacilityLocationSolution
+        <decltype(cost), VorType> Sol;
+    typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
     typedef typename VorType::GeneratorsSet FSet;
 
-    //create voronoi with current
+    //create voronoi and solution
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    Sol sol(std::move(voronoi), FSet{SGM::A, SGM::B}, cost);
 
     //create facility location local searhc step
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
-        ls(voronoi, cost, FSet{SGM::A, SGM::B});
+        ls(std::move(sol));
 
     //search 
     search(ls);
 
     //print result
-    Sol & s = ls.getSolution();
+    SolOcjWithCopy & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;
+//! [FL Search Example]
 
     return true;
     

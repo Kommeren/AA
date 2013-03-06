@@ -15,7 +15,7 @@
 
 #include "utils/logger.hpp"
 
-#include "paal/local_search/steiner_tree/steiner_tree.hpp"
+#include "paal/steiner_tree/steiner_tree.hpp"
 #include "paal/data_structures/bimap.hpp"
 
 #include "utils/read_steinlib.hpp"
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         typedef typename VoronoiT::GeneratorsSet FSet;
         VoronoiT voronoi(FSet(terminals.begin(), terminals.end()),
                          FSet(steinerPoints.begin(), steinerPoints.end()), m);
-        paal::local_search::steiner_tree::SteinerTree<Metric, VoronoiT> st(m, voronoi);
+        paal::steiner_tree::SteinerTree<Metric, VoronoiT> st(m, voronoi);
         std::vector<int> selectedSteinerPoints = st.getResultSteinerVertices(); 
 
         auto resRange = boost::join(terminals, selectedSteinerPoints);

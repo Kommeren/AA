@@ -17,6 +17,9 @@
 
 #include <boost/range/adaptor/map.hpp>
 
+#include "paal/data_structures/metric/metric_traits.hpp"
+#include "voronoi_traits.hpp"
+
 namespace paal {
 namespace data_structures {
 
@@ -40,7 +43,6 @@ class Voronoi {
                     addGenerator(f);
                 }
             }
-
        
         // returns diff between new cost and old cost
         Dist addGenerator(VertexType f) {
@@ -160,6 +162,10 @@ class Voronoi {
         const Dist m_costOfNoGenerator;
 };
 
+template <typename Metric>
+struct VoronoiTraits<Voronoi<Metric>> : 
+    public  _VoronoiTraits<Voronoi<Metric>, typename MetricTraits<Metric>::VertexType> {
+};
 
 };
 };

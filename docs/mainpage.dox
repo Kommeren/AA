@@ -26,17 +26,18 @@
         <li>\ref local_search
             <ul>
             <li>\ref paal::local_search::two_local_search::TwoLocalSearchStep
-            <li>\ref uncapaciated facility location
+            <li>\ref paal::local_search::facility_location::FacilityLocationLocalSearchStep
         </ul>
         <li> miscellaneous
             <ul>
-            <li>\ref steiner_tree
+            <li>\ref paal::steiner_tree::SteinerTree
             </ul>
         </ul>
     <li> Concepts
         <ul>
         <li>\ref metric
         <li>\ref cycle
+        <li>\ref voronoi
         </ul>
     <li> Data Structures
         <ul>

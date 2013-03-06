@@ -5,24 +5,34 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include <set>
-#include <map>
-#include <cassert>
-
-#include "paal/data_structures/voronoi.hpp"
 
 #ifndef FACILITY_LOCATION_SOLUTION_HPP
 #define FACILITY_LOCATION_SOLUTION_HPP
 
+#include <set>
+#include <cassert>
+#include <type_traits>
+
+#include "paal/data_structures/voronoi/voronoi.hpp"
+
 namespace paal {
 namespace data_structures {
 
-template <typename FacilityCost, typename VoronoiType/*, typename VoronoiType::DistanceType NO_FACILITY_COST = INT_MAX*/>
+/**
+ * @brief dscribes solution to facility location
+ * The initial solution is passed as voronoi, which has to be thr model of the \ref voronoi concept.
+ * The generators of the voronoi are the facilities and the vertices are the clients.
+ *
+ * @tparam FacilityCost
+ * @tparam VoronoiType
+ */
+template <typename FacilityCost, typename VoronoiType>
 class FacilityLocationSolution { 
     public:
-        typedef typename VoronoiType::VertexType VertexType;
-        typedef typename VoronoiType::Dist Dist;
-        typedef typename VoronoiType::GeneratorsSet ChosenFacilitiesSet;
+        typedef VoronoiTraits<VoronoiType> VT;
+        typedef typename VT::VertexType VertexType;
+        typedef typename VT::DistanceType Dist;
+        typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
         typedef std::set<VertexType> UnchosenFacilitiesSet;
 
         FacilityLocationSolution(VoronoiType  voronoi,
@@ -61,9 +71,10 @@ class FacilityLocationSolution {
         const ChosenFacilitiesSet & getChosenFacilities() const {
             return m_voronoi.getGenerators();
         }
-        
-        const VoronoiType & getVoronoi() const {
-            return m_voronoi;
+
+        decltype(std::declval<VoronoiType>().getVerticesForGenerator(std::declval<VertexType>()))
+        getClientsForFacility(VertexType f) const {
+            return m_voronoi.getVerticesForGenerator(f);
         }
 
     private:

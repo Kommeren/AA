@@ -9,13 +9,15 @@
 #define METRIC_TRAITS_HPP 
 #include <type_traits>
 
+#include "paal/utils/type_functions.hpp"
+
 namespace paal {
 namespace data_structures {
 
 template <typename Metric>
 struct MetricTraits {
     typedef int VertexType;
-    typedef decltype(std::declval<Metric>()
+    typedef puretype(std::declval<Metric>()
              (std::declval<VertexType>(), std::declval<VertexType>())) DistanceType;
 };
 

@@ -35,7 +35,7 @@ private:
     typedef typename Traits<Chosen>::ColTIter ChosenTIter;
     typedef typename Traits<Unchosen>::ColTIter UnchosenTIter;
 public:
-    typedef data_structures::ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;;    
+    typedef data_structures::ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;    
     FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : m_sol(std::move(sol)) {}
 
     typedef boost::joined_range<typename Traits<Chosen>::ColTIterRange, 
