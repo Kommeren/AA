@@ -22,6 +22,18 @@
 namespace paal {
 namespace steiner_tree {
 
+/**
+ * class SteinerTree
+ * @brief This is Alexander Zelikovsky 11/6 approximation algorithm for steiner tree.
+ *
+ * Example: <br>
+   \snippet steiner_tree_example.cpp Steiner Tree Example
+ *
+ * full example is facility_location_example.cpp
+ *
+ * @tparam Metric we only use this metric for distances  (Steiner, Terminal) and (Terminal, Terminal)
+ * @tparam Voronoi models \ref voronoi. This is a voronoi division where generators are terminals  of the steiner tree.
+ */
 template <typename Metric, typename Voronoi> 
 class SteinerTree {
     typedef int Idx;
@@ -37,7 +49,7 @@ public:
     /**
      * @brief 
      *
-     * @param m we only use this metric for distances  (Steiner, Terminal) and (Terminal, Terminal)
+     * @param m 
      * @param voronoi
      */
     SteinerTree(const Metric & m, const Voronoi & voronoi) : 
@@ -93,7 +105,7 @@ private:
     typedef boost::graph_traits<SpanningTree> gtraits;
     typedef typename gtraits::edge_descriptor SEdge;
     
-    //Adjeny Matrix types
+    //Adjacency Matrix types
     typedef typename utils::AdjacencyMatrix<Metric>::type AMatrix;
     typedef boost::graph_traits<AMatrix> mtraits;
     typedef typename mtraits::edge_descriptor MEdge;
@@ -137,8 +149,8 @@ private:
         //finding nearest vertex to subset
         for(const ThreeTuple & subset : utils::make_range(subRange)) {
             //TODO awfull coding, need to be changed to loop
-            //There is possible problem, one point could be in two Voronoi regions
-            //In our implementation the poin will be in exactly o0ne region and there 
+            //There is possible problem, one point could belong to two Voronoi regions
+            //In our implementation the poin will be in exactly one region and there 
             //it will not be contained in the range
             auto vRange1 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<0>(subset)));
             auto vRange2 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<1>(subset)));

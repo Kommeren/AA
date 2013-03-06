@@ -34,7 +34,10 @@ struct DefaultFLComponents {
 
 /**
  * @class FacilityLocationLocalSearchStep
- * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.
+ * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.<br>
+ * The Update is facility_location::Update. <br>
+ * The Solution is adapted data_structures::FacilityLocationSolution. <br>
+ * The SolutionElement is facility_location::Facility  <br>
  * Use DefaultFLComponents for default search components.
  *
  * The FacilityLocationLocalSearchStep takes as constructor parameter  data_structures::FacilityLocationSolution.

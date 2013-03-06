@@ -25,5 +25,7 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);
 
     paal::steiner_tree::SteinerTree<Metric, VoronoiT> st(gm, voronoi);
-    st.getResultSteinerVertices(); 
+    auto steiner = st.getResultSteinerVertices(); 
+    BOOST_CHECK_EQUAL(steiner.size(), size_t(1));
+    BOOST_CHECK_EQUAL(*steiner.begin(), SGM::E);
 }

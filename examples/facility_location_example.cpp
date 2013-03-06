@@ -17,11 +17,15 @@ int main() {
     typedef paal::data_structures::FacilityLocationSolution
         <decltype(cost), VorType> Sol;
     typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
-    typedef typename VorType::GeneratorsSet FSet;
+    typedef paal::data_structures::VoronoiTraits<VorType> VT;
+    typedef typename VT::GeneratorsSet GSet;
+    typedef typename VT::VerticesSet VSet;
+    typedef typename Sol::UnchosenFacilitiesSet USet;
+
 
     //create voronoi and solution
-    VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-    Sol sol(std::move(voronoi), FSet{SGM::A, SGM::B}, cost);
+    VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, cost);
 
     //create facility location local searhc step
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  

@@ -8,7 +8,8 @@
 #ifndef VORONOI_TRAITS_HPP
 #define VORONOI_TRAITS_HPP
 
-#include <type_traits>
+#include "paal/utils/type_functions.hpp"
+
 namespace paal {
 namespace data_structures {
 
@@ -17,8 +18,11 @@ struct _VoronoiTraits {
     typedef Vertex VertexType;
     typedef decltype(std::declval<V>().addGenerator(std::declval<VertexType>()))
                 DistanceType;
-    typedef decltype(std::declval<V>().getGenerators())
+    typedef puretype(std::declval<V>().getGenerators())
                 GeneratorsSet;
+    
+    typedef puretype(std::declval<V>().getVertices())
+                VerticesSet;
 };
 
 //default VertexType is int.
