@@ -14,7 +14,14 @@
 namespace paal {
 namespace data_structures {
 
-template <typename DistanceTypeParam> class ArrayMetric {
+/**
+ * @class ArrayMetric
+ * @brief \ref metric implementation on 2 dimentional array
+ *
+ * @tparam DistanceTypeParam
+ */
+template <typename DistanceTypeParam> 
+class ArrayMetric {
     public:
         typedef DistanceTypeParam DistanceType;
         typedef int VertexType;

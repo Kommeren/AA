@@ -24,6 +24,12 @@ namespace paal {
 namespace data_structures {
 
 
+/**
+ * @class Voronoi
+ * @brief simple implementation of the \ref voronoi concept.
+ *
+ * @tparam Metric
+ */
 template <typename Metric>
 class Voronoi {
     public:

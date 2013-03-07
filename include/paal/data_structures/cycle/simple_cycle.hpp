@@ -21,6 +21,13 @@ namespace data_structures {
 
 
 //TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
+/**
+ * @class SimpleCycle
+ * @brief This is the simpliest implementation of the \ref cycle concept based on the list.
+ *
+ * @tparam CycleEl
+ * @tparam IdxT
+ */
 template <typename CycleEl, typename IdxT = int> class  SimpleCycle {
 public:
     typedef std::pair<CycleEl, CycleEl> CycleElPair;

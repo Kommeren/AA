@@ -52,6 +52,14 @@ namespace metric_fillers {
 }
 
 
+/**
+ * @class GraphMetric
+ * @brief Adopts boost graph as \ref metric.
+ *
+ * @tparam Graph
+ * @tparam DistanceType
+ * @tparam GraphType
+ */
 // GENERIC
 // GraphType could be sparse, dense, large ...
 template <typename Graph, typename DistanceType, 

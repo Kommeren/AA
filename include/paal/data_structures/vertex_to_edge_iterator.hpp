@@ -13,6 +13,13 @@
 namespace paal {
 namespace data_structures {
 
+/**
+ * @class VertexIterator
+ * @brief transforms collection to collection of pairs consecutive elements of the input collection.
+ *      The last elemment and the first element are considered consequtive.
+ *
+ * @tparam VertexIterator
+ */
 template <typename VertexIterator>
 class VertexToEdgeIterator  {
 public:

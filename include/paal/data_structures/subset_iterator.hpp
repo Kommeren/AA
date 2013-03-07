@@ -18,6 +18,13 @@ namespace paal {
 namespace data_structures {
 
 //minor TODO could be more efficient in direct array of iterators inmplementation
+/**
+ * @class SubsetsIterator
+ * @brief Iterator to all k-subsets of given collection.
+ *
+ * @tparam Iterator
+ * @tparam k
+ */
 template <typename Iterator,int k> class SubsetsIterator : 
     private SubsetsIterator<Iterator, k-1>{
     

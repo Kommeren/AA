@@ -26,7 +26,15 @@ namespace data_structures {
 
 
 //minor TODO write specification when T is integral (copy instead of reference)
-template <typename T, typename Idx = int> class BiMap {
+/**
+ * @class BiMap
+ * @brief implements both sides mapping from the collection to (0,size(collection)) interval.
+ *
+ * @tparam T
+ * @tparam Idx
+ */
+template <typename T, typename Idx = int> 
+class BiMap {
 public:
     
     BiMap() {}

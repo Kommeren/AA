@@ -47,6 +47,9 @@
         <li>\ref paal::data_structures::ObjectWithCopy
         <li>\ref paal::data_structures::FacilityLocationSolution
         <li>\ref paal::data_structures::Voronoi
+        <li>\ref paal::data_structures::SubsetsIterator
+        <li>\ref paal::data_structures::VertexToEdgeIterator
+        <li>\ref paal::data_structures::BiMap
         </ul>
     </ul>
 
