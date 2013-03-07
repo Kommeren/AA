@@ -20,11 +20,11 @@ template <typename DistanceTypeParam> class ArrayMetric {
         typedef int VertexType;
         ArrayMetric(int N = 0) : m_matrix(boost::extents[N][N]) { }
         
-        template <typename Vertex> DistanceType operator()(const Vertex & v, const Vertex & w) const {
+        DistanceType operator()(const VertexType & v, const VertexType & w) const {
             return m_matrix[v][w];
         }
         
-        template <typename Vertex> DistanceType & operator()(const Vertex & v, const Vertex & w) {
+        DistanceType & operator()(const VertexType & v, const VertexType & w) {
             return m_matrix[v][w];
         }
 
