@@ -15,20 +15,22 @@ struct DoNothingFunctor {
     void  operator()(Args&&... args) const {}
 };
 
-struct ReturnFalseFunctor {
+template <typename T, T t>
+struct ReturnSomethingFunctor {
     template <typename ... Args > 
-    bool  operator()(Args&&... args) const {
-        return false;
+    T  operator()(Args&&... args) const {
+        return t;
     } 
 };
 
-struct ReturnTrueFunctor {
-    template <typename ... Args > 
-    bool  operator()(Args&&... args) const {
-        return true;
-    }
-};
+struct ReturnFalseFunctor : 
+    public ReturnSomethingFunctor<bool, false> {};
 
+struct ReturnTrueFunctor : 
+    public ReturnSomethingFunctor<bool, true> {};
+
+struct ReturnZeroFunctor :
+    public ReturnSomethingFunctor<int, 0> {};
 }
 }
 #endif /* DO_NOTIHNG_FUNCTOR_HPP */
