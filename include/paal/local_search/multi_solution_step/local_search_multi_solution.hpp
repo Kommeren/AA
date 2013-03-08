@@ -16,6 +16,7 @@
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_traits.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/iterator_utils.hpp"
 
 namespace paal {
 namespace local_search {

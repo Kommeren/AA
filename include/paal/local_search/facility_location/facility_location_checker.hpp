@@ -6,6 +6,11 @@
  * @date 2013-02-01
  */
 
+#include <cassert>
+
+#include "facility_location_update_element.hpp"
+#include "facility_location_solution_element.hpp"
+
 namespace paal {
 namespace local_search {
 namespace facility_location {
