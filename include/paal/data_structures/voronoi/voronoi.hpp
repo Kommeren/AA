@@ -41,6 +41,14 @@ class Voronoi {
         typedef GeneratorsSet Vertices;
         typedef typename GeneratorsToVertices::const_iterator VerticesForGeneratorIter;
 
+        /**
+         * @brief Constructor
+         *
+         * @param generators
+         * @param vertices
+         * @param m
+         * @param costOfNoGenerator
+         */
         Voronoi(const GeneratorsSet & generators, 
                Vertices vertices,
                const Metric & m, Dist costOfNoGenerator = INT_MAX) :
@@ -49,6 +57,32 @@ class Voronoi {
                     addGenerator(f);
                 }
             }
+        
+        /**
+         * @brief Copy constructor
+         *
+         * @param v
+         */
+        Voronoi(const Voronoi & v) : m_generatorsToVertices(v.m_generatorsToVertices), 
+                m_vertices(v.m_vertices), m_generators(v.m_generators), 
+                m_metric(v.m_metric), m_costOfNoGenerator(v.m_costOfNoGenerator) {
+            auto b = m_generatorsToVertices.begin();
+            auto e = m_generatorsToVertices.end();
+            for(;b!=e; ++b) {
+                m_verticesToGenerators.insert(std::make_pair(b->second, b));
+            }
+        }
+        
+        /**
+         * @brief Move constructor
+         *
+         * @param v
+         */
+        Voronoi(Voronoi && v) : m_verticesToGenerators(std::move(v.m_verticesToGenerators)),
+                                m_generatorsToVertices(std::move(v.m_generatorsToVertices)), 
+                m_vertices(std::move(v.m_vertices)), m_generators(std::move(v.m_generators)), 
+                m_metric(v.m_metric), m_costOfNoGenerator(v.m_costOfNoGenerator) {
+        }
        
         // returns diff between new cost and old cost
         Dist addGenerator(VertexType f) {
@@ -99,7 +133,7 @@ class Voronoi {
                     //(with other containers you have to be carefull cause of iter invalidation)
                     ++begin;
                     cost -= dist(v);
-                    cost += adjustVertexType(v, op);
+                    cost += adjustVertex(v, op);
                 }
             }
             m_generators.erase(f);
@@ -129,17 +163,22 @@ class Voronoi {
             return m_metric(v, vertexToGenerators(v));
         }
         
-        Dist adjustVertexType(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
+        Dist adjustVertex(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d = Dist();
+            VertexType f_best;
             for(VertexType f : m_generators) {
-                if(filter(f) &&  (init || m_metric(v,f) < d)) {
-                    assign(v,f);
-                    d = m_metric(v,f);
-                    init = false;
+                if(filter(f)) {
+                    Dist td = m_metric(v,f);
+                    if(init || td < d) {
+                        f_best = f;
+                        d = td;
+                        init = false;
+                    }
                 }
             }
             assert(!init);
+            assign(v,f_best);
             return d; 
         }
 
@@ -149,8 +188,9 @@ class Voronoi {
             return i->second->first;
         }
 
+
         void assign(VertexType v, VertexType f) {
-            auto prev = m_verticesToGenerators[v];
+            auto prev = m_verticesToGenerators.at(v);
             m_generatorsToVertices.erase(prev);
             m_verticesToGenerators[v] = 
                 m_generatorsToVertices.insert(std::make_pair(f, v));

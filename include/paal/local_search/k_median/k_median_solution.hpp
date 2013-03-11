@@ -22,7 +22,11 @@ class KMedianSolution :
 public:
     KMedianSolution(VoronoiType voronoi,
                     typename base::UnchosenFacilitiesSet uf) : 
-        base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(base::getChosenFacilities() == k);}
+        base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(base::getChosenFacilities().size() == k);}
+    
+    KMedianSolution(const KMedianSolution & kmsol) : base(kmsol) {}
+    
+    KMedianSolution(KMedianSolution && kmsol) : base(std::move(kmsol)) {}
 private:
     utils::ReturnZeroFunctor m_zeroFunc;
         

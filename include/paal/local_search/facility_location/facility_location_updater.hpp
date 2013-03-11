@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-02-01
  */
+
 namespace paal {
 namespace local_search {
 namespace facility_location {
@@ -35,7 +36,7 @@ public:
                 break;
             }
             default: {
-                assert(false);\
+                assert(false);
             }
         }
     }
