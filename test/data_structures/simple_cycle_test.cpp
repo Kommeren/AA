@@ -1,19 +1,14 @@
 #define BOOST_TEST_MODULE cycle
 
-#include <boost/test/unit_test.hpp>
-#include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "utils/logger.hpp"
-
-#include <vector>
-#include <string>
+#include "cycle.hpp"
 
 using std::string;
-using std::vector;
 
 using namespace paal::data_structures;
 
 struct T {
-    typedef typename vector<string>::iterator iter;
+    typedef typename std::vector<string>::iterator iter;
     typedef std::pair<string, string> P;
 };
 
@@ -54,23 +49,12 @@ template  <typename I> void  pe(I b, I e) {
 }
 
 
-template <typename I1, typename I2> bool vecEquals(I1 b1, I1 e1, I2 b2, I2 e2) {
-    if(std::distance(b1, e1) != std::distance(b2, e2)) {
-        return false;
-    }
-    return std::equal(b1, e1 , b2);
-}
-
 template <typename El, typename Sol> 
-void checkSwap(T::iter b, T::iter e, const El & p1, const  El & p2, const El & start, const Sol & sol) {
+void checkSwapEdge(T::iter b, T::iter e, const El & p1, const  El & p2, const El & start, const Sol & sol) {
     SimpleCycle<string> cm(b, e);
     cm.flip(p1, p2);
     auto r = cm.getEdgeRange(start);
     BOOST_CHECK(vecEquals(sol.begin(), sol.end(), r.first, r.second));
-}
-
-namespace {
-    vector<string> v = {"1","2","3","4","5","6","7","8","9","10"};
 }
 
 
@@ -84,12 +68,21 @@ BOOST_AUTO_TEST_CASE(iterator_size) {
     }
 }
 
-BOOST_AUTO_TEST_CASE(swap_edges_3) {
+template <typename T>
+struct SimplCycleTemp : public SimpleCycle<T> {
+    template <typename Iter> SimplCycleTemp(Iter b, Iter e) : SimpleCycle<T>(b, e) {}
+};
+
+BOOST_AUTO_TEST_CASE(swap_edges_3_test) {
     std::vector<T::P> sol = {T::P("1","2"), T::P("2", "3"), T::P("3","1")};
-    checkSwap(v.begin(), v.begin() + 3, "2", "2", "1", sol);
+    checkSwapEdge(v.begin(), v.begin() + 3, "2", "2", "1", sol);
+    swap_edges_3<SimplCycleTemp>();
 }
 
-BOOST_AUTO_TEST_CASE(swap_edges_4) {
-    std::vector<T::P> sol = {T::P("1","3"), T::P("3", "2"), T::P("2","4"), T::P("4", "1")};
-    checkSwap(v.begin(), v.begin() + 4, "2", "3", "1", sol);
+BOOST_AUTO_TEST_CASE(swap_edges_4_test) {
+    std::vector<T::P> solE = {T::P("1","3"), T::P("3", "2"), T::P("2","4"), T::P("4", "1")};
+    checkSwapEdge(v.begin(), v.begin() + 4, "2", "3", "1", solE);
+
+    swap_edges_4<SimplCycleTemp>();
 }
+

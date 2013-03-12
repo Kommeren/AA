@@ -8,16 +8,7 @@
 #ifndef BIMAP_HPP
 #define BIMAP_HPP 
 
-/*#if !defined(NDEBUG)
-#define BOOST_MULTI_INDEX_ENABLE_INVARIANT_CHECKING
-//#define BOOST_MULTI_INDEX_ENABLE_SAFE_MODE
-#endif
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <iostream>
-#include <string>*/
+#include <map>
 
 #include "paal/utils/iterator_utils.hpp"
 

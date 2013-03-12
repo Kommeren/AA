@@ -8,6 +8,7 @@
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
+#include "paal/data_structures/cycle/splay_cycle.hpp"
 #include "paal/local_search/components.hpp"
 
 #include "utils/logger.hpp"
@@ -19,7 +20,8 @@ using namespace paal;
 
 std::string path = "test/data/TSPLIB/symmetrical/";
 
-BOOST_AUTO_TEST_CASE(TSPLIB) {
+template <typename Cycle>
+void test() {
     read_tsplib::TSPLIB_Directory::Graph graph(std::cin);
     read_tsplib::TSPLIB_Matrix mtx;
 
@@ -30,15 +32,17 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
     //create random solution 
     std::random_shuffle(v.begin(), v.end());
-    typedef data_structures::SimpleCycle<int> Cycle;
+    LOG_COPY_DEL(v.begin(), v.end(), ",");
     Cycle cycle(v.begin(), v.end());
+    LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
 
     //creating local search
     auto lsc = getDefaultTwoLocalComponents(mtx);
     auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
 
     //printing 
-    ON_LOG(auto const & c = ls.getSolution());
+    ON_LOG( const Cycle & c = ls.getSolution());
+    LOG_COPY_DEL(c.vbegin(), c.vend(), ",");
     LOG("Length before\t" << simple_algo::getLength(mtx, c));
     ON_LOG(int i = 0);
 
@@ -47,6 +51,14 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, c));
     });
 
+}
+
+BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
+    test<paal::data_structures::SimpleCycle<int>>();
+}
+
+BOOST_AUTO_TEST_CASE(TSPLIB) {
+    test<paal::data_structures::SplayCycle<int>>();
 }
 
 using paal::local_search::SearchComponents;

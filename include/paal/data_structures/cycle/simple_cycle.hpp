@@ -101,7 +101,7 @@ public:
             }
             
             VertexIterator operator++(int){
-                EdgeIterator i(*this);
+                VertexIterator i(*this);
                 operator++();
                 return i;
             }
