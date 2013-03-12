@@ -18,6 +18,10 @@ namespace splay_tree {
   template<typename N> inline size_t node_size(N node) {
     return (node == NULL) ? 0 : node->size();
   }
+  
+  template<typename N> inline N * copy_node(N * node) {
+    return (node == NULL) ? NULL : new N(*node);
+  }
 
   /**
    * Node of a SplayTree.
@@ -37,11 +41,15 @@ namespace splay_tree {
         right_(NULL), parent_(NULL), reversed_(false), size_(1) {
       }
       
-      Node(const Node & n) : val_(n.val_), left_(new Node(*n.left_)), 
-        right_(new Node(*n.right_)), parent_(NULL), reversed_(n.reversed_), 
+      Node(const Node & n) : val_(n.val_), left_(copy_node(n.left_)), 
+        right_(copy_node(n.right_)), parent_(NULL), reversed_(n.reversed_), 
         size_(n.size_) {
-            right_->parent_ = this;
-            left_->parent_ = this;
+            if(right_) {
+                right_->parent_ = this;
+            }
+            if(left_) {
+                left_->parent_ = this;
+            }
       }
 
       /** @returns parent node */
@@ -338,7 +346,7 @@ namespace splay_tree {
           splay.root_ = NULL;
       }
       
-      SplayTree(const SplayTree & splay) : root_(new node_type(*splay.root_)) {
+      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
