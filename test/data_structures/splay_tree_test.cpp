@@ -64,7 +64,6 @@ BOOST_AUTO_TEST_CASE(SplayTreeCreateEmpty) {
 BOOST_AUTO_TEST_CASE(SplayTree_CreateFromRange) {
   const int kN = 101;
   std::vector<int> input(kN);
-  input.resize(kN);
   fill_range(input.begin(), input.end());
   SplayTree<int> t(input.begin(), input.end());
   SplayTree<int> t1(input);

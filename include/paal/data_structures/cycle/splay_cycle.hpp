@@ -18,7 +18,7 @@ namespace data_structures {
 
 template <typename T> 
 class SplayCycle {
-    typedef splay_tree::template Iterator<T, true> SIter;
+    typedef splay_tree::template Iterator<T> SIter;
 public:
     typedef CycleIterator<SIter> VIter;
     SplayCycle() {}
@@ -34,7 +34,7 @@ public:
     VIter vbegin(const T& t) const {
         size_t i = m_splayTree.getIdx(t);
         assert(i != size_t(-1));
-        return VIter(SIter(m_splayTree.splay(i)), m_splayTree.begin(), m_splayTree.end());
+        return VIter(SIter(m_splayTree.splay(i), &m_splayTree), m_splayTree.begin(), m_splayTree.end());
     }
 
     VIter vend() const {

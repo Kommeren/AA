@@ -122,9 +122,9 @@ namespace splay_tree {
                 + ((right_ != NULL) ? right_->size_ : 0);
       }
 
-      /** @returns next in same tree according to infix order */
+      /** @returns next in same tree according to infix order 
+       * WARNING, we assume that path from root to the this node is normalized*/
       node_type *next() {
-        normalize_root_path();
         node_type *node = right();
         if (node != NULL) {
           return node->subtree_min();
@@ -145,7 +145,6 @@ namespace splay_tree {
 
       /** @returns previous in same tree according to infix order */
       node_type *prev() {
-        normalize_root_path();
         node_type *node = left();
         if (node != NULL) {
           return node->subtree_max();
@@ -167,8 +166,10 @@ namespace splay_tree {
       /** @returns first node in subtree according to infix order */
       node_type *subtree_min() {
         node_type *node = this;
+        normalize();
         while (node->left() != NULL) {
           node = node->left();
+          node->normalize();
         }
         return node;
       }
@@ -176,8 +177,10 @@ namespace splay_tree {
       /** @returns last node in subtree according to infix order */
       node_type *subtree_max() {
         node_type *node = this;
+        normalize();
         while (node->right() != NULL) {
           node = node->right();
+          node->normalize();
         }
         return node;
       }
@@ -236,40 +239,41 @@ namespace splay_tree {
   };
 
 
-  template <typename T, SplayImplEnum S> class SplayTree;
+  template <typename T, SplayImplEnum s> class SplayTree;
 
   /**
    * SplayTree elements iterator.
    *
    * Traversing order is determined by template argument.
    **/
-  template<typename V, bool IsForward> class Iterator
+  template<typename V, SplayImplEnum splay_impl = kTopDownUnbalanced, bool IsForward = true> class Iterator
     : public boost::iterator_facade <
-    Iterator<V, IsForward>,
+    Iterator<V, splay_impl, IsForward>,
     Node<V>*,
     boost::bidirectional_traversal_tag,
       V& > {
+      typedef SplayTree<V, splay_impl> ST;
     public:
       typedef V value_type;
       typedef Node<value_type> node_type;
 
       /** @brief iterator after last element */
-      Iterator() : current_(NULL) {
+      Iterator() : current_(NULL), rotation_cnt_(0), splay_(NULL) {
       }
 
       /**
        * @brief iterator to element in given node
        * @param node node storing element pointed by iterator
        **/
-      explicit Iterator(node_type *node) : current_(node) {
+      explicit Iterator(node_type *node, const ST * splay) : current_(node), rotation_cnt_(0), splay_(splay) {
       }
 
       /**
        * @brief copy constructor
        * @param other iterator to be copied
        **/
-      Iterator(const Iterator<value_type, IsForward> &other) :
-        current_(other.current_) {
+      Iterator(const Iterator &other) :
+        current_(other.current_), rotation_cnt_(0), splay_(other.splay_) {
       }
 
     private:
@@ -278,8 +282,16 @@ namespace splay_tree {
       friend class SplayTree<V, kTopDown>;
       friend class SplayTree<V, kBottomUp>;
 
+      void normalize() {
+        if(rotation_cnt_ != splay_->getRotationCnt()) {
+            current_->normalize_root_path();
+            rotation_cnt_ = splay_->getRotationCnt();
+        }
+      }
+
       /** @brief increments iterator */
       void increment() {
+        normalize();
         if (IsForward) {
           current_ = current_->next();
         } else {
@@ -289,6 +301,7 @@ namespace splay_tree {
 
       /** @brief decrements iterator */
       void decrement() {
+        normalize();
         if (IsForward) {
           current_ = current_->prev();
         } else {
@@ -300,7 +313,7 @@ namespace splay_tree {
        * @param other iterator to be compared with
        * @returns true iff iterators point to the same node
        **/
-      bool equal(const Iterator<value_type, IsForward> &other) const {
+      bool equal(const Iterator &other) const {
         return this->current_ == other.current_;
       }
 
@@ -311,6 +324,8 @@ namespace splay_tree {
 
       /** pointed node */
       node_type* current_;
+      size_t rotation_cnt_;
+      const ST * splay_;
   };
 
   /**
@@ -326,27 +341,27 @@ namespace splay_tree {
     public:
       typedef T value_type;
       typedef Node<value_type> node_type;
-      typedef Iterator<value_type, true> iterator;
-      typedef const Iterator<value_type, true> const_iterator;
-      typedef Iterator<value_type, false> reverse_iterator;
-      typedef const Iterator<value_type, false> const_reverse_iterator;
+      typedef Iterator<value_type, SplayImpl, true> iterator;
+      typedef const Iterator<value_type, SplayImpl, true> const_iterator;
+      typedef Iterator<value_type, SplayImpl, false> reverse_iterator;
+      typedef const Iterator<value_type, SplayImpl, false> const_reverse_iterator;
 
-      SplayTree() {}
+      SplayTree() : rotation_cnt_(0) {}
 
       /**
        * @brief constructs tree from elements between two iterators
        * @param b iterator to first element
        * @param e iterator to element after last
        **/
-      template<typename I> SplayTree(const I b, const I e) {
+      template<typename I> SplayTree(const I b, const I e) : rotation_cnt_(0) {
         root_ = build_tree(b, e);
       }
       
-      SplayTree(SplayTree && splay) : root_(splay.root_), t2node_(std::move(splay.t2node_)) {
+      SplayTree(SplayTree && splay) : root_(splay.root_), t2node_(std::move(splay.t2node_)), rotation_cnt_(0) {
           splay.root_ = NULL;
       }
       
-      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
+      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)), rotation_cnt_(0) {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
@@ -358,7 +373,7 @@ namespace splay_tree {
        * @brief creates tree from elements in std::vector
        * @param array vector container
        **/
-      template<typename A> explicit SplayTree(const A &array) {
+      template<typename A> explicit SplayTree(const A &array) : rotation_cnt_(0) {
         root_ = build_tree(array, 0, array.size());
       }
 
@@ -368,7 +383,7 @@ namespace splay_tree {
 
       /** @returns forward iterator to first element in container */
       iterator begin() const {
-        return (root_ == NULL) ? end() : iterator(root_->subtree_min());
+        return (root_ == NULL) ? end() : iterator(root_->subtree_min(), this);
       }
 
       /** @returns forward iterator to element after last in container */
@@ -379,7 +394,7 @@ namespace splay_tree {
       /** @returns reverse iterator to last element in container */
       reverse_iterator rbegin() {
         return (root_ == NULL) ? rend()
-               : reverse_iterator(root_->subtree_max());
+               : reverse_iterator(root_->subtree_max(), this);
       }
 
       /** @returns reverse iterator to element before first in container */
@@ -420,6 +435,10 @@ namespace splay_tree {
             }
         }
         return i;
+      }
+
+      size_t getRotationCnt() const {
+          return rotation_cnt_;
       }
 
       /**
@@ -757,6 +776,7 @@ namespace splay_tree {
       /** root node of a tree */
       mutable node_type *root_;
       std::map<T, node_type *> t2node_;
+      size_t rotation_cnt_;
   };
 }
 }
