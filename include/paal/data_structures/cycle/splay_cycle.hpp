@@ -19,6 +19,7 @@ namespace data_structures {
 template <typename T> 
 class SplayCycle {
     typedef splay_tree::template Iterator<T> SIter;
+    typedef splay_tree::SplayTree<T> SplayTree; 
 public:
     typedef CycleIterator<SIter> VIter;
     SplayCycle() {}
@@ -59,7 +60,7 @@ public:
     }
 
 private:
-    splay_tree::SplayTree<T> m_splayTree; 
+    SplayTree m_splayTree; 
     const size_t m_size;
 };
 

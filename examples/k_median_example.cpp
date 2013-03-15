@@ -25,7 +25,7 @@ int main() {
     VorType voronoi(GSet{SGM::B, SGM::D}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::C});
 
-    //create facility location local searhc step
+    //create facility location local search step
     paal::local_search::k_median::KMedianLocalSearchStep<k, VorType>  
         ls(std::move(sol));
 

@@ -32,20 +32,20 @@ template <typename Graph> struct GraphMetricTraits {
 namespace metric_fillers {
 
     //generic
-    template <typename GraphTypeTag> class GraphMericFillerImpl {};
+    template <typename GraphTypeTag> class GraphMetricFillerImpl {};
     
-    template <> class GraphMericFillerImpl<graph_type::Sparse> {
+    template <> class GraphMetricFillerImpl<graph_type::Sparse> {
         public:
-        template <typename Graph, typename ResultMatrics> 
-        void fillMatrix(const Graph & g, ResultMatrics & rm)  {
+        template <typename Graph, typename ResultMatrix> 
+        void fillMatrix(const Graph & g, ResultMatrix & rm)  {
 	    boost::johnson_all_pairs_shortest_paths(g, rm); 
         }
     };
     
-    template <> class GraphMericFillerImpl<graph_type::Dense> {
+    template <> class GraphMetricFillerImpl<graph_type::Dense> {
         public:
-        template <typename Graph, typename ResultMatrics> 
-        void fillMatrix(const Graph & g, ResultMatrics & rm)  {
+        template <typename Graph, typename ResultMatrix> 
+        void fillMatrix(const Graph & g, ResultMatrix & rm)  {
 	    boost::floyd_warshall_initialized_all_pairs_shortest_paths(g, rm);
         }
     };
@@ -65,7 +65,7 @@ namespace metric_fillers {
 template <typename Graph, typename DistanceType, 
           typename GraphType = typename GraphMetricTraits<Graph>::GraphTypeTag > 
 struct  GraphMetric : public ArrayMetric<DistanceType>, 
-            public metric_fillers::GraphMericFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> {
+            public metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> {
       typedef   ArrayMetric<DistanceType> GMBase;
 
     GraphMetric(const Graph & g)  

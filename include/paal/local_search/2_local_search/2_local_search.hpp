@@ -27,7 +27,7 @@ namespace two_local_search {
  See \ref local_search. There are three ways to provide search components
  <ul>
        <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
-       <li> use TwoLocalComponents to provide your own search Componnts
+       <li> use TwoLocalComponents to provide your own search Components
        <li> write your own implementation of MultiSearchComponents
  </ul>
  Basic usage of this algorithm is extremely simple and elegant. <br> We are using some helper functions from the library.
@@ -61,7 +61,7 @@ class  TwoLocalSearchStep :
 };
 
 template <typename Gain, 
-          typename GetNeighborhood = TrivialNeigborGetter, 
+          typename GetNeighborhood = TrivialNeighborGetter, 
           typename StopCondition = utils::ReturnFalseFunctor> 
 class TwoLocalComponents : 
     public MultiSearchComponents<
@@ -94,12 +94,12 @@ public :
  * @return 
  */
 template <typename Gain, 
-          typename GetNeighborhood = TrivialNeigborGetter,
+          typename GetNeighborhood = TrivialNeighborGetter,
           typename StopCondition = utils::ReturnFalseFunctor>
 TwoLocalComponents<Gain, GetNeighborhood, StopCondition>  
 
     make_TwoLocalSearchComponents(Gain ch, 
-            GetNeighborhood ng = TrivialNeigborGetter(),
+            GetNeighborhood ng = TrivialNeighborGetter(),
             StopCondition sc = utils::ReturnFalseFunctor()) {
 
     return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));

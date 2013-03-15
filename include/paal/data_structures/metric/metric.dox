@@ -1,6 +1,6 @@
 /*! \page metric Metric
 \section m_concept Metric Concept
-Metric is a concept modeling distance function fullfilling trangle inequality. That is if \a m is a metric and \a x,y,z are some vertices then, \a m(x,y) + \a m(y,z) > \a m(x,z).<br><br>
+Metric is a concept modeling distance function fulfilling triangle inequality. That is if \a m is a metric and \a x,y,z are some vertices then, \a m(x,y) + \a m(y,z) > \a m(x,z).<br><br>
 VertexType - denotes type of point from considered space i.e. argument of the metric.<br>
 DistanceType - denotes type of the distance beetwen points.<br>
 Metric need to have fulfill the interface: <br>
@@ -19,7 +19,7 @@ We have:
  
  Default value of VertexType is int and the DistanceType is detected automatically.
 
-\section m_impl Metric implemntations
- Paal provides several metrics implementation. The basic one is paal::data_structures::ArrayMetric which is acctually 2 dimentional array.
+\section m_impl Metric implementations
+ Paal provides several metrics implementation. The basic one is paal::data_structures::ArrayMetric which is actually 2 dimensional array.
  The library contains paal::data_structures::GraphMetric which is the metric adapter for boost graph library. 
 */

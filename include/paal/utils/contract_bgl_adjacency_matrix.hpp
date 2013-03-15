@@ -1,12 +1,12 @@
 /**
- * @file contract_bgl_adjaceny_matrix.hpp
+ * @file contract_bgl_adjacency_matrix.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-22
  */
-#ifndef CONTRACT_BGL_ADJACENY_MATRIX_HPP
-#define CONTRACT_BGL_ADJACENY_MATRIX_HPP
+#ifndef CONTRACT_BGL_ADJACENCY_MATRIX_HPP
+#define CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 
 #include <boost/graph/adjacency_matrix.hpp>
 
@@ -51,4 +51,4 @@ boost::adjacency_matrix<Directed,
 
 }
 }
-#endif /* CONTRACT_BGL_ADJACENY_MATRIX_HPP */
+#endif /* CONTRACT_BGL_ADJACENCY_MATRIX_HPP */

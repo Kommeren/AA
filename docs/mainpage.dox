@@ -1,21 +1,20 @@
 /*! \mainpage This is the Practical Approximation Algorithms library. 
  
   \section Introduction
-    The PAAl is a header-only, general library consisting of general algorithms, <br>
+    The PAAl is a header-only, general library consisting of general algorithms, 
     data structures and several complete solution for the various optimization problems.
+    The PAAl is implemented taking advantage of the new fabulous features of C++ introduced in the c++0x standard.
  
   \section Installation
-   There is no need to install anything because the PAAl is header only. <br>
-   All you have to do is to download the library and include appropriate headers.<br>
+   There is no need to install anything because the PAAl is header only. 
+   All you have to do is to download the library and include appropriate headers.
 
-   Only, if you'd like to develop the library you must compile the unit test.
+   Only, if you'd like to develop the library, you must compile the unit test.
 
   \section get_repo Download
     In order to download repository please run the following command:
     
     <B>    git clone git://siekiera.mimuw.edu.pl/paal.git/ </B>
-
-
 
 
   \section Contents
@@ -66,7 +65,7 @@
   ___________________________________________________________________________________________________
   
       ALGORITHMS COMPONENTS - eg. NeighborhoodGetter, SolutionUpdater.
-      This are the brics  working on specific data structures concepts.
+      This are the bricks  working on specific data structures concepts.
   ___________________________________________________________________________________________________
   
       DATA_STRUCTURES - e.g. Metric, Cycle. The data structure used by algorithm helpers. 
@@ -81,7 +80,8 @@
   Also note that the same algorithm helpers that are used by local search can be used to produced the simulated annealing algorithm. <br>
   If the user want to swap implementation of the metric to use specific properties of his topology is not the problem at all! <br>
   
-
+ \section Platforms
+ Currently the library compiles on the gcc 4.6.3. Unfortunately the library does not compile on the newest Microsoft Visual Studio 2012 due to the poor support of c++0x.
 
   \section  Testing
 

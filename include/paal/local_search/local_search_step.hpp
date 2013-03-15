@@ -1,6 +1,6 @@
 /**
  * @file local_search.hpp
- * @brief Costam
+ * @brief consists different kinds of local search steps.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -77,8 +77,8 @@ We will refer to this schema as LocalSearchMultiSolution. <br>
 Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 \section local_search_interface  LOCAL SEARCH INTERFACE
-Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we anderstend one lookup of the neighborhood. The lookup is finished by one update if the better solution is found.
-So the LocalSearchStep archepyte is of the form:
+Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we understand one lookup of the neighborhood. The lookup is finished by one update if the better solution is found.
+So the LocalSearchStep archetype is of the form:
 <pre>
    class LocalSearchStepArchetype {
        //perform one step of local search
@@ -89,20 +89,20 @@ So the LocalSearchStep archepyte is of the form:
    }
 </pre>
 
-The LocalSearchStep is actually the core of the design. In the simplest variant, if we've  got th LocalSearchStep, all we have to do is to run search as long as it's  returning true.
+The LocalSearchStep is actually the core of the design. In the simplest variant, if we've  got the LocalSearchStep, all we have to do is to run search as long as it's  returning true.
 In the more general case one can check some additional stop condition and perform some operations between the local search steps. In order to make it possible we introduce two additional concepts:
 <pre>
     class PostSearchActionArchetype {
         void operator()(Solution &);
     }
 </pre>
-The PostSearchAction functor is invoked after each succesfull search step.
+The PostSearchAction functor is invoked after each successful search step.
 <pre>
     class GlobalStopConditionArchetype {
         bool operator()(Solution &);
     }
 </pre>
-The GlobalStopCondition is checked after each succesfull search step.
+The GlobalStopCondition is checked after each successful search step.
 
 Now we introduce the search function interface:
 <pre>
@@ -151,7 +151,7 @@ Concepts:
     }
     </pre>
     </li>
-    <li> <i>SearchComponents</i>All of the previous concepts are grouped togheter into one class.
+    <li> <i>SearchComponents</i>All of the previous concepts are grouped together into one class.
     <pre>
     SearchComponentsArchetype {
         GetNeighborhood & getNeighborhood();
@@ -187,7 +187,7 @@ After we've defined components we run LS.
 
 \subsection local_search_multi LOCAL SEARCH MULTI SOLUTION 
 
-The interface and conceptes of the  LocalSearchMultiSolution are very simmilar to the LocalSearchSingleSolution ones.<br>
+The interface and concepts of the  LocalSearchMultiSolution are very similar to the LocalSearchSingleSolution ones.<br>
 
 <br>
 Note that <i>SolutionElement</i> is the type of the specific element of the solution. <br>
@@ -201,10 +201,10 @@ Concepts:
         SolutionElementIterator end();
         InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
                              // The inner solution type is InnerSolution
-                             // If this member fuction is provided, the LocalSearchStep getSolution() returns InnerSolution.
+                             // If this member function is provided, the LocalSearchStep getSolution() returns InnerSolution.
     }
     </pre>
-    <li> <i>MultiGetNeighborhood</i>  is a concept class responisble for getting the neighborhood of the current solution  
+    <li> <i>MultiGetNeighborhood</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
     MultiGetNeighborhoodArchetype {
         UpdateIteratorsRange operator()(const Solution & s, const SolutionElement &)
@@ -230,7 +230,7 @@ Concepts:
     }
     </pre>
     
-    <li> <i>MultiSearchComponents</i>All of the previous concepts are grouped togheter into one class.
+    <li> <i>MultiSearchComponents</i>All of the previous concepts are grouped together into one class.
     <pre>
     MultiSearchComponentsArchetype {
         MultiGetNeighborhood & getNeighborhood();

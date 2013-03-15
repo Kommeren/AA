@@ -20,10 +20,10 @@ namespace paal {
 namespace data_structures {
 
 
-//TODO THIS IS SIMPLIEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
+//TODO THIS IS SIMPLEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
 /**
  * @class SimpleCycle
- * @brief This is the simpliest implementation of the \ref cycle concept based on the list.
+ * @brief This is the simplest implementation of the \ref cycle concept based on the list.
  *
  * @tparam CycleEl
  * @tparam IdxT

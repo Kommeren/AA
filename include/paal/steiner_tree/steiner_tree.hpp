@@ -11,7 +11,7 @@
 #include <boost/range/any_range.hpp>
 
 #include "paal/utils/iterator_utils.hpp"
-#include "paal/utils/contract_bgl_adjaceny_matrix.hpp"
+#include "paal/utils/contract_bgl_adjacency_matrix.hpp"
 
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"

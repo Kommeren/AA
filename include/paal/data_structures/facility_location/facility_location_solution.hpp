@@ -19,8 +19,8 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @brief dscribes solution to facility location
- * The initial solution is passed as voronoi, which has to be thr model of the \ref voronoi concept.
+ * @brief describes solution to facility location
+ * The initial solution is passed as voronoi, which has to be the model of the \ref voronoi concept.
  * The generators of the voronoi are the facilities and the vertices are the clients.
  *
  * @tparam FacilityCost

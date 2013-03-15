@@ -56,7 +56,7 @@ public:
 };
 
 
-//assigns given solution element with new value computes the objectove function
+//assigns given solution element with new value computes the objective function
 //and assigns the old value to the solution element 
 //solution remains the same
 struct Gain {

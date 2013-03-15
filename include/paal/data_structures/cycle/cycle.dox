@@ -11,7 +11,7 @@ Cycle need to fulfill the interface:
 </pre> 
 <br>
 CycleElem and VertexIterator types are provided through paal::data_structures::CycleTraits and are detected automatically.
-\section implementation Impelmentation
+\section implementation Implementation
 Library provide only one very simple implementation of cycle that is paal::data_structures::SimpleCycle.
 
 */

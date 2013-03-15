@@ -16,7 +16,7 @@ namespace data_structures {
 
 /**
  * @class ArrayMetric
- * @brief \ref metric implementation on 2 dimentional array
+ * @brief \ref metric implementation on 2 dimensional array
  *
  * @tparam DistanceTypeParam
  */

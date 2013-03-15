@@ -17,7 +17,7 @@ namespace paal {
 namespace local_search{
 
 
-struct TrivialNeigborGetter {
+struct TrivialNeighborGetter {
     template <typename SolutionElement, typename Solution> 
                           std::pair<utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type>, 
                                     utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type> > 

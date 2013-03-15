@@ -9,7 +9,7 @@
 #define SEARCH_COMPONENTS_HPP 
 
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/do_notihng_functor.hpp"
+#include "paal/utils/do_nothing_functor.hpp"
 
 namespace paal {
 namespace local_search {

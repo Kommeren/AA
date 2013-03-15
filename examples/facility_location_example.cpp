@@ -27,7 +27,7 @@ int main() {
     VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, cost);
 
-    //create facility location local searhc step
+    //create facility location local search step
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
         ls(std::move(sol));
 

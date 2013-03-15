@@ -84,6 +84,8 @@ public:
     }
 };
 
+
+
 template <typename Solution, typename SearchComponents> 
 class LocalSearchStep<Solution, SearchComponents, search_strategies::SteepestSlope> 
         : public LocalSearchStepBase<Solution, SearchComponents>  {
