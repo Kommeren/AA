@@ -9,7 +9,7 @@ struct SampleGraphsMetrics {
     typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
     enum nodes { A, B, C, D, E, F, G, H };
 
-    static GraphMT getGraphMetricSmall() {
+    static graph_t getGraphSmall() {
         const int num_nodes = 5;
         Edge edge_array[] = { Edge(A, C), Edge(B, B), Edge(B, D), Edge(B, E),
             Edge(C, B), Edge(C, D), Edge(D, E), Edge(E, A), Edge(E, B)
@@ -19,7 +19,11 @@ struct SampleGraphsMetrics {
 
         graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
 
-        return GraphMT(g);
+        return g;
+    }
+    
+    static GraphMT getGraphMetricSmall() {
+        return GraphMT(getGraphSmall());
     }
     
     static GraphMT getGraphMetricSteiner() {
