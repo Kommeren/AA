@@ -9,6 +9,7 @@
 #include "paal/min_cost_max_flow/min_cost_max_flow.hpp"
 
 #include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
 
 using namespace boost;
 
@@ -51,38 +52,33 @@ private:
     Reversed & m_rev;
 };
 
-
-BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
-/*    auto g = SampleGraphsMetrics::getGraphSmall();
-    typedef decltype(g) Graph;*/
-   typedef adjacency_list < listS, vecS, directedS,
-                  property < vertex_name_t, std::string >,
-                      property < edge_capacity_t, long,
-                          property < edge_residual_capacity_t, long,
-                              property < edge_reverse_t, Traits::edge_descriptor, 
-                                property <edge_weight_t, long>
-                                       > 
+typedef adjacency_list < listS, vecS, directedS,
+               property < vertex_name_t, std::string >,
+                   property < edge_capacity_t, long,
+                       property < edge_residual_capacity_t, long,
+                           property < edge_reverse_t, Traits::edge_descriptor, 
+                             property <edge_weight_t, long>
                                     > 
-                                > > Graph;
+                                 > 
+                             > > Graph;
+typedef property_map < Graph, edge_capacity_t >::type Capacity;
+typedef property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
+typedef property_map < Graph, edge_weight_t >::type Weight;
 
+Graph getSampleGraph(unsigned & s, unsigned & t) {
     typedef Traits::vertex_descriptor vd;
     typedef Traits::edge_descriptor ed;
     const typename boost::graph_traits<Graph>::vertices_size_type N(6);
-    typedef property_map < Graph, edge_capacity_t >::type Capacity;
-    typedef property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
-    typedef property_map < Graph, edge_weight_t >::type Weight;
     typedef property_map < Graph, edge_reverse_t >::type Reversed;
     
     Graph g(N);
     Capacity  capacity = get(edge_capacity, g);
     Reversed rev = get(edge_reverse, g);
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g);
-    
+    ResidualCapacity residual_capacity = get(edge_residual_capacity, g); 
     Weight weight = get(edge_weight, g);
-    Weight weight2(weight);
 
-
-    vd s(0), t(5);
+    s = 0;
+    t = 5;
 
     EdgeAdder<Graph, Weight, Capacity, Reversed, ResidualCapacity> 
         ea(g, weight, capacity, rev, residual_capacity);
@@ -90,40 +86,37 @@ BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
     ea.addEdge(0, 1, 4 ,2);
     ea.addEdge(0, 2, 2 ,2);
 
-    ea.addEdge(1, 3, 1 ,1);
+    ea.addEdge(1, 3, 2 ,2);
     ea.addEdge(1, 4, 1 ,1);
     ea.addEdge(2, 3, 1 ,1);
     ea.addEdge(2, 4, 1 ,1);
-/*    ea.addEdgeSym(1, 2, 1 ,1);
-    ea.addEdgeSym(1, 3, 1 ,1);
-    ea.addEdgeSym(2, 4, 1 ,1);
-    ea.addEdgeSym(3, 4, 1 ,1);*/
 
     ea.addEdge(3, 5, 4 ,20);
     ea.addEdge(4, 5, 2 ,20);
 
-    std::vector<int> pred(N);
-    std::vector<int> distance(N, (std::numeric_limits<int>::max)());
-    distance[s] = 0;
-    
-    assert(edge(0,1, g).second);
-    assert(edge(0,2, g).second);
-    
-    std::cout << residual_capacity[edge(0,1, g).first] << std::endl;
-    std::cout << residual_capacity[edge(0,2, g).first] << std::endl;
-    std::cout << residual_capacity[edge(1,0, g).first] << std::endl;
-    std::cout << residual_capacity[edge(2,0, g).first] << std::endl;
+    return g;
+}
 
+
+BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
+    unsigned s,t;
+    Graph g = getSampleGraph(s, t);
+    
     edmonds_karp_max_flow(g, s, t);
+    ResidualCapacity residual_capacity = get(edge_residual_capacity, g); 
     auto gRes = detail::residual_graph(g, residual_capacity);
-//    path_augmentation_from_residual(gRes, s, t);
     cycle_cancelation_from_residual(gRes);
-    std::iota(pred.begin(), pred.end(), 0);
 
-    std::cout << residual_capacity[edge(0,1, g).first] << std::endl;
-    std::cout << residual_capacity[edge(0,2, g).first] << std::endl;
-    std::cout << residual_capacity[edge(1,0, g).first] << std::endl;
-    std::cout << residual_capacity[edge(2,0, g).first] << std::endl;
+    BOOST_CHECK(find_min_cost(g) == 58);
+}
 
-    //std::cout << cost << std::endl;
+BOOST_AUTO_TEST_CASE(path_augmentation_test) {
+    unsigned s,t;
+    Graph g = getSampleGraph(s, t);
+    
+    ResidualCapacity residual_capacity = get(edge_residual_capacity, g); 
+    auto gRes = detail::residual_graph(g, residual_capacity);
+    path_augmentation_from_residual(gRes, s, t);
+
+    BOOST_CHECK(find_min_cost(g) == 58);
 }

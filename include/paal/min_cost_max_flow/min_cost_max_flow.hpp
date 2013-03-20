@@ -18,18 +18,27 @@
 //
 namespace boost {
 
-template<class Graph,
-    class CapacityEdgeMap,
-    class WeightEdgeMap>
-typename property_traits<CapacityEdgeMap>::value_type
-find_min_cost(Graph g_t, CapacityEdgeMap capacity, WeightEdgeMap weight_orig_t)
+template<class Graph>
+typename property_traits<typename property_map < Graph, edge_capacity_t >::type>::value_type
+find_min_cost(Graph & g)
 {
-    typename graph_traits<Graph>::edge_iterator w_ei, w_ei_end;
+    typename graph_traits<Graph>::edge_iterator ei, end;
+    typedef typename property_map < Graph, edge_capacity_t >::type Capacity;
+    typedef typename property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
+    typedef typename property_map < Graph, edge_weight_t >::type Weight;
+    
+    ResidualCapacity residual_capacity = get(edge_residual_capacity, g);
+    Capacity  capacity = get(edge_capacity, g);
+    Weight weight = get(edge_weight, g);
+
     long cost = 0;
-    boost::tie(w_ei, w_ei_end) = edges(g_t);
-    for(;w_ei != w_ei_end; ++w_ei) {
-        if((weight_orig_t[*w_ei])< 0)
-            cost = cost + (capacity[*w_ei])*(-weight_orig_t[*w_ei]);
+    boost::tie(ei, end) = edges(g);
+    for(;ei != end; ++ei) {
+        if((capacity[*ei]) >  0) {
+            cost +=  (capacity[*ei] - residual_capacity[*ei]) * weight[*ei];
+        } else {
+            cost -=  residual_capacity[*ei] * weight[*ei];
+        }
     }
     return cost;
 }
@@ -50,7 +59,7 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
     typedef typename property_map < ResidualGraph, edge_reverse_t >::type Reversed;
     typedef std::vector<unsigned> Pred;
 
-    int N = num_vertices(g);
+    unsigned N = num_vertices(g);
     Weight weight = get(edge_weight, g);
     std::vector<Dist> distance(N);
     //TODO this vector shouldn't be needed
@@ -91,11 +100,11 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
     VD v;
     EI i, end;
     for (boost::tie(i, end) = edges(g); i != end; ++i) {
-        std::cout << "e: " << *i  
+/*        std::cout << "e: " << *i  
             << " dist source " << distance[source(*i, g)] 
             << " dist target " << distance[target(*i, g)] 
             << " w " << weight[*i]<< 
-                    std::endl;
+                    std::endl;*/
         if (get(distance, source(*i, g)) + get(weight, *i) < 
              get(distance, target(*i,g))) {
              v = source(*i, g);
