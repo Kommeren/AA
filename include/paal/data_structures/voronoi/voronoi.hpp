@@ -33,10 +33,10 @@ namespace data_structures {
 template <typename Metric>
 class Voronoi {
     public:
-        typedef typename Metric::VertexType VertexType;    
+        typedef typename MetricTraits<Metric>::VertexType VertexType;    
         typedef std::multimap<VertexType, VertexType> GeneratorsToVertices;
         typedef std::set<VertexType> GeneratorsSet;
-        typedef typename Metric::DistanceType Dist;
+        typedef typename MetricTraits<Metric>::DistanceType Dist;
         //TODO change to vector
         typedef GeneratorsSet Vertices;
         typedef typename GeneratorsToVertices::const_iterator VerticesForGeneratorIter;
@@ -51,7 +51,7 @@ class Voronoi {
          */
         Voronoi(const GeneratorsSet & generators, 
                Vertices vertices,
-               const Metric & m, Dist costOfNoGenerator = INT_MAX) :
+               const Metric & m, Dist costOfNoGenerator = std::numeric_limits <Dist>::max()) :
             m_vertices(std::move(vertices)), m_metric(m), m_costOfNoGenerator(costOfNoGenerator) {
                 for(VertexType f : generators) {
                     addGenerator(f);

@@ -22,10 +22,10 @@ Each model of the Voronoi concept need to model also WeakVoronoi concept. Additi
 class VoronoiArchetype : public WeakVoronoiArchetype {
     
     // returns diff between new cost and old cost
-    Dist addGenerator(VertexType f) {
+    Dist addGenerator(VertexType f);
         
     // returns diff between new cost and old cost
-    Dist remGenerator(VertexType f) {
+    Dist remGenerator(VertexType f);
 }
 </pre>
 

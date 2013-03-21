@@ -2,7 +2,6 @@
 
 #include <boost/test/unit_test.hpp>
 
-#define BOOST_RESULT_OF_USE_DECLTYPE
 
 #include <iostream>
 
@@ -107,7 +106,7 @@ BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
     auto gRes = detail::residual_graph(g, residual_capacity);
     cycle_cancelation_from_residual(gRes);
 
-    BOOST_CHECK(find_min_cost(g) == 58);
+    BOOST_CHECK(find_min_cost(g) == 29);
 }
 
 BOOST_AUTO_TEST_CASE(path_augmentation_test) {
@@ -118,5 +117,5 @@ BOOST_AUTO_TEST_CASE(path_augmentation_test) {
     auto gRes = detail::residual_graph(g, residual_capacity);
     path_augmentation_from_residual(gRes, s, t);
 
-    BOOST_CHECK(find_min_cost(g) == 58);
+    BOOST_CHECK(find_min_cost(g) == 29);
 }

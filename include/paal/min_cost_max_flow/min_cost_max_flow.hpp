@@ -8,6 +8,8 @@
 #ifndef MIN_COST_MAX_FLOW_HPP
 #define MIN_COST_MAX_FLOW_HPP 
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/graph_concepts.hpp>
@@ -15,7 +17,7 @@
 #include <boost/pending/relaxed_heap.hpp>
 #include <boost/graph/edmonds_karp_max_flow.hpp>
 #include <boost/iterator/transform_iterator.hpp>
-//
+
 namespace boost {
 
 template<class Graph>
@@ -36,18 +38,16 @@ find_min_cost(Graph & g)
     for(;ei != end; ++ei) {
         if((capacity[*ei]) >  0) {
             cost +=  (capacity[*ei] - residual_capacity[*ei]) * weight[*ei];
-        } else {
-            cost -=  residual_capacity[*ei] * weight[*ei];
-        }
+        } 
     }
     return cost;
 }
 
 
-template <typename Graph>
+/*template <typename Graph>
 void path_augmentation(Graph &g, typename graph_traits<Graph>::vertex_descriptor s, typename graph_traits<Graph>::vertex_descriptor t) {
 
-}
+}*/
 
 template <typename ResidualGraph>
 void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<ResidualGraph>::vertex_descriptor s, 
@@ -100,11 +100,6 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
     VD v;
     EI i, end;
     for (boost::tie(i, end) = edges(g); i != end; ++i) {
-/*        std::cout << "e: " << *i  
-            << " dist source " << distance[source(*i, g)] 
-            << " dist target " << distance[target(*i, g)] 
-            << " w " << weight[*i]<< 
-                    std::endl;*/
         if (get(distance, source(*i, g)) + get(weight, *i) < 
              get(distance, target(*i,g))) {
              v = source(*i, g);
@@ -155,7 +150,6 @@ void cycle_cancelation_from_residual(ResidualGraph &g) {
         std::fill(distance.begin(), distance.end(),0);
     }
 }
-
 
 }
 
