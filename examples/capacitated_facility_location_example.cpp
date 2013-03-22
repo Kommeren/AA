@@ -14,18 +14,15 @@ int main() {
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
 
-    std::vector<std::vector<int>> capv{{},{},{},{},{}};
-    auto cap = [&](int i, int j){ return capv[i][j];};
-
-    std::vector<int> fcapv{};
+    std::vector<int> fcapv{2, 2};
     auto fcap = [&](int i){ return fcapv[i];};
     
-    std::vector<int> cdemv{};
+    std::vector<int> cdemv{2, 2};
     auto cdem = [&](int i){ return cdemv[i];};
     
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<
-        decltype(gm), decltype(cap), decltype(fcap), decltype(cdem)> VorType;
+        decltype(gm), decltype(fcap), decltype(cdem)> VorType;
     typedef paal::data_structures::FacilityLocationSolution
         <decltype(cost), VorType> Sol;
     typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
@@ -36,8 +33,8 @@ int main() {
 
 
     //create voronoi and solution
-    VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, cap, fcap, cdem);
-    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, cost);
+    VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
+    Sol sol(std::move(voronoi), USet{SGM::B}, cost);
 
     //create facility location local search step
     FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
