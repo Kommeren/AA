@@ -8,8 +8,10 @@
 
 #include <cassert>
 
+#include "paal/utils/type_functions.hpp"
 #include "facility_location_update_element.hpp"
 #include "facility_location_solution_element.hpp"
+#include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 
 namespace paal {
 namespace local_search {
@@ -18,12 +20,13 @@ namespace facility_location {
 template <typename VertexType> class FacilityLocationChecker {
 public:
         template <class Solution, class Update> 
-    int operator()(const Solution & s, 
+    auto operator()(const Solution & s, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            const Update & ue) {
+            const Update & ue) ->
+                typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
         auto const & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        int ret;
+        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret;
         switch (ue.getImpl()->getType()) {
             case REMOVE : {
                 auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());

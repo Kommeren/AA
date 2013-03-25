@@ -46,8 +46,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(Gain) {
-            int i = this->x(this->s, this->u);          
-            use(i);
+            use(this->x(this->s, this->u) > 0);          
         }
 };
 

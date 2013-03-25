@@ -32,9 +32,23 @@ private:
         
 };
 
+} //k_median
+} //local search
+
+namespace data_structures {
+    template <int k, typename Voronoi>
+    class FacilityLocationSolutionTraits<local_search::k_median::KMedianSolution<k, Voronoi>> {
+        typedef VoronoiTraits<Voronoi> VT;
+        typedef local_search::k_median::KMedianSolution<k, Voronoi> KMS;
+    public:
+        typedef typename VT::VertexType VertexType;
+        typedef typename VT::DistanceType Dist;
+        typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
+        typedef puretype(std::declval<KMS>().getUnchosenFacilities()) UnchosenFacilitiesSet;
+    };
 }
-}
-}
+
+} //paal
 
 
 #endif /* K_MEDIAN_SOLUTION_HPP */

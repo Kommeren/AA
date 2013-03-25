@@ -131,7 +131,8 @@ public:
      * @return true if the solution is improved false otherwise 
      */
     bool search() {
-        Fitness max = -1;
+        Fitness max;
+        bool init = false;
         bool stop = false;
         auto currSE = m_solution.begin();
         auto endSE =  m_solution.end();
@@ -143,7 +144,8 @@ public:
             for(;currUpdate !=  adjustmentSet.second && !stop; ++currUpdate) {
                 Fitness gain = this->m_searchComponents.gain()(m_solution, *currSE, *currUpdate); 
                 
-                if(gain > max) {
+                if(!init || gain > max) {
+                    init = true;
                     bestSE = currSE;
                     bestUpdate = *currUpdate;
                     max = gain;

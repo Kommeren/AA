@@ -10,6 +10,7 @@ int main() {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
+
    
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
@@ -17,7 +18,7 @@ int main() {
     std::vector<int> fcapv{2, 2};
     auto fcap = [&](int i){ return fcapv[i];};
     
-    std::vector<int> cdemv{2, 2};
+    std::vector<int> cdemv{2, 2, 1, 3, 3};
     auto cdem = [&](int i){ return cdemv[i];};
     
     //define voronoi and solution

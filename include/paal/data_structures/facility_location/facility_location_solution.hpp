@@ -15,6 +15,8 @@
 
 #include "paal/data_structures/voronoi/voronoi.hpp"
 
+#include "facility_location_solution_traits.hpp"
+
 namespace paal {
 namespace data_structures {
 
@@ -82,6 +84,17 @@ class FacilityLocationSolution {
         VoronoiType m_voronoi;
         UnchosenFacilitiesSet m_unchosenFacilities;
         const FacilityCost & m_facCosts;
+};
+
+template <typename FacilityCost, typename Voronoi>
+class FacilityLocationSolutionTraits<FacilityLocationSolution<FacilityCost, Voronoi>> {
+    typedef VoronoiTraits<Voronoi> VT;
+    typedef FacilityLocationSolution<FacilityCost, Voronoi> FLS;
+public:
+    typedef typename VT::VertexType VertexType;
+    typedef typename VT::DistanceType Dist;
+    typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
+    typedef puretype(std::declval<FLS>().getUnchosenFacilities()) UnchosenFacilitiesSet;
 };
 
 

@@ -5,12 +5,15 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include "facility_location_solution_element.hpp"
-#include "paal/utils/type_functions.hpp"
-#include "paal/data_structures/object_with_copy.hpp"
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>
+
+#include "paal/utils/type_functions.hpp"
+#include "paal/data_structures/object_with_copy.hpp"
+#include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
+
+#include "facility_location_solution_element.hpp"
 
 namespace paal {
 namespace local_search {
@@ -89,6 +92,16 @@ private:
     FacilityLocationSolutionWithCopy m_sol;    
 };
 
+
 } //facility_location
 } // local_search
+
+namespace data_structures {
+    template <typename FacilityLocationSolution>
+    struct FacilityLocationSolutionTraits<ObjectWithCopy<FacilityLocationSolution>> : 
+                public FacilityLocationSolutionTraits<FacilityLocationSolution> {};
+}
+
+
+
 } // paal

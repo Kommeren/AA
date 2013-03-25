@@ -87,7 +87,7 @@ template <typename T> struct Add : public RemoveAndAddBase<T> {
 
 class Update {
 public:
-    template <typename T> Update(T * t) : m_impl(t) {}
+    Update(AbstractUpdate * t) : m_impl(t) {}
 
     const AbstractUpdate * getImpl() const {
         return m_impl;

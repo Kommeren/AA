@@ -18,15 +18,60 @@ namespace data_structures {
 template <typename Metric, typename GeneratorsCapacieties, typename VerticesDemands>
 class CapacitatedVoronoi {
 public:
+    class Dist {
+    public:
+        typedef typename MetricTraits<Metric>::DistanceType DistI;
+        Dist() {} 
+        Dist(DistI real, DistI distToFullAssign) : 
+            m_realDist(real), m_distToFullAssignment(distToFullAssign) {}
+        Dist operator-(Dist d) {
+            return Dist(m_realDist - d.m_realDist, 
+                        m_distToFullAssignment - d.m_distToFullAssignment);
+        }
+
+        
+        bool operator>(DistI d) {
+            if(m_distToFullAssignment > 0) {
+                return true;
+            } else  if(m_distToFullAssignment < 0) {
+                return false;
+            }
+            return m_realDist > d;
+        }
+        
+        const Dist & operator+=(Dist d) {
+            m_realDist += d.m_realDist;
+            m_distToFullAssignment += d.m_distToFullAssignment;
+            return *this;
+        }
+        
+        Dist operator+(Dist d) {
+            Dist ret(d);
+            ret += *this;
+            return ret;
+        }
+        
+        Dist operator-() {
+            return Dist(-m_realDist, m_distToFullAssignment);
+        }
+    
+        friend  Dist  operator+(DistI di, Dist d) {
+            return Dist(d.m_realDist + di, d.m_distToFullAssignment); 
+        }
+
+    private:
+        DistI m_realDist;
+        DistI m_distToFullAssignment;
+    };
+    typedef typename Dist::DistI DistI;
     typedef typename MetricTraits<Metric>::VertexType VertexType;    
     typedef std::set<VertexType> Generators;
-    typedef typename MetricTraits<Metric>::DistanceType Dist;
     typedef std::vector<int> Vertices;
 
     CapacitatedVoronoi(const Generators & gen, Vertices ver,
                        const Metric & m, 
                        const GeneratorsCapacieties & gc, const VerticesDemands & vd, 
-                       Dist costOfNoGenerator = std::numeric_limits<Dist>::max() ) : 
+                       DistI costOfNoGenerator = std::numeric_limits<DistI>::max() ) : 
                          m_residual_capacity(boost::get(boost::edge_residual_capacity, m_g)),
                          m_capacity(boost::get(boost::edge_capacity, m_g)),
                          m_weight(boost::get(boost::edge_weight, m_g)),
@@ -36,7 +81,7 @@ public:
                          m_vertices(std::move(ver)), m_metric(m), 
                          m_generatorsCap(gc),
                          m_capacitySum(std::accumulate(m_vertices.begin(), m_vertices.end(), 
-                                    Dist(0), [&](Dist d, VertexType v){return d + vd(v);})),
+                                    DistI(0), [&](DistI d, VertexType v){return d + vd(v);})),
                          m_firstGeneratorId(m_vertices.size() + 2),
                          m_costOfNoGenerator(costOfNoGenerator) 
                             {
@@ -57,11 +102,12 @@ public:
         VD genGraph = add_vertex(boost::property<boost::vertex_name_t, int>(gen), m_g);
         m_gToGraphV.insert(std::make_pair(gen, genGraph));
         for(const std::pair<VertexType, VD> & v : m_vToGraphV) {
-            addEdge(genGraph, v.second, m_metric(v.first, gen), 0);
+            addEdge(v.second, genGraph, m_metric(v.first, gen), std::numeric_limits<DistI>::max());
         }
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
+        boost::path_augmentation_from_residual(m_gRes, m_s, m_t);
         boost::cycle_cancelation_from_residual(m_gRes);
 
         return getCost() - costStart;
@@ -76,9 +122,15 @@ public:
         
         //removing flow from the net
         for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
+            bool b;
             VD v = boost::source(e, m_g);
-            Dist cap = m_residual_capacity[m_rev[e]];
-            ED edgeFromStart = boost::edge(m_s, v, m_g).first;
+            if(v == m_t) {
+                continue;
+            }
+            DistI cap = m_residual_capacity[m_rev[e]];
+            ED edgeFromStart;
+            std::tie(edgeFromStart, b) =  boost::edge(m_s, v, m_g);
+            assert(b);
             m_residual_capacity[edgeFromStart] += cap;
             m_residual_capacity[m_rev[edgeFromStart]] -= cap;
         }
@@ -104,11 +156,21 @@ public:
     //fake
     std::pair<typename std::vector<int>::iterator, typename std::vector<int>::iterator > 
         getVerticesForGenerator(VertexType gen) const {
+            IEI ei, end;
+            VD v = m_gToGraphV.at(gen);
+            auto r = boost::in_edges(v, m_g);
+            auto ret = boost::make_transform_iterator(r.first, std::bind(&CapacitatedVoronoi::getVerticesForGenerator, this));
+            std::cout << "d";
             typename std::vector<int>::iterator i;
             return std::make_pair(i, i);
     }
 
+    
+
+
 private:
+
+
     void addEdge(int v, int w, int weight, int capacity) {
         ED e,f;
         e = addDirEdge(v, w, weight, capacity);
@@ -129,25 +191,26 @@ private:
     Dist getCost() {
         OEI ei, end;
         std::tie(ei, end) = boost::out_edges(m_s, m_g);
-        Dist resCap =  std::accumulate(ei, end, Dist(0), [&](Dist d, const ED & e){
+        DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e){
             return d + m_residual_capacity[e];
         });
 
+        DistI cost =  boost::find_min_cost(m_gRes);
         //There are clients that are not fully assigned
-        if(resCap > Dist(0)) {
-            return m_costOfNoGenerator - (m_capacitySum - resCap);
+        if(resCap > DistI(0)) {
+            return Dist(cost, -(m_costOfNoGenerator - (m_capacitySum - resCap)));
         } else { //all clients are assigned now we compute the cost of the assignment
-            return boost::find_min_cost(m_gRes);
+            return Dist(cost, 0);
         }
     }
     
     typedef boost::adjacency_list < boost::listS, boost::vecS,  boost::bidirectionalS,
         boost::property<boost::vertex_name_t, int >,
-            boost::property < boost::edge_capacity_t, Dist,
-                boost::property < boost::edge_residual_capacity_t, Dist,
+            boost::property < boost::edge_capacity_t, DistI,
+                boost::property < boost::edge_residual_capacity_t, DistI,
                     boost::property < boost::edge_reverse_t, 
                                         boost::adjacency_list_traits <boost::listS, boost::vecS, boost::bidirectionalS >::edge_descriptor, 
-                      boost::property <boost::edge_weight_t, Dist>
+                      boost::property <boost::edge_weight_t, DistI>
                              > 
                           > 
                       > > Graph;
@@ -175,6 +238,10 @@ private:
         m_weight[e] = weight;
         return e;
     }
+    
+    void getVertexForEdge(const ED & e) {
+        return m_vToGraphV.at(boost::source(e, m_g));
+    }
 
     Graph m_g;
     ResidualCapacity m_residual_capacity;
@@ -189,12 +256,13 @@ private:
     Vertices m_vertices;
     const Metric & m_metric;
     const GeneratorsCapacieties & m_generatorsCap;
-    const Dist m_capacitySum;
+    const DistI m_capacitySum;
     const VD m_firstGeneratorId;
-    Dist m_costOfNoGenerator;
+    DistI m_costOfNoGenerator;
     VertexToGraphVertex m_vToGraphV;
     VertexToGraphVertex m_gToGraphV;
 };
+
 
 } // data_structures
 } //paal

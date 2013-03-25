@@ -79,6 +79,15 @@ public:
     T & getObj() {
         return m_obj;
     }
+    
+    /**
+     * @brief getter for inner object
+     *
+     * @return member object
+     */
+    const T & getObj() const {
+        return m_obj;
+    }
 
 private:
     /**

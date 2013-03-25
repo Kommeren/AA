@@ -70,8 +70,7 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiGain : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiGain) {
-            int i = this->x(this->s, this->e, this->u);
-            use(i);
+            use((this->x)(this->s, this->e, this->u) > 0);
         }
 };
 
