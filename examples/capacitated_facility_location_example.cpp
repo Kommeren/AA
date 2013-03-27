@@ -35,6 +35,7 @@ int main() {
 
     //create voronoi and solution
     VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
+    voronoi.getVerticesForGenerator(0);
     Sol sol(std::move(voronoi), USet{SGM::B}, cost);
 
     //create facility location local search step
@@ -51,6 +52,6 @@ int main() {
     std::cout << std::endl;
 //! [FL Search Example]
 
-    return true;
+    return 0;
     
 }

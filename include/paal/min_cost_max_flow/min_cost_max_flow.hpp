@@ -16,6 +16,7 @@
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/pending/relaxed_heap.hpp>
 #include <boost/graph/edmonds_karp_max_flow.hpp>
+#include <boost/graph/bellman_ford_shortest_paths.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
 namespace boost {
@@ -73,9 +74,9 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
         std::iota(pred.begin(), pred.end(), 0);
         std::fill(distance.begin(), distance.end(),(std::numeric_limits<Dist>::max)());
         distance[s] = 0;
-        bool b =  bellman_ford_shortest_paths(g, int(N), 
+        /*bool b =*/  bellman_ford_shortest_paths(g, int(N), 
             weight_map(weight).distance_map(&distance[0]).predecessor_map(&pred[0]));
-        assert(b);
+//        assert(b);
         if(pred[t] == t) {
             break;
         }
@@ -97,7 +98,7 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
     
     int N = num_vertices(g);
     Weight weight = get(edge_weight, g);
-    VD v;
+    VD v = -1;
     EI i, end;
     for (boost::tie(i, end) = edges(g); i != end; ++i) {
         if (get(distance, source(*i, g)) + get(weight, *i) < 
@@ -106,6 +107,7 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
              break;
         }
     }
+    assert(v != VD(-1));
     for(int i = 0; i < N + 1; ++i) {
         v = pred[v];
     }
