@@ -37,6 +37,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::string fname;
         double opt;
         is_test_cases >> fname >> opt;
+        opt *= MULTIPL;
         if(fname == "")
             return;
 
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname);
-        std::vector<double> facCost;
+        std::vector<long long> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;
         boost::integer_range<int> fac(0,0);

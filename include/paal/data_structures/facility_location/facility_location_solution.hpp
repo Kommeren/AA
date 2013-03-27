@@ -79,6 +79,10 @@ class FacilityLocationSolution {
             return m_voronoi.getVerticesForGenerator(f);
         }
 
+        const VoronoiType & getVoronoi() const {
+            return m_voronoi;
+        }
+
     private:
 
         VoronoiType m_voronoi;

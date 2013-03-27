@@ -13,31 +13,34 @@
 
 namespace paal {
 
-data_structures::ArrayMetric<double> readORLIB_FL(std::istream & ist, std::vector<double> & facCosts, std::vector<int> & facCap,
+const long long MULTIPL = 10000;
+data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::vector<long long> & facCosts, std::vector<int> & facCap,
                        std::vector<int> & demands,
                        boost::integer_range<int> & fac,
-                       boost::integer_range<int> & clients ) { 
+                       boost::integer_range<int> & clients ) {
     int N, F;
     ist >> F >> N;
     
     fac =     boost::irange(0, F);
     clients = boost::irange(F, N + F);
     
-    data_structures::ArrayMetric<double> m(N + F);
+    data_structures::ArrayMetric<long long> m(N + F);
     demands.resize(N);
     facCosts.resize(F);
     facCap.resize(F);
-    for(int i : boost::irange(0,F)) {
-        ist >> facCap[i] >> facCosts[i];
-    }
     
     double l;
+    for(int i : boost::irange(0,F)) {
+        ist >> facCap[i] >> l;
+        facCosts[i] = ((long long)l) * MULTIPL;
+    }
+    
     for(int i : boost::irange(0,N)) {
         ist >> demands[i];    
         for(int j : boost::irange(0,F)) {
             ist >> l;
-            m(i+F, j) = l;
-            m(j, i+F) = l;
+            m(i+F, j) = ((long long)l) * MULTIPL;
+            m(j, i+F) = ((long long)l) * MULTIPL;
     //        LOG(i+F << " "<< j << " " << l);
         }
     }

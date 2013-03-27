@@ -38,6 +38,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::string fname;
         double opt;
         is_test_cases >> fname >> opt;
+        opt *= MULTIPL;
         if(fname == "")
             return;
 
@@ -45,7 +46,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
-        std::vector<double> facCost;
+        std::vector<long long> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;
         boost::integer_range<int> fac(0,0);
@@ -76,15 +77,13 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         ON_LOG(auto & s = ls.getSolution().getObj());
 
         search(ls, [&](data_structures::ObjectWithCopy<Sol> & s) {
-           for(int f : s->getChosenFacilities())  {
-                LOG(f << ",");
-           }
-           LOG("\n");
+           LOG_COPY_DEL(s->getChosenFacilities().begin(), s->getChosenFacilities().end(), ",");
+           auto cost = s->getVoronoi().getCost();
+           LOG("current cost "<< cost.getDistToFullAssignment() << " " << cost.getRealDist());
         });
         double c = simple_algo::getFLCost(metric, cost, s);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG("APPROXIMATION RATIO: " << c / opt);
-        break;
     }
 }

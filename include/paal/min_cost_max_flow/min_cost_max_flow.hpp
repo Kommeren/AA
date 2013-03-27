@@ -23,18 +23,14 @@ namespace boost {
 
 template<class Graph>
 typename property_traits<typename property_map < Graph, edge_capacity_t >::type>::value_type
-find_min_cost(Graph & g)
+find_min_cost(const Graph & g)
 {
     typename graph_traits<Graph>::edge_iterator ei, end;
-    typedef typename property_map < Graph, edge_capacity_t >::type Capacity;
-    typedef typename property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
-    typedef typename property_map < Graph, edge_weight_t >::type Weight;
-    
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g);
-    Capacity  capacity = get(edge_capacity, g);
-    Weight weight = get(edge_weight, g);
+    auto residual_capacity = get(edge_residual_capacity, g);
+    auto capacity = get(edge_capacity, g);
+    auto weight = get(edge_weight, g);
 
-    long cost = 0;
+    typename std::decay<decltype(weight[*ei])>::type cost = 0;
     boost::tie(ei, end) = edges(g);
     for(;ei != end; ++ei) {
         if((capacity[*ei]) >  0) {
@@ -74,8 +70,9 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
         std::iota(pred.begin(), pred.end(), 0);
         std::fill(distance.begin(), distance.end(),(std::numeric_limits<Dist>::max)());
         distance[s] = 0;
-        /*bool b =*/  bellman_ford_shortest_paths(g, int(N), 
+        bool b =  bellman_ford_shortest_paths(g, int(N), 
             weight_map(weight).distance_map(&distance[0]).predecessor_map(&pred[0]));
+
 //        assert(b);
         if(pred[t] == t) {
             break;
@@ -84,6 +81,22 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
        for(unsigned i = 0; i < N; ++i) {
            predE[i] = edge(pred[i], i, g).first; 
        }
+
+//DEBUG
+     double delta;
+     unsigned u;
+
+    std::cout << "NOWA sciezka: :" <<std::endl;
+      EdgeD e = predE[t];
+      do {
+
+        delta = std::min(double(delta), double(get(residual_capacity, e)));
+        std::cout << e << " " << delta << " " << weight[e] <<std::endl;
+
+        u = source(e, g);
+        e = predE[u];
+      } while (u != s);
+//DEBUG
        detail::augment(g, s, t, &predE[0], residual_capacity, rev);
     }
 }

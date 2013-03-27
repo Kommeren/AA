@@ -32,6 +32,10 @@ public:
         DistI getDistToFullAssignment() const {
             return m_distToFullAssignment;
         }
+
+        DistI getRealDist() const {
+            return m_realDist;
+        }
         
         bool operator>(DistI d) {
             if(m_distToFullAssignment > 0) {
@@ -107,10 +111,16 @@ public:
         }
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
+//            ED e = boost::edge(0, 2, m_g).first;
         if(costStart.getDistToFullAssignment() < 0) {
-            boost::path_augmentation_from_residual(gRes, m_s, m_t);
+//            boost::path_augmentation_from_residual(gRes, m_s, m_t);
+//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
+            boost::edmonds_karp_max_flow(m_g, m_s, m_t);
+
+//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
         }
         boost::cycle_cancelation_from_residual(gRes);
+//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
 
         return getCost() - costStart;
     }
@@ -143,7 +153,8 @@ public:
         m_generators.erase(gen);
         restoreIndex();
         
-        boost::path_augmentation_from_residual(gRes, m_s, m_t);
+        //boost::path_augmentation_from_residual(gRes, m_s, m_t);
+        boost::edmonds_karp_max_flow(m_g, m_s, m_t);
         boost::cycle_cancelation_from_residual(gRes);
 
         return getCost() - costStart;
@@ -157,6 +168,24 @@ public:
         return m_vertices;
     }
 
+
+    Dist getCost() const  {
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+//        ED e = boost::edge(0, 2, m_g).first;
+    //        std::cout << "Cost : Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
+        OEI ei, end;
+        std::tie(ei, end) = boost::out_edges(m_s, m_g);
+        DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e){
+  //          std::cout << "PETLA : Cost : Residual cap" << e << " "  << residual_capacity[e] << " d = " << d << std::endl; 
+            return d + residual_capacity[e];
+        });
+//            std::cout << "Cost : Residual cap" << e << " "  << residual_capacity[e] << " resCup = " << resCap << std::endl; 
+
+        DistI cost =  boost::find_min_cost(m_g);
+        //There are clients that are not fully assigned
+        return Dist(cost, -resCap);
+    }
+    
 private:
 
 
@@ -169,23 +198,6 @@ private:
         }
     }
 
-    Dist getCost() {
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
-        OEI ei, end;
-        std::tie(ei, end) = boost::out_edges(m_s, m_g);
-        DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e){
-            return d + residual_capacity[e];
-        });
-
-        DistI cost =  boost::find_min_cost(m_g);
-        //There are clients that are not fully assigned
-        if(resCap > DistI(0)) {
-            return Dist(cost, -(m_costOfNoGenerator - (m_capacitySum - resCap)));
-        } else { //all clients are assigned now we compute the cost of the assignment
-            return Dist(cost, 0);
-        }
-    }
-    
     typedef boost::adjacency_list < boost::listS, boost::vecS,  boost::bidirectionalS,
         boost::property<boost::vertex_name_t, VertexType >,
             boost::property < boost::edge_capacity_t, DistI,
