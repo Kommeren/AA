@@ -89,7 +89,7 @@ public:
                          m_costOfNoGenerator(costOfNoGenerator) 
                             {
         for(VertexType v : m_vertices) {
-            VD vGraph = boost::add_vertex(m_g);
+            VD vGraph = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
             m_vToGraphV.insert(std::make_pair(v, vGraph));
             addEdge(m_s, vGraph, 0, vd(v));
         }
@@ -245,21 +245,34 @@ private:
         return e;
     }
     
+    DistI getFlowOnEdge(const ED & e) const {
+        auto capacityMap = boost::get(boost::edge_capacity, m_g);
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        return capacityMap[e] - residual_capacity[e];
+    }
+    
     VertexType getVertexForEdge(const ED & e) const  {
         auto name = boost::get(boost::vertex_name, m_g);
         return name[boost::source(e, m_g)];
     }
 
     struct Trans {
-        VertexType operator()(const ED &e) const {
-            return m_v->getVertexForEdge(e);
+        std::pair<VertexType, DistI> operator()(const ED &e) const {
+            return std::make_pair(m_v->getVertexForEdge(e), m_v->getFlowOnEdge(e));
         }
         const CapacitatedVoronoi * m_v;
     };
 
-    typedef boost::transform_iterator<Trans, IEI, VertexType> VForGenerator;
+    typedef boost::transform_iterator<Trans, IEI, std::pair<VertexType, DistI>> VForGenerator;
 public:
     
+    /**
+     * @brief member function for getting assignment, for generator.
+     *
+     * @return returns range of pairs; the first element of pair is the Vertex 
+     * and the second element is the flow from this vertext to given generator
+     *
+     */
     std::pair<VForGenerator, VForGenerator> 
     getVerticesForGenerator(VertexType gen) const {
         IEI ei, end;

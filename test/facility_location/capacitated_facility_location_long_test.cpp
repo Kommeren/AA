@@ -42,6 +42,10 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         if(fname == "")
             return;
 
+        if(fname != "cap42") {
+            continue;
+        }
+
         LOG("TEST " << fname);
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
@@ -68,22 +72,23 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         typedef typename VorType::Vertices VSet;
         typedef typename Sol::UnchosenFacilitiesSet USet;
 
-        VorType voronoi( FSet{},  VSet(clients.begin(), clients.end()), metric, facCapacities, verticesDemands);
-        Sol sol(std::move(voronoi), USet(fac.begin(), fac.end()), cost);
+        VorType voronoi( FSet{fac.begin(), fac.end()},  VSet(clients.begin(), clients.end()), metric, facCapacities, verticesDemands);
+        Sol sol(std::move(voronoi), USet{}, cost);
 
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(std::move(sol));
 
         ON_LOG(auto & s = ls.getSolution().getObj());
 
-        search(ls, [&](data_structures::ObjectWithCopy<Sol> & s) {
-           LOG_COPY_DEL(s->getChosenFacilities().begin(), s->getChosenFacilities().end(), ",");
-           auto cost = s->getVoronoi().getCost();
+        search(ls, [&](data_structures::ObjectWithCopy<Sol> & sol) {
+           LOG_COPY_DEL(sol->getChosenFacilities().begin(), sol->getChosenFacilities().end(), ",");
+           ON_LOG(auto cost = sol->getVoronoi().getCost());
            LOG("current cost "<< cost.getDistToFullAssignment() << " " << cost.getRealDist());
         });
-        double c = simple_algo::getFLCost(metric, cost, s);
+        double c = simple_algo::getCFLCost(metric, cost, s);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG("APPROXIMATION RATIO: " << c / opt);
+        break;
     }
 }

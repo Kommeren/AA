@@ -73,7 +73,7 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
         bool b =  bellman_ford_shortest_paths(g, int(N), 
             weight_map(weight).distance_map(&distance[0]).predecessor_map(&pred[0]));
 
-//        assert(b);
+        assert(b);
         if(pred[t] == t) {
             break;
         }

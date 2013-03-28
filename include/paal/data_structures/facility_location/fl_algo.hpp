@@ -16,6 +16,26 @@ namespace simple_algo {
 
     template <typename Metric, typename FCosts, typename FLSolution> 
        typename data_structures::MetricTraits<Metric>::DistanceType
+getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
+    auto const & ch      = fls.getChosenFacilities();
+
+    typedef data_structures::MetricTraits<Metric> MT;
+    typedef typename MT::DistanceType Dist;
+    typedef typename MT::VertexType VertexType;
+
+    Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
+
+    for(VertexType f : ch) {
+        for(std::pair<VertexType, Dist> v : utils::make_range(fls.getClientsForFacility(f))) {
+            d += m(v.first, f) * v.second; 
+        }
+    }
+
+    return d;
+}
+    
+template <typename Metric, typename FCosts, typename FLSolution> 
+       typename data_structures::MetricTraits<Metric>::DistanceType
 getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     auto const & ch      = fls.getChosenFacilities();
 
@@ -23,7 +43,7 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     typedef typename MT::DistanceType Dist;
     typedef typename MT::VertexType VertexType;
 
-    Dist d = std::accumulate(ch.begin(), ch.end(), double(0.), [&](Dist d, VertexType f){return d+fcosts(f);});
+    Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
 
     for(VertexType f : ch) {
         for(VertexType v : utils::make_range(fls.getClientsForFacility(f))) {
