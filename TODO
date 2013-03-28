@@ -1,3 +1,8 @@
-* udokumentowac jak podmieniać componenty w local searchu, jak robic wizytory
-* przemyslec traitsy, moze dorobic wszedzie trik z std::iteratora
+* wiecej danych w testach 2-local search
 * udokumentowac problemy (np. FL)
+* udokumentowac jak podmieniać componenty w local searchu, jak robic wizytory
+* zmienic kolejnosc przgladania w FL, sa 2 opcje
+** mozna zmienic na single_solution 
+** mozna zacyklic rozwiazanie, zeby nie zaczynal zawsze z tego samego punktu
+* przemyslec traitsy, moze dorobic wszedzie trik z std::iteratora
+

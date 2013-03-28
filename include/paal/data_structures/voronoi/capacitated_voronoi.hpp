@@ -8,9 +8,12 @@
 #ifndef CAPACITATED_VORONOI_HPP
 #define CAPACITATED_VORONOI_HPP 
 
+#include <boost/graph/adjacency_list.hpp>
+
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/min_cost_max_flow/min_cost_max_flow.hpp"
-#include <boost/graph/adjacency_list.hpp>
+#include "paal/utils/iterator_utils.hpp"
+
 
 namespace paal {
 namespace data_structures {
@@ -35,6 +38,11 @@ public:
 
         DistI getRealDist() const {
             return m_realDist;
+        }
+
+        bool operator==(Dist d) const {
+            return m_realDist ==  d.m_realDist &&
+                   m_distToFullAssignment == d.m_distToFullAssignment;
         }
         
         bool operator>(DistI d) {
@@ -66,6 +74,12 @@ public:
             return Dist(d.m_realDist + di, d.m_distToFullAssignment); 
         }
 
+        template <typename Stream >
+        friend Stream & operator<<(Stream & s, Dist d) {
+            return s << d.m_distToFullAssignment << " " <<  d.m_realDist; 
+            
+        }
+
     private:
         DistI m_realDist;
         DistI m_distToFullAssignment;
@@ -80,7 +94,7 @@ public:
                        const GeneratorsCapacieties & gc, const VerticesDemands & vd, 
                        DistI costOfNoGenerator = std::numeric_limits<DistI>::max()/*,
                        DistI infiniteCapacity = std::numeric_limits<DistI>::max()*/) : 
-                         m_s(boost::add_vertex(m_g)), m_t(boost::add_vertex(m_g)),
+                         m_s(addVertex()), m_t(addVertex()),
                          m_vertices(std::move(ver)), m_metric(m), 
                          m_generatorsCap(gc),
                          m_capacitySum(std::accumulate(m_vertices.begin(), m_vertices.end(), 
@@ -89,7 +103,7 @@ public:
                          m_costOfNoGenerator(costOfNoGenerator) 
                             {
         for(VertexType v : m_vertices) {
-            VD vGraph = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
+            VD vGraph = addVertex(v);
             m_vToGraphV.insert(std::make_pair(v, vGraph));
             addEdge(m_s, vGraph, 0, vd(v));
         }
@@ -100,27 +114,29 @@ public:
     
     // returns diff between new cost and old cost
     Dist addGenerator(VertexType gen) {
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
-        auto gRes = boost::detail::residual_graph(m_g, residual_capacity);
         Dist costStart = getCost();
         m_generators.insert(gen);
-        VD genGraph = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(gen), m_g);
+        VD genGraph = addVertex(gen);
         m_gToGraphV.insert(std::make_pair(gen, genGraph));
         for(const std::pair<VertexType, VD> & v : m_vToGraphV) {
             addEdge(v.second, genGraph, m_metric(v.first, gen), std::numeric_limits<DistI>::max());
         }
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
-//            ED e = boost::edge(0, 2, m_g).first;
         if(costStart.getDistToFullAssignment() < 0) {
-//            boost::path_augmentation_from_residual(gRes, m_s, m_t);
-//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
             boost::edmonds_karp_max_flow(m_g, m_s, m_t);
-
-//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
         }
-        boost::cycle_cancelation_from_residual(gRes);
-//            std::cout << "Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
+
+        EI i, end;
+        std::tie(i,end) = boost::edges(m_g);
+
+        std::cout << "Stan przed cancel " <<std::endl ;
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        for(;i!= end; ++i) {
+            std::cout << *i << " " << residual_capacity[*i] <<std::endl ;
+        }
+
+        boost::cycle_cancelation(m_g);
 
         return getCost() - costStart;
     }
@@ -132,7 +148,6 @@ public:
         auto genGraph = m_gToGraphV[gen];
         auto rev = get(boost::edge_reverse, m_g);
         auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
-        auto gRes = boost::detail::residual_graph(m_g, residual_capacity);
         
         //removing flow from the net
         for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
@@ -155,7 +170,7 @@ public:
         
         //boost::path_augmentation_from_residual(gRes, m_s, m_t);
         boost::edmonds_karp_max_flow(m_g, m_s, m_t);
-        boost::cycle_cancelation_from_residual(gRes);
+        boost::cycle_cancelation(m_g);
 
         return getCost() - costStart;
     }
@@ -171,22 +186,18 @@ public:
 
     Dist getCost() const  {
         auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
-//        ED e = boost::edge(0, 2, m_g).first;
-    //        std::cout << "Cost : Residual cap" << e << " "  << residual_capacity[e] << std::endl; 
         OEI ei, end;
         std::tie(ei, end) = boost::out_edges(m_s, m_g);
-        DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e){
-  //          std::cout << "PETLA : Cost : Residual cap" << e << " "  << residual_capacity[e] << " d = " << d << std::endl; 
+        DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e) {
             return d + residual_capacity[e];
         });
-//            std::cout << "Cost : Residual cap" << e << " "  << residual_capacity[e] << " resCup = " << resCap << std::endl; 
 
         DistI cost =  boost::find_min_cost(m_g);
-        //There are clients that are not fully assigned
         return Dist(cost, -resCap);
     }
     
 private:
+
 
 
     void restoreIndex() {
@@ -222,6 +233,18 @@ private:
     typedef boost::filtered_graph<Graph, 
         boost::is_residual_edge<ResidualCapacity> > ResidualGraph;
     
+    VD addVertex(VertexType v = VertexType()) {
+//        auto rev = get(boost::edge_reverse, m_g);
+        VD vG = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
+  //      bool b;
+    //    ED e;
+        /*std::tie(e,b) = boost::add_edge(vG, vG, m_g);
+        assert(b);
+        rev[e] = e;*/
+        return vG;
+    }
+
+
     void addEdge(VD v, VD w, DistI weight, DistI capacity) {
         auto rev = get(boost::edge_reverse, m_g);
         ED e,f;

@@ -30,8 +30,8 @@ find_min_cost(const Graph & g)
     auto capacity = get(edge_capacity, g);
     auto weight = get(edge_weight, g);
 
-    typename std::decay<decltype(weight[*ei])>::type cost = 0;
-    boost::tie(ei, end) = edges(g);
+    typename property_traits<typename property_map<Graph, edge_weight_t>::const_type>::value_type cost = 0;
+    tie(ei, end) = edges(g);
     for(;ei != end; ++ei) {
         if((capacity[*ei]) >  0) {
             cost +=  (capacity[*ei] - residual_capacity[*ei]) * weight[*ei];
@@ -40,31 +40,39 @@ find_min_cost(const Graph & g)
     return cost;
 }
 
-
-/*template <typename Graph>
-void path_augmentation(Graph &g, typename graph_traits<Graph>::vertex_descriptor s, typename graph_traits<Graph>::vertex_descriptor t) {
-
-}*/
-
-template <typename ResidualGraph>
-void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<ResidualGraph>::vertex_descriptor s, 
-                                                       typename graph_traits<ResidualGraph>::vertex_descriptor t) {
-    typedef typename property_map < ResidualGraph, edge_weight_t >::type Weight;
-    typedef typename graph_traits < ResidualGraph>::edge_descriptor EdgeD;
+template <typename Graph>
+void path_augmentation(Graph &gOrig, typename graph_traits<Graph>::vertex_descriptor s, 
+                                                       typename graph_traits<Graph>::vertex_descriptor t) {
+    typedef typename property_map < Graph, edge_weight_t >::type Weight;
+    typedef typename graph_traits < Graph>::edge_descriptor ED;
+    typedef typename graph_traits < Graph>::out_edge_iterator OEI;
+    typedef typename graph_traits < Graph>::vertex_descriptor VD;
+    typedef typename graph_traits < Graph>::vertex_iterator VI;
     typedef typename property_traits<Weight>::value_type Dist;
-    typedef typename property_map < ResidualGraph, edge_residual_capacity_t >::type ResidualCapacity;
-    typedef typename property_map < ResidualGraph, edge_reverse_t >::type Reversed;
+    typedef typename property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
+    typedef typename property_map < Graph, edge_reverse_t >::type Reversed;
     typedef std::vector<unsigned> Pred;
+
+    ResidualCapacity residual_capacity = get(edge_residual_capacity, gOrig); 
+    auto g = detail::residual_graph(gOrig, residual_capacity);
 
     unsigned N = num_vertices(g);
     Weight weight = get(edge_weight, g);
     std::vector<Dist> distance(N);
     //TODO this vector shouldn't be needed
-    std::vector<EdgeD> predE(N);
+    std::vector<ED> predE(N);
     Pred  pred(N);
     std::iota(pred.begin(), pred.end(), 0);
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g);
+    auto capacity = get(edge_capacity, g);
     Reversed rev = get(edge_reverse, g);
+    
+    VI u_iter, u_end;
+    OEI ei, e_end;
+    for (tie(u_iter, u_end) = vertices(gOrig); u_iter != u_end; ++u_iter) {
+        for (tie(ei, e_end) = out_edges(*u_iter, gOrig); ei != e_end; ++ei) {
+            put(residual_capacity, *ei, get(capacity, *ei));
+        }
+    }
 
     while(true) {
         std::iota(pred.begin(), pred.end(), 0);
@@ -83,11 +91,11 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
        }
 
 //DEBUG
-     double delta;
+/*     double delta;
      unsigned u;
 
     std::cout << "NOWA sciezka: :" <<std::endl;
-      EdgeD e = predE[t];
+      ED e = predE[t];
       do {
 
         delta = std::min(double(delta), double(get(residual_capacity, e)));
@@ -95,7 +103,7 @@ void path_augmentation_from_residual(ResidualGraph &g, typename graph_traits<Res
 
         u = source(e, g);
         e = predE[u];
-      } while (u != s);
+      } while (u != s);*/
 //DEBUG
        detail::augment(g, s, t, &predE[0], residual_capacity, rev);
     }
@@ -128,38 +136,95 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
     return v;
 }
 
-template <typename ResidualGraph>
-void cycle_cancelation_from_residual(ResidualGraph &g) {
-    typedef typename property_map < ResidualGraph, edge_weight_t >::type Weight;
-    typedef std::vector<unsigned> Pred;
+template <typename Graph>
+void cycle_cancelation(Graph &gOrig) {
+    typedef typename property_map < Graph, edge_weight_t >::type Weight;
     typedef typename property_traits<Weight>::value_type Dist;
-    typedef typename graph_traits < ResidualGraph>::edge_descriptor EdgeD;
-    typedef typename property_map < ResidualGraph, edge_reverse_t >::type Reversed;
-    typedef typename property_map < ResidualGraph, edge_residual_capacity_t >::type ResidualCapacity;
-    typedef std::vector<unsigned> Pred;
+
+    auto residual_capacity = get(edge_residual_capacity, gOrig); 
+    auto g = detail::residual_graph(gOrig, residual_capacity);
+    
+    typedef graph_traits<decltype(g)> GTraits;
+    typedef typename GTraits::edge_descriptor ED;
+    typedef typename GTraits::vertex_descriptor VD;
+    typedef typename GTraits::edge_iterator EI;
     
     unsigned N = num_vertices(g);
-    Weight weight = get(edge_weight, g);
+    typedef std::vector<VD> Pred;
+    auto weight = get(edge_weight, g);
     std::vector<Dist> distance(N);
     Pred  pred(N);
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g);
-    Reversed rev = get(edge_reverse, g);
+    auto rev = get(edge_reverse, gOrig);
     //TODO this vector shouldn't be needed
-    std::vector<EdgeD> predE(N);
+    std::vector<ED> predE(N);
     
     std::iota(pred.begin(), pred.end(), 0);
     std::fill(distance.begin(), distance.end(), 0);
-    while(!bellman_ford_shortest_paths(g, int(N), 
+    while(!bellman_ford_shortest_paths(g, N, 
         weight_map(weight).distance_map(&distance[0]).predecessor_map(&pred[0]))) {
+        EI i, end;
+        for (tie(i, end) = edges(g); i != end; ++i) {
+            if (get(&distance[0], source(*i, g)) + get(weight, *i) < 
+                 get(&distance[0], target(*i,g))) {
+                 pred[target(*i, g)] = source(*i, g);
+                 distance[target(*i, g)] = get(&distance[0], source(*i, g)) + get(weight, *i);
+            }
+        }
 
-        unsigned cycleStart = find_cycle_start(g, &distance[0], &pred[0]);
+        VD cycleStart = find_cycle_start(g, &distance[0], &pred[0]);
 
         assert(pred[cycleStart] != cycleStart);
-    
-        for(unsigned i = 0; i < N; ++i) {
-            predE[i] = edge(pred[i], i, g).first; 
+
+//DEBUG
+  Dist delta = std::numeric_limits<Dist>::max();
+    std::cout << "NOWA sciezka: :" <<std::endl;
+      VD u = pred[cycleStart];
+      VD t = cycleStart;
+      do {
+        bool b;
+        ED e;
+        tie(e, b) = edge(u, t, g);
+        assert(b);
+        delta = std::min(delta, get(residual_capacity, e));
+        std::cout << e << " " << delta << " " << weight[e] <<std::endl;
+        t = u;
+        u = pred[u];
+      } while (u != cycleStart);
+        
+        std::tie(i,end) = boost::edges(gOrig);
+      std::cout << "Stan: " <<std::endl ;
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, gOrig);
+        for(;i!= end; ++i) {
+            std::cout << *i << " " << residual_capacity[*i] <<std::endl ;
         }
-        detail::augment(g, cycleStart, cycleStart, &predE[0], residual_capacity, rev);
+//DEBUG
+    
+        for(VD i = 0; i < N; ++i) {
+            if(pred[i] != i) {
+                bool b;
+                tie(predE[i] ,b) = edge(pred[i], i, g);
+//                std::cout << "PRED" << pred[i] << " " << i << std::endl;
+                assert(b);
+            }
+        }
+
+        //DEBUG
+/*     double delta;
+     unsigned u;
+
+    std::cout << "NOWA sciezka: :" <<std::endl;
+      ED e = predE[t];
+      do {
+
+        delta = std::min(double(delta), double(get(residual_capacity, e)));
+        std::cout << e << " " << delta << " " << weight[e] <<std::endl;
+
+        u = source(e, g);
+        e = predE[u];
+      } while (u != s);*/
+//DEBUG
+
+        detail::augment(gOrig, cycleStart, cycleStart, &predE[0], residual_capacity, rev);
         
         std::iota(pred.begin(), pred.end(), 0);
         std::fill(distance.begin(), distance.end(),0);

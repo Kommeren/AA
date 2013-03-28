@@ -16,50 +16,43 @@ typedef adjacency_list_traits < vecS, vecS, directedS > Traits;
 
 template <typename Graph, typename Weight, typename Capacity, typename Reversed, typename ResidualCapacity>
 class EdgeAdder {
-public:
-    EdgeAdder(Graph & g, Weight & w, Capacity & c, Reversed & rev, ResidualCapacity & residualCapacity) 
-        : m_g(g), m_w(w), m_cap(c), m_resCap(residualCapacity), m_rev(rev) {}
-void addEdge(int v, int w, int weight, int capacity) {
-        //bool b;
-        Traits::edge_descriptor e,f;
-        e = add(v, w, weight, capacity);
-        f = add(w, v, -weight, 0);
-        m_rev[e] = f; 
-        m_rev[f] = e; 
-    }
-    /*void addEdgeSym(int v, int w, int weight, int capacity) {
-        auto e = add(v, w, weight, capacity);
-        auto f = add(w, v, weight, capacity);
-        m_rev[e] = f; 
-        m_rev[f] = e; 
-    }*/
-private:
-    Traits::edge_descriptor add(int v, int w, int weight, int capacity) {
-        bool b;
-        Traits::edge_descriptor e;
-        std::tie(e, b) = add_edge(v, w, m_g);
-        assert(b);
-        m_cap[e] = capacity;
-        m_resCap[e] = capacity;
-        m_w[e] = weight;
-        return e;
-    }
-    Graph & m_g;
-    Weight & m_w;
-    Capacity & m_cap;
-    ResidualCapacity & m_resCap;
-    Reversed & m_rev;
+    public:
+        EdgeAdder(Graph & g, Weight & w, Capacity & c, Reversed & rev, ResidualCapacity & residualCapacity) 
+            : m_g(g), m_w(w), m_cap(c), m_resCap(residualCapacity), m_rev(rev) {}
+        void addEdge(int v, int w, int weight, int capacity) {
+            //bool b;
+            Traits::edge_descriptor e,f;
+            e = add(v, w, weight, capacity);
+            f = add(w, v, -weight, 0);
+            m_rev[e] = f; 
+            m_rev[f] = e; 
+        }
+    private:
+        Traits::edge_descriptor add(int v, int w, int weight, int capacity) {
+            bool b;
+            Traits::edge_descriptor e;
+            std::tie(e, b) = add_edge(v, w, m_g);
+            assert(b);
+            m_cap[e] = capacity;
+            m_w[e] = weight;
+            return e;
+        }
+        Graph & m_g;
+        Weight & m_w;
+        Capacity & m_cap;
+        ResidualCapacity & m_resCap;
+        Reversed & m_rev;
 };
 
 typedef adjacency_list < listS, vecS, directedS,
-               property < vertex_name_t, std::string >,
-                   property < edge_capacity_t, long,
-                       property < edge_residual_capacity_t, long,
-                           property < edge_reverse_t, Traits::edge_descriptor, 
-                             property <edge_weight_t, long>
-                                    > 
-                                 > 
-                             > > Graph;
+        property < vertex_name_t, std::string >,
+            property < edge_capacity_t, long,
+                property < edge_residual_capacity_t, long,
+                    property < edge_reverse_t, Traits::edge_descriptor, 
+                        property <edge_weight_t, long>
+                             > 
+                        > 
+                     > > Graph;
 typedef property_map < Graph, edge_capacity_t >::type Capacity;
 typedef property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
 typedef property_map < Graph, edge_weight_t >::type Weight;
@@ -69,7 +62,7 @@ Graph getSampleGraph(unsigned & s, unsigned & t) {
     typedef Traits::edge_descriptor ed;
     const typename boost::graph_traits<Graph>::vertices_size_type N(6);
     typedef property_map < Graph, edge_reverse_t >::type Reversed;
-    
+
     Graph g(N);
     Capacity  capacity = get(edge_capacity, g);
     Reversed rev = get(edge_reverse, g);
@@ -100,22 +93,20 @@ Graph getSampleGraph(unsigned & s, unsigned & t) {
 BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
     unsigned s,t;
     Graph g = getSampleGraph(s, t);
-    
-    edmonds_karp_max_flow(g, s, t);
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g); 
-    auto gRes = detail::residual_graph(g, residual_capacity);
-    cycle_cancelation_from_residual(gRes);
 
+    edmonds_karp_max_flow(g, s, t);
+    cycle_cancelation(g);
+
+    LOG("min cost cycle canceling " << find_min_cost(g));
     BOOST_CHECK(find_min_cost(g) == 29);
 }
 
 BOOST_AUTO_TEST_CASE(path_augmentation_test) {
     unsigned s,t;
     Graph g = getSampleGraph(s, t);
-    
-    ResidualCapacity residual_capacity = get(edge_residual_capacity, g); 
-    auto gRes = detail::residual_graph(g, residual_capacity);
-    path_augmentation_from_residual(gRes, s, t);
 
+    path_augmentation(g, s, t);
+
+    LOG("min cost path augmentation " << find_min_cost(g));
     BOOST_CHECK(find_min_cost(g) == 29);
 }
