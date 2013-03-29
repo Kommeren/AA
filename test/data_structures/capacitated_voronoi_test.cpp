@@ -2,6 +2,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
+#include "paal/data_structures/voronoi/voronoi_traits.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/logger.hpp"
 
@@ -25,13 +26,13 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     Voronoi voronoi(GSet{},
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
-    LOG("ODLEGLOSCI OD A");
+/*    LOG("ODLEGLOSCI OD A");
     for(int i = 0; i < 5; ++i)
         LOG(gm(SGM::A, i));
     
     LOG("ODLEGLOSCI OD B");
     for(int i = 0; i < 5; ++i)
-        LOG(gm(SGM::B, i));
+        LOG(gm(SGM::B, i));*/
 
     voronoi.addGenerator(SGM::A);
     auto ab_min_a = voronoi.addGenerator(SGM::B);
@@ -40,17 +41,18 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     BOOST_CHECK_EQUAL(voronoi.remGenerator(SGM::B), -ab_min_a);
 
 }
-/*
+
 BOOST_AUTO_TEST_CASE(test_1) {
     LOG("Test 1");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
-    typedef Voronoi<decltype(gm)> Voronoi;
+    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    Voronoi voronoi(GSet{SGM::A, SGM::B}, 
+            VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
     voronoi.addGenerator(SGM::C);
     voronoi.remGenerator(SGM::A);
@@ -58,4 +60,4 @@ BOOST_AUTO_TEST_CASE(test_1) {
     voronoi.remGenerator(SGM::C);
     voronoi.addGenerator(SGM::D);
     voronoi.remGenerator(SGM::A);
-}*/
+}

@@ -166,7 +166,7 @@ class Voronoi {
         Dist adjustVertex(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
             bool init = true;
             Dist d = Dist();
-            VertexType f_best;
+            VertexType f_best = VertexType();
             for(VertexType f : m_generators) {
                 if(filter(f)) {
                     Dist td = m_metric(v,f);

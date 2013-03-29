@@ -137,7 +137,7 @@ public:
         auto currSE = m_solution.begin();
         auto endSE =  m_solution.end();
         auto bestSE = currSE;
-        Update bestUpdate;
+        Update bestUpdate = Update();
         for(;currSE != endSE && !stop; ++currSE) {
             auto adjustmentSet = this->m_searchComponents.getNeighborhood()(m_solution, *currSE);
             auto currUpdate = adjustmentSet.first;

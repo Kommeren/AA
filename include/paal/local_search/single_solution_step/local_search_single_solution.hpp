@@ -101,7 +101,7 @@ public:
         base(std::move(solution), std::move(searchComponents)) {}
 
     bool search() {
-        Fitness max;
+        Fitness max = Fitness();
         bool init = false;
         auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution);
         auto currUpdate = adjustmentSet.first;

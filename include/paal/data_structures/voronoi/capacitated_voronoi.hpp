@@ -9,6 +9,7 @@
 #define CAPACITATED_VORONOI_HPP 
 
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/range/irange.hpp>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/min_cost_max_flow/min_cost_max_flow.hpp"
@@ -67,7 +68,7 @@ public:
         }
         
         Dist operator-() {
-            return Dist(-m_realDist, m_distToFullAssignment);
+            return Dist(-m_realDist, -m_distToFullAssignment);
         }
     
         friend  Dist  operator+(DistI di, Dist d) {
@@ -123,18 +124,18 @@ public:
         }
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
-        if(costStart.getDistToFullAssignment() < 0) {
+        if(costStart.getDistToFullAssignment() > 0) {
             boost::edmonds_karp_max_flow(m_g, m_s, m_t);
         }
 
-        EI i, end;
+/*        EI i, end;
         std::tie(i,end) = boost::edges(m_g);
 
         std::cout << "Stan przed cancel " <<std::endl ;
         auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
         for(;i!= end; ++i) {
             std::cout << *i << " " << residual_capacity[*i] <<std::endl ;
-        }
+        }*/
 
         boost::cycle_cancelation(m_g);
 
@@ -193,7 +194,7 @@ public:
         });
 
         DistI cost =  boost::find_min_cost(m_g);
-        return Dist(cost, -resCap);
+        return Dist(cost, resCap);
     }
     
 private:
@@ -201,10 +202,10 @@ private:
 
 
     void restoreIndex() {
-        unsigned N = boost::num_vertices(m_g);
+        const unsigned N = boost::num_vertices(m_g);
         m_gToGraphV.clear();
         auto name = boost::get(boost::vertex_name, m_g);
-        for(unsigned i : boost::irange(m_firstGeneratorId, N)) {
+        for(unsigned i : boost::irange(unsigned(m_firstGeneratorId), N)) {
             m_gToGraphV[name[i]] = i;
         }
     }

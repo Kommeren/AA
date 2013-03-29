@@ -144,9 +144,11 @@ void cycle_cancelation(Graph &gOrig) {
     auto residual_capacity = get(edge_residual_capacity, gOrig); 
     auto g = detail::residual_graph(gOrig, residual_capacity);
     
-    typedef graph_traits<decltype(g)> GTraits;
-    typedef typename GTraits::edge_descriptor ED;
-    typedef typename GTraits::vertex_descriptor VD;
+    typedef graph_traits<decltype(g)> ResGTraits;
+    typedef graph_traits<Graph> GTraits;
+    typedef typename ResGTraits::edge_descriptor ED;
+    typedef typename ResGTraits::vertex_descriptor VD;
+    typedef typename ResGTraits::edge_iterator REI;
     typedef typename GTraits::edge_iterator EI;
     
     unsigned N = num_vertices(g);
@@ -162,7 +164,7 @@ void cycle_cancelation(Graph &gOrig) {
     std::fill(distance.begin(), distance.end(), 0);
     while(!bellman_ford_shortest_paths(g, N, 
         weight_map(weight).distance_map(&distance[0]).predecessor_map(&pred[0]))) {
-        EI i, end;
+        REI i, end;
         for (tie(i, end) = edges(g); i != end; ++i) {
             if (get(&distance[0], source(*i, g)) + get(weight, *i) < 
                  get(&distance[0], target(*i,g))) {
@@ -176,7 +178,7 @@ void cycle_cancelation(Graph &gOrig) {
         assert(pred[cycleStart] != cycleStart);
 
 //DEBUG
-  Dist delta = std::numeric_limits<Dist>::max();
+/*  Dist delta = std::numeric_limits<Dist>::max();
     std::cout << "NOWA sciezka: :" <<std::endl;
       VD u = pred[cycleStart];
       VD t = cycleStart;
@@ -190,13 +192,15 @@ void cycle_cancelation(Graph &gOrig) {
         t = u;
         u = pred[u];
       } while (u != cycleStart);
-        
-        std::tie(i,end) = boost::edges(gOrig);
-      std::cout << "Stan: " <<std::endl ;
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, gOrig);
+      { 
+        EI i, end;
+        std::tie(i,end) = edges(gOrig);
+        std::cout << "Stan: " <<std::endl ;
+        auto residual_capacity = get(boost::edge_residual_capacity, gOrig);
         for(;i!= end; ++i) {
             std::cout << *i << " " << residual_capacity[*i] <<std::endl ;
         }
+      }*/
 //DEBUG
     
         for(VD i = 0; i < N; ++i) {
@@ -207,22 +211,6 @@ void cycle_cancelation(Graph &gOrig) {
                 assert(b);
             }
         }
-
-        //DEBUG
-/*     double delta;
-     unsigned u;
-
-    std::cout << "NOWA sciezka: :" <<std::endl;
-      ED e = predE[t];
-      do {
-
-        delta = std::min(double(delta), double(get(residual_capacity, e)));
-        std::cout << e << " " << delta << " " << weight[e] <<std::endl;
-
-        u = source(e, g);
-        e = predE[u];
-      } while (u != s);*/
-//DEBUG
 
         detail::augment(gOrig, cycleStart, cycleStart, &predE[0], residual_capacity, rev);
         
