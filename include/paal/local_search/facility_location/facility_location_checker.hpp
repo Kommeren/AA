@@ -31,6 +31,7 @@ public:
             case REMOVE : {
                 auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());
                 ret = FLS.invokeOnCopy(&FLS_T::remFacility, r->get());
+                //TODO for capacitated version we should  just restart copy
                 FLS.invokeOnCopy(&FLS_T::addFacility, r->get());
                 break;
             }

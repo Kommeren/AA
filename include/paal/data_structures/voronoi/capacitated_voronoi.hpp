@@ -165,6 +165,8 @@ public:
             residual_capacity[rev[edgeFromStart]] -= cap;
         }
         boost::clear_vertex(genGraph, m_g);
+        assert(!boost::edge(m_t, genGraph, m_g).second);
+        assert(!boost::edge(genGraph, m_t, m_g).second);
         boost::remove_vertex(genGraph, m_g);
         m_generators.erase(gen);
         restoreIndex();
