@@ -26,8 +26,8 @@ using namespace paal::local_search::facility_location;
 using namespace paal;
 
 bool le(double x, double y) {
-    static const double epsilon = 0.01;
-    return x - epsilon <= y;
+    static const double epsilon = 0.001;
+    return x * (1 - epsilon) <= y;
 }
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
@@ -38,13 +38,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::string fname;
         double opt;
         is_test_cases >> fname >> opt;
-        opt *= MULTIPL;
+        opt = cast(opt);
         if(fname == "")
             return;
-
-        if(fname != "cap42") {
-            continue;
-        }
 
         LOG("TEST " << fname);
         LOG(std::setprecision(20) <<  "OPT " << opt);
@@ -55,7 +51,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::vector<int> demands;
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_FL(ifs, facCost, facCap, demands, fac, clients);
+        auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
     
         auto cost = [&](int i){ return facCost[i];};
@@ -73,7 +69,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         typedef typename Sol::UnchosenFacilitiesSet USet;
 
         VorType voronoi( FSet{fac.begin(), fac.end()},  VSet(clients.begin(), clients.end()), metric, facCapacities, verticesDemands);
-        Sol sol(std::move(voronoi), USet{}, cost);
+        Sol sol(std::move(voronoi), USet{/*fac.begin(), fac.end()*/}, cost);
 
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(std::move(sol));
@@ -82,13 +78,12 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
 
         search(ls, [&](data_structures::ObjectWithCopy<Sol> & sol) {
            LOG_COPY_DEL(sol->getChosenFacilities().begin(), sol->getChosenFacilities().end(), ",");
-           ON_LOG(auto cost = sol->getVoronoi().getCost());
-           LOG("current cost "<< cost.getDistToFullAssignment() << " " << cost.getRealDist());
+           ON_LOG(auto c = sol->getVoronoi().getCost());
+           LOG("current cost " << simple_algo::getCFLCost(metric, cost, s) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
         });
         double c = simple_algo::getCFLCost(metric, cost, s);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG("APPROXIMATION RATIO: " << c / opt);
-        break;
     }
 }

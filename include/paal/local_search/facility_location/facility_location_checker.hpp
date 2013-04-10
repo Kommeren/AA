@@ -26,27 +26,30 @@ public:
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
         auto const & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret;
+        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
         switch (ue.getImpl()->getType()) {
             case REMOVE : {
                 auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());
                 ret = FLS.invokeOnCopy(&FLS_T::remFacility, r->get());
                 //TODO for capacitated version we should  just restart copy
-                FLS.invokeOnCopy(&FLS_T::addFacility, r->get());
+                back = FLS.invokeOnCopy(&FLS_T::addFacility, r->get());
+                assert(ret == -back);
                 break;
             }
             case ADD: {
                 auto a = static_cast<const Add<VertexType> *>(ue.getImpl());
                 ret = FLS.invokeOnCopy(&FLS_T::addFacility, a->get());
-                FLS.invokeOnCopy(&FLS_T::remFacility, a->get());
+                back = FLS.invokeOnCopy(&FLS_T::remFacility, a->get());
+                assert(ret == -back);
                 break;
             }
             case SWAP: {
                 auto s = static_cast<const Swap<VertexType> *>(ue.getImpl());
                 ret  = FLS.invokeOnCopy(&FLS_T::addFacility, s->getTo());
                 ret += FLS.invokeOnCopy(&FLS_T::remFacility, s->getFrom());
-                FLS.invokeOnCopy(&FLS_T::addFacility, s->getFrom());
-                FLS.invokeOnCopy(&FLS_T::remFacility, s->getTo());
+                back = FLS.invokeOnCopy(&FLS_T::addFacility, s->getFrom());
+                back += FLS.invokeOnCopy(&FLS_T::remFacility, s->getTo());
+                assert(ret == -back);
                 break;
             }
             default: {

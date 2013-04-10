@@ -26,7 +26,7 @@ using namespace paal;
 
 bool le(double x, double y) {
     static const double epsilon = 0.01;
-    return x - epsilon <= y;
+    return x * (1 - epsilon) <= y;
 }
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::string fname;
         double opt;
         is_test_cases >> fname >> opt;
-        opt *= MULTIPL;
+        opt = cast(opt);
         if(fname == "")
             return;
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         std::vector<int> demands;
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_FL(ifs, facCost, facCap, demands, fac, clients);
+        auto metric = paal::readORLIB_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
     
         auto cost = [&](int i){ return facCost[i];};
     

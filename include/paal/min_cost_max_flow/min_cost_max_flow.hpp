@@ -30,10 +30,11 @@ find_min_cost(const Graph & g)
     auto capacity = get(edge_capacity, g);
     auto weight = get(edge_weight, g);
 
-    typename property_traits<typename property_map<Graph, edge_weight_t>::const_type>::value_type cost = 0;
+    typedef typename property_traits<typename property_map<Graph, edge_weight_t>::const_type>::value_type Cost;
+    Cost cost = 0;
     tie(ei, end) = edges(g);
     for(;ei != end; ++ei) {
-        if((capacity[*ei]) >  0) {
+        if((capacity[*ei]) > Cost(0)) {
             cost +=  (capacity[*ei] - residual_capacity[*ei]) * weight[*ei];
         } 
     }
@@ -51,7 +52,7 @@ void path_augmentation(Graph &gOrig, typename graph_traits<Graph>::vertex_descri
     typedef typename property_traits<Weight>::value_type Dist;
     typedef typename property_map < Graph, edge_residual_capacity_t >::type ResidualCapacity;
     typedef typename property_map < Graph, edge_reverse_t >::type Reversed;
-    typedef std::vector<unsigned> Pred;
+    typedef std::vector<VD> Pred;
 
     ResidualCapacity residual_capacity = get(edge_residual_capacity, gOrig); 
     auto g = detail::residual_graph(gOrig, residual_capacity);

@@ -44,3 +44,27 @@ BOOST_AUTO_TEST_CASE(test_1) {
     voronoi.addGenerator(SGM::D);
     voronoi.remGenerator(SGM::A);
 }
+
+template <typename Voronoi>
+void remAdd(Voronoi & v, int g) {
+    auto back = v.remGenerator(g);
+    auto ret = v.addGenerator(g);
+    assert(-back == ret);
+}
+
+BOOST_AUTO_TEST_CASE(test_2) {
+    LOG("Test 2");
+    typedef SampleGraphsMetrics SGM;
+    auto gm = SGM::getGraphMetricSmall();
+
+    typedef Voronoi<decltype(gm)> Voronoi;
+    typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
+    typedef typename VT::GeneratorsSet GSet;
+    typedef typename VT::VerticesSet VSet;
+    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    remAdd(voronoi, SGM::A);
+    remAdd(voronoi, SGM::B);
+    remAdd(voronoi, SGM::C);
+    remAdd(voronoi, SGM::D);
+    remAdd(voronoi, SGM::E);
+}

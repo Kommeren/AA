@@ -47,9 +47,9 @@ public:
         }
         
         bool operator>(DistI d) {
-            if(m_distToFullAssignment > 0) {
+            if(m_distToFullAssignment > DistI(0)) {
                 return true;
-            } else  if(m_distToFullAssignment < 0) {
+            } else  if(m_distToFullAssignment < DistI(0)) {
                 return false;
             }
             return m_realDist > d;
@@ -90,6 +90,33 @@ public:
     typedef std::set<VertexType> Generators;
     typedef std::vector<VertexType> Vertices;
 
+private:
+    typedef boost::adjacency_list < boost::listS, boost::vecS,  boost::bidirectionalS,
+        boost::property<boost::vertex_name_t, VertexType >,
+            boost::property < boost::edge_capacity_t, DistI,
+                boost::property < boost::edge_residual_capacity_t, DistI,
+                    boost::property < boost::edge_reverse_t, 
+                                        boost::adjacency_list_traits <boost::listS, boost::vecS, boost::bidirectionalS >::edge_descriptor, 
+                      boost::property <boost::edge_weight_t, DistI>
+                             > 
+                          > 
+                      > > Graph;
+    typedef boost::graph_traits<Graph> GTraits;
+    typedef typename GTraits::edge_descriptor ED;
+    typedef typename GTraits::edge_iterator EI;
+    typedef typename GTraits::out_edge_iterator OEI;
+    typedef typename GTraits::in_edge_iterator IEI;
+    typedef typename GTraits::vertex_descriptor VD;
+    typedef typename boost::property_map < Graph, boost::edge_capacity_t >::type Capacity;
+    typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
+    typedef typename boost::property_map < Graph, boost::edge_weight_t >::type Weight;
+    typedef typename boost::property_map < Graph, boost::edge_reverse_t >::type Reversed;
+    typedef typename std::map<VertexType, VD> VertexToGraphVertex;
+    typedef boost::filtered_graph<Graph, 
+        boost::is_residual_edge<ResidualCapacity> > ResidualGraph;
+
+public:
+
     CapacitatedVoronoi(const Generators & gen, Vertices ver,
                        const Metric & m, 
                        const GeneratorsCapacieties & gc, const VerticesDemands & vd, 
@@ -112,6 +139,27 @@ public:
             addGenerator(g);
         }
     }
+
+    CapacitatedVoronoi(const CapacitatedVoronoi & other) :
+        m_g(other.m_g),
+        m_s(other.m_s), m_t(other.m_t),
+        m_generators(other.m_generators),
+        m_vertices(other.m_vertices),
+        m_metric(other.m_metric),
+        m_generatorsCap(other.m_generatorsCap),
+        m_capacitySum(other.m_capacitySum),
+        m_firstGeneratorId(other.m_firstGeneratorId),
+        m_costOfNoGenerator(other.m_costOfNoGenerator),
+        m_vToGraphV(other.m_vToGraphV),
+        m_gToGraphV(other.m_gToGraphV) {
+            auto edges =  boost::edges(m_g);
+            auto rev = boost::get(boost::edge_reverse, m_g);
+            for(auto e : utils::make_range(edges)) {
+                auto eb =  boost::edge(boost::target(e, m_g), boost::source(e, m_g), m_g);
+                assert(eb.second);
+                rev[e] = eb.first;
+            }
+        }
     
     // returns diff between new cost and old cost
     Dist addGenerator(VertexType gen) {
@@ -124,9 +172,10 @@ public:
         }
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
-        if(costStart.getDistToFullAssignment() > 0) {
+
+//        if(costStart.getDistToFullAssignment() > 0) {
             boost::edmonds_karp_max_flow(m_g, m_s, m_t);
-        }
+//        }
 
 /*        EI i, end;
         std::tie(i,end) = boost::edges(m_g);
@@ -146,12 +195,12 @@ public:
     Dist remGenerator(VertexType gen) {
         Dist costStart = getCost();
         m_generators.erase(gen);
-        auto genGraph = m_gToGraphV[gen];
-        auto rev = get(boost::edge_reverse, m_g);
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto genGraph = m_gToGraphV.at(gen);
+//        auto rev = get(boost::edge_reverse, m_g);
+//        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
         
         //removing flow from the net
-        for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
+/*        for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
             bool b;
             VD v = boost::source(e, m_g);
             if(v == m_t) {
@@ -163,12 +212,11 @@ public:
             assert(b);
             residual_capacity[edgeFromStart] += cap;
             residual_capacity[rev[edgeFromStart]] -= cap;
-        }
+        }*/
         boost::clear_vertex(genGraph, m_g);
         assert(!boost::edge(m_t, genGraph, m_g).second);
         assert(!boost::edge(genGraph, m_t, m_g).second);
         boost::remove_vertex(genGraph, m_g);
-        m_generators.erase(gen);
         restoreIndex();
         
         //boost::path_augmentation_from_residual(gRes, m_s, m_t);
@@ -198,6 +246,46 @@ public:
         DistI cost =  boost::find_min_cost(m_g);
         return Dist(cost, resCap);
     }
+
+    template <typename OStream> 
+    friend OStream & operator<<(OStream & s, CapacitatedVoronoi & v) {
+        s << boost::num_vertices(v.m_g) << ", ";
+        s <<  v.m_s <<", " << v.m_t << "\n";
+        auto vertices = boost::vertices(v.m_g);
+        auto edges = boost::edges(v.m_g);
+        auto capacity = boost::get(boost::edge_capacity, v.m_g);
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, v.m_g);
+        auto name = boost::get(boost::vertex_name, v.m_g);
+        for(int v : utils::make_range(vertices)) {
+            s << v << "-> " << name[v]<< ", ";
+        }
+        s <<  "\n";
+        for(auto e : utils::make_range(edges)) {
+            s << e << "-> " << residual_capacity[e] << "-> " << capacity[e]<< ", ";
+        }
+        s <<  "\n";
+        for(int g : v.m_generators) {
+            s <<  g << "\n";
+        }
+        s <<  "\n";
+        for(int g : v.m_vertices) {
+            s <<  g << "\n";
+        }
+        s <<  "\n";
+        s<< v.m_capacitySum << "\n";
+        s << v.m_firstGeneratorId << "\n";
+        s <<  v.m_costOfNoGenerator << "\n";
+        s <<  "\n";
+        for(std::pair<int, int> g : v.m_vToGraphV) {
+            s <<  g.first << ", " << g.second << "\n";
+        }
+        s <<  "\n";
+        for(std::pair<int, int> g : v.m_gToGraphV) {
+            s <<  g.first << ", " << g.second << "\n";
+        }
+        s <<  "\n";
+        return s;
+    }
     
 private:
 
@@ -212,29 +300,6 @@ private:
         }
     }
 
-    typedef boost::adjacency_list < boost::listS, boost::vecS,  boost::bidirectionalS,
-        boost::property<boost::vertex_name_t, VertexType >,
-            boost::property < boost::edge_capacity_t, DistI,
-                boost::property < boost::edge_residual_capacity_t, DistI,
-                    boost::property < boost::edge_reverse_t, 
-                                        boost::adjacency_list_traits <boost::listS, boost::vecS, boost::bidirectionalS >::edge_descriptor, 
-                      boost::property <boost::edge_weight_t, DistI>
-                             > 
-                          > 
-                      > > Graph;
-    typedef boost::graph_traits<Graph> GTraits;
-    typedef typename GTraits::edge_descriptor ED;
-    typedef typename GTraits::edge_iterator EI;
-    typedef typename GTraits::out_edge_iterator OEI;
-    typedef typename GTraits::in_edge_iterator IEI;
-    typedef typename GTraits::vertex_descriptor VD;
-    typedef typename boost::property_map < Graph, boost::edge_capacity_t >::type Capacity;
-    typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
-    typedef typename boost::property_map < Graph, boost::edge_weight_t >::type Weight;
-    typedef typename boost::property_map < Graph, boost::edge_reverse_t >::type Reversed;
-    typedef typename std::map<VertexType, VD> VertexToGraphVertex;
-    typedef boost::filtered_graph<Graph, 
-        boost::is_residual_edge<ResidualCapacity> > ResidualGraph;
     
     VD addVertex(VertexType v = VertexType()) {
 //        auto rev = get(boost::edge_reverse, m_g);
@@ -253,7 +318,7 @@ private:
         ED e,f;
         e = addDirEdge(v, w, weight, capacity);
         f = addDirEdge(w, v, -weight, 0);
-        rev[e] = f; 
+        rev[e] = f;
         rev[f] = e; 
     }
     

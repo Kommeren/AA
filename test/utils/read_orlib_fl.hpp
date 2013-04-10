@@ -8,12 +8,43 @@
 #ifndef READ_ORLIB_FC_HPP
 #define READ_ORLIB_FC_HPP
 
+#include <type_traits>
+
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "utils/logger.hpp"
 
 namespace paal {
 
-const long long MULTIPL = 10000;
+
+long long cast(double d) {
+    static const double MULTIPL = 1000000;
+    return (long long)(d * MULTIPL);
+}
+
+namespace cap {
+    class uncapacitated;
+    class capacitated;
+}
+
+
+template <typename IsCapacitated, typename IStream>
+typename std::enable_if<std::is_same<IsCapacitated, cap::uncapacitated>::value, int>::type  
+readDemand(IStream & i){
+    int a;
+    i >> a;
+    return 1;
+}
+
+template <typename IsCapacitated, typename IStream>
+typename std::enable_if<std::is_same<IsCapacitated, cap::capacitated>::value, int>::type
+readDemand(IStream & ist){
+    int a;
+    ist >> a;
+    return a;
+}
+
+
+template <typename IsCapacitated>
 data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::vector<long long> & facCosts, std::vector<int> & facCap,
                        std::vector<int> & demands,
                        boost::integer_range<int> & fac,
@@ -32,15 +63,17 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
     double l;
     for(int i : boost::irange(0,F)) {
         ist >> facCap[i] >> l;
-        facCosts[i] = ((long long)l) * MULTIPL;
+        facCosts[i] = cast(l);
     }
     
     for(int i : boost::irange(0,N)) {
-        ist >> demands[i];    
+
+        demands[i] = readDemand<IsCapacitated>(ist);    
         for(int j : boost::irange(0,F)) {
             ist >> l;
-            m(i+F, j) = ((long long)l) * MULTIPL;
-            m(j, i+F) = ((long long)l) * MULTIPL;
+            l /= double(demands[i]);
+            m(i+F, j) = cast(l);
+            m(j, i+F) = cast(l);
     //        LOG(i+F << " "<< j << " " << l);
         }
     }
