@@ -1,6 +1,6 @@
 /**
  * @file min_cost_max_flow.hpp
- * @brief 
+ * @brief contains varius algoritms for min cost max flow. This is in the boost namespace because something like this is on the boost to do list and should be provided.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-18
@@ -233,7 +233,6 @@ void edmonds_karp_without_init(Graph &g,
     std::vector<ED> pred(N);
     auto rev = get(edge_reverse, g);
     auto res = get(edge_residual_capacity, g);
-    auto capacity = get(edge_capacity, g);
     put(&color[0], sink, Color::gray());
     while (get(&color[0], sink) != Color::white()) {
       boost::queue<VD> Q;

@@ -173,18 +173,9 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-//        if(costStart.getDistToFullAssignment() > 0) {
-            boost::edmonds_karp_max_flow(m_g, m_s, m_t);
-//        }
-
-/*        EI i, end;
-        std::tie(i,end) = boost::edges(m_g);
-
-        std::cout << "Stan przed cancel " <<std::endl ;
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
-        for(;i!= end; ++i) {
-            std::cout << *i << " " << residual_capacity[*i] <<std::endl ;
-        }*/
+        if(costStart.getDistToFullAssignment() > 0) {
+            boost::edmonds_karp_without_init(m_g, m_s, m_t);
+        }
 
         boost::cycle_cancelation(m_g);
 
@@ -196,11 +187,11 @@ public:
         Dist costStart = getCost();
         m_generators.erase(gen);
         auto genGraph = m_gToGraphV.at(gen);
-//        auto rev = get(boost::edge_reverse, m_g);
-//        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto rev = get(boost::edge_reverse, m_g);
+        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
         
         //removing flow from the net
-/*        for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
+        for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
             bool b;
             VD v = boost::source(e, m_g);
             if(v == m_t) {
@@ -212,7 +203,7 @@ public:
             assert(b);
             residual_capacity[edgeFromStart] += cap;
             residual_capacity[rev[edgeFromStart]] -= cap;
-        }*/
+        }
         boost::clear_vertex(genGraph, m_g);
         assert(!boost::edge(m_t, genGraph, m_g).second);
         assert(!boost::edge(genGraph, m_t, m_g).second);
@@ -220,7 +211,7 @@ public:
         restoreIndex();
         
         //boost::path_augmentation_from_residual(gRes, m_s, m_t);
-        boost::edmonds_karp_max_flow(m_g, m_s, m_t);
+        boost::edmonds_karp_without_init(m_g, m_s, m_t);
         boost::cycle_cancelation(m_g);
 
         return getCost() - costStart;

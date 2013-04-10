@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         double c = simple_algo::getFLCost(metric, cost, s);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
-        LOG("APPROXIMATION RATIO: " << c / opt);
+        LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
     }
     
 }

@@ -18,7 +18,7 @@ namespace paal {
 
 long long cast(double d) {
     static const double MULTIPL = 1000000;
-    return (long long)(d * MULTIPL);
+    return (long long)(d * MULTIPL) + 1;
 }
 
 namespace cap {
