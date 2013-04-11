@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <string>
+#include <iomanip>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"
@@ -53,6 +54,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         while(ls.search()) {
             LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
         }
+        LOG(std::setprecision(20) << "APPROXIMATION RATIO: " << float(simple_algo::getLength(mtx, cman)) / opt);
     }
 }
 

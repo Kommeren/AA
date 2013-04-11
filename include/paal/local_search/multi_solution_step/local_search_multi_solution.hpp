@@ -131,7 +131,7 @@ public:
      * @return true if the solution is improved false otherwise 
      */
     bool search() {
-        Fitness max;
+        Fitness max = Fitness();
         bool init = false;
         bool stop = false;
         auto currSE = m_solution.begin();
