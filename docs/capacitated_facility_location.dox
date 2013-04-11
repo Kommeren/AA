@@ -1,0 +1,19 @@
+/*! \page cfl Capacitated Facility Location
+
+\section def Problem definition.
+In capacitated facility location we have set F of possible facilitities locations, set C of clients. Each client i has specific demand D<sub>i</sub>, each facility j has specific capacity U<sub>j</sub> and cost F<sub>i</sub>, additionally for each client i and facility j, there is a cost per unit of assigning i to j (the transportation cost). The goal is to deterine the set of open facilities and  assign the demand of each client to some set of open facilities in sucha a way that:
+<ol>
+<li> sum of the demand assigned to one facility is no greater than facility's capacity
+<li> minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients demands (the transportation cost).
+</ol>
+\section Solution
+
+Capacitated Facility Location (CFL) problem is solved in the same way as uncapacitated facility location (see paal::local_search::facility_location::FacilityLocationLocalSearchStep). The only difference is that we use capacitated version fo the voronoi (see paal::data_structures::CapacitatedVoronoi).
+  example: 
+    \snippet capacitated_facility_location_example.cpp CFL Search Example
+ 
+  full example is capacitated_facility_location_example.cpp
+
+
+
+*/
