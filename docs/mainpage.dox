@@ -27,6 +27,7 @@
             <li>\ref paal::local_search::two_local_search::TwoLocalSearchStep
             <li>\ref paal::local_search::facility_location::FacilityLocationLocalSearchStep
             <li>\ref paal::local_search::k_median::KMedianLocalSearchStep
+            <li>\ref cfl
         </ul>
         <li> miscellaneous
             <ul>
