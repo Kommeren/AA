@@ -19,6 +19,15 @@
 namespace paal {
 namespace data_structures {
 
+/**
+ * @class CapacitatedVoronoi
+ * @brief This class is assigning vertices demands to capacitated generators in such a way that the total cost is minimized.
+ *        The solution is based on the min cost max flow algorithm.
+ *
+ * @tparam Metric
+ * @tparam GeneratorsCapacieties is a functor which for each Generator returns its capacity .
+ * @tparam VerticesDemands is a functor which for each vertex returns its demand.
+ */
 template <typename Metric, typename GeneratorsCapacieties, typename VerticesDemands>
 class CapacitatedVoronoi {
 public:
@@ -78,7 +87,6 @@ public:
         template <typename Stream >
         friend Stream & operator<<(Stream & s, Dist d) {
             return s << d.m_distToFullAssignment << " " <<  d.m_realDist; 
-            
         }
 
     private:
@@ -107,13 +115,19 @@ private:
     typedef typename GTraits::out_edge_iterator OEI;
     typedef typename GTraits::in_edge_iterator IEI;
     typedef typename GTraits::vertex_descriptor VD;
-    typedef typename boost::property_map < Graph, boost::edge_capacity_t >::type Capacity;
     typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
-    typedef typename boost::property_map < Graph, boost::edge_weight_t >::type Weight;
-    typedef typename boost::property_map < Graph, boost::edge_reverse_t >::type Reversed;
     typedef typename std::map<VertexType, VD> VertexToGraphVertex;
     typedef boost::filtered_graph<Graph, 
         boost::is_residual_edge<ResidualCapacity> > ResidualGraph;
+    
+    struct Trans {
+        std::pair<VertexType, DistI> operator()(const ED &e) const {
+            return std::make_pair(m_v->getVertexForEdge(e), m_v->getFlowOnEdge(e));
+        }
+        const CapacitatedVoronoi * m_v;
+    };
+
+    typedef boost::transform_iterator<Trans, IEI, std::pair<VertexType, DistI>> VForGenerator;
 
 public:
 
@@ -224,6 +238,24 @@ public:
     const Vertices & getVertices() const {
         return m_vertices;
     }
+    
+    /**
+     * @brief member function for getting assignment, for generator.
+     *
+     * @return returns range of pairs; the first element of pair is the Vertex 
+     * and the second element is the flow from this vertext to given generator
+     *
+     */
+    std::pair<VForGenerator, VForGenerator> 
+    getVerticesForGenerator(VertexType gen) const {
+        IEI ei, end;
+        VD v = m_gToGraphV.at(gen);
+        auto r = boost::in_edges(v, m_g);
+        Trans t; 
+        t.m_v = this;
+        return std::make_pair(VForGenerator(r.first,  t),
+                              VForGenerator(r.second, t));
+    }
 
 
     Dist getCost() const  {
@@ -280,8 +312,6 @@ public:
     
 private:
 
-
-
     void restoreIndex() {
         const unsigned N = boost::num_vertices(m_g);
         m_gToGraphV.clear();
@@ -293,13 +323,7 @@ private:
 
     
     VD addVertex(VertexType v = VertexType()) {
-//        auto rev = get(boost::edge_reverse, m_g);
         VD vG = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
-  //      bool b;
-    //    ED e;
-        /*std::tie(e,b) = boost::add_edge(vG, vG, m_g);
-        assert(b);
-        rev[e] = e;*/
         return vG;
     }
 
@@ -338,35 +362,6 @@ private:
         return name[boost::source(e, m_g)];
     }
 
-    struct Trans {
-        std::pair<VertexType, DistI> operator()(const ED &e) const {
-            return std::make_pair(m_v->getVertexForEdge(e), m_v->getFlowOnEdge(e));
-        }
-        const CapacitatedVoronoi * m_v;
-    };
-
-    typedef boost::transform_iterator<Trans, IEI, std::pair<VertexType, DistI>> VForGenerator;
-public:
-    
-    /**
-     * @brief member function for getting assignment, for generator.
-     *
-     * @return returns range of pairs; the first element of pair is the Vertex 
-     * and the second element is the flow from this vertext to given generator
-     *
-     */
-    std::pair<VForGenerator, VForGenerator> 
-    getVerticesForGenerator(VertexType gen) const {
-        IEI ei, end;
-        VD v = m_gToGraphV.at(gen);
-        auto r = boost::in_edges(v, m_g);
-        Trans t; 
-        t.m_v = this;
-        return std::make_pair(VForGenerator(r.first,  t),
-                              VForGenerator(r.second, t));
-    }
-
-private:
 
     Graph m_g;
     VD m_s,m_t;
