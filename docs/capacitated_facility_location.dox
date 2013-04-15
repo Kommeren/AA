@@ -14,6 +14,10 @@ Capacitated Facility Location (CFL) problem is solved in the same way as uncapac
  
   full example is capacitated_facility_location_example.cpp
 
+\subsection app Approximation Ration 6
 
+\subsection References
+
+\cite Chudak1047770 
 
 */

@@ -10,36 +10,33 @@ int main() {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
-
    
-    std::vector<int> fcosts{7,8};
-    auto cost = [&](int i){ return fcosts[i];};
+    std::vector<int> fcostsv{7,8};
+    auto facilityCost = [&](int i){ return fcostsv[i];};
 
     std::vector<int> fcapv{2, 2};
-    auto fcap = [&](int i){ return fcapv[i];};
+    auto facilityCapacity = [&](int i){ return fcapv[i];};
     
     std::vector<int> cdemv{2, 2, 1, 3, 3};
-    auto cdem = [&](int i){ return cdemv[i];};
+    auto clientDemand = [&](int i){ return cdemv[i];};
     
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<
-        decltype(gm), decltype(fcap), decltype(cdem)> VorType;
+        decltype(gm), decltype(facilityCapacity), decltype(clientDemand)> VorType;
     typedef paal::data_structures::FacilityLocationSolution
-        <decltype(cost), VorType> Sol;
+        <decltype(facilityCost), VorType> Sol;
     typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
     typedef paal::data_structures::VoronoiTraits<VorType> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
     typedef typename Sol::UnchosenFacilitiesSet USet;
 
-
     //create voronoi and solution
-    VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
-    voronoi.getVerticesForGenerator(0);
-    Sol sol(std::move(voronoi), USet{SGM::B}, cost);
+    VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, facilityCapacity, clientDemand);
+    Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
     //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
+    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
         ls(std::move(sol));
 
     //search 

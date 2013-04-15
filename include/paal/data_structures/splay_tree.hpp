@@ -264,6 +264,7 @@ namespace splay_tree {
       /**
        * @brief iterator to element in given node
        * @param node node storing element pointed by iterator
+       * @param splay pointer to the splay tree
        **/
       explicit Iterator(node_type *node, const ST * splay) : current_(node), rotation_cnt_(0), splay_(splay) {
       }
