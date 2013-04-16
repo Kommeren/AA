@@ -191,7 +191,7 @@ public:
             boost::edmonds_karp_without_init(m_g, m_s, m_t);
         }
 
-        boost::cycle_cancelation(m_g);
+        boost::cycle_cancellation(m_g);
 
         return getCost() - costStart;
     }
@@ -226,7 +226,7 @@ public:
         
         //boost::path_augmentation_from_residual(gRes, m_s, m_t);
         boost::edmonds_karp_without_init(m_g, m_s, m_t);
-        boost::cycle_cancelation(m_g);
+        boost::cycle_cancellation(m_g);
 
         return getCost() - costStart;
     }
@@ -243,7 +243,7 @@ public:
      * @brief member function for getting assignment, for generator.
      *
      * @return returns range of pairs; the first element of pair is the Vertex 
-     * and the second element is the flow from this vertext to given generator
+     * and the second element is the flow from this vertex to given generator
      *
      */
     std::pair<VForGenerator, VForGenerator> 

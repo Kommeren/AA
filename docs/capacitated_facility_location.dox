@@ -1,7 +1,7 @@
 /*! \page cfl Capacitated Facility Location
 
 \section def Problem definition.
-In capacitated facility location we have set of possible facilitities locations, set of clients. Each client \a i has specific demand \a clientDemand(i), each facility \a j has specific capacity \a facilityCapacity(j) and \a facilityCost(j), additionally for each client \a i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to deterine the set of open facilities and  assign the demand of each client to some set of open facilities in sucha a way that:
+In capacitated facility location we have set of possible facilities locations, set of clients. Each client \a i has specific demand \a clientDemand(i), each facility \a j has specific capacity \a facilityCapacity(j) and \a facilityCost(j), additionally for each client \a i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to deterine the set of open facilities and  assign the demand of each client to some set of open facilities in such a way that:
 <ol>
 <li> sum of the demand assigned to one facility is no greater than facility's capacity
 <li> minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients demands (the transportation cost).
@@ -12,7 +12,7 @@ More formally, let \f$x_{ij}\f$ denote the demand assigned by client \a i to fac
 where:&\\
 &\forall_{i}\sum_j{x_{ij}} = clientDemand(i)\\
 &\forall_{j}\sum_{i}x_{ij} \le facilityCapacity(j)\\
-&x_ij \ge 0\\
+&x_{ij} \ge 0\\
 &y_j \in \{0,1\}\\
 \f}
 
@@ -20,14 +20,15 @@ where:&\\
 
 Capacitated Facility Location (CFL) problem is solved in the same way as uncapacitated facility location (see paal::local_search::facility_location::FacilityLocationLocalSearchStep). The only difference is that we use capacitated version fo the voronoi (see paal::data_structures::CapacitatedVoronoi).
   example: 
-    \snippet capacitated_facility_location_example.cpp CFL Search Example
+\snippet capacitated_facility_location_example.cpp CFL Search Example
  
   full example is capacitated_facility_location_example.cpp
 
-\subsection app Approximation Ration 6
+\subsection app Approximation Ration equals 6.
 
 \subsection References
 
 \cite Chudak1047770 
+\cite Korupolu1998 
 
 */

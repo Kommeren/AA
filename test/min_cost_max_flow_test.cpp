@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
     Graph g = getSampleGraph(s, t);
 
     edmonds_karp_max_flow(g, s, t);
-    cycle_cancelation(g);
+    cycle_cancellation(g);
 
     LOG("min cost cycle canceling " << find_min_cost(g));
     BOOST_CHECK(find_min_cost(g) == 29);

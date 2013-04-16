@@ -1,6 +1,6 @@
 /**
  * @file min_cost_max_flow.hpp
- * @brief contains varius algoritms for min cost max flow. This is in the boost namespace because something like this is on the boost to do list and should be provided.
+ * @brief contains varius algorithms for min cost max flow. This is in the boost namespace because something like this is on the boost to do list and should be provided.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-18
@@ -138,7 +138,7 @@ find_cycle_start(Graph & g, const DistanceMap & distance, const ParentMap & pred
 }
 
 template <typename Graph>
-void cycle_cancelation(Graph &gOrig) {
+void cycle_cancellation(Graph &gOrig) {
     typedef typename property_map < Graph, edge_weight_t >::type Weight;
     typedef typename property_traits<Weight>::value_type Dist;
 

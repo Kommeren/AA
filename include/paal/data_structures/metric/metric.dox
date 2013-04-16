@@ -2,7 +2,7 @@
 \section m_concept Metric Concept
 Metric is a concept modeling distance function fulfilling triangle inequality. That is if \a m is a metric and \a x,y,z are some vertices then, \a m(x,y) + \a m(y,z) > \a m(x,z).<br><br>
 VertexType - denotes type of point from considered space i.e. argument of the metric.<br>
-DistanceType - denotes type of the distance beetwen points.<br>
+DistanceType - denotes type of the distance between points.<br>
 Metric need to have fulfill the interface: <br>
 <pre>
     MetricArchetype {

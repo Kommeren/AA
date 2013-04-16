@@ -30,7 +30,7 @@ public:
 };
 
 
-//ranges adaptor for pair
+//ranges adapter for pair
 template<typename Iter>
 struct range : std::pair<Iter, Iter> {
     range( const std::pair<Iter,Iter> & p) : std::pair<Iter, Iter>(p) {}
