@@ -27,8 +27,6 @@ Capacitated Facility Location (CFL) problem is solved in the same way as uncapac
 \subsection app Approximation Ration equals 6.
 
 \subsection References
-
-\cite Chudak1047770 
-\cite Korupolu1998 
+The algorithm is described in the \cite Korupolu1998. The Approximation ration analysis is in \cite Chudak1047770.
 
 */
