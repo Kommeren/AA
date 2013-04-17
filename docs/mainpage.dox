@@ -45,6 +45,7 @@
         <li>\ref paal::data_structures::GraphMetric
         <li>\ref paal::data_structures::ArrayMetric
         <li>\ref paal::data_structures::SimpleCycle
+        <li>\ref paal::data_structures::SplayCycle
         <li>\ref paal::data_structures::ObjectWithCopy
         <li>\ref paal::data_structures::FacilityLocationSolution
         <li>\ref paal::data_structures::Voronoi
