@@ -24,14 +24,14 @@
         <ul>
         <li>\ref local_search
             <ul>
-            <li>\ref paal::local_search::two_local_search::TwoLocalSearchStep
+            <li>\ref twoopt 
             <li>\ref fl 
-            <li>\ref paal::local_search::k_median::KMedianLocalSearchStep
+            <li>\ref kmedian
             <li>\ref cfl
         </ul>
         <li> miscellaneous
             <ul>
-            <li>\ref paal::steiner_tree::SteinerTree
+            <li>\ref stein
             </ul>
         </ul>
     <li> Concepts

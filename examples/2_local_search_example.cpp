@@ -1,3 +1,11 @@
+/**
+ * @file 2_local_search_example.cpp
+ * @brief 2-opt example.
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
+
 #include <vector>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"

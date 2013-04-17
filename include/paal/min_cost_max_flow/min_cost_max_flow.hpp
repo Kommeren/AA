@@ -1,6 +1,6 @@
 /**
  * @file min_cost_max_flow.hpp
- * @brief contains varius algorithms for min cost max flow. This is in the boost namespace because something like this is on the boost to do list and should be provided.
+ * @brief contains various algorithms for min cost max flow. This is in the boost namespace because something like this is on the boost to do list and should be provided.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-18

@@ -29,10 +29,10 @@ namespace steiner_tree {
  * Example: <br>
    \snippet steiner_tree_example.cpp Steiner Tree Example
  *
- * full example is facility_location_example.cpp
+ * full example is steiner_tree_example.cpp
  *
  * @tparam Metric we only use this metric for distances  (Steiner, Terminal) and (Terminal, Terminal)
- * @tparam Voronoi models \ref voronoi. This is a voronoi division where generators are terminals  of the steiner tree.
+ * @tparam Voronoi models WeakVronoi (see \ref voronoi). This is a voronoi division where generators are terminals  of the steiner tree.
  */
 template <typename Metric, typename Voronoi> 
 class SteinerTree {

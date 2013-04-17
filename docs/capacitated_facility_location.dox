@@ -1,7 +1,7 @@
 /*! \page cfl Capacitated Facility Location
 
 \section def Problem definition.
-In capacitated facility location we have set of possible facilities locations, set of clients. Each client \a i has specific demand \a clientDemand(i), each facility \a j has specific capacity \a facilityCapacity(j) and \a facilityCost(j), additionally for each client \a i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to deterine the set of open facilities and  assign the demand of each client to some set of open facilities in such a way that:
+In capacitated facility location we have set of possible facilities locations, set of clients. Each client \a i has specific demand \a clientDemand(i), each facility \a j has specific capacity \a facilityCapacity(j) and \a facilityCost(j), additionally for each client \a i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to determine the set of open facilities and  assign the demand of each client to some set of open facilities in such a way that:
 <ol>
 <li> sum of the demand assigned to one facility is no greater than facility's capacity
 <li> minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients demands (the transportation cost).

@@ -11,8 +11,10 @@ Index:
 <ul>
     <li> \ref Preliminaries - containing preliminaries to Local Search and our interpretation of it.
     <li> LOCAL SEARCH INTERFACE - containing c++ interfaces of Local Search classes.
-    <li> SPECIFIC IMPLEMENTATIONS - containing the general idea of the library.
-    <li> 2-opt for TSP  - containing the implementation of the 2_local_search for TSP and basic usage of this class
+    <ul>
+    <li> LOCAL SEARCH SINGLE SOLUTION
+    <li> LOCALC SEARCH MULTI SOLUTION
+    </ul>
 </ul>
 
 
