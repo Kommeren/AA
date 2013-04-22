@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     ON_LOG(F f);
 
     //printing 
-    int s = ls.getSolution();
+    int & s = ls.getSolution();
     LOG("f("<< s <<") \t" << f(s));
     ON_LOG(int i = 0);
 
