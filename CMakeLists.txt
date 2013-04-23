@@ -37,18 +37,20 @@ file(GLOB_RECURSE example_bins "${EXAMPLE_DIR}/*.cpp")
 message(${test_bins})
 
 add_executable (main  ${BIN_DIR}/main.cpp)
-target_link_libraries (main) 
+target_link_libraries (main)
+
+set(LIBS ${Boost_LIBRARIES} glpk)
 
 foreach(t ${test_bins})
     get_filename_component(n ${t} NAME_WE)
     message("adding test " : ${n})
     add_executable(${n} ${t})
-    target_link_libraries (${n} ${Boost_LIBRARIES}) 
+    target_link_libraries (${n} ${LIBS}) 
 endforeach()
 
 foreach(t ${example_bins})
     get_filename_component(n ${t} NAME_WE)
     message("adding examaple " : ${n})
     add_executable(${n} ${t})
-    target_link_libraries (${n} ${Boost_LIBRARIES}) 
+    target_link_libraries (${n} ${LIBS}) 
 endforeach()
