@@ -22,12 +22,19 @@ public:
         glp_delete_prob(m_lp);
     }
 protected:
+
+    bool equals(double a, double b) {
+        return abs(a -b ) < EPSILON;
+    }
+
     template <typename Vec>
-    void initVec(Vec & v, int initResSize) {
+    void initVec(Vec & v, int initResSize = 1) {
         v.reserve(initResSize);
         v.push_back(0);
     }
 
+
+    const double EPSILON = 0.00001;
     glp_prob * m_lp; 
     std::vector<int> m_row;
     std::vector<int> m_col;
@@ -57,6 +64,30 @@ public:
     double solve() {
         glp_simplex(m_lp, NULL);
         return glp_get_obj_val(m_lp);
+    }
+
+    bool round() {
+        std::vector<int> columnsToDelete;
+        initVec(columnsToDelete);
+        for(int jIdx : boost::irange(1, jNr + 1)) {
+            double x = glp_get_col_prim(m_lp, jIdx);
+            if(equals(x, 1) || equals(x, 0)) {
+                columnsToDelete.push_back(jIdx);
+            } 
+            if(equals(x,1)) {
+                //TODO store aSSIGNMENT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            }
+
+        }
+
+        
+        int delelted = columnsToDelete.size() - 1;
+        glp_del_cols(m_lp, delelted, &columnsToDelete[0]);
+        jNr -= delelted;
+        return delelted > 0;
+    }
+
+    void relax() {
     }
 
 protected:
@@ -140,6 +171,7 @@ protected:
    const int mNr;
    const int jNr;
    Idx idx;
+//   std::map<int, int> 
 
 
 };

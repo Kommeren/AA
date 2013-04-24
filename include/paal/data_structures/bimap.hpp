@@ -45,6 +45,12 @@ public:
         m_idToT(bm.m_idToT), 
         m_tToID(bm.m_tToID) {
     }
+    
+    BiMap & operator=(BiMap && bm) { 
+        m_idToT = std::move(bm.m_idToT); 
+        m_tToID = std::move(bm.m_tToID);
+        return *this;
+    }
 
     Idx getIdx(const T & t) const {
         auto iter = m_tToID.find(t);

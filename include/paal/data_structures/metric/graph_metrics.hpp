@@ -67,10 +67,11 @@ template <typename Graph, typename DistanceType,
 struct  GraphMetric : public ArrayMetric<DistanceType>, 
             public metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> {
       typedef   ArrayMetric<DistanceType> GMBase;
+      typedef metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> GMFBase;
 
     GraphMetric(const Graph & g)  
         : GMBase(boost::num_vertices(g)) {
-        fillMatrix(g, GMBase::m_matrix);
+            GMFBase::fillMatrix(g, GMBase::m_matrix);
     }
 };
 

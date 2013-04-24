@@ -15,9 +15,9 @@ namespace data_structures {
 
 template <typename Cycle> 
 class CycleStartFromLastChange {
+public:
     typedef typename  CycleTraits<Cycle>::CycleElem CycleElem;
     typedef typename  CycleTraits<Cycle>::VertexIterator VertexIterator;
-public:
     CycleStartFromLastChange(Cycle & c) :
         m_cycle(c), m_element(*c.vbegin()) {}
 
