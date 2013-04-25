@@ -48,10 +48,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
                     costf, timef, Tf);
 
     LOG(ga.solve());
+    ga.round();
 
-    /*x1 = glp_get_col_prim(lp, 1);
-    x2 = glp_get_col_prim(lp, 2);
-    x3 = glp_get_col_prim(lp, 3);
-    LOG("\nz = "<< z << "; x1 = " << x1 <<"; x2 = "<< x2 << "; x3 = "<< x3 << "\n");*/
 }
 

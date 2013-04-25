@@ -27,6 +27,11 @@ public:
     ~LPBase() {
         glp_delete_prob(m_lp);
     }
+    
+    double solve() {
+        glp_simplex(m_lp, NULL);
+        return glp_get_obj_val(m_lp);
+    }
 protected:
 
 
@@ -42,15 +47,18 @@ protected:
     }*/
     
     template <typename RoundCondition>
-    bool round(RoundCondition & rc) {
+    bool roundGen(RoundCondition  rc) {
         int delelted(0);
         int size = glp_get_num_cols(m_lp);
-        for(int i = 0; i < size; ++i) {
+        LOG("size = " << size);
+        for(int i = 1; i <= size; ++i) {
             double x = glp_get_col_prim(m_lp, i);
-            std::string s = glp_get_col_name(m_lp, i);
-            auto doRound = rc(x, s);
+            auto doRound = rc(x, i);
             if(doRound.first) {
+                LOG("rounduje = " << i);
+                LOG("size policznoy = " << glp_get_num_cols(m_lp));
                 roundColToValue(i, doRound.second);
+                LOG("porounduje = " << i);
                 --size;
                 --i;
             }
@@ -61,14 +69,13 @@ protected:
 
     
     template <typename RelaxCondition>
-    bool relax(RelaxCondition & rc) {
+    bool relaxGen(RelaxCondition  rc) {
         int delelted(0);
         int size = glp_get_num_rows(m_lp);
         for(int i = 0; i < size; ++i) {
             double x = glp_get_row_prim(m_lp, i);
-            std::string s = glp_get_row_name(m_lp, i);
-            if(rc(x,s)) { 
-                glp_del_rows(m_lp, 1, &i-sizeof(int));
+            if(rc(x,i)) { 
+                glp_del_rows(m_lp, 1, &i-1);
                 --size;
                 --i;
             }
@@ -78,16 +85,17 @@ protected:
     }
 
     void roundColToValue(int col, double value) {
+        LOG("round na col = " << col << " val =  " << value ); 
         int size = glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]); 
         for(int i : boost::irange(1, size + 1)) {
             double currUb = glp_get_row_ub(m_lp, m_idxTmp[i]);
             double currLb = glp_get_row_lb(m_lp, m_idxTmp[i]);
             int currType = glp_get_row_type(m_lp, m_idxTmp[i]);
             double diff = m_valTmp[i] * value;
+            LOG("Usataiwam bounda na wiersz " << m_idxTmp[i] << " val = " << m_valTmp[i]); 
             glp_set_row_bnds(m_lp, m_idxTmp[i], currType, currLb - diff, currUb - diff);
         }
-        
-        glp_del_cols(m_lp, 1, &col-sizeof(int));
+        glp_del_cols(m_lp, 1, &col-1);
     }
 
     int getColDegree(int col) {
@@ -158,18 +166,14 @@ public:
         loadMatrix();
     }
 
-    double solve() {
-        glp_simplex(m_lp, NULL);
-        return glp_get_obj_val(m_lp);
-    }
 
 
     bool round() {
-        return round(&GeneralAssignement::roundCondition);
+        return roundGen(&GeneralAssignement::roundCondition);
     }
 
     void relax() {
-        return relax(std::bind(&GeneralAssignement::relaxCondition, this));
+        return relaxGen(std::bind(&GeneralAssignement::relaxCondition, this));
     }
 
 protected:
@@ -177,7 +181,7 @@ protected:
     typedef typename std::iterator_traits<MachineIter>::reference MachineRef;
     typedef utils::Compare<double> Compare;
 
-    static std::pair<bool, double> roundCondition(double x, const std::string &) {
+    static std::pair<bool, double> roundCondition(double x, int col) {
         for(int j = 0; j < 2; ++j) {
             if(Compare::e(x,j)) {
                 return std::make_pair(true, j);
@@ -186,8 +190,7 @@ protected:
         return std::make_pair(false, -1);
     };
     
-    bool relaxCondition(double x, const std::string &name) {
-        int row = getRow(name);
+    bool relaxCondition(double x, int row) {
         return getRowDegree(row) <= 2 && Compare::ge(getRowSum(row),1); 
     };
 
