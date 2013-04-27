@@ -13,7 +13,7 @@ template <typename T>
 class Compare {
 public:
     static bool e(T a, T b) {
-        return abs(a -b ) < EPSILON;
+        return std::abs(a -b ) < EPSILON;
     }
     
     static bool ge(T a, T b) {
@@ -24,7 +24,7 @@ private:
     static const T EPSILON;
 };
 
-template <typename T> const T Compare<T>::EPSILON = 0.00001;
+template <typename T> const T Compare<T>::EPSILON = std::numeric_limits<T>::epsilon();
 
 }
 }

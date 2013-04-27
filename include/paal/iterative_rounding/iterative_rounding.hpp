@@ -15,21 +15,31 @@ namespace paal {
 
 class LPBase {
 public:
-    LPBase(int initResSize) :
+    LPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
         m_lp(glp_create_prob()) {
         glp_create_index(m_lp);
-        initVec(m_row, initResSize);
-        initVec(m_col, initResSize);
-        initVec(m_val, initResSize);
-        initVec(m_idxTmp, initResSize);
-        initVec(m_valTmp, initResSize);
+        initVec(m_row, numberOfNonZerosInMatrix);
+        initVec(m_col, numberOfNonZerosInMatrix);
+        initVec(m_val, numberOfNonZerosInMatrix);
+        int maxRowCol = std::max(numberOfRows,  numberOfColumns);
+        initVec(m_idxTmp, maxRowCol);
+        initVec(m_valTmp, maxRowCol);
     }
+    
+    LPBase(int numberOfRows, int numberOfColumns) : LPBase(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
+    
     ~LPBase() {
         glp_delete_prob(m_lp);
     }
     
     double solve() {
+        glp_adv_basis(m_lp, 0);
         glp_simplex(m_lp, NULL);
+        int colNr = glp_get_num_cols(m_lp);
+        LOG("Result:");
+        for(int i : boost::irange(1, 1 + colNr)) {
+            LOG("col " << i << " val " << glp_get_col_prim(m_lp, i));
+        }
         return glp_get_obj_val(m_lp);
     }
 protected:
@@ -39,17 +49,11 @@ protected:
         glp_load_matrix(m_lp, m_row.size() - 1, &m_row[0], &m_col[0], &m_val[0]);
     }
 
-/*    double getCoef(int row, int col) {
-        glp_get_mat_row(m_lp, row, &m_idxTmp[0], &m_valTmp[0]);
-        auto idx = std::find_if(m_idxTmp.begin(), m_idxTmp.end(), [&](int i){return i == col;});
-        assert(idx != m_idxTmp.end());
-        return m_valTmp[idx - m_idxTmp.begin()];
-    }*/
-    
     template <typename RoundCondition>
     bool roundGen(RoundCondition  rc) {
         int delelted(0);
         int size = glp_get_num_cols(m_lp);
+        LOG("roundGen");
         LOG("size = " << size);
         for(int i = 1; i <= size; ++i) {
             double x = glp_get_col_prim(m_lp, i);
@@ -72,9 +76,10 @@ protected:
     bool relaxGen(RelaxCondition  rc) {
         int delelted(0);
         int size = glp_get_num_rows(m_lp);
-        for(int i = 0; i < size; ++i) {
+        for(int i = 1; i <= size; ++i) {
             double x = glp_get_row_prim(m_lp, i);
-            if(rc(x,i)) { 
+            if(rc(x,i)) {
+                LOG("RELAKSUJE " << i);
                 glp_del_rows(m_lp, 1, &i-1);
                 --size;
                 --i;
@@ -88,12 +93,13 @@ protected:
         LOG("round na col = " << col << " val =  " << value ); 
         int size = glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]); 
         for(int i : boost::irange(1, size + 1)) {
-            double currUb = glp_get_row_ub(m_lp, m_idxTmp[i]);
-            double currLb = glp_get_row_lb(m_lp, m_idxTmp[i]);
-            int currType = glp_get_row_type(m_lp, m_idxTmp[i]);
+            int row = m_idxTmp[i];
+            double currUb = glp_get_row_ub(m_lp, row);
+            double currLb = glp_get_row_lb(m_lp, row);
+            int currType = glp_get_row_type(m_lp, row);
             double diff = m_valTmp[i] * value;
-            LOG("Usataiwam bounda na wiersz " << m_idxTmp[i] << " val = " << m_valTmp[i]); 
-            glp_set_row_bnds(m_lp, m_idxTmp[i], currType, currLb - diff, currUb - diff);
+            LOG("Usataiwam bounda na wiersz " << row << " diff = " << diff); 
+            glp_set_row_bnds(m_lp, row, currType, currLb - diff, currUb - diff);
         }
         glp_del_cols(m_lp, 1, &col-1);
     }
@@ -116,12 +122,12 @@ protected:
         return std::accumulate(m_valTmp.begin(), m_valTmp.begin() + size + 1, 0.);
     }
 
-    int getCol(std::string & name) {
-        return glp_find_col(m_lp, name.c_str());
+    std::string getColName(int col) {
+        return glp_get_col_name(m_lp, col);
     }
     
-    int getRow(std::string & name) {
-        return glp_find_row(m_lp, name.c_str());
+    std::string getRowName(int row) {
+        return glp_get_row_name(m_lp, row);
     }
 
 
@@ -132,8 +138,8 @@ protected:
 
 private:
     template <typename Vec>
-    void initVec(Vec & v, int initResSize = 1) {
-        v.reserve(initResSize);
+    void initVec(Vec & v, int numberOfNonZerosInMatrix = 0) {
+        v.reserve(++numberOfNonZerosInMatrix);
         v.push_back(0);
     }
 
@@ -152,9 +158,12 @@ public:
 
     GeneralAssignement(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
-                      Cost c, ProceedingTime t, MachineAvailableTime T) : LPBase(2 * (std::distance(mbegin, mend)* std::distance(jbegin, jend) + 1)),  
-                        m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
-                        m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend){
+                      Cost c, ProceedingTime t, MachineAvailableTime T) : 
+        LPBase(std::distance(jbegin, jend) + std::distance(mbegin, mend), 
+               std::distance(jbegin, jend) * std::distance(mbegin, mend), 
+               2 * (std::distance(mbegin, mend) * std::distance(jbegin, jend))),  
+                m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
+                m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend) {
         glp_set_prob_name(m_lp, "generalized assignement problem");
         glp_set_obj_dir(m_lp, GLP_MIN);
 
@@ -172,8 +181,8 @@ public:
         return roundGen(&GeneralAssignement::roundCondition);
     }
 
-    void relax() {
-        return relaxGen(std::bind(&GeneralAssignement::relaxCondition, this));
+    bool relax() {
+        return relaxGen(std::bind(&GeneralAssignement::relaxCondition, this, std::placeholders::_1, std::placeholders::_2));
     }
 
 protected:
@@ -182,24 +191,37 @@ protected:
     typedef utils::Compare<double> Compare;
 
     static std::pair<bool, double> roundCondition(double x, int col) {
+        LOG("SPRAWDZAM CZY ZAOKRAGLAC: Columna = " << col << " val =  " << x);
         for(int j = 0; j < 2; ++j) {
             if(Compare::e(x,j)) {
+                LOG("ZAOKRAGLAM");
                 return std::make_pair(true, j);
             }
         }
+        LOG("NIE ZAOKRAGLAM");
         return std::make_pair(false, -1);
     };
     
     bool relaxCondition(double x, int row) {
-        return getRowDegree(row) <= 2 && Compare::ge(getRowSum(row),1); 
+        return isMachineName(getRowName(row)) && 
+               getRowDegree(row) <= 2 && 
+               Compare::ge(getRowSum(row),1); 
     };
+
+    std::string getMachinePrefix() const {
+        return "machine ";
+    }
 
     std::string getJobDesc(int jIdx) {
         return "job " + std::to_string(jIdx);
     }
     
     std::string getMachineDesc(int mIdx) {
-        return "machine " + std::to_string(mIdx);
+        return getMachinePrefix() + std::to_string(mIdx);
+    }
+
+    bool isMachineName(const std::string & s) {
+        return s.compare(0, getMachinePrefix().size(), getMachinePrefix()) == 0;
     }
 
     //adding varables
@@ -243,7 +265,7 @@ protected:
     //constraints for machines
     int addConstraintsForMachines(ProceedingTime & t, MachineAvailableTime & T)  {
         int rowIdx(m_row.back() + 1);
-        glp_add_rows(m_lp, m_jCnt);
+        glp_add_rows(m_lp, m_mCnt);
         int mIdx(1);
         for(MachineRef m : utils::make_range(m_mbegin, m_mend)) {
             int jIdx(1);

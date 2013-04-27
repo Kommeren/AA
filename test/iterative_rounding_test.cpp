@@ -49,6 +49,8 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
     LOG(ga.solve());
     ga.round();
+   ga.relax();
+    LOG(ga.solve());
 
 }
 
