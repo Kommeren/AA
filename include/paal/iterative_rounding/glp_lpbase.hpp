@@ -46,6 +46,10 @@ public:
     void deleteRow(int row) {
         glp_del_rows(m_lp, 1, &row-1);
     }
+    
+    void deleteCol(int col) {
+        glp_del_cols(m_lp, 1, &col-1);
+    }
 
     int addColumn(double costCoef, BoundType b, double lb, double ub, const std::string & name) {
         
@@ -53,6 +57,7 @@ public:
         glp_set_col_name(m_lp, m_colNr, name.c_str());
         glp_set_col_bnds(m_lp, m_colNr, boundType2GLP(b), lb, ub);
         glp_set_obj_coef(m_lp, m_colNr, costCoef);
+        resizeTmp();
         return m_colNr++;
     }
     
@@ -65,6 +70,7 @@ public:
         glp_add_rows(m_lp, 1);
         glp_set_row_name(m_lp, m_rowNr, name.c_str());
         glp_set_row_bnds(m_lp, m_rowNr, boundType2GLP(b), lb, ub);
+        resizeTmp();
         return m_rowNr++;
     }
 
@@ -185,7 +191,10 @@ public:
         glp_set_row_bnds(m_lp, row, boundType2GLP(b), lb, ub);
     }
 private:
-
+    void resizeTmp() {
+        m_idxTmp.push_back(0);
+        m_valTmp.push_back(0);
+    }
 
     template <typename Vec>
     void initVec(Vec & v, int numberOfNonZerosInMatrix = 0) {

@@ -48,11 +48,23 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
                     jobs.begin(), jobs.end(), 
                     costf, timef, Tf);
 
+    /*GLPBase lp;
+    ga.init(lp);
+    lp.solve();
+    lp.setRowBounds(3, UP, 0, 1);
+    lp.setRowBounds(2, FX, 0, 0);
+    lp.deleteCol(3);
+    lp.setRowBounds(4, UP, 0, 2);
+    lp.setRowBounds(2, FX, 0, 0);
+    lp.deleteCol(3);
+    lp.solve();*/
     IterativeRounding<decltype(ga)> ir(std::move(ga));
     LOG(ir.solve());
     ir.round();
     ir.relax();
     LOG(ir.solve());
+    ir.round();
+    ir.relax();
 
 }
 

@@ -26,13 +26,14 @@ public:
     }
     
     bool round() {
-        int delelted(0);
+        int deleted(0);
         int size = m_lpBase.colSize();
         LOG("roundGen");
         LOG("size = " << size);
         for(int i = 1; i <= size; ++i) {
             auto doRound = m_engine.roundCondition(m_lpBase, i);
             if(doRound.first) {
+                ++deleted;
                 LOG("rounduje = " << i);
                 roundColToValue(i, doRound.second);
                 LOG("porounduje = " << i);
@@ -41,14 +42,15 @@ public:
             }
         }
         
-        return delelted > 0;
+        return deleted > 0;
     }
     
     bool relax() {
-        int delelted(0);
+        int deleted(0);
         int size = m_lpBase.rowSize();
         for(int i = 1; i <= size; ++i) {
             if(m_engine.relaxCondition(m_lpBase, i)) {
+                ++deleted;
                 LOG("RELAKSUJE " << i);
                 m_lpBase.deleteRow(i);
                 --size;
@@ -56,7 +58,7 @@ public:
             }
         }
         
-        return delelted > 0;
+        return deleted > 0;
     }
 
 
@@ -76,7 +78,7 @@ private:
             LOG("Usataiwam bounda na wiersz " << row << " diff = " << diff); 
             m_lpBase.setRowBounds(row, currType, currLb - diff, currUb - diff);
         }
-        m_lpBase.deleteRow(col);
+        m_lpBase.deleteCol(col);
     }
     
     LPBase m_lpBase;

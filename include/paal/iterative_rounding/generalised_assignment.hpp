@@ -10,7 +10,7 @@ public:
 
     GeneralAssignement(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
-                      Cost c, ProceedingTime t, MachineAvailableTime T) : 
+                      const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T) : 
                 m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
                 m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
                 m_c(c), m_t(t), m_T(T) {}
