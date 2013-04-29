@@ -14,6 +14,7 @@
 
 #include "utils/logger.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/iterative_rounding/generalised_assignment.hpp"
 
 using namespace  paal;
 
@@ -47,10 +48,11 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
                     jobs.begin(), jobs.end(), 
                     costf, timef, Tf);
 
-    LOG(ga.solve());
-    ga.round();
-   ga.relax();
-    LOG(ga.solve());
+    IterativeRounding<decltype(ga)> ir(std::move(ga));
+    LOG(ir.solve());
+    ir.round();
+    ir.relax();
+    LOG(ir.solve());
 
 }
 
