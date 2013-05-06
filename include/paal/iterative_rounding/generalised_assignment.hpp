@@ -9,6 +9,7 @@
 #define GENERALISED_ASSIGNMENT_HPP 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 namespace paal {
+namespace ir {
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>
 class GeneralAssignement  {
 public:
@@ -157,5 +158,7 @@ make_GeneralAssignement(MachineIter mbegin, MachineIter mend,
                 mbegin, mend, jbegin, jend, c, t, T);
 }
 
-}
+
+} //ir
+} //paal
 #endif /* GENERALISED_ASSIGNMENT_HPP */

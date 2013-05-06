@@ -21,6 +21,7 @@
 #include "paal/iterative_rounding/glp_lpbase.hpp"
 
 namespace paal {
+namespace ir {
 
 struct TrivialVisitor {
     template <typename LP>
@@ -104,6 +105,7 @@ private:
     Visitor m_visitor;
 };
 
+} //ir
 } //paal
 
 

@@ -12,6 +12,7 @@
 #include "bound_type.hpp"
 
 namespace paal {
+namespace ir {
 
 //template <typename Visitor>
 class GLPBase {
@@ -250,5 +251,9 @@ private:
     mutable Ids m_idxTmp;
     mutable Vals m_valTmp;
 };
-}
+
+
+} //ir
+} //paal
+
 #endif /* LPBASE_HPP */

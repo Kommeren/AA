@@ -17,6 +17,7 @@
 #include "paal/iterative_rounding/generalised_assignment.hpp"
 
 using namespace  paal;
+using namespace  paal::ir;
 
 struct LogVisitor : public TrivialVisitor {
 
@@ -78,7 +79,8 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
    auto j1 = j2m.find(1);
    BOOST_CHECK(j1 != j2m.end() && j1->second == 0);
-    
+   
+   //compile with trivial visitor
    {
          auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
