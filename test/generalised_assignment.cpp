@@ -18,6 +18,18 @@
 
 using namespace  paal;
 
+struct LogVisitor : public TrivialVisitor {
+
+    template <typename LP>
+    void roundCol(LP & lp, int col, double val) {
+        LOG("Column "<< col << " rounded to " << val);
+    }
+    
+    template <typename LP>
+    void relaxRow(LP & lp, int row) {
+        LOG("Relax row " << row);
+    }
+};
 
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
@@ -48,23 +60,32 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
                     jobs.begin(), jobs.end(), 
                     costf, timef, Tf);
 
-    /*GLPBase lp;
-    ga.init(lp);
-    lp.solve();
-    lp.setRowBounds(3, UP, 0, 1);
-    lp.setRowBounds(2, FX, 0, 0);
-    lp.deleteCol(3);
-    lp.setRowBounds(4, UP, 0, 2);
-    lp.setRowBounds(2, FX, 0, 0);
-    lp.deleteCol(3);
-    lp.solve();*/
-    IterativeRounding<decltype(ga)> ir(std::move(ga));
+    IterativeRounding<decltype(ga), LogVisitor> ir(std::move(ga));
     LOG(ir.solve());
     ir.round();
     ir.relax();
     LOG(ir.solve());
     ir.round();
     ir.relax();
+
+    auto const & j2m = ir.getSolution();
+    for(const std::pair<int, int> & jm : j2m) {
+        LOG("Job " << jm.first << " assigned to Machine " << jm.second);
+    }
+
+   auto j0 = j2m.find(0);
+   BOOST_CHECK(j0 != j2m.end() && j0->second == 0);
+
+   auto j1 = j2m.find(1);
+   BOOST_CHECK(j1 != j2m.end() && j1->second == 0);
+    
+   {
+         auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
+                    jobs.begin(), jobs.end(), 
+                    costf, timef, Tf);
+        IterativeRounding<decltype(ga)> irdef(ga);
+        irdef.getSolution();
+   }
 
 }
 

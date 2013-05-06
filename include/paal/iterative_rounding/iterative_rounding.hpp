@@ -1,3 +1,10 @@
+/**
+ * @file iterative_rounding.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-05-06
+ */
 #ifndef ITERATIVE_ROUNDING_HPP
 #define ITERATIVE_ROUNDING_HPP 
 
@@ -15,7 +22,15 @@
 
 namespace paal {
 
-template <typename Engine, typename LPBase = GLPBase>
+struct TrivialVisitor {
+    template <typename LP>
+    void roundCol(LP &lp, int col, double val) {}
+    
+    template <typename LP>
+    void relaxRow(LP &lp, int row) {}
+};
+
+template <typename Engine, typename Visitor = TrivialVisitor, typename LPBase = GLPBase>
 class IterativeRounding  {
 public:
     IterativeRounding(Engine e) : m_engine(std::move(e)) {
@@ -28,15 +43,12 @@ public:
     bool round() {
         int deleted(0);
         int size = m_lpBase.colSize();
-        LOG("roundGen");
-        LOG("size = " << size);
         for(int i = 1; i <= size; ++i) {
             auto doRound = m_engine.roundCondition(m_lpBase, i);
             if(doRound.first) {
                 ++deleted;
-                LOG("rounduje = " << i);
+                m_visitor.roundCol(m_lpBase, i, doRound.second);
                 roundColToValue(i, doRound.second);
-                LOG("porounduje = " << i);
                 --size;
                 --i;
             }
@@ -51,7 +63,7 @@ public:
         for(int i = 1; i <= size; ++i) {
             if(m_engine.relaxCondition(m_lpBase, i)) {
                 ++deleted;
-                LOG("RELAKSUJE " << i);
+                m_visitor.relaxRow(m_lpBase, i);
                 m_lpBase.deleteRow(i);
                 --size;
                 --i;
@@ -61,11 +73,18 @@ public:
         return deleted > 0;
     }
 
+    LPBase & getLP() {
+        return m_lpBase;
+    }
+
+    decltype(std::declval<Engine>().getSolution()) getSolution() {
+        return m_engine.getSolution();
+    }
+
 
 private:    
    
     void roundColToValue(int col, double value) {
-        LOG("round na col = " << col << " val =  " << value ); 
         auto column = m_lpBase.getColumn(col);
         int row;
         double coef;
@@ -75,7 +94,6 @@ private:
             double currLb = m_lpBase.getRowLb(row);
             BoundType currType = m_lpBase.getRowBoundType(row);
             double diff = coef * value;
-            LOG("Usataiwam bounda na wiersz " << row << " diff = " << diff); 
             m_lpBase.setRowBounds(row, currType, currLb - diff, currUb - diff);
         }
         m_lpBase.deleteCol(col);
@@ -83,6 +101,7 @@ private:
     
     LPBase m_lpBase;
     Engine m_engine;
+    Visitor m_visitor;
 };
 
 } //paal

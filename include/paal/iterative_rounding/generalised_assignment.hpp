@@ -1,3 +1,10 @@
+/**
+ * @file generalised_assignment.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-05-06
+ */
 #ifndef GENERALISED_ASSIGNMENT_HPP
 #define GENERALISED_ASSIGNMENT_HPP 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
@@ -7,6 +14,7 @@ class GeneralAssignement  {
 public:
     typedef typename utils::IterToElem<JobIter>::type Job;
     typedef typename utils::IterToElem<MachineIter>::type Machine;
+    typedef std::map<Job, Machine> JobsToMachines;
 
     GeneralAssignement(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
@@ -21,16 +29,17 @@ public:
     typedef utils::Compare<double> Compare;
 
     template <typename LP>
-    static std::pair<bool, double> roundCondition(const LP & lp, int col) {
+    std::pair<bool, double> roundCondition(const LP & lp, int col) {
         double x = lp.getColPrim(col);
-        LOG("SPRAWDZAM CZY ZAOKRAGLAC: Columna = " << col << " val =  " << x);
         for(int j = 0; j < 2; ++j) {
             if(Compare::e(x,j)) {
-                LOG("ZAOKRAGLAM");
+                if(j == 1) {
+                    int idx = std::stoi(lp.getColName(col));
+                    m_jobToMachine.insert(std::make_pair(*(m_jbegin +  (getJIdx(idx) - 1)), *(m_mbegin +  (getMIdx(idx) - 1))));
+                }
                 return std::make_pair(true, j);
             }
         }
-        LOG("NIE ZAOKRAGLAM");
         return std::make_pair(false, -1);
     };
     
@@ -50,6 +59,10 @@ public:
         addConstraintsForJobs(lp);
         addConstraintsForMachines(lp);
         lp.loadMatrix();
+    }
+
+    JobsToMachines & getSolution() {
+        return m_jobToMachine;
     }
 private:
 
@@ -76,7 +89,6 @@ private:
         for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
             int mIdx(1);
             for(MachineRef m : utils::make_range(m_mbegin, m_mend)) {
-                LOG("column = " << idx(jIdx, mIdx) );
                 lp.addColumn(m_c(j,m));
                 ++mIdx;
             }
@@ -90,7 +102,6 @@ private:
         for(int jIdx : boost::irange(1, m_jCnt + 1)) {
             int rowIdx = lp.addRow(FX, 1.0, 1.0, getJobDesc(jIdx));
             for(int mIdx : boost::irange(1, m_mCnt + 1)) {
-                LOG("row = " << rowIdx << " idx " << idx(jIdx, mIdx));
                 lp.addConstraintCoef(rowIdx, idx(jIdx,mIdx));
                 ++mIdx;
             }
@@ -106,7 +117,6 @@ private:
             int jIdx(1);
 
             for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
-                LOG("row = " << rowIdx << " idx " << idx(jIdx, mIdx));
                 lp.addConstraintCoef(rowIdx, idx(jIdx, mIdx), m_t(j, m));
                 ++jIdx;
             }
@@ -135,7 +145,7 @@ private:
     const Cost & m_c; 
     const ProceedingTime & m_t; 
     const MachineAvailableTime & m_T; 
-    std::map<Job, Machine> m_jobToMachine;
+    JobsToMachines m_jobToMachine;
 };
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>

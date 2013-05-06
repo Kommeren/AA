@@ -1,3 +1,10 @@
+/**
+ * @file bound_type.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-05-06
+ */
 #ifndef BOUND_TYPE_HPP
 #define BOUND_TYPE_HPP
 

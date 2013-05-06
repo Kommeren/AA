@@ -1,3 +1,10 @@
+/**
+ * @file glp_lpbase.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-05-06
+ */
 #ifndef LPBASE_HPP
 #define LPBASE_HPP
 #include <glpk.h>
@@ -5,11 +12,16 @@
 #include "bound_type.hpp"
 
 namespace paal {
+
+//template <typename Visitor>
 class GLPBase {
+    typedef std::vector<int> Ids;
+    typedef std::vector<double> Vals;
+    typedef boost::zip_iterator<boost::tuple<typename Ids::iterator, 
+                                             typename Vals::iterator>> ColumnIterator;
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
         m_lp(glp_create_prob()) {
-        //glp_create_index(m_lp);
         initVec(m_row, numberOfNonZerosInMatrix);
         initVec(m_col, numberOfNonZerosInMatrix);
         initVec(m_val, numberOfNonZerosInMatrix);
@@ -35,11 +47,6 @@ public:
     double solve() {
         glp_adv_basis(m_lp, 0);
         glp_simplex(m_lp, NULL);
-        int colNr = glp_get_num_cols(m_lp);
-        LOG("Result:");
-        for(int i : boost::irange(1, 1 + colNr)) {
-            LOG("col " << i << " val " << glp_get_col_prim(m_lp, i));
-        }
         return glp_get_obj_val(m_lp);
     }
     
@@ -85,8 +92,6 @@ public:
         m_val.push_back(coef);
     }
     
-    typedef boost::zip_iterator<boost::tuple<typename std::vector<int>::iterator, 
-                                             typename std::vector<double>::iterator>> ColumnIterator;
     std::pair<ColumnIterator, ColumnIterator>
             getColumn(int col) {
         int size = glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]);
@@ -115,16 +120,11 @@ public:
     bool roundGen(RoundCondition  rc) {
         int delelted(0);
         int size = glp_get_num_cols(m_lp);
-        LOG("roundGen");
-        LOG("size = " << size);
         for(int i = 1; i <= size; ++i) {
             double x = glp_get_col_prim(m_lp, i);
             auto doRound = rc(x, i);
             if(doRound.first) {
-                LOG("rounduje = " << i);
-                LOG("size policznoy = " << glp_get_num_cols(m_lp));
                 roundColToValue(i, doRound.second);
-                LOG("porounduje = " << i);
                 --size;
                 --i;
             }
@@ -141,7 +141,6 @@ public:
         for(int i = 1; i <= size; ++i) {
             double x = glp_get_row_prim(m_lp, i);
             if(rc(x,i)) {
-                LOG("RELAKSUJE " << i);
                 glp_del_rows(m_lp, 1, &i-1);
                 --size;
                 --i;
@@ -191,6 +190,9 @@ public:
         glp_set_row_bnds(m_lp, row, boundType2GLP(b), lb, ub);
     }
 private:
+    GLPBase(GLPBase &&) {} 
+    GLPBase(const GLPBase &) {}
+
     void resizeTmp() {
         m_idxTmp.push_back(0);
         m_valTmp.push_back(0);
@@ -241,12 +243,12 @@ private:
     glp_prob * m_lp;
     int m_rowNr = 1;
     int m_colNr = 1;
-    std::vector<int> m_row;
-    std::vector<int> m_col;
-    std::vector<double> m_val;
+    Ids m_row;
+    Ids m_col;
+    Vals m_val;
 
-    mutable std::vector<int> m_idxTmp;
-    mutable std::vector<double> m_valTmp;
+    mutable Ids m_idxTmp;
+    mutable Vals m_valTmp;
 };
 }
 #endif /* LPBASE_HPP */
