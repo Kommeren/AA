@@ -31,7 +31,7 @@ struct TrivialVisitor {
     void relaxRow(LP &lp, int row) {}
 };
 
-template <typename Engine, typename Visitor = TrivialVisitor, typename LPBase = GLPBase>
+template <typename Engine, typename Visitor = TrivialVisitor, typename LPBase = GLP>
 class IterativeRounding  {
 public:
     IterativeRounding(Engine e) : m_engine(std::move(e)) {

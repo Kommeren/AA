@@ -10,6 +10,8 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 namespace paal {
 namespace ir {
+
+
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>
 class GeneralAssignement  {
 public:
