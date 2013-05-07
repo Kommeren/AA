@@ -40,6 +40,7 @@ public:
     // "sorry, unimplemented: mangling dotstar_expr" :)
     template <typename F, typename... Args> 
     typename utils::ReturnType<T, F, Args...>::type
+    //typename std::result_of<F>::type //TODO investigate
     invoke(F f, Args... args) { 
         (m_copy.*(f))(args...);
         return (m_obj.*(f))(args...);

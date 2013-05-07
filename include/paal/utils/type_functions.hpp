@@ -87,7 +87,7 @@ template <typename T> struct kTuple<T, 1> {
     
 template <typename T, typename F, typename... Args> 
 struct ReturnType {
-    typedef  decltype(((std::declval<T*>())->*(std::declval<F>()))(std::declval<Args...>())) type;
+    typedef  decltype(((std::declval<T*>())->*(std::declval<F>()))(std::declval<Args>()...)) type;
 };
 
 } //utils
