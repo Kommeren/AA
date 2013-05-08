@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             boost::integer_range<int> jobs(0,0);
             paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
             auto  Tf = [&](int i){return machinesBounds[i];}; 
-            auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
+            auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
                     costs, times, Tf);
             times(0, 0);

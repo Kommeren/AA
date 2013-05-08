@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
     auto  Tf = [&](int i){return T[i];}; 
 
 
-    auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
+    auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
                     costf, timef, Tf);
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    
    //compile with trivial visitor
    {
-         auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
+         auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
                     costf, timef, Tf);
         IterativeRounding<decltype(ga)> irdef(ga);

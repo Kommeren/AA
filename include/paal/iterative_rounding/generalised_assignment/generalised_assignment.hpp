@@ -13,13 +13,13 @@ namespace ir {
 
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>
-class GeneralAssignement  {
+class GeneralAssignment  {
 public:
     typedef typename utils::IterToElem<JobIter>::type Job;
     typedef typename utils::IterToElem<MachineIter>::type Machine;
     typedef std::map<Job, Machine> JobsToMachines;
 
-    GeneralAssignement(MachineIter mbegin, MachineIter mend, 
+    GeneralAssignment(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
                       const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T) : 
                 m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
@@ -55,7 +55,7 @@ public:
 
     template <typename LP>
     void init(LP & lp) {
-        lp.setLPName("generalized assignement problem");
+        lp.setLPName("generalized assignment problem");
         lp.setMinObjFun(); 
 
         addVariables(lp);
@@ -152,11 +152,11 @@ private:
 };
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>
-GeneralAssignement<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>
-make_GeneralAssignement(MachineIter mbegin, MachineIter mend, 
+GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>
+make_GeneralAssignment(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
                       const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T) {
-    return  GeneralAssignement<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>(
+    return  GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>(
                 mbegin, mend, jbegin, jend, c, t, T);
 }
 
