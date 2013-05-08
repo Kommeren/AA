@@ -40,6 +40,10 @@ public:
     double solve() {
         return m_lpBase.solve();
     }
+
+    bool empty() {
+        return m_lpBase.colSize() == 0;
+    }
     
     bool round() {
         int deleted(0);
@@ -77,6 +81,10 @@ public:
     LPBase & getLP() {
         return m_lpBase;
     }
+    
+    Engine & getEngine() {
+        return m_engine;
+    }
 
     decltype(std::declval<Engine>().getSolution()) getSolution() {
         return m_engine.getSolution();
@@ -104,6 +112,15 @@ private:
     Engine m_engine;
     Visitor m_visitor;
 };
+
+template <typename IR> 
+void solve(IR &ir) {
+    while(!ir.empty()) {
+        ir.solve();
+        ir.round();
+        ir.relax();
+    }
+}
 
 } //ir
 } //paal

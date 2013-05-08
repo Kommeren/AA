@@ -132,11 +132,11 @@ private:
     }
     
     int getJIdx(int idx) {
-        return idx / m_mCnt + 1;
+        return (idx - 1) / m_mCnt + 1;
     }
     
     int getMIdx(int idx) {
-        return idx % m_mCnt;
+        return (idx - 1) % m_mCnt + 1;
     }
 
     const int m_mCnt;
@@ -155,7 +155,7 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
 GeneralAssignement<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>
 make_GeneralAssignement(MachineIter mbegin, MachineIter mend, 
                       JobIter jbegin, JobIter jend,
-                      Cost c, ProceedingTime t, MachineAvailableTime T) {
+                      const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T) {
     return  GeneralAssignement<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime>(
                 mbegin, mend, jbegin, jend, c, t, T);
 }

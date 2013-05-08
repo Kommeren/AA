@@ -14,7 +14,7 @@
 
 #include "utils/logger.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/iterative_rounding/generalised_assignment.hpp"
+#include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;

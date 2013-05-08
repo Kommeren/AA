@@ -16,7 +16,8 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 
-#include "paal/iterative_rounding/generalised_assignment.hpp"
+#include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_gen_ass.hpp"
 
@@ -53,39 +54,52 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         ss >> numberOfCases;
 
         LOG(fname << " " << numberOfCases);
+        std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
+        int num;
+        ifs >> num;
+        assert(num == numberOfCases);
         for(int i : boost::irange(0, numberOfCases)) {
             is_test_cases >> opt;
             LOG("case " << i << " opt "<< opt);
         
 
-/*        std::ifstream ifs(testDir + "/cases/" + fname);
-        std::vector<long long> facCost;
-        std::vector<int> facCap;
-        std::vector<int> demands;
-        boost::integer_range<int> fac(0,0);
-        boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
+            paal::M costs;
+            paal::M times;
+            std::vector<int> machinesBounds;
+            boost::integer_range<int> machines(0,0);
+            boost::integer_range<int> jobs(0,0);
+            paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
+            auto  Tf = [&](int i){return machinesBounds[i];}; 
+            auto ga = make_GeneralAssignement(machines.begin(), machines.end(),
+                    jobs.begin(), jobs.end(), 
+                    costs, times, Tf);
+            times(0, 0);
+            IterativeRounding<decltype(ga)> ir(std::move(ga));
+            paal::ir::solve(ir);
     
-        auto cost = [&](int i){ return facCost[i];};
     
-        typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
 
-        typedef paal::data_structures::FacilityLocationSolution
-            <decltype(cost), VorType> Sol;
-        typedef typename VorType::GeneratorsSet FSet;
-        VorType voronoi( FSet{},  FSet(clients.begin(), clients.end()), metric);
-        Sol sol(std::move(voronoi), FSet(fac.begin(), fac.end()), cost);
+            ON_LOG(auto & s = ir.getEngine().getSolution());
+            int c(0);
+            std::vector<int> machinesLoad(machines.size(), 0);
+            for(const std::pair<int, int> & jm : s ) {
+        //        LOG("job " << jm.first << " assigned to machine " << jm.second);
+                c += costs(jm.first, jm.second);
+                machinesLoad[jm.second] += times(jm.first, jm.second);
+            }
+            double approximationRatio = 1.;
+            for(int m : machines) {
+                BOOST_CHECK(machinesLoad[m] <= 2 * machinesBounds[m]);
+                approximationRatio = std::max(approximationRatio, double(machinesLoad[m]) / double(machinesBounds[m]));
+            }
 
-        FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
-            ls(std::move(sol));
+            for(int j : jobs) {
+                BOOST_CHECK(s.find(j) != s.end());
+            }
 
-        ON_LOG(auto & s = ls.getSolution().getObj());
-
-        search(ls);
-        double c = simple_algo::getFLCost(metric, cost, s);
-        LOG(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(le(opt, c));
-        LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);*/
+            LOG("cost " << c);
+            BOOST_CHECK(le(c, opt));
+            LOG( std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
         is_test_cases.getline(buf, MAX_LINE);
     }

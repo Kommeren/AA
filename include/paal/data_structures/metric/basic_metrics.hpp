@@ -15,17 +15,17 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @class ArrayMetric
+ * @class AssymetricArrayMetric
  * @brief \ref metric implementation on 2 dimensional array
  *
  * @tparam DistanceTypeParam
  */
 template <typename DistanceTypeParam> 
-class ArrayMetric {
+class AssymetricArrayMetric {
     public:
         typedef DistanceTypeParam DistanceType;
         typedef int VertexType;
-        ArrayMetric(int N = 0) : m_matrix(boost::extents[N][N]) { }
+        AssymetricArrayMetric(int N = 0, int M = 0) : m_matrix(boost::extents[N][M]) { }
         
         DistanceType operator()(const VertexType & v, const VertexType & w) const {
             return m_matrix[v][w];
@@ -39,7 +39,7 @@ class ArrayMetric {
             return m_matrix.size();
         }
 
-        ArrayMetric & operator=(const ArrayMetric & am) {
+        AssymetricArrayMetric & operator=(const AssymetricArrayMetric & am) {
             auto shape = am.m_matrix.shape();
             std::vector<size_t> dim(shape, shape + DIM_NR);
             m_matrix.resize(dim);
@@ -52,6 +52,12 @@ class ArrayMetric {
         static const int DIM_NR = 2;
         typedef boost::multi_array<DistanceType, DIM_NR> matrix_type; 
         matrix_type m_matrix;
+};
+
+template <typename DistanceTypeParam> 
+class ArrayMetric : public AssymetricArrayMetric<DistanceTypeParam> {
+public:
+    ArrayMetric(int N = 0) : AssymetricArrayMetric<DistanceTypeParam>(N, N) {}
 };
 
 }
