@@ -8,12 +8,13 @@
 #ifndef GENERALISED_ASSIGNMENT_HPP
 #define GENERALISED_ASSIGNMENT_HPP 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/iterative_rounding/default_engine.hpp"
+
 namespace paal {
 namespace ir {
 
-
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>
-class GeneralAssignment  {
+class GeneralAssignment : public IRComponents<> {
 public:
     typedef typename utils::IterToElem<JobIter>::type Job;
     typedef typename utils::IterToElem<MachineIter>::type Machine;
@@ -33,17 +34,12 @@ public:
 
     template <typename LP>
     std::pair<bool, double> roundCondition(const LP & lp, int col) {
-        double x = lp.getColPrim(col);
-        for(int j = 0; j < 2; ++j) {
-            if(Compare::e(x,j)) {
-                if(j == 1) {
-                    int idx = std::stoi(lp.getColName(col));
-                    m_jobToMachine.insert(std::make_pair(*(m_jbegin +  (getJIdx(idx) - 1)), *(m_mbegin +  (getMIdx(idx) - 1))));
-                }
-                return std::make_pair(true, j);
-            }
+        auto ret = IRComponents<>::roundCondition(lp, col);
+        if(ret.first && ret.second == 1) {
+             int idx = std::stoi(lp.getColName(col));
+              m_jobToMachine.insert(std::make_pair(*(m_jbegin +  (getJIdx(idx) - 1)), *(m_mbegin +  (getMIdx(idx) - 1))));
         }
-        return std::make_pair(false, -1);
+        return ret;
     };
     
     template <typename LP>
