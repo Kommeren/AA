@@ -1,5 +1,5 @@
 /**
- * @file ircomponents.hpp
+ * @file ir_components.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
