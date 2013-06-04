@@ -12,15 +12,15 @@
 #include "paal/data_structures/bimap.hpp"
 
 namespace paal {
-namespace utils {
+namespace data_structures {
 
-template <typename Metric>
+template <typename Metric, typename Bimap>
 class MetricOnIdx {
 public:
     typedef typename Metric::DistanceType DistanceType;
     typedef typename Metric::VertexType   VertexType;
 
-    MetricOnIdx(const Metric & m, const data_structures::BiMap<VertexType> & idx) : m_metric(m), m_idx(idx) {}
+    MetricOnIdx(const Metric & m, const Bimap & idx) : m_metric(m), m_idx(idx) {}
 
     DistanceType operator()(int i, int j) const {
         return m_metric(m_idx.getVal(i), m_idx.getVal(j));
@@ -29,6 +29,13 @@ private:
     const Metric & m_metric;
     const data_structures::BiMap<VertexType> & m_idx;
 };
+
+template <typename Metric, typename Bimap>
+MetricOnIdx<Metric, Bimap>
+make_metricOnIdx(const Metric & m, const Bimap & b) {
+    return MetricOnIdx<Metric, Bimap>(m, b);
+}
+
 }
 }
 #endif /* METRIC_ON_IDX_HPP */

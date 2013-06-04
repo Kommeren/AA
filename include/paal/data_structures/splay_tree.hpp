@@ -775,7 +775,7 @@ namespace splay_tree {
       }*/
 
       /** root node of a tree */
-      mutable node_type *root_;
+      mutable node_type *root_ = NULL;
       std::map<T, node_type *> t2node_;
       size_t rotation_cnt_;
   };

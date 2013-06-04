@@ -1,6 +1,7 @@
 #include <boost/graph/adjacency_matrix.hpp>
 
 #include "paal/data_structures/bimap.hpp"
+#include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/metric_on_idx.hpp"
 
 namespace paal {
@@ -25,8 +26,9 @@ template <typename Metric>  struct AdjacencyMatrix {
 metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     typedef typename AdjacencyMatrix<Metric>::type Graph;
     const unsigned N = std::distance(vbegin, vend);
-    typedef typename Metric::VertexType VertexType;
-    typedef typename Metric::DistanceType Dist;
+    typedef data_structures::MetricTraits<Metric> MT;
+    typedef typename MT::VertexType VertexType;
+    typedef typename MT::DistanceType Dist;
     Graph g(N);
     auto r = make_range(vbegin, vend);
     for(VertexType v : r){
@@ -45,9 +47,10 @@ template <typename Metric, typename VertexIter>
  typename   AdjacencyMatrix<Metric>::type
 metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
                      data_structures::BiMap<typename IterToElem<VertexIter>::type> & idx) {
-    typedef typename Metric::VertexType VertexType;
+    typedef data_structures::MetricTraits<Metric> MT;
+    typedef typename MT::VertexType VertexType;
     idx = data_structures::BiMap<VertexType>(vbegin, vend); 
-    MetricOnIdx<Metric> idxMetric(m, idx);
+    auto  idxMetric = data_structures::make_metricOnIdx(m, idx);
     std::function<int(VertexType)> trans = [&](VertexType v) {return idx.getIdx(v);};
     return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans), 
                                   boost::make_transform_iterator(vend, trans));

@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(std::move(sol));
 
-        ON_LOG(auto & s = ls.getSolution().getObj());
+        auto & s = ls.getSolution().getObj();
 
         search(ls, [&](data_structures::ObjectWithCopy<Sol> & sol) {
            LOG_COPY_DEL(sol->getChosenFacilities().begin(), sol->getChosenFacilities().end(), ",");

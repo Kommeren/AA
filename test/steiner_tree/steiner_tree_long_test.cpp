@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         auto g = paal::utils::metricToBGLWithIndex(m, boost::begin(resRange), boost::end(resRange), idx);
         std::vector<int> pm(resRange.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
-        paal::utils::MetricOnIdx<Metric> idxM(m, idx);
+        auto idxM = paal::data_structures::make_metricOnIdx(m, idx);
         int res(0);
         for(int i : boost::irange(0, int(pm.size()))) {
             res += idxM(i, pm[i]);

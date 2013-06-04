@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(std::move(sol));
 
-        ON_LOG(auto & s = ls.getSolution().getObj());
+        auto & s = ls.getSolution().getObj();
 
         search(ls);
         double c = simple_algo::getFLCost(metric, cost, s);

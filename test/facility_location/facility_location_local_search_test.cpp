@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     BOOST_CHECK(ls.search());
     ON_LOG(auto & s = ls.getSolution());
     ON_LOG(auto const & ch = s->getChosenFacilities());
-    std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
+    LOG_COPY_DEL(ch.begin(), ch.end(), ",");
     LOG("");
     BOOST_CHECK(!ls.search());
     
