@@ -63,15 +63,27 @@ protected:
 };
 
 
+struct DefaultSolveLP {
+    template <typename LP>
+    double operator()(LP & lp) {
+        return lp.solve();
+    };
+};
 
-template <typename RoundCondition = DefaultRoundCondition, 
+template <typename SolveLP = DefaultSolveLP, 
+          typename RoundCondition = DefaultRoundCondition, 
           typename RelaxContition = utils::ReturnFalseFunctor, 
           typename Init = utils::DoNothingFunctor> 
 class IRComponents {
 public:
-    IRComponents(RoundCondition round = RoundCondition(), RelaxContition relax = RelaxContition(), Init i = Init()) 
-        : m_roundCondition(round), m_relaxCondition(relax), m_init(i) {}
+    IRComponents(SolveLP solve = SolveLP(), RoundCondition round = RoundCondition(),
+                 RelaxContition relax = RelaxContition(), Init i = Init()) 
+        : m_solveLP(solve), m_roundCondition(round), m_relaxCondition(relax), m_init(i) {}
 
+    template <typename LP>
+    double solveLP(LP & lp) {
+        return m_solveLP(lp);
+    }
 
     template <typename LP>
     std::pair<bool, double> roundCondition(const LP & lp, int col) {
@@ -89,6 +101,7 @@ public:
     };
 
 private:
+    SolveLP m_solveLP;
     RoundCondition m_roundCondition;
     RelaxContition m_relaxCondition;
     Init m_init;

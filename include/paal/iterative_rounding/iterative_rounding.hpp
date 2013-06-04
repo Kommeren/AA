@@ -37,8 +37,9 @@ public:
     IterativeRounding(Engine e) : m_engine(std::move(e)) {
         e.init(m_lpBase);
     }
+    
     double solve() {
-        return m_lpBase.solve();
+        return m_engine.solveLP(m_lpBase);
     }
 
     bool empty() {
