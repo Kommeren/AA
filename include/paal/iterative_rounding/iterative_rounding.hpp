@@ -35,7 +35,7 @@ template <typename Engine, typename Visitor = TrivialVisitor, typename LPBase = 
 class IterativeRounding  {
 public:
     IterativeRounding(Engine e) : m_engine(std::move(e)) {
-        e.init(m_lpBase);
+        m_engine.init(m_lpBase);
     }
     
     double solve() {

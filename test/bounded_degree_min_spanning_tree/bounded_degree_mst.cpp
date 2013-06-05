@@ -80,8 +80,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     degBounds[5] = 1;
     
     auto bdmst = make_BoundedDegreeMST(g, costs, degBounds);
+    
     IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
-
+    
     LOG(ir.solve());
     ir.round();
     ir.relax();

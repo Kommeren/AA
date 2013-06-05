@@ -20,6 +20,10 @@ public:
     static bool ge(T a, T b) {
         return a >= b - EPSILON;
     }
+    
+    static bool le(T a, T b) {
+        return a <= b + EPSILON;
+    }
 
 private:
     static const T EPSILON;

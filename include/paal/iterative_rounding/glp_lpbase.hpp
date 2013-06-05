@@ -19,6 +19,7 @@ class GLPBase {
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
         m_lp(glp_create_prob()) {
+        glp_create_index(m_lp);
         initVec(m_row, numberOfNonZerosInMatrix);
         initVec(m_col, numberOfNonZerosInMatrix);
         initVec(m_val, numberOfNonZerosInMatrix);
@@ -254,12 +255,28 @@ public:
         return glp_get_col_name(m_lp, col);
     }
     
+    int getColByName(const std::string & colName) const {
+        return glp_find_col(m_lp, colName.c_str());
+    }
+    
+    double getColUb(int col) const {
+        return glp_get_col_ub(m_lp, col);
+    }
+    
+    double getColLb(int col) const {
+        return glp_get_col_lb(m_lp, col);
+    }
+    
     std::string getRowName(int row) const {
         return glp_get_row_name(m_lp, row);
     }
     
+    int getRowByName(const std::string & rowName) const {
+        return glp_find_row(m_lp, rowName.c_str());
+    }
+    
     double getRowUb(int row) const {
-        return  glp_get_row_ub(m_lp, row);
+        return glp_get_row_ub(m_lp, row);
     }
     
     double getRowLb(int row) const {
