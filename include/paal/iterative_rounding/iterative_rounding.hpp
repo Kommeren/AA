@@ -42,8 +42,16 @@ public:
         return m_engine.solveLP(m_lpBase);
     }
 
-    bool empty() {
-        return m_lpBase.colSize() == 0;
+    bool integerSolution() {
+        int size = m_lpBase.colSize();
+        for(int col = 1; col <= size; ++col) {
+            double colVal = m_lpBase.getColPrim(col);
+            if (!utils::Compare<double>::e(colVal, std::round(colVal))) {
+                return false;
+            }
+        }
+        
+        return true;
     }
     
     bool round() {
@@ -116,11 +124,11 @@ private:
 
 template <typename IR> 
 void solve(IR &ir) {
-    while(!ir.empty()) {
+    do {
         ir.solve();
         ir.round();
         ir.relax();
-    }
+    } while (!ir.integerSolution());
 }
 
 } //ir

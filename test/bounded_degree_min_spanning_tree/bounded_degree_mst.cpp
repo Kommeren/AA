@@ -62,10 +62,10 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     addEdge(g, costs, 2, 1, 84);
     addEdge(g, costs, 3, 1, 37);
     addEdge(g, costs, 4, 2, 176);
-    addEdge(g, costs, 5, 3, 105);
-    addEdge(g, costs, 4, 3, 190);
     addEdge(g, costs, 2, 3, 176);
+    addEdge(g, costs, 4, 3, 190);
     addEdge(g, costs, 4, 1, 260);
+    addEdge(g, costs, 5, 3, 105);
     addEdge(g, costs, 5, 4, 243);
     addEdge(g, costs, 4, 0, 259);
     
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     ir.round();
     ir.relax();
     
-    BOOST_CHECK(ir.empty());
+    BOOST_CHECK(ir.integerSolution());
     
     auto const & tree = ir.getSolution();
     for (const std::pair<Edge, bool> & e : tree) {
