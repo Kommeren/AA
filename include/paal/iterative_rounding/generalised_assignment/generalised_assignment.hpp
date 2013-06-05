@@ -60,7 +60,8 @@ public:
         lp.loadMatrix();
     }
 
-    JobsToMachines & getSolution() {
+    template <typename LP>
+    JobsToMachines & getSolution(const LP & lp) {
         return m_jobToMachine;
     }
 private:

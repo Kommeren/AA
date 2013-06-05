@@ -95,8 +95,8 @@ public:
         return m_engine;
     }
 
-    decltype(std::declval<Engine>().getSolution()) getSolution() {
-        return m_engine.getSolution();
+    decltype(std::declval<Engine>().getSolution(std::declval<LPBase>())) getSolution() {
+        return m_engine.getSolution(m_lpBase);
     }
 
 

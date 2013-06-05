@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
     
     
 
-            auto & s = ir.getEngine().getSolution();
+            auto & s = ir.getEngine().getSolution(ir.getLP());
             int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);
             for(const std::pair<int, int> & jm : s ) {

@@ -19,13 +19,14 @@ template <typename Graph, typename CostMap, typename DegreeBoundMap>
 class BoundedDegreeMST : public IRComponents<> {
 public:
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
-              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap) {}
+              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap), m_solutionGenerated(false) {}
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef std::map<Edge, bool> SpanningTree;
-    typedef std::map<Edge, std::string> EdgeMap;
+    typedef std::map<Edge, std::string> EdgeNameMap;
+    typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
     
     typedef utils::Compare<double> Compare;
@@ -61,7 +62,11 @@ public:
         lp.loadMatrix();
     }
     
-    SpanningTree & getSolution() {
+    template <typename LP>
+    SpanningTree & getSolution(const LP & lp) {
+        if (!m_solutionGenerated) {
+            generateSolution(lp);
+        }
         return m_spanningTree;
     }
 
@@ -75,7 +80,7 @@ private:
     }
     
     std::string getEdgeName(int eIdx) const {
-        return "edge " + std::to_string(eIdx);
+        return std::to_string(eIdx);
     }
     
     //adding variables
@@ -83,11 +88,14 @@ private:
     void addVariables(LP & lp) {
         auto edges = boost::edges(m_g);
         int eIdx(0);
+        m_edgeList.resize(num_edges(m_g));
         
         for(Edge e : utils::make_range(edges.first, edges.second)) {
             std::string colName = getEdgeName(eIdx);
             lp.addColumn(m_costMap[e], DB, 0, 1, colName);
             m_edgeMap[e] = colName;
+            m_spanningTree[e] = false;
+            m_edgeList[eIdx] = e;
             ++eIdx;
         }
     }
@@ -161,13 +169,27 @@ private:
         
         return nonZeroIncCnt;
     }
+    
+    template <typename LP>
+    void generateSolution(const LP & lp) {
+        int size = lp.colSize();
+        
+        for (int col = 1; col <= size; ++col) {
+            m_spanningTree[ m_edgeList[ std::stoi(lp.getColName(col)) ] ] = true;
+        }
+        m_solutionGenerated = true;
+    }
 
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
-    SpanningTree    m_spanningTree;
-    EdgeMap         m_edgeMap;
+    
+    EdgeNameMap     m_edgeMap;
+    EdgeList        m_edgeList;
     VertexList      m_vertexList;
+    
+    bool            m_solutionGenerated;
+    SpanningTree    m_spanningTree;
 };
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
