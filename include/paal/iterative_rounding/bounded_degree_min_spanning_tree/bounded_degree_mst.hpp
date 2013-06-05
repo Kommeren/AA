@@ -10,16 +10,22 @@
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
+#include "paal/iterative_rounding/lp_row_generation.hpp"
+#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle.hpp"
 
 
 namespace paal {
 namespace ir {
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
-class BoundedDegreeMST : public IRComponents<> {
+class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle > > {
 public:
+    typedef RowGenerationSolveLP < BoundedDegreeMSTOracle > LPSolve;
+  
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
-              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap), m_solutionGenerated(false) {}
+              IRComponents< LPSolve >(LPSolve(m_separationOracle)),
+              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
+              m_solutionGenerated(false) {}
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -33,7 +39,7 @@ public:
     
     template <typename LP>
     std::pair<bool, double> roundCondition(const LP & lp, int col) {
-        auto ret = IRComponents<>::roundCondition(lp, col);
+        auto ret = IRComponents< LPSolve >::roundCondition(lp, col);
         ret.first = (ret.first && ret.second == 0);
         return ret;
     };
@@ -190,6 +196,8 @@ private:
     
     bool            m_solutionGenerated;
     SpanningTree    m_spanningTree;
+    
+    BoundedDegreeMSTOracle m_separationOracle;
 };
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
