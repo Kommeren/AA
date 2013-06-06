@@ -6,6 +6,8 @@
  * @date 2013-02-01
  */
 #include <algorithm>
+#include <numeric>
+#include <string>
 #include "paal/data_structures/cycle/cycle_traits.hpp"
 #include "paal/data_structures/vertex_to_edge_iterator.hpp"
 

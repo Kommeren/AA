@@ -5,6 +5,10 @@
  * @version 1.0
  * @date 2013-02-01
  */
+    
+#include <vector>
+#include <numeric>
+#include <cstdlib>
 
 #include <boost/iterator/iterator_adaptor.hpp>
 

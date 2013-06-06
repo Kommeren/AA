@@ -18,9 +18,11 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
+#include "paal/utils/array2function.hpp"
+#include "paal/data_structures/facility_location/fl_algo.hpp"
+
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
-#include "paal/data_structures/facility_location/fl_algo.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
@@ -54,9 +56,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
     
-        auto cost = [&](int i){ return facCost[i];};
-        auto verticesDemands = [&](int i){return demands[i - firstClient]; };
-        auto facCapacities = [&](int i){return facCap[i]; };
+        auto cost = make_Array2Function(facCost);
+        auto verticesDemands = make_Array2Function(&demands[0] - firstClient);
+        auto facCapacities = make_Array2Function(facCap);
         std::cout << std::accumulate(clients.begin(), clients.end(), 
                                     0, [&](int d, int v){return d + verticesDemands(v);}) << std::endl;
     

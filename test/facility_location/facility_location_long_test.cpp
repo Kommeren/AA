@@ -17,9 +17,11 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/local_search/facility_location/facility_location.hpp"
+#include "paal/utils/array2function.hpp"
+#include "paal/data_structures/facility_location/fl_algo.hpp"
+
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
-#include "paal/data_structures/facility_location/fl_algo.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
@@ -52,7 +54,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
     
-        auto cost = [&](int i){ return facCost[i];};
+        auto cost = make_Array2Function(facCost);
     
         typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
 

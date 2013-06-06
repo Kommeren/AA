@@ -7,6 +7,7 @@
  */
 #ifndef LPBASE_HPP
 #define LPBASE_HPP
+#include <numeric>
 #include <glpk.h>
 #include <boost/iterator/zip_iterator.hpp>
 #include "bound_type.hpp"

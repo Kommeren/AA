@@ -36,7 +36,7 @@ int main() {
     Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
     //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
+/*    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
         ls(std::move(sol));
 
     //search 
@@ -46,7 +46,7 @@ int main() {
     SolOcjWithCopy & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 //! [CFL Search Example]
 
     return 0;

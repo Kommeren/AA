@@ -9,6 +9,7 @@
 #define MIN_COST_MAX_FLOW_HPP 
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
+#include <numeric>
 
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/graph_traits.hpp>

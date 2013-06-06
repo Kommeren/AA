@@ -8,6 +8,8 @@
 #ifndef IR_COMPONENTS_HPP
 #define IR_COMPONENTS_HPP 
 
+
+#include <cmath>
 #include "paal/utils/double_rounding.hpp"
 #include "paal/utils/do_nothing_functor.hpp"
 

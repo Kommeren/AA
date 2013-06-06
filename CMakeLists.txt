@@ -6,7 +6,13 @@ set(EXAMPLE_DIR ${PROJECT_DIR}/examples)
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
-#set(CMAKE_COMPILER_IS_CLANGXX 1)
+if(${USE_CLANG}) 
+    #    SET (CMAKE_CXX_COMPILER  "/usr/bin/clang++")
+    SET (CMAKE_CXX_COMPILER  "clang++")
+    include_directories(/usr/include/i386-linux-gnu/c++/4.7/)
+    #    ADD_DEFINITIONS("-stdlib=libc++")
+    #   set(LIBS c++)
+endif()
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/" ${CMAKE_MODULE_PATH})
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -36,10 +42,7 @@ file(GLOB_RECURSE example_bins "${EXAMPLE_DIR}/*.cpp")
 
 message(${test_bins})
 
-add_executable (main  ${BIN_DIR}/main.cpp)
-target_link_libraries (main)
-
-set(LIBS ${Boost_LIBRARIES} glpk)
+set(LIBS ${LIBS} ${Boost_LIBRARIES} glpk)
 
 foreach(t ${test_bins})
     get_filename_component(n ${t} NAME_WE)

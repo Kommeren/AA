@@ -14,6 +14,7 @@ class Compare {
 public:
     static bool e(T a, T b) {
         return std::abs(a -b ) < EPSILON;
+        //return abs(a -b ) < EPSILON; //this line breaks generalised_assignment_long_test TODO investigate
     }
     
     static bool ge(T a, T b) {

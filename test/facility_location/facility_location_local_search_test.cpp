@@ -4,6 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "paal/local_search/facility_location/facility_location.hpp"
+#include "paal/utils/array2function.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/logger.hpp"
 
@@ -14,7 +15,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    auto cost = [&](int i){ return fcosts[i];};
+    auto cost = make_Array2Function(fcosts);
     
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
     typedef paal::data_structures::FacilityLocationSolution

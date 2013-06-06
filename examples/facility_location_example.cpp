@@ -1,8 +1,11 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
+#include "paal/utils/array2function.hpp"
 #include "utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
+
+
 
 int main() {
 //! [FL Search Example]
@@ -10,12 +13,12 @@ int main() {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    auto cost = [&](int i){ return fcosts[i];};
-    
+    typedef Array2Function<std::vector<int>> Cost;  
+
     //define voronoi and solution
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
     typedef paal::data_structures::FacilityLocationSolution
-        <decltype(cost), VorType> Sol;
+        <Cost, VorType> Sol;
     typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
     typedef paal::data_structures::VoronoiTraits<VorType> VT;
     typedef typename VT::GeneratorsSet GSet;
@@ -25,10 +28,10 @@ int main() {
 
     //create voronoi and solution
     VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, cost);
+    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, make_Array2Function(fcosts));
 
     //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
+    FacilityLocationLocalSearchStep<VorType, Cost>  
         ls(std::move(sol));
 
     //search 

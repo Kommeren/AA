@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <numeric>
+
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 #include "paal/data_structures/bimap.hpp"
