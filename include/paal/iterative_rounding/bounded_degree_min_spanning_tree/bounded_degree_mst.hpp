@@ -18,14 +18,14 @@ namespace paal {
 namespace ir {
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
-class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle > > {
+class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph > > > {
 public:
-    typedef RowGenerationSolveLP < BoundedDegreeMSTOracle > LPSolve;
+    typedef RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph > > LPSolve;
   
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
-              IRComponents< LPSolve >(LPSolve(m_separationOracle)),
+              IRComponents< LPSolve >(LPSolve()),
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
-              m_solutionGenerated(false) {}
+              m_solutionGenerated(false) { }
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -42,7 +42,7 @@ public:
         auto ret = IRComponents< LPSolve >::roundCondition(lp, col);
         ret.first = (ret.first && ret.second == 0);
         return ret;
-    };
+    }
     
     template <typename LP>
     bool relaxCondition(const LP & lp, int row) {
@@ -54,7 +54,7 @@ public:
         else {
             return false;
         }
-    };
+    }
 
     template <typename LP>
     void init(LP & lp) {
@@ -66,6 +66,9 @@ public:
         addAllSetEquality(lp);
         
         lp.loadMatrix();
+        
+        IRComponents< LPSolve >::m_solveLP.setOracle(&m_separationOracle);
+        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap);
     }
     
     template <typename LP>
@@ -117,15 +120,12 @@ private:
             int rowIdx = lp.addRow(UP, 0, m_degBoundMap[v], getDegBoundDesc(dbIdx));
             auto adjVertices = adjacent_vertices(v, m_g);
             
-            for(Vertex u : utils::make_range(adjVertices.first, adjVertices.second)) {
+            for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
                 bool b; Edge e;
                 std::tie(e, b) = boost::edge(v, u, m_g);
                 
                 if (b) {
                     lp.addConstraintCoef(rowIdx, lp.getColByName(m_edgeMap[e]));
-                }
-                else {
-                    // TODO fail
                 }
             }
             
@@ -158,7 +158,7 @@ private:
         int nonZeroIncCnt(0);
         auto adjVertices = adjacent_vertices(v, m_g);
         
-        for(Vertex u : utils::make_range(adjVertices.first, adjVertices.second)) {
+        for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
             bool b; Edge e;
             std::tie(e, b) = boost::edge(v, u, m_g);
 
@@ -167,9 +167,6 @@ private:
                 if (colIdx != 0 && !Compare::e(lp.getColUb(colIdx), 0)) {
                     ++nonZeroIncCnt;
                 }
-            }
-            else {
-              // TODO fail
             }
         }
         
@@ -197,7 +194,7 @@ private:
     bool            m_solutionGenerated;
     SpanningTree    m_spanningTree;
     
-    BoundedDegreeMSTOracle m_separationOracle;
+    BoundedDegreeMSTOracle< Graph > m_separationOracle;
 };
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>

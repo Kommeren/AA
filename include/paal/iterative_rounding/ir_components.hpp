@@ -100,8 +100,9 @@ public:
         return m_init(lp); 
     };
 
-private:
+protected:
     SolveLP m_solveLP;
+private:
     RoundCondition m_roundCondition;
     RelaxContition m_relaxCondition;
     Init m_init;
