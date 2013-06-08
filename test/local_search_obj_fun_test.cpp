@@ -49,7 +49,7 @@ struct SU {
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     //creating local search
     typedef  SearchObjFunctionComponents<NG, F, SU> SearchComp;
-    LocalSearchFunctionStep<int, SearchComp> ls;
+    LocalSearchFunctionStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
     ON_LOG(F f);
 
     //printing 

@@ -42,13 +42,17 @@ namespace two_local_search {
 template <typename Cycle,
           typename SearchComponents>
 class  TwoLocalSearchStep : 
-   public LocalSearchStepMultiSolution<TwoLocalSearchAdapter<data_structures::CycleStartFromLastChange<Cycle>>, SearchComponents>  {
+   public LocalSearchStepMultiSolution<
+            TwoLocalSearchAdapter<
+                data_structures::CycleStartFromLastChange<Cycle>>, 
+                search_strategies::ChooseFirstBetter,
+                SearchComponents>  {
 
     BOOST_CONCEPT_ASSERT((data_structures::concepts::Cycle<Cycle>));
   
     typedef data_structures::CycleStartFromLastChange<Cycle> CycleWrap;
     typedef TwoLocalSearchAdapter<CycleWrap> CycleAdapt;
-    typedef LocalSearchStepMultiSolution<CycleAdapt, SearchComponents> base;
+    typedef LocalSearchStepMultiSolution<CycleAdapt, search_strategies::ChooseFirstBetter, SearchComponents> base;
 
     public:
 

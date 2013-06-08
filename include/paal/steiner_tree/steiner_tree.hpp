@@ -1,6 +1,8 @@
 #include <map>
 #include <stack>
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
@@ -8,13 +10,14 @@
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/iterator/zip_iterator.hpp>
-#include <boost/range/any_range.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/contract_bgl_adjacency_matrix.hpp"
 
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
+#include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search_step.hpp"
@@ -38,12 +41,13 @@ template <typename Metric, typename Voronoi>
 class SteinerTree {
     typedef int Idx;
 public:
-    typedef typename Metric::DistanceType Dist;
-    typedef typename Metric::VertexType VertexType;
+    typedef data_structures::MetricTraits<Metric> MT;
+    typedef typename MT::DistanceType Dist;
+    typedef typename MT::VertexType VertexType;
     static const int SUSBSET_SIZE = 3;
 
     typedef typename utils::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
-    typedef boost::tuple<const ThreeTuple &, Dist> Update;
+    typedef std::tuple<ThreeTuple, Dist> Update;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     /**
@@ -66,23 +70,35 @@ public:
 
         auto ti = boost::irange<int>(0, N);
 
-        auto ng = [&](const AMatrix & t){
+        auto ng = [&](const AMatrix & t) {
             auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
-            return std::make_pair(boost::make_zip_iterator(boost::make_tuple(subsets.first, m_subsDists.begin())), 
-                                  boost::make_zip_iterator(boost::make_tuple(subsets.second, m_subsDists.end())));
+            auto removeRefFromTuple = 
+                [](const boost::tuple<const ThreeTuple &, int &> & t){
+                    return Update(boost::get<0>(t), boost::get<1>(t));
+            };
+
+            typedef boost::transform_iterator<
+                        decltype(removeRefFromTuple),
+                        decltype(boost::make_zip_iterator(boost::make_tuple(subsets.first, m_subsDists.begin()))),
+                        Update> TI;
+
+            return std::make_pair(TI(boost::make_zip_iterator(boost::make_tuple(subsets.first, 
+                                                                             m_subsDists.begin())), removeRefFromTuple), 
+                                  TI(boost::make_zip_iterator(boost::make_tuple(subsets.second, 
+                                                                             m_subsDists.end())), removeRefFromTuple));
         };
         
         auto obj_fun = [&](const AMatrix & m, const Update &t) {return this->gain(t);};
 
         auto su = [&](AMatrix & m, const Update & t) {
-            this->contract(m, boost::get<0>(t));
-            res.push_back(m_nearestVertex[boost::get<0>(t)]);
+            this->contract(m, std::get<0>(t));
+            res.push_back(m_nearestVertex[std::get<0>(t)]);
         };
 
         auto sc = local_search::make_SearchComponents(ng, obj_fun, su);
 
         typedef local_search::LocalSearchStep<AMatrix, 
-                    decltype(sc), local_search::search_strategies::SteepestSlope>  LS;
+                     local_search::search_strategies::SteepestSlope, decltype(sc)>  LS;
         LS ls(utils::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 
@@ -134,10 +150,10 @@ private:
     Dist gain(const Update & t){
         auto const  & m = m_save;
         VertexType a,b,c;
-        std::tie(a, b, c) = boost::get<0>(t);
+        std::tie(a, b, c) = std::get<0>(t);
         
         assert(m(a,b) == m(b,c) || m(b,c) == m(c, a) || m(c,a) == m(a,b));
-        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - boost::get<1>(t);
+        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - std::get<1>(t);
     }
 
     void fillSubDists() {

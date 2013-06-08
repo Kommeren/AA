@@ -19,7 +19,6 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     typedef  SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSteiner();
     typedef decltype(gm) Metric;
-    
     typedef paal::data_structures::Voronoi<Metric> VoronoiT;
     typedef typename VoronoiT::GeneratorsSet FSet;
     VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);

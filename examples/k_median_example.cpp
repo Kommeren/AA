@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include "paal/local_search/k_median/k_median.hpp"
 #include "utils/sample_graph.hpp"
 

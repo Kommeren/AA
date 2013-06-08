@@ -64,7 +64,8 @@ template <int k, typename Voronoi,
 class KMedianLocalSearchStep : 
     public LocalSearchStepMultiSolution<
                facility_location::FacilityLocationSolutionAdapter<
-                    KMedianSolution<k, Voronoi>>, 
+                    KMedianSolution<k, Voronoi>>,
+               search_strategies::ChooseFirstBetter,
                MultiSearchComponents>  {
 
 public:
@@ -73,6 +74,7 @@ public:
     
     typedef LocalSearchStepMultiSolution<
                 KMSolutionAdapter,
+                search_strategies::ChooseFirstBetter,
                 MultiSearchComponents>  base;
 
     KMedianLocalSearchStep(

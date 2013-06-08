@@ -92,7 +92,10 @@ int main() {
     //creating local search
     Solution initSol{DIM, 0};
     fillRand(initSol);
-    local_search::LocalSearchStepMultiSolution<Solution, SearchComp> ls(initSol);
+    local_search::LocalSearchStepMultiSolution<
+        Solution, 
+        local_search::search_strategies::ChooseFirstBetter, 
+        SearchComp> ls(initSol);
 
     //search
     search(ls); 

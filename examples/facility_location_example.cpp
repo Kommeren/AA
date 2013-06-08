@@ -1,3 +1,4 @@
+#include <iostream>
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/array2function.hpp"

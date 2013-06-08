@@ -5,7 +5,7 @@
  * @version 1.0
  * @date 2013-02-04
  */
-
+#include <iostream>
 #include "paal/steiner_tree/steiner_tree.hpp"
 #include "utils/sample_graph.hpp"
 

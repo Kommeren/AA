@@ -7,6 +7,7 @@
  */
 
 #include <vector>
+#include <iostream>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"

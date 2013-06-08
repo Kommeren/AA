@@ -56,7 +56,7 @@ auto logAction = [&](int s) {
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search
-   LocalSearchStep<int, SearchComp> ls;
+   LocalSearchStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
 
    //printing
    int & solution = ls.getSolution();
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
 BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
    //creating local search
-   LocalSearchStep<int, SearchComp, search_strategies::SteepestSlope> ls;
+   LocalSearchStep<int, search_strategies::SteepestSlope, SearchComp> ls;
 
    //printing 
    auto const & s = ls.getSolution();

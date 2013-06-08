@@ -82,7 +82,10 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
     //creating local search
     Solution initSol(DIM, 0);
     fillRand(initSol);
-    local_search::LocalSearchStepMultiSolution<Solution, SearchComp> ls(initSol);
+    local_search::LocalSearchStepMultiSolution<
+        Solution, 
+        local_search::search_strategies::ChooseFirstBetter, 
+        SearchComp> ls(initSol);
 
     //printing
     auto const & s = ls.getSolution();
@@ -106,8 +109,9 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
     //creating local search
     Solution initSol(DIM, 0);
     fillRand(initSol);
-    local_search::LocalSearchStepMultiSolution<Solution, SearchComp, 
-                    local_search::search_strategies::SteepestSlope> ls(initSol);
+    local_search::LocalSearchStepMultiSolution<Solution, 
+                    local_search::search_strategies::SteepestSlope,
+                    SearchComp> ls(initSol);
 
     //printing 
     auto const & s = ls.getSolution();

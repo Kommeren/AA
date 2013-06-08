@@ -54,25 +54,25 @@ namespace detail {
 
 //TODO concepts !!!
 template <typename Solution,
-          typename SearchObjFunctionComponents,
-          typename SearchStrategy = search_strategies::ChooseFirstBetter> 
+          typename SearchStrategy, 
+          typename SearchObjFunctionComponents>
 
 class LocalSearchFunctionStep : 
     public LocalSearchStep<
                 Solution,
+                SearchStrategy,
                 typename detail::SearchObjFunctionComponentsToSearchComponents<
                     SearchObjFunctionComponents,
-                    Solution>::type,
-                SearchStrategy
+                    Solution>::type
                 > {
     typedef detail::SearchObjFunctionComponentsToSearchComponents<
         SearchObjFunctionComponents, Solution> Convert;
     typedef typename Convert::type SearchComponents;
     typedef typename Convert::GainType Gain;
     typedef LocalSearchStep<
-                Solution, 
-                SearchComponents,
-                SearchStrategy> base;
+                Solution,
+                SearchStrategy,
+                SearchComponents> base;
     public:
     LocalSearchFunctionStep(Solution sol = Solution(), 
             SearchObjFunctionComponents s = SearchObjFunctionComponents()) :  

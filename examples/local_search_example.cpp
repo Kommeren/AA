@@ -50,7 +50,7 @@ typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
 int main() {
 //! [Local Search Example]
    //creating local search
-   LocalSearchStep<int, SearchComp> ls;
+   LocalSearchStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
 
    //search
    search(ls);

@@ -61,7 +61,8 @@ template <typename Voronoi,
 class FacilityLocationLocalSearchStep : 
     public LocalSearchStepMultiSolution<
                FacilityLocationSolutionAdapter<
-                    data_structures::FacilityLocationSolution<FacilityCost, Voronoi>>, 
+                    data_structures::FacilityLocationSolution<FacilityCost, Voronoi>>,
+               search_strategies::ChooseFirstBetter,
                MultiSearchComponents>  {
 
 public:
@@ -70,6 +71,7 @@ public:
     
     typedef LocalSearchStepMultiSolution<
                 FLSolutionAdapter,
+                search_strategies::ChooseFirstBetter,
                 MultiSearchComponents>  base;
 
     FacilityLocationLocalSearchStep(

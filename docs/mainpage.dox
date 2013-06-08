@@ -84,7 +84,7 @@
   If the user want to swap implementation of the metric to use specific properties of his topology is not the problem at all! <br>
   
  \section Platforms
- Currently the library compiles on the gcc 4.7.2. Unfortunately the library does not compile on the newest Microsoft Visual Studio 2012 due to the poor support of c++0x.
+ Currently the library compiles on the gcc 4.7.3. and clang 3.2 Unfortunately the library does not compile on the newest Microsoft Visual Studio 2012 due to the poor support of c++0x.
 
   \section  Testing
 

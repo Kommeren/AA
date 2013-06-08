@@ -26,46 +26,50 @@ namespace search_strategies {
 }
 
 
-template <typename Solution, 
-          typename SearchComponents> 
-
+template <typename Solution> 
 class LocalSearchStepBase {
-    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
 protected:
-    LocalSearchStepBase(Solution solution, SearchComponents searchComponents) :
-        m_solution(std::move(solution)), m_searchComponents(std::move(searchComponents)) {}
+    LocalSearchStepBase(Solution solution) :
+        m_solution(std::move(solution)) {}
    
     Solution m_solution;
-    SearchComponents m_searchComponents;
 
 public:
-    typedef typename  Update<SearchComponents, Solution>::type Update;
     
     Solution & getSolution() {
         return m_solution;
     }
 };
 
+template <typename Solution,
+          typename SearchStrategy, 
+          typename... SearchComponents>
+
+class LocalSearchStep  {
+    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
+                  std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
+    LocalSearchStep() = delete;
+};
 
 template <typename Solution,
           typename SearchComponents,
-          typename SearchStrategy = search_strategies::ChooseFirstBetter> 
+          typename... SearchComponentsRest>
 
-class LocalSearchStep : 
-    public LocalSearchStepBase<Solution, SearchComponents> {
+class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponents, SearchComponentsRest...> : 
+    public LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> {
+private:
+    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
     
-        static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
-                      std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
-    typedef LocalSearchStepBase<Solution, SearchComponents> base;
+    typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
     using base::m_solution;
-
-protected:
-    using base::m_searchComponents;
+    typedef typename  Update<SearchComponents, Solution>::type Update;
 
 public:
-    LocalSearchStep(Solution solution = Solution(), SearchComponents searchComponents = SearchComponents()) :
-        base(std::move(solution), std::move(searchComponents)) {}
-    typedef typename base::Update Update;
+    LocalSearchStep(Solution solution = Solution()) :
+        base(std::move(solution)) {}
+
+    LocalSearchStep(Solution solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
+        base(std::move(solution), std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
 
     bool search() {
         auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution);
@@ -80,37 +84,57 @@ public:
                 }
             }
         }
-        return false;
+        return base::search();
     }
+protected:
+    SearchComponents m_searchComponents;
 };
 
-
-
-template <typename Solution, typename SearchComponents> 
-class LocalSearchStep<Solution, SearchComponents, search_strategies::SteepestSlope> 
-        : public LocalSearchStepBase<Solution, SearchComponents>  {
-    typedef LocalSearchStepBase<Solution, SearchComponents> base;
-    typedef typename Fitness<SearchComponents, Solution>::type Fitness;
-    using base::m_solution;
-
-protected:
-    using base::m_searchComponents;
-
+template <typename Solution>
+class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter> : 
+    public LocalSearchStepBase<Solution> {
 public:
-    LocalSearchStep(Solution solution = Solution(), SearchComponents searchComponents= SearchComponents()) :
-        base(std::move(solution), std::move(searchComponents)) {}
+    typedef LocalSearchStepBase<Solution> base;
+    LocalSearchStep(Solution sol) : base(std::move(sol)) {}
 
     bool search() {
+        return false;
+    }
+
+};
+
+template <typename Solution, typename SearchComponents, typename... SearchComponentsRest> 
+class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponents, SearchComponentsRest...> 
+        : public LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...>  {
+    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
+    typedef LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...> base;
+    typedef typename Fitness<SearchComponents, Solution>::type Fitness;
+    using base::m_solution;
+    typedef typename  Update<SearchComponents, Solution>::type Update;
+
+public:
+    LocalSearchStep(Solution solution = Solution()) :
+        base(std::move(solution)) {}
+
+    LocalSearchStep(Solution solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
+        base(std::move(solution), std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
+
+    bool search() {
+        return base::searchAndPassBest(best());
+    }
+private:
+    typedef std::tuple<Fitness, SearchComponents &, Update> BestDesc;
+    BestDesc best() {
         Fitness max = Fitness();
         bool init = false;
         auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution);
         auto currUpdate = adjustmentSet.first;
-        auto bestUpdate = currUpdate;
+        Update bestUpdate = Update();
 
         for(;currUpdate !=  adjustmentSet.second; ++currUpdate) {
             Fitness gain = m_searchComponents.gain()(m_solution, *currUpdate);
             if(!init || gain > max) {
-                bestUpdate = currUpdate;
+                bestUpdate = *currUpdate;
                 max = gain;
                 init = true;
             } 
@@ -118,13 +142,40 @@ public:
                 break;
             }
         }
-        if(max > 0) {
-            m_searchComponents.updateSolution()(m_solution, *bestUpdate);
-        }
-        return max > 0;
+
+        return BestDesc(max, m_searchComponents, bestUpdate);
     }
+protected:
+    
+    template <typename Best>
+    bool searchAndPassBest(const Best & b) {
+        auto b2 = best();
+        if(std::get<0>(b) > std::get<0>(b2)) {
+            return base::searchAndPassBest(b);
+        } else {
+            return base::searchAndPassBest(b2);
+        }
+    }
+
+    SearchComponents m_searchComponents;
 };
 
+template <typename Solution> 
+class LocalSearchStep<Solution, search_strategies::SteepestSlope> 
+        : public LocalSearchStepBase<Solution>  {
+public:
+    typedef LocalSearchStepBase<Solution> base;
+    LocalSearchStep(Solution sol) : base(std::move(sol)) {}
+    
+    template <typename Best>
+    bool searchAndPassBest(const Best &b) {
+        if(std::get<0>(b) > 0) {
+            std::get<1>(b).updateSolution()(this->m_solution, std::get<2>(b));
+        }
+        return std::get<0>(b) > 0;
+        
+    }
+};
 } // local_search
 } // paal
 
