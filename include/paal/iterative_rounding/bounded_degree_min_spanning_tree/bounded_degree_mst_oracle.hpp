@@ -38,9 +38,9 @@ public:
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
-        return !findAnyViolatedConstraint();
         //TODO how to select heuristics
-//         return !findMostViolatedConstraint();
+        return !findMostViolatedConstraint();
+//         return !findAnyViolatedConstraint();
     }
     
     template <typename LP>
