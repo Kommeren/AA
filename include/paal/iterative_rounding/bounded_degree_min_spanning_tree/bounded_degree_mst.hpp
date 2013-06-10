@@ -183,6 +183,7 @@ private:
         m_solutionGenerated = true;
     }
 
+private:
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;

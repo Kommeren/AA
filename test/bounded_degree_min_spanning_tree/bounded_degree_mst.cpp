@@ -1,5 +1,5 @@
 /**
- * @file bounded_degree_mst_test.cpp
+ * @file bounded_degree_mst.cpp
  * @brief 
  * @author Piotr Godlewski
  * @version 1.0
@@ -12,7 +12,6 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "utils/logger.hpp"
-#include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
 using namespace  paal;

@@ -23,6 +23,8 @@ public:
         initVec(m_row, numberOfNonZerosInMatrix);
         initVec(m_col, numberOfNonZerosInMatrix);
         initVec(m_val, numberOfNonZerosInMatrix);
+        initVec(m_newRowCol);
+        initVec(m_newRowVal);
     }
     
     GLPBase(int numberOfRows = 0, int numberOfColumns = 0) : GLPBase(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
@@ -65,6 +67,10 @@ public:
         glp_set_row_bnds(m_lp, m_rowNr, boundType2GLP(b), lb, ub);
         return m_rowNr++;
     }
+    
+    void deleteRow() {
+        --m_rowNr;
+    }
 
     //add row with default for name
     int addRow(BoundType b = UP, double lb = 0, double ub = 0) {
@@ -81,6 +87,18 @@ public:
         glp_load_matrix(m_lp, m_row.size() - 1, &m_row[0], &m_col[0], &m_val[0]);
     }
     
+    void addNewRowCoef(int col, double coef = 1) {
+        m_newRowCol.push_back(col);
+        m_newRowVal.push_back(coef);
+    }
+    
+    void loadNewRow() {
+        glp_set_mat_row(m_lp, m_rowNr - 1, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
+        m_newRowCol.clear();
+        m_newRowVal.clear();
+        initVec(m_newRowCol);
+        initVec(m_newRowVal);
+    }
 
 /*    template <typename RoundCondition>
     bool roundGen(RoundCondition  rc) {
@@ -175,6 +193,9 @@ private:
     Ids m_row;
     Ids m_col;
     Vals m_val;
+    
+    Ids m_newRowCol;
+    Vals m_newRowVal;
 };
 
 
@@ -226,6 +247,7 @@ public:
     }
 
     void deleteRow(int row) {
+        GLPBase::deleteRow();
         glp_del_rows(m_lp, 1, &row-1);
     }
     
