@@ -28,6 +28,42 @@ struct DefaultRoundCondition {
     };
 };
 
+
+template <int...> 
+class RoundConditionEquals {
+    RoundConditionEquals() = delete;
+};
+
+template <int arg, int... args> 
+class RoundConditionEquals<arg, args...>  : 
+        public RoundConditionEquals<args...> {
+public:
+    template <typename LP>
+    std::pair<bool, double> operator()(const LP & lp, int col) {
+        return get(lp, lp.getColPrim(col));
+    }
+protected:
+    template <typename LP>
+    std::pair<bool, double> get(const LP & lp, double x) {
+        if(utils::Compare<double>::e(x, arg)) {
+            return std::make_pair(true, arg);
+        } else {
+            return RoundConditionEquals<args...>::get(lp, x);
+        }
+    }
+};
+
+template <> 
+class RoundConditionEquals<> { 
+protected:
+    template <typename LP>
+    std::pair<bool, double> get(const LP & lp, double x) {
+        return std::make_pair(false, -1);
+    }
+};
+
+
+
 template <typename RoundCondition = DefaultRoundCondition, 
           typename RelaxContition = utils::ReturnFalseFunctor, 
           typename Init = utils::DoNothingFunctor> 
