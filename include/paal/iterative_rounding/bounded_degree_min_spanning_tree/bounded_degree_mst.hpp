@@ -44,7 +44,7 @@ public:
         if (isDegBoundName(lp.getRowName(row))) {
             int vIdx = getDegBoundIndex(lp.getRowName(row));
             Vertex v = m_vertexList[vIdx];
-            return Compare::le(nonZeroIncEdges(lp, v), m_degBoundMap[v] + 1);
+            return (nonZeroIncEdges(lp, v) <= m_degBoundMap[v] + 1);
         }
         else {
             return false;
