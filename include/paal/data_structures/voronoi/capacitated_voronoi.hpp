@@ -134,13 +134,10 @@ public:
     CapacitatedVoronoi(const Generators & gen, Vertices ver,
                        const Metric & m, 
                        const GeneratorsCapacieties & gc, const VerticesDemands & vd, 
-                       DistI costOfNoGenerator = std::numeric_limits<DistI>::max()/*,
-                       DistI infiniteCapacity = std::numeric_limits<DistI>::max()*/) : 
+                       DistI costOfNoGenerator = std::numeric_limits<DistI>::max()) : 
                          m_s(addVertex()), m_t(addVertex()),
                          m_vertices(std::move(ver)), m_metric(m), 
                          m_generatorsCap(gc),
-                         m_capacitySum(std::accumulate(m_vertices.begin(), m_vertices.end(), 
-                                    DistI(0), [&](DistI d, VertexType v){return d + vd(v);})),
                          m_firstGeneratorId(m_vertices.size() + 2),
                          m_costOfNoGenerator(costOfNoGenerator) 
                             {
@@ -161,7 +158,6 @@ public:
         m_vertices(other.m_vertices),
         m_metric(other.m_metric),
         m_generatorsCap(other.m_generatorsCap),
-        m_capacitySum(other.m_capacitySum),
         m_firstGeneratorId(other.m_firstGeneratorId),
         m_costOfNoGenerator(other.m_costOfNoGenerator),
         m_vToGraphV(other.m_vToGraphV),
@@ -295,7 +291,6 @@ public:
             s <<  g << "\n";
         }
         s <<  "\n";
-        s<< v.m_capacitySum << "\n";
         s << v.m_firstGeneratorId << "\n";
         s <<  v.m_costOfNoGenerator << "\n";
         s <<  "\n";
@@ -370,7 +365,6 @@ private:
     Vertices m_vertices;
     const Metric & m_metric;
     const GeneratorsCapacieties & m_generatorsCap;
-    const DistI m_capacitySum;
     const VD m_firstGeneratorId;
     DistI m_costOfNoGenerator;
     VertexToGraphVertex m_vToGraphV;

@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         typedef typename Sol::UnchosenFacilitiesSet USet;
 
         VorType voronoi( FSet{fac.begin(), fac.end()},  VSet(clients.begin(), clients.end()), metric, facCapacities, verticesDemands);
-        Sol sol(std::move(voronoi), USet{/*fac.begin(), fac.end()*/}, cost);
+        Sol sol(std::move(voronoi), USet{}, cost);
 
         FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
             ls(std::move(sol));
