@@ -48,6 +48,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
+        assert(ifs.good());
         std::vector<long long> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;
