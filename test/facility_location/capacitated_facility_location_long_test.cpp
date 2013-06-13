@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         int firstClient = clients.front();
     
         auto cost = make_Array2Function(facCost);
-        auto verticesDemands = make_Array2Function(&demands[0] - firstClient);
+        auto verticesDemands = make_Array2Function(demands, -firstClient);
         auto facCapacities = make_Array2Function(facCap);
         std::cout << std::accumulate(clients.begin(), clients.end(), 
                                     0, [&](int d, int v){return d + verticesDemands(v);}) << std::endl;

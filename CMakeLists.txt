@@ -19,7 +19,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_CXX_FLAGS "-pthread -Wall -fno-strict-aliasing")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe")
 
 # Boost
 find_package(Boost 1.52 COMPONENTS unit_test_framework REQUIRED)

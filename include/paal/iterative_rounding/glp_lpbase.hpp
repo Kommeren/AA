@@ -247,12 +247,16 @@ public:
     }
 
     void deleteRow(int row) {
+        int arr[2];
+        arr[1] = row;
         GLPBase::deleteRow();
-        glp_del_rows(m_lp, 1, &row-1);
+        glp_del_rows(m_lp, 1, arr);
     }
     
     void deleteCol(int col) {
-        glp_del_cols(m_lp, 1, &col-1);
+        int arr[2];
+        arr[1] = col;
+        glp_del_cols(m_lp, 1, arr);
     }
     
     int getColDegree(int col) const {

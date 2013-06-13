@@ -1,6 +1,7 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
+#include "paal/utils/array2function.hpp"
 #include "utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
@@ -12,13 +13,13 @@ int main() {
     auto gm = SGM::getGraphMetricSmall();
    
     std::vector<int> fcostsv{7,8};
-    auto facilityCost = [&](int i){ return fcostsv[i];};
+    auto facilityCost = make_Array2Function(fcostsv);
 
     std::vector<int> fcapv{2, 2};
-    auto facilityCapacity = [&](int i){ return fcapv[i];};
+    auto facilityCapacity = make_Array2Function(fcapv);
     
     std::vector<int> cdemv{2, 2, 1, 3, 3};
-    auto clientDemand = [&](int i){ return cdemv[i];};
+    auto clientDemand = make_Array2Function(cdemv);
     
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<
@@ -36,7 +37,7 @@ int main() {
     Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
     //create facility location local search step
-/*    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
+    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
         ls(std::move(sol));
 
     //search 
@@ -46,7 +47,7 @@ int main() {
     SolOcjWithCopy & s = ls.getSolution();
     auto const & ch = s->getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
-    std::cout << std::endl;*/
+    std::cout << std::endl;
 //! [CFL Search Example]
 
     return 0;
