@@ -39,8 +39,8 @@ public:
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
         //TODO how to select heuristics
-        return !findMostViolatedConstraint();
-//         return !findAnyViolatedConstraint();
+//         return !findMostViolatedConstraint();
+        return !findAnyViolatedConstraint();
     }
     
     template <typename LP>
@@ -101,7 +101,7 @@ private:
             if (0 != colIdx) {
                 double colVal = lp.getColPrim(colIdx) / 2;
                 
-                if (!utils::Compare<double>::e(colVal, 0)) {
+                if (!utils::Compare<double>::e(colVal, 0, EPSILON)) {
                     Vertex u = source(e.first, *m_g);
                     Vertex v = target(e.first, *m_g);
                     addEdge(u, v, colVal);
@@ -219,7 +219,7 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > m_maximumViolation && !utils::Compare<double>::e(violation, 0)) {
+        if (violation > m_maximumViolation && !utils::Compare<double>::e(violation, 0, EPSILON)) {
             m_maximumViolation = violation;
             m_violatedConstraintFound = true;
             m_violatingSetSize = 0;
@@ -266,7 +266,11 @@ private:
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
     boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
+    
+    static const double EPSILON;
 };
+
+template <typename Graph> const double BoundedDegreeMSTOracle<Graph>::EPSILON = 1e-10;
 
 } //ir
 } //paal

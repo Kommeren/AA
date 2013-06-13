@@ -18,10 +18,10 @@ namespace ir {
 
 struct DefaultRoundCondition {
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col) {
+    std::pair<bool, double> operator()(const LP & lp, int col, double epsilon) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
-        if(utils::Compare<double>::e(x,r)) {
+        if(utils::Compare<double>::e(x,r,epsilon)) {
             return std::make_pair(true, r);
         }
         return std::make_pair(false, -1);
@@ -39,16 +39,16 @@ class RoundConditionEquals<arg, args...>  :
         public RoundConditionEquals<args...> {
 public:
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col) {
-        return get(lp, lp.getColPrim(col));
+    std::pair<bool, double> operator()(const LP & lp, int col, double epsilon) {
+        return get(lp, lp.getColPrim(col), epsilon);
     }
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x) {
-        if(utils::Compare<double>::e(x, arg)) {
+    std::pair<bool, double> get(const LP & lp, double x, double epsilon) {
+        if(utils::Compare<double>::e(x, arg, epsilon)) {
             return std::make_pair(true, arg);
         } else {
-            return RoundConditionEquals<args...>::get(lp, x);
+            return RoundConditionEquals<args...>::get(lp, x, epsilon);
         }
     }
 };
@@ -57,7 +57,7 @@ template <>
 class RoundConditionEquals<> { 
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x) {
+    std::pair<bool, double> get(const LP & lp, double x, double epsilon) {
         return std::make_pair(false, -1);
     }
 };
@@ -86,8 +86,9 @@ public:
     }
 
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, int col) {
-        return m_roundCondition(lp, col);
+    std::pair<bool, double> roundCondition(const LP & lp, int col,
+                                           double epsilon = utils::Compare<double>::epsilon()) {
+        return m_roundCondition(lp, col, epsilon);
     }
 
     template <typename LP>

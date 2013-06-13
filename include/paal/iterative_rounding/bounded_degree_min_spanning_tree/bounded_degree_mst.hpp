@@ -40,6 +40,11 @@ public:
     typedef utils::Compare<double> Compare;
     
     template <typename LP>
+    std::pair<bool, double> roundCondition(const LP & lp, int col) {
+        return BoundedDegreeMSTBase::roundCondition(lp, col, BoundedDegreeMST::EPSILON);
+    }
+    
+    template <typename LP>
     bool relaxCondition(const LP & lp, int row) {
         if (isDegBoundName(lp.getRowName(row))) {
             int vIdx = getDegBoundIndex(lp.getRowName(row));
@@ -158,8 +163,8 @@ private:
             std::tie(e, b) = boost::edge(v, u, m_g);
 
             if (b) {
-                int colIdx = lp.getColByName(m_edgeMap[e]);
-                if (colIdx != 0 && !Compare::e(lp.getColUb(colIdx), 0)) {
+                // column not rounded
+                if (0 != lp.getColByName(m_edgeMap[e])) {
                     ++nonZeroIncCnt;
                 }
             }
@@ -191,7 +196,12 @@ private:
     SpanningTree    m_spanningTree;
     
     BoundedDegreeMSTOracle< Graph > m_separationOracle;
+    
+    static const double EPSILON;
 };
+
+template <typename Graph, typename CostMap, typename DegreeBoundMap>
+const double BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>::EPSILON = 1e-10;
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
 BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>

@@ -12,17 +12,21 @@ namespace utils {
 template <typename T>
 class Compare {
 public:
-    static bool e(T a, T b) {
-        return std::abs(a -b ) < EPSILON;
+    static bool e(T a, T b, T epsilon = EPSILON) {
+        return std::abs(a - b) < epsilon;
         //return abs(a -b ) < EPSILON; //this line breaks generalised_assignment_long_test TODO investigate
     }
     
-    static bool ge(T a, T b) {
-        return a >= b - EPSILON;
+    static bool ge(T a, T b, T epsilon = EPSILON) {
+        return a >= b - epsilon;
     }
     
-    static bool le(T a, T b) {
-        return a <= b + EPSILON;
+    static bool le(T a, T b, T epsilon = EPSILON) {
+        return a <= b + epsilon;
+    }
+    
+    static T epsilon() {
+        return EPSILON;
     }
 
 private:
