@@ -20,7 +20,6 @@ class EdgeAdder {
         EdgeAdder(Graph & g, Weight & w, Capacity & c, Reversed & rev, ResidualCapacity & residualCapacity) 
             : m_g(g), m_w(w), m_cap(c), m_resCap(residualCapacity), m_rev(rev) {}
         void addEdge(int v, int w, int weight, int capacity) {
-            //bool b;
             Traits::edge_descriptor e,f;
             e = add(v, w, weight, capacity);
             f = add(w, v, -weight, 0);

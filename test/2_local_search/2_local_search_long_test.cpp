@@ -52,7 +52,9 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //search
         while(ls.search()) {
-            LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
+            if( i++ % 10 == 0) {
+                LOG("Length after\t" << i << ": " << simple_algo::getLength(mtx, cman));
+            }
         }
         LOG(std::setprecision(20) << "APPROXIMATION RATIO: " << float(simple_algo::getLength(mtx, cman)) / opt);
     }
@@ -101,14 +103,18 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
             LOG("epsilon = " << epsilon);
             lsCut.getSearchComponents().gain().setEpsilon(epsilon);
             while(lsCut.search()) {
-                LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
+                if( i++ % 100 == 0) {
+                    LOG("Length after\t" << i << ": " << simple_algo::getLength(mtx, cman));
+                }
             }
         }
 
         LOG("Normal search at the end");
         auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(lsCut.getSolution()), std::move(lsc));
         while(ls.search()) {
-            LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
+            if( i++ % 100 == 0) {
+                LOG("Length after\t" << i << ": " << simple_algo::getLength(mtx, cman));
+            }
         }
     }
 }

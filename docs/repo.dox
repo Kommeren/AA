@@ -26,6 +26,7 @@ git clone git@siekiera.mimuw.edu.pl:paal.git
 git fetch
 git rebase origin/master
 </pre>
+and follow the instructions.
 <b>Particularly never use git pull</b>
 <li> If you have no experience in using git or in case of any problems please contact wygos@mimuw.edu.pl
 </ul>

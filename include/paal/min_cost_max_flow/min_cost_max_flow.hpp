@@ -56,7 +56,7 @@ public:
         bool b;
         ED e;
         tie(e ,b) = edge(pred_[v], v, g_);
-        assert(b);
+//        assert(b);
         return e;
     }
 private:
@@ -122,7 +122,7 @@ void path_augmentation(Graph &gOrig, typename graph_traits<Graph>::vertex_descri
             break;
         }
 
-       detail::augment(g, s, t, detail::make_mapVerticesToEdges(pred, g), residual_capacity, rev);
+        detail::augment(gOrig, s, t, detail::make_mapVerticesToEdges(pred, gOrig), residual_capacity, rev);
     }
 }
 
