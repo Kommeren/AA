@@ -17,6 +17,12 @@
 namespace paal {
 namespace ir {
 
+/**
+ * @class BoundedDegreeMSTOracle
+ * @brief this is a separation oracle for the row generation in the bounded degree minimum spanning tree problem.
+ *
+ * @tparam Graph input graph, has to be a model of boost::Graph
+ */
 template <typename Graph>
 class BoundedDegreeMSTOracle {
 public:
@@ -29,12 +35,25 @@ public:
     BoundedDegreeMSTOracle() : m_g(0), m_edgeNameMap(0)
     { }
     
+    /**
+     * @brief initializes the pointers to problem instance data structures
+     * @param g pointer to the input graph
+     * @param vertexList pointer to the input graph vertices list
+     * @param edgeMap pointer to the input graph edge names map
+     */
     void init(const Graph * g, const VertexList * vertexList, const EdgeNameMap * edgeMap) {
         m_g = g;
         m_vertexList = vertexList;
         m_edgeNameMap = edgeMap;
     }
-                           
+
+    /**
+     * @brief checks if the current LP solution is feasible
+     * @param lp LP object
+     * @return true iff the current LP solution is feasible
+     *
+     * @tparam LP
+     */
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
@@ -43,6 +62,12 @@ public:
         return !findAnyViolatedConstraint();
     }
     
+    /**
+     * @brief adds a violated constraint to the LP
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void addViolatedConstraint(LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
@@ -81,7 +106,13 @@ private:
                                   > AuxGraph;
     typedef std::vector < AuxEdge > AuxEdgeList;
     typedef std::map < AuxVertex, bool > ViolatingSet;
-                                  
+    
+    /**
+     * @brief creates the auxiliary directed graph used for feasibility testing
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void fillAuxiliaryDigraph(const LP & lp) {
         int numVertices(boost::num_vertices(*m_g));
@@ -119,6 +150,17 @@ private:
         }
     }
     
+    /**
+     * @brief adds an edge to the auxiliary graph
+     * @param vSrc source vertex of for the added edge
+     * @param vTrg target vertex of for the added edge
+     * @param cap capacity of the added edge
+     * @param noRev if the reverse edge should have zero capacity
+     * @return created edge of the auxiliary graph
+     *
+     * @tparam SrcVertex
+     * @tparam TrgVertex
+     */
     template <typename SrcVertex, typename TrgVertex>
     AuxEdge addEdge(const SrcVertex & vSrc, const TrgVertex & vTrg, double cap, bool noRev = false) {
         bool b, bRev;
@@ -143,6 +185,15 @@ private:
         return e;
     }
     
+    /**
+     * @brief calculates the sum of the variables for edges incident with a given vertex
+     * @param v vertex
+     * @param lp LP object
+     * @return sum of variables for edges incident with given vertex
+     *
+     * @tparam SrcVertex
+     * @tparam TrgVertex
+     */
     template <typename LP>
     double degreeOf(const Vertex & v, const LP & lp) {
         double res = 0;
@@ -162,6 +213,10 @@ private:
         return res;
     }
     
+    /**
+     * @brief finds any violated constraint
+     * @return true iff a violated consrtaint was found
+     */
     bool findAnyViolatedConstraint() {
         auto vertices = boost::vertices(m_auxGraph);
         // TODO random source node
@@ -188,6 +243,10 @@ private:
         return false;
     }
     
+    /**
+     * @brief finds the most violated constraint
+     * @return true iff a violated consrtaint was found
+     */
     bool findMostViolatedConstraint() {
         auto vertices = boost::vertices(m_auxGraph);
         const Vertex & src = *(vertices.first);
@@ -206,6 +265,11 @@ private:
         return m_violatedConstraintFound;
     }
     
+    /**
+     * @brief finds the most violated set of vertices containing \c src and avoiding \c trg
+     * @param src vertex to be contained in the violating set
+     * @param trg vertex not to be contained in the violating set
+     */
     void checkViolation(const Vertex & src, const Vertex & trg) {
         int numVertices(boost::num_vertices(*m_g));
         double origVal = m_cap[m_srcToV[src]];

@@ -17,6 +17,16 @@
 namespace paal {
 namespace ir {
 
+/**
+ * @class BoundedDegreeMST
+ * @brief this is a model of IRComponents concept.<br>
+ * The LPSolve is ir::RowGenerationSolveLP. <br>
+ * The RoundCondition is ir::RoundConditionEquals < 0 >.
+ *
+ * @tparam Graph input graph, has to be a model of boost::Graph
+ * @tparam CostMap map from Graph edges to costs
+ * @tparam DegreeBoundMap map from Graph vertices to degree bouds
+ */
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
 class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph > >,
                                                RoundConditionEquals<0> > {
@@ -39,11 +49,27 @@ public:
     
     typedef utils::Compare<double> Compare;
     
+    /**
+     * @brief checks if column of the LP can be rounded to 0, with epsilon specific to the bounded degree MST problem
+     * @param lp LP object
+     * @param col column number
+     * @return a pair consisting of a bool specifying if the column can be rounded and a double value to which the column is being rounded
+     *
+     * @tparam LP
+     */
     template <typename LP>
     std::pair<bool, double> roundCondition(const LP & lp, int col) {
         return BoundedDegreeMSTBase::roundCondition(lp, col, BoundedDegreeMST::EPSILON);
     }
     
+    /**
+     * @brief checks if the row of the LP can be relaxed
+     * @param lp LP object
+     * @param col row number
+     * @return true iff row can be relaxed
+     *
+     * @tparam LP
+     */
     template <typename LP>
     bool relaxCondition(const LP & lp, int row) {
         if (isDegBoundName(lp.getRowName(row))) {
@@ -56,6 +82,12 @@ public:
         }
     }
 
+    /**
+     * @brief initializes the LP (variables for edges, degree bound constraints and constraint for all edges) and the separation oracle
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void init(LP & lp) {
         lp.setLPName("bounded degree minimum spanning tree");
@@ -71,6 +103,13 @@ public:
         m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap);
     }
     
+    /**
+     * @brief returns the generated spanning tree
+     * @param lp LP object
+     * @return generated spanning tree: map from input Graph edges to bool values (if the edge belongs to the tree)
+     *
+     * @tparam LP
+     */
     template <typename LP>
     SpanningTree & getSolution(const LP & lp) {
         if (!m_solutionGenerated) {
@@ -92,7 +131,12 @@ private:
         return std::to_string(eIdx);
     }
     
-    //adding variables
+    /**
+     * @brief adds a variable to the LP for each edge in the input graph
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void addVariables(LP & lp) {
         auto edges = boost::edges(m_g);
@@ -109,7 +153,12 @@ private:
         }
     }
     
-    //adding degree bound constraints
+    /**
+     * @brief adds a degree bound constraint to the LP for each vertex in the input graph
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void addDegreeBoundConstraints(LP & lp) {
         int dbIdx(0);
@@ -134,7 +183,12 @@ private:
         }
     }
     
-    //adding equality for the whole set
+    /**
+     * @brief adds an equality constraint to the LP for the set of all edges in the input graph
+     * @param lp LP object
+     *
+     * @tparam LP
+     */
     template <typename LP>
     void addAllSetEquality(LP & lp) {
         int vCnt = num_vertices(m_g);
@@ -153,6 +207,14 @@ private:
         return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
     }
     
+    /**
+     * @brief counts edges incident with a given vertex with a non-zero value in the LP solution
+     * @param lp LP object
+     * @param v vertex
+     * @return number of non-zero edges incident with the given vertex
+     *
+     * @tparam LP
+     */
     template <typename LP>
     int nonZeroIncEdges(const LP & lp, const Vertex & v) {
         int nonZeroIncCnt(0);
@@ -203,6 +265,19 @@ private:
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
 const double BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>::EPSILON = 1e-10;
 
+
+/**
+ * @brief make template function for BoundedDegreeMST, just to avoid providing type names in template.
+ *
+ * @tparam Graph
+ * @tparam CostMap
+ * @tparam DegreeBoundMap
+ * @param g
+ * @param costMap
+ * @param degBoundMap
+ *
+ * @return 
+ */
 template <typename Graph, typename CostMap, typename DegreeBoundMap>
 BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>
 make_BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) {
