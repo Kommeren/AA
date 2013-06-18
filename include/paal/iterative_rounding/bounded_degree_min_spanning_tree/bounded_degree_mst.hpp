@@ -12,6 +12,7 @@
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/lp_row_generation.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle.hpp"
+#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle_components.hpp"
 
 
 namespace paal {
@@ -26,12 +27,14 @@ namespace ir {
  * @tparam Graph input graph, has to be a model of boost::Graph
  * @tparam CostMap map from Graph edges to costs
  * @tparam DegreeBoundMap map from Graph vertices to degree bouds
+ * @tparam OracleComponents components for separation oracle heuristics
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap>
-class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph > >,
+template <typename Graph, typename CostMap, typename DegreeBoundMap,
+          typename OracleComponents = BoundedDegreeMSTOracleComponents<> >
+class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > >,
                                                RoundConditionEquals<0> > {
 public:
-    typedef IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph > >,
+    typedef IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > >,
                            RoundConditionEquals<0> > BoundedDegreeMSTBase;
   
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
@@ -100,7 +103,7 @@ public:
         lp.loadMatrix();
         
         BoundedDegreeMSTBase::m_solveLP.setOracle(&m_separationOracle);
-        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap);
+        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap, EPSILON);
     }
     
     /**
@@ -257,13 +260,13 @@ private:
     bool            m_solutionGenerated;
     SpanningTree    m_spanningTree;
     
-    BoundedDegreeMSTOracle< Graph > m_separationOracle;
+    BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
     
     static const double EPSILON;
 };
 
-template <typename Graph, typename CostMap, typename DegreeBoundMap>
-const double BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>::EPSILON = 1e-10;
+template <typename Graph, typename CostMap, typename DegreeBoundMap, typename OracleComponents>
+const double BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, OracleComponents>::EPSILON = 1e-10;
 
 
 /**

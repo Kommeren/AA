@@ -23,7 +23,7 @@ namespace ir {
  *
  * @tparam Graph input graph, has to be a model of boost::Graph
  */
-template <typename Graph>
+template <typename Graph, typename OracleComponents>
 class BoundedDegreeMSTOracle {
 public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -40,11 +40,14 @@ public:
      * @param g pointer to the input graph
      * @param vertexList pointer to the input graph vertices list
      * @param edgeMap pointer to the input graph edge names map
+     * @param epsilon tolerance for double comparison
      */
-    void init(const Graph * g, const VertexList * vertexList, const EdgeNameMap * edgeMap) {
+    void init(const Graph * g, const VertexList * vertexList, const EdgeNameMap * edgeMap,
+              const double & epsilon) {
         m_g = g;
         m_vertexList = vertexList;
         m_edgeNameMap = edgeMap;
+        EPSILON = epsilon;
     }
 
     /**
@@ -57,9 +60,8 @@ public:
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
-        //TODO how to select heuristics
-//         return !findMostViolatedConstraint();
-        return !findAnyViolatedConstraint();
+        m_oracleComponents.initialTest(*this);
+        return !m_oracleComponents.findViolated(*this, boost::num_vertices(*m_g));
     }
     
     /**
@@ -86,6 +88,59 @@ public:
         }
         
         lp.loadNewRow();
+    }
+    
+    
+    /**
+     * @brief finds any violated constraint
+     * @param srcVertexIndex index of the source vertex
+     * @return true iff a violated consrtaint was found
+     */
+    bool findAnyViolatedConstraint(int srcVertexIndex) {
+        auto vertices = boost::vertices(m_auxGraph);
+        const Vertex & src = boost::vertex(srcVertexIndex, m_auxGraph);
+        assert(src != m_src && src != m_trg);
+        
+        m_violatedConstraintFound = false;
+        m_maximumViolation = 0;
+        
+        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
+            if (src != trg && trg != m_src && trg != m_trg) {
+                checkViolation(src, trg);
+                if (m_violatedConstraintFound) {
+                    return true;
+                }
+                
+                checkViolation(trg, src);
+                if (m_violatedConstraintFound) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * @brief finds the most violated constraint
+     * @return true iff a violated consrtaint was found
+     */
+    bool findMostViolatedConstraint() {
+        auto vertices = boost::vertices(m_auxGraph);
+        const Vertex & src = *(vertices.first);
+        assert(src != m_src && src != m_trg);
+        
+        m_violatedConstraintFound = false;
+        m_maximumViolation = 0;
+        
+        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
+            if (src != trg && trg != m_src && trg != m_trg) {
+                checkViolation(src, trg);
+                checkViolation(trg, src);
+            }
+        }
+        
+        return m_violatedConstraintFound;
     }
 
 private:
@@ -214,58 +269,6 @@ private:
     }
     
     /**
-     * @brief finds any violated constraint
-     * @return true iff a violated consrtaint was found
-     */
-    bool findAnyViolatedConstraint() {
-        auto vertices = boost::vertices(m_auxGraph);
-        // TODO random source node
-        const Vertex & src = *(vertices.first);
-        assert(src != m_src && src != m_trg);
-        
-        m_violatedConstraintFound = false;
-        m_maximumViolation = 0;
-        
-        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
-            if (src != trg && trg != m_src && trg != m_trg) {
-                checkViolation(src, trg);
-                if (m_violatedConstraintFound) {
-                    return true;
-                }
-                
-                checkViolation(trg, src);
-                if (m_violatedConstraintFound) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    }
-    
-    /**
-     * @brief finds the most violated constraint
-     * @return true iff a violated consrtaint was found
-     */
-    bool findMostViolatedConstraint() {
-        auto vertices = boost::vertices(m_auxGraph);
-        const Vertex & src = *(vertices.first);
-        assert(src != m_src && src != m_trg);
-        
-        m_violatedConstraintFound = false;
-        m_maximumViolation = 0;
-        
-        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
-            if (src != trg && trg != m_src && trg != m_trg) {
-                checkViolation(src, trg);
-                checkViolation(trg, src);
-            }
-        }
-        
-        return m_violatedConstraintFound;
-    }
-    
-    /**
      * @brief finds the most violated set of vertices containing \c src and avoiding \c trg
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
@@ -309,7 +312,9 @@ private:
         m_cap[m_vToTrg[trg]] = 1;
     }
     
-private:  
+private:
+    OracleComponents    m_oracleComponents;
+    
     const Graph *               m_g;
     const EdgeNameMap *         m_edgeNameMap;
     const VertexList *          m_vertexList;
@@ -331,10 +336,8 @@ private:
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
     boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
     
-    static const double EPSILON;
+    double EPSILON;
 };
-
-template <typename Graph> const double BoundedDegreeMSTOracle<Graph>::EPSILON = 1e-10;
 
 } //ir
 } //paal
