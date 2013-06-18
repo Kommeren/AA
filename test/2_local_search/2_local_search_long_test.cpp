@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //search
         while(ls.search()) {
-            if( i++ % 10 == 0) {
+            if( i++ % 100 == 0) {
                 LOG("Length after\t" << i << ": " << simple_algo::getLength(mtx, cman));
             }
         }

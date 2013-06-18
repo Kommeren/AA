@@ -10,9 +10,11 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
-#include "paal/min_cost_max_flow/min_cost_max_flow.hpp"
+#include "paal/min_cost_max_flow/cycle_cancellation.hpp"
+#include "paal/min_cost_max_flow/edmonds_karp_no_init.hpp"
 #include "paal/utils/iterator_utils.hpp"
 
 
@@ -184,7 +186,7 @@ public:
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
         if(costStart.getDistToFullAssignment() > 0) {
-            boost::edmonds_karp_without_init(m_g, m_s, m_t);
+            boost::edmonds_karp_no_init(m_g, m_s, m_t);
         }
 
         boost::cycle_cancellation(m_g);
@@ -220,8 +222,7 @@ public:
         boost::remove_vertex(genGraph, m_g);
         restoreIndex();
         
-        //boost::path_augmentation_from_residual(gRes, m_s, m_t);
-        boost::edmonds_karp_without_init(m_g, m_s, m_t);
+        boost::edmonds_karp_no_init(m_g, m_s, m_t);
         boost::cycle_cancellation(m_g);
 
         return getCost() - costStart;
@@ -262,7 +263,7 @@ public:
             return d + residual_capacity[e];
         });
 
-        DistI cost =  boost::find_min_cost(m_g);
+        DistI cost =  boost::find_flow_cost(m_g);
         return Dist(cost, resCap);
     }
 

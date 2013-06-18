@@ -55,8 +55,6 @@ struct SampleGraphsMetrics {
 
         return GraphMT(g);
     } 
-
-
 };
 
 #endif //SAMPLE_GRAPH_HPP
