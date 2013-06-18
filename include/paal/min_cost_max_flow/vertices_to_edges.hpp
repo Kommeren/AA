@@ -11,17 +11,20 @@
 namespace boost {
 namespace detail {
 template <typename Pred, typename Graph>
-class MapVerticesToEdges {
+class MapVerticesToEdges : 
+    public put_get_helper<typename graph_traits<Graph>::edge_descriptor, MapVerticesToEdges<Pred, Graph>> {
     typedef graph_traits<Graph> gtraits;
-    typedef typename gtraits::edge_descriptor ED;
-    typedef typename gtraits::vertex_descriptor VD;
 public:
+    typedef boost::readable_property_map_tag category;
+    typedef typename gtraits::edge_descriptor value_type;
+    typedef value_type reference;
+    typedef typename gtraits::vertex_descriptor key_type;
     MapVerticesToEdges(Pred p, const Graph & g) : 
         pred_(p), g_(g) {}
 
-     ED operator()(VD v) const {
+     reference operator[](key_type v) const {
         bool b;
-        ED e;
+        value_type e;
         tie(e ,b) = edge(get(pred_, v), v, g_);
 //        assert(b);
         return e;
@@ -38,12 +41,6 @@ make_mapVerticesToEdges(const Pred & p, const Graph & g)  {
 }
 
 }//detail
-
-template <typename Pred, typename Graph>
-typename graph_traits<Graph>::edge_descriptor 
-get(const detail::MapVerticesToEdges<Pred, Graph> & map, typename graph_traits<Graph>::vertex_descriptor v) {
-    return map(v);
-}
 
 } // boost
 #endif /* VERTICES_TO_EDGES_HPP */
