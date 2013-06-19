@@ -1,7 +1,6 @@
 #define BOOST_TEST_MODULE path_augmentation_test
 
 #include <boost/test/unit_test.hpp>
-#include <iostream>
 
 #include "paal/min_cost_max_flow/path_augmentation.hpp"
 #include "paal/min_cost_max_flow/find_flow_cost.hpp"
@@ -27,9 +26,10 @@ BOOST_AUTO_TEST_CASE(path_augmentation_test) {
 
     int N = num_vertices(g);
     std::vector<int> dist(N);
+    std::vector<int> dist_prev(N);
     std::vector<int> pre(N);
 
-    boost::path_augmentation(g, s, t, boost::distance_map(&dist[0]).predecessor_map(&pre[0]));
+    boost::path_augmentation(g, s, t, boost::distance_map(&dist[0]).predecessor_map(&pre[0])/*.distance_map2(&dist_prev[0])*/);
 
     int cost =  boost::find_flow_cost(g);
     BOOST_CHECK(cost == 29);

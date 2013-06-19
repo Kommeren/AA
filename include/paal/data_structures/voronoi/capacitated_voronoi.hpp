@@ -14,6 +14,7 @@
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/min_cost_max_flow/cycle_cancellation.hpp"
+#include "paal/min_cost_max_flow/path_augmentation.hpp"
 #include "paal/min_cost_max_flow/edmonds_karp_no_init.hpp"
 #include "paal/utils/iterator_utils.hpp"
 
@@ -119,8 +120,6 @@ private:
     typedef typename GTraits::vertex_descriptor VD;
     typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
     typedef typename std::map<VertexType, VD> VertexToGraphVertex;
-    typedef boost::filtered_graph<Graph, 
-        boost::is_residual_edge<ResidualCapacity> > ResidualGraph;
     
     struct Trans {
         std::pair<VertexType, DistI> operator()(const ED &e) const {
@@ -141,8 +140,7 @@ public:
                          m_vertices(std::move(ver)), m_metric(m), 
                          m_generatorsCap(gc),
                          m_firstGeneratorId(m_vertices.size() + 2),
-                         m_costOfNoGenerator(costOfNoGenerator) 
-                            {
+                         m_costOfNoGenerator(costOfNoGenerator) {
         for(VertexType v : m_vertices) {
             VD vGraph = addVertex(v);
             m_vToGraphV.insert(std::make_pair(v, vGraph));
@@ -154,6 +152,9 @@ public:
     }
 
     CapacitatedVoronoi(const CapacitatedVoronoi & other) :
+        m_dist(other.m_dist),
+        m_dist_prev(other.m_dist_prev),
+        m_pred(other.m_pred),
         m_g(other.m_g),
         m_s(other.m_s), m_t(other.m_t),
         m_generators(other.m_generators),
@@ -185,11 +186,9 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        if(costStart.getDistToFullAssignment() > 0) {
-            boost::edmonds_karp_no_init(m_g, m_s, m_t);
-        }
-
-        boost::cycle_cancellation(m_g);
+        boost::path_augmentation(m_g, m_s, m_t,                                 //not in boost yet 
+                boost::predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+                                                                    
 
         return getCost() - costStart;
     }
@@ -320,6 +319,11 @@ private:
     
     VD addVertex(VertexType v = VertexType()) {
         VD vG = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
+        int N = num_vertices(m_g);
+        
+        m_dist.resize(N);
+        m_dist_prev.resize(N);
+        m_pred.resize(N);
         return vG;
     }
 
@@ -357,6 +361,11 @@ private:
         auto name = boost::get(boost::vertex_name, m_g);
         return name[boost::source(e, m_g)];
     }
+
+    typedef std::vector<DistI> VPropMap;
+    VPropMap m_dist;
+    VPropMap m_dist_prev;
+    std::vector<VD> m_pred;
 
 
     Graph m_g;
