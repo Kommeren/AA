@@ -1,5 +1,5 @@
-#include <iostream>                  // for std::cout
-#include <fstream>
+// #include <iostream>                  // for std::cout
+// #include <fstream>
 // #include <tuple>
 
 // #include <utility>                   // for std::pair
@@ -16,7 +16,7 @@
 // #include "paal/iterative_rounding/iterative_rounding.hpp"
 // #include "paal/iterative_rounding/ir_components.hpp"
 
-#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
+#include "paal/iterative_rounding/tree_aug.hpp"
 //#include "paal/iterative_rounding/glp_lpbase.hpp"
 
 using namespace boost;
@@ -81,25 +81,15 @@ void readTreeAug(const std::string & filename,
   }
 
 }
-///The main entry point
-int main(int argc, char* argv[])
+int main(int,char*[])
 {
-  
-  if (argc != 2) {
-    std::cerr << "Usage: " << std::endl;
-    std::cerr << argv[0] << " <problem_instance> " << std::endl;   
-    std::cerr <<  "where <problem_instance> is a file describing a problem instance. The file examples/tree_aug_example_input.lgfmod is an example of such a file. " << std::endl;   
-
-    return -1;
-  }
+    
 
   Graph g;
   Cost cost      = get(edge_weight, g);
   TreeMap treeMap      = get(edge_color, g);
     
-  //  std::string eT_file=argv[1];
-
-  readTreeAug(argv[1],g,cost,treeMap);
+  readTreeAug("G2.lgfmod",g,cost,treeMap);
 
   paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
 
