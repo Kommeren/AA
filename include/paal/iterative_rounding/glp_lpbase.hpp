@@ -15,6 +15,12 @@
 namespace paal {
 namespace ir {
 
+   
+/**
+ * class GLPBase
+ * @brief This class contains member functions needeed to initialize LP
+ */
+
 class GLPBase {
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
@@ -67,7 +73,9 @@ public:
         glp_set_row_bnds(m_lp, m_rowNr, boundType2GLP(b), lb, ub);
         return m_rowNr++;
     }
-    
+   
+
+    //CR ja bym to dal protected
     void deleteRow() {
         --m_rowNr;
     }
@@ -86,12 +94,16 @@ public:
     void loadMatrix() {
         glp_load_matrix(m_lp, m_row.size() - 1, &m_row[0], &m_col[0], &m_val[0]);
     }
-    
+   
+
+    //CR dopisałem, opis klasy, te metode bym przeniosl do nowej klasy pomiedzy GLPBase GLP, 
+    //Jak to zrobimy w ten sposob i opiszemy to jest mniejsz szansa, ze ktos bedzie wolal te metody, w inicie
     void addNewRowCoef(int col, double coef = 1) {
         m_newRowCol.push_back(col);
         m_newRowVal.push_back(coef);
     }
     
+    //CR jak wyzej
     void loadNewRow() {
         glp_set_mat_row(m_lp, m_rowNr - 1, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
         m_newRowCol.clear();
@@ -193,7 +205,7 @@ private:
     Ids m_row;
     Ids m_col;
     Vals m_val;
-    
+    //CR jak wyzej
     Ids m_newRowCol;
     Vals m_newRowVal;
 };

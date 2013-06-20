@@ -14,6 +14,7 @@ namespace ir {
 template <typename Oracle>
 class RowGenerationSolveLP {
 public:
+    //CR tu powinno byc nullptr 
     RowGenerationSolveLP() : m_oracle(0) {}
   
     template <typename LP>

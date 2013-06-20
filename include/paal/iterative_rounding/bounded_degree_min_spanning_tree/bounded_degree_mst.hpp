@@ -26,7 +26,7 @@ namespace ir {
  *
  * @tparam Graph input graph, has to be a model of boost::Graph
  * @tparam CostMap map from Graph edges to costs
- * @tparam DegreeBoundMap map from Graph vertices to degree bouds
+ * @tparam DegreeBoundMap map from Graph vertices to degree bounds
  * @tparam OracleComponents components for separation oracle heuristics
  */
 template <typename Graph, typename CostMap, typename DegreeBoundMap,
@@ -51,7 +51,10 @@ public:
     typedef std::vector<Vertex> VertexList;
     
     typedef utils::Compare<double> Compare;
-    
+   
+
+    //CR jak przeniesiemy eppsilona (patrz na uwagi w  ir_components..), ot ta metoda nie jest potrzrebna
+    //za to bedzie potrzeba zmienic cos w kontruktorze
     /**
      * @brief checks if column of the LP can be rounded to 0, with epsilon specific to the bounded degree MST problem
      * @param lp LP object
@@ -78,6 +81,9 @@ public:
         if (isDegBoundName(lp.getRowName(row))) {
             int vIdx = getDegBoundIndex(lp.getRowName(row));
             Vertex v = m_vertexList[vIdx];
+            //CR Sa juz zaimplementowane funkcje getRowDegree / getColDegree
+            //wydaje mi sie, ze mozesz tego uzyc zamiast nonZeroIncCnt
+            //Trzeba uwazac na te funckje przy zmianie semantyki usuwania kolumn/ wierszy bo one moga sie zepsuc...
             return (nonZeroIncEdges(lp, v) <= m_degBoundMap[v] + 1);
         }
         else {
@@ -170,6 +176,7 @@ private:
         
         for(Vertex v : utils::make_range(vertices.first, vertices.second)) {
             int rowIdx = lp.addRow(UP, 0, m_degBoundMap[v], getDegBoundDesc(dbIdx));
+            //CR tu i w paru innych miejscach brakuje namespace'a, to dlatego, ze ze zrobiles using namespace boost w testach.
             auto adjVertices = adjacent_vertices(v, m_g);
             
             for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
@@ -196,7 +203,8 @@ private:
     void addAllSetEquality(LP & lp) {
         int vCnt = num_vertices(m_g);
         int rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
-        
+       
+        //CR ja bym tu zrobil petle po wszystkich kolumnach po prostu
         for (const std::pair<Edge, std::string> & e : m_edgeMap) {
             lp.addConstraintCoef(rowIdx, lp.getColByName(e.second));
         }
@@ -209,7 +217,8 @@ private:
     int getDegBoundIndex(const std::string & s) const {
         return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
     }
-    
+   
+    //CR tak jak pisalem wczesniej, ta funkcja chyba nie jest potrzebna
     /**
      * @brief counts edges incident with a given vertex with a non-zero value in the LP solution
      * @param lp LP object

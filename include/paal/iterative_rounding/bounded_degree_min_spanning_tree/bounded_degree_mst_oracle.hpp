@@ -60,6 +60,7 @@ public:
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
+        //CR jak to sie powiedzie to chyba powinnismy cos zwrocic
         m_oracleComponents.initialTest(*this);
         return !m_oracleComponents.findViolated(*this, boost::num_vertices(*m_g));
     }
@@ -226,6 +227,11 @@ private:
         
         assert(b && bRev);
         
+        //CR taka ogolna uwaga do boostowych map
+        //to to, zeby do nich uzywac funkcji get i put
+        //to co ty tutaj  robisz raczej zawsze bedzie dzialac
+        //ale jezeli otrzymalbys graf z zewnatrz to nie mozesz zalozyc, ze property map bedzie mialo operator[]
+        //perwnie lepiej po prostu zawsze uzywac get i put
         m_cap[e] = cap;
         if (noRev) {
             m_cap[eRev] = 0;
@@ -239,7 +245,10 @@ private:
         
         return e;
     }
-    
+   
+
+
+    //CR taka funkcja juz chyba jest w GLP i nazywa sie getColSum/getRowSum
     /**
      * @brief calculates the sum of the variables for edges incident with a given vertex
      * @param v vertex
@@ -268,6 +277,12 @@ private:
         return res;
     }
     
+
+    //CR checkViolation moglo by zwracac boola i wtedy nie byla by potrzebna skaldowa m_violatedConstraintFound
+    //takie sterowanie przez zmienna skladowa jest troche nieczytelne
+    //
+    //podobnie m_maximumViolation mogloby być np. argumentem tej funkcji, 
+    //moglaby sie ona nazywac na przyklad checkViolationGreaterThan, argument moglby miec wartosc domyslna.
     /**
      * @brief finds the most violated set of vertices containing \c src and avoiding \c trg
      * @param src vertex to be contained in the violating set
@@ -312,6 +327,9 @@ private:
         m_cap[m_vToTrg[trg]] = 1;
     }
     
+//CR to private nie jest potrzebne
+//
+//jak chcesz zaznaczyc, ze teraz sa składowe to lepiej zrobidc komentarz
 private:
     OracleComponents    m_oracleComponents;
     

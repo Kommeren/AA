@@ -16,6 +16,13 @@
 namespace paal {
 namespace ir {
 
+
+//CR ja bym dał epsilon jako składową klasy Compare
+//Wtedy przestanie ona być "statyczna" ale trudno
+//Można by dać Compare jako składową DefaultRoundCondition
+//DefaultRoundCondition mialby epsilon jako parametr konstruktora, i mozna by wtedy dac jakas defaultowa wartosc
+//
+//Ogolnie jak mysle, o koncepcie RoundCondition to nie pasuje mi tu ten epsilon
 struct DefaultRoundCondition {
     template <typename LP>
     std::pair<bool, double> operator()(const LP & lp, int col, double epsilon) {
