@@ -1,9 +1,9 @@
 /**
- * @file generalised_assignment.hpp
+ * @file tree_aug.hpp
  * @brief 
- * @author Piotr Wygocki
+ * @author Attila Bernath
  * @version 1.0
- * @date 2013-05-06
+ * @date 2013-06-20
  */
 #ifndef TREE_AUG_HPP
 #define TREE_AUG_HPP
@@ -16,7 +16,6 @@
 #include <algorithm>                 // for std::for_each
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
-//  #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -33,6 +32,10 @@ namespace paal {
   namespace ir {
 
 
+    ///A class that translates bool map on the edges to a filter, which can be used with
+    ///boost::filtered_graph. That is, we translate operator[] to
+    ///operator().  We do a little more: we will also need the negated
+    ///version of the map (for the graph of the non-tree edges).
     template <typename EdgeBoolMap, bool negate>
     struct BoolMapToFilter {
       BoolMapToFilter() { }
@@ -48,6 +51,17 @@ namespace paal {
     };
 
 
+    /**
+     * class TreeAug @brief This is Jain's iterative rounding
+     * 2-approximation algorithm for the Generalised Steiner Network
+     * Problem, specialized for the Tree Augmentation Problem
+     *
+     * Example:  tree_aug_example.cpp
+     *
+     * @tparam Graph the graph type used
+     * @tparam TreeMap it is assumed to be a bool map on the edges of a graph of type Graph. It is used for designating a spanning tree in the graph.
+     * @tparam CostMap type for the costs of the links.
+     */
     template <typename Graph, typename TreeMap, typename CostMap >
     class TreeAug : public IRComponents < > {
     public:
@@ -58,53 +72,23 @@ namespace paal {
 
       typedef std::map< Edge, bool > EdgeBoolMap;
 
+      ///Constructor.
+      ///
+      ///@param _g  the graph to work with
+      ///@param _treeMap designate a spanning tree in \c _g
+      ///@param _costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
       TreeAug(const Graph & _g, const TreeMap & _treeMap, const CostMap & _costMap) :
 	IRComponents< >(),
 	g(_g),  treeMap(_treeMap), costMap(_costMap),
 	inTreeFilter(treeMap),tree(g,inTreeFilter),
-	nonTreeFilter(treeMap),ntree(g,nonTreeFilter){ }
-    
-
-      
-      template <typename LP>
-      std::pair<bool, double> roundCondition(const LP & lp, int col) 
-      {
-	double x = lp.getColPrim(col);
-        if(utils::Compare<double>::ge(x,0.5)) {
-	  inSolution[colName2Edge[lp.getColName(col)]]=true;
-	  return std::make_pair(true, 1);
-        }
-        return std::make_pair(false, -1);
-
-      }
-    
-      template <typename LP>
-      bool relaxCondition(const LP & lp, int row) {
-        // if (isDegBoundName(lp.getRowName(row))) {
-	//   int vIdx = getDegBoundIndex(lp.getRowName(row));
-	//   Vertex v = m_vertexList[vIdx];
-	//   return Compare::le(nonZeroIncEdges(lp, v), m_degBoundMap[v] + 1);
-        // }
-        // else {
-
-	for (Edge e: coveredBy[rowName2Edge[lp.getRowName(row)]])
-	  {
-	    if (inSolution[e])
-	      return true;
-	  }
-	return false;
-      // }
-      }
-
-      template <typename LP>
-      void init(LP & lp) {    
-
+	nonTreeFilter(treeMap),ntree(g,nonTreeFilter)
+      { 
+	
+	//we print out the input.
 	std::cout << "The graph:" << std::endl;
 	print_graph(g);
-
 	std::cout << "The spanning tree:" << std::endl;
 	print_graph(tree);
-
 	std::cout << "The rest:" << std::endl;
 	print_graph(ntree);
 
@@ -115,38 +99,41 @@ namespace paal {
 	int numberOfVertices=num_vertices(g);
 
 
-  
-	std::vector< Edge > pred(numberOfVertices);
-
+	//We need to fill two very useful auxiliary data structures:
+	//\c covers and \c coveredBy. These are containing lists of
+	//edges. For a tree edge \c t the list \c coveredBy[t]
+	//contains the list of links covering \c t. Similarly, for a
+	//link \c e, the list \c covers[e] contains the list of tree
+	//edges covered by \c e (that is, the tree edges in the unique
+	//path in the tree between the endnodes of \c e).
 	{
-	  typename boost::graph_traits<NonTreeGraph>
-	    ::edge_iterator ei, ei_end;
-	  for(boost::tie(ei,ei_end) = edges(ntree); ei != ei_end; ++ei){
-	    std::cout << index[source(*ei,ntree)]<<"-"<<index[target(*ei,ntree)] << " ";
-    
-	    //typename graph_traits<TreeGraph>::vertex_descriptor a = source(*ei,ntree);
+	  std::vector< Edge > pred(numberOfVertices);	  
+	  std::map< Vertex, bool > wasSeen;
+	  typename boost::graph_traits<Graph>
+	    ::vertex_iterator ui, ui_end;
+	  for (boost::tie(ui,ui_end) = vertices(g); ui != ui_end; ++ui) {
+	    wasSeen[*ui]=true;
 
-	    breadth_first_search(tree, source(*ei,ntree),
+	    breadth_first_search(tree, *ui,
 				 visitor(make_bfs_visitor(record_edge_predecessors(&pred[0], boost::on_tree_edge()))));
-      
-	    //my_bfs(tree,source(*ei,ntree),predEdgeMap);
-      
-	    Vertex node=target(*ei,ntree);
-	    while (node!=source(*ei,ntree)){
-	      covers[*ei].push_back(pred[node]);
-	      coveredBy[pred[node]].push_back(*ei);
-      
-	      node=source(pred[node],tree);
+
+	    typename boost::graph_traits<NonTreeGraph>::out_edge_iterator ei, ei_end;
+	    for(boost::tie(ei,ei_end) = out_edges(*ui,ntree); ei != ei_end; ++ei){
+	      Vertex node=target(*ei,ntree);
+	      if (!wasSeen[node]){
+		while (node!=*ui){
+		    covers[*ei].push_back(pred[node]);
+		    coveredBy[pred[node]].push_back(*ei);
+		    node=source(pred[node],tree);
+		  }
+	      }
 	    }
-
-
-
-	    // breadth_first_search(tree, source(*ei,ntree),
-	    // 			 make_bfs_visitor(record_edge_predecessors(pred.begin(), on_tree_edge())));
-
-	  }
+		
+	  }	
 	  std::cout << std::endl;
+      
 	}
+	//This is just for debug purposes
 	{
 	  typename boost::graph_traits<NonTreeGraph>
 	    ::edge_iterator ei, ei_end;
@@ -160,8 +147,11 @@ namespace paal {
 	  }  
 	}
 
-
-
+      }//end of Constructor
+    
+      ///Initialize the cut LP.
+      template <typename LP>
+      void init(LP & lp) {    
 
         lp.setLPName("Tree augmentation");
         lp.setMinObjFun(); 
@@ -180,24 +170,60 @@ namespace paal {
         // BoundedDegreeMSTBase::m_solveLP.setOracle(&m_separationOracle);
         // m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap);
       }
+
+      
+      ///A variable is rounded up to 1, if it has value at least half in the solution
+      template <typename LP>
+      std::pair<bool, double> roundCondition(const LP & lp, int col) 
+      {
+	double x = lp.getColPrim(col);
+        if(utils::Compare<double>::ge(x,0.5)) {
+	  inSolution[colName2Edge[lp.getColName(col)]]=true;
+	  return std::make_pair(true, 1);
+        }
+        return std::make_pair(false, -1);
+
+      }
     
-    template <typename LP>
-    EdgeBoolMap & getSolution(const LP & lp) {
-      return inSolution;
-    }
+      ///A condition belonging to a tree edge \c t can be relaxed if
+      ///some link in the fundamental cut belonging to \c t is chosen
+      ///in the solution.
+      ///
+      ///In fact we don't even need to relax, since these constraints became trivial after rounding. So returning always false should be fine, too.
+      template <typename LP>
+      bool relaxCondition(const LP & lp, int row) {
+
+	for (Edge e: coveredBy[rowName2Edge[lp.getRowName(row)]])
+	  {
+	    if (inSolution[e])
+	      return true;
+	  }
+	return false;
+      }
+
+    
+      ///Return the solution found
+      template <typename LP>
+      EdgeBoolMap & getSolution(const LP & lp) {
+	return inSolution;
+      }
 
 
     private:
+      ///The input
       const Graph & g;
       const TreeMap & treeMap;
       const CostMap & costMap;
       
+      ///Auxiliary data structures
       BoolMapToFilter<TreeMap,true> inTreeFilter;
       typedef boost::filtered_graph<Graph, BoolMapToFilter<TreeMap,true> > TreeGraph;
+      //The spanning tree
       TreeGraph  tree;
       
       BoolMapToFilter<TreeMap,false> nonTreeFilter;
       typedef boost::filtered_graph<Graph, BoolMapToFilter<TreeMap,false> > NonTreeGraph;
+      //The non-tree (=set of links)
       NonTreeGraph ntree;
 
       //Structures for the "covers" and "coveredBy" relations
@@ -205,17 +231,18 @@ namespace paal {
       typedef std::map< Edge , EdgeList > CoverMap;
       CoverMap covers,coveredBy;
       
-      typedef std::map<Edge, std::string> Edge2ColName;
-      Edge2ColName edge2ColName;
 
-      typedef std::map<std::string, Edge> ColName2Edge;
-      ColName2Edge colName2Edge;
-      
+      //cross reference between links and column names
+      std::map<Edge, std::string> edge2ColName;
+      std::map<std::string, Edge> colName2Edge;
+
+      //reference between tree edges and row names
       std::map<std::string, Edge> rowName2Edge;
       
+      //Which links are chosen in the solution
       EdgeBoolMap inSolution;
 
-
+      
       std::string getEdgeName(int eIdx) const {
         return std::to_string(eIdx);
       }
@@ -223,6 +250,8 @@ namespace paal {
       std::string getCutConstrPrefix() const {
         return "cutConstraint";
       }      
+      
+      
       std::string getRowName(int dbIdx) const {
         return getCutConstrPrefix() + std::to_string(dbIdx);
       }
@@ -247,7 +276,7 @@ namespace paal {
 	return eIdx;
       }
     
-      //adding variables
+      //adding the cut constraints
       //returns the number of rows added
       template <typename LP>
       int addCutConstraints(LP & lp) {
@@ -290,11 +319,6 @@ namespace paal {
       
     }
 
-    // template <typename Graph, typename CostMap, typename DegreeBoundMap>
-    // BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>
-    // make_BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) {
-    //   return BoundedDegreeMST<Graph, CostMap, DegreeBoundMap>(g, costMap, degBoundMap);
-    // }
   } //ir
 } //paal
 

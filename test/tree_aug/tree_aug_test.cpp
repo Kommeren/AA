@@ -12,7 +12,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "utils/logger.hpp"
-#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
+#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -31,11 +31,13 @@ struct LogVisitor : public TrivialVisitor {
     }
 };
 
-typedef adjacency_list < vecS, vecS, undirectedS,
-                            property < vertex_degree_t, int,
-                                property < vertex_index_t, int >
-                                     >,
-                            property < edge_weight_t, double > > Graph;
+// create a typedef for the Graph type
+typedef adjacency_list<vecS, vecS, undirectedS,
+		       //property < vertex_index_t, int >,
+		       no_property,
+		       property < edge_weight_t, double,  
+				  property < edge_color_t, bool> > > Graph;
+
 typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
 typedef graph_traits < Graph >::edge_descriptor Edge;
 
@@ -57,7 +59,7 @@ typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
 BOOST_AUTO_TEST_CASE(tree_aug) {
-    Graph g;
+  Graph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap      = get(edge_color, g);
 
@@ -82,7 +84,7 @@ BOOST_AUTO_TEST_CASE(tree_aug) {
 
       
     paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
-    LOG(paal::ir::solve(ir));
+    paal::ir::solve(ir);
     BOOST_CHECK(ir.integerSolution());
 
     
