@@ -2,6 +2,7 @@
 *.tmp
 build
 build_debug
+build_clang
 html
 latex
 const.cmake
