@@ -165,7 +165,7 @@ Concepts:
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStep interface.
+Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Update types it might be usefull to provide SearchComponents for each type of Update.
 
 \subsubsection Example
 full example: local_search_example.cpp
@@ -244,7 +244,7 @@ Concepts:
 
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface.
+Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Update types it might be usefull to provide SearchComponents for each type of Update.
 
 \subsubsection Example
 full example: local_search_multi_solution_example.cpp
