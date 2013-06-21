@@ -75,6 +75,47 @@ protected:
     
     const utils::Compare<double> m_compare;
 };
+        
+
+template <typename Cond, typename F> 
+class RoundConditionToFun {
+public:
+    RoundConditionToFun(Cond c = Cond(), F f = F()) : 
+        m_cond(c), m_f(f) {}
+
+    template <typename LP>
+    std::pair<bool, double> operator()(const LP & lp, int col) {
+        double x = lp.getColPrim(col);
+        if(m_cond(x)) {
+            return std::make_pair(true, m_f(x));
+        }
+        return std::make_pair(false, -1);
+    }
+private:
+    Cond m_cond;
+    F m_f;
+};
+
+
+class CondBiggerEqualThan {
+public:
+    CondBiggerEqualThan(double b) : m_bound(b) {}    
+
+    bool operator()(double x) {
+        return utils::Compare<double>::ge(x, m_bound);
+    }
+
+private:
+    double m_bound;
+};
+
+
+///A variable is rounded up to 1, if it has value at least half in the solution
+struct RoundConditionGreaterThanHalf  : 
+    public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnSomethingFunctor<int, 1>> {
+        RoundConditionGreaterThanHalf() : 
+            RoundConditionToFun(CondBiggerEqualThan(0.5)) {}
+};
 
 
 struct DefaultSolveLP {
