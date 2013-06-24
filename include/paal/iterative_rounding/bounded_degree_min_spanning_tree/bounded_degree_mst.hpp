@@ -34,13 +34,15 @@ template <typename Graph, typename CostMap, typename DegreeBoundMap,
 class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > >,
                                                RoundConditionEquals<0> > {
 public:
-    typedef IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > >,
-                           RoundConditionEquals<0> > BoundedDegreeMSTBase;
+    typedef RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > > SolveLP;
+    typedef RoundConditionEquals<0> RoundCondition;
+    typedef IRComponents < SolveLP, RoundCondition > BoundedDegreeMSTBase;
   
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
-              BoundedDegreeMSTBase(),
+              BoundedDegreeMSTBase(SolveLP(), RoundCondition(BoundedDegreeMST::EPSILON)),
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
-              m_solutionGenerated(false) { }
+              m_solutionGenerated(false),
+              m_compare(BoundedDegreeMST::EPSILON) { }
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -50,23 +52,6 @@ public:
     typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
     
-    typedef utils::Compare<double> Compare;
-   
-
-    //CR jak przeniesiemy eppsilona (patrz na uwagi w  ir_components..), ot ta metoda nie jest potrzrebna
-    //za to bedzie potrzeba zmienic cos w kontruktorze
-    /**
-     * @brief checks if column of the LP can be rounded to 0, with epsilon specific to the bounded degree MST problem
-     * @param lp LP object
-     * @param col column number
-     * @return a pair consisting of a bool specifying if the column can be rounded and a double value to which the column is being rounded
-     *
-     * @tparam LP
-     */
-    template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, int col) {
-        return BoundedDegreeMSTBase::roundCondition(lp, col, BoundedDegreeMST::EPSILON);
-    }
     
     /**
      * @brief checks if the row of the LP can be relaxed
@@ -108,7 +93,7 @@ public:
         lp.loadMatrix();
         
         BoundedDegreeMSTBase::m_solveLP.setOracle(&m_separationOracle);
-        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap, EPSILON);
+        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap, &m_compare);
     }
     
     /**
@@ -240,6 +225,7 @@ private:
     
     BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
     
+    const utils::Compare<double>   m_compare;
     static const double EPSILON;
 };
 

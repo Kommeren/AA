@@ -46,7 +46,7 @@ public:
         int size = m_lpBase.colSize();
         for(int col = 1; col <= size; ++col) {
             double colVal = m_lpBase.getColPrim(col);
-            if (!utils::Compare<double>::e(colVal, std::round(colVal))) {
+            if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;
             }
         }
@@ -120,6 +120,7 @@ private:
     LPBase m_lpBase;
     Engine m_engine;
     Visitor m_visitor;
+    utils::Compare<double> m_compare;
 };
 
 template <typename IR> 

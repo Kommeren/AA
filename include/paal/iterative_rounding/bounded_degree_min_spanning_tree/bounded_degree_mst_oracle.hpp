@@ -32,7 +32,7 @@ public:
     typedef std::map<Edge, std::string> EdgeNameMap;
     typedef std::vector<Vertex> VertexList;
     
-    BoundedDegreeMSTOracle() : m_g(0), m_edgeNameMap(0)
+    BoundedDegreeMSTOracle() : m_g(nullptr), m_edgeNameMap(nullptr), m_vertexList(nullptr), m_compare(nullptr)
     { }
     
     /**
@@ -43,11 +43,11 @@ public:
      * @param epsilon tolerance for double comparison
      */
     void init(const Graph * g, const VertexList * vertexList, const EdgeNameMap * edgeMap,
-              const double & epsilon) {
+              const utils::Compare<double> * compare) {
         m_g = g;
         m_vertexList = vertexList;
         m_edgeNameMap = edgeMap;
-        EPSILON = epsilon;
+        m_compare = compare;
     }
 
     /**
@@ -201,7 +201,7 @@ private:
             if (0 != colIdx) {
                 double colVal = lp.getColPrim(colIdx) / 2;
                 
-                if (!utils::Compare<double>::e(colVal, 0, EPSILON)) {
+                if (!m_compare->e(colVal, 0)) {
                     Vertex u = source(e.first, *m_g);
                     Vertex v = target(e.first, *m_g);
                     addEdge(u, v, colVal);
@@ -307,7 +307,7 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > minViolation && !utils::Compare<double>::e(violation, 0, EPSILON)) {
+        if (violation > minViolation && !m_compare->e(violation, 0)) {
             violated = true;
             m_violatingSetSize = 0;
             
@@ -340,6 +340,7 @@ private:
     const Graph *               m_g;
     const EdgeNameMap *         m_edgeNameMap;
     const VertexList *          m_vertexList;
+    const utils::Compare<double> * m_compare;
     
     AuxGraph    m_auxGraph;
     Vertex      m_src;
@@ -354,8 +355,6 @@ private:
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
     boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
-    
-    double EPSILON;
 };
 
 } //ir

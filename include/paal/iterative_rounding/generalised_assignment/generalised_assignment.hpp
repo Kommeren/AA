@@ -46,7 +46,7 @@ public:
     bool relaxCondition(const LP & lp, int row) {
         return isMachineName(lp.getRowName(row)) && 
                lp.getRowDegree(row) <= 2 && 
-               Compare::ge(lp.getRowSum(row),1); 
+               m_compare.ge(lp.getRowSum(row),1); 
     };
 
     template <typename LP>
@@ -146,6 +146,7 @@ private:
     const ProceedingTime & m_t; 
     const MachineAvailableTime & m_T; 
     JobsToMachines m_jobToMachine;
+    const Compare m_compare;
 };
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>

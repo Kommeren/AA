@@ -15,24 +15,24 @@
 
 namespace paal {
 namespace ir {
+  
 
-
-//CR ja bym dał epsilon jako składową klasy Compare
-//Wtedy przestanie ona być "statyczna" ale trudno
-//Można by dać Compare jako składową DefaultRoundCondition
-//DefaultRoundCondition mialby epsilon jako parametr konstruktora, i mozna by wtedy dac jakas defaultowa wartosc
-//
-//Ogolnie jak mysle, o koncepcie RoundCondition to nie pasuje mi tu ten epsilon
-struct DefaultRoundCondition {
+class DefaultRoundCondition {
+public:
+    DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
+  
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col, double epsilon) {
+    std::pair<bool, double> operator()(const LP & lp, int col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
-        if(utils::Compare<double>::e(x,r,epsilon)) {
+        if(m_compare.e(x,r)) {
             return std::make_pair(true, r);
         }
         return std::make_pair(false, -1);
     };
+    
+protected:
+    const utils::Compare<double> m_compare;
 };
 
 
@@ -45,28 +45,35 @@ template <int arg, int... args>
 class RoundConditionEquals<arg, args...>  : 
         public RoundConditionEquals<args...> {
 public:
+    RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
+    
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col, double epsilon) {
-        return get(lp, lp.getColPrim(col), epsilon);
+    std::pair<bool, double> operator()(const LP & lp, int col) {
+        return get(lp, lp.getColPrim(col));
     }
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x, double epsilon) {
-        if(utils::Compare<double>::e(x, arg, epsilon)) {
+    std::pair<bool, double> get(const LP & lp, double x) {
+        if(this->m_compare.e(x, arg)) {
             return std::make_pair(true, arg);
         } else {
-            return RoundConditionEquals<args...>::get(lp, x, epsilon);
+            return RoundConditionEquals<args...>::get(lp, x);
         }
     }
 };
 
 template <> 
-class RoundConditionEquals<> { 
+class RoundConditionEquals<> {
+public:
+    RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
+    
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x, double epsilon) {
+    std::pair<bool, double> get(const LP & lp, double x) {
         return std::make_pair(false, -1);
     }
+    
+    const utils::Compare<double> m_compare;
 };
 
 
@@ -93,9 +100,8 @@ public:
     }
 
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, int col,
-                                           double epsilon = utils::Compare<double>::epsilon()) {
-        return m_roundCondition(lp, col, epsilon);
+    std::pair<bool, double> roundCondition(const LP & lp, int col) {
+        return m_roundCondition(lp, col);
     }
 
     template <typename LP>

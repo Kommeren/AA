@@ -12,28 +12,28 @@ namespace utils {
 template <typename T>
 class Compare {
 public:
-    static bool e(T a, T b, T epsilon = EPSILON) {
-        return std::abs(a - b) < epsilon;
-        //return abs(a -b ) < EPSILON; //this line breaks generalised_assignment_long_test TODO investigate
+    Compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
+    
+    bool e(T a, T b) const {
+        return std::abs(a - b) < m_epsilon;
+        //return abs(a -b ) < m_epsilon; //this line breaks generalised_assignment_long_test TODO investigate
     }
     
-    static bool ge(T a, T b, T epsilon = EPSILON) {
-        return a >= b - epsilon;
+    bool ge(T a, T b) const {
+        return a >= b - m_epsilon;
     }
     
-    static bool le(T a, T b, T epsilon = EPSILON) {
-        return a <= b + epsilon;
+    bool le(T a, T b) const {
+        return a <= b + m_epsilon;
     }
     
-    static T epsilon() {
-        return EPSILON;
+    static T defaultEpsilon() {
+        return std::numeric_limits<T>::epsilon();
     }
 
 private:
-    static const T EPSILON;
+    const T m_epsilon;
 };
-
-template <typename T> const T Compare<T>::EPSILON = std::numeric_limits<T>::epsilon();
 
 }
 }
