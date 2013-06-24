@@ -60,9 +60,13 @@ public:
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
-        //CR jak to sie powiedzie to chyba powinnismy cos zwrocic
-        m_oracleComponents.initialTest(*this);
-        return !m_oracleComponents.findViolated(*this, boost::num_vertices(*m_g));
+        
+        if (m_oracleComponents.initialTest(*this)) {
+            return true;
+        }
+        else {
+            return !m_oracleComponents.findViolated(*this, boost::num_vertices(*m_g));
+        }
     }
     
     /**
@@ -102,18 +106,17 @@ public:
         const Vertex & src = boost::vertex(srcVertexIndex, m_auxGraph);
         assert(src != m_src && src != m_trg);
         
-        m_violatedConstraintFound = false;
-        m_maximumViolation = 0;
-        
+        std::pair<bool, double> violation;
+                
         for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                checkViolation(src, trg);
-                if (m_violatedConstraintFound) {
+                violation = checkViolationGreaterThan(src, trg);
+                if (violation.first) {
                     return true;
                 }
                 
-                checkViolation(trg, src);
-                if (m_violatedConstraintFound) {
+                violation = checkViolationGreaterThan(trg, src);
+                if (violation.first) {
                     return true;
                 }
             }
@@ -131,17 +134,27 @@ public:
         const Vertex & src = *(vertices.first);
         assert(src != m_src && src != m_trg);
         
-        m_violatedConstraintFound = false;
-        m_maximumViolation = 0;
+        bool violatedConstraintFound = false;
+        double maximumViolation = 0;
+        std::pair<bool, double> violation;
         
         for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                checkViolation(src, trg);
-                checkViolation(trg, src);
+                violation = checkViolationGreaterThan(src, trg, maximumViolation);
+                maximumViolation = std::max(maximumViolation, violation.second);
+                if (violation.first) {
+                    violatedConstraintFound = true;
+                }
+                
+                violation = checkViolationGreaterThan(trg, src, maximumViolation);
+                maximumViolation = std::max(maximumViolation, violation.second);
+                if (violation.first) {
+                    violatedConstraintFound = true;
+                }
             }
         }
         
-        return m_violatedConstraintFound;
+        return violatedConstraintFound;
     }
 
 private:
@@ -227,21 +240,16 @@ private:
         
         assert(b && bRev);
         
-        //CR taka ogolna uwaga do boostowych map
-        //to to, zeby do nich uzywac funkcji get i put
-        //to co ty tutaj  robisz raczej zawsze bedzie dzialac
-        //ale jezeli otrzymalbys graf z zewnatrz to nie mozesz zalozyc, ze property map bedzie mialo operator[]
-        //perwnie lepiej po prostu zawsze uzywac get i put
-        m_cap[e] = cap;
+        boost::put(m_cap, e, cap);
         if (noRev) {
-            m_cap[eRev] = 0;
+            boost::put(m_cap, eRev, 0);
         }
         else {
-            m_cap[eRev] = cap;
+            boost::put(m_cap, eRev, cap);
         }
         
-        m_rev[e] = eRev;
-        m_rev[eRev] = e;
+        boost::put(m_rev, e, eRev);
+        boost::put(m_rev, eRev, e);
         
         return e;
     }
@@ -249,6 +257,7 @@ private:
 
 
     //CR taka funkcja juz chyba jest w GLP i nazywa sie getColSum/getRowSum
+    // TODO: getRowSum robi troche co innego, ale mozne dodac do GLP ogolna funkcje robiaca to co degreeOf
     /**
      * @brief calculates the sum of the variables for edges incident with a given vertex
      * @param v vertex
@@ -277,40 +286,36 @@ private:
         return res;
     }
     
-
-    //CR checkViolation moglo by zwracac boola i wtedy nie byla by potrzebna skaldowa m_violatedConstraintFound
-    //takie sterowanie przez zmienna skladowa jest troche nieczytelne
-    //
-    //podobnie m_maximumViolation mogloby być np. argumentem tej funkcji, 
-    //moglaby sie ona nazywac na przyklad checkViolationGreaterThan, argument moglby miec wartosc domyslna.
     /**
-     * @brief finds the most violated set of vertices containing \c src and avoiding \c trg
+     * @brief finds the most violated set of vertices containing \c src and avoiding \c trg and saves it if the violation is greater than \c minViolation
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
+     * @param minViolation minimum violation that a set should have to be saved
+     * @return a pair of bool (if a violated set was found) and the violation of the found set
      */
-    void checkViolation(const Vertex & src, const Vertex & trg) {
+    std::pair<bool, double> checkViolationGreaterThan(const Vertex & src, const Vertex & trg, double minViolation = 0) {
         int numVertices(boost::num_vertices(*m_g));
-        double origVal = m_cap[m_srcToV[src]];
+        double origVal = boost::get(m_cap, m_srcToV[src]);
+        bool violated = false;
 
-        m_cap[m_srcToV[src]] = numVertices;
+        boost::put(m_cap, m_srcToV[src], numVertices);
         // capacity of srcToV[trg] does not change
-        m_cap[m_vToTrg[src]] = 0;
-        m_cap[m_vToTrg[trg]] = numVertices;
+        boost::put(m_cap, m_vToTrg[src], 0);
+        boost::put(m_cap, m_vToTrg[trg], numVertices);
         
         // TODO better flow algorithm
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > m_maximumViolation && !utils::Compare<double>::e(violation, 0, EPSILON)) {
-            m_maximumViolation = violation;
-            m_violatedConstraintFound = true;
+        if (violation > minViolation && !utils::Compare<double>::e(violation, 0, EPSILON)) {
+            violated = true;
             m_violatingSetSize = 0;
             
             auto vertices = boost::vertices(m_auxGraph);
             auto colors = boost::get(boost::vertex_color, m_auxGraph);
-            auto srcColor = colors[m_src];
+            auto srcColor = boost::get(colors, m_src);
             for (const Vertex & v : utils::make_range(vertices.first, vertices.second)) {
-                if (v != m_src && v != m_trg && colors[v] == srcColor) {
+                if (v != m_src && v != m_trg && boost::get(colors, v) == srcColor) {
                     m_violatingSet[v] = true;
                     ++m_violatingSetSize;
                 }
@@ -321,16 +326,15 @@ private:
         }
         
         // reset the original values for the capacities
-        m_cap[m_srcToV[src]] = origVal;
+        boost::put(m_cap, m_srcToV[src], origVal);
         // capacity of srcToV[trg] does not change
-        m_cap[m_vToTrg[src]] = 1;
-        m_cap[m_vToTrg[trg]] = 1;
+        boost::put(m_cap, m_vToTrg[src], 1);
+        boost::put(m_cap, m_vToTrg[trg], 1);
+        
+        return std::make_pair(violated, violation);
     }
     
-//CR to private nie jest potrzebne
-//
-//jak chcesz zaznaczyc, ze teraz sa składowe to lepiej zrobidc komentarz
-private:
+    
     OracleComponents    m_oracleComponents;
     
     const Graph *               m_g;
@@ -346,9 +350,6 @@ private:
     
     ViolatingSet        m_violatingSet;
     int                 m_violatingSetSize;
-    
-    bool                m_violatedConstraintFound;
-    double              m_maximumViolation;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;

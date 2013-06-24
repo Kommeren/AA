@@ -82,9 +82,8 @@ public:
             int vIdx = getDegBoundIndex(lp.getRowName(row));
             Vertex v = m_vertexList[vIdx];
             //CR Sa juz zaimplementowane funkcje getRowDegree / getColDegree
-            //wydaje mi sie, ze mozesz tego uzyc zamiast nonZeroIncCnt
             //Trzeba uwazac na te funckje przy zmianie semantyki usuwania kolumn/ wierszy bo one moga sie zepsuc...
-            return (nonZeroIncEdges(lp, v) <= m_degBoundMap[v] + 1);
+            return (lp.getRowDegree(row) <= boost::get(m_degBoundMap, v) + 1);
         }
         else {
             return false;
@@ -154,7 +153,7 @@ private:
         
         for(Edge e : utils::make_range(edges.first, edges.second)) {
             std::string colName = getEdgeName(eIdx);
-            lp.addColumn(m_costMap[e], DB, 0, 1, colName);
+            lp.addColumn(boost::get(m_costMap, e), DB, 0, 1, colName);
             m_edgeMap[e] = colName;
             m_spanningTree[e] = false;
             m_edgeList[eIdx] = e;
@@ -175,7 +174,7 @@ private:
         m_vertexList.resize(boost::num_vertices(m_g));
         
         for(Vertex v : utils::make_range(vertices.first, vertices.second)) {
-            int rowIdx = lp.addRow(UP, 0, m_degBoundMap[v], getDegBoundDesc(dbIdx));
+            int rowIdx = lp.addRow(UP, 0, boost::get(m_degBoundMap, v), getDegBoundDesc(dbIdx));
             auto adjVertices = boost::adjacent_vertices(v, m_g);
             
             for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
@@ -200,12 +199,12 @@ private:
      */
     template <typename LP>
     void addAllSetEquality(LP & lp) {
-        int vCnt = num_vertices(m_g);
+        int vCnt = boost::num_vertices(m_g);
+        int colCnt = lp.colSize();
         int rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
-       
-        //CR ja bym tu zrobil petle po wszystkich kolumnach po prostu
-        for (const std::pair<Edge, std::string> & e : m_edgeMap) {
-            lp.addConstraintCoef(rowIdx, lp.getColByName(e.second));
+        
+        for (int colIdx = 1; colIdx <= colCnt; ++colIdx) {
+            lp.addConstraintCoef(rowIdx, colIdx);
         }
     }
     
@@ -215,35 +214,6 @@ private:
     
     int getDegBoundIndex(const std::string & s) const {
         return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
-    }
-   
-    //CR tak jak pisalem wczesniej, ta funkcja chyba nie jest potrzebna
-    /**
-     * @brief counts edges incident with a given vertex with a non-zero value in the LP solution
-     * @param lp LP object
-     * @param v vertex
-     * @return number of non-zero edges incident with the given vertex
-     *
-     * @tparam LP
-     */
-    template <typename LP>
-    int nonZeroIncEdges(const LP & lp, const Vertex & v) {
-        int nonZeroIncCnt(0);
-        auto adjVertices = boost::adjacent_vertices(v, m_g);
-        
-        for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
-            bool b; Edge e;
-            std::tie(e, b) = boost::edge(v, u, m_g);
-
-            if (b) {
-                // column not rounded
-                if (0 != lp.getColByName(m_edgeMap[e])) {
-                    ++nonZeroIncCnt;
-                }
-            }
-        }
-        
-        return nonZeroIncCnt;
     }
     
     template <typename LP>
@@ -256,7 +226,7 @@ private:
         m_solutionGenerated = true;
     }
 
-private:
+
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;

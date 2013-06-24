@@ -73,12 +73,6 @@ public:
         glp_set_row_bnds(m_lp, m_rowNr, boundType2GLP(b), lb, ub);
         return m_rowNr++;
     }
-   
-
-    //CR ja bym to dal protected
-    void deleteRow() {
-        --m_rowNr;
-    }
 
     //add row with default for name
     int addRow(BoundType b = UP, double lb = 0, double ub = 0) {
@@ -193,6 +187,10 @@ protected:
                 assert(false);
                 return FR;
         }
+    }
+    
+    void deleteRow() {
+        --m_rowNr;
     }
     
     glp_prob * m_lp;
