@@ -12,19 +12,17 @@
 
 namespace paal {
 
-using namespace boost;
-
-typedef adjacency_list < vecS, vecS, undirectedS,
-                        property < vertex_degree_t, int,
-                            property < vertex_index_t, int >
+typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
+                        boost::property < boost::vertex_degree_t, int,
+                            boost::property < boost::vertex_index_t, int >
                                  >,
-                        property < edge_weight_t, double > > Graph;
-typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
-typedef graph_traits < Graph >::edge_descriptor Edge;
+                        boost::property < boost::edge_weight_t, double > > Graph;
+typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::undirectedS > Traits;
+typedef boost::graph_traits < Graph >::edge_descriptor Edge;
 
-typedef property_map < Graph, vertex_degree_t >::type Bound;
-typedef property_map < Graph, vertex_index_t >::type Index;
-typedef property_map < Graph, edge_weight_t >::type Cost;
+typedef boost::property_map < Graph, boost::vertex_degree_t >::type Bound;
+typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
+typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 
 template <typename Graph, typename Cost>
 Edge addEdge(Graph & g, Cost & cost, int u, int v, double c) {

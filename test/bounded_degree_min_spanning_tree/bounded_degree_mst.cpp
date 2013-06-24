@@ -16,7 +16,6 @@
 
 using namespace  paal;
 using namespace  paal::ir;
-using namespace  boost;
 
 struct LogVisitor : public TrivialVisitor {
 
@@ -31,13 +30,13 @@ struct LogVisitor : public TrivialVisitor {
     }
 };
 
-typedef adjacency_list < vecS, vecS, undirectedS,
-                            property < vertex_degree_t, int,
-                                property < vertex_index_t, int >
+typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
+                            boost::property < boost::vertex_degree_t, int,
+                                boost::property < boost::vertex_index_t, int >
                                      >,
-                            property < edge_weight_t, double > > Graph;
-typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
-typedef graph_traits < Graph >::edge_descriptor Edge;
+                            boost::property < boost::edge_weight_t, double > > Graph;
+typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::undirectedS > Traits;
+typedef boost::graph_traits < Graph >::edge_descriptor Edge;
 
 template <typename Graph, typename Cost>
 Edge addEdge(Graph & g, Cost & cost, int u, int v, double c) {
@@ -49,14 +48,14 @@ Edge addEdge(Graph & g, Cost & cost, int u, int v, double c) {
     return e;
 }
 
-typedef property_map < Graph, vertex_degree_t >::type Bound;
-typedef property_map < Graph, vertex_index_t >::type Index;
-typedef property_map < Graph, edge_weight_t >::type Cost;
+typedef boost::property_map < Graph, boost::vertex_degree_t >::type Bound;
+typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
+typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     //sample problem
     Graph g;
-    Cost costs = get(edge_weight, g);
+    Cost costs = boost::get(boost::edge_weight, g);
     
     std::map<Edge, bool> correctBdmst;
    
@@ -71,8 +70,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     correctBdmst[addEdge(g, costs, 5, 4, 243)] = false;
     correctBdmst[addEdge(g, costs, 4, 0, 259)] = false;
     
-    Bound degBounds = get(vertex_degree, g);
-    Index indices = get(vertex_index, g);
+    Bound degBounds = boost::get(boost::vertex_degree, g);
+    Index indices = boost::get(boost::vertex_index, g);
     
     degBounds[0] = 1;
     degBounds[1] = 3;

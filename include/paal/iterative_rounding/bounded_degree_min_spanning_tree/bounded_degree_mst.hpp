@@ -150,7 +150,7 @@ private:
     void addVariables(LP & lp) {
         auto edges = boost::edges(m_g);
         int eIdx(0);
-        m_edgeList.resize(num_edges(m_g));
+        m_edgeList.resize(boost::num_edges(m_g));
         
         for(Edge e : utils::make_range(edges.first, edges.second)) {
             std::string colName = getEdgeName(eIdx);
@@ -172,12 +172,11 @@ private:
     void addDegreeBoundConstraints(LP & lp) {
         int dbIdx(0);
         auto vertices = boost::vertices(m_g);
-        m_vertexList.resize(num_vertices(m_g));
+        m_vertexList.resize(boost::num_vertices(m_g));
         
         for(Vertex v : utils::make_range(vertices.first, vertices.second)) {
             int rowIdx = lp.addRow(UP, 0, m_degBoundMap[v], getDegBoundDesc(dbIdx));
-            //CR tu i w paru innych miejscach brakuje namespace'a, to dlatego, ze ze zrobiles using namespace boost w testach.
-            auto adjVertices = adjacent_vertices(v, m_g);
+            auto adjVertices = boost::adjacent_vertices(v, m_g);
             
             for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
                 bool b; Edge e;
@@ -230,7 +229,7 @@ private:
     template <typename LP>
     int nonZeroIncEdges(const LP & lp, const Vertex & v) {
         int nonZeroIncCnt(0);
-        auto adjVertices = adjacent_vertices(v, m_g);
+        auto adjVertices = boost::adjacent_vertices(v, m_g);
         
         for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
             bool b; Edge e;

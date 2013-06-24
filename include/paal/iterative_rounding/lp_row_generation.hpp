@@ -14,8 +14,7 @@ namespace ir {
 template <typename Oracle>
 class RowGenerationSolveLP {
 public:
-    //CR tu powinno byc nullptr 
-    RowGenerationSolveLP() : m_oracle(0) {}
+    RowGenerationSolveLP() : m_oracle(nullptr) {}
   
     template <typename LP>
     double operator()(LP & lp) {
