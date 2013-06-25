@@ -84,15 +84,61 @@ struct DefaultSolveLP {
     };
 };
 
+struct DeleteRow {
+    template <typename LP>
+    void operator()(LP & lp, int & row, int & rowCnt) {
+        lp.deleteRow(row);
+        --row;
+        --rowCnt;
+    };
+};
+
+struct DeleteCol {
+    template <typename LP>
+    void operator()(LP & lp, int & col, double value, int & colCnt) {
+        auto column = lp.getColumn(col);
+        int row;
+        double coef;
+        for(const boost::tuple<int, double> & c : utils::make_range(column)) {
+            boost::tie(row, coef) = c;
+            double currUb = lp.getRowUb(row);
+            double currLb = lp.getRowLb(row);
+            BoundType currType = lp.getRowBoundType(row);
+            double diff = coef * value;
+            lp.setRowBounds(row, currType, currLb - diff, currUb - diff);
+        }
+        lp.deleteCol(col);
+        --col;
+        --colCnt;
+    };
+};
+
+struct TrivializeRow {
+    template <typename LP>
+    void operator()(LP & lp, int & row, int & rowCnt) {
+        lp.setRowBounds(row, FR, 0, 0);
+    };
+};
+
+struct FixCol {
+    template <typename LP>
+    void operator()(LP & lp, int & col, double value, int & colCnt) {
+        lp.setColBounds(col, FX, value, value);
+    };
+};
+
 template <typename SolveLP = DefaultSolveLP, 
           typename RoundCondition = DefaultRoundCondition, 
           typename RelaxContition = utils::ReturnFalseFunctor, 
-          typename Init = utils::DoNothingFunctor> 
+          typename Init = utils::DoNothingFunctor,
+          typename DeleteRowStrategy = DeleteRow,
+          typename DeleteColStrategy = DeleteCol> 
 class IRComponents {
 public:
     IRComponents(SolveLP solve = SolveLP(), RoundCondition round = RoundCondition(),
-                 RelaxContition relax = RelaxContition(), Init i = Init()) 
-        : m_solveLP(solve), m_roundCondition(round), m_relaxCondition(relax), m_init(i) {}
+                 RelaxContition relax = RelaxContition(), Init i = Init(),
+                 DeleteRowStrategy deleteRow = DeleteRowStrategy(), DeleteColStrategy deleteCol = DeleteColStrategy()) 
+        : m_solveLP(solve), m_roundCondition(round), m_relaxCondition(relax), m_init(i), m_deleteRow(deleteRow), m_deleteCol(deleteCol) {}
 
     template <typename LP>
     double solveLP(LP & lp) {
@@ -110,8 +156,18 @@ public:
     };
     
     template <typename LP>
-    bool init(const LP & lp) {
+    bool init(LP & lp) {
         return m_init(lp); 
+    };
+    
+    template <typename LP>
+    void deleteRow(LP & lp, int & row, int & rowCnt) {
+        return m_deleteRow(lp, row, rowCnt);
+    };
+    
+    template <typename LP>
+    void deleteCol(LP & lp, int & col, double value, int & colCnt) {
+        return m_deleteCol(lp, col, value, colCnt);
     };
 
 protected:
@@ -120,6 +176,8 @@ private:
     RoundCondition m_roundCondition;
     RelaxContition m_relaxCondition;
     Init m_init;
+    DeleteRowStrategy m_deleteRow;
+    DeleteColStrategy m_deleteCol;
 };
 
 } //paal

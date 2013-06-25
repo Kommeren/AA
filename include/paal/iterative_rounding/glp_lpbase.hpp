@@ -143,8 +143,11 @@ public:
     void setRowBounds(int row, BoundType b, double lb, double ub) {
         glp_set_row_bnds(m_lp, row, boundType2GLP(b), lb, ub);
     }
-
-
+    
+    void setColBounds(int col, BoundType b, double lb, double ub) {
+        glp_set_col_bnds(m_lp, col, boundType2GLP(b), lb, ub);
+    }
+    
 protected:
     typedef std::vector<int> Ids;
     typedef std::vector<double> Vals;
@@ -351,6 +354,10 @@ public:
     
     BoundType getRowBoundType(int row) const {
         return glp2BoundType(glp_get_row_type(m_lp, row));
+    }
+    
+    BoundType getColBoundType(int col) const {
+        return glp2BoundType(glp_get_col_type(m_lp, col));
     }
     
     std::pair<ColumnIterator, ColumnIterator>

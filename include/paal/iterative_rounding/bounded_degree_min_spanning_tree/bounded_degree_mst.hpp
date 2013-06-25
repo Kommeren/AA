@@ -66,8 +66,6 @@ public:
         if (isDegBoundName(lp.getRowName(row))) {
             int vIdx = getDegBoundIndex(lp.getRowName(row));
             Vertex v = m_vertexList[vIdx];
-            //CR Sa juz zaimplementowane funkcje getRowDegree / getColDegree
-            //Trzeba uwazac na te funckje przy zmianie semantyki usuwania kolumn/ wierszy bo one moga sie zepsuc...
             return (lp.getRowDegree(row) <= boost::get(m_degBoundMap, v) + 1);
         }
         else {

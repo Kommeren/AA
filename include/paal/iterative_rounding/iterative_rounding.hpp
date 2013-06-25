@@ -20,6 +20,7 @@
 #include "paal/utils/double_rounding.hpp"
 #include "paal/iterative_rounding/glp_lpbase.hpp"
 
+
 namespace paal {
 namespace ir {
 
@@ -58,13 +59,13 @@ public:
         int deleted(0);
         int size = m_lpBase.colSize();
         for(int i = 1; i <= size; ++i) {
-            auto doRound = m_engine.roundCondition(m_lpBase, i);
-            if(doRound.first) {
-                ++deleted;
-                m_visitor.roundCol(m_lpBase, i, doRound.second);
-                roundColToValue(i, doRound.second);
-                --size;
-                --i;
+            if (m_lpBase.getColBoundType(i) != FX) {
+                auto doRound = m_engine.roundCondition(m_lpBase, i);
+                if(doRound.first) {
+                    ++deleted;
+                    m_visitor.roundCol(m_lpBase, i, doRound.second);
+                    m_engine.deleteCol(m_lpBase, i, doRound.second, size);
+                }
             }
         }
         
@@ -75,12 +76,12 @@ public:
         int deleted(0);
         int size = m_lpBase.rowSize();
         for(int i = 1; i <= size; ++i) {
-            if(m_engine.relaxCondition(m_lpBase, i)) {
-                ++deleted;
-                m_visitor.relaxRow(m_lpBase, i);
-                m_lpBase.deleteRow(i);
-                --size;
-                --i;
+            if (m_lpBase.getRowBoundType(i) != FR) {
+                if(m_engine.relaxCondition(m_lpBase, i)) {
+                    ++deleted;
+                    m_visitor.relaxRow(m_lpBase, i);
+                    m_engine.deleteRow(m_lpBase, i, size);
+                }
             }
         }
         
@@ -101,21 +102,6 @@ public:
 
 
 private:    
-   
-    void roundColToValue(int col, double value) {
-        auto column = m_lpBase.getColumn(col);
-        int row;
-        double coef;
-        for(const boost::tuple<int, double> & c : utils::make_range(column)) {
-            boost::tie(row, coef) = c;
-            double currUb = m_lpBase.getRowUb(row);
-            double currLb = m_lpBase.getRowLb(row);
-            BoundType currType = m_lpBase.getRowBoundType(row);
-            double diff = coef * value;
-            m_lpBase.setRowBounds(row, currType, currLb - diff, currUb - diff);
-        }
-        m_lpBase.deleteCol(col);
-    }
     
     LPBase m_lpBase;
     Engine m_engine;
