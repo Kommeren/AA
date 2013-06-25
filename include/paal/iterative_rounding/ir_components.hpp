@@ -170,9 +170,8 @@ public:
         return m_deleteCol(lp, col, value, colCnt);
     };
 
-protected:
-    SolveLP m_solveLP;
 private:
+    SolveLP m_solveLP;
     RoundCondition m_roundCondition;
     RelaxContition m_relaxCondition;
     Init m_init;

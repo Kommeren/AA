@@ -39,10 +39,21 @@ public:
     typedef IRComponents < SolveLP, RoundCondition > BoundedDegreeMSTBase;
   
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
-              BoundedDegreeMSTBase(SolveLP(), RoundCondition(BoundedDegreeMST::EPSILON)),
+              BoundedDegreeMSTBase(SolveLP(m_separationOracle), RoundCondition(BoundedDegreeMST::EPSILON)),
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
-              m_solutionGenerated(false),
-              m_compare(BoundedDegreeMST::EPSILON) { }
+              m_edgeMap(), m_vertexList(), m_solutionGenerated(false),
+              m_compare(BoundedDegreeMST::EPSILON),
+              m_separationOracle(g, m_edgeMap, m_vertexList, m_compare)
+    {}
+              
+    BoundedDegreeMST(BoundedDegreeMST && o) :
+              BoundedDegreeMSTBase(SolveLP(m_separationOracle), RoundCondition(BoundedDegreeMST::EPSILON)),
+              m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
+              m_edgeMap(std::move(o.m_edgeMap)), m_edgeList(std::move(o.m_edgeList)), m_vertexList(std::move(o.m_vertexList)),
+              m_solutionGenerated(o.m_solutionGenerated), m_spanningTree(std::move(o.m_spanningTree)),
+              m_compare(std::move(o.m_compare)),
+              m_separationOracle(m_g, m_edgeMap, m_vertexList, m_compare)
+    {}
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -89,9 +100,6 @@ public:
         addAllSetEquality(lp);
         
         lp.loadMatrix();
-        
-        BoundedDegreeMSTBase::m_solveLP.setOracle(&m_separationOracle);
-        m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap, &m_compare);
     }
     
     /**
@@ -221,10 +229,10 @@ private:
     bool            m_solutionGenerated;
     SpanningTree    m_spanningTree;
     
-    BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
-    
     const utils::Compare<double>   m_compare;
     static const double EPSILON;
+    
+    BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
 };
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap, typename OracleComponents>

@@ -14,25 +14,21 @@ namespace ir {
 template <typename Oracle>
 class RowGenerationSolveLP {
 public:
-    RowGenerationSolveLP() : m_oracle(nullptr) {}
+    RowGenerationSolveLP(Oracle & oracle) : m_oracle(oracle) {}
   
     template <typename LP>
     double operator()(LP & lp) {
         double res;
         res = lp.solve();
-        while (!m_oracle->feasibleSolution(lp)) {
-            m_oracle->addViolatedConstraint(lp);
+        while (!m_oracle.feasibleSolution(lp)) {
+            m_oracle.addViolatedConstraint(lp);
             res = lp.solve();
         }
         return res;
     }
     
-    void setOracle(Oracle * oracle) {
-        m_oracle = oracle;
-    }
-    
 private:
-    Oracle * m_oracle;
+    Oracle & m_oracle;
 };
 
 } //paal

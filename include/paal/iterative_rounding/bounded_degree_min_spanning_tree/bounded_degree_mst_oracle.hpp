@@ -32,23 +32,10 @@ public:
     typedef std::map<Edge, std::string> EdgeNameMap;
     typedef std::vector<Vertex> VertexList;
     
-    BoundedDegreeMSTOracle() : m_g(nullptr), m_edgeNameMap(nullptr), m_vertexList(nullptr), m_compare(nullptr)
+    BoundedDegreeMSTOracle(const Graph & g, const EdgeNameMap & edgeMap,
+                           const VertexList & vertexList, const utils::Compare<double> & compare)
+                           : m_g(g), m_edgeNameMap(edgeMap), m_vertexList(vertexList), m_compare(compare)
     { }
-    
-    /**
-     * @brief initializes the pointers to problem instance data structures
-     * @param g pointer to the input graph
-     * @param vertexList pointer to the input graph vertices list
-     * @param edgeMap pointer to the input graph edge names map
-     * @param epsilon tolerance for double comparison
-     */
-    void init(const Graph * g, const VertexList * vertexList, const EdgeNameMap * edgeMap,
-              const utils::Compare<double> * compare) {
-        m_g = g;
-        m_vertexList = vertexList;
-        m_edgeNameMap = edgeMap;
-        m_compare = compare;
-    }
 
     /**
      * @brief checks if the current LP solution is feasible
@@ -65,7 +52,7 @@ public:
             return true;
         }
         else {
-            return !m_oracleComponents.findViolated(*this, boost::num_vertices(*m_g));
+            return !m_oracleComponents.findViolated(*this, boost::num_vertices(m_g));
         }
     }
     
@@ -79,9 +66,9 @@ public:
     void addViolatedConstraint(LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
-        for (const std::pair<Edge, std::string> & e : *m_edgeNameMap) {
-            const Vertex & u = boost::source(e.first, *m_g);
-            const Vertex & v = boost::target(e.first, *m_g);
+        for (const std::pair<Edge, std::string> & e : m_edgeNameMap) {
+            const Vertex & u = boost::source(e.first, m_g);
+            const Vertex & v = boost::target(e.first, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
                 int colIdx = lp.getColByName(e.second);
@@ -184,7 +171,7 @@ private:
      */
     template <typename LP>
     void fillAuxiliaryDigraph(const LP & lp) {
-        int numVertices(boost::num_vertices(*m_g));
+        int numVertices(boost::num_vertices(m_g));
         
         m_auxGraph.clear();
         m_srcToV.resize(numVertices);
@@ -196,14 +183,14 @@ private:
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (const std::pair<Edge, std::string> & e : (*m_edgeNameMap)) {
+        for (const std::pair<Edge, std::string> & e : m_edgeNameMap) {
             int colIdx = lp.getColByName(e.second);
             if (0 != colIdx) {
                 double colVal = lp.getColPrim(colIdx) / 2;
                 
-                if (!m_compare->e(colVal, 0)) {
-                    Vertex u = source(e.first, *m_g);
-                    Vertex v = target(e.first, *m_g);
+                if (!m_compare.e(colVal, 0)) {
+                    Vertex u = source(e.first, m_g);
+                    Vertex v = target(e.first, m_g);
                     addEdge(u, v, colVal);
                     //addEdge(v, u, colVal);
                 }
@@ -213,7 +200,7 @@ private:
         m_src = boost::add_vertex(m_auxGraph);
         m_trg = boost::add_vertex(m_auxGraph);
         
-        for (const Vertex & v : (*m_vertexList)) {
+        for (const Vertex & v : m_vertexList) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
@@ -270,14 +257,14 @@ private:
     template <typename LP>
     double degreeOf(const Vertex & v, const LP & lp) {
         double res = 0;
-        auto adjVertices = boost::adjacent_vertices(v, *m_g);
+        auto adjVertices = boost::adjacent_vertices(v, m_g);
             
         for (const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
             bool b; Edge e;
-            std::tie(e, b) = boost::edge(v, u, *m_g);
+            std::tie(e, b) = boost::edge(v, u, m_g);
             
             if (b) {
-                int colIdx = lp.getColByName(m_edgeNameMap->find(e)->second);
+                int colIdx = lp.getColByName(m_edgeNameMap.find(e)->second);
                 if (0 != colIdx) {
                     res += lp.getColPrim(colIdx);
                 }
@@ -294,7 +281,7 @@ private:
      * @return a pair of bool (if a violated set was found) and the violation of the found set
      */
     std::pair<bool, double> checkViolationGreaterThan(const Vertex & src, const Vertex & trg, double minViolation = 0) {
-        int numVertices(boost::num_vertices(*m_g));
+        int numVertices(boost::num_vertices(m_g));
         double origVal = boost::get(m_cap, m_srcToV[src]);
         bool violated = false;
 
@@ -307,7 +294,7 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > minViolation && !m_compare->e(violation, 0)) {
+        if (violation > minViolation && !m_compare.e(violation, 0)) {
             violated = true;
             m_violatingSetSize = 0;
             
@@ -337,10 +324,10 @@ private:
     
     OracleComponents    m_oracleComponents;
     
-    const Graph *               m_g;
-    const EdgeNameMap *         m_edgeNameMap;
-    const VertexList *          m_vertexList;
-    const utils::Compare<double> * m_compare;
+    const Graph &               m_g;
+    const EdgeNameMap &         m_edgeNameMap;
+    const VertexList &          m_vertexList;
+    const utils::Compare<double> & m_compare;
     
     AuxGraph    m_auxGraph;
     Vertex      m_src;
