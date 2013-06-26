@@ -127,8 +127,9 @@ template <typename IR>
 void solve(IR &ir) {
     do {
         ir.solve();
-        ir.round();
-        ir.relax();
+        bool rounded = ir.round();
+        bool relaxed = ir.relax();
+        assert(rounded || relaxed);
     } while (!ir.integerSolution());
 }
 

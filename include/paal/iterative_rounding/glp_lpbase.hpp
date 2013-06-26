@@ -143,6 +143,8 @@ public:
     void setRowBounds(int row, BoundType b, double lb, double ub) {
         glp_set_row_bnds(m_lp, row, boundType2GLP(b), lb, ub);
     }
+
+
 protected:
     typedef std::vector<int> Ids;
     typedef std::vector<double> Vals;
@@ -224,6 +226,34 @@ public:
     GLP(int numberOfRows = 0, int numberOfColumns = 0) : 
         GLP(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
     
+    template <typename ostream>
+    friend ostream & operator<<(ostream & o, GLP & glp) {
+        int rows = glp_get_num_rows(glp.m_lp);
+        o << "Solution " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
+
+        int cols = glp_get_num_cols(glp.m_lp);
+        for(int i : boost::irange(1, cols + 1)) {
+            o << glp_get_obj_coef(glp.m_lp, i) << ", ";
+        }
+        o << std::endl << "Rows" << std::endl;
+
+        for(int row : boost::irange(1, rows + 1)) {
+            cols = glp_get_mat_row(glp.m_lp, row, &glp.m_idxTmp[0], &glp.m_valTmp[0]);
+            if(cols == 0) {
+                continue;
+            }
+            o << "Row " << glp_get_row_name(glp.m_lp, row) << std::endl;
+            o << "Bounds " << "type =  " << GLPBase::glp2BoundType(glp_get_row_type(glp.m_lp, row)) << " lb = " << glp_get_row_lb(glp.m_lp, row) << " ub = " << glp_get_row_ub(glp.m_lp, row) << std::endl;
+            for(int i : boost::irange(1, cols + 1)) {
+                o << "(col = " << glp.m_idxTmp[i] << " name = " << glp_get_col_name(glp.m_lp, glp.m_idxTmp[i]) << ", coef = " << glp.m_valTmp[i] 
+                  << ", sol = " << glp_get_col_prim(glp.m_lp, glp.m_idxTmp[i]) << ") - "; 
+            }
+            o << std::endl;
+        }
+        o << std::endl;
+        return o;
+    }
+    
     int addColumn(double costCoef, BoundType b, double lb, double ub, const std::string & name) {
         resizeTmp();
         return GLPBase::addColumn(costCoef, b, lb, ub, name);
@@ -277,14 +307,14 @@ public:
         return glp_get_mat_row(m_lp, row, &m_idxTmp[0], &m_valTmp[0]); 
     }
     
-    int getColSum(int col) const {
-        int size =  glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]); 
-        return std::accumulate(m_valTmp.begin(), m_valTmp.begin() + size + 1, 0.);
+    double getColSum(int col) const {
+        int size =  glp_get_mat_col(m_lp, col, &m_idxTmp[0], NULL); 
+        return getSolSumForIds(m_idxTmp.begin() + 1, m_idxTmp.begin() + size + 1);
     }
     
-    int getRowSum(int col) const {
-        int size =  glp_get_mat_row(m_lp, col, &m_idxTmp[0], &m_valTmp[0]); 
-        return std::accumulate(m_valTmp.begin(), m_valTmp.begin() + size + 1, 0.);
+    double getRowSum(int col) const {
+        int size =  glp_get_mat_row(m_lp, col, &m_idxTmp[0], NULL); 
+        return getSolSumForIds(m_idxTmp.begin() + 1, m_idxTmp.begin() + size + 1);
     }
 
     std::string getColName(int col) const {
@@ -332,6 +362,13 @@ public:
     }
 
 private:
+
+    template <typename Iter>
+    double getSolSumForIds(Iter begin, Iter end) const  {
+        return std::accumulate(begin, end, 0., [=](double sum, int u){
+            return sum + getColPrim(u);
+        });
+    }
     
     void resizeTmp() {
         m_idxTmp.push_back(0);

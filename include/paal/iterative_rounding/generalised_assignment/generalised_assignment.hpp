@@ -45,8 +45,13 @@ public:
     template <typename LP>
     bool relaxCondition(const LP & lp, int row) {
         return isMachineName(lp.getRowName(row)) && 
-               lp.getRowDegree(row) <= 2 && 
-               m_compare.ge(lp.getRowSum(row),1); 
+                        (
+                          lp.getRowDegree(row) <= 1 ||
+                                (
+                                  lp.getRowDegree(row) == 2 &&
+                                  m_compare.ge(lp.getRowSum(row),1)
+                                )
+                        );
     };
 
     template <typename LP>
@@ -117,6 +122,7 @@ private:
             int jIdx(1);
 
             for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
+                assert(m_t(j, m) <= m_T(m));
                 lp.addConstraintCoef(rowIdx, idx(jIdx, mIdx), m_t(j, m));
                 ++jIdx;
             }
