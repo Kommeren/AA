@@ -26,14 +26,22 @@ namespace ir {
 
 struct TrivialVisitor {
     template <typename LP>
-    void roundCol(LP &lp, int col, double val) {}
+    void roundCol(LP &lp, ColId col, double val) {}
     
     template <typename LP>
-    void relaxRow(LP &lp, int row) {}
+    void relaxRow(LP &lp, RowId row) {}
 };
 
 template <typename Engine, typename Visitor = TrivialVisitor, typename LPBase = GLP>
 class IterativeRounding  {
+    double getVal(ColId col) const {
+        auto i = m_rounded.find(col.get());
+        if(i == m_rounded.end()) {
+            return m_lpBase.getColPrim(col);
+        } else {
+            return i->second;
+        }
+    }
 public:
     IterativeRounding(Engine e) : m_engine(std::move(e)) {
         m_engine.init(m_lpBase);
@@ -44,8 +52,7 @@ public:
     }
 
     bool integerSolution() {
-        int size = m_lpBase.colSize();
-        for(int col = 1; col <= size; ++col) {
+        for(ColId col :utils::make_range(m_lpBase.getColumns())) {
             double colVal = m_lpBase.getColPrim(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;
@@ -57,14 +64,22 @@ public:
     
     bool round() {
         int deleted(0);
-        int size = m_lpBase.colSize();
-        for(int i = 1; i <= size; ++i) {
-            if (m_lpBase.getColBoundType(i) != FX) {
-                auto doRound = m_engine.roundCondition(m_lpBase, i);
-                if(doRound.first) {
-                    ++deleted;
-                    m_visitor.roundCol(m_lpBase, i, doRound.second);
-                    m_engine.deleteCol(m_lpBase, i, doRound.second, size);
+        bool repeat = true;
+        //TODO optimize
+        while(repeat) {
+            repeat = false;
+            for(auto cols = m_lpBase.getColumns(); cols.first != cols.second; ++cols.first) {
+                ColId col = *cols.first;
+                if (m_lpBase.getColBoundType(col) != FX) {
+                    auto doRound = m_engine.roundCondition(m_lpBase, col);
+                    if(doRound.first) {
+                        m_rounded.insert(std::make_pair(col.get(), doRound.second));
+                        ++deleted;
+                        m_visitor.roundCol(m_lpBase, col, doRound.second);
+                        m_engine.deleteCol(m_lpBase, col, doRound.second);
+                        repeat = true;
+                        break;
+                    }
                 }
             }
         }
@@ -74,13 +89,21 @@ public:
     
     bool relax() {
         int deleted(0);
-        int size = m_lpBase.rowSize();
-        for(int i = 1; i <= size; ++i) {
-            if (m_lpBase.getRowBoundType(i) != FR) {
-                if(m_engine.relaxCondition(m_lpBase, i)) {
-                    ++deleted;
-                    m_visitor.relaxRow(m_lpBase, i);
-                    m_engine.deleteRow(m_lpBase, i, size);
+        bool repeat = true;
+        //TODO optimize
+        while(repeat) {
+            repeat = false;
+
+            for(auto rows = m_lpBase.getRows(); rows.first != rows.second; ++rows.first) {
+                RowId row = *rows.first;
+                if (m_lpBase.getRowBoundType(row) != FR) {
+                    if(m_engine.relaxCondition(m_lpBase, row)) {
+                        ++deleted;
+                        m_visitor.relaxRow(m_lpBase, row);
+                        m_engine.deleteRow(m_lpBase, row);
+                        repeat = true;
+                        break;
+                    }
                 }
             }
         }
@@ -96,17 +119,20 @@ public:
         return m_engine;
     }
 
-    decltype(std::declval<Engine>().getSolution(std::declval<LPBase>())) getSolution() {
-        return m_engine.getSolution(m_lpBase);
+    typedef decltype(std::bind(&IterativeRounding::getVal, std::declval<const IterativeRounding *>(), std::placeholders::_1)) GiveSolution;
+
+    decltype(std::declval<Engine>().getSolution(std::declval<GiveSolution &>(), std::declval<LPBase &>())) getSolution() {
+        return m_engine.getSolution(std::bind(&IterativeRounding::getVal, this, std::placeholders::_1), m_lpBase);
     }
 
 
-private:    
+private:   
     
     LPBase m_lpBase;
     Engine m_engine;
     Visitor m_visitor;
     utils::Compare<double> m_compare;
+    std::unordered_map<int, double> m_rounded;
 };
 
 template <typename IR> 

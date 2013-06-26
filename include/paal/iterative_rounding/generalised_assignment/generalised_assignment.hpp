@@ -31,19 +31,9 @@ public:
     typedef typename std::iterator_traits<JobIter>::reference JobRef;
     typedef typename std::iterator_traits<MachineIter>::reference MachineRef;
     typedef utils::Compare<double> Compare;
-
-    template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, int col) {
-        auto ret = IRComponents<>::roundCondition(lp, col);
-        if(ret.first && ret.second == 1) {
-             int idx = std::stoi(lp.getColName(col));
-              m_jobToMachine.insert(std::make_pair(*(m_jbegin +  (getJIdx(idx) - 1)), *(m_mbegin +  (getMIdx(idx) - 1))));
-        }
-        return ret;
-    };
     
     template <typename LP>
-    bool relaxCondition(const LP & lp, int row) {
+    bool relaxCondition(const LP & lp, RowId row) {
         return isMachineName(lp.getRowName(row)) && 
                         (
                           lp.getRowDegree(row) <= 1 ||
@@ -65,8 +55,16 @@ public:
         lp.loadMatrix();
     }
 
-    template <typename LP>
-    JobsToMachines & getSolution(const LP & lp) {
+    template <typename GiveSolution, typename LP>
+    JobsToMachines & getSolution(const GiveSolution & sol, const LP &) {
+        if(!m_solutionGenerated) {
+            m_solutionGenerated = true;
+            for(int idx : boost::irange(0, int(m_colIdx.size()))) { 
+                if(m_compare.e(sol(m_colIdx[idx]), 1)) {
+                    m_jobToMachine.insert(std::make_pair(*(m_jbegin + getJIdx(idx)), *(m_mbegin + getMIdx(idx))));
+                }
+            }
+        }
         return m_jobToMachine;
     }
 private:
@@ -90,24 +88,21 @@ private:
     //adding varables
     template <typename LP>
     void addVariables(LP &lp) {
-        int jIdx(1);
+        m_colIdx.reserve(m_mCnt * m_jCnt);
         for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
-            int mIdx(1);
             for(MachineRef m : utils::make_range(m_mbegin, m_mend)) {
-                lp.addColumn(m_c(j,m));
-                ++mIdx;
+                m_colIdx.push_back(lp.addColumn(m_c(j,m)));
             }
-            ++jIdx;
         }
     }
         
     //constraints for job
     template <typename LP>
     void addConstraintsForJobs(LP & lp) {
-        for(int jIdx : boost::irange(1, m_jCnt + 1)) {
-            int rowIdx = lp.addRow(FX, 1.0, 1.0, getJobDesc(jIdx));
-            for(int mIdx : boost::irange(1, m_mCnt + 1)) {
-                lp.addConstraintCoef(rowIdx, idx(jIdx,mIdx));
+        for(int jIdx : boost::irange(0, m_jCnt)) {
+            RowId rowIdx = lp.addRow(FX, 1.0, 1.0, getJobDesc(jIdx));
+            for(int mIdx : boost::irange(0, m_mCnt)) {
+                lp.addConstraintCoef(rowIdx, m_colIdx[idx(jIdx,mIdx)]);
                 ++mIdx;
             }
         }
@@ -116,14 +111,14 @@ private:
     //constraints for machines
     template <typename LP>
     void addConstraintsForMachines(LP & lp)  {
-        int mIdx(1);
+        int mIdx(0);
         for(MachineRef m : utils::make_range(m_mbegin, m_mend)) {
-            int rowIdx = lp.addRow(UP, 0.0, m_T(m), getMachineDesc(mIdx));
-            int jIdx(1);
+            RowId rowIdx = lp.addRow(UP, 0.0, m_T(m), getMachineDesc(mIdx));
+            int jIdx(0);
 
             for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
                 assert(m_t(j, m) <= m_T(m));
-                lp.addConstraintCoef(rowIdx, idx(jIdx, mIdx), m_t(j, m));
+                lp.addConstraintCoef(rowIdx, m_colIdx[idx(jIdx, mIdx)], m_t(j, m));
                 ++jIdx;
             }
             ++mIdx;
@@ -131,15 +126,15 @@ private:
     }
 
     int idx(int jIdx, int mIdx) {
-        return (jIdx - 1) * m_mCnt + mIdx;
+        return jIdx * m_mCnt + mIdx;
     }
     
     int getJIdx(int idx) {
-        return (idx - 1) / m_mCnt + 1;
+        return idx / m_mCnt;
     }
     
     int getMIdx(int idx) {
-        return (idx - 1) % m_mCnt + 1;
+        return idx % m_mCnt;
     }
 
     const int m_mCnt;
@@ -153,6 +148,8 @@ private:
     const MachineAvailableTime & m_T; 
     JobsToMachines m_jobToMachine;
     const Compare m_compare;
+    std::vector<ColId> m_colIdx;
+    bool m_solutionGenerated = false;
 };
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime>

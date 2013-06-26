@@ -11,6 +11,11 @@
 #include <glpk.h>
 
 #include <boost/iterator/zip_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
+#include "paal/data_structures/bimap.hpp"
+#include "paal/iterative_rounding/ids.hpp"
+
 #include "bound_type.hpp"
 
 namespace paal {
@@ -23,16 +28,7 @@ namespace ir {
  */
 
 class GLPBase {
-    class Id {
-        friend class GLPBase;
-        int m_col;
-    };
 public:
-    class ColId : Id {};
-    class RowId : Id {};
-
-
-
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
         m_lp(glp_create_prob()) {
         glp_create_index(m_lp);
@@ -41,6 +37,8 @@ public:
         initVec(m_val, numberOfNonZerosInMatrix);
         initVec(m_newRowCol);
         initVec(m_newRowVal);
+        glp_init_smcp(&m_glpkControl);
+        m_glpkControl.msg_lev = GLP_MSG_OFF;
     }
     
     GLPBase(int numberOfRows = 0, int numberOfColumns = 0) : GLPBase(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
@@ -59,62 +57,62 @@ public:
     
     double solve() {
         glp_adv_basis(m_lp, 0);
-        glp_simplex(m_lp, NULL);
+        glp_simplex(m_lp, &m_glpkControl);
         return glp_get_obj_val(m_lp);
     }
     
 
-    int addColumn(double costCoef, BoundType b, double lb, double ub, const std::string & name) {
-        glp_add_cols(m_lp, 1);
-        glp_set_col_name(m_lp, m_colNr, name.c_str());
-        glp_set_col_bnds(m_lp, m_colNr, boundType2GLP(b), lb, ub);
-        glp_set_obj_coef(m_lp, m_colNr, costCoef);
-        return m_colNr++;
-    }
-    
-    //add column with default for name
-    int addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0) {
-        return addColumn(costCoef, b, lb, ub, std::to_string(m_colNr).c_str());
+    ColId addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
+        int colNr = glp_add_cols(m_lp, 1);
+        if(name != "") {
+            glp_set_col_name(m_lp, colNr, name.c_str());
+        }
+        glp_set_col_bnds(m_lp, colNr, boundType2GLP(b), lb, ub);
+        glp_set_obj_coef(m_lp, colNr, costCoef);
+        m_colIdx.add(colNr - 1);
+        return ColId(colNr - 1);
     }
    
-    int addRow(BoundType b, double lb, double ub, const std::string & name) {
-        glp_add_rows(m_lp, 1);
-        glp_set_row_name(m_lp, m_rowNr, name.c_str());
-        glp_set_row_bnds(m_lp, m_rowNr, boundType2GLP(b), lb, ub);
-        return m_rowNr++;
-    }
-
-    //add row with default for name
-    int addRow(BoundType b = UP, double lb = 0, double ub = 0) {
-        return addRow(b, lb, ub, std::to_string(m_rowNr).c_str());
+    RowId addRow(BoundType b=UP, double lb=0, double ub=0, const std::string & name = "") {
+        int rowNr = glp_add_rows(m_lp, 1);
+        if(name != "") {
+            glp_set_row_name(m_lp, rowNr, name.c_str());
+        }
+        glp_set_row_bnds(m_lp, rowNr, boundType2GLP(b), lb, ub);
+        m_rowIdx.add(rowNr - 1);
+        return RowId(rowNr - 1);
     }
     
-    void addConstraintCoef(int row, int col, double coef = 1) {
-        m_row.push_back(row);
-        m_col.push_back(col);
+    void addConstraintCoef(RowId row, ColId col, double coef = 1) {
+        m_row.push_back(getRow(row));
+        m_col.push_back(getCol(col));
         m_val.push_back(coef);
     }
     
     void loadMatrix() {
         glp_load_matrix(m_lp, m_row.size() - 1, &m_row[0], &m_col[0], &m_val[0]);
+        m_originalColSize = glp_get_num_cols(m_lp);
+        m_originalRowSize = glp_get_num_rows(m_lp);
     }
    
 
     //CR dopisałem, opis klasy, te metode bym przeniosl do nowej klasy pomiedzy GLPBase GLP, 
     //Jak to zrobimy w ten sposob i opiszemy to jest mniejsz szansa, ze ktos bedzie wolal te metody, w inicie
-    void addNewRowCoef(int col, double coef = 1) {
-        m_newRowCol.push_back(col);
+    void addNewRowCoef(ColId col, double coef = 1) {
+        m_newRowCol.push_back(getCol(col));
         m_newRowVal.push_back(coef);
     }
     
     //CR jak wyzej
     void loadNewRow() {
-        glp_set_mat_row(m_lp, m_rowNr - 1, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
+        int rowNr = glp_get_num_rows(m_lp);
+        glp_set_mat_row(m_lp, rowNr, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
         m_newRowCol.clear();
         m_newRowVal.clear();
         initVec(m_newRowCol);
         initVec(m_newRowVal);
     }
+
 
 /*    template <typename RoundCondition>
     bool roundGen(RoundCondition  rc) {
@@ -150,15 +148,32 @@ public:
         return delelted > 0;
     }*/
 
-    void setRowBounds(int row, BoundType b, double lb, double ub) {
-        glp_set_row_bnds(m_lp, row, boundType2GLP(b), lb, ub);
+    void setRowBounds(RowId row, BoundType b, double lb, double ub) {
+        glp_set_row_bnds(m_lp, getRow(row), boundType2GLP(b), lb, ub);
     }
     
-    void setColBounds(int col, BoundType b, double lb, double ub) {
-        glp_set_col_bnds(m_lp, col, boundType2GLP(b), lb, ub);
+    void setColBounds(ColId col, BoundType b, double lb, double ub) {
+        glp_set_col_bnds(m_lp, getCol(col), boundType2GLP(b), lb, ub);
     }
     
 protected:
+
+    int getCol(ColId col) const {
+        return m_colIdx.getIdx(col.get()) + 1;
+    }
+    
+    int getRow(RowId row) const {
+        return m_rowIdx.getIdx(row.get()) + 1;
+    }
+    
+    ColId getColIdx(int col) const {
+        return ColId(m_colIdx.getVal(col - 1));
+    }
+
+    RowId getRowIdx(int row) const {
+        return RowId(m_rowIdx.getVal(row - 1));
+    }
+
     typedef std::vector<int> Ids;
     typedef std::vector<double> Vals;
 
@@ -203,15 +218,15 @@ protected:
                 return FR;
         }
     }
-    
-    void deleteRow() {
-        --m_rowNr;
-    }
-    
+   
+    int m_originalColSize;
+    int m_originalRowSize;
     glp_prob * m_lp;
-    int m_rowNr = 1;
-    int m_colNr = 1;
+    data_structures::EraseableBiMap<int> m_colIdx;
+    data_structures::EraseableBiMap<int> m_rowIdx;
+
 private:
+
     GLPBase(GLPBase &&) {} 
     GLPBase(const GLPBase &) {}
 
@@ -221,13 +236,20 @@ private:
     //CR jak wyzej
     Ids m_newRowCol;
     Vals m_newRowVal;
+    glp_smcp m_glpkControl;
 };
 
 
 
 class GLP : public GLPBase {
-    typedef boost::zip_iterator<boost::tuple<typename Ids::iterator, 
-                                             typename Vals::iterator>> ColumnIterator;
+    typedef decltype(std::bind(&GLP::getRowIdx, std::declval<const GLP *>(), std::placeholders::_1)) RowTrans;
+    typedef decltype(std::bind(&GLP::getColIdx, std::declval<const GLP *>(), std::placeholders::_1)) ColTrans;
+    typedef typename boost::transform_iterator<RowTrans, typename Ids::iterator, RowId> TransformRow;
+    typedef typename boost::transform_iterator<ColTrans, typename Ids::iterator, ColId> TransformCol;
+    typedef boost::zip_iterator<boost::tuple<TransformRow, 
+                                             typename Vals::iterator>> RowsInColumnIterator;
+    typedef boost::zip_iterator<boost::tuple<TransformCol, 
+                                             typename Vals::iterator>> ColsInRowIterator;
 public:
     GLP(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) : 
             GLPBase(numberOfRows, numberOfColumns, numberOfNonZerosInMatrix) {
@@ -241,25 +263,25 @@ public:
     
     template <typename ostream>
     friend ostream & operator<<(ostream & o, GLP & glp) {
-        int rows = glp_get_num_rows(glp.m_lp);
         o << "Solution " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
 
-        int cols = glp_get_num_cols(glp.m_lp);
-        for(int i : boost::irange(1, cols + 1)) {
-            o << glp_get_obj_coef(glp.m_lp, i) << ", ";
+        for(ColId col : utils::make_range(glp.getColumns())) {
+            o << glp_get_obj_coef(glp.m_lp, glp.getCol(col)) << ", ";
         }
         o << std::endl << "Rows" << std::endl;
 
-        for(int row : boost::irange(1, rows + 1)) {
-            cols = glp_get_mat_row(glp.m_lp, row, &glp.m_idxTmp[0], &glp.m_valTmp[0]);
-            if(cols == 0) {
+        for(RowId row : utils::make_range(glp.getRows())) {
+            auto cols = glp.getColumnsInRow(row);
+            if(cols.first == cols.second) {
                 continue;
             }
-            o << "Row " << glp_get_row_name(glp.m_lp, row) << std::endl;
-            o << "Bounds " << "type =  " << GLPBase::glp2BoundType(glp_get_row_type(glp.m_lp, row)) << " lb = " << glp_get_row_lb(glp.m_lp, row) << " ub = " << glp_get_row_ub(glp.m_lp, row) << std::endl;
-            for(int i : boost::irange(1, cols + 1)) {
-                o << "(col = " << glp.m_idxTmp[i] << " name = " << glp_get_col_name(glp.m_lp, glp.m_idxTmp[i]) << ", coef = " << glp.m_valTmp[i] 
-                  << ", sol = " << glp_get_col_prim(glp.m_lp, glp.m_idxTmp[i]) << ") - "; 
+            o << "Row " << glp.getRowName(row) << std::endl;
+            o << "Bounds " << "type =  " << glp.getRowBoundType(row) << " lb = " << glp.getRowLb(row) << " ub = " << glp.getRowUb(row) << std::endl;
+            for(auto colAndVal : utils::make_range(cols)) {
+                ColId  col = boost::get<0>(colAndVal);
+                double val = boost::get<1>(colAndVal);
+                o << "(col = " << col.get() << " name = " << glp.getColName(col) << ", coef = " << val 
+                  << ", sol = " << glp.getColPrim(col) << ") - "; 
             }
             o << std::endl;
         }
@@ -267,28 +289,18 @@ public:
         return o;
     }
     
-    int addColumn(double costCoef, BoundType b, double lb, double ub, const std::string & name) {
+    ColId addColumn(double costCoef = 0, BoundType b= LO, double lb = 0, double ub = 0, const std::string & name = "") {
         resizeTmp();
         return GLPBase::addColumn(costCoef, b, lb, ub, name);
     }
-    
-    //add column with default for name
-    int addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0) {
-        return addColumn(costCoef, b, lb, ub, std::to_string(m_colNr).c_str());
-    }
    
-    int addRow(BoundType b, double lb, double ub, const std::string & name) {
+    RowId addRow(BoundType b = UP, double lb = 0, double ub = 0, const std::string & name = "") {
         resizeTmp();
         return GLPBase::addRow(b, lb, ub, name);
     }
 
-    //add row with default for name
-    int addRow(BoundType b = UP, double lb = 0, double ub = 0) {
-        return addRow(b, lb, ub, std::to_string(m_rowNr).c_str());
-    }
-
-    double getColPrim(int col) const {
-        return glp_get_col_prim(m_lp, col);
+    double getColPrim(ColId col) const {
+        return glp_get_col_prim(m_lp, getCol(col));
     }
 
     int colSize() const {
@@ -299,91 +311,137 @@ public:
         return glp_get_num_rows(m_lp); 
     }
 
-    void deleteRow(int row) {
+    void deleteRow(RowId row) {
         int arr[2];
-        arr[1] = row;
-        GLPBase::deleteRow();
+        arr[1] = getRow(row);
+        m_rowIdx.erase(row.get());
         glp_del_rows(m_lp, 1, arr);
     }
     
-    void deleteCol(int col) {
+    void deleteCol(ColId col) {
         int arr[2];
-        arr[1] = col;
+        arr[1] = getCol(col);
+        m_colIdx.erase(col.get());
         glp_del_cols(m_lp, 1, arr);
     }
     
-    int getColDegree(int col) const {
-        return glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]); 
+    int getColDegree(ColId col) const {
+        return glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], &m_valTmp[0]); 
     }
     
-    int getRowDegree(int row) const {
-        return glp_get_mat_row(m_lp, row, &m_idxTmp[0], &m_valTmp[0]); 
+    int getRowDegree(RowId row) const {
+        return glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], &m_valTmp[0]); 
     }
     
-    double getColSum(int col) const {
-        int size =  glp_get_mat_col(m_lp, col, &m_idxTmp[0], NULL); 
+    double getColSum(ColId col) const {
+        int size =  glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], NULL); 
         return getSolSumForIds(m_idxTmp.begin() + 1, m_idxTmp.begin() + size + 1);
     }
     
-    double getRowSum(int col) const {
-        int size =  glp_get_mat_row(m_lp, col, &m_idxTmp[0], NULL); 
+    double getRowSum(RowId row) const {
+        int size =  glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], NULL); 
         return getSolSumForIds(m_idxTmp.begin() + 1, m_idxTmp.begin() + size + 1);
     }
 
-    std::string getColName(int col) const {
-        return glp_get_col_name(m_lp, col);
+    std::string getColName(ColId col) const {
+        const char * name = glp_get_col_name(m_lp, getCol(col));
+        if(name == NULL) {
+            return "";
+        }
+        return name;
     }
     
-    int getColByName(const std::string & colName) const {
-        return glp_find_col(m_lp, colName.c_str());
+    ColId getColByName(const std::string & colName) const {
+        return getColIdx(glp_find_col(m_lp, colName.c_str()));
     }
     
-    double getColUb(int col) const {
-        return glp_get_col_ub(m_lp, col);
+    double getColUb(ColId col) const {
+        return glp_get_col_ub(m_lp, getCol(col));
     }
     
-    double getColLb(int col) const {
-        return glp_get_col_lb(m_lp, col);
+    double getColLb(ColId col) const {
+        return glp_get_col_lb(m_lp, getCol(col));
     }
     
-    std::string getRowName(int row) const {
-        return glp_get_row_name(m_lp, row);
+    std::string getRowName(RowId row) const {
+        const char * name = glp_get_row_name(m_lp, getRow(row));
+        if(name == NULL) {
+            return "";
+        }
+        return name;
     }
     
     int getRowByName(const std::string & rowName) const {
         return glp_find_row(m_lp, rowName.c_str());
     }
     
-    double getRowUb(int row) const {
-        return glp_get_row_ub(m_lp, row);
+    double getRowUb(RowId row) const {
+        return glp_get_row_ub(m_lp, getRow(row));
     }
     
-    double getRowLb(int row) const {
-        return glp_get_row_lb(m_lp, row);
+    double getRowLb(RowId row) const {
+        return glp_get_row_lb(m_lp, getRow(row));
     }
     
-    BoundType getRowBoundType(int row) const {
-        return glp2BoundType(glp_get_row_type(m_lp, row));
+    BoundType getRowBoundType(RowId row) const {
+        return glp2BoundType(glp_get_row_type(m_lp, getRow(row)));
     }
     
-    BoundType getColBoundType(int col) const {
-        return glp2BoundType(glp_get_col_type(m_lp, col));
+    BoundType getColBoundType(ColId col) const {
+        return glp2BoundType(glp_get_col_type(m_lp, getCol(col)));
     }
-    
-    std::pair<ColumnIterator, ColumnIterator>
-            getColumn(int col) {
-        int size = glp_get_mat_col(m_lp, col, &m_idxTmp[0], &m_valTmp[0]);
+   
+
+    std::pair<RowsInColumnIterator, RowsInColumnIterator>
+            getRowsInColumn(ColId col) const {
+        int size = glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], &m_valTmp[0]);
         return std::make_pair(
-                boost::make_zip_iterator(boost::make_tuple(m_idxTmp.begin() + 1, m_valTmp.begin() + 1)),
-                boost::make_zip_iterator(boost::make_tuple(m_idxTmp.begin() + size + 1, m_valTmp.begin() + 1 + size)));
+                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idxTmp.begin() + 1, std::bind(&GLP::getRowIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1)),
+                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idxTmp.begin() + size + 1, std::bind(&GLP::getRowIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1 + size)));
     }
+    
+    std::pair<ColsInRowIterator, ColsInRowIterator>
+            getColumnsInRow(RowId row) const {
+        int size = glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], &m_valTmp[0]);
+        return std::make_pair(
+                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idxTmp.begin() + 1, std::bind(&GLP::getColIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1)),
+                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idxTmp.begin() + size + 1, std::bind(&GLP::getColIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1 + size)));
+    }
+
+    typedef boost::transform_iterator<ColTrans, decltype(boost::begin(boost::irange(0,0))), ColId> ColIter;
+    std::pair<ColIter, ColIter> getColumns() const {
+        auto range = boost::irange(1, glp_get_num_cols(m_lp) + 1);
+        return std::make_pair(ColIter(boost::begin(range), std::bind(&GLP::getColIdx, this, std::placeholders::_1)),
+                              ColIter(boost::end(range)  , std::bind(&GLP::getColIdx, this, std::placeholders::_1)));
+    }
+    
+    typedef boost::transform_iterator<RowTrans, decltype(boost::begin(boost::irange(0,0))), RowId> RowIter;
+    std::pair<RowIter, RowIter> getRows() const {
+        auto range = boost::irange(1, glp_get_num_rows(m_lp) + 1);
+        return std::make_pair(RowIter(boost::begin(range), std::bind(&GLP::getRowIdx, this, std::placeholders::_1)),
+                              RowIter(boost::end(range)  , std::bind(&GLP::getRowIdx, this, std::placeholders::_1)));
+    }
+    
+    typedef boost::transform_iterator<decltype(&make_ColId), decltype(boost::begin(boost::irange(0,0))), ColId> OrigColIter;
+    std::pair<OrigColIter, OrigColIter> getOriginalColumns() const {
+        auto range = boost::irange(1, m_originalColSize +  1);
+        return std::make_pair(OrigColIter(boost::begin(range), &make_ColId),
+                              OrigColIter(boost::end(range)  , &make_ColId));
+    }
+    
+/*    typedef boost::transform_iterator<&Row, decltype(boost::begin(boost::irange(0,0))), RowId> OrigRowIter;
+    std::pair<OrigRowIter, OrigRowIter> getOriginalRows() const {
+        auto range = boost::irange(1, m_originalRowSize + 1);
+        return std::make_pair(OrigRowIter(boost::begin(range), std::bind(&GLP::getRowIdx, this, std::placeholders::_1)),
+                              OrigRowIter(boost::end(range)  , std::bind(&GLP::getRowIdx, this, std::placeholders::_1)));
+    }*/
 
 private:
 
     template <typename Iter>
     double getSolSumForIds(Iter begin, Iter end) const  {
         return std::accumulate(begin, end, 0., [=](double sum, int u){
-            return sum + getColPrim(u);
+            return sum + glp_get_col_prim(m_lp, u);
         });
     }
     

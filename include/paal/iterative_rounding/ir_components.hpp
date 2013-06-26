@@ -22,7 +22,7 @@ public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col) {
+    std::pair<bool, double> operator()(const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
@@ -48,7 +48,7 @@ public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
     
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col) {
+    std::pair<bool, double> operator()(const LP & lp, ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 protected:
@@ -86,20 +86,18 @@ struct DefaultSolveLP {
 
 struct DeleteRow {
     template <typename LP>
-    void operator()(LP & lp, int & row, int & rowCnt) {
+    void operator()(LP & lp, RowId row) {
         lp.deleteRow(row);
-        --row;
-        --rowCnt;
     };
 };
 
 struct DeleteCol {
     template <typename LP>
-    void operator()(LP & lp, int & col, double value, int & colCnt) {
-        auto column = lp.getColumn(col);
-        int row;
+    void operator()(LP & lp, ColId col, double value) {
+        auto column = lp.getRowsInColumn(col);
+        RowId row;
         double coef;
-        for(const boost::tuple<int, double> & c : utils::make_range(column)) {
+        for(const boost::tuple<RowId, double> & c : utils::make_range(column)) {
             boost::tie(row, coef) = c;
             double currUb = lp.getRowUb(row);
             double currLb = lp.getRowLb(row);
@@ -108,21 +106,19 @@ struct DeleteCol {
             lp.setRowBounds(row, currType, currLb - diff, currUb - diff);
         }
         lp.deleteCol(col);
-        --col;
-        --colCnt;
     };
 };
 
 struct TrivializeRow {
     template <typename LP>
-    void operator()(LP & lp, int & row, int & rowCnt) {
+    void operator()(LP & lp, RowId row) {
         lp.setRowBounds(row, FR, 0, 0);
     };
 };
 
 struct FixCol {
     template <typename LP>
-    void operator()(LP & lp, int & col, double value, int & colCnt) {
+    void operator()(LP & lp, ColId col, double value) {
         lp.setColBounds(col, FX, value, value);
     };
 };
@@ -132,7 +128,7 @@ template <typename SolveLP = DefaultSolveLP,
           typename RelaxContition = utils::ReturnFalseFunctor, 
           typename Init = utils::DoNothingFunctor,
           typename DeleteRowStrategy = DeleteRow,
-          typename DeleteColStrategy = DeleteCol> 
+          typename DeleteColStrategy = FixCol> 
 class IRComponents {
 public:
     IRComponents(SolveLP solve = SolveLP(), RoundCondition round = RoundCondition(),
@@ -146,12 +142,12 @@ public:
     }
 
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, int col) {
+    std::pair<bool, double> roundCondition(const LP & lp, ColId col) {
         return m_roundCondition(lp, col);
     }
 
     template <typename LP>
-    bool relaxCondition(const LP & lp, int row) {
+    bool relaxCondition(const LP & lp, RowId row) {
         return m_relaxCondition(lp, row); 
     };
     
@@ -161,13 +157,13 @@ public:
     };
     
     template <typename LP>
-    void deleteRow(LP & lp, int & row, int & rowCnt) {
-        return m_deleteRow(lp, row, rowCnt);
+    void deleteRow(LP & lp, RowId row) {
+        return m_deleteRow(lp, row);
     };
     
     template <typename LP>
-    void deleteCol(LP & lp, int & col, double value, int & colCnt) {
-        return m_deleteCol(lp, col, value, colCnt);
+    void deleteCol(LP & lp, ColId col, double value) {
+        return m_deleteCol(lp, col, value);
     };
 
 private:

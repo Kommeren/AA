@@ -6,7 +6,7 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE iterative_rounding_test
+#define BOOST_TEST_MODULE generalized_assignment_test
 
 #include <boost/test/unit_test.hpp>
 
@@ -22,18 +22,18 @@ using namespace  paal::ir;
 struct LogVisitor : public TrivialVisitor {
 
     template <typename LP>
-    void roundCol(LP & lp, int col, double val) {
-        LOG("Column "<< col << " rounded to " << val);
+    void roundCol(LP & lp, ColId col, double val) {
+        LOG("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename LP>
-    void relaxRow(LP & lp, int row) {
-        LOG("Relax row " << row);
+    void relaxRow(LP & lp, RowId row) {
+        LOG("Relax row " << row.get());
     }
 };
 
 
-BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     //sample problem
     auto machines = boost::irange(0,2);
     auto jobs = boost::irange(0,2);

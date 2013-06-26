@@ -13,6 +13,7 @@
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
+#include <boost/range/irange.hpp>
 
 #include "paal/utils/iterator_utils.hpp"
 
@@ -89,7 +90,9 @@ private:
  */
 template <typename T, typename Idx = int> 
 class BiMap {
+    typedef std::unordered_map<T,Idx> TToID;
 public:
+    typedef typename TToID::const_iterator Iterator;
     
     BiMap() {}
 
@@ -133,14 +136,23 @@ public:
         m_idToT.push_back(t);
         return idx;
     }
+
+    std::pair<Iterator, Iterator> getRange() const {
+        return std::make_pair(m_tToID.begin(), m_tToID.end());
+    }
+
+
 protected:
     std::vector<T> m_idToT;
-    std::unordered_map<T,Idx> m_tToID;
+    TToID m_tToID;
 };
 
 
 template <typename T, typename Idx = int> 
-class EraseableBiMap : public BiMap<Tm Idx> {
+class EraseableBiMap : public BiMap<T, Idx> {
+    typedef BiMap<T, Idx> base;
+    using base::m_tToID;
+    using base::m_idToT;
 public:
     void erase(const T & t) {
         auto i = m_tToID.find(t);
@@ -149,7 +161,7 @@ public:
         m_tToID.erase(i);
         m_idToT.erase(m_idToT.begin() + idx);
 
-        for(int i : utils::make_range(idx, m_idToT.size())) {
+        for(int i : boost::irange(idx, Idx(m_idToT.size()))) {
             assert(m_tToID.at(m_idToT[i]) == i + 1);
             m_tToID[m_idToT[i]] = i;
         }

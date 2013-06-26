@@ -41,7 +41,7 @@ public:
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
               BoundedDegreeMSTBase(SolveLP(m_separationOracle), RoundCondition(BoundedDegreeMST::EPSILON)),
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
-              m_edgeMap(), m_vertexList(), m_solutionGenerated(false),
+              m_edgeMap(), m_vertexList(),
               m_compare(BoundedDegreeMST::EPSILON),
               m_separationOracle(g, m_edgeMap, m_vertexList, m_compare)
     {}
@@ -50,7 +50,7 @@ public:
               BoundedDegreeMSTBase(SolveLP(m_separationOracle), RoundCondition(BoundedDegreeMST::EPSILON)),
               m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
               m_edgeMap(std::move(o.m_edgeMap)), m_edgeList(std::move(o.m_edgeList)), m_vertexList(std::move(o.m_vertexList)),
-              m_solutionGenerated(o.m_solutionGenerated), m_spanningTree(std::move(o.m_spanningTree)),
+              m_spanningTree(std::move(o.m_spanningTree)),
               m_compare(std::move(o.m_compare)),
               m_separationOracle(m_g, m_edgeMap, m_vertexList, m_compare)
     {}
@@ -59,7 +59,7 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef std::map<Edge, bool> SpanningTree;
-    typedef std::map<Edge, std::string> EdgeNameMap;
+    typedef std::map<Edge, ColId> EdgeMap;
     typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
     
@@ -73,7 +73,7 @@ public:
      * @tparam LP
      */
     template <typename LP>
-    bool relaxCondition(const LP & lp, int row) {
+    bool relaxCondition(const LP & lp, RowId row) {
         if (isDegBoundName(lp.getRowName(row))) {
             int vIdx = getDegBoundIndex(lp.getRowName(row));
             Vertex v = m_vertexList[vIdx];
@@ -109,10 +109,10 @@ public:
      *
      * @tparam LP
      */
-    template <typename LP>
-    SpanningTree & getSolution(const LP & lp) {
+    template <typename GetSolution, typename LP>
+    SpanningTree & getSolution(const GetSolution & sol, const LP & lp) {
         if (!m_solutionGenerated) {
-            generateSolution(lp);
+            generateSolution(sol, lp);
         }
         return m_spanningTree;
     }
@@ -142,10 +142,9 @@ private:
         int eIdx(0);
         m_edgeList.resize(boost::num_edges(m_g));
         
-        for(Edge e : utils::make_range(edges.first, edges.second)) {
+        for(Edge e : utils::make_range(edges)) {
             std::string colName = getEdgeName(eIdx);
-            lp.addColumn(boost::get(m_costMap, e), DB, 0, 1, colName);
-            m_edgeMap[e] = colName;
+            m_edgeMap.insert(std::make_pair(e, lp.addColumn(boost::get(m_costMap, e), DB, 0, 1, colName)));
             m_spanningTree[e] = false;
             m_edgeList[eIdx] = e;
             ++eIdx;
@@ -165,16 +164,11 @@ private:
         m_vertexList.resize(boost::num_vertices(m_g));
         
         for(Vertex v : utils::make_range(vertices.first, vertices.second)) {
-            int rowIdx = lp.addRow(UP, 0, boost::get(m_degBoundMap, v), getDegBoundDesc(dbIdx));
-            auto adjVertices = boost::adjacent_vertices(v, m_g);
+            RowId rowIdx = lp.addRow(UP, 0, boost::get(m_degBoundMap, v), getDegBoundDesc(dbIdx));
+            auto adjEdges = boost::out_edges(v, m_g);
             
-            for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
-                bool b; Edge e;
-                std::tie(e, b) = boost::edge(v, u, m_g);
-                
-                if (b) {
-                    lp.addConstraintCoef(rowIdx, lp.getColByName(m_edgeMap[e]));
-                }
+            for(Edge e : utils::make_range(adjEdges)) {
+                lp.addConstraintCoef(rowIdx, m_edgeMap.at(e));
             }
             
             m_vertexList[dbIdx] = v;
@@ -191,10 +185,9 @@ private:
     template <typename LP>
     void addAllSetEquality(LP & lp) {
         int vCnt = boost::num_vertices(m_g);
-        int colCnt = lp.colSize();
-        int rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
+        RowId rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
         
-        for (int colIdx = 1; colIdx <= colCnt; ++colIdx) {
+        for (ColId colIdx : utils::make_range(lp.getColumns())) {
             lp.addConstraintCoef(rowIdx, colIdx);
         }
     }
@@ -207,14 +200,14 @@ private:
         return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
     }
     
-    template <typename LP>
-    void generateSolution(const LP & lp) {
-        int size = lp.colSize();
-        
-        for (int col = 1; col <= size; ++col) {
-            m_spanningTree[ m_edgeList[ std::stoi(lp.getColName(col)) ] ] = true;
-        }
+    template <typename GetSolution, typename LP>
+    void generateSolution(const GetSolution & sol, const LP &) {
         m_solutionGenerated = true;
+        for (auto edgeAndCol : m_edgeMap) {
+            if(m_compare.e(sol(edgeAndCol.second), 1)) {
+                m_spanningTree[edgeAndCol.first] = true;
+            }
+        }
     }
 
 
@@ -222,15 +215,15 @@ private:
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
     
-    EdgeNameMap     m_edgeMap;
+    EdgeMap         m_edgeMap;
     EdgeList        m_edgeList;
     VertexList      m_vertexList;
     
-    bool            m_solutionGenerated;
     SpanningTree    m_spanningTree;
     
     const utils::Compare<double>   m_compare;
     static const double EPSILON;
+    bool m_solutionGenerated = false;
     
     BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
 };

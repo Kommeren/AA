@@ -20,13 +20,13 @@ using namespace  paal::ir;
 struct LogVisitor : public TrivialVisitor {
 
     template <typename LP>
-    void roundCol(LP & lp, int col, double val) {
-        LOG("Column "<< col << " rounded to " << val);
+    void roundCol(LP & lp, ColId col, double val) {
+        LOG("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename LP>
-    void relaxRow(LP & lp, int row) {
-        LOG("Relax row " << row);
+    void relaxRow(LP & lp, RowId row) {
+        LOG("Relax row " << row.get());
     }
 };
 

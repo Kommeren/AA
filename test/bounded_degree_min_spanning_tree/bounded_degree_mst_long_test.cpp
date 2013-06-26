@@ -46,7 +46,8 @@ void checkResult(Graph & g, std::map<Edge, bool> & tree,
             treeCost += costs[e.first];
         }
     }
-    
+
+    LOG("tree edges: " << treeEdges);
     BOOST_CHECK(treeEdges == verticesNum - 1);
     BOOST_CHECK(treeCost <= bestCost);
     

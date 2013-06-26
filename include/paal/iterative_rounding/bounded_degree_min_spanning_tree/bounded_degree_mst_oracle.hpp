@@ -29,12 +29,12 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::map<Edge, std::string> EdgeNameMap;
+    typedef std::map<Edge, ColId> EdgeMap;
     typedef std::vector<Vertex> VertexList;
     
-    BoundedDegreeMSTOracle(const Graph & g, const EdgeNameMap & edgeMap,
+    BoundedDegreeMSTOracle(const Graph & g, const EdgeMap & edgeMap,
                            const VertexList & vertexList, const utils::Compare<double> & compare)
-                           : m_g(g), m_edgeNameMap(edgeMap), m_vertexList(vertexList), m_compare(compare)
+                           : m_g(g), m_edgeMap(edgeMap), m_vertexList(vertexList), m_compare(compare)
     { }
 
     /**
@@ -66,16 +66,13 @@ public:
     void addViolatedConstraint(LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
-        for (const std::pair<Edge, std::string> & e : m_edgeNameMap) {
+        for (auto const & e : m_edgeMap) {
             const Vertex & u = boost::source(e.first, m_g);
             const Vertex & v = boost::target(e.first, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
-                int colIdx = lp.getColByName(e.second);
-                
-                if (0 != colIdx) {
-                    lp.addNewRowCoef(colIdx);
-                }
+                ColId colIdx = e.second;
+                lp.addNewRowCoef(colIdx);
             }
         }
         
@@ -183,17 +180,14 @@ private:
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (const std::pair<Edge, std::string> & e : m_edgeNameMap) {
-            int colIdx = lp.getColByName(e.second);
-            if (0 != colIdx) {
-                double colVal = lp.getColPrim(colIdx) / 2;
-                
-                if (!m_compare.e(colVal, 0)) {
-                    Vertex u = source(e.first, m_g);
-                    Vertex v = target(e.first, m_g);
-                    addEdge(u, v, colVal);
-                    //addEdge(v, u, colVal);
-                }
+        for (auto const & e : m_edgeMap) {
+            ColId colIdx = e.second;
+            double colVal = lp.getColPrim(colIdx) / 2;
+            
+            if (!m_compare.e(colVal, 0)) {
+                Vertex u = source(e.first, m_g);
+                Vertex v = target(e.first, m_g);
+                addEdge(u, v, colVal);
             }
         }
         
@@ -257,18 +251,11 @@ private:
     template <typename LP>
     double degreeOf(const Vertex & v, const LP & lp) {
         double res = 0;
-        auto adjVertices = boost::adjacent_vertices(v, m_g);
+        auto adjEdges = boost::out_edges(v, m_g);
             
-        for (const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
-            bool b; Edge e;
-            std::tie(e, b) = boost::edge(v, u, m_g);
-            
-            if (b) {
-                int colIdx = lp.getColByName(m_edgeNameMap.find(e)->second);
-                if (0 != colIdx) {
-                    res += lp.getColPrim(colIdx);
-                }
-            }
+        for (Edge e : utils::make_range(adjEdges)) {
+            ColId colIdx = m_edgeMap.find(e)->second;
+            res += lp.getColPrim(colIdx);
         }
         return res;
     }
@@ -325,7 +312,7 @@ private:
     OracleComponents    m_oracleComponents;
     
     const Graph &               m_g;
-    const EdgeNameMap &         m_edgeNameMap;
+    const EdgeMap &         m_edgeMap;
     const VertexList &          m_vertexList;
     const utils::Compare<double> & m_compare;
     

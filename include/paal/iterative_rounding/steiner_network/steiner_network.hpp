@@ -52,8 +52,8 @@ public:
         lp.loadMatrix();
     }
     
-    template <typename LP>
-    SpanningTree & getSolution(const LP & lp) {
+    template <typename GetSolution, typename LP>
+    SpanningTree & getSolution(const GetSolution&, const LP & lp) {
         if (!m_solutionGenerated) {
             generateSolution(lp);
         }
