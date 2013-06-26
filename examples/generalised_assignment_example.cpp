@@ -1,14 +1,11 @@
 /**
- * @file iterative_rounding_test.cpp
+ * @file generalized_assignment_test.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE iterative_rounding_test
-
-#include <boost/test/unit_test.hpp>
 
 #include <vector>
 
@@ -18,9 +15,7 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-
-
-BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+int main() {
     //sample problem
     auto machines = boost::irange(0,2);
     auto jobs = boost::irange(0,2);
@@ -58,5 +53,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
     for(const std::pair<int, int> & jm : j2m) {
         std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
     }
+
+    return 0;
 }
 

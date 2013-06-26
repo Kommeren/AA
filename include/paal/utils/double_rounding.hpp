@@ -19,6 +19,10 @@ public:
         //return abs(a -b ) < m_epsilon; //this line breaks generalised_assignment_long_test TODO investigate
     }
     
+    bool g(T a, T b) const {
+        return a > b + m_epsilon;
+    }
+    
     bool ge(T a, T b) const {
         return a >= b - m_epsilon;
     }
