@@ -133,9 +133,27 @@ public:
         m_idToT.push_back(t);
         return idx;
     }
-private:
+protected:
     std::vector<T> m_idToT;
     std::unordered_map<T,Idx> m_tToID;
+};
+
+
+template <typename T, typename Idx = int> 
+class EraseableBiMap : public BiMap<Tm Idx> {
+public:
+    void erase(const T & t) {
+        auto i = m_tToID.find(t);
+        assert(i != m_tToID.end());
+        Idx idx = i->second;
+        m_tToID.erase(i);
+        m_idToT.erase(m_idToT.begin() + idx);
+
+        for(int i : utils::make_range(idx, m_idToT.size())) {
+            assert(m_tToID.at(m_idToT[i]) == i + 1);
+            m_tToID[m_idToT[i]] = i;
+        }
+    }
 };
 
 template <typename T, typename Idx = int> class BiMapOfConsecutive {

@@ -9,6 +9,7 @@
 #define LPBASE_HPP
 #include <numeric>
 #include <glpk.h>
+
 #include <boost/iterator/zip_iterator.hpp>
 #include "bound_type.hpp"
 
@@ -22,7 +23,16 @@ namespace ir {
  */
 
 class GLPBase {
+    class Id {
+        friend class GLPBase;
+        int m_col;
+    };
 public:
+    class ColId : Id {};
+    class RowId : Id {};
+
+
+
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
         m_lp(glp_create_prob()) {
         glp_create_index(m_lp);
