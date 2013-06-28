@@ -255,8 +255,10 @@ private:
         auto adjEdges = boost::out_edges(v, m_g);
             
         for (Edge e : utils::make_range(adjEdges)) {
-            ColId colIdx = m_edgeMap.left.find(e)->second;
-            res += lp.getColPrim(colIdx);
+            auto i = m_edgeMap.left.find(e);
+            if(i != m_edgeMap.left.end()) {
+                res += lp.getColPrim(i->second);
+            }
         }
         return res;
     }

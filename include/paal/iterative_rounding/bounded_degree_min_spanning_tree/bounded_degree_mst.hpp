@@ -77,7 +77,7 @@ public:
     std::pair<bool, double> roundCondition(const LP & lp, ColId col) {
         auto ret = BoundedDegreeMSTBase::roundCondition(lp, col);
         if(ret.first) {
-            m_edgeMap.right.erase(m_edgeMap.right.find(col));
+            m_edgeMap.right.erase(col);
         }
         return ret;
         

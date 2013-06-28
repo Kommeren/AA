@@ -109,6 +109,7 @@ struct DeleteCol {
     };
 };
 
+/* not supported now
 struct TrivializeRow {
     template <typename LP>
     void operator()(LP & lp, RowId row) {
@@ -121,7 +122,7 @@ struct FixCol {
     void operator()(LP & lp, ColId col, double value) {
         lp.setColBounds(col, FX, value, value);
     };
-};
+};*/
 
 template <typename SolveLP = DefaultSolveLP, 
           typename RoundCondition = DefaultRoundCondition, 
