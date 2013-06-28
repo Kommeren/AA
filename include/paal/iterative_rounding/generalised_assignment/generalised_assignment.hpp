@@ -34,7 +34,7 @@ public:
     
     template <typename LP>
     bool relaxCondition(const LP & lp, RowId row) {
-        return isMachineName(lp.getRowName(row)) && 
+        return m_machineRows.find(row) != m_machineRows.end() && 
                         (
                           lp.getRowDegree(row) <= 1 ||
                                 (
@@ -55,8 +55,8 @@ public:
         lp.loadMatrix();
     }
 
-    template <typename GiveSolution, typename LP>
-    JobsToMachines & getSolution(const GiveSolution & sol, const LP &) {
+    template <typename GetSolution>
+    JobsToMachines & getSolution(const GetSolution & sol) {
         if(!m_solutionGenerated) {
             m_solutionGenerated = true;
             for(int idx : boost::irange(0, int(m_colIdx.size()))) { 
@@ -68,22 +68,6 @@ public:
         return m_jobToMachine;
     }
 private:
-
-    std::string getMachinePrefix() const {
-        return "machine ";
-    }
-
-    std::string getJobDesc(int jIdx) {
-        return "job " + std::to_string(jIdx);
-    }
-    
-    std::string getMachineDesc(int mIdx) {
-        return getMachinePrefix() + std::to_string(mIdx);
-    }
-
-    bool isMachineName(const std::string & s) {
-        return s.compare(0, getMachinePrefix().size(), getMachinePrefix()) == 0;
-    }
 
     //adding varables
     template <typename LP>
@@ -100,7 +84,7 @@ private:
     template <typename LP>
     void addConstraintsForJobs(LP & lp) {
         for(int jIdx : boost::irange(0, m_jCnt)) {
-            RowId rowIdx = lp.addRow(FX, 1.0, 1.0, getJobDesc(jIdx));
+            RowId rowIdx = lp.addRow(FX, 1.0, 1.0);
             for(int mIdx : boost::irange(0, m_mCnt)) {
                 lp.addConstraintCoef(rowIdx, m_colIdx[idx(jIdx,mIdx)]);
                 ++mIdx;
@@ -113,7 +97,8 @@ private:
     void addConstraintsForMachines(LP & lp)  {
         int mIdx(0);
         for(MachineRef m : utils::make_range(m_mbegin, m_mend)) {
-            RowId rowIdx = lp.addRow(UP, 0.0, m_T(m), getMachineDesc(mIdx));
+            RowId rowIdx = lp.addRow(UP, 0.0, m_T(m));
+            m_machineRows.insert(rowIdx);
             int jIdx(0);
 
             for(JobRef j : utils::make_range(m_jbegin, m_jend)) {
@@ -149,6 +134,7 @@ private:
     JobsToMachines m_jobToMachine;
     const Compare m_compare;
     std::vector<ColId> m_colIdx;
+    std::set<RowId> m_machineRows;
     bool m_solutionGenerated = false;
 };
 

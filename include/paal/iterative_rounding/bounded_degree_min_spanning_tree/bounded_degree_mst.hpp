@@ -108,10 +108,10 @@ public:
      *
      * @tparam LP
      */
-    template <typename GetSolution, typename LP>
-    SpanningTree & getSolution(const GetSolution & sol, const LP & lp) {
+    template <typename GetSolution>
+    SpanningTree & getSolution(const GetSolution & sol) {
         if (!m_solutionGenerated) {
-            generateSolution(sol, lp);
+            generateSolution(sol);
         }
         return m_spanningTree;
     }
@@ -201,8 +201,8 @@ private:
         return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
     }
     
-    template <typename GetSolution, typename LP>
-    void generateSolution(const GetSolution & sol, const LP &) {
+    template <typename GetSolution>
+    void generateSolution(const GetSolution & sol) {
         m_solutionGenerated = true;
         for (auto edgeAndCol : m_edgeMapOriginal) {
             if(m_compare.e(sol(edgeAndCol.second), 1)) {
