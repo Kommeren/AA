@@ -10,6 +10,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
+#include <boost/bimap.hpp>
 
 #include "paal/utils/double_rounding.hpp"
 
@@ -29,7 +30,7 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::map<Edge, ColId> EdgeMap;
+    typedef boost::bimap<Edge, ColId> EdgeMap;
     typedef std::vector<Vertex> VertexList;
     
     BoundedDegreeMSTOracle(const Graph & g, const EdgeMap & edgeMap,
@@ -67,11 +68,11 @@ public:
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
         for (auto const & e : m_edgeMap) {
-            const Vertex & u = boost::source(e.first, m_g);
-            const Vertex & v = boost::target(e.first, m_g);
+            const Vertex & u = boost::source(e.left, m_g);
+            const Vertex & v = boost::target(e.left, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
-                ColId colIdx = e.second;
+                ColId colIdx = e.right;
                 lp.addNewRowCoef(colIdx);
             }
         }
@@ -92,7 +93,7 @@ public:
         
         std::pair<bool, double> violation;
                 
-        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
+        for (const Vertex & trg : utils::make_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(src, trg);
                 if (violation.first) {
@@ -122,7 +123,7 @@ public:
         double maximumViolation = 0;
         std::pair<bool, double> violation;
         
-        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
+        for (const Vertex & trg : utils::make_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(src, trg, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
@@ -181,12 +182,12 @@ private:
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
         for (auto const & e : m_edgeMap) {
-            ColId colIdx = e.second;
+            ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx) / 2;
             
             if (!m_compare.e(colVal, 0)) {
-                Vertex u = source(e.first, m_g);
-                Vertex v = target(e.first, m_g);
+                Vertex u = source(e.left, m_g);
+                Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);
             }
         }
@@ -254,7 +255,7 @@ private:
         auto adjEdges = boost::out_edges(v, m_g);
             
         for (Edge e : utils::make_range(adjEdges)) {
-            ColId colIdx = m_edgeMap.find(e)->second;
+            ColId colIdx = m_edgeMap.left.find(e)->second;
             res += lp.getColPrim(colIdx);
         }
         return res;

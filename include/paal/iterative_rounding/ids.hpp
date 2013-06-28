@@ -12,6 +12,10 @@ namespace ir {
         int get() {
             return m_id;
         }
+
+        bool operator<(Id id) const {
+            return m_id < id.m_id;
+        }
     private:
         int m_id;
     };

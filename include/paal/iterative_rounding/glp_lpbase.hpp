@@ -27,6 +27,7 @@ namespace ir {
  * @brief This class contains member functions needeed to initialize LP
  */
 
+
 class GLPBase {
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :

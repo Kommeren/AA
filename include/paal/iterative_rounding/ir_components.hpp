@@ -128,7 +128,7 @@ template <typename SolveLP = DefaultSolveLP,
           typename RelaxContition = utils::ReturnFalseFunctor, 
           typename Init = utils::DoNothingFunctor,
           typename DeleteRowStrategy = DeleteRow,
-          typename DeleteColStrategy = FixCol> 
+          typename DeleteColStrategy = DeleteCol> 
 class IRComponents {
 public:
     IRComponents(SolveLP solve = SolveLP(), RoundCondition round = RoundCondition(),

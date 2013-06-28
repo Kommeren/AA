@@ -8,6 +8,7 @@
 #ifndef BOUNDED_DEGREE_MST_HPP
 #define BOUNDED_DEGREE_MST_HPP
 
+
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/lp_row_generation.hpp"
@@ -34,14 +35,14 @@ template <typename Graph, typename CostMap, typename DegreeBoundMap,
 class BoundedDegreeMST : public IRComponents < RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > >,
                                                RoundConditionEquals<0> > {
 public:
-    typedef RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, OracleComponents > > SolveLP;
+    typedef BoundedDegreeMSTOracle< Graph, OracleComponents > Oracle;
+    typedef RowGenerationSolveLP < Oracle > SolveLP;
     typedef RoundConditionEquals<0> RoundCondition;
     typedef IRComponents < SolveLP, RoundCondition > BoundedDegreeMSTBase;
   
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap) :
               BoundedDegreeMSTBase(SolveLP(m_separationOracle), RoundCondition(BoundedDegreeMST::EPSILON)),
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
-              m_edgeMap(), m_vertexList(),
               m_compare(BoundedDegreeMST::EPSILON),
               m_separationOracle(g, m_edgeMap, m_vertexList, m_compare)
     {}
@@ -59,29 +60,27 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef std::map<Edge, bool> SpanningTree;
-    typedef std::map<Edge, ColId> EdgeMap;
+    typedef typename Oracle::EdgeMap EdgeMap;
+    typedef std::map<Edge, ColId> EdgeMapOriginal;
     typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
     
-    
     /**
-     * @brief checks if the row of the LP can be relaxed
+     * @brief checks if the row of the LP can be rounded
      * @param lp LP object
      * @param col row number
-     * @return true iff row can be relaxed
+     * @return true iff row can be rounded
      *
      * @tparam LP
      */
     template <typename LP>
-    bool relaxCondition(const LP & lp, RowId row) {
-        if (isDegBoundName(lp.getRowName(row))) {
-            int vIdx = getDegBoundIndex(lp.getRowName(row));
-            Vertex v = m_vertexList[vIdx];
-            return (lp.getRowDegree(row) <= boost::get(m_degBoundMap, v) + 1);
+    std::pair<bool, double> roundCondition(const LP & lp, ColId col) {
+        auto ret = BoundedDegreeMSTBase::roundCondition(lp, col);
+        if(ret.first) {
+            m_edgeMap.right.erase(m_edgeMap.right.find(col));
         }
-        else {
-            return false;
-        }
+        return ret;
+        
     }
 
     /**
@@ -144,7 +143,9 @@ private:
         
         for(Edge e : utils::make_range(edges)) {
             std::string colName = getEdgeName(eIdx);
-            m_edgeMap.insert(std::make_pair(e, lp.addColumn(boost::get(m_costMap, e), DB, 0, 1, colName)));
+            ColId col =  lp.addColumn(boost::get(m_costMap, e), DB, 0, 1, colName);
+            m_edgeMap.insert(typename EdgeMap::value_type(e, col));
+            m_edgeMapOriginal.insert(typename EdgeMapOriginal::value_type(e, col));
             m_spanningTree[e] = false;
             m_edgeList[eIdx] = e;
             ++eIdx;
@@ -168,7 +169,7 @@ private:
             auto adjEdges = boost::out_edges(v, m_g);
             
             for(Edge e : utils::make_range(adjEdges)) {
-                lp.addConstraintCoef(rowIdx, m_edgeMap.at(e));
+                lp.addConstraintCoef(rowIdx, m_edgeMap.left.at(e));
             }
             
             m_vertexList[dbIdx] = v;
@@ -203,7 +204,7 @@ private:
     template <typename GetSolution, typename LP>
     void generateSolution(const GetSolution & sol, const LP &) {
         m_solutionGenerated = true;
-        for (auto edgeAndCol : m_edgeMap) {
+        for (auto edgeAndCol : m_edgeMapOriginal) {
             if(m_compare.e(sol(edgeAndCol.second), 1)) {
                 m_spanningTree[edgeAndCol.first] = true;
             }
@@ -215,6 +216,7 @@ private:
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
     
+    EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
     EdgeList        m_edgeList;
     VertexList      m_vertexList;
@@ -225,7 +227,7 @@ private:
     static const double EPSILON;
     bool m_solutionGenerated = false;
     
-    BoundedDegreeMSTOracle< Graph, OracleComponents > m_separationOracle;
+    Oracle m_separationOracle;
 };
 
 template <typename Graph, typename CostMap, typename DegreeBoundMap, typename OracleComponents>
