@@ -99,14 +99,16 @@ private:
 
 class CondBiggerEqualThan {
 public:
-    CondBiggerEqualThan(double b) : m_bound(b) {}    
+    CondBiggerEqualThan(double b, double epsilon = utils::Compare<double>::defaultEpsilon()) 
+        : m_bound(b), m_compare(epsilon) {}    
 
     bool operator()(double x) {
-        return utils::Compare<double>::ge(x, m_bound);
+        return m_compare.ge(x, m_bound);
     }
 
 private:
     double m_bound;
+    const utils::Compare<double> m_compare;
 };
 
 
