@@ -264,8 +264,8 @@ public:
         GLP(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
     
     template <typename ostream>
-    friend ostream & operator<<(ostream & o, GLP & glp) {
-        o << "Solution " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
+    friend ostream & operator<<(ostream & o, const  GLP & glp) {
+        o << "Problem name: " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
 
         for(ColId col : utils::make_range(glp.getColumns())) {
             o << glp_get_obj_coef(glp.m_lp, glp.getCol(col)) << ", ";
@@ -282,12 +282,16 @@ public:
             for(auto colAndVal : utils::make_range(cols)) {
                 ColId  col = boost::get<0>(colAndVal);
                 double val = boost::get<1>(colAndVal);
-                o << "(col = " << col.get() << " name = " << glp.getColName(col) << ", coef = " << val 
-                  << ", sol = " << glp.getColPrim(col) << ") - "; 
+                o << "(col = " << col.get() << " name = " << glp.getColName(col) << ", coef = " << val << ") - "; 
             }
             o << std::endl;
         }
+        o << "Current solution: "<<std::endl;
+        for(ColId col : utils::make_range(glp.getColumns())) {
+            o  << glp.getColPrim(col) << ", ";
+        }
         o << std::endl;
+
         return o;
     }
     

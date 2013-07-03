@@ -121,7 +121,7 @@ namespace paal {
                             }
 
                         }	
-                        std::cout << std::endl;
+                        //std::cout << std::endl;
 
                     }
 
@@ -129,10 +129,13 @@ namespace paal {
 
 
                     template <typename LP>
-                    std::pair<bool, double> roundCondition(LP & lp, int col) {
+                    std::pair<bool, double> roundCondition(LP & lp, ColId col) {
+                        std::cout<<"Round condition: "<<std::endl;
+                        std::cout<<lp;
                         auto res = Base::roundCondition(lp, col);
                         if(res.first) {        
-                            inSolution[colName2Edge[lp.getColName(col)]]=true;
+                            inSolution[colId2Edge[col]]=true;
+                            
                         }
                         return res;
                     }
@@ -152,7 +155,7 @@ namespace paal {
 
 
                             lp.loadMatrix();
-
+                            //std::cout<<lp;
                         }
 
 
@@ -161,18 +164,21 @@ namespace paal {
                     ///some link in the fundamental cut belonging to \c t is chosen
                     ///in the solution.
                     ///
-                    ///In fact we don't even need to relax, since these constraints became trivial after rounding. So returning always false should be fine, too.
+                    ///In fact we don't even need to relax, since
+                    ///these constraints became trivial after
+                    ///rounding. So returning always false should be
+                    ///fine, too.
                     template <typename LP>
-                        bool relaxCondition(const LP & lp, int row) {
-
-                            for (Edge e: coveredBy[rowName2Edge[lp.getRowName(row)]])
+                        bool relaxCondition(const LP & lp, RowId row) {
+                        //std::cout<<lp;
+                        for (Edge e: coveredBy[rowId2Edge[row]])
                             {
                                 if (inSolution[e])
                                     return true;
                             }
-                            return false;
-                        }
-
+                        return false;
+                    }
+            
 
                     ///Return the solution found
                     template <typename LP>
@@ -205,11 +211,12 @@ namespace paal {
 
 
                     //cross reference between links and column names
-                    std::map<Edge, std::string> edge2ColName;
-                    std::map<std::string, Edge> colName2Edge;
+                    std::map<Edge, ColId> edge2ColId;
+                    std::map<ColId, Edge> colId2Edge;
 
                     //reference between tree edges and row names
-                    std::map<std::string, Edge> rowName2Edge;
+                    //std::map<std::string, Edge> rowName2Edge;
+                    std::map<RowId, Edge> rowId2Edge;
 
                     //Which links are chosen in the solution
                     EdgeBoolMap inSolution;
@@ -238,9 +245,9 @@ namespace paal {
 
                             for(Edge e : utils::make_range(edges.first, edges.second)) {
                                 std::string colName = getEdgeName(eIdx);
-                                lp.addColumn(costMap[e], LO, 0, whatever, colName);
-                                edge2ColName[e] = colName;
-                                colName2Edge[colName]=e;
+                                ColId colIdx=lp.addColumn(costMap[e], LO, 0, whatever, colName);
+                                edge2ColId[e] = colIdx;
+                                colId2Edge[colIdx]=e;
                                 inSolution[e] = false;
                                 // m_edgeList[eIdx] = e;
                                 ++eIdx;
@@ -258,13 +265,14 @@ namespace paal {
                                 ::edge_iterator ei, ei_end;
                             for(boost::tie(ei,ei_end) = edges(tree); ei != ei_end; ++ei){
                                 std::string rowName = getRowName(dbIndex);
-                                int rowIdx = lp.addRow(LO, 1, whatever, rowName );
-                                rowName2Edge[rowName]=*ei;
-                                std::cout<<rowIdx<<":  ";
+                                RowId rowIdx = lp.addRow(LO, 1, whatever, rowName );
+                                //rowName2Edge[rowName]=*ei;
+                                rowId2Edge[rowIdx]=*ei;
+                                //std::cout<<rowIdx<<":  ";
 
                                 for (Edge pe:coveredBy[*ei]){
-                                    std::cout<<edge2ColName[pe]<<", ";
-                                    lp.addConstraintCoef(rowIdx, lp.getColByName(edge2ColName[pe]));
+                                    //std::cout<<edge2ColId[pe]<<", ";
+                                    lp.addConstraintCoef(rowIdx, edge2ColId[pe]);
 
                                 }
                                 std::cout<<std::endl;
