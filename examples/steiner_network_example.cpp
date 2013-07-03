@@ -51,10 +51,10 @@ int main() {
 
     IterativeRounding<decltype(steiner)> ir(std::move(steiner));
 
-/*    solve(ir);
+    solve(ir);
 
     // printing result
-    auto const & j2m = ir.getSolution();
+/*    auto const & j2m = ir.getSolution();
     for(const std::pair<int, int> & jm : j2m) {
         std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
     }*/

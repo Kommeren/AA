@@ -35,8 +35,9 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::map<Edge, bool> SpanningTree;
-    typedef std::map<Edge, std::string> EdgeNameMap;
+    typedef std::map<Edge, bool> ResultNetwork;
+    typedef typename Oracle::EdgeMap EdgeMap;
+    typedef std::map<Edge, ColId> OriginalEdgeMap;
     typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
     
@@ -45,105 +46,71 @@ public:
 
     template <typename LP>
     void init(LP & lp) {
-        lp.setLPName("steiner network tree");
+        lp.setLPName("steiner network");
         lp.setMinObjFun(); 
         
         addVariables(lp);
         lp.loadMatrix();
     }
+
+    template <typename LP>
+    std::pair<bool, double> roundCondition(const LP & lp, ColId id) {
+        auto ret = base::roundCondition(lp, id);
+        if(ret.first) {
+            assert(m_compare.e(ret.second, 0));
+            //removing edge
+            m_edgeMap.right.erase(id);
+            return ret;
+        } else {
+            return m_roundHalf(lp, id);
+        }
+    }
     
     template <typename GetSolution>
-    SpanningTree & getSolution(const GetSolution& sol) {
+    ResultNetwork & getSolution(const GetSolution& sol) {
         if (!m_solutionGenerated) {
             generateSolution(sol);
         }
-        return m_spanningTree;
+        return m_resultNetwork;
     }
 
 private:
-
-
-    std::string getDegBoundPrefix() const {
-        return "degBound ";
-    }
-  
-    std::string getDegBoundDesc(int dbIdx) const {
-        return getDegBoundPrefix() + std::to_string(dbIdx);
-    }
-    
-    std::string getEdgeName(int eIdx) const {
-        return std::to_string(eIdx);
-    }
     
     //adding variables
     template <typename LP>
     void addVariables(LP & lp) {
         auto edges = boost::edges(m_g);
-        int eIdx(0);
-        m_edgeList.resize(num_edges(m_g));
         
         for(Edge e : utils::make_range(edges.first, edges.second)) {
-            std::string colName = getEdgeName(eIdx);
-            lp.addColumn(m_costMap[e], DB, 0, 1, colName);
-            m_edgeMap[e] = colName;
-            m_spanningTree[e] = false;
-            m_edgeList[eIdx] = e;
-            ++eIdx;
+            ColId col =  lp.addColumn(m_costMap[e], DB, 0, 1);
+            m_originalEdgeMap.insert(typename OriginalEdgeMap::value_type(e, col));
+            m_edgeMap.insert(typename EdgeMap::value_type(e, col));
         }
     }
     
-    bool isDegBoundName(const std::string & s) const {
-        return s.compare(0, getDegBoundPrefix().size(), getDegBoundPrefix()) == 0;
-    }
-    
-    int getDegBoundIndex(const std::string & s) const {
-        return std::stoi( s.substr(getDegBoundPrefix().size(), s.size() - getDegBoundPrefix().size()) );
-    }
-    
-    template <typename LP>
-    int nonZeroIncEdges(const LP & lp, const Vertex & v) {
-        int nonZeroIncCnt(0);
-        auto adjVertices = adjacent_vertices(v, m_g);
-        
-        for(const Vertex & u : utils::make_range(adjVertices.first, adjVertices.second)) {
-            bool b; Edge e;
-            std::tie(e, b) = boost::edge(v, u, m_g);
-
-            if (b) {
-                int colIdx = lp.getColByName(m_edgeMap[e]);
-                if (colIdx != 0 && !m_compare.e(lp.getColUb(colIdx), 0)) {
-                    ++nonZeroIncCnt;
-                }
+    template <typename GetSolution>
+    void generateSolution(const GetSolution & sol) {
+        for (auto const & edgeCol : m_originalEdgeMap ) {
+            if(m_compare.e(sol(edgeCol.second), 1)) {
+                m_resultNetwork.insert();
             }
-        }
-        
-        return nonZeroIncCnt;
-    }
-    
-    template <typename LP>
-    void generateSolution(const LP & lp) {
-        int size = lp.colSize();
-        
-        for (int col = 1; col <= size; ++col) {
-            m_spanningTree[ m_edgeList[ std::stoi(lp.getColName(col)) ] ] = true;
         }
         m_solutionGenerated = true;
     }
 
-private:
     const Graph & m_g;
     const CostMap & m_costMap;
     const Restrictions & m_restrictions;
     
-    EdgeNameMap     m_edgeMap;
-    EdgeList        m_edgeList;
-    VertexList      m_vertexList;
+    EdgeMap          m_edgeMap;
+    OriginalEdgeMap m_originalEdgeMap;
     
     bool            m_solutionGenerated;
-    SpanningTree    m_spanningTree;
+    ResultNetwork    m_resultNetwork;
     
     Compare m_compare;
     Oracle m_separationOracle;
+    RoundConditionGreaterThanHalf m_roundHalf;
 };
 
 template <typename Graph, typename CostMap, typename Restrictions>

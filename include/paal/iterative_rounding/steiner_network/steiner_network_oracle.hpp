@@ -10,6 +10,7 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
+#include <boost/bimap.hpp>
 
 #include "paal/utils/double_rounding.hpp"
 
@@ -24,18 +25,18 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::map<Edge, std::string> EdgeNameMap;
+    typedef boost::bimap<Edge, ColId> EdgeMap;
     typedef std::vector<Vertex> VertexList;
     
     SteinerNetworkOracle(
             const Graph & g, 
             const Restrictions & restrictions, 
-            const EdgeNameMap & edgeMap,
+            const EdgeMap & edgeMap,
             const Compare & comp)
              : m_g(g), 
                m_restrictionsVec(boost::num_vertices(m_g)),
                m_restrictions(restrictions), 
-               m_edgeNameMap(edgeMap),
+               m_edgeMap(edgeMap),
                m_compare(comp) { 
         fillRestrictions();
     }
@@ -48,18 +49,15 @@ public:
     
     template <typename LP>
     void addViolatedConstraint(LP & lp) {
-        lp.addRow(UP, 0, m_violatingSetSize - 1);
+        lp.addRow(UP, 0, m_violatingSet.size() - 1);
         
-        for (const std::pair<Edge, std::string> & e : *m_edgeNameMap) {
-            const Vertex & u = boost::source(e.first, *m_g);
-            const Vertex & v = boost::target(e.first, *m_g);
+        for (auto const & e : m_edgeMap) {
+            const Vertex & u = boost::source(e.left, m_g);
+            const Vertex & v = boost::target(e.left, m_g);
             
-            if (m_violatingSet[u] && m_violatingSet[v]) {
-                int colIdx = lp.getColByName(e.second);
-                
-                if (0 != colIdx) {
-                    lp.addNewRowCoef(colIdx);
-                }
+            if (m_violatingSet.find(u) != m_violatingSet.end() && 
+                m_violatingSet.find(v) != m_violatingSet.end()) {
+                    lp.addNewRowCoef(e.right);
             }
         }
         
@@ -71,8 +69,6 @@ private:
     typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
     typedef std::vector<std::pair<Vertex, Vertex>> RestrictionsVector;
 
-    //When this class whas local class in fillRestrictions clang had 
-    //errors inside boost concepts...TODO investigate
     template <typename G>
     struct Mapping { 
         typedef Mapping value_type; 
@@ -140,7 +136,7 @@ private:
                                                     >
                                   > AuxGraph;
     typedef std::vector < AuxEdge > AuxEdgeList;
-    typedef std::map < AuxVertex, bool > ViolatingSet;
+    typedef std::set < AuxVertex > ViolatingSet;
                                   
     template <typename LP>
     void fillAuxiliaryDigraph(const LP & lp) {
@@ -149,16 +145,14 @@ private:
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (const std::pair<Edge, std::string> & e : m_edgeNameMap) {
-            int colIdx = lp.getColByName(e.second);
-            if (0 != colIdx) {
-                double colVal = lp.getColPrim(colIdx);
-                
-                if (!m_compare.e(colVal, 0)) {
-                    Vertex u = source(e.first, *m_g);
-                    Vertex v = target(e.first, *m_g);
-                    addEdge(u, v, colVal);
-                }
+        for (auto const & e : m_edgeMap) {
+            ColId colIdx = e.right;
+            double colVal = lp.getColPrim(colIdx);
+            
+            if (!m_compare.e(colVal, 0)) {
+                Vertex u = source(e.left, m_g);
+                Vertex v = target(e.left, m_g);
+                addEdge(u, v, colVal);
             }
         }
     }
@@ -186,7 +180,7 @@ private:
         // TODO random source node
         
         for (auto const & src_trg : m_restrictionsVec) {
-            if(m_compare.g(checkViolation(src_trg.first, src_trg.second), 0)) {
+            if(m_compare.g(checkViolationBiggerThan(src_trg.first, src_trg.second), 0)) {
                 return true;
             }
         }
@@ -216,20 +210,16 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double violation = m_restrictions(src, trg) - minCut;
         
-        if (m_compare.ge(violation, maximumViolation) && !m_compare.e(violation, 0)) {
+        if (m_compare.g(violation, maximumViolation)) {
+            m_violatingSet.clear();
             maximumViolation = violation;
-            m_violatingSetSize = 0;
             
             auto vertices = boost::vertices(m_auxGraph);
             auto colors = boost::get(boost::vertex_color, m_auxGraph);
             auto srcColor = boost::get(colors, src);
             for (const Vertex & v : utils::make_range(vertices.first, vertices.second)) {
-                if (v != src && v != trg && colors[v] == srcColor) {
-                    m_violatingSet[v] = true;
-                    ++m_violatingSetSize;
-                }
-                else {
-                    m_violatingSet[v] = false;
+                if (boost::get(colors, v) == srcColor) {
+                    m_violatingSet.insert(v);
                 }
             }
         }
@@ -247,9 +237,8 @@ private:
     
     
     ViolatingSet        m_violatingSet;
-    int                 m_violatingSetSize;
     
-    EdgeNameMap         m_edgeNameMap;
+    EdgeMap         m_edgeMap;
     const utils::Compare<double> & m_compare;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;

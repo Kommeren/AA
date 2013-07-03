@@ -84,7 +84,7 @@ public:
         m_cond(c), m_f(f) {}
 
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, int col) {
+    std::pair<bool, double> operator()(const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
             return std::make_pair(true, m_f(x));
