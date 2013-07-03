@@ -137,12 +137,14 @@ private:
 
 template <typename IR> 
 void solve(IR &ir) {
+    bool irsol=false;
     do {
         ir.solve();
         bool rounded = ir.round();
         bool relaxed = ir.relax();
-        assert(rounded || relaxed);
-    } while (!ir.integerSolution());
+        irsol=ir.integerSolution();
+        assert( irsol || rounded || relaxed);
+    } while (!irsol);
 }
 
 } //ir
