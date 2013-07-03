@@ -54,9 +54,10 @@ int main() {
     solve(ir);
 
     // printing result
-/*    auto const & j2m = ir.getSolution();
-    for(const std::pair<int, int> & jm : j2m) {
-        std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
-    }*/
+    std::cout << "Edges in steiner network" << std::endl;
+    auto const & edges = ir.getSolution();
+    for(auto const  & e : edges) {
+        std::cout << "Edge " << e << std::endl;
+    }
 }
 

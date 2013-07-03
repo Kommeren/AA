@@ -26,17 +26,19 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef boost::bimap<Edge, ColId> EdgeMap;
+    typedef std::set<Edge> ResultNetwork;
     typedef std::vector<Vertex> VertexList;
     
     SteinerNetworkOracle(
             const Graph & g, 
             const Restrictions & restrictions, 
             const EdgeMap & edgeMap,
+            const ResultNetwork & res,
             const Compare & comp)
              : m_g(g), 
-               m_restrictionsVec(boost::num_vertices(m_g)),
                m_restrictions(restrictions), 
                m_edgeMap(edgeMap),
+               m_resultNetwork(res),
                m_compare(comp) { 
         fillRestrictions();
     }
@@ -49,14 +51,14 @@ public:
     
     template <typename LP>
     void addViolatedConstraint(LP & lp) {
-        lp.addRow(UP, 0, m_violatingSet.size() - 1);
+        lp.addRow(LO, m_violatedRestriction);
         
         for (auto const & e : m_edgeMap) {
             const Vertex & u = boost::source(e.left, m_g);
             const Vertex & v = boost::target(e.left, m_g);
             
-            if (m_violatingSet.find(u) != m_violatingSet.end() && 
-                m_violatingSet.find(v) != m_violatingSet.end()) {
+            if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
+                (m_violatingSet.find(v) != m_violatingSet.end())) {
                     lp.addNewRowCoef(e.right);
             }
         }
@@ -119,7 +121,6 @@ private:
         boost::kruskal_minimum_spanning_tree(g, Mapping<TGraph>(g, m_restrictionsVec));
     }
 
-
     typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::directedS > Traits;
     typedef Traits::edge_descriptor AuxEdge;
     typedef Traits::vertex_descriptor AuxVertex;
@@ -149,11 +150,14 @@ private:
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
             
-            if (!m_compare.e(colVal, 0)) {
-                Vertex u = source(e.left, m_g);
-                Vertex v = target(e.left, m_g);
-                addEdge(u, v, colVal);
-            }
+            Vertex u = source(e.left, m_g);
+            Vertex v = target(e.left, m_g);
+            addEdge(u, v, colVal);
+        }
+        for (auto const & e : m_resultNetwork) {
+            Vertex u = source(e, m_g);
+            Vertex v = target(e, m_g);
+            addEdge(u, v, 1);
         }
     }
     
@@ -180,6 +184,7 @@ private:
         // TODO random source node
         
         for (auto const & src_trg : m_restrictionsVec) {
+            assert(src_trg.first != src_trg.second);
             if(m_compare.g(checkViolationBiggerThan(src_trg.first, src_trg.second), 0)) {
                 return true;
             }
@@ -208,9 +213,11 @@ private:
 */    
     double checkViolationBiggerThan(Vertex  src, Vertex trg, double maximumViolation = 0) {
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
-        double violation = m_restrictions(src, trg) - minCut;
+        double restriction = m_restrictions(src, trg);
+        double violation = restriction - minCut;
         
         if (m_compare.g(violation, maximumViolation)) {
+            m_violatedRestriction = restriction;
             m_violatingSet.clear();
             maximumViolation = violation;
             
@@ -237,8 +244,10 @@ private:
     
     
     ViolatingSet        m_violatingSet;
+    Dist                m_violatedRestriction;
     
-    EdgeMap         m_edgeMap;
+    const EdgeMap       &  m_edgeMap;
+    const ResultNetwork &  m_resultNetwork;
     const utils::Compare<double> & m_compare;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;

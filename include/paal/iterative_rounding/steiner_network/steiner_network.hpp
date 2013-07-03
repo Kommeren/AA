@@ -30,25 +30,34 @@ public:
     SteinerNetwork(const Graph & g, const CostMap & costMap, const Restrictions & restrictions) :
             base(RowGenerationSolveLP<Oracle>(m_separationOracle)),
             m_g(g), m_costMap(costMap), m_restrictions(restrictions),
-            m_solutionGenerated(false), m_separationOracle(m_g, m_restrictions, m_edgeMap, m_compare) { }
+            m_separationOracle(m_g, m_restrictions, m_edgeMap, m_resultNetwork, m_compare) { }
+    
+    SteinerNetwork(SteinerNetwork && other) :
+            base(RowGenerationSolveLP<Oracle>(m_separationOracle)),
+            m_g(std::move(other.m_g)), m_costMap(std::move(other.m_costMap)), 
+            m_restrictions(std::move(other.m_restrictions)),
+            m_compare(std::move(other.m_compare)),
+            m_separationOracle(m_g, m_restrictions, m_edgeMap, m_resultNetwork, m_compare) { }
+    
+    SteinerNetwork(const SteinerNetwork & other) :
+            base(RowGenerationSolveLP<Oracle>(m_separationOracle)),
+            m_g(other.m_g), m_costMap(other.m_costMap), 
+            m_restrictions(other.m_restrictions),
+            m_compare(other.m_compare),
+            m_separationOracle(m_g, m_restrictions, m_edgeMap, m_resultNetwork, m_compare) { }
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::map<Edge, bool> ResultNetwork;
+    typedef typename Oracle::ResultNetwork ResultNetwork;
     typedef typename Oracle::EdgeMap EdgeMap;
     typedef std::map<Edge, ColId> OriginalEdgeMap;
-    typedef std::vector<Edge> EdgeList;
-    typedef std::vector<Vertex> VertexList;
-    
     typedef utils::Compare<double> Compare;
-    
 
     template <typename LP>
     void init(LP & lp) {
         lp.setLPName("steiner network");
-        lp.setMinObjFun(); 
-        
+        lp.setMinObjFun();
         addVariables(lp);
         lp.loadMatrix();
     }
@@ -62,15 +71,19 @@ public:
             m_edgeMap.right.erase(id);
             return ret;
         } else {
-            return m_roundHalf(lp, id);
+            ret = m_roundHalf(lp, id);
+            if(ret.first) {
+                auto i = m_edgeMap.right.find(id);
+                assert(i != m_edgeMap.right.end());
+
+                m_resultNetwork.insert(i->second);
+            }
+            return ret;
         }
     }
     
     template <typename GetSolution>
     ResultNetwork & getSolution(const GetSolution& sol) {
-        if (!m_solutionGenerated) {
-            generateSolution(sol);
-        }
         return m_resultNetwork;
     }
 
@@ -87,16 +100,6 @@ private:
             m_edgeMap.insert(typename EdgeMap::value_type(e, col));
         }
     }
-    
-    template <typename GetSolution>
-    void generateSolution(const GetSolution & sol) {
-        for (auto const & edgeCol : m_originalEdgeMap ) {
-            if(m_compare.e(sol(edgeCol.second), 1)) {
-                m_resultNetwork.insert();
-            }
-        }
-        m_solutionGenerated = true;
-    }
 
     const Graph & m_g;
     const CostMap & m_costMap;
@@ -105,7 +108,6 @@ private:
     EdgeMap          m_edgeMap;
     OriginalEdgeMap m_originalEdgeMap;
     
-    bool            m_solutionGenerated;
     ResultNetwork    m_resultNetwork;
     
     Compare m_compare;
