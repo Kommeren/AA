@@ -67,7 +67,7 @@ namespace paal {
             class TreeAug : public IRComponents <DefaultSolveLP, RoundConditionGreaterThanHalf> {
                 public:
 
-                    typedef IRComponents <DefaultSolveLP, RoundConditionGreaterThanHalf> base;
+                    typedef IRComponents <DefaultSolveLP, RoundConditionGreaterThanHalf> Base;
 
 
                     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -87,19 +87,7 @@ namespace paal {
                         nonTreeFilter(treeMap),ntree(g,nonTreeFilter)
                 { 
 
-                    //we print out the input.
-                    std::cout << "The graph:" << std::endl;
-                    print_graph(g);
-                    std::cout << "The spanning tree:" << std::endl;
-                    print_graph(tree);
-                    std::cout << "The rest:" << std::endl;
-                    print_graph(ntree);
 
-
-                    // get the property map for vertex indices
-                    typedef typename boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
-                    IndexMap index = get(boost::vertex_index, g);
-                    int numberOfVertices=num_vertices(g);
 
 
                     //We need to fill two very useful auxiliary data structures:
@@ -110,7 +98,7 @@ namespace paal {
                     //edges covered by \c e (that is, the tree edges in the unique
                     //path in the tree between the endnodes of \c e).
                     {
-                        std::vector< Edge > pred(numberOfVertices);	  
+                        std::vector< Edge > pred(num_vertices(g));	  
                         std::map< Vertex, bool > wasSeen;
                         typename boost::graph_traits<Graph>
                             ::vertex_iterator ui, ui_end;
@@ -136,31 +124,18 @@ namespace paal {
                         std::cout << std::endl;
 
                     }
-                    //This is just for debug purposes
-                    {
-                        typename boost::graph_traits<NonTreeGraph>
-                            ::edge_iterator ei, ei_end;
-                        for(boost::tie(ei,ei_end) = edges(ntree); ei != ei_end; ++ei){
-                            std::cout << index[source(*ei,ntree)]<<"-"<<index[target(*ei,ntree)] << "  has path in the tree: ";
-                            for (auto pe:covers[*ei]){
-                                std::cout << index[source(pe,tree)]<<"-"<<index[target(pe,tree)] << ", ";
-
-                            }
-                            std::cout << std::endl;    
-                        }  
-                    }
 
                 }//end of Constructor
 
 
                     template <typename LP>
-                        std::pair<bool, double> roundCondition(LP & lp, int col) {
-                            auto res = base::roundCondition(lp, col);
-                            if(res.first) {        
-                                inSolution[colName2Edge[lp.getColName(col)]]=true;
-                            }
-                            return res;
+                    std::pair<bool, double> roundCondition(LP & lp, int col) {
+                        auto res = Base::roundCondition(lp, col);
+                        if(res.first) {        
+                            inSolution[colName2Edge[lp.getColName(col)]]=true;
                         }
+                        return res;
+                    }
 
                     ///Initialize the cut LP.
                     template <typename LP>
@@ -171,17 +146,13 @@ namespace paal {
 
                             int num=addVariables(lp);
 
-                            std::cout<<"Number of columns initially: "<<num<<std::endl;
+                            //std::cout<<"Number of columns initially: "<<num<<std::endl;
                             num=addCutConstraints(lp);
-                            std::cout<<"Number of rows initially: "<<num<<std::endl;
+                            //std::cout<<"Number of rows initially: "<<num<<std::endl;
 
-                            // addDegreeBoundConstraints(lp);
-                            // addAllSetEquality(lp);
 
                             lp.loadMatrix();
 
-                            // BoundedDegreeMSTBase::m_solveLP.setOracle(&m_separationOracle);
-                            // m_separationOracle.init(&m_g, &m_vertexList, &m_edgeMap);
                         }
 
 
