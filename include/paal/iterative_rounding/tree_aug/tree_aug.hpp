@@ -19,6 +19,7 @@
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/breadth_first_search.hpp>
+#include <boost/graph/connected_components.hpp>
 
 
 
@@ -30,6 +31,22 @@
 
 namespace paal {
     namespace ir {
+
+        
+        ///This function return the number of edges in a graph. The
+        ///reason this function was written is that BGL's num_edges()
+        ///function does not work properly for filtered_graph.  See
+        ///http://www.boost.org/doc/libs/1_54_0/libs/graph/doc/filtered_graph.html#2
+        template <class EdgeListGraph>
+        int my_num_edges(const EdgeListGraph& G)
+        {
+            int num=0;
+            typename boost::graph_traits<EdgeListGraph>::edge_iterator ei, ei_end;
+            for (boost::tie(ei, ei_end) = edges(G); ei != ei_end; ++ei){
+                ++num;
+            }
+            return num;
+        }
 
 
         ///A class that translates bool map on the edges to a filter, which can be used with
@@ -53,9 +70,16 @@ namespace paal {
 
 
         /**
-         * class TreeAug @brief This is Jain's iterative rounding
+         * \brief This is Jain's iterative rounding
          * 2-approximation algorithm for the Generalised Steiner Network
-         * Problem, specialized for the Tree Augmentation Problem
+         * Problem, specialized for the Tree Augmentation Problem.
+         *
+         * The Tree Augmentation Problem is the following. Given a
+         * 2-edge connected graph, in which a spanning tree is
+         * designated. The non-tree edges are also called links. The
+         * links have non-negative costs. The problem is to find a
+         * minimum cost subset of links which, together with the
+         * tree-edges give a 2-edge-connected graph.
          *
          * Example:  tree_aug_example.cpp
          *
@@ -88,7 +112,12 @@ namespace paal {
                 { 
 
 
-
+                    std::cout<<"The graph:"<<std::endl;
+                    print_graph(g);
+                    std::cout<<"The spanning tree:"<<std::endl;
+                    print_graph(tree);
+                    std::cout<<"The rest:"<<std::endl;
+                    print_graph(ntree);
 
                     //We need to fill two very useful auxiliary data structures:
                     //\c covers and \c coveredBy. These are containing lists of
@@ -126,19 +155,68 @@ namespace paal {
                     }
 
                 }//end of Constructor
-
-
-                    template <typename LP>
-                    std::pair<bool, double> roundCondition(LP & lp, ColId col) {
-                        std::cout<<"Round condition: "<<std::endl;
-                        std::cout<<lp;
-                        auto res = Base::roundCondition(lp, col);
-                        if(res.first) {        
-                            inSolution[colId2Edge[col]]=true;
-                            
-                        }
-                        return res;
+            
+            ///Check validity of the input
+            /**This function can be used to check validity of the
+               input. The input is valid if it consists of a
+               2-edge-connected, in which a spanning tree is
+               designated. The input validity is not checked by
+               default.
+             */
+            bool checkInputValidity(std::string & errorMsg){
+                //Num of edges == num of nodes-1 in the tree?
+                {
+                    int nV=num_vertices(g);
+                    //This is not very nice, but BGL sucks for filtered_graph
+                    int nE=my_num_edges(tree);
+                    
+                    if (nE != nV-1){
+                        errorMsg="The number of edges in the spanning tree is not good. It is "+std::to_string(nE)+", and it should be "+std::to_string(nV-1)+".";
+                        return false;
                     }
+                }
+                //Is the tree connected?
+                {   
+                    std::vector<int> component(num_vertices(g));
+                    int num = connected_components(tree, &component[0]);
+
+                    if (num>1){
+                        errorMsg="The spanning tree is not connected.";
+                        return false;
+                    }
+                }
+                //Is the graph 2-edge-connected?
+                {
+                    typename boost::graph_traits<TreeGraph>
+                        ::edge_iterator ei, ei_end;
+                    for(boost::tie(ei,ei_end) = edges(tree); ei != ei_end; ++ei){
+                        
+                        if (coveredBy[*ei].size()==0){
+                            errorMsg="The graph is not 2-edge-connected. The spanning tree edge ("+std::to_string(source(*ei,tree))+","+std::to_string(target(*ei,tree))+") is a cut edge.";
+                            return false;
+                            
+                        }        
+                    }       
+                }
+                errorMsg="";
+                return true;
+                
+            }
+            
+            ///Round a coordinate up if it is at least half in the
+            ///current solution.
+            template <typename LP>
+            std::pair<bool, double> roundCondition(LP & lp, ColId col) {
+
+                ///Round a coordinate up if it is at least half.
+                auto res = Base::roundCondition(lp, col);
+                //Save some auxiliary info
+                if(res.first) {        
+                    inSolution[colId2Edge[col]]=true;
+                    
+                }
+                return res;
+            }
 
                     ///Initialize the cut LP.
                     template <typename LP>
@@ -284,10 +362,9 @@ namespace paal {
                             }
                             return dbIndex;
                         }
+            
 
-
-
-            };
+                };
 
 
 
