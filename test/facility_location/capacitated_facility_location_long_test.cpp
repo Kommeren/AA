@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         VorType voronoi( FSet{fac.begin(), fac.end()},  VSet(clients.begin(), clients.end()), metric, facCapacities, verticesDemands);
         Sol sol(std::move(voronoi), USet{}, cost);
 
-        FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
-            ls(std::move(sol));
+        FacilityLocationLocalSearchStep<VorType, decltype(cost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
+            ls(std::move(sol), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type(), typename DefaultSwapFLComponents<int>::type());
 
         auto & s = ls.getSolution().getObj();
 

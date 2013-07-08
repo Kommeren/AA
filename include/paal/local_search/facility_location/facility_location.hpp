@@ -26,11 +26,27 @@ namespace facility_location {
  * @tparam VertexType
  */
 template <typename VertexType> 
-struct DefaultFLComponents {
+struct DefaultRemoveFLComponents {
     typedef MultiSearchComponents<
-                FacilityLocationGetNeighborhood<VertexType>,
-                FacilityLocationChecker        <VertexType>,
-                FacilityLocationUpdater        <VertexType>> type;
+                FacilityLocationGetNeighborhoodRemove<VertexType>,
+                FacilityLocationCheckerRemove        <VertexType>,
+                FacilityLocationUpdaterRemove        <VertexType>> type;
+};
+
+template <typename VertexType> 
+struct DefaultAddFLComponents {
+    typedef MultiSearchComponents<
+                FacilityLocationGetNeighborhoodAdd<VertexType>,
+                FacilityLocationCheckerAdd        <VertexType>,
+                FacilityLocationUpdaterAdd        <VertexType>> type;
+};
+
+template <typename VertexType> 
+struct DefaultSwapFLComponents {
+    typedef MultiSearchComponents<
+                FacilityLocationGetNeighborhoodSwap<VertexType>,
+                FacilityLocationCheckerSwap        <VertexType>,
+                FacilityLocationUpdaterSwap        <VertexType>> type;
 };
 
 /**
@@ -56,14 +72,14 @@ struct DefaultFLComponents {
  */
 template <typename Voronoi,
           typename FacilityCost,
-          typename MultiSearchComponents = typename DefaultFLComponents<typename Voronoi::VertexType>::type>
+          typename... MultiSearchComponents>
 
 class FacilityLocationLocalSearchStep : 
     public LocalSearchStepMultiSolution<
                FacilityLocationSolutionAdapter<
                     data_structures::FacilityLocationSolution<FacilityCost, Voronoi>>,
                search_strategies::ChooseFirstBetter,
-               MultiSearchComponents>  {
+               MultiSearchComponents...>  {
 
 public:
     typedef data_structures::FacilityLocationSolution<FacilityCost, Voronoi> FLSolution;
@@ -72,13 +88,13 @@ public:
     typedef LocalSearchStepMultiSolution<
                 FLSolutionAdapter,
                 search_strategies::ChooseFirstBetter,
-                MultiSearchComponents>  base;
+                MultiSearchComponents...>  base;
 
     FacilityLocationLocalSearchStep(
             FLSolution fls,
-            MultiSearchComponents sc = MultiSearchComponents()) :
+            MultiSearchComponents... sc) :
                 base(FLSolutionAdapter(std::move(fls)), 
-                                       std::move(sc)) {}
+                                       std::move(sc)...) {}
 };
 
 }

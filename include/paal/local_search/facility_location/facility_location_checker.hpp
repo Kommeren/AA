@@ -17,47 +17,65 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-template <typename VertexType> class FacilityLocationChecker {
+template <typename VertexType> 
+class FacilityLocationCheckerRemove {
 public:
-        template <class Solution, class Update> 
+        template <class Solution> 
     auto operator()(const Solution & s, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            const Update & ue) ->
+            Remove<VertexType> r) ->
+                typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
+        auto const & FLS = s.get();
+        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
+
+        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
+
+        ret = FLS.invokeOnCopy(&FLS_T::remFacility, r.get());
+        //TODO for capacitated version we should  just restart copy
+        back = FLS.invokeOnCopy(&FLS_T::addFacility, r.get());
+        assert(ret == -back);
+        return -ret;
+    }
+};
+
+template <typename VertexType> 
+class FacilityLocationCheckerAdd {
+public:
+        template <class Solution> 
+    auto operator()(const Solution & s, 
+            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            Add<VertexType> a) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
         auto const & FLS = s.get();
         typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
         typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
-        switch (ue.getImpl()->getType()) {
-            case REMOVE : {
-                auto r = static_cast<const Remove<VertexType> *>(ue.getImpl());
-                ret = FLS.invokeOnCopy(&FLS_T::remFacility, r->get());
-                //TODO for capacitated version we should  just restart copy
-                back = FLS.invokeOnCopy(&FLS_T::addFacility, r->get());
-                assert(ret == -back);
-                break;
-            }
-            case ADD: {
-                auto a = static_cast<const Add<VertexType> *>(ue.getImpl());
-                ret = FLS.invokeOnCopy(&FLS_T::addFacility, a->get());
-                back = FLS.invokeOnCopy(&FLS_T::remFacility, a->get());
-                assert(ret == -back);
-                break;
-            }
-            case SWAP: {
-                auto s = static_cast<const Swap<VertexType> *>(ue.getImpl());
-                ret  = FLS.invokeOnCopy(&FLS_T::addFacility, s->getTo());
-                ret += FLS.invokeOnCopy(&FLS_T::remFacility, s->getFrom());
-                back = FLS.invokeOnCopy(&FLS_T::addFacility, s->getFrom());
-                back += FLS.invokeOnCopy(&FLS_T::remFacility, s->getTo());
-                assert(ret == -back);
-                break;
-            }
-            default: {
-                assert(false);
-            }
-        }
+
+        ret = FLS.invokeOnCopy(&FLS_T::addFacility, a.get());
+        back = FLS.invokeOnCopy(&FLS_T::remFacility, a.get());
+        assert(ret == -back);
         return -ret;
 
+    }
+};
+
+template <typename VertexType> 
+class FacilityLocationCheckerSwap {
+public:
+        template <class Solution> 
+    auto operator()(const Solution & sol, 
+            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            const Swap<VertexType> & s) ->
+                typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
+        auto const & FLS = sol.get();
+        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
+        typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
+        
+        ret  = FLS.invokeOnCopy(&FLS_T::addFacility, s.getTo());
+        ret += FLS.invokeOnCopy(&FLS_T::remFacility, s.getFrom());
+        back = FLS.invokeOnCopy(&FLS_T::addFacility, s.getFrom());
+        back += FLS.invokeOnCopy(&FLS_T::remFacility, s.getTo());
+        assert(ret == -back);
+        return -ret;
     }
 };
 

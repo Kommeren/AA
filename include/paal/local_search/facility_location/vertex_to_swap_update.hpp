@@ -15,27 +15,24 @@ namespace facility_location {
 
 template <typename VertexType> class VertexToSwapUpdate {
 public:
-    VertexToSwapUpdate(VertexType v) : m_u(&m_sw), m_from(v) {}
-
-    VertexToSwapUpdate() : m_u(&m_sw) {}
+    VertexToSwapUpdate(VertexType v) : m_from(v) {}
     
-    VertexToSwapUpdate(const VertexToSwapUpdate & u) : m_u(&m_sw),  m_from(u.m_from) { 
-    }
+    VertexToSwapUpdate() = default;
+    VertexToSwapUpdate(const VertexToSwapUpdate & u) = default;
     
     VertexToSwapUpdate & operator=(const VertexToSwapUpdate & u)  { 
         m_from = u.m_from;
         return *this;
     }
 
-    const Update & operator()(VertexType v) const {
+    const Swap<VertexType> & operator()(VertexType v) const {
         m_sw.setFrom(m_from); 
         m_sw.setTo(v);
-        return m_u;
+        return m_sw;
     }
 
 private:
     mutable Swap<VertexType> m_sw;
-    Update m_u;
     VertexType m_from;
 };
 }

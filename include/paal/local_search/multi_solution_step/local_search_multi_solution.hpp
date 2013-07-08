@@ -132,7 +132,8 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBette
     typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
-
+//TODO change after redesign
+protected:
     LocalSearchStepMultiSolution(Solution solution = Solution()) : 
         base(std::move(solution)) {}
 public:

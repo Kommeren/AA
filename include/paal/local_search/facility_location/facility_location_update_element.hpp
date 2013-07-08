@@ -12,23 +12,11 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-enum UpdateType {REMOVE, ADD, SWAP};
 
-class AbstractUpdate {
-protected:
-    virtual ~AbstractUpdate() {}
-public:
-    virtual UpdateType getType() const = 0;
-};
-
-template <typename T> class Swap : public AbstractUpdate {
+template <typename T> class Swap {
 public:
     Swap(T from, T to) : m_from(from), m_to(to) {}
     Swap() {}
-
-    UpdateType getType() const {
-        return SWAP;
-    }
 
     T getFrom() const {
         return m_from;
@@ -52,11 +40,12 @@ private:
 };
 
 
-template <typename T> class RemoveAndAddBase : public AbstractUpdate {
-public:
+template <typename T> class RemoveAndAddBase {
+protected:
     RemoveAndAddBase(T t) : m_t(t) {}
     RemoveAndAddBase() {}
 
+public:
     T get() const {
         return m_t;
     }
@@ -72,29 +61,11 @@ private:
 template <typename T> struct Remove : public RemoveAndAddBase<T> {
     Remove(T t) : RemoveAndAddBase<T>(t) {}
     Remove() {}
-    UpdateType getType() const {
-        return REMOVE;
-    }
 };
 
 template <typename T> struct Add : public RemoveAndAddBase<T> {
     Add(T t) : RemoveAndAddBase<T>(t) {}
     Add() {}
-    UpdateType getType() const {
-        return ADD;
-    }
-};
-
-class Update {
-public:
-    Update(AbstractUpdate * t) : m_impl(t) {}
-
-    const AbstractUpdate * getImpl() const {
-        return m_impl;
-    }
-
-private:
-    AbstractUpdate * m_impl;
 };
 
 

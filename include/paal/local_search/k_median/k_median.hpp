@@ -11,6 +11,7 @@
 #include "paal/local_search/multi_solution_step/local_search_multi_solution.hpp"
 
 #include "paal/local_search/facility_location/facility_location_checker.hpp"
+#include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
 #include "paal/local_search/facility_location/facility_location_updater.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 
@@ -31,9 +32,9 @@ namespace k_median {
 template <typename VertexType> 
 struct DefaultKMedianComponents {
     typedef MultiSearchComponents<
-                KMedianGetNeighborhood         <VertexType>,
-                facility_location::FacilityLocationChecker        <VertexType>,
-                facility_location::FacilityLocationUpdater        <VertexType>> type;
+                facility_location::FacilityLocationGetNeighborhoodSwap <VertexType>,
+                facility_location::FacilityLocationCheckerSwap         <VertexType>,
+                facility_location::FacilityLocationUpdaterSwap         <VertexType>> type;
 };
 
 

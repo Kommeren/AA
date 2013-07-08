@@ -24,8 +24,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi),FSet{SGM::A, SGM::B}, cost );
 
-    FacilityLocationLocalSearchStep<VorType, decltype(cost)>  
-        ls(std::move(sol));
+    FacilityLocationLocalSearchStep<VorType, decltype(cost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
+          ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
 
     LOG("cost(0) = " << cost(0));
     BOOST_CHECK(ls.search());

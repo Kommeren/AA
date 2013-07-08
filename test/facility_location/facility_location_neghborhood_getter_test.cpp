@@ -12,7 +12,7 @@ using namespace paal::data_structures;
 using namespace paal::local_search::facility_location;
 
 
-BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
+BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
@@ -25,15 +25,46 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
 
    FacilityLocationSolutionAdapter<Sol> sa(sol);  
-   FacilityLocationGetNeighborhood<int> ng;
-   auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
-   auto b = r.first;
-   auto e = r.second;
-   BOOST_CHECK_EQUAL(std::distance(b, e), 2);
-
-   BOOST_CHECK(b!=e);
-   BOOST_CHECK_EQUAL(b->getImpl()->getType(), REMOVE);
-   BOOST_CHECK(++b!=e);
-   BOOST_CHECK_EQUAL(b->getImpl()->getType(), SWAP);
-   BOOST_CHECK(++b == e);
+   {
+        FacilityLocationGetNeighborhoodRemove<int> ng;
+        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 1);
+   }
+   {
+        FacilityLocationGetNeighborhoodRemove<int> ng;
+        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
+   }
+   {
+        FacilityLocationGetNeighborhoodAdd<int> ng;
+        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
+   }
+   {
+        FacilityLocationGetNeighborhoodAdd<int> ng;
+        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 1);
+   }
+   {
+        FacilityLocationGetNeighborhoodSwap<int> ng;
+        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
+   }
+   {
+        FacilityLocationGetNeighborhoodSwap<int> ng;
+        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto b = r.first;
+        auto e = r.second;
+        BOOST_CHECK_EQUAL(std::distance(b, e), 1);
+   }
 }

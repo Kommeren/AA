@@ -23,12 +23,12 @@ public:
         template <typename Solution> 
     auto operator()(const Solution &s, const Fac & el) ->
     std::pair<boost::transform_iterator<facility_location::VertexToSwapUpdate<VertexType>, 
-                 decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Update &>,
+                 decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Swap<VertexType> &>,
               boost::transform_iterator<facility_location::VertexToSwapUpdate<VertexType>,
-                 decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Update &>>
+                 decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Swap<VertexType> &>>
     {
         typedef boost::transform_iterator<facility_location::VertexToSwapUpdate<VertexType>, 
-                  decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Update &> NeighIter;
+                  decltype(s.get()->getUnchosenFacilities().begin()), const facility_location::Swap<VertexType> &> NeighIter;
 
         auto const & FCS = s.get(); 
         auto e = el.getElem();
