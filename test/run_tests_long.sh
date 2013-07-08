@@ -11,7 +11,7 @@ echo ------------------------------------------- bimap_perf_test 	 -------------
 #echo ------------------------------------------- bounded_degree_mst_long_test 	 -------------------------------------------------------------------------------------
 #./${build_dir}/bounded_degree_mst_long_test
 echo ------------------------------------------- capacitated_facility_location_long_test 	 -------------------------------------------------------------------------------------
-./${build_dir}/capacitated_facility_location_long_test
+./${build_dir}/capacitated_facility_location_long_test --run_test=FacilityLocationLong
 echo ------------------------------------------- facility_location_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/facility_location_long_test
 echo ------------------------------------------- generalised_assignment_long_test 	 -------------------------------------------------------------------------------------

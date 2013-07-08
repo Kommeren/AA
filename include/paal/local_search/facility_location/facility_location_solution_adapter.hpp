@@ -19,7 +19,8 @@ namespace local_search {
 namespace facility_location {
 
 
-template <typename FacilityLocationSolution> class FacilityLocationSolutionAdapter {
+template <typename FacilityLocationSolution> 
+class FacilityLocationSolutionAdapter {
     typedef FacilityLocationSolution FLS;
 public:
     typedef typename FacilityLocationSolution::VertexType VertexType;

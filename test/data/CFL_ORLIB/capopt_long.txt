@@ -1,4 +1,3 @@
-#this tests are too big for current version of the library
 capa8000        19240822.449 
 capa10000           18438046.543 
 capa12000           17765201.949 
