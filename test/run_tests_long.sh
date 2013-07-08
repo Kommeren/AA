@@ -16,5 +16,7 @@ echo ------------------------------------------- facility_location_long_test 	 -
 ./${build_dir}/facility_location_long_test
 echo ------------------------------------------- generalised_assignment_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/generalised_assignment_long_test
+echo ------------------------------------------- steiner_network_long_test 	 -------------------------------------------------------------------------------------
+./${build_dir}/steiner_network_long_test
 echo ------------------------------------------- steiner_tree_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/steiner_tree_long_test

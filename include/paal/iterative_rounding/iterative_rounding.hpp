@@ -139,7 +139,8 @@ template <typename IR>
 void solve(IR &ir) {
     bool irsol=false;
     do {
-        ir.solve();
+        bool solved = ir.solve();
+        assert(solved);
         bool rounded = ir.round();
         bool relaxed = ir.relax();
         irsol=ir.integerSolution();

@@ -30,6 +30,7 @@ public:
     SteinerNetwork(const Graph & g, const CostMap & costMap, const Restrictions & restrictions) :
             base(RowGenerationSolveLP<Oracle>(m_separationOracle)),
             m_g(g), m_costMap(costMap), m_restrictions(restrictions),
+            m_compare(EPSILON),
             m_separationOracle(m_g, m_restrictions, m_edgeMap, m_resultNetwork, m_compare) { }
     
     SteinerNetwork(SteinerNetwork && other) :
@@ -60,6 +61,7 @@ public:
         lp.setMinObjFun();
         addVariables(lp);
         lp.loadMatrix();
+        assert(m_separationOracle.checkIfSolutionExists());
     }
 
     template <typename LP>
@@ -113,7 +115,11 @@ private:
     Compare m_compare;
     Oracle m_separationOracle;
     RoundConditionGreaterThanHalf m_roundHalf;
+    static const double EPSILON;
 };
+
+template <typename Graph, typename CostMap, typename Restrictions>
+const double SteinerNetwork<Graph, CostMap, Restrictions>::EPSILON = 1e-10;
 
 template <typename Graph, typename CostMap, typename Restrictions>
 SteinerNetwork<Graph, CostMap, Restrictions>

@@ -1,17 +1,22 @@
 /**
- * @file steiner_network_example.cpp
+ * @file steiner_network_test.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-06-24
  */
 
+#define BOOST_TEST_MODULE steiner_network
+
 #include <vector>
 
+#include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
+
+#include "utils/logger.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -27,10 +32,8 @@ int restrictions(int i, int j) {
 }
 
 
-int main() {
+BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
-//    auto  restrictions = [&](int i, int j){return 2;};
-    
     Graph g(3);
     bool b;
     b = boost::add_edge(0 , 1, EdgeProp(1), g).second;
@@ -54,10 +57,10 @@ int main() {
     solve(ir);
 
     // printing result
-    std::cout << "Edges in steiner network" << std::endl;
+    LOG("Edges in steiner network");
     auto const & edges = ir.getSolution();
     for(auto const  & e : edges) {
-        std::cout << "Edge " << e << std::endl;
+        LOG("Edge " << e);
     }
 }
 

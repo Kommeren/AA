@@ -12,7 +12,9 @@
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 #include <boost/bimap.hpp>
 
+#include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/utils/double_rounding.hpp"
+#include "paal/utils/do_nothing_functor.hpp"
 
 
 namespace paal {
@@ -28,6 +30,7 @@ public:
     typedef boost::bimap<Edge, ColId> EdgeMap;
     typedef std::set<Edge> ResultNetwork;
     typedef std::vector<Vertex> VertexList;
+
     
     SteinerNetworkOracle(
             const Graph & g, 
@@ -37,16 +40,26 @@ public:
             const Compare & comp)
              : m_g(g), 
                m_restrictions(restrictions), 
+               m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, boost::num_vertices(m_g))),
+               m_auxGraph(boost::num_vertices(g)),
                m_edgeMap(edgeMap),
                m_resultNetwork(res),
                m_compare(comp) { 
-        fillRestrictions();
+               }
+
+    bool checkIfSolutionExists() {
+        for (auto const & e : m_edgeMap) {
+            Vertex u = source(e.left, m_g);
+            Vertex v = target(e.left, m_g);
+            addEdge(u, v, 1);
+        }
+        return !findAnyViolatedConstraint();
     }
                            
     template <typename LP>
     bool feasibleSolution(const LP & lp) {
         fillAuxiliaryDigraph(lp);
-        return !findAnyViolatedConstraint();
+        return !findMostViolatedConstraint();
     }
     
     template <typename LP>
@@ -56,7 +69,7 @@ public:
         for (auto const & e : m_edgeMap) {
             const Vertex & u = boost::source(e.left, m_g);
             const Vertex & v = boost::target(e.left, m_g);
-            
+                
             if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
                 (m_violatingSet.find(v) != m_violatingSet.end())) {
                     lp.addNewRowCoef(e.right);
@@ -69,57 +82,6 @@ public:
 private:
     //TODO make it signed type
     typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
-    typedef std::vector<std::pair<Vertex, Vertex>> RestrictionsVector;
-
-    template <typename G>
-    struct Mapping { 
-        typedef Mapping value_type; 
-
-        Mapping(const G & g, RestrictionsVector & resVec) : 
-            m_restrictionsVec(&resVec), m_g(&g) {}
-
-        Mapping & operator=(const Mapping &) = default;
-        Mapping & operator=(Mapping &&) = default;
-        
-        Mapping(const Mapping &) = default;
-        Mapping(Mapping &&) = default;
-
-        Mapping & operator*() {
-            return *this;
-        }
-
-        Mapping & operator++() { 
-            return *this;
-        }
-        
-        Mapping & operator++(int) {
-            return *this;
-        }
-
-        std::pair<Vertex, Vertex> & operator=(Edge e) {
-            m_restrictionsVec->push_back(std::make_pair(boost::source(e, *m_g), boost::target(e, *m_g)));
-            return m_restrictionsVec->back();
-        }
-        
-        RestrictionsVector * m_restrictionsVec; 
-        const G * m_g;
-    };
-
-    void fillRestrictions() {
-        typedef  boost::property < boost::edge_weight_t, Dist> EdgeProp;
-        typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                            boost::no_property,  EdgeProp> TGraph;
-        int N = boost::num_vertices(m_g);
-        TGraph g(N);
-        for(int i : boost::irange(0, N)) {
-            for(int j : boost::irange(i, N)) {
-                boost::add_edge(i, j, 
-                        EdgeProp(-std::max(m_restrictions(i, j), m_restrictions(j, i))),  g);
-            }
-        }
-            
-        boost::kruskal_minimum_spanning_tree(g, Mapping<TGraph>(g, m_restrictionsVec));
-    }
 
     typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::directedS > Traits;
     typedef Traits::edge_descriptor AuxEdge;
@@ -141,7 +103,7 @@ private:
                                   
     template <typename LP>
     void fillAuxiliaryDigraph(const LP & lp) {
-        m_auxGraph.clear();
+        boost::remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
         m_cap = boost::get(boost::edge_capacity, m_auxGraph);
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
@@ -149,10 +111,12 @@ private:
         for (auto const & e : m_edgeMap) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
-            
-            Vertex u = source(e.left, m_g);
-            Vertex v = target(e.left, m_g);
-            addEdge(u, v, colVal);
+
+            if(m_compare.g(colVal, 0)) {
+                Vertex u = source(e.left, m_g);
+                Vertex v = target(e.left, m_g);
+                addEdge(u, v, colVal);
+            }
         }
         for (auto const & e : m_resultNetwork) {
             Vertex u = source(e, m_g);
@@ -193,24 +157,17 @@ private:
         return false;
     }
     
-/*    bool findMostViolatedConstraint() {
-        auto vertices = boost::vertices(m_auxGraph);
-        const Vertex & src = *(vertices.first);
-        assert(src != m_src && src != m_trg);
-        
-        m_violatedConstraintFound = false;
-        m_maximumViolation = 0;
-        
-        for (const Vertex & trg : utils::make_range(vertices.first, vertices.second)) {
-            if (src != trg && trg != m_src && trg != m_trg) {
-                checkViolation(src, trg);
-                checkViolation(trg, src);
-            }
+    bool findMostViolatedConstraint() {
+        double max = 0;
+
+        for (auto const & src_trg : m_restrictionsVec) {
+            assert(src_trg.first != src_trg.second);
+            max = std::max(checkViolationBiggerThan(src_trg.first, src_trg.second), max);
         }
         
-        return m_violatedConstraintFound;
+        return m_compare.g(max, 0);
     }
-*/    
+    
     double checkViolationBiggerThan(Vertex  src, Vertex trg, double maximumViolation = 0) {
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = m_restrictions(src, trg);
@@ -237,8 +194,8 @@ private:
     
     const Graph &  m_g;
     
-    RestrictionsVector m_restrictionsVec;
     const Restrictions & m_restrictions;
+    RestrictionsVector m_restrictionsVec;
     
     AuxGraph    m_auxGraph;
     
