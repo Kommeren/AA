@@ -9,15 +9,10 @@
 #define K_MEDIAN_HPP 
 
 #include "paal/local_search/multi_solution_step/local_search_multi_solution.hpp"
-
-#include "paal/local_search/facility_location/facility_location_checker.hpp"
-#include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
-#include "paal/local_search/facility_location/facility_location_updater.hpp"
+#include "paal/local_search/facility_location/facility_location_swap.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 
-
 #include "k_median_solution.hpp"
-#include "k_median_get_neighbor.hpp"
 
 namespace paal {
 namespace local_search {

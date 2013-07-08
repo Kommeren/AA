@@ -4,7 +4,9 @@
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
-#include "paal/local_search/facility_location/facility_location_neighbor_getter.hpp"
+#include "paal/local_search/facility_location/facility_location_add.hpp"
+#include "paal/local_search/facility_location/facility_location_remove.hpp"
+#include "paal/local_search/facility_location/facility_location_swap.hpp"
 #include "utils/sample_graph.hpp"
 
 

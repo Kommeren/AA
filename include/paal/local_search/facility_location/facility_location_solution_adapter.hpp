@@ -12,8 +12,7 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/object_with_copy.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
-
-#include "facility_location_solution_element.hpp"
+#include "paal/local_search/facility_location/facility_location_solution_element.hpp"
 
 namespace paal {
 namespace local_search {
