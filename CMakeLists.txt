@@ -33,25 +33,32 @@ include_directories (${TEST_DIR})
 
 ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
-#set(CMAKE_BUILD_TYPE Release)
 
 file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
 file(GLOB_RECURSE example_bins "${EXAMPLE_DIR}/*.cpp")
 
-message(${test_bins})
-
-set(LIBS ${LIBS} ${Boost_LIBRARIES} glpk)
-
 foreach(t ${test_bins})
+    set(TEST_LIBS ${LIBS} ${Boost_LIBRARIES})
+
     get_filename_component(n ${t} NAME_WE)
     message("adding test " : ${n})
     add_executable(${n} ${t})
-    target_link_libraries (${n} ${LIBS}) 
+    if(${t} MATCHES ".*iterative_rounding.*") 
+        message("opcaj 1" ${t})
+        target_link_libraries (${n} ${TEST_LIBS} glpk) 
+    else()
+        message("opcaj 2" ${t})
+        target_link_libraries (${n} ${TEST_LIBS}) 
+    endif()
 endforeach()
 
 foreach(t ${example_bins})
     get_filename_component(n ${t} NAME_WE)
     message("adding examaple " : ${n})
     add_executable(${n} ${t})
-    target_link_libraries (${n} ${LIBS}) 
+    if(${t} MATCHES ".*iterative_rounding.*") 
+        target_link_libraries (${n} ${LIBS} glpk) 
+    else()
+        target_link_libraries (${n} ${LIBS}) 
+    endif()
 endforeach()
