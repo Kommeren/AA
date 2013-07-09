@@ -37,8 +37,8 @@ int main() {
     Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
     //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost)>  
-        ls(std::move(sol));
+    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
+          ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
 
     //search 
     search(ls);

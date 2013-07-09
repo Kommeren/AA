@@ -39,6 +39,7 @@ void runTests(const std::string & fname, Solve solve) {
     std::string testDir = "test/data/CFL_ORLIB/";
     std::ifstream is_test_cases(testDir + fname);
 
+    assert(is_test_cases.good());
     while(is_test_cases.good()) {
         std::string fname;
         double opt;

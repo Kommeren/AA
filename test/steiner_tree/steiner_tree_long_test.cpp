@@ -31,6 +31,7 @@ void readLine(std::istream & is, std::string & fname, int & OPT) {
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     std::string testDir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(testDir + "/index");
+    assert(is_test_cases.good());
     while(is_test_cases.good()) {
         std::string fname;
         int opt;

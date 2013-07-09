@@ -35,6 +35,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
     std::string testDir = "test/data/FL_ORLIB/";
     std::ifstream is_test_cases(testDir + "uncapopt.txt");
 
+    assert(is_test_cases.good());
     while(is_test_cases.good()) {
         std::string fname;
         double opt;
