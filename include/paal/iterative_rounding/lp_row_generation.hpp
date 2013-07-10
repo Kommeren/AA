@@ -19,10 +19,10 @@ public:
     template <typename LP>
     double operator()(LP & lp) {
         double res;
-        res = lp.solve();
+        res = lp.solveToExtremePoint();
         while (!m_oracle.feasibleSolution(lp)) {
             m_oracle.addViolatedConstraint(lp);
-            res = lp.solve();
+            res = lp.solveToExtremePoint();
         }
         return res;
     }

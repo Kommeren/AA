@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     
     IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
     
-    LOG(ir.solve());
+    LOG(ir.solveLPToExtremePoint());
     ir.round();
     ir.relax();
     

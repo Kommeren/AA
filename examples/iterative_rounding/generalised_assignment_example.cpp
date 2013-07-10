@@ -46,7 +46,7 @@ int main() {
 
     IterativeRounding<decltype(ga)> ir(std::move(ga));
 
-    solve(ir);
+    solve_iterative_rounding(ir);
 
     // printing result
     auto const & j2m = ir.getSolution();

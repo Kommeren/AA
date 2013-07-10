@@ -51,7 +51,7 @@ int main() {
 
     IterativeRounding<decltype(steiner)> ir(std::move(steiner));
 
-    solve(ir);
+    solve_iterative_rounding(ir);
 
     // printing result
     std::cout << "Edges in steiner network" << std::endl;

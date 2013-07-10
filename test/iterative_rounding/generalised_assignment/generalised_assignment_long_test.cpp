@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
                     costs, times, Tf);
             times(0, 0);
             IterativeRounding<decltype(ga)> ir(std::move(ga));
-            paal::ir::solve(ir);
+            paal::ir::solve_iterative_rounding(ir);
     
     
 

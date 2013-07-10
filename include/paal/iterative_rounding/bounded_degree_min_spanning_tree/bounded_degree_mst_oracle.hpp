@@ -239,7 +239,6 @@ private:
 
 
     //CR taka funkcja juz chyba jest w GLP i nazywa sie getColSum/getRowSum
-    // TODO: getRowSum robi troche co innego, ale mozne dodac do GLP ogolna funkcje robiaca to co degreeOf
     /**
      * @brief calculates the sum of the variables for edges incident with a given vertex
      * @param v vertex

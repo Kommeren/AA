@@ -56,7 +56,7 @@ public:
         glp_set_obj_dir(m_lp, GLP_MIN);
     }
     
-    double solve() {
+    double solveToExtremePoint() {
         glp_adv_basis(m_lp, 0);
         glp_simplex(m_lp, &m_glpkControl);
         return glp_get_obj_val(m_lp);

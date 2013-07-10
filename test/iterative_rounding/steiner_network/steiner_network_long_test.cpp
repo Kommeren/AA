@@ -75,6 +75,6 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // default heuristics
         auto ga = paal::ir::make_SteinerNetwork(g, costs, restrictions);
         paal::ir::IterativeRounding<decltype(ga)> ir(std::move(ga));
-        paal::ir::solve(ir);
+        paal::ir::solve_iterative_rounding(ir);
     }
 }

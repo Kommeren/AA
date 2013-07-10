@@ -120,10 +120,10 @@ struct RoundConditionGreaterThanHalf  :
 };
 
 
-struct DefaultSolveLP {
+struct DefaultSolveLPToExtremePoint {
     template <typename LP>
     double operator()(LP & lp) {
-        return lp.solve();
+        return lp.solveToExtremePoint();
     };
 };
 
@@ -167,7 +167,7 @@ struct FixCol {
     };
 };*/
 
-template <typename SolveLP = DefaultSolveLP, 
+template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint, 
           typename RoundCondition = DefaultRoundCondition, 
           typename RelaxContition = utils::ReturnFalseFunctor, 
           typename Init = utils::DoNothingFunctor,
@@ -175,13 +175,13 @@ template <typename SolveLP = DefaultSolveLP,
           typename DeleteColStrategy = DeleteCol> 
 class IRComponents {
 public:
-    IRComponents(SolveLP solve = SolveLP(), RoundCondition round = RoundCondition(),
+    IRComponents(SolveLPToExtremePoint solve = SolveLPToExtremePoint(), RoundCondition round = RoundCondition(),
                  RelaxContition relax = RelaxContition(), Init i = Init(),
                  DeleteRowStrategy deleteRow = DeleteRowStrategy(), DeleteColStrategy deleteCol = DeleteColStrategy()) 
         : m_solveLP(solve), m_roundCondition(round), m_relaxCondition(relax), m_init(i), m_deleteRow(deleteRow), m_deleteCol(deleteCol) {}
 
     template <typename LP>
-    double solveLP(LP & lp) {
+    double solveLPToExtremePoint(LP & lp) {
         return m_solveLP(lp);
     }
 
@@ -211,7 +211,7 @@ public:
     };
 
 private:
-    SolveLP m_solveLP;
+    SolveLPToExtremePoint m_solveLP;
     RoundCondition m_roundCondition;
     RelaxContition m_relaxCondition;
     Init m_init;

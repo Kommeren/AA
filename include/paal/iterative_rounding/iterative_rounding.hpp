@@ -47,8 +47,8 @@ public:
         m_irComponents.init(m_lpBase);
     }
     
-    double solve() {
-        return m_irComponents.solveLP(m_lpBase);
+    double solveLPToExtremePoint() {
+        return m_irComponents.solveLPToExtremePoint(m_lpBase);
     }
 
     bool integerSolution() {
@@ -135,11 +135,14 @@ private:
     std::unordered_map<int, double> m_rounded;
 };
 
+
+
+//TODO add resolve
 template <typename IR> 
-void solve(IR &ir) {
+void solve_iterative_rounding(IR &ir) {
     bool irsol=false;
     do {
-        bool solved = ir.solve();
+        bool solved = ir.solveLPToExtremePoint();
         assert(solved);
         bool rounded = ir.round();
         bool relaxed = ir.relax();

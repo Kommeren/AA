@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
 
     IterativeRounding<decltype(steiner)> ir(std::move(steiner));
 
-    solve(ir);
+    solve_iterative_rounding(ir);
 
     // printing result
     LOG("Edges in steiner network");

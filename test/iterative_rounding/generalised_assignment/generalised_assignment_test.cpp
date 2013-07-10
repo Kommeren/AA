@@ -62,10 +62,10 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
                     costf, timef, Tf);
 
     IterativeRounding<decltype(ga), LogVisitor> ir(std::move(ga));
-    LOG(ir.solve());
+    LOG(ir.solveLPToExtremePoint());
     ir.round();
     ir.relax();
-    LOG(ir.solve());
+    LOG(ir.solveLPToExtremePoint());
     ir.round();
     ir.relax();
 

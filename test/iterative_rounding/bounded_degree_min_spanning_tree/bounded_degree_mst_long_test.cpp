@@ -125,7 +125,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // default heuristics
         auto ga = paal::ir::make_BoundedDegreeMST(g, costs, degBounds);
         paal::ir::IterativeRounding<decltype(ga)> ir(std::move(ga));
-        paal::ir::solve(ir);
+        paal::ir::solve_iterative_rounding(ir);
     
         auto & tree = ir.getSolution();
         checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         auto ga2 = paal::ir::BoundedDegreeMST<Graph, Cost, Bound,
                                               paal::ir::BoundedDegreeMSTOracleComponents<paal::ir::FindMostViolated> >(g, costs, degBounds);
         paal::ir::IterativeRounding<decltype(ga2)> ir2(std::move(ga2));
-        paal::ir::solve(ir2);
+        paal::ir::solve_iterative_rounding(ir2);
     
         auto & tree2 = ir2.getSolution();
         checkResult(g, tree2, costs, degBounds, verticesNum, bestCost);
