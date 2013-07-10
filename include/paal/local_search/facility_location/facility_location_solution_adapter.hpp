@@ -5,6 +5,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#include <unordered_map>
+#include <unordered_set>
 
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/join.hpp>
@@ -24,10 +26,14 @@ class FacilityLocationSolutionAdapter {
     typedef FacilityLocationSolution FLS;
 public:
     typedef typename FacilityLocationSolution::VertexType VertexType;
-    typedef decltype(std::declval<FacilityLocationSolution>().getChosenFacilities()) Chosen;
-    typedef decltype(std::declval<FacilityLocationSolution>().getUnchosenFacilities()) Unchosen;
-private:
     typedef Facility<VertexType> Fac;
+    typedef std::vector<Fac> Facilities;
+    typedef typename Facilities::iterator FacIter;
+    typedef decltype(std::declval<FLS>().getChosenFacilities()) Chosen;
+    typedef decltype(std::declval<FLS>().getUnchosenFacilities()) Unchosen;
+    typedef typename data_structures::FacilityLocationSolutionTraits<FLS>::Dist Dist;
+    typedef std::unordered_set<VertexType> UnchosenCopy;
+private:
     typedef std::function<Fac(VertexType)> TransFunct;
     template <typename Col> 
     struct Traits {
@@ -39,19 +45,20 @@ private:
     typedef typename Traits<Unchosen>::ColTIter UnchosenTIter;
 public:
     typedef data_structures::ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;    
-    FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : m_sol(std::move(sol)) {}
-
     typedef boost::joined_range<typename Traits<Chosen>::ColTIterRange, 
                                 typename Traits<Unchosen>::ColTIterRange> Range;
     typedef typename boost::range_iterator<Range>::type SolutionIterator;
 
-    Range getRange() const {
+    FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : 
+            m_sol(std::move(sol)), 
+            m_unchosenCopy(m_sol.getUnchosenFacilities().begin(), 
+                         m_sol.getUnchosenFacilities().end()) {
         //TODO examine why doesn't work
         //auto const &  ch = m_sol.invoke(&FLS::getChosenFacilities);
         //auto const &  uch = m_sol.invoke(&FLS::getUnchosenFacilities);
-        auto const &  ch = m_sol->getChosenFacilities();
-        auto const &  uch = m_sol->getUnchosenFacilities();
         
+        auto const &  ch = m_sol.getChosenFacilities();
+        auto const &  uch = m_sol.getUnchosenFacilities();
         auto chb = ch.begin();
         auto che = ch.end();
         auto uchb = uch.begin();
@@ -69,27 +76,70 @@ public:
         typename Traits<Chosen>::ColTIterRange   rch(chBegin, chEnd);
         typename Traits<Unchosen>::ColTIterRange ruch(uchBegin, uchEnd);
 
-        return boost::join(rch, ruch);
-    }
-    
-     SolutionIterator begin() const {
-        return boost::begin(getRange());
-    }
-    
-    SolutionIterator end() const {
-        return boost::end(getRange());
+        auto join = boost::join(rch, ruch);
+        m_facilities.resize(std::distance(boost::begin(join), boost::end(join)));
+        std::copy(join.begin(), join.end(), m_facilities.begin());
+        for(auto & f : m_facilities) {
+            m_vertexToFac.insert(std::make_pair(f.getElem(), &f));
+        }
     }
 
-    FacilityLocationSolutionWithCopy & get() {
+    Dist addFacilityTentative(VertexType v) {
+        return m_sol.addFacility(v);
+    }
+    
+    Dist addFacility(Fac & se) {
+        auto ret = addFacilityTentative(se.getElem());
+        assert(se.getIsChosen() == UNCHOSEN);
+        se.setIsChosen(CHOSEN);
+        m_unchosenCopy.erase(se.getElem());
+        return ret;
+    }
+    
+    Dist removeFacilityTentative(VertexType v) {
+        return m_sol.remFacility(v);
+    }
+
+    Dist removeFacility(Fac & se) {
+        auto ret = removeFacilityTentative(se.getElem());
+        assert(se.getIsChosen() == CHOSEN);
+        se.setIsChosen(UNCHOSEN);
+        m_unchosenCopy.insert(se.getElem());
+        return ret;
+    }
+
+    Fac & getFacility(VertexType v) {
+        auto i = m_vertexToFac.find(v);
+        assert(i != m_vertexToFac.end());
+        return *(i->second);
+    }
+
+    
+    FacIter begin() {
+        return m_facilities.begin();
+    }
+    
+    FacIter end() {
+        return m_facilities.end();
+    }
+
+    FacilityLocationSolution & get() {
         return m_sol;
     }
     
-    const FacilityLocationSolutionWithCopy & get() const {
+    const FacilityLocationSolution & get() const {
         return m_sol;
+    }
+
+    const UnchosenCopy & getUnchosenCopy() const {
+        return m_unchosenCopy;
     }
     
 private:
-    FacilityLocationSolutionWithCopy m_sol;    
+    FacilityLocationSolution m_sol;    
+    Facilities m_facilities;
+    std::unordered_map<VertexType, Fac*> m_vertexToFac;
+    UnchosenCopy m_unchosenCopy;
 };
 
 

@@ -26,62 +26,42 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-template <typename T> class Add {
-public:
-    Add(T t) : m_t(t) {}
-    Add() {}
-
-    T get() const {
-        return m_t;
-    }
-    
-    void set(T t) {
-        m_t = t;
-    }
-
-private:
-    T m_t;
-};
-
+struct Add {};
 
 template <typename VertexType> 
 class FacilityLocationUpdaterAdd {
 public:
     template <typename Solution> 
-    void operator()(Solution & s, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            Add<VertexType> a) {
+    void operator()(
+            Solution & s, 
+            typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            Add) {
 
-        auto & FLS = s.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        FLS.invoke(&FLS_T::addFacility, a.get());
+        s.addFacility(se);
     }
 };
 
     
 template <typename VertexType> 
 class FacilityLocationGetNeighborhoodAdd {
-    typedef Add<VertexType> AddType;
-    typedef std::vector<AddType> Updates;
+    typedef std::vector<Add> Updates;
     typedef typename Updates::iterator Iter;
 
 public: 
+    FacilityLocationGetNeighborhoodAdd() : m_add(1) {}
     typedef Facility<VertexType> Fac;
 
     template <typename Solution> 
         std::pair<Iter, Iter>
-    operator()(const Solution &, const Fac & el) {
-        auto e = el.getElem();
-
-        m_currSol.clear();
+    operator()(const Solution &, Fac & el) {
         if(el.getIsChosen() == UNCHOSEN) {
             //the update of UNCHOSEN could be added to the solution
-            m_currSol.push_back(e);
+            return std::make_pair(m_add.begin(), m_add.end());
         }
-        return std::make_pair(m_currSol.begin(), m_currSol.end());
+        return std::pair<Iter, Iter>();
     }
 private:
-    Updates m_currSol;
+    Updates m_add;
 };
 
 
@@ -89,16 +69,12 @@ template <typename VertexType>
 class FacilityLocationCheckerAdd {
 public:
         template <class Solution> 
-    auto operator()(const Solution & s, 
+    auto operator()(Solution & s, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            Add<VertexType> a) ->
+            Add ) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
-        auto const & FLS = s.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
-
-        ret = FLS.invokeOnCopy(&FLS_T::addFacility, a.get());
-        back = FLS.invokeOnCopy(&FLS_T::remFacility, a.get());
+        auto ret = s.addFacilityTentative(se.getElem());
+        auto back = s.removeFacilityTentative(se.getElem());
         assert(ret == -back);
         return -ret;
 

@@ -25,48 +25,50 @@ BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     VorType voronoi(FSet{SGM::A}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E} , gm);
     typedef FacilityLocationSolution<decltype(cost), VorType> Sol;
     Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
+    FacilityLocationSolutionAdapter<Sol> sa(sol); 
+    Facility<int> facChosen(CHOSEN, SGM::A);
+    Facility<int> facUnchosen(UNCHOSEN, SGM::B);
 
-   FacilityLocationSolutionAdapter<Sol> sa(sol);  
-   {
+    {
         FacilityLocationGetNeighborhoodRemove<int> ng;
-        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
-   }
-   {
+    }
+    {
         FacilityLocationGetNeighborhoodRemove<int> ng;
-        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-   }
-   {
+    }
+    {
         FacilityLocationGetNeighborhoodAdd<int> ng;
-        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-   }
-   {
+    }
+    {
         FacilityLocationGetNeighborhoodAdd<int> ng;
-        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
-   }
-   {
+    }
+    {
         FacilityLocationGetNeighborhoodSwap<int> ng;
-        auto r = ng(sa, Facility<int>(UNCHOSEN, SGM::A));
+        auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-   }
-   {
+    }
+    {
         FacilityLocationGetNeighborhoodSwap<int> ng;
-        auto r = ng(sa, Facility<int>(CHOSEN, SGM::A));
+        auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
-   }
+    }
 }

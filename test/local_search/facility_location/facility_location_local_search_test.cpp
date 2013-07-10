@@ -27,10 +27,10 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     FacilityLocationLocalSearchStep<VorType, decltype(cost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
           ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
 
-    LOG("cost(0) = " << cost(0));
     BOOST_CHECK(ls.search());
     ON_LOG(auto & s = ls.getSolution());
-    ON_LOG(auto const & ch = s->getChosenFacilities());
+    ON_LOG(auto const & ch = s.getChosenFacilities());
+    LOG("Solution after the first search");
     LOG_COPY_DEL(ch.begin(), ch.end(), ",");
     LOG("");
     BOOST_CHECK(!ls.search());

@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(cycle_canceling_test) {
         = boost::SampleGraphMetricsUndirected::getSampleGraph(s, t);
 
     int N = num_vertices(g);
-    std::vector<unsigned int> dist(N);
+    std::vector<int> dist(N);
     std::vector<unsigned int> pre(N);
 
     boost::edmonds_karp_max_flow(g, s, t);

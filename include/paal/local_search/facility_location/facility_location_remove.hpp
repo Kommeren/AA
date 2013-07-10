@@ -26,41 +26,22 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-
-template <typename T> 
-class Remove {
-public:
-    Remove(T t) : m_t(t) {}
-    Remove() {}
-
-    T get() const {
-        return m_t;
-    }
-    
-    void set(T t) {
-        m_t = t;
-    }
-
-private:
-    T m_t;
-};
+struct Remove {};
 
 template <typename VertexType> 
 class FacilityLocationCheckerRemove {
 public:
         template <class Solution> 
-    auto operator()(const Solution & s, 
+    auto operator()(Solution & s, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            Remove<VertexType> r) ->
+            Remove) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
-        auto const & FLS = s.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
 
         typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
 
-        ret = FLS.invokeOnCopy(&FLS_T::remFacility, r.get());
+        ret = s.removeFacilityTentative(se.getElem());
         //TODO for capacitated version we should  just restart copy
-        back = FLS.invokeOnCopy(&FLS_T::addFacility, r.get());
+        back = s.addFacilityTentative(se.getElem());
         assert(ret == -back);
         return -ret;
     }
@@ -70,41 +51,36 @@ template <typename VertexType>
 class FacilityLocationUpdaterRemove {
 public:
         template <typename Solution> 
-    void operator()(Solution & s, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
-            Remove<VertexType> r) {
-
-        auto & FLS = s.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        FLS.invoke(&FLS_T::remFacility, r.get());
+    void operator()(
+            Solution & s, 
+            typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            Remove) {
+        s.removeFacility(se);
     }
 };
 
 template <typename VertexType> 
 class FacilityLocationGetNeighborhoodRemove {
-    typedef Remove<VertexType> RemoveType;
-    typedef std::vector<RemoveType> Updates;
+    typedef std::vector<Remove> Updates;
     typedef typename Updates::iterator Iter;
 
 public: 
-    typedef Facility<VertexType> Fac;
+
+    FacilityLocationGetNeighborhoodRemove() : m_remove(1) {}
 
     template <typename Solution> 
         typename std::pair<Iter, Iter>
-    operator()(const Solution &, const Fac & el) {
-        auto e = el.getElem();
-         
-        m_currSol.clear();
+    operator()(const Solution &, 
+            typename utils::SolToElem<Solution>::type & el) {
         if(el.getIsChosen() == CHOSEN) { 
             //the update of CHOSEN could be remove
-            m_currSol.push_back(e);
+            return std::make_pair(m_remove.begin(), m_remove.end());
         }
-        return std::make_pair(m_currSol.begin(), m_currSol.end());
+        return std::pair<Iter, Iter>();
     }
 private:
-    Updates m_currSol;
+    Updates m_remove;
 };
-
 
 } // facility_location
 } // local_search

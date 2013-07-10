@@ -18,9 +18,14 @@ enum is_chosen { CHOSEN, UNCHOSEN};
 template <typename T> class Facility {
 public:
     Facility(is_chosen ic, T e) : m_isChosen(ic), m_elem(e) {}
+    Facility() = default;
 
     is_chosen getIsChosen() const {
         return m_isChosen;
+    }
+    
+    void setIsChosen(is_chosen ic) {
+        m_isChosen = ic;
     }
 
     T getElem() const {

@@ -28,10 +28,10 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     FacilityLocationSolutionAdapter<Sol> sa(std::move(sol));  
     auto & realSol = sa.get(); 
 
-    realSol.invoke(&Sol::addFacility, SGM::C);
-    realSol.invoke(&Sol::remFacility, SGM::A);
-    realSol.invoke(&Sol::addFacility, SGM::A);
-    realSol.invoke(&Sol::remFacility, SGM::C);
-    realSol.invoke(&Sol::addFacility, SGM::D);
-    realSol.invoke(&Sol::remFacility, SGM::A);
+    realSol.addFacility(SGM::C);
+    realSol.remFacility(SGM::A);
+    realSol.addFacility(SGM::A);
+    realSol.remFacility(SGM::C);
+    realSol.addFacility(SGM::D);
+    realSol.remFacility(SGM::A);
 }

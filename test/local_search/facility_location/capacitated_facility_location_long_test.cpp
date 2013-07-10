@@ -79,10 +79,11 @@ void runTests(const std::string & fname, Solve solve) {
         Sol sol(std::move(voronoi), USet{}, cost);
 
 
-        auto logger =  [&](data_structures::ObjectWithCopy<Sol> & sol) {
-           LOG_COPY_DEL(sol->getChosenFacilities().begin(), sol->getChosenFacilities().end(), ",");
-           ON_LOG(auto c = sol->getVoronoi().getCost());
-           LOG("current cost " << simple_algo::getCFLCost(metric, cost, sol.getObj()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
+        auto logger =  [&](Sol & sol) {
+           ON_LOG(auto const & ch =  sol.getChosenFacilities());
+           LOG_COPY_DEL(ch.begin(), ch.end(), ",");
+           ON_LOG(auto c = sol.getVoronoi().getCost());
+           LOG("current cost " << simple_algo::getCFLCost(metric, cost, sol) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
         };
 
         auto s = solve.template operator()<VorType>(std::move(sol), metric, cost, opt, logger);
@@ -105,11 +106,11 @@ struct SolveAddRemove {
         search(lsRemove, a);
         
         FacilityLocationLocalSearchStep<VorType, Cost, DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type>  
-            lsRemoveAdd(std::move(lsRemove.getSolution().getObj()), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type());
+            lsRemoveAdd(std::move(lsRemove.getSolution()), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type());
 
         search(lsRemoveAdd, a);
         
-        auto const & s1 = lsRemoveAdd.getSolution().getObj();
+        auto const & s1 = lsRemoveAdd.getSolution();
         double c1 = simple_algo::getCFLCost(metric, cost, s1);
         LOG(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c1 / opt);
         return s1;
@@ -126,7 +127,7 @@ struct SolveAddRemoveSwap {
             ls(std::move(s), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type(), typename DefaultSwapFLComponents<int>::type());
 
         search(ls, a);
-        return ls.getSolution().getObj();
+        return ls.getSolution();
     }
         
 };

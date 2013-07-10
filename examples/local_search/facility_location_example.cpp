@@ -39,8 +39,8 @@ int main() {
     search(ls);
 
     //print result
-    SolOcjWithCopy & s = ls.getSolution();
-    auto const & ch = s->getChosenFacilities();
+    auto const & s = ls.getSolution();
+    auto const & ch = s.getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;
 //! [FL Search Example]

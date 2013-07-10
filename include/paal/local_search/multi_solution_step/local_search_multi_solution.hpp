@@ -120,6 +120,7 @@ public:
           
         return base::search();
     }
+          
 private:
     MultiSearchComponents m_searchComponents;
 };

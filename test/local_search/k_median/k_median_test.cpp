@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
     search(ls);
 
     //print result
-    SolOcjWithCopy & s = ls.getSolution();
-    auto const & ch = s->getChosenFacilities();
+    auto const & s = ls.getSolution();
+    auto const & ch = s.getChosenFacilities();
     LOG("Solution:");
     LOG_COPY_DEL(ch.begin(), ch.end(), ",");
 }

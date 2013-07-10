@@ -28,21 +28,22 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
    FacilityLocationSolutionAdapter<Sol> sa(std::move(sol));  
    auto b = sa.begin();
    auto e = sa.end();
+   auto & A = *b;
    BOOST_CHECK_EQUAL(*b, Facility<int>(UNCHOSEN, SGM::A));
    BOOST_CHECK(b != e);
    BOOST_CHECK_EQUAL(*(++b), Facility<int>(UNCHOSEN, SGM::B));
+   auto & B = *b;
    BOOST_CHECK(b != e);
    BOOST_CHECK(++b == e);
 
-   auto & realSol = sa.get(); 
 
-   realSol.invoke(&Sol::addFacility,SGM::A);
+   sa.addFacility(A);
    
    b = sa.begin();
    e = sa.end();
-   BOOST_CHECK_EQUAL(*b, Facility<int>(CHOSEN, SGM::A));
+   BOOST_CHECK_EQUAL(*b, A);
    BOOST_CHECK(b != e);
-   BOOST_CHECK_EQUAL(*(++b), Facility<int>(UNCHOSEN, SGM::B));
+   BOOST_CHECK_EQUAL(*(++b), B);
    BOOST_CHECK(b != e);
    BOOST_CHECK(++b == e);
 

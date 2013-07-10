@@ -77,18 +77,16 @@ template <typename VertexType>
 class FacilityLocationCheckerSwap {
 public:
         template <class Solution> 
-    auto operator()(const Solution & sol, 
+    auto operator()(Solution & sol, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
             const Swap<VertexType> & s) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
-        auto const & FLS = sol.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
         typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
         
-        ret  = FLS.invokeOnCopy(&FLS_T::addFacility, s.getTo());
-        ret += FLS.invokeOnCopy(&FLS_T::remFacility, s.getFrom());
-        back = FLS.invokeOnCopy(&FLS_T::addFacility, s.getFrom());
-        back += FLS.invokeOnCopy(&FLS_T::remFacility, s.getTo());
+        ret   = sol.addFacilityTentative(s.getTo());
+        ret  += sol.removeFacilityTentative(s.getFrom());
+        back  = sol.addFacilityTentative(s.getFrom());
+        back += sol.removeFacilityTentative(s.getTo());
         assert(ret == -back);
         return -ret;
     }
@@ -102,10 +100,8 @@ public:
     void operator()(Solution & sol, 
             const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
             const Swap<VertexType> & s) {
-        auto & FLS = sol.get();
-        typedef typename std::decay<decltype(FLS)>::type::ObjectType FLS_T;
-        FLS.invoke(&FLS_T::addFacility, s.getTo());
-        FLS.invoke(&FLS_T::remFacility, s.getFrom());
+        sol.addFacility(sol.getFacility(s.getTo()));
+        sol.removeFacility(sol.getFacility(s.getFrom()));
     }
 };
 
@@ -113,9 +109,8 @@ template <typename VertexType>
 class FacilityLocationGetNeighborhoodSwap {
     template <typename Solution>
     struct IterType {
-        typedef puretype(std::declval<Solution>().get()) InnerSol; 
-        typedef puretype(std::declval<InnerSol>()->getUnchosenFacilities()) Unchosen; 
-        typedef typename utils::SolToIter<Unchosen>::type UchIter; 
+        typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen; 
+        typedef typename utils::SolToIter<const Unchosen>::type UchIter; 
         typedef boost::transform_iterator<VertexToSwapUpdate<VertexType>, 
                  UchIter, const Swap<VertexType> &> TransIter;
         typedef std::pair<TransIter, TransIter> TransRange;
@@ -127,19 +122,16 @@ public:
     //Due to the memory optimization at one moment only one Update is valid
     template <typename Solution> typename IterType<Solution>::TransRange
     operator()(const Solution &s, const Fac & el) {
-        auto const & FCS = s.get(); 
         auto e = el.getElem();
 
-        auto const & uch = FCS->getUnchosenFacilities();
-
-        typedef boost::transform_iterator<VertexToSwapUpdate<VertexType>, 
-             decltype(uch.begin()), const Swap<VertexType> &> TransIter;
+        typedef typename IterType<Solution>::TransIter TransIter;
 
         if(el.getIsChosen() == CHOSEN) {
             //the update of CHOSEN could be swap with some unchosen
+            auto const & uch = s.getUnchosenCopy();
             VertexToSwapUpdate<VertexType> uchToUE(e);
             return std::make_pair(TransIter(uch.begin(), uchToUE), 
-                                        TransIter(uch.end()  , uchToUE)); 
+                                  TransIter(uch.end()  , uchToUE)); 
         }
         return std::make_pair(TransIter(), TransIter()); 
     }
