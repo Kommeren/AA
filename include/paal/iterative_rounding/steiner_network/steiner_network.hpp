@@ -65,16 +65,16 @@ public:
     }
 
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, ColId id) {
+    boost::optional<double> roundCondition(const LP & lp, ColId id) {
         auto ret = base::roundCondition(lp, id);
-        if(ret.first) {
-            assert(m_compare.e(ret.second, 0));
+        if(ret) {
+            assert(m_compare.e(*ret, 0));
             //removing edge
             m_edgeMap.right.erase(id);
             return ret;
         } else {
             ret = m_roundHalf(lp, id);
-            if(ret.first) {
+            if(ret) {
                 auto i = m_edgeMap.right.find(id);
                 assert(i != m_edgeMap.right.end());
 

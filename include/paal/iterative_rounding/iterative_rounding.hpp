@@ -72,11 +72,11 @@ public:
                 ColId col = *cols.first;
                 if (m_lpBase.getColBoundType(col) != FX) {
                     auto doRound = m_irComponents.roundCondition(m_lpBase, col);
-                    if(doRound.first) {
-                        m_rounded.insert(std::make_pair(col.get(), doRound.second));
+                    if(doRound) {
+                        m_rounded.insert(std::make_pair(col.get(), *doRound));
                         ++deleted;
-                        m_visitor.roundCol(m_lpBase, col, doRound.second);
-                        m_irComponents.deleteCol(m_lpBase, col, doRound.second);
+                        m_visitor.roundCol(m_lpBase, col, *doRound);
+                        m_irComponents.deleteCol(m_lpBase, col, *doRound);
                         repeat = true;
                         break;
                     }

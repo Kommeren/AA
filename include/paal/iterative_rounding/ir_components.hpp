@@ -8,8 +8,10 @@
 #ifndef IR_COMPONENTS_HPP
 #define IR_COMPONENTS_HPP 
 
-
 #include <cmath>
+
+#include <boost/optional.hpp>
+
 #include "paal/utils/double_rounding.hpp"
 #include "paal/utils/do_nothing_functor.hpp"
 
@@ -22,13 +24,13 @@ public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, ColId col) {
+    boost::optional<double> operator()(const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
-            return std::make_pair(true, r);
+            return r;
         }
-        return std::make_pair(false, -1);
+        return boost::optional<double>();
     };
     
 protected:
@@ -48,14 +50,14 @@ public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
     
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, ColId col) {
+    boost::optional<double> operator()(const LP & lp, ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x) {
+    boost::optional<double> get(const LP & lp, double x) {
         if(this->m_compare.e(x, arg)) {
-            return std::make_pair(true, arg);
+            return double(arg);
         } else {
             return RoundConditionEquals<args...>::get(lp, x);
         }
@@ -69,8 +71,8 @@ public:
     
 protected:
     template <typename LP>
-    std::pair<bool, double> get(const LP & lp, double x) {
-        return std::make_pair(false, -1);
+    boost::optional<double> get(const LP & lp, double x) {
+        return boost::optional<double>();
     }
     
     const utils::Compare<double> m_compare;
@@ -84,12 +86,12 @@ public:
         m_cond(c), m_f(f) {}
 
     template <typename LP>
-    std::pair<bool, double> operator()(const LP & lp, ColId col) {
+    boost::optional<double> operator()(const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
-            return std::make_pair(true, m_f(x));
+            return m_f(x);
         }
-        return std::make_pair(false, -1);
+        return boost::optional<double>();
     }
 private:
     Cond m_cond;
@@ -186,7 +188,7 @@ public:
     }
 
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, ColId col) {
+    boost::optional<double> roundCondition(const LP & lp, ColId col) {
         return m_roundCondition(lp, col);
     }
 

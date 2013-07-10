@@ -74,9 +74,9 @@ public:
      * @tparam LP
      */
     template <typename LP>
-    std::pair<bool, double> roundCondition(const LP & lp, ColId col) {
+    boost::optional<double> roundCondition(const LP & lp, ColId col) {
         auto ret = BoundedDegreeMSTBase::roundCondition(lp, col);
-        if(ret.first) {
+        if(ret) {
             m_edgeMap.right.erase(col);
         }
         return ret;
