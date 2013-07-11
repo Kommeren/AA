@@ -63,9 +63,6 @@ BOOST_AUTO_TEST_CASE(tree_aug) {
     Cost cost = get(edge_weight, g);
     TreeMap treeMap      = get(edge_color, g);
 
-    
-
-
     //Example G2.lgf=tree_aug_example_input.lgfmod
     addEdge(g, 0, 1, treeMap, true, cost,0 );
     addEdge(g, 1, 2, treeMap, true, cost,0 );
@@ -77,8 +74,6 @@ BOOST_AUTO_TEST_CASE(tree_aug) {
     addEdge(g, 2, 4, treeMap, false, cost,1 );
     addEdge(g, 2, 5, treeMap, false, cost,1 );
     addEdge(g, 4, 5, treeMap, false, cost,1 );
-    Index indices = get(vertex_index, g);
-    
 
     paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
 
@@ -86,7 +81,5 @@ BOOST_AUTO_TEST_CASE(tree_aug) {
     paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
     paal::ir::solve(ir);
     BOOST_CHECK(ir.integerSolution());
-
-    
 }
 

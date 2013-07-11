@@ -86,6 +86,7 @@ public:
         m_cond(c), m_f(f) {}
 
     template <typename LP>
+
     boost::optional<double> operator()(const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
