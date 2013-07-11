@@ -18,6 +18,6 @@ label
 2	4	2	1	0
 2	5	3	1	0
 4	5	4	1	0
-#file format similar to lgf, with the following exceptions:
+#file format similar to Lemon Graph Format (lgf), with the following exceptions:
 #-only use remarks in the end of the file
 #-after @nodes specify the number of nodes, after @edges specify number of edges

@@ -20,7 +20,8 @@
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/connected_components.hpp>
-
+#include <boost/property_map/property_map.hpp>
+#include <boost/graph/stoer_wagner_min_cut.hpp>
 
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
@@ -33,7 +34,7 @@ namespace paal {
     namespace ir {
 
         
-        ///This function return the number of edges in a graph. The
+        ///This function returns the number of edges in a graph. The
         ///reason this function was written is that BGL's num_edges()
         ///function does not work properly for filtered_graph.  See
         ///http://www.boost.org/doc/libs/1_54_0/libs/graph/doc/filtered_graph.html#2
@@ -66,6 +67,21 @@ namespace paal {
                     }
                 EdgeBoolMap ebmap;
             };
+
+
+        template <typename Graph>
+        class Const1EdgeMap
+            : public boost::put_get_helper<int, Const1EdgeMap<Graph> >
+        {
+        public:
+            typedef boost::readable_property_map_tag category;
+            typedef int value_type;
+            typedef int reference;
+            typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
+            typedef Edge key_type;
+            reference operator[ ](Edge e) const { return 1; }
+        };
+
 
 
 
@@ -112,47 +128,6 @@ namespace paal {
                 { 
 
 
-                    std::cout<<"The graph:"<<std::endl;
-                    print_graph(g);
-                    std::cout<<"The spanning tree:"<<std::endl;
-                    print_graph(tree);
-                    std::cout<<"The rest:"<<std::endl;
-                    print_graph(ntree);
-
-                    //We need to fill two very useful auxiliary data structures:
-                    //\c covers and \c coveredBy. These are containing lists of
-                    //edges. For a tree edge \c t the list \c coveredBy[t]
-                    //contains the list of links covering \c t. Similarly, for a
-                    //link \c e, the list \c covers[e] contains the list of tree
-                    //edges covered by \c e (that is, the tree edges in the unique
-                    //path in the tree between the endnodes of \c e).
-                    {
-                        std::vector< Edge > pred(num_vertices(g));	  
-                        std::map< Vertex, bool > wasSeen;
-                        typename boost::graph_traits<Graph>
-                            ::vertex_iterator ui, ui_end;
-                        for (boost::tie(ui,ui_end) = vertices(g); ui != ui_end; ++ui) {
-                            wasSeen[*ui]=true;
-
-                            breadth_first_search(tree, *ui,
-                                    visitor(make_bfs_visitor(record_edge_predecessors(&pred[0], boost::on_tree_edge()))));
-
-                            typename boost::graph_traits<NonTreeGraph>::out_edge_iterator ei, ei_end;
-                            for(boost::tie(ei,ei_end) = out_edges(*ui,ntree); ei != ei_end; ++ei){
-                                Vertex node=target(*ei,ntree);
-                                if (!wasSeen[node]){
-                                    while (node!=*ui){
-                                        covers[*ei].push_back(pred[node]);
-                                        coveredBy[pred[node]].push_back(*ei);
-                                        node=source(pred[node],tree);
-                                    }
-                                }
-                            }
-
-                        }	
-                        //std::cout << std::endl;
-
-                    }
 
                 }//end of Constructor
             
@@ -169,7 +144,9 @@ namespace paal {
                     int nV=num_vertices(g);
                     //This is not very nice, but BGL sucks for filtered_graph
                     int nE=my_num_edges(tree);
-                    
+
+                    //std::cout<<nV<<std::endl;
+
                     if (nE != nV-1){
                         errorMsg="The number of edges in the spanning tree is not good. It is "+std::to_string(nE)+", and it should be "+std::to_string(nV-1)+".";
                         return false;
@@ -187,17 +164,15 @@ namespace paal {
                 }
                 //Is the graph 2-edge-connected?
                 {
-                    typename boost::graph_traits<TreeGraph>
-                        ::edge_iterator ei, ei_end;
-                    for(boost::tie(ei,ei_end) = edges(tree); ei != ei_end; ++ei){
+                    Const1EdgeMap<Graph> const1EdgeMap;
+                    int w = boost::stoer_wagner_min_cut(g, const1EdgeMap);
+                    if (w<2){
+                        errorMsg="The graph is not 2-edge-connected.";
+                        return false;
                         
-                        if (coveredBy[*ei].size()==0){
-                            errorMsg="The graph is not 2-edge-connected. The spanning tree edge ("+std::to_string(source(*ei,tree))+","+std::to_string(target(*ei,tree))+") is a cut edge.";
-                            return false;
-                            
-                        }        
-                    }       
-                }
+                    }        
+                }       
+                
                 errorMsg="";
                 return true;
                 
@@ -222,14 +197,67 @@ namespace paal {
                     template <typename LP>
                         void init(LP & lp) {    
 
+                        //We need to fill two very useful auxiliary data structures:
+                        //\c covers and \c coveredBy. These are containing lists of
+                        //edges. For a tree edge \c t the list \c coveredBy[t]
+                        //contains the list of links covering \c t. Similarly, for a
+                        //link \c e, the list \c covers[e] contains the list of tree
+                        //edges covered by \c e (that is, the tree edges in the unique
+                        //path in the tree between the endnodes of \c e).
+                        {
+                            //First we erase the previous conents
+                            {
+                                typename boost::graph_traits<NonTreeGraph>::edge_iterator ei, ei_end;
+                                for(boost::tie(ei,ei_end) = edges(ntree); ei != ei_end; ++ei){
+                                    covers[*ei].clear();
+                                }
+
+                            }
+
+                            {
+                                typename boost::graph_traits<TreeGraph>::edge_iterator ei, ei_end;
+                                for(boost::tie(ei,ei_end) = edges(tree); ei != ei_end; ++ei){
+                                    coveredBy[*ei].clear();
+                                }
+
+                            }
+
+                            std::vector< Edge > pred(num_vertices(g));	  
+                            std::map< Vertex, bool > wasSeen;
+                            typename boost::graph_traits<Graph>
+                                ::vertex_iterator ui, ui_end;
+                            for (boost::tie(ui,ui_end) = vertices(g); ui != ui_end; ++ui) {
+                                wasSeen[*ui]=true;
+                                //std::cerr<<"Node "<<*ui<<"."<<std::endl;
+
+                                breadth_first_search(tree, *ui,
+                                                     visitor(make_bfs_visitor(record_edge_predecessors(&pred[0], boost::on_tree_edge()))));
+
+                                typename boost::graph_traits<NonTreeGraph>::out_edge_iterator ei, ei_end;
+                                for(boost::tie(ei,ei_end) = out_edges(*ui,ntree); ei != ei_end; ++ei){
+                                    //std::cerr<<"edge "<<*ei<<"."<<std::endl;
+                                    Vertex node=target(*ei,ntree);
+                                    if (!wasSeen[node]){
+                                        while (node!=*ui){
+                                            covers[*ei].push_back(pred[node]);
+                                            coveredBy[pred[node]].push_back(*ei);
+                                            node=source(pred[node],tree);
+                                        }
+                                    }
+                                }
+
+                            }	
+                            //std::cout << std::endl;
+
+                        }
                             lp.setLPName("Tree augmentation");
                             lp.setMinObjFun(); 
 
                             int num=addVariables(lp);
 
-                            //std::cout<<"Number of columns initially: "<<num<<std::endl;
+                            std::cout<<"Number of columns initially: "<<num<<std::endl;
                             num=addCutConstraints(lp);
-                            //std::cout<<"Number of rows initially: "<<num<<std::endl;
+                            std::cout<<"Number of rows initially: "<<num<<std::endl;
 
 
                             lp.loadMatrix();
@@ -238,9 +266,12 @@ namespace paal {
 
 
 
-                    ///A condition belonging to a tree edge \c t can be relaxed if
-                    ///some link in the fundamental cut belonging to \c t is chosen
-                    ///in the solution.
+            
+                    ///Relax condition.
+                    ///
+                    ///A condition belonging to a tree edge \c t can
+                    ///be relaxed if some link in the fundamental cut
+                    ///belonging to \c t is chosen in the solution.
                     ///
                     ///In fact we don't even need to relax, since
                     ///these constraints became trivial after

@@ -37,7 +37,7 @@ typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
 
-void readTreeAug(const std::string & filename, 
+void readTreeAugFromFile(const std::string & filename, 
 		 Graph & g, Cost & cost, TreeMap & treeMap) {
   std::string s;
 
@@ -99,12 +99,20 @@ int main(int argc, char* argv[])
     
   //  std::string eT_file=argv[1];
 
-  readTreeAug(argv[1],g,cost,treeMap);
+  readTreeAugFromFile(argv[1],g,cost,treeMap);
 
   paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
-
-      
+  
+  std::string error;
+  if (!treeaug.checkInputValidity(error)){
+      std::cerr<<"The input is not valid!"<<std::endl;
+      std::cerr<<error<<std::endl;
+      return -1;
+  }
+  
   paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
+
+  
   paal::ir::solve(ir);
 
 
