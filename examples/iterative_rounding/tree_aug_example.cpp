@@ -1,5 +1,5 @@
-// #include <iostream>                  // for std::cout
-// #include <fstream>
+#include <iostream>                  // for std::cout
+#include <fstream>
 // #include <tuple>
 
 // #include <utility>                   // for std::pair
@@ -16,7 +16,7 @@
 // #include "paal/iterative_rounding/iterative_rounding.hpp"
 // #include "paal/iterative_rounding/ir_components.hpp"
 
-#include "paal/iterative_rounding/tree_aug.hpp"
+#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
 //#include "paal/iterative_rounding/glp_lpbase.hpp"
 
 using namespace boost;
@@ -37,7 +37,7 @@ typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
 
-void readTreeAug(const std::string & filename, 
+void readTreeAugFromFile(const std::string & filename, 
 		 Graph & g, Cost & cost, TreeMap & treeMap) {
   std::string s;
 
@@ -81,21 +81,41 @@ void readTreeAug(const std::string & filename,
   }
 
 }
-int main(int,char*[])
+///The main entry point
+int main(int argc, char* argv[])
 {
-    
+  
+  if (argc != 2) {
+    std::cerr << "Usage: " << std::endl;
+    std::cerr << argv[0] << " <problem_instance> " << std::endl;   
+    std::cerr <<  "where <problem_instance> is a file describing a problem instance. The file examples/tree_aug_example_input.lgfmod is an example of such a file. " << std::endl;   
+
+    return -1;
+  }
 
   Graph g;
   Cost cost      = get(edge_weight, g);
   TreeMap treeMap      = get(edge_color, g);
     
-  readTreeAug("G2.lgfmod",g,cost,treeMap);
+  //  std::string eT_file=argv[1];
+
+  readTreeAugFromFile(argv[1],g,cost,treeMap);
 
   paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
-
-      
+  
+  std::string error;
+  if (!treeaug.checkInputValidity(error)){
+      std::cerr<<"The input is not valid!"<<std::endl;
+      std::cerr<<error<<std::endl;
+      return -1;
+  }
+  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+  
   paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
-  paal::ir::solve(ir);
+
+  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+  
+  paal::ir::solve_iterative_rounding(ir);
 
 
   typename boost::property_map<Graph, boost::vertex_index_t>::type  index = get(boost::vertex_index, g);
@@ -116,6 +136,7 @@ int main(int,char*[])
   }
   std::cout<<std::endl;
   std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
+  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
 
   return 0;

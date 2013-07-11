@@ -1,9 +1,9 @@
 /**
- * @file bounded_degree_mst.cpp
+ * @file tree_aug_test.cpp
  * @brief 
- * @author Piotr Godlewski
+ * @author Attila Bernath
  * @version 1.0
- * @date 2013-06-04
+ * @date 2013-07-10
  */
 
 #define BOOST_TEST_MODULE bounded_degree_mst_test
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(tree_aug) {
 
       
     paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
-    paal::ir::solve(ir);
+    paal::ir::solve_iterative_rounding(ir);
     BOOST_CHECK(ir.integerSolution());
 }
 

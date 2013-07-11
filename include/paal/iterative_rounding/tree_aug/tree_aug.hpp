@@ -112,6 +112,7 @@ namespace paal {
 
                     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
                     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
+            typedef double CostValue;
 
                     typedef std::map< Edge, bool > EdgeBoolMap;
 
@@ -124,7 +125,7 @@ namespace paal {
                         //	base(),
                         g(_g),  treeMap(_treeMap), costMap(_costMap),
                         inTreeFilter(treeMap),tree(g,inTreeFilter),
-                        nonTreeFilter(treeMap),ntree(g,nonTreeFilter)
+                        nonTreeFilter(treeMap),ntree(g,nonTreeFilter),m_solCost(0)
                 { 
 
 
@@ -187,8 +188,9 @@ namespace paal {
                 auto res = Base::roundCondition(lp, col);
                 //Save some auxiliary info
                 if(res) {        
-                    inSolution[colId2Edge[col]]=true;
-                    
+                    m_inSolution[colId2Edge[col]]=true;
+                    m_solCost+=costMap[colId2Edge[col]];
+                    std::cout<<"Cost="<<m_solCost<<std::endl;
                 }
                 return res;
             }
@@ -279,10 +281,12 @@ namespace paal {
                     ///fine, too.
                     template <typename LP>
                         bool relaxCondition(const LP & lp, RowId row) {
+
+                        
                         //std::cout<<lp;
                         for (Edge e: coveredBy[rowId2Edge[row]])
                             {
-                                if (inSolution[e])
+                                if (m_inSolution[e])
                                     return true;
                             }
                         return false;
@@ -292,8 +296,15 @@ namespace paal {
                     ///Return the solution found
                     template <typename LP>
                         EdgeBoolMap & getSolution(const LP & lp) {
-                            return inSolution;
+                            return m_inSolution;
                         }
+
+            ///Return the cost of the solution found
+            CostValue   getSolutionValue() const{
+                //std::cout<<"Cost="<<m_solCost<<std::endl;
+
+                return m_solCost;
+            }
 
 
                 private:
@@ -328,8 +339,10 @@ namespace paal {
                     std::map<RowId, Edge> rowId2Edge;
 
                     //Which links are chosen in the solution
-                    EdgeBoolMap inSolution;
+                    EdgeBoolMap m_inSolution;
 
+                    //Cost of the solution found
+                    CostValue m_solCost;
 
                     std::string getEdgeName(int eIdx) const {
                         return std::to_string(eIdx);
@@ -357,7 +370,7 @@ namespace paal {
                                 ColId colIdx=lp.addColumn(costMap[e], LO, 0, whatever, colName);
                                 edge2ColId[e] = colIdx;
                                 colId2Edge[colIdx]=e;
-                                inSolution[e] = false;
+                                m_inSolution[e] = false;
                                 // m_edgeList[eIdx] = e;
                                 ++eIdx;
                             }
