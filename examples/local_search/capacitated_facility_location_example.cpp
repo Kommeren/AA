@@ -26,7 +26,6 @@ int main() {
         decltype(gm), decltype(facilityCapacity), decltype(clientDemand)> VorType;
     typedef paal::data_structures::FacilityLocationSolution
         <decltype(facilityCost), VorType> Sol;
-    typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
     typedef paal::data_structures::VoronoiTraits<VorType> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;

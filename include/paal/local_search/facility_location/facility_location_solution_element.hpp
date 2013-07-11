@@ -32,8 +32,15 @@ public:
         return m_elem;
     }
 
+    //TODO this is to tricky
     bool operator==(const Facility & se) const {
-        return m_isChosen == se.m_isChosen && m_elem == se.m_elem;
+        return /*m_isChosen == se.m_isChosen && */m_elem == se.m_elem;
+    }
+
+    template <typename ostream, typename TT>
+    friend ostream & operator<<(ostream & o, Facility<TT> f) {
+        o << "(" << f.getElem() << "," << f.getIsChosen() << ")";
+        return o;
     }
 
 private:
@@ -41,10 +48,12 @@ private:
     T m_elem;    
 };
 
-template <typename stream, typename T> stream & operator<<(stream & o, const Facility<T> & se) {
-    o << se.getIsChosen() << "," << se.getElem() << " ";
-    return o;
-}
+struct FacilityHash {
+    template <typename T>
+    size_t operator()(Facility<T> f) const {
+        return std::hash<T>()(f.getElem());
+    }
+};
 
 
 }

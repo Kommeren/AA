@@ -27,13 +27,11 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     Voronoi voronoi(GSet{},
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
-    LOG("ODLEGLOSCI OD A");
-    for(int i = 0; i < 5; ++i)
+    /*for(int i = 0; i < 5; ++i)
         LOG(gm(SGM::A, i));
     
-    LOG("ODLEGLOSCI OD B");
     for(int i = 0; i < 5; ++i)
-        LOG(gm(SGM::B, i));
+        LOG(gm(SGM::B, i));*/
 
     voronoi.addGenerator(SGM::A);
     auto ab_min_a = voronoi.addGenerator(SGM::B);

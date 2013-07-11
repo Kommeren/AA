@@ -12,7 +12,7 @@
 #include <boost/range/join.hpp>
 
 #include "paal/utils/type_functions.hpp"
-#include "paal/data_structures/object_with_copy.hpp"
+#include "paal/data_structures/collection_starts_from_last_change.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_element.hpp"
 
@@ -29,6 +29,8 @@ public:
     typedef Facility<VertexType> Fac;
     typedef std::vector<Fac> Facilities;
     typedef typename Facilities::iterator FacIter;
+    typedef data_structures::CollectionStartsFromLastChange<FacIter, FacilityHash> CycledFacilities;
+    typedef typename CycledFacilities::ResultIterator ResultIterator;
     typedef decltype(std::declval<FLS>().getChosenFacilities()) Chosen;
     typedef decltype(std::declval<FLS>().getUnchosenFacilities()) Unchosen;
     typedef typename data_structures::FacilityLocationSolutionTraits<FLS>::Dist Dist;
@@ -44,7 +46,6 @@ private:
     typedef typename Traits<Chosen>::ColTIter ChosenTIter;
     typedef typename Traits<Unchosen>::ColTIter UnchosenTIter;
 public:
-    typedef data_structures::ObjectWithCopy<FacilityLocationSolution> FacilityLocationSolutionWithCopy;    
     typedef boost::joined_range<typename Traits<Chosen>::ColTIterRange, 
                                 typename Traits<Unchosen>::ColTIterRange> Range;
     typedef typename boost::range_iterator<Range>::type SolutionIterator;
@@ -53,10 +54,6 @@ public:
             m_sol(std::move(sol)), 
             m_unchosenCopy(m_sol.getUnchosenFacilities().begin(), 
                          m_sol.getUnchosenFacilities().end()) {
-        //TODO examine why doesn't work
-        //auto const &  ch = m_sol.invoke(&FLS::getChosenFacilities);
-        //auto const &  uch = m_sol.invoke(&FLS::getUnchosenFacilities);
-        
         auto const &  ch = m_sol.getChosenFacilities();
         auto const &  uch = m_sol.getUnchosenFacilities();
         auto chb = ch.begin();
@@ -82,6 +79,7 @@ public:
         for(auto & f : m_facilities) {
             m_vertexToFac.insert(std::make_pair(f.getElem(), &f));
         }
+        m_cycledFacilities = CycledFacilities(m_facilities.begin(), m_facilities.end());
     }
 
     Dist addFacilityTentative(VertexType v) {
@@ -93,6 +91,7 @@ public:
         assert(se.getIsChosen() == UNCHOSEN);
         se.setIsChosen(CHOSEN);
         m_unchosenCopy.erase(se.getElem());
+        m_cycledFacilities.setLastChange(se);
         return ret;
     }
     
@@ -105,6 +104,7 @@ public:
         assert(se.getIsChosen() == CHOSEN);
         se.setIsChosen(UNCHOSEN);
         m_unchosenCopy.insert(se.getElem());
+        m_cycledFacilities.setLastChange(se);
         return ret;
     }
 
@@ -115,12 +115,12 @@ public:
     }
 
     
-    FacIter begin() {
-        return m_facilities.begin();
+    ResultIterator begin() {
+        return m_cycledFacilities.begin();
     }
     
-    FacIter end() {
-        return m_facilities.end();
+    ResultIterator end() {
+        return m_cycledFacilities.end();
     }
 
     FacilityLocationSolution & get() {
@@ -138,6 +138,7 @@ public:
 private:
     FacilityLocationSolution m_sol;    
     Facilities m_facilities;
+    CycledFacilities m_cycledFacilities;
     std::unordered_map<VertexType, Fac*> m_vertexToFac;
     UnchosenCopy m_unchosenCopy;
 };
@@ -145,13 +146,4 @@ private:
 
 } //facility_location
 } // local_search
-
-namespace data_structures {
-    template <typename FacilityLocationSolution>
-    struct FacilityLocationSolutionTraits<ObjectWithCopy<FacilityLocationSolution>> : 
-                public FacilityLocationSolutionTraits<FacilityLocationSolution> {};
-}
-
-
-
 } // paal

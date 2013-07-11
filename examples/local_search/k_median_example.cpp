@@ -14,7 +14,6 @@ int main() {
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
     typedef paal::local_search::k_median::KMedianSolution
         <k, VorType> Sol;
-    typedef paal::data_structures::ObjectWithCopy<Sol> SolOcjWithCopy;
     typedef paal::data_structures::VoronoiTraits<VorType> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
