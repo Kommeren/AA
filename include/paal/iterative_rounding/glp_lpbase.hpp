@@ -58,7 +58,8 @@ public:
     
     double solveToExtremePoint() {
         glp_adv_basis(m_lp, 0);
-        glp_simplex(m_lp, &m_glpkControl);
+        int ret = glp_simplex(m_lp, &m_glpkControl);
+        assert(ret == 0);
         return glp_get_obj_val(m_lp);
     }
     

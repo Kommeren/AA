@@ -142,12 +142,11 @@ template <typename IR>
 void solve_iterative_rounding(IR &ir) {
     bool irsol=false;
     do {
-        bool solved = ir.solveLPToExtremePoint();
-        assert(solved);
-        bool rounded = ir.round();
-        bool relaxed = ir.relax();
+        ir.solveLPToExtremePoint();
+        bool rounded{ir.round()};
+        bool relaxed{ir.relax()};
         irsol=ir.integerSolution();
-        assert( irsol || rounded || relaxed);
+        assert(irsol || rounded || relaxed);
     } while (!irsol);
 }
 
