@@ -104,10 +104,10 @@ namespace paal {
          * @tparam CostMap type for the costs of the links.
          */
         template <typename Graph, typename TreeMap, typename CostMap >
-            class TreeAug : public IRComponents <DefaultSolveLP, RoundConditionGreaterThanHalf> {
+            class TreeAug : public IRComponents <DefaultSolveLPToExtremePoint, RoundConditionGreaterThanHalf> {
                 public:
 
-                    typedef IRComponents <DefaultSolveLP, RoundConditionGreaterThanHalf> Base;
+                    typedef IRComponents <DefaultSolveLPToExtremePoint, RoundConditionGreaterThanHalf> Base;
 
 
                     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -181,12 +181,12 @@ namespace paal {
             ///Round a coordinate up if it is at least half in the
             ///current solution.
             template <typename LP>
-            std::pair<bool, double> roundCondition(LP & lp, ColId col) {
+            boost::optional<double> roundCondition(LP & lp, ColId col) {
 
                 ///Round a coordinate up if it is at least half.
                 auto res = Base::roundCondition(lp, col);
                 //Save some auxiliary info
-                if(res.first) {        
+                if(res) {        
                     inSolution[colId2Edge[col]]=true;
                     
                 }

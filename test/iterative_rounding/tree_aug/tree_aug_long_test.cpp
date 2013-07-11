@@ -213,7 +213,7 @@ BOOST_AUTO_TEST_CASE(tree_aug_long) {
         
         paal::ir::IterativeRounding<decltype(treeaug)> irw(treeaug);
 
-        paal::ir::solve(irw);
+        paal::ir::solve_iterative_rounding(irw);
         
 
     }
