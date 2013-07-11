@@ -299,12 +299,6 @@ namespace paal {
                             return m_inSolution;
                         }
 
-            ///Return the cost of the solution found
-            CostValue   getSolutionValue() const{
-                //std::cout<<"Cost="<<m_solCost<<std::endl;
-
-                return m_solCost;
-            }
 
 
                 private:

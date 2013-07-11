@@ -109,11 +109,9 @@ int main(int argc, char* argv[])
       std::cerr<<error<<std::endl;
       return -1;
   }
-  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
   
   paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
 
-  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
   
   paal::ir::solve_iterative_rounding(ir);
 
@@ -136,7 +134,6 @@ int main(int argc, char* argv[])
   }
   std::cout<<std::endl;
   std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
-  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
 
   return 0;
