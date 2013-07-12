@@ -137,7 +137,8 @@ int main(int argc, char* argv[])
   }
   std::cout<<std::endl;
   std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
-  std::cout<<"The total cost of the solution is "<<ir.getSolutionValue()<<std::endl;
+  auto & irc=ir.getIRComponents();
+  std::cout<<"The total cost of the solution is "<<irc.getSolutionValue()<<std::endl;
 
 
   return 0;

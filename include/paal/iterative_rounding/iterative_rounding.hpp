@@ -126,9 +126,6 @@ public:
     }
 
 
-    decltype(std::declval<IRComponents>().getSolutionValue()) getSolutionValue() {
-        return m_irComponents.getSolutionValue();
-    }
 
 private:   
     

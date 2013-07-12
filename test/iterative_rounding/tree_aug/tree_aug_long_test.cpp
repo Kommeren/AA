@@ -211,9 +211,16 @@ BOOST_AUTO_TEST_CASE(tree_aug_long) {
         std::cerr<<"Inputvalidation "<<filename<<" ends."<<std::endl;
         
         paal::ir::IterativeRounding<decltype(treeaug)> irw(treeaug);
+        
+        double lplowerbd=irw.solveLPToExtremePoint();
+        
 
         paal::ir::solve_iterative_rounding(irw);
         
-
+        auto & ircomp=irw.getIRComponents();
+        double solval =ircomp.getSolutionValue();
+        std::cout<<"Cost of solution found: "<<solval<<", LP lower bound: "<<lplowerbd<<std::endl;
+        BOOST_CHECK(solval<=2*lplowerbd);
+        
     }
 }
