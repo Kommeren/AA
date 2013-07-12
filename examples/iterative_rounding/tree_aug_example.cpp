@@ -16,7 +16,7 @@
 // #include "paal/iterative_rounding/iterative_rounding.hpp"
 // #include "paal/iterative_rounding/ir_components.hpp"
 
-#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
+#include "paal/iterative_rounding/treeaug/tree_aug.hpp"
 //#include "paal/iterative_rounding/glp_lpbase.hpp"
 
 using namespace boost;
@@ -112,8 +112,11 @@ int main(int argc, char* argv[])
   
   paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
 
+
   
   paal::ir::solve_iterative_rounding(ir);
+
+  std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
 
   typename boost::property_map<Graph, boost::vertex_index_t>::type  index = get(boost::vertex_index, g);
@@ -134,6 +137,7 @@ int main(int argc, char* argv[])
   }
   std::cout<<std::endl;
   std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
+  std::cout<<"The total cost of the solution is "<<ir.getSolutionValue()<<std::endl;
 
 
   return 0;

@@ -12,7 +12,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "utils/logger.hpp"
-#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
+#include "paal/iterative_rounding/treeaug/tree_aug.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;

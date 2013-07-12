@@ -13,7 +13,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "utils/logger.hpp"
-#include "paal/iterative_rounding/tree_aug/tree_aug.hpp"
+#include "paal/iterative_rounding/treeaug/tree_aug.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -168,8 +168,7 @@ BOOST_AUTO_TEST_CASE(tree_aug_long) {
         std::string fname;
         int MAX_LINE = 256;
         char buf[MAX_LINE];
-        int verticesNum, edgesNum;
-        double bestCost;
+
         is_test_cases.getline(buf, MAX_LINE);
         if(buf[0] == 0) {
             return;

@@ -299,6 +299,10 @@ namespace paal {
                             return m_inSolution;
                         }
 
+                    ///Return the solution found
+             CostValue getSolutionValue() {
+                            return m_solCost;
+                        }
 
 
                 private:
@@ -391,7 +395,7 @@ namespace paal {
                                     lp.addConstraintCoef(rowIdx, edge2ColId[pe]);
 
                                 }
-                                std::cout<<std::endl;
+                                //std::cout<<std::endl;
 
                                 // m_edgeMap[e] = colName;
                                 // m_spanningTree[e] = false;

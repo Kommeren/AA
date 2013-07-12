@@ -126,6 +126,10 @@ public:
     }
 
 
+    decltype(std::declval<IRComponents>().getSolutionValue()) getSolutionValue() {
+        return m_irComponents.getSolutionValue();
+    }
+
 private:   
     
     LPBase m_lpBase;
@@ -149,6 +153,7 @@ void solve_iterative_rounding(IR &ir) {
         irsol=ir.integerSolution();
         assert(irsol || rounded || relaxed);
     } while (!irsol);
+
 }
 
 } //ir
