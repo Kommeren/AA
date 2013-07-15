@@ -5,6 +5,10 @@
  * @version 1.0
  * @date 2013-02-01
  */
+
+#ifndef CYCLE_ALGO
+#define CYCLE_ALGO
+
 #include <algorithm>
 #include <numeric>
 #include <string>
@@ -43,3 +47,5 @@ template <typename Cycle, typename Stream> void print(const Cycle & cm, Stream &
 
 }//paal
 }//simple_algo
+
+#endif //CYCLE_ALGO

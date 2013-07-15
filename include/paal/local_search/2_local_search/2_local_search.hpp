@@ -39,30 +39,6 @@ namespace two_local_search {
 * @tparam Cycle input cycle, hast to be model of the  \ref cycle concept
 * @tparam SearchComponents this is model MultiSearchComponents
 */
-template <typename Cycle,
-          typename SearchComponents>
-class  TwoLocalSearchStep : 
-   public LocalSearchStepMultiSolution<
-            TwoLocalSearchAdapter<
-                data_structures::CycleStartFromLastChange<Cycle>>, 
-                search_strategies::ChooseFirstBetter,
-                SearchComponents>  {
-
-    BOOST_CONCEPT_ASSERT((data_structures::concepts::Cycle<Cycle>));
-  
-    typedef data_structures::CycleStartFromLastChange<Cycle> CycleWrap;
-    typedef TwoLocalSearchAdapter<CycleWrap> CycleAdapt;
-    typedef LocalSearchStepMultiSolution<CycleAdapt, search_strategies::ChooseFirstBetter, SearchComponents> base;
-
-    public:
-
-        TwoLocalSearchStep(Cycle c, SearchComponents sc) 
-           : base(CycleAdapt(m_cycleS), std::move(sc)), m_cycle(std::move(c)), m_cycleS(m_cycle) {}
-
-    private:
-       Cycle m_cycle;
-       CycleWrap m_cycleS;
-};
 
 template <typename Gain, 
           typename GetNeighborhood = TrivialNeighborGetter, 
@@ -109,6 +85,28 @@ TwoLocalComponents<Gain, GetNeighborhood, StopCondition>
     return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }
 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename Cycle,
+          typename... Components>
+bool two_local_search(
+            Cycle & cycle,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components) {
+    typedef data_structures::CycleStartFromLastChange<Cycle> CSFLCh;
+    CSFLCh cycleSFLCh(cycle);
+    local_search::two_local_search::TwoLocalSearchAdapter<CSFLCh> cycleAdapted(cycleSFLCh);
+    return local_search_multi_solution(cycleAdapted, std::move(psa), std::move(gsc), std::move(components)...);
+}
+
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename Cycle, 
+          typename... Components>
+bool two_local_search_simple(Cycle & cycle, Components... components) {
+    return two_local_search(cycle, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+}
 
 /**
  * @brief get default two local search components

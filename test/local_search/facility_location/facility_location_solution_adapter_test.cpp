@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     
     Sol sol(std::move(voronoi), FSet{SGM::A,SGM::B}, cost);
 
-   FacilityLocationSolutionAdapter<Sol> sa(std::move(sol));  
+   FacilityLocationSolutionAdapter<Sol> sa(sol);  
    auto b = sa.begin();
    auto e = sa.end();
    auto & A = *b;

@@ -19,30 +19,26 @@ using namespace  paal;
 
 int main() {
 //! [Two Local Search Example]
-   //sample data
-   typedef  SampleGraphsMetrics SGM;
-   auto gm = SGM::getGraphMetricSmall();
-   const int size = gm.size();
-   std::vector<int> v(size);
-   std::iota(v.begin(), v.end(), 0);
+    //sample data
+    typedef  SampleGraphsMetrics SGM;
+    auto gm = SGM::getGraphMetricSmall();
+    const int size = gm.size();
+    std::vector<int> v(size);
+    std::iota(v.begin(), v.end(), 0);
 
-   //create random solution 
-   std::random_shuffle(v.begin(), v.end());
-   typedef data_structures::SimpleCycle<int> Cycle;
-   Cycle cycle(v.begin(), v.end());
-   std::cout << "Length \t" << simple_algo::getLength(gm, cycle) << std::endl;
+    //create random solution 
+    std::random_shuffle(v.begin(), v.end());
+    typedef data_structures::SimpleCycle<int> Cycle;
+    Cycle cycle(v.begin(), v.end());
+    std::cout << "Length \t" << simple_algo::getLength(gm, cycle) << std::endl;
 
-   //creating local search
-   auto lsc = getDefaultTwoLocalComponents(gm);
-   TwoLocalSearchStep<decltype(cycle), decltype(lsc)> ls(std::move(cycle), std::move(lsc));
+    //search
+    two_local_search_simple(cycle, getDefaultTwoLocalComponents(gm));
 
-   //search
-   local_search::search(ls);
-   
-   //printing
-   std::cout << "Length \t" << simple_algo::getLength(gm, ls.getSolution()) << std::endl;
+    //printing
+    std::cout << "Length \t" << simple_algo::getLength(gm, cycle) << std::endl;
 
 //! [Two Local Search Example]
-   return 0;
+    return 0;
 }
 

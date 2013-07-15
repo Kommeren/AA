@@ -6,13 +6,12 @@
 #include <string>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
-#include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/data_structures/cycle/splay_cycle.hpp"
 #include "paal/local_search/components.hpp"
 
-#include "utils/logger.hpp"
 #include "utils/read_tsplib.h"
+#include "2_local_search_logger.hpp"
 
 using std::vector;
 using namespace paal::local_search::two_local_search;
@@ -36,21 +35,15 @@ void test() {
     Cycle cycle(v.begin(), v.end());
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
 
-    //creating local search
-    auto lsc = getDefaultTwoLocalComponents(mtx);
-    auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(cycle), std::move(lsc));
-
     //printing 
-    ON_LOG( const Cycle & c = ls.getSolution());
-    LOG_COPY_DEL(c.vbegin(), c.vend(), ",");
-    LOG("Length before\t" << simple_algo::getLength(mtx, c));
-    ON_LOG(int i = 0);
+    LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
+    LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
+
+    //setting logger
+    auto logger = utils::make_twoLSLogger(mtx);
 
     //search
-    search(ls, [&](const Cycle & c) {
-        LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, c));
-    });
-
+    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));  
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
@@ -73,39 +66,33 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     std::iota(v.begin(), v.end(), 0);
 
     //create random solution 
+    typedef data_structures::SimpleCycle<int> Cycle;
     std::random_shuffle(v.begin(), v.end());
-    data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
+    Cycle cycle(v.begin(), v.end());
     int startLen = simple_algo::getLength(mtx, cycle);
 
     //creating local search
     auto lsc = getDefaultTwoLocalComponents(mtx);
-    typedef GainCutSmallImproves<puretype(lsc.gain()), int> CIC;
+    typedef paal::local_search::GainCutSmallImproves<puretype(lsc.gain()), int> CIC;
     double epsilon = 0.001;
-    CIC  cut(std::move(lsc.gain()), startLen, epsilon);
+    CIC  cut(lsc.gain(), startLen, epsilon);
     auto cutLsc = swapGain(lsc, std::move(cut));
-    auto lsCut = TwoLocalSearchStep<decltype(cycle), decltype(cutLsc)>(std::move(cycle), std::move(cutLsc));
+    
+    //setting logger
+    auto logger = utils::make_twoLSLogger(mtx);
 
-#ifdef LOGGER_ON
     //printing 
-    auto const & cman = lsCut.getSolution();
-    LOG("Length before\t" << simple_algo::getLength(mtx, cman));
-    int i = 0;
-#endif
+    LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
 
     //search
     for(int j = 0; j < 20; ++j) {
         epsilon /= 2;
         LOG("epsilon = " << epsilon);
-        lsCut.getSearchComponents().gain().setEpsilon(epsilon);
-        while(lsCut.search()) {
-            LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
-        }
+        cutLsc.gain().setEpsilon(epsilon);
+        two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
     }
 
     LOG("Normal search at the end");
-    auto ls = TwoLocalSearchStep<decltype(cycle), decltype(lsc)>(std::move(lsCut.getSolution()), std::move(lsc));
-    while(ls.search()) {
-        LOG("Length after\t" << i++ << ": " << simple_algo::getLength(mtx, cman));
-    }
+    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
 }
 

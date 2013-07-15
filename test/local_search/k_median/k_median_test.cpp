@@ -27,16 +27,14 @@ BOOST_AUTO_TEST_CASE(test_1) {
     VorType voronoi(GSet{SGM::B, SGM::D}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::C});
 
-    //create facility location local search step
-    paal::local_search::k_median::KMedianLocalSearchStep<k, VorType>  
-        ls(std::move(sol));
+    //create facility location local search components
+    paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
 
     //search 
-    search(ls);
+    paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
 
     //print result
-    auto const & s = ls.getSolution();
-    auto const & ch = s.getChosenFacilities();
+    auto const & ch = sol.getChosenFacilities();
     LOG("Solution:");
     LOG_COPY_DEL(ch.begin(), ch.end(), ",");
 }

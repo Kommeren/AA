@@ -41,6 +41,10 @@ public:
     Cycle & getCycle() {
         return m_cycle;
     }
+    
+    const Cycle & getCycle() const {
+        return m_cycle;
+    }
 
 private:
     Cycle & m_cycle;

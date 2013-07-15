@@ -31,6 +31,32 @@ bool le(double x, double y) {
     static const double epsilon = 0.001;
     return x * (1 - epsilon) <= y;
 }
+        
+
+template <typename Metric, typename Cost>
+class FLLogger  {
+public:
+FLLogger(const Metric & m, const Cost & c) :
+            m_metric(m), m_cost(c) {}
+
+template <typename Sol>
+void operator()(Sol & sol) {
+           ON_LOG(auto const & ch =  sol.get().getChosenFacilities());
+           LOG_COPY_DEL(ch.begin(), ch.end(), ",");
+           ON_LOG(auto c = sol.get().getVoronoi().getCost());
+           LOG("current cost " << simple_algo::getCFLCost(m_metric, m_cost, sol.get()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
+        };
+
+private:
+    const Metric & m_metric;
+    const Cost & m_cost;
+};
+
+template <typename Metric, typename Cost>
+FLLogger<Metric, Cost> 
+make_fLLogger(const Metric & m , const Cost & c)  {
+    return FLLogger<Metric, Cost>(m, c);
+};
 
 
 
@@ -79,16 +105,10 @@ void runTests(const std::string & fname, Solve solve) {
         Sol sol(std::move(voronoi), USet{}, cost);
 
 
-        auto logger =  [&](Sol & sol) {
-           ON_LOG(auto const & ch =  sol.getChosenFacilities());
-           LOG_COPY_DEL(ch.begin(), ch.end(), ",");
-           ON_LOG(auto c = sol.getVoronoi().getCost());
-           LOG("current cost " << simple_algo::getCFLCost(metric, cost, sol) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
-        };
 
-        auto s = solve.template operator()<VorType>(std::move(sol), metric, cost, opt, logger);
+        solve.template operator()<VorType>(sol, metric, cost, opt, make_fLLogger(metric, cost));
 
-        double c = simple_algo::getCFLCost(metric, cost, s);
+        double c = simple_algo::getCFLCost(metric, cost, sol);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG(std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
@@ -96,38 +116,28 @@ void runTests(const std::string & fname, Solve solve) {
 }
 
 struct SolveAddRemove {
+    DefaultRemoveFLComponents<int>::type rem;
+    DefaultAddFLComponents<int>::type    add;
+    utils::ReturnFalseFunctor nop;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
-    Solution operator()(Solution sol, Metric metric, Cost cost, double opt, Action a) {
+    void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
+        facility_location_local_search(sol, a, nop, rem);
+        facility_location_local_search(sol, a, nop, rem, add);
         
-        FacilityLocationLocalSearchStep<VorType, Cost, DefaultRemoveFLComponents<int>::type>  
-            lsRemove(std::move(sol), typename DefaultRemoveFLComponents<int>::type());
-
-        search(lsRemove, a);
-        
-        FacilityLocationLocalSearchStep<VorType, Cost, DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type>  
-            lsRemoveAdd(std::move(lsRemove.getSolution()), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type());
-
-        search(lsRemoveAdd, a);
-        
-        auto const & s1 = lsRemoveAdd.getSolution();
-        double c1 = simple_algo::getCFLCost(metric, cost, s1);
-        LOG(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c1 / opt);
-        return s1;
+        double c = simple_algo::getCFLCost(metric, cost, sol);
+        LOG(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
     }
 };
 
-struct SolveAddRemoveSwap {
+struct SolveAddRemoveSwap : public SolveAddRemove {
+    DefaultSwapFLComponents<int>::type   swap;
     
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
-    Solution operator()(Solution sol, Metric metric, Cost cost, double opt, Action a) {
-        auto s = SolveAddRemove().template operator()<VorType>(std::move(sol), metric, cost, opt, a);
-
-        FacilityLocationLocalSearchStep<VorType, decltype(cost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
-            ls(std::move(s), typename DefaultRemoveFLComponents<int>::type(), typename DefaultAddFLComponents<int>::type(), typename DefaultSwapFLComponents<int>::type());
-
-        search(ls, a);
-        return ls.getSolution();
+    void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
+        facility_location_local_search(sol, a, nop, rem);
+        facility_location_local_search(sol, a, nop, rem, add);
+        facility_location_local_search(sol, a, nop, rem, add, swap);
     }
         
 };

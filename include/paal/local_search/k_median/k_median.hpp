@@ -11,6 +11,7 @@
 #include "paal/local_search/multi_solution_step/local_search_multi_solution.hpp"
 #include "paal/local_search/facility_location/facility_location_swap.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
+#include "paal/local_search/facility_location/facility_location.hpp"
 
 #include "k_median_solution.hpp"
 
@@ -54,7 +55,9 @@ struct DefaultKMedianComponents {
  * @tparam Voronoi
  * @tparam MultiSearchComponents
  */
-template <int k, typename Voronoi,
+
+
+/*template <int k, typename Voronoi,
           typename MultiSearchComponents = typename DefaultKMedianComponents<typename Voronoi::VertexType>::type>
 
 class KMedianLocalSearchStep : 
@@ -78,7 +81,7 @@ public:
             MultiSearchComponents sc = MultiSearchComponents()) :
                 base(KMSolutionAdapter(std::move(kms)), 
                                        std::move(sc)) {}
-};
+};*/
 
 
 

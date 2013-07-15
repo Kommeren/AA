@@ -64,14 +64,15 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         typedef typename VorType::GeneratorsSet FSet;
         VorType voronoi( FSet{},  FSet(clients.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), FSet(fac.begin(), fac.end()), cost);
+    
+        DefaultRemoveFLComponents<int>::type rem;
+        DefaultAddFLComponents<int>::type    add;
+        DefaultSwapFLComponents<int>::type   swap;
+        utils::ReturnFalseFunctor nop;
 
-        FacilityLocationLocalSearchStep<VorType, decltype(cost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
-            ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
+        facility_location_local_search(sol, nop, nop, rem, add, swap);
 
-        auto & s = ls.getSolution();
-
-        search(ls);
-        double c = simple_algo::getFLCost(metric, cost, s);
+        double c = simple_algo::getFLCost(metric, cost, sol);
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);

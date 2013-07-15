@@ -46,8 +46,8 @@ class LocalSearchStepMultiSolutionBase {
 protected:    
     typedef typename utils::SolToElem<Solution>::type SolutionElement;
 
-    LocalSearchStepMultiSolutionBase(Solution solution = Solution()) : 
-        m_solution(std::move(solution)) {}
+    LocalSearchStepMultiSolutionBase(Solution & solution) : 
+        m_solution(solution) {}
 
 public:
 
@@ -57,18 +57,13 @@ public:
 
 protected:
 
-    Solution m_solution;
+    Solution & m_solution;
 };
 
 template <typename Solution,
           typename SearchStrategy,
           typename... MultiSearchComponentsRest>
-class LocalSearchStepMultiSolution {
-    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
-                    std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
-    LocalSearchStepMultiSolution() = delete;
-};
-
+class LocalSearchStepMultiSolution; 
 
 template <typename Solution,
           typename MultiSearchComponents,
@@ -83,14 +78,14 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBette
 public:
 
     LocalSearchStepMultiSolution(
-            Solution solution, 
+            Solution & solution, 
             MultiSearchComponents sc, 
             MultiSearchComponentsRest... rest) : 
-        base(std::move(solution), std::move(rest)...), m_searchComponents(std::move(sc)) {}
+        base(solution, std::move(rest)...), m_searchComponents(std::move(sc)) {}
     
     LocalSearchStepMultiSolution(
-            Solution solution = Solution()) : 
-        base(std::move(solution)), m_searchComponents(MultiSearchComponents()) {}
+            Solution & solution) : 
+        base(solution), m_searchComponents(MultiSearchComponents()) {}
 
     typedef typename  base::SolutionElement SolutionElement;
     using base::m_solution;
@@ -135,8 +130,8 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBette
     friend class LocalSearchStepMultiSolution;
 //TODO change after redesign
 protected:
-    LocalSearchStepMultiSolution(Solution solution = Solution()) : 
-        base(std::move(solution)) {}
+    LocalSearchStepMultiSolution(Solution & solution) : 
+        base(solution) {}
 public:
     using base::getSolution;
     bool search() {
@@ -145,17 +140,26 @@ public:
 };
 
 
-template <typename Solution, typename MultiSearchComponents, typename... MultiSearchComponentsRest> 
-class LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponents, MultiSearchComponentsRest...> : 
-        public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> {      
+template <typename Solution, 
+          typename MultiSearchComponents, 
+          typename... MultiSearchComponentsRest> 
+class LocalSearchStepMultiSolution<
+        Solution, 
+        search_strategies::SteepestSlope, 
+        MultiSearchComponents, 
+        MultiSearchComponentsRest...> : 
+      public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> { 
 
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
     typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> base;
 public:
 
-    LocalSearchStepMultiSolution(Solution solution = Solution(), MultiSearchComponents sc = MultiSearchComponents()) : 
-        base(std::move(solution)), m_searchComponents(std::move(sc)) {}
+    LocalSearchStepMultiSolution(Solution & solution) : 
+        base(solution) {}
+    
+    LocalSearchStepMultiSolution(Solution & solution, MultiSearchComponents sc,  MultiSearchComponentsRest... rest) : 
+        base(solution, rest...), m_searchComponents(std::move(sc)) {}
 
     typedef typename base::SolutionElement SolutionElement;
     typedef typename utils::SolToIter<Solution>::type SolutionIterator;
@@ -228,8 +232,8 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope> :
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
 
-    LocalSearchStepMultiSolution(Solution solution = Solution()) : 
-        base(std::move(solution)) {}
+    LocalSearchStepMultiSolution(Solution & solution) : 
+        base(solution) {}
 public:
     using base::getSolution;
     using base::m_solution;
@@ -243,6 +247,32 @@ public:
     }
 };
 
+
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename Solution,
+          typename... Components>
+bool local_search_multi_solution(
+            Solution & solution,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components) {
+    LocalSearchStepMultiSolution<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
+    bool ret = false;
+    while(!gsc(solution) && lss.search()) {
+        ret = true;
+        psa(solution);
+    }
+    return ret;
+}
+
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename Solution, 
+          typename... Components>
+bool local_search_multi_solution_simple(Solution & solution, Components... components) {
+    return local_search_multi_solution<SearchStrategy>(solution, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+}
 
 
 } // local_search

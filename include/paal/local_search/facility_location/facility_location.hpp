@@ -69,32 +69,28 @@ struct DefaultSwapFLComponents {
  * @tparam FacilityCost
  * @tparam MultiSearchComponents
  */
-template <typename Voronoi,
-          typename FacilityCost,
-          typename... MultiSearchComponents>
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename FacilityLocationSolution,
+          typename... Components>
+bool facility_location_local_search(
+            FacilityLocationSolution & fls,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components) {
+    typedef FacilityLocationSolutionAdapter<FacilityLocationSolution> FLSA;
+    FLSA flsa(fls);
+    return local_search_multi_solution(flsa, std::move(psa), std::move(gsc), std::move(components)...);
+}
 
-class FacilityLocationLocalSearchStep : 
-    public LocalSearchStepMultiSolution<
-               FacilityLocationSolutionAdapter<
-                    data_structures::FacilityLocationSolution<FacilityCost, Voronoi>>,
-               search_strategies::ChooseFirstBetter,
-               MultiSearchComponents...>  {
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename FacilityLocationSolution, 
+          typename... Components>
+bool facility_location_local_search_simple(FacilityLocationSolution & fls, Components... components) {
+    return facility_location_local_search(fls, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+}
 
-public:
-    typedef data_structures::FacilityLocationSolution<FacilityCost, Voronoi> FLSolution;
-    typedef FacilityLocationSolutionAdapter<FLSolution> FLSolutionAdapter;
-    
-    typedef LocalSearchStepMultiSolution<
-                FLSolutionAdapter,
-                search_strategies::ChooseFirstBetter,
-                MultiSearchComponents...>  base;
-
-    FacilityLocationLocalSearchStep(
-            FLSolution fls,
-            MultiSearchComponents... sc) :
-                base(FLSolutionAdapter(std::move(fls)), 
-                                       std::move(sc)...) {}
-};
 
 }
 }

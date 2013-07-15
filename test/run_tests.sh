@@ -24,8 +24,8 @@ exit_on_error
 echo ------------------------------------------- cycle_cancellation_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/cycle_cancellation_test
 exit_on_error
-echo ------------------------------------------- facility_location_local_search_test 	 -------------------------------------------------------------------------------------
-./${build_dir}/facility_location_local_search_test
+echo ------------------------------------------- facility_location_test 	 -------------------------------------------------------------------------------------
+./${build_dir}/facility_location_test
 exit_on_error
 echo ------------------------------------------- facility_location_neghborhood_getter_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/facility_location_neghborhood_getter_test

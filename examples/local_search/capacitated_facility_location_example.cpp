@@ -35,16 +35,11 @@ int main() {
     VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, facilityCapacity, clientDemand);
     Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
-    //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, decltype(facilityCost), DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
-          ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
-
     //search 
-    search(ls);
+    facility_location_local_search_simple(sol, DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
 
     //print result
-    auto const & s = ls.getSolution();
-    auto const & ch = s.getChosenFacilities();
+    auto const & ch = sol.getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;
 //! [CFL Search Example]

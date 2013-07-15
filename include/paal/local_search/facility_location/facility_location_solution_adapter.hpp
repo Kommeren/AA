@@ -5,6 +5,11 @@
  * @version 1.0
  * @date 2013-02-01
  */
+
+#ifndef FACILITY_LOCATION_SOLUTION_ADAPTER_HPP
+#define FACILITY_LOCATION_SOLUTION_ADAPTER_HPP
+
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -50,8 +55,8 @@ public:
                                 typename Traits<Unchosen>::ColTIterRange> Range;
     typedef typename boost::range_iterator<Range>::type SolutionIterator;
 
-    FacilityLocationSolutionAdapter(FacilityLocationSolution sol) : 
-            m_sol(std::move(sol)), 
+    FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) : 
+            m_sol(sol), 
             m_unchosenCopy(m_sol.getUnchosenFacilities().begin(), 
                          m_sol.getUnchosenFacilities().end()) {
         auto const &  ch = m_sol.getChosenFacilities();
@@ -136,7 +141,7 @@ public:
     }
     
 private:
-    FacilityLocationSolution m_sol;    
+    FacilityLocationSolution & m_sol;    
     Facilities m_facilities;
     CycledFacilities m_cycledFacilities;
     std::unordered_map<VertexType, Fac*> m_vertexToFac;
@@ -147,3 +152,5 @@ private:
 } //facility_location
 } // local_search
 } // paal
+
+#endif //FACILITY_LOCATION_SOLUTION_ADAPTER_HPP

@@ -26,6 +26,9 @@ bool search(LocalSearchStep & lss,
     return ret;
 }
 
-}
-}
+
+
+
+}//local_search
+}//paal
 #endif /* LOCAL_SEARCH_HPP */

@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     typedef paal::local_search::k_median::KMedianSolution<k, Voronoi> Sol;
     
     Sol sol(std::move(voronoi), GSet{SGM:: C,SGM::D, SGM::E});
-    FacilityLocationSolutionAdapter<Sol> sa(std::move(sol));  
+    FacilityLocationSolutionAdapter<Sol> sa(sol);  
     auto & realSol = sa.get(); 
 
     realSol.addFacility(SGM::C);

@@ -33,6 +33,10 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
             return m_cycle.getCycle();
         }
         
+        decltype(std::declval<const Cycle>().getCycle()) get() const {
+            return m_cycle.getCycle();
+        }
+        
         Cycle & getWrap() {
             return m_cycle;
         }

@@ -25,15 +25,13 @@ int main() {
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::C});
 
     //create facility location local search step
-    paal::local_search::k_median::KMedianLocalSearchStep<k, VorType>  
-        ls(std::move(sol));
+    paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
 
     //search 
-    search(ls);
+    paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
 
     //print result
-    auto const & s = ls.getSolution();
-    auto const & ch = s.getChosenFacilities();
+    auto const & ch = sol.getChosenFacilities();
     std::cout << "Solution:" << std::endl;
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;

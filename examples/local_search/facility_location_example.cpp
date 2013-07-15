@@ -30,16 +30,16 @@ int main() {
     VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, make_Array2Function(fcosts));
 
-    //create facility location local search step
-    FacilityLocationLocalSearchStep<VorType, Cost, DefaultRemoveFLComponents<int>::type, DefaultAddFLComponents<int>::type, DefaultSwapFLComponents<int>::type>  
-          ls(std::move(sol), DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
+    //create facility location local search components
+    DefaultRemoveFLComponents<int>::type rem;
+    DefaultAddFLComponents<int>::type    add;
+    DefaultSwapFLComponents<int>::type   swap;
 
     //search 
-    search(ls);
+    facility_location_local_search_simple(sol, rem, add, swap);
 
     //print result
-    auto const & s = ls.getSolution();
-    auto const & ch = s.getChosenFacilities();
+    auto const & ch = sol.getChosenFacilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
     std::cout << std::endl;
 //! [FL Search Example]

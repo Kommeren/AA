@@ -8,6 +8,9 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP 
 
+namespace paal {
+namespace local_search {
+
 template <typename Gain, typename Dist>
 class GainCutSmallImproves {
 public:    
@@ -36,4 +39,23 @@ private:
     Dist m_currOpt;    
     double m_epsilon;    
 };
+
+
+class StopConditionCountLimit {
+public:
+    StopConditionCountLimit(unsigned limit) : m_cnt(0), m_limit(limit) {}
+
+    template <typename... Args> 
+    bool operator()(Args&&... ) {
+        return m_cnt++ >= m_limit;
+    }
+private:
+    unsigned m_cnt;
+    const unsigned m_limit;
+
+};
+
+} // local_search
+} // paal
+
 #endif /* COMPONENTS_HPP */
