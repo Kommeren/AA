@@ -26,17 +26,18 @@ int f(int i) {
     return i;
 }
 
+namespace bm = boost::mpl;
+namespace bf = boost::fusion;
+namespace ds = paal::data_structures;
+
+
 template <typename... Args>
-using Comps = typename  paal::data_structures::Components<
+using Comps = typename  ds::Components<
         names::A, names::B, names::C>::type<Args...> ;
 
         
-namespace bm = boost::mpl;
-namespace bf = boost::fusion;
-
 BOOST_AUTO_TEST_CASE(ComponentsTest) {
-
-    //default
+    //default arguments
     Comps<int, double, int> comps;
     comps.get<names::A>();
     comps.set<names::A>(7);
@@ -57,18 +58,30 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
 
     BOOST_CHECK_EQUAL(comps5.call<names::A>(2), 2);
 
-    typedef paal::data_structures::SwapType<names::A, std::pair<int, int>, CompsF>::type Swapped;
+    typedef ds::SwapType<names::A, std::pair<int, int>, CompsF>::type Swapped;
 
     //This is unfortunately not true
     //typedef Comps<std::pair<int, int>, double, int> SwappedCheck;
 //    static_assert(std::is_same<Swapped, SwappedCheck>::value, "Invalid swapped type");
 
-    Swapped swap = paal::data_structures::swap<names::A>(std::make_pair(11, 12), comps5);
+    Swapped swap = ds::swap<names::A>(std::make_pair(11, 12), comps5);
     
     auto p = swap.get<names::A>();
     BOOST_CHECK_EQUAL(p.first, 11);
     BOOST_CHECK_EQUAL(p.second, 12);
     BOOST_CHECK_EQUAL(swap.get<names::B>(), 2);
     BOOST_CHECK_EQUAL(swap.get<names::C>(), 17);
+}
 
+template <typename... Args>
+using CompsWithDefaults = typename  ds::Components<
+        names::A, names::B, ds::NameWithDefault<names::C, int>>::type<Args...> ;
+
+BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
+    CompsWithDefaults<int, double, float> comps;
+    CompsWithDefaults<int, double> comps2(1,2, 3.5);
+    BOOST_CHECK_EQUAL(comps2.get<names::C>(), 3);
+    
+    //This won't compile
+    //CompsWithDefaults<int> comps3;
 }

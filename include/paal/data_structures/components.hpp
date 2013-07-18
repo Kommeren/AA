@@ -27,14 +27,71 @@
 namespace paal {
 namespace data_structures {
 
-struct NoDefault;
 
+template <typename Name, typename Default>
+struct NameWithDefault;
 
 namespace detail {
-    template <typename Names, typename Types>
+
+    template <typename T>
+    struct GetName {
+        typedef T type;
+    };
+
+    template <typename Name, typename Default>
+    struct GetName<NameWithDefault<Name, Default>> {
+        typedef Name type;
+    };
+
+    struct NoDefault;
+
+    template <typename T>
+    struct GetDefault {
+        typedef NoDefault type;
+    };
+
+    template <typename Name, typename Default>
+    struct GetDefault<NameWithDefault<Name, Default>> {
+        typedef Default type;
+    };
+    
+
+    template <typename NamesWithDefaults, typename TypesPrefix>
     class Components {
-        static const int N = boost::mpl::size<Names>::type::value;
-        static_assert(boost::mpl::size<Types>::type::value == N, "Incrrect number of parameters");
+        static const int N = boost::mpl::size<NamesWithDefaults>::type::value;
+        static const int TYPES_NR = boost::mpl::size<TypesPrefix>::type::value;
+        static_assert(TYPES_NR <= N, "Incrrect number of parameters");
+
+        typedef typename boost::mpl::fold<
+                NamesWithDefaults,
+                boost::mpl::vector<>,
+                boost::mpl::push_back<boost::mpl::_1, GetName<boost::mpl::_2>>
+            >::type Names;
+
+        typedef typename boost::mpl::fold<
+                NamesWithDefaults,
+                boost::mpl::vector<>,
+                boost::mpl::if_<std::is_same<GetDefault<boost::mpl::_2>, NoDefault>,
+                                boost::mpl::_1, //then
+                                boost::mpl::push_back<boost::mpl::_1, GetDefault<boost::mpl::_2>>>//else
+            >::type Defaults;
+
+        static_assert(boost::mpl::size<Defaults>::type::value + TYPES_NR >= N, "Incrrect number of parameters");
+
+        typedef typename boost::mpl::fold<
+                Defaults,
+                Defaults,
+                boost::mpl::if_<boost::mpl::less<boost::mpl::integral_c<int, N - TYPES_NR>, boost::mpl::size<boost::mpl::_1>>,
+                                boost::mpl::pop_front<boost::mpl::_1>, //then
+                                boost::mpl::_1>//else
+            >::type NeededDefaults;
+
+        typedef typename boost::mpl::fold<
+                NeededDefaults,
+                TypesPrefix,
+                boost::mpl::push_back<boost::mpl::_1, boost::mpl::_2>
+            >::type Types;
+
         typedef typename boost::mpl::zip_view<boost::mpl::vector<Names, Types>> NamesWithTypes;
         
         template <template <class, class> class Pair>
@@ -132,7 +189,6 @@ template <typename Name, typename NewType, typename Components> class SwapType;
 
 template <typename Name, typename NewType, typename Names, typename Types> 
 class SwapType<Name, NewType, detail::Components<Names, Types>> {
-public:
     typedef typename boost::mpl::find<Names, Name>::type::pos pos; // position to insert
     typedef typename boost::mpl::begin<Types>::type TypesBegin; // begin iterator
     typedef typename boost::mpl::advance<TypesBegin, pos>::type TypeIter; // iterator on position
@@ -140,6 +196,7 @@ public:
     typedef typename boost::mpl::begin<TypesErased>::type ErasedBegin; // begin of new collection with erased element
     typedef typename boost::mpl::advance<ErasedBegin, pos>::type TypeIterErased; // correct place in collection with erased element
     typedef typename boost::mpl::insert<TypesErased, TypeIterErased, NewType>::type TypesSwapped; // insert new element  (final collection) 
+public:
     typedef detail::Components<Names, TypesSwapped> type;
 };
 
@@ -190,8 +247,8 @@ swap(NewType comp, detail::Components<Names, Types> components){
     typedef typename boost::mpl::erase<Names, pos>::type NamesErased; // removed old element
 
     boost::mpl::for_each(detail::make_Rewrite(components, resComponents), 
-                         static_cast<NamesErased*>(0), 
-                         static_cast<detail::ToConstructable*>(0));
+                         static_cast<NamesErased*>(nullptr), 
+                         static_cast<detail::ToConstructable*>(nullptr));
     resComponents.template set<Name>(comp);
 
     return std::move(resComponents);
