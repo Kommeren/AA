@@ -10,22 +10,14 @@
 
 #include <utility>
 
-#include <boost/mpl/zip_view.hpp>
-#include <boost/mpl/fold.hpp>
-#include <boost/mpl/map.hpp>
-#include <boost/mpl/find.hpp>
-#include <boost/fusion/container/map.hpp>
-#include <boost/fusion/include/map.hpp>
-#include <boost/fusion/view/zip_view.hpp>
-#include <boost/fusion/include/zip_view.hpp>
-#include <boost/fusion/include/mpl.hpp>
-#include <boost/fusion/sequence/intrinsic/at_key.hpp>
-#include <boost/fusion/include/at_key.hpp>
-#include <boost/preprocessor/repetition/enum.hpp>
+#include <boost/mpl/if.hpp>
+
+#include "types_vector.hpp"
 
 
 namespace paal {
 namespace data_structures {
+
 
 
 template <typename Name, typename Default>
@@ -33,6 +25,128 @@ struct NameWithDefault;
 
 namespace detail {
 
+    
+    template <typename T>
+    struct WrapToConstructable {
+        typedef T type;
+    };
+
+    template <typename Name, typename Names, typename Types>
+    struct TypeForName {
+        typedef typename remove_n_first<1, Names>::type NewNames;
+        typedef typename remove_n_first<1, Types>::type NewTypes;
+        typedef typename TypeForName<Name, NewNames, NewTypes>::type type;
+    };
+
+    template <typename Name,typename Type, typename... Args1, typename... Args2>
+    struct TypeForName<Name, TypesVector<Name, Args1...>, TypesVector<Type, Args2...>>{
+        typedef Type type;
+    };
+
+    template <typename T, typename Name> 
+    class HasTemplateGet {  
+        private: 
+            template <typename U, U> 
+                class check 
+                { }; 
+
+            template <typename C>
+                static char f(check<decltype(std::declval<const C>().template get<Name>()) (C::*)() const, &C::template get<Name>>*);
+
+            template <typename C>
+                static long f(...); 
+
+        public:
+            static  const bool value = (sizeof(f<typename std::decay<T>::type>(0)) == sizeof(char));
+    }; 
+    
+    template <typename Names, typename Types>
+    class Components;
+    
+    template <>
+    class Components<TypesVector<>, TypesVector<>> {
+    public:
+        void get() const {}
+        
+        Components() = default;
+
+        template <typename Comps>
+        Components(const Comps & comps) {} 
+    };
+
+    template <typename Name, typename Type, typename... NamesRest, typename... TypesRest>
+    class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> : 
+            Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> {
+        typedef Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> base;
+        typedef TypesVector<Name, NamesRest...> Names;
+        typedef TypesVector<Type, TypesRest...> Types; 
+    public:
+        Components() = default;
+
+        template <typename T, typename... TypesPrefix>
+        Components(T t, TypesPrefix ... types) : base(types...), m_component(std::move(t)) 
+        {}
+       
+        //constructor takes Components class with appropriate signature
+        template <typename Types2>
+        Components(Components<Names, Types2> comps) : 
+            base(std::move(static_cast<Components<TypesVector<NamesRest...>,
+                                typename remove_n_first<1, Types2>::type>                           
+                            >(comps))), 
+            m_component(std::move(comps.template get<Name>())) {} 
+        
+        //constructor takes Components class with appropriate signature
+        template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value>::type  >
+        Components(Comps comps) : 
+            base(comps), 
+            m_component(std::move(comps.template get<Name>())) {} 
+
+        template <typename ComponentName, typename... Args>
+        auto call(Args&&... args) ->
+        decltype(std::declval<typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
+            return get<ComponentName>()(std::forward<Args>(args)...);
+        }
+
+        template <typename ComponentName>
+        void set(const typename TypeForName<ComponentName, Names, Types>::type  comp) {
+            get<ComponentName>() = std::move(comp);
+        }
+        
+        
+        template <typename ComponentName>
+        typename TypeForName<ComponentName, Names, Types>::type & get() {
+            return get(WrapToConstructable<ComponentName>());
+        }
+        
+        template <typename ComponentName>
+        const typename TypeForName<ComponentName, Names, Types>::type & get() const {
+            return get(WrapToConstructable<ComponentName>());
+        }
+        
+    protected:
+        template <typename ComponentName>
+        const typename TypeForName<ComponentName, Names, Types>::type & 
+        get(WrapToConstructable<ComponentName> w) const {
+            return base::get(w);
+        }
+        
+        const Type & get(WrapToConstructable<Name>) const {
+            return m_component;
+        }
+        
+        template <typename ComponentName>
+        typename TypeForName<ComponentName, Names, Types>::type & 
+        get(WrapToConstructable<ComponentName> w) { 
+            return base::get(w);
+        }
+        
+        Type & get(WrapToConstructable<Name>) {
+            return m_component;
+        }
+
+        Type m_component;
+    };
+    
     template <typename T>
     struct GetName {
         typedef T type;
@@ -54,134 +168,68 @@ namespace detail {
     struct GetDefault<NameWithDefault<Name, Default>> {
         typedef Default type;
     };
-    
 
+    struct PushBackName {
+        template <typename Vector, typename NameWithDefault>
+        struct apply {
+            typedef typename push_back<Vector, typename GetName<NameWithDefault>::type>::type type;
+        };
+    };
+    
+    struct PushBackDefault {
+        template <typename Vector, typename NameWithDefault>
+        struct apply {
+            typedef typename GetDefault<NameWithDefault>::type Default;
+
+            typedef typename 
+                boost::mpl::if_<std::is_same<Default, NoDefault>,
+                            Vector, //then
+                            typename push_back<Vector, Default>::type //else
+                        >::type  type;
+        };
+    };
+    
     template <typename NamesWithDefaults, typename TypesPrefix>
-    class Components {
-        static const int N = boost::mpl::size<NamesWithDefaults>::type::value;
-        static const int TYPES_NR = boost::mpl::size<TypesPrefix>::type::value;
+    class SetDefaults {
+    public:
+        static const int N = size<NamesWithDefaults>::value;
+        static const int TYPES_NR = size<TypesPrefix>::value;
         static_assert(TYPES_NR <= N, "Incrrect number of parameters");
 
-        typedef typename boost::mpl::fold<
+
+        typedef typename fold<
                 NamesWithDefaults,
-                boost::mpl::vector<>,
-                boost::mpl::push_back<boost::mpl::_1, GetName<boost::mpl::_2>>
+                TypesVector<>,
+                PushBackName
             >::type Names;
 
-        typedef typename boost::mpl::fold<
+        typedef typename fold<
                 NamesWithDefaults,
-                boost::mpl::vector<>,
-                boost::mpl::if_<std::is_same<GetDefault<boost::mpl::_2>, NoDefault>,
-                                boost::mpl::_1, //then
-                                boost::mpl::push_back<boost::mpl::_1, GetDefault<boost::mpl::_2>>>//else
+                TypesVector<>,
+                PushBackDefault
             >::type Defaults;
-
-        static_assert(boost::mpl::size<Defaults>::type::value + TYPES_NR >= N, "Incrrect number of parameters");
-
-        typedef typename boost::mpl::fold<
-                Defaults,
-                Defaults,
-                boost::mpl::if_<boost::mpl::less<boost::mpl::integral_c<int, N - TYPES_NR>, boost::mpl::size<boost::mpl::_1>>,
-                                boost::mpl::pop_front<boost::mpl::_1>, //then
-                                boost::mpl::_1>//else
-            >::type NeededDefaults;
-
-        typedef typename boost::mpl::fold<
-                NeededDefaults,
-                TypesPrefix,
-                boost::mpl::push_back<boost::mpl::_1, boost::mpl::_2>
-            >::type Types;
-
-        typedef typename boost::mpl::zip_view<boost::mpl::vector<Names, Types>> NamesWithTypes;
         
-        template <template <class, class> class Pair>
-        struct NamesWithTypesToPairs {
-        typedef typename boost::mpl::transform_view <
-                                NamesWithTypes,
-                                boost::mpl::unpack_args<Pair<boost::mpl::_1, 
-                                                             boost::mpl::_2>>
-                             >::type type;
-        };
+        static const int DEFAULTS_NR = size<Defaults>::value;
+        static_assert(DEFAULTS_NR + TYPES_NR >= N, "Incrrect number of parameters");
 
-        typedef typename boost::mpl::fold<
-                typename NamesWithTypesToPairs<boost::mpl::pair>::type,
-                boost::mpl::map<>,
-                boost::mpl::insert<boost::mpl::_1, boost::mpl::_2>
-            >::type NameTypeMap;
+        typedef typename remove_n_first<DEFAULTS_NR + TYPES_NR - N, Defaults>::type NeededDefaults;
 
-        template <typename Name>
-        struct TypeForName {
-            typedef typename boost::mpl::at<NameTypeMap, Name>::type type;
-        };
-
-        //TODO we do not support object which are not default constructible
-        template <int k, typename Component, typename... ComponentTypesPrefix>
-        void setComonentsPartial(Component component, ComponentTypesPrefix... components) {
-            typedef typename boost::mpl::at<Names, boost::mpl::int_<k>>::type Name;
-            boost::fusion::at_key<Name>(m_components) = component;
-            setComonentsPartial<k+1>(components...);
-        }
-       
-        //boundary condition
-        template <int k>
-        void setComonentsPartial() {}
-
-    public:
-        typedef typename boost::fusion::result_of::as_map<
-                typename NamesWithTypesToPairs<boost::fusion::pair>::type
-            >::type ComponentsMap;
-        
-        Components() = default;
-        
-        Components(Components &&) = default;
-
-        Components(const Components &) = default;
-        
-        Components& operator=(const Components &) = default;
-
-        Components& operator=(Components &&) = default;
-
-        template <typename... ComponentTypesPrefix>
-        Components(ComponentTypesPrefix... components) {
-           setComonentsPartial<0>(components...); 
-        }
-        
-        template <typename ComponentName, typename... Args>
-        auto call(Args&&... args) ->
-        decltype(std::declval<typename TypeForName<ComponentName>::type>()(std::forward<Args>(args)...)) {
-            return boost::fusion::at_key<ComponentName>(m_components)(std::forward<Args>(args)...);
-        }
-
-        template <typename ComponentName>
-        void set(const typename TypeForName<ComponentName>::type & comp) {
-            boost::fusion::at_key<ComponentName>(m_components) = comp;
-        }
-        
-        template <typename ComponentName>
-        typename boost::fusion::result_of::at_key<ComponentsMap, ComponentName>::type & get() {
-            return boost::fusion::at_key<ComponentName>(m_components);
-        }
-        
-        template <typename ComponentName>
-        const typename boost::fusion::result_of::at_key<const ComponentsMap, ComponentName>::type & get() const {
-            return boost::fusion::at_key<ComponentName>(m_components);
-        }
-
-    private:
-
-        ComponentsMap m_components;
+        public:
+        typedef typename join<TypesPrefix, NeededDefaults>::type Types;
+        typedef Components<Names, Types> type;
     };
+
 };
 
 
-//implementation on variadic templates is imposible because of
+//direct implementation on variadic templates is imposible because of
 //week support for type detection for inner template classes
-template <typename... ComponentNames>
+template <typename... ComponentNamesWithDefaults>
 class Components {
-    typedef typename boost::mpl::vector<ComponentNames...> Names;
+    typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
 public:
     template <typename... ComponentTypes>
-    using type = typename detail::Components<Names, typename boost::mpl::vector<ComponentTypes...>>;
+    using type = typename detail::SetDefaults<NamesWithDefaults, TypesVector<ComponentTypes...>>::type;
 };
 
 
@@ -189,67 +237,64 @@ template <typename Name, typename NewType, typename Components> class SwapType;
 
 template <typename Name, typename NewType, typename Names, typename Types> 
 class SwapType<Name, NewType, detail::Components<Names, Types>> {
-    typedef typename boost::mpl::find<Names, Name>::type::pos pos; // position to insert
-    typedef typename boost::mpl::begin<Types>::type TypesBegin; // begin iterator
-    typedef typename boost::mpl::advance<TypesBegin, pos>::type TypeIter; // iterator on position
-    typedef typename boost::mpl::erase<Types, TypeIter>::type TypesErased; // removed old element
-    typedef typename boost::mpl::begin<TypesErased>::type ErasedBegin; // begin of new collection with erased element
-    typedef typename boost::mpl::advance<ErasedBegin, pos>::type TypeIterErased; // correct place in collection with erased element
-    typedef typename boost::mpl::insert<TypesErased, TypeIterErased, NewType>::type TypesSwapped; // insert new element  (final collection) 
+    static const int p =  pos<Name, Names>::value; // position to insert
+    typedef typename replace_at_pos<p, NewType, Types>::type TypesSwapped;
 public:
     typedef detail::Components<Names, TypesSwapped> type;
 };
 
-
 namespace detail {
-    template <typename T>
-    struct WrapToConstructable {
-        typedef T type;
-    };
-
-    template <typename OldComps, typename NewComps>
-    class Rewrite {
-    public:
-        Rewrite(const OldComps & old, NewComps & nw) : 
-            m_old(old), m_new(nw) {}
-
-        template <typename NameWrap>
-        void operator()(NameWrap a) {
-            typedef typename NameWrap::type Name;
-            m_new.template set<Name>(std::move(m_old.template get<Name>()));
-        }
-
-    private:
-        const OldComps & m_old;
-        NewComps & m_new;
+    template <typename Comp>
+    struct get_types;
+    
+    template <typename Names, typename Types>
+    struct get_types<Components<Names, Types>> {
+        typedef Types type;
     };
     
-    template <typename OldComps, typename NewComps>
-    Rewrite<OldComps, NewComps>
-    make_Rewrite(OldComps & old, NewComps & nw) {
-        return Rewrite<OldComps, NewComps>(old, nw);
-    }
 
-    struct ToConstructable {
-        template <typename T>
-        struct apply {
-            typedef WrapToConstructable<T> type;
-        };
+    template <typename Name, typename NewType, typename Names, typename Types> 
+    class TempSwapped {
+        typedef detail::Components<Names, Types> Comps;
+        typedef typename SwapType<Name, NewType, Comps>::type Swapped;
+        typedef typename detail::get_types<Swapped>::type NewTypes;
+
+    public:
+        TempSwapped(const Comps & comps, const NewType & comp) :
+            m_comps(comps), m_comp(comp) {}
+
+        template <typename ComponentName>
+        const typename detail::TypeForName<ComponentName, Names, NewTypes>::type & get() const {
+            return get(detail::WrapToConstructable<ComponentName>());
+        }
+    private:
+
+        template <typename ComponentName>
+        auto get(detail::WrapToConstructable<ComponentName> w) const ->
+        decltype(std::declval<const Comps>().template get<ComponentName>()) {
+            return m_comps.template get<ComponentName>();
+        }
+
+        const NewType & get(detail::WrapToConstructable<Name>) const {
+            return m_comp;
+        }
+
+        const Comps & m_comps; 
+        const NewType & m_comp; 
     };
 }
+
 
 template <typename Name, typename NewType, typename Names, typename Types> 
 typename SwapType<Name, NewType, detail::Components<Names, Types> >::type
 swap(NewType comp, detail::Components<Names, Types> components){
-    typename SwapType<Name, NewType, detail::Components<Names, Types> >::type resComponents;
-    
-    typedef typename boost::mpl::find<Names, Name>::type pos; 
-    typedef typename boost::mpl::erase<Names, pos>::type NamesErased; // removed old element
+    typedef detail::Components<Names, Types> Comps;
+    typedef typename SwapType<Name, NewType, Comps>::type Swapped;
+//    detail::TempSwapped<Name, NewType, Names, Types> st(components, comp);
 
-    boost::mpl::for_each(detail::make_Rewrite(components, resComponents), 
-                         static_cast<NamesErased*>(nullptr), 
-                         static_cast<detail::ToConstructable*>(nullptr));
-    resComponents.template set<Name>(comp);
+    Swapped resComponents(
+              detail::TempSwapped<Name, NewType, Names, Types>
+                          (components, comp));
 
     return std::move(resComponents);
 }
