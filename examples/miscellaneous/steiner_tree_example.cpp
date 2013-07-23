@@ -23,15 +23,12 @@ int main() {
     typedef typename VT::VerticesSet VSet;
     VoronoiT voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D}, VSet{SGM::E}, gm);
 
-    //steiner tree object
-    paal::steiner_tree::SteinerTree<Metric, VoronoiT> st(gm, voronoi);
-
     //run algorithm
-    auto steiner =  st.getResultSteinerVertices();
+    auto steinerPoints = paal::steiner_tree::getSteinerVertices(gm, voronoi);
 
     //print result
     std::cout << "Steiner points:" << std::endl;
-    std::copy(steiner.begin(), steiner.end(), std::ostream_iterator<int>(std::cout, "\n"));
+    std::copy(steinerPoints.begin(), steinerPoints.end(), std::ostream_iterator<int>(std::cout, "\n"));
 //! [Steiner Tree Example]
     return 0;
 }

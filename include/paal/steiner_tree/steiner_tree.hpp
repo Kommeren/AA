@@ -111,7 +111,7 @@ public:
         local_search::search(ls, [&](AMatrix & a){this->findSave(a);});
 
         uniqueRes(res);
-        return res; 
+        return std::move(res); 
     }
 private:
     //Spanning tree types
@@ -305,6 +305,15 @@ private:
     data_structures::ArrayMetric<Dist> m_save;
     data_structures::BiMap<VertexType> m_tIdx;
 };
+
+
+template <typename Metric, typename Voronoi>
+typename SteinerTree<Metric, Voronoi>::ResultSteinerVertices
+getSteinerVertices(const Metric & m, const Voronoi & v ) {
+    SteinerTree<Metric, Voronoi> st(m, v);
+    return st.getResultSteinerVertices();
+}
+
 
 } // steiner_tree
 } //paal

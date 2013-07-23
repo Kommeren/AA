@@ -51,8 +51,7 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         typedef typename VoronoiT::GeneratorsSet FSet;
         VoronoiT voronoi(FSet(terminals.begin(), terminals.end()),
                          FSet(steinerPoints.begin(), steinerPoints.end()), m);
-        paal::steiner_tree::SteinerTree<Metric, VoronoiT> st(m, voronoi);
-        std::vector<int> selectedSteinerPoints = st.getResultSteinerVertices(); 
+        std::vector<int> selectedSteinerPoints = paal::steiner_tree::getSteinerVertices(m, voronoi); 
 
         auto resRange = boost::join(terminals, selectedSteinerPoints);
         LOG_COPY_DEL(boost::begin(resRange), boost::end(resRange), ",");
