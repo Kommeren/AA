@@ -99,7 +99,7 @@ public:
 
         typedef local_search::LocalSearchStep<AMatrix, 
                      local_search::search_strategies::SteepestSlope, decltype(sc)>  LS;
-        LS ls(utils::metricToBGLWithIndex(
+        LS ls(data_structures::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 
                         m_voronoi.getGenerators().end(), 
@@ -122,7 +122,7 @@ private:
     typedef typename gtraits::edge_descriptor SEdge;
     
     //Adjacency Matrix types
-    typedef typename utils::AdjacencyMatrix<Metric>::type AMatrix;
+    typedef typename data_structures::AdjacencyMatrix<Metric>::type AMatrix;
     typedef boost::graph_traits<AMatrix> mtraits;
     typedef typename mtraits::edge_descriptor MEdge;
    
