@@ -103,10 +103,10 @@ public:
     
     /**
      * @brief returns the generated spanning tree
-     * @param lp LP object
+     * @param sol GetSolution object
      * @return generated spanning tree: map from input Graph edges to bool values (if the edge belongs to the tree)
      *
-     * @tparam LP
+     * @tparam GetSolution
      */
     template <typename GetSolution>
     SpanningTree & getSolution(const GetSolution & sol) {

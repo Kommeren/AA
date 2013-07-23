@@ -17,6 +17,6 @@ We solve this problem using zelikovsky 11/6 approximation algorithm (see paal::s
 Complexity of the algorithm is \f$O(|V|*|E| + |T|^4)\f$ where \a T is the set of terminals.
 
 \subsection References
-The is shown in the \cite Zelikovsky93.
+The algorithm is described in the \cite Zelikovsky93.
 
 */

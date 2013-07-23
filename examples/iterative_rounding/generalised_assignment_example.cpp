@@ -1,5 +1,5 @@
 /**
- * @file generalized_assignment_test.cpp
+ * @file generalised_assignment_example.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
