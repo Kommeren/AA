@@ -97,18 +97,20 @@ public:
 
         auto sc = local_search::make_SearchComponents(ng, obj_fun, su);
 
-        typedef local_search::LocalSearchStep<AMatrix, 
-                     local_search::search_strategies::SteepestSlope, decltype(sc)>  LS;
-        LS ls(data_structures::metricToBGLWithIndex(
+        auto lsSolution = data_structures::metricToBGLWithIndex(
                         m_metric, 
                         m_voronoi.getGenerators().begin(), 
                         m_voronoi.getGenerators().end(), 
-                        m_tIdx) , sc);
+                        m_tIdx);
         
         fillSubDists();
 
-        findSave(ls.getSolution());
-        local_search::search(ls, [&](AMatrix & a){this->findSave(a);});
+        findSave(lsSolution);
+        local_search::local_search<local_search::search_strategies::SteepestSlope>(
+                lsSolution,  
+                [&](AMatrix & a){this->findSave(a);}, 
+                utils::ReturnFalseFunctor(), 
+                sc);
 
         uniqueRes(res);
         return std::move(res); 

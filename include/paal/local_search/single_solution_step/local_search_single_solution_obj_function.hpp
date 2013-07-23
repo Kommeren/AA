@@ -15,6 +15,14 @@
 namespace paal {
 namespace local_search {
 
+template <typename SearchComponentsObjFun> 
+struct SearchObjFunctionComponentsTraits {
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetNeighborhood>::type GetNeighborhoodT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<UpdateSolution>::type UpdateSolutionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<StopCondition>::type StopConditionT; 
+};
+
 namespace detail {
     template <typename F, typename Solution, typename UpdateSolution> class Fun2Check {
             typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
@@ -40,14 +48,14 @@ namespace detail {
                     SearchObjFunctionComponents> traits; 
     public:
         typedef detail::Fun2Check< 
-                        typename traits::ObjectiveFunction, 
+                        typename traits::ObjFunctionT, 
                         Solution, 
-                        typename traits::UpdateSolution> GainType;
+                        typename traits::UpdateSolutionT> GainType;
         typedef SearchComponents<
-                    typename traits::GetNeighborhood, 
+                    typename traits::GetNeighborhoodT, 
                              GainType,
-                    typename traits::UpdateSolution, 
-                    typename traits::StopCondition>  type;
+                    typename traits::UpdateSolutionT, 
+                    typename traits::StopConditionT>  type;
     };
 }
 
@@ -74,18 +82,45 @@ class LocalSearchFunctionStep :
                 SearchStrategy,
                 SearchComponents> base;
     public:
-    LocalSearchFunctionStep(Solution sol = Solution(), 
+    LocalSearchFunctionStep(Solution & sol, 
             SearchObjFunctionComponents s = SearchObjFunctionComponents()) :  
-        base(std::move(sol), 
+        base(sol, 
              SearchComponents
                    (
-                    std::move(s.getNeighborhood()),
-                    Gain(std::move(s.getObjectiveFunction()), base::m_searchComponents.template get<UpdateSolution>()),
-                    std::move(s.updateSolution()),
-                    std::move(s.stopCondition())
+                    std::move(s.template get<GetNeighborhood>()),
+                    Gain(std::move(s.template get<ObjFunction>()), base::m_searchComponents.template get<UpdateSolution>()),
+                    std::move(s.template get<UpdateSolution>()),
+                    std::move(s.template get<StopCondition>())
                    )
             ) {} 
 };
+
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename Solution,
+          typename... Components>
+bool local_search_obj_fun(
+            Solution & solution,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components) {
+    LocalSearchFunctionStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
+    bool ret = false;
+    while(!gsc(solution) && lss.search()) {
+        ret = true;
+        psa(solution);
+    }
+    return ret;
+}
+
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename Solution, 
+          typename... Components>
+bool local_search_obj_fun_simple(Solution & solution, Components... components) {
+    return local_search<SearchStrategy>(solution, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+}
+
 
 } //local_search
 } //paal

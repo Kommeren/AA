@@ -55,30 +55,25 @@ auto logAction = [&](int s) {
 
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
-   //creating local search
-    ls::LocalSearchStep<int, ls::search_strategies::ChooseFirstBetter, SearchComp> ls;
-
    //printing
-   int & solution = ls.getSolution();
+   int solution(0);
    LOG("f("<< solution <<") \t" << f(solution));
+   utils::ReturnFalseFunctor nop;
 
    //search
-   BOOST_CHECK(search(ls, logAction));
+   BOOST_CHECK(ls::local_search(solution, logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(solution, 6);
 }
 
 
 BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
-   //creating local search
-    ls::LocalSearchStep<int, ls::search_strategies::SteepestSlope, SearchComp> ls;
-
    //printing 
-   auto const & s = ls.getSolution();
+   int s(0);
    LOG("f("<< s <<") \t" << f(s));
    ON_LOG(i = 0);
+   utils::ReturnFalseFunctor nop;
    
    //search
-   BOOST_CHECK(search(ls, logAction));
-
+   BOOST_CHECK(ls::local_search<ls::search_strategies::SteepestSlope>(s, logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(s, 6);
 }

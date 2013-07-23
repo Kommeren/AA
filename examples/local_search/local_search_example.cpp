@@ -49,12 +49,14 @@ typedef  ls::SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
 
 int main() {
 //! [Local Search Example]
-   //creating local search
-    ls::LocalSearchStep<int, ls::search_strategies::ChooseFirstBetter, SearchComp> ls;
+   //creating solution
+   int solution(0);
 
    //search
-   search(ls);
-   std::cout << "Local search solution: " <<  ls.getSolution() << std::endl;
+   local_search_simple(solution, SearchComp());
+
+   //print
+   std::cout << "Local search solution: " <<  solution << std::endl;
 //! [Local Search Example]
   return 0; 
 }

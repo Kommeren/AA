@@ -12,13 +12,14 @@
 
 #include <vector>
 
-#include "paal/local_search/local_search_step.hpp"
+#include "paal/local_search/single_solution_step/search_obj_func_components.hpp"
+#include "paal/local_search/single_solution_step/local_search_single_solution_obj_function.hpp"
 #include "utils/logger.hpp"
 
 
 using std::string;
 using std::vector;
-using namespace  paal::local_search;
+namespace ls = paal::local_search;
 using namespace  paal;
 
 struct F {
@@ -48,19 +49,21 @@ struct SU {
 
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     //creating local search
-    typedef  SearchObjFunctionComponents<NG, F, SU> SearchComp;
-    LocalSearchFunctionStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
+    typedef  ls::SearchComponentsObjFun<NG, F, SU> SearchComp;
     ON_LOG(F f);
 
     //printing 
-    int & s = ls.getSolution();
+    int s(0);
     LOG("f("<< s <<") \t" << f(s));
     ON_LOG(int i = 0);
 
-    //search
-    search(ls, [&](int s) {
+    //setting logger
+    auto logger =  [&](int s) {
         //printing
         LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
-        });
+        };
+
+    //search
+    ls::local_search_obj_fun(s, logger, utils::ReturnFalseFunctor(), SearchComp()); 
     BOOST_CHECK_EQUAL(s, 6);
 }
