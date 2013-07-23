@@ -8,7 +8,7 @@
 #ifndef SEARCH_COMPONENTS_HPP
 #define SEARCH_COMPONENTS_HPP 
 
-#include "paal/data_structures/components.hpp"
+#include "paal/data_structures/components/components.hpp"
 #include "paal/utils/do_nothing_functor.hpp"
 
 namespace paal {

@@ -8,7 +8,7 @@
 #ifndef SEARCH_TRAITS_HPP
 #define SEARCH_TRAITS_HPP
 
-#include "paal/data_structures/component_traits.hpp"
+#include "paal/data_structures/components/component_traits.hpp"
 #include "paal/local_search/search_components.hpp"
 
 namespace paal {

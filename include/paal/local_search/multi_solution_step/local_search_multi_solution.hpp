@@ -26,21 +26,6 @@ namespace search_strategies {
     class SteepestSlope;
 }
 
-namespace detail {
-    template <typename Solution>
-    typename std::enable_if<utils::has_get<Solution>::value, decltype(std::declval<Solution>().get()) &>::type 
-    getSolution(Solution & s) {
-        return s.get();
-    }
-    
-    
-    template <typename Solution>
-    typename std::enable_if<!utils::has_get<Solution>::value, Solution &>::type 
-    getSolution(Solution & s) {
-        return s;
-    }
-}
-
 template <typename Solution>
 class LocalSearchStepMultiSolutionBase {
 protected:    
@@ -50,9 +35,8 @@ protected:
         m_solution(solution) {}
 
 public:
-
-    decltype(detail::getSolution(std::declval<Solution &>())) getSolution() {
-        return detail::getSolution(m_solution);
+    Solution & getSolution() {
+        return m_solution;
     }
 
 protected:
@@ -272,12 +256,7 @@ bool local_search_multi_solution(
             GlobalStopCondition gsc,
             Components... components) {
     LocalSearchStepMultiSolution<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
-    bool ret = false;
-    while(!gsc(solution) && lss.search()) {
-        ret = true;
-        psa(solution);
-    }
-    return ret;
+    return search(lss, psa, gsc);
 }
 
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 

@@ -12,7 +12,7 @@
 #include <type_traits>
 #include <boost/mpl/equal.hpp>
 
-#include "paal/data_structures/components.hpp"
+#include "paal/data_structures/components/components.hpp"
 
 
 

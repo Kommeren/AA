@@ -201,12 +201,7 @@ bool local_search(
             GlobalStopCondition gsc,
             Components... components) {
     LocalSearchStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
-    bool ret = false;
-    while(!gsc(solution) && lss.search()) {
-        ret = true;
-        psa(solution);
-    }
-    return ret;
+    return search(lss, psa, gsc);
 }
 
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
