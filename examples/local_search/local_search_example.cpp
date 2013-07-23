@@ -11,10 +11,10 @@
 
 #include "paal/local_search/local_search_step.hpp"
 
-using namespace  paal::local_search;
+//! [Local Search Components Example]
+namespace ls =  paal::local_search;
 using namespace  paal;
 
-//! [Local Search Components Example]
 int f(int x) {
     return -x*x + 12 * x -27;
 }
@@ -43,14 +43,14 @@ struct UpdateSolution {
     }
 };
 
-typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+typedef  ls::SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
 
 //! [Local Search Components Example]
 
 int main() {
 //! [Local Search Example]
    //creating local search
-   LocalSearchStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
+    ls::LocalSearchStep<int, ls::search_strategies::ChooseFirstBetter, SearchComp> ls;
 
    //search
    search(ls);

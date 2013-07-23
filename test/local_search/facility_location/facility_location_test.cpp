@@ -4,7 +4,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "paal/local_search/facility_location/facility_location.hpp"
-#include "paal/local_search/components.hpp"
+#include "paal/local_search/custom_components.hpp"
 #include "paal/utils/array2function.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/logger.hpp"

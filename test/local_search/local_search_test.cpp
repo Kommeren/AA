@@ -15,7 +15,7 @@
 #include "paal/local_search/local_search_step.hpp"
 #include "utils/logger.hpp"
 
-using namespace  paal::local_search;
+namespace ls = paal::local_search;
 using namespace  paal;
 
 int f(int x) {
@@ -46,7 +46,7 @@ struct UpdateSolution {
     }
 };
 
-typedef  SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+typedef  ls::SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
    
 ON_LOG(int i = 0);
 auto logAction = [&](int s) {
@@ -56,7 +56,7 @@ auto logAction = [&](int s) {
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
    //creating local search
-   LocalSearchStep<int, search_strategies::ChooseFirstBetter, SearchComp> ls;
+    ls::LocalSearchStep<int, ls::search_strategies::ChooseFirstBetter, SearchComp> ls;
 
    //printing
    int & solution = ls.getSolution();
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 
 BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
    //creating local search
-   LocalSearchStep<int, search_strategies::SteepestSlope, SearchComp> ls;
+    ls::LocalSearchStep<int, ls::search_strategies::SteepestSlope, SearchComp> ls;
 
    //printing 
    auto const & s = ls.getSolution();

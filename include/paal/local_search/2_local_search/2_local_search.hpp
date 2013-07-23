@@ -60,6 +60,7 @@ public :
                        GetNeighborhood ng = GetNeighborhood(), 
                        StopCondition sc = StopCondition()) : 
             base(std::move(ng), std::move(ic), TwoLocalSearchUpdater(), std::move(sc)) {}
+
 };
 
 /**
@@ -122,6 +123,15 @@ getDefaultTwoLocalComponents(const Metric & m) {
 
 
 } //two_local_search
+
+template <typename Gain, typename GetNeighborhood, typename StopCondition> 
+struct SearchComponentsTraits<two_local_search::TwoLocalComponents<Gain, GetNeighborhood, StopCondition>> 
+        : SearchComponentsTraits<
+            MultiSearchComponents<GetNeighborhood, Gain, two_local_search::TwoLocalSearchUpdater, StopCondition>
+                               > {};
+
+
+
 } //local_search
 } //paal
 

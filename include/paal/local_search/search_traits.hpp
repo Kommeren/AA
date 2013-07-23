@@ -6,23 +6,26 @@
  * @date 2013-02-19
  */
 #ifndef SEARCH_TRAITS_HPP
-#define SEARCH_TRAITS_HPP 
+#define SEARCH_TRAITS_HPP
+
+#include "paal/data_structures/component_traits.hpp"
+#include "paal/local_search/search_components.hpp"
 
 namespace paal {
 namespace local_search {
 
 template <typename SearchComponents> 
 struct SearchComponentsTraits {
-    typedef puretype(std::declval<SearchComponents>().getNeighborhood()) GetNeighborhood; 
-    typedef puretype(std::declval<SearchComponents>().gain()) Gain; 
-    typedef puretype(std::declval<SearchComponents>().updateSolution()) UpdateSolution; 
-    typedef puretype(std::declval<SearchComponents>().stopCondition()) StopCondition; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetNeighborhood>::type GetNeighborhoodT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<UpdateSolution>::type UpdateSolutionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StopCondition>::type StopConditionT; 
 };
 
 template <typename SearchComponents, typename Solution> 
 class Update {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::GetNeighborhood NG;
+                SearchComponents>::GetNeighborhoodT NG;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>()
                                 ).first) UpdateIterator;
@@ -34,7 +37,7 @@ public:
 template <typename SearchComponents, typename Solution> 
 class MultiUpdate {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::GetNeighborhood NG;
+                SearchComponents>::GetNeighborhoodT NG;
     typedef typename utils::SolToElem<Solution>::type Element;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>(),
@@ -48,7 +51,7 @@ public:
 template <typename SearchComponents, typename Solution> 
 class Fitness {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::Gain Gain;
+                SearchComponents>::GainT Gain;
     typedef typename Update<SearchComponents, Solution>::type Update;
 public:
     typedef decltype(std::declval<Gain>()(
@@ -60,7 +63,7 @@ public:
 template <typename SearchComponents, typename Solution> 
 class MultiFitness {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::Gain Gain;
+                SearchComponents>::GainT Gain;
     typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
     typedef typename utils::SolToElem<Solution>::type SolutionElement;
 public:

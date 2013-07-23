@@ -80,7 +80,7 @@ class LocalSearchFunctionStep :
              SearchComponents
                    (
                     std::move(s.getNeighborhood()),
-                    Gain(std::move(s.getObjectiveFunction()), base::m_searchComponents.updateSolution()),
+                    Gain(std::move(s.getObjectiveFunction()), base::m_searchComponents.template get<UpdateSolution>()),
                     std::move(s.updateSolution()),
                     std::move(s.stopCondition())
                    )

@@ -87,7 +87,7 @@ public:
             Solution & solution) : 
         base(solution), m_searchComponents(MultiSearchComponents()) {}
 
-    typedef typename  base::SolutionElement SolutionElement;
+    typedef typename base::SolutionElement SolutionElement;
     using base::m_solution;
     
     MultiSearchComponents & getSearchComponents() {
@@ -102,12 +102,12 @@ public:
     bool search() {
 
         for(SolElementRef r : m_solution) {
-            auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution, r);
+            auto adjustmentSet = call<GetNeighborhood>(m_solution, r);
             for(const Update & update : utils::make_range(adjustmentSet)) {
-                if(m_searchComponents.gain()(m_solution, r, update) > 0) {
-                    m_searchComponents.updateSolution()(m_solution, r, update);
+                if(call<Gain>(m_solution, r, update) > 0) {
+                    call<UpdateSolution>(m_solution, r, update);
                     return true;
-                } else if(m_searchComponents.stopCondition()(m_solution, r, update)) {
+                } else if(call<StopCondition>(m_solution, r, update)) {
                     return false;
                 }
             }
@@ -117,6 +117,12 @@ public:
     }
           
 private:
+    template <typename Action, typename... Args> 
+    auto call(Args&&... args) -> 
+    decltype(std::declval<MultiSearchComponents>().template call<Action>(args...)){
+        return m_searchComponents.template call<Action>(args...);
+    }
+    
     MultiSearchComponents m_searchComponents;
 };
 
@@ -203,10 +209,10 @@ private:
         auto bestSE = currSE;
         Update bestUpdate = Update();
         for(;currSE != endSE && !stop; ++currSE) {
-            auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution, *currSE);
+            auto adjustmentSet = call<GetNeighborhood>(m_solution, *currSE);
             auto currUpdate = adjustmentSet.first;
             for(;currUpdate !=  adjustmentSet.second && !stop; ++currUpdate) {
-                Fitness gain = m_searchComponents.gain()(m_solution, *currSE, *currUpdate); 
+                Fitness gain = call<Gain>(m_solution, *currSE, *currUpdate); 
                 
                 if(!init || gain > max) {
                     init = true;
@@ -214,12 +220,19 @@ private:
                     bestUpdate = *currUpdate;
                     max = gain;
                 } 
-                stop = m_searchComponents.stopCondition()(m_solution, *currSE, *currUpdate);
+                stop = call<StopCondition>(m_solution, *currSE, *currUpdate);
             }
         }
           
         return BestDesc(max, m_searchComponents, bestSE, bestUpdate);
     }
+    
+    template <typename Action, typename... Args> 
+    auto call(Args&&... args) -> 
+    decltype(std::declval<MultiSearchComponents>().template call<Action>(args...)){
+        return m_searchComponents.template call<Action>(args...);
+    }
+
     MultiSearchComponents m_searchComponents;
 };
 
@@ -241,7 +254,7 @@ public:
     template <typename Best>
     bool searchAndPassBest(Best b) {
         if(std::get<0>(b) > 0) {
-            std::get<1>(b).updateSolution()(m_solution, *std::get<2>(b), std::get<3>(b));
+            std::get<1>(b).template call<UpdateSolution>(m_solution, *std::get<2>(b), std::get<3>(b));
         }
         return std::get<0>(b) > 0;
     }

@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-02-26
  */
-#ifndef COMPONENTS_HPP
-#define COMPONENTS_HPP 
+#ifndef CUSTOM_COMPONENTS_HPP
+#define CUSTOM_COMPONENTS_HPP 
 
 namespace paal {
 namespace local_search {
@@ -14,6 +14,10 @@ namespace local_search {
 template <typename Gain, typename Dist>
 class GainCutSmallImproves {
 public:    
+    GainCutSmallImproves() = default; 
+    GainCutSmallImproves(GainCutSmallImproves && ) = default; 
+    GainCutSmallImproves(const GainCutSmallImproves & ) = default; 
+
     GainCutSmallImproves(Gain ic, Dist currOpt, double epsilon) :
                 m_improveChecker(std::move(ic)), m_currOpt(currOpt), m_epsilon(epsilon)  {}
     template <typename... Args> Dist 
@@ -58,4 +62,4 @@ private:
 } // local_search
 } // paal
 
-#endif /* COMPONENTS_HPP */
+#endif /* CUSTOM_COMPONENTS_HPP */

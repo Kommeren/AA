@@ -72,14 +72,14 @@ public:
         base(std::move(solution), std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
 
     bool search() {
-        auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution);
+        auto adjustmentSet = call<GetNeighborhood>(m_solution);
 
         for(const Update & update : utils::make_range(adjustmentSet)) {
-            if(m_searchComponents.gain()(m_solution, update) > 0) {
-                m_searchComponents.updateSolution()(m_solution, update);
+            if(call<Gain>(m_solution, update) > 0) {
+                call<UpdateSolution>(m_solution, update);
                 return true;
             } else {
-                if(m_searchComponents.stopCondition()(m_solution, update)) {
+                if(call<StopCondition>(m_solution, update)) {
                     break;
                 }
             }
@@ -87,6 +87,12 @@ public:
         return base::search();
     }
 protected:
+    template <typename Action, typename... Args> 
+    auto call(Args&&... args) -> 
+    decltype(std::declval<SearchComponents>().template call<Action>(args...)){
+        return m_searchComponents.template call<Action>(args...);
+    }
+
     SearchComponents m_searchComponents;
 };
 
@@ -127,18 +133,18 @@ private:
     BestDesc best() {
         Fitness max = Fitness();
         bool init = false;
-        auto adjustmentSet = m_searchComponents.getNeighborhood()(m_solution);
+        auto adjustmentSet = call<GetNeighborhood>(m_solution);
         auto currUpdate = adjustmentSet.first;
         Update bestUpdate = Update();
 
         for(;currUpdate !=  adjustmentSet.second; ++currUpdate) {
-            Fitness gain = m_searchComponents.gain()(m_solution, *currUpdate);
+            Fitness gain = call<Gain>(m_solution, *currUpdate);
             if(!init || gain > max) {
                 bestUpdate = *currUpdate;
                 max = gain;
                 init = true;
             } 
-            if(m_searchComponents.stopCondition()(m_solution, *currUpdate)) {
+            if(call<StopCondition>(m_solution, *currUpdate)) {
                 break;
             }
         }
@@ -156,6 +162,12 @@ protected:
             return base::searchAndPassBest(b2);
         }
     }
+    
+    template <typename Action, typename... Args> 
+    auto call(Args&&... args) -> 
+    decltype(std::declval<SearchComponents>().template call<Action>(args...)){
+        return m_searchComponents.template call<Action>(args...);
+    }
 
     SearchComponents m_searchComponents;
 };
@@ -170,7 +182,7 @@ public:
     template <typename Best>
     bool searchAndPassBest(const Best &b) {
         if(std::get<0>(b) > 0) {
-            std::get<1>(b).updateSolution()(this->m_solution, std::get<2>(b));
+            std::get<1>(b).template call<UpdateSolution>(this->m_solution, std::get<2>(b));
         }
         return std::get<0>(b) > 0;
         

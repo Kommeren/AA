@@ -95,10 +95,10 @@ class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponent
 template <typename X, typename Solution> 
 class MultiSearchComponents {
     typedef SearchComponentsTraits<X> Traits; 
-    typedef typename Traits::GetNeighborhood NG;
-    typedef typename Traits::Gain IC;
-    typedef typename Traits::UpdateSolution SU;
-    typedef typename Traits::StopCondition SC;
+    typedef typename Traits::GetNeighborhoodT NG;
+    typedef typename Traits::GainT IC;
+    typedef typename Traits::UpdateSolutionT SU;
+    typedef typename Traits::StopConditionT SC;
 public:
     BOOST_CONCEPT_ASSERT((MultiGetNeighborhood<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiGain<IC, Solution, X>));

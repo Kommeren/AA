@@ -93,3 +93,40 @@ BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
     //This won't compile
     //CompsWithDefaults<int> comps3;
 }
+
+
+
+struct A {
+    A(int x) : a(x) {}
+    A()  = delete;
+
+    int a;
+};
+
+struct B {
+    B(int x) : b(x) {}
+    B()  = delete;
+
+    int b;
+};
+
+struct C {
+    C(int x) : c(x) {}
+    C()  = delete;
+
+    int c;
+};
+
+BOOST_AUTO_TEST_CASE(ComponentsSwapNotDefConstructible) {
+    A a(1);
+    B b(2);
+    C c(3);
+
+    CompsWithDefaults<A, B> comps(a, b);
+    BOOST_CHECK_EQUAL(comps.get<names::A>().a, 1);
+    auto s = ds::swap<names::A>(c, comps);
+    BOOST_CHECK_EQUAL(s.get<names::A>().c, 3);
+    
+    auto s2 = ds::swap<names::B>(c, comps);
+    BOOST_CHECK_EQUAL(s2.get<names::B>().c, 3);
+}

@@ -46,18 +46,18 @@ namespace detail {
     template <typename T, typename Name> 
     class HasTemplateGet {  
         private: 
-            template <typename U, U> 
+            template <typename U> 
                 class check 
                 { }; 
 
             template <typename C>
-                static char f(check<decltype(std::declval<const C>().template get<Name>()) (C::*)() const, &C::template get<Name>>*);
+                static char f(check<decltype(std::declval<const C>().template get<Name>()) (C::*)() const>*);
 
             template <typename C>
                 static long f(...); 
 
         public:
-            static  const bool value = (sizeof(f<typename std::decay<T>::type>(0)) == sizeof(char));
+            static  const bool value = (sizeof(f<typename std::decay<T>::type>(nullptr)) == sizeof(char));
     }; 
     
     template <typename Names, typename Types>
@@ -75,22 +75,27 @@ namespace detail {
     };
 
     template <typename Name, typename Type, typename... NamesRest, typename... TypesRest>
-    class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> : 
-            Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> {
+    class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> { 
         typedef Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> base;
         typedef TypesVector<Name, NamesRest...> Names;
-        typedef TypesVector<Type, TypesRest...> Types; 
+        typedef TypesVector<Type, TypesRest...> Types;
+
     public:
         Components() = default;
+        
+        Components(const Components &) = default;
+        
+        Components(Components &&) = default;
 
         template <typename T, typename... TypesPrefix>
-        Components(T t, TypesPrefix ... types) : base(types...), m_component(std::move(t)) 
+        Components(T t, TypesPrefix... types) : 
+            m_base(std::move(types)...), m_component(std::move(t)) 
         {}
        
         //constructor takes Components class with appropriate signature
         template <typename Types2>
         Components(Components<Names, Types2> comps) : 
-            base(std::move(static_cast<Components<TypesVector<NamesRest...>,
+            m_base(std::move(static_cast<Components<TypesVector<NamesRest...>,
                                 typename remove_n_first<1, Types2>::type>                           
                             >(comps))), 
             m_component(std::move(comps.template get<Name>())) {} 
@@ -98,7 +103,7 @@ namespace detail {
         //constructor takes Components class with appropriate signature
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value>::type  >
         Components(Comps comps) : 
-            base(comps), 
+            m_base(comps), 
             m_component(std::move(comps.template get<Name>())) {} 
 
         template <typename ComponentName, typename... Args>
@@ -127,7 +132,7 @@ namespace detail {
         template <typename ComponentName>
         const typename TypeForName<ComponentName, Names, Types>::type & 
         get(WrapToConstructable<ComponentName> w) const {
-            return base::get(w);
+            return m_base.template get<ComponentName>();
         }
         
         const Type & get(WrapToConstructable<Name>) const {
@@ -137,13 +142,15 @@ namespace detail {
         template <typename ComponentName>
         typename TypeForName<ComponentName, Names, Types>::type & 
         get(WrapToConstructable<ComponentName> w) { 
-            return base::get(w);
+            return m_base.template get<ComponentName>();
         }
         
         Type & get(WrapToConstructable<Name>) {
             return m_component;
         }
-
+        
+        //we cannot use inheritance (even private) because gcc 4.7.3 says  " is an ambiguous base class of..." !
+        base m_base;
         Type m_component;
     };
     
@@ -223,13 +230,20 @@ namespace detail {
 
 
 //direct implementation on variadic templates is imposible because of
-//week support for type detection for inner template classes
+//weak support for type detection for inner template classes
 template <typename... ComponentNamesWithDefaults>
 class Components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
 public:
     template <typename... ComponentTypes>
     using type = typename detail::SetDefaults<NamesWithDefaults, TypesVector<ComponentTypes...>>::type;
+
+    template <typename... Components>
+    static 
+    type<Components...>
+    make_components(Components... comps) {
+        return type<Components...>(std::move(comps)...);
+    }
 };
 
 

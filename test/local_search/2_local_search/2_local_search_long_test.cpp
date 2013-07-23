@@ -8,7 +8,7 @@
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
-#include "paal/local_search/components.hpp"
+#include "paal/local_search/custom_components.hpp"
 
 #include "utils/read_tsplib.h"
 #include "2_local_search_logger.hpp"
@@ -79,10 +79,11 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 
         //creating local search
         auto lsc = getDefaultTwoLocalComponents(mtx);
-        typedef paal::local_search::GainCutSmallImproves<puretype(lsc.gain()), int> CIC;
+        typedef local_search::SearchComponentsTraits<puretype(lsc)>::GainT GainT;
+        typedef paal::local_search::GainCutSmallImproves<GainT, int> CIC;
         double epsilon = 0.001;
-        CIC  cut(lsc.gain(), startLen, epsilon);
-        auto cutLsc = swapGain(lsc, std::move(cut));
+        CIC  cut(lsc.get<local_search::Gain>(), startLen, epsilon);
+        auto cutLsc = data_structures::swap<local_search::Gain>(std::move(cut), lsc);
         
         //setting logger
         auto logger = utils::make_twoLSLogger(mtx, 100);
@@ -95,7 +96,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         for(int j = 0; j < 20; ++j) {
             epsilon /= 2;
             LOG("epsilon = " << epsilon);
-            cutLsc.gain().setEpsilon(epsilon);
+            cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
             two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
         }
 
