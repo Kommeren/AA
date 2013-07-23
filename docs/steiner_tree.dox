@@ -1,10 +1,10 @@
 /*! \page stein SteinerTree
 
 \section def Problem definition.
-Int the Steiner tree problem  we are given the set of nonterminals, the set of terminals and the metric \a m. Our goal is to find minimum spanning tree consisting all terminals (and possibly some nonterminals).
+In the Steiner tree problem  we are given the set of nonterminals, the set of terminals and the metric \a m. Our goal is to find minimum spanning tree consisting all terminals (and possibly some nonterminals).
 
 \section Solution
-We solve this problem using zelikovsky 11/6 approximation algorithm (see paal::steiner_tree::SteinerTree). The algorithm exploit model of the WeakVoronoi concept (see \ref voronoi), where the generators are the terminals and the verticess are nonterminals.
+We solve this problem using zelikovsky 11/6 approximation algorithm. The algorithm exploit model of the WeakVoronoi concept (see \ref voronoi), where the generators are the terminals and the vertices are nonterminals.  There is one additional assumption on Metric i.e.  we only use this metric only for distances (Nonterminal, Terminal) and (Terminal, Terminal).
 
   example: 
    \snippet steiner_tree_example.cpp Steiner Tree Example
