@@ -12,7 +12,6 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/local_search/local_search_step.hpp"
-#include "utils/logger.hpp"
 
 using namespace  paal;
 

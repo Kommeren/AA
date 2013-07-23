@@ -1,6 +1,2 @@
-* udokumentowac jak podmieniać componenty w local searchu, jak robic wizytory
-* zmienic kolejnosc przgladania w FL, sa 2 opcje
-** mozna zmienic na single_solution 
-** mozna zacyklic rozwiazanie, zeby nie zaczynal zawsze z tego samego punktu
-* przemyslec traitsy, moze dorobic wszedzie trik z std::iteratora
+* make better traits, maybe it supposed to look like std::iterator traits
 

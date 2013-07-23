@@ -2,7 +2,7 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/array2function.hpp"
-#include "utils/sample_graph.hpp"
+#include "test/utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
 

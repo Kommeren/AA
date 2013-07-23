@@ -12,7 +12,7 @@
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
-#include "utils/sample_graph.hpp"
+#include "test/utils/sample_graph.hpp"
 
 using namespace  paal::local_search::two_local_search;
 using namespace  paal;

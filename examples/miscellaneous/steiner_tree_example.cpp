@@ -7,7 +7,7 @@
  */
 #include <iostream>
 #include "paal/steiner_tree/steiner_tree.hpp"
-#include "utils/sample_graph.hpp"
+#include "test/utils/sample_graph.hpp"
 
 int main() {
 //! [Steiner Tree Example]
