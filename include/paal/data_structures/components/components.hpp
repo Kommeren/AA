@@ -92,6 +92,10 @@ namespace detail {
         Components(const Components &) = default;
         
         Components(Components &&) = default;
+        
+        Components& operator=(const Components &) = default;
+        
+        Components& operator=(Components &&) = default;
 
         template <typename T, typename... TypesPrefix>
         Components(T t, TypesPrefix... types) : 
