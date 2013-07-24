@@ -1,5 +1,12 @@
-#ifndef SPLAY_SPLAYTREE_H_
-#define SPLAY_SPLAYTREE_H_
+/**
+ * @file splay_tree.hpp
+ * @brief 
+ * @author unknown
+ * @version 1.0
+ * @date 2013-07-24
+ */
+#ifndef SPLAY_TREE_HPP
+#define SPLAY_TREE_HPP
 
 #include <boost/utility.hpp>
 #include <boost/iterator.hpp>
@@ -783,4 +790,4 @@ namespace splay_tree {
 }
 }
 
-#endif  // SPLAY_SPLAYTREE_H_
+#endif  // SPLAY_TREE_HPP

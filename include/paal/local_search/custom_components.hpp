@@ -1,5 +1,5 @@
 /**
- * @file components.hpp
+ * @file custom_components.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

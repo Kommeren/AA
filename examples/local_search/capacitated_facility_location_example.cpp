@@ -1,4 +1,10 @@
-
+/**
+ * @file capacitated_facility_location_example.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
 #include "paal/utils/array2function.hpp"

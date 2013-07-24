@@ -9,9 +9,9 @@
 #ifndef TWO_LOCAL_SEARCH_HPP
 #define TWO_LOCAL_SEARCH_HPP
 
-#include "paal/local_search/multi_solution_step/trivial_neighbor.hpp"
+#include "paal/local_search/multi_solution/trivial_neighbor.hpp"
 #include "paal/local_search/search_components.hpp"
-#include "paal/local_search/multi_solution_step/local_search_multi_solution.hpp"
+#include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
 #include "paal/local_search/2_local_search/2_local_search_updater.hpp"
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"

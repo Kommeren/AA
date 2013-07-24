@@ -1,3 +1,10 @@
+/**
+ * @file k_median_example.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <iostream>
 #include "paal/local_search/k_median/k_median.hpp"
 #include "test/utils/sample_graph.hpp"

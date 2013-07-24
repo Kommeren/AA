@@ -1,3 +1,11 @@
+/**
+ * @file ids.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-07-24
+ */
+
 #ifndef IDS_HPP
 #define IDS_HPP 
 

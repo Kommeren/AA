@@ -1,5 +1,5 @@
 /**
- * @file local_search.hpp
+ * @file local_search_step.hpp
  * @brief consists different kinds of local search steps.
  * @author Piotr Wygocki
  * @version 1.0
@@ -268,7 +268,7 @@ After we've defined components we run LS.
 */
 
 
-#include "single_solution_step/local_search_single_solution.hpp"
-#include "single_solution_step/local_search_single_solution_obj_function.hpp"
-#include "multi_solution_step/local_search_multi_solution.hpp"
+#include "single_solution/local_search_single_solution.hpp"
+#include "single_solution/local_search_single_solution_obj_function.hpp"
+#include "multi_solution/local_search_multi_solution.hpp"
 

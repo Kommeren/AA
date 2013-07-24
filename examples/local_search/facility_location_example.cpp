@@ -1,3 +1,10 @@
+/**
+ * @file facility_location_example.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
 #include <iostream>
 
 #include "paal/local_search/facility_location/facility_location.hpp"

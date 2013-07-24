@@ -1,3 +1,10 @@
+/**
+ * @file steiner_tree.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-07-24
+ */
 #include <map>
 #include <stack>
 
