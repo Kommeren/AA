@@ -10,8 +10,6 @@
 
 #include <utility>
 
-#include <boost/mpl/if.hpp>
-
 #include "types_vector.hpp"
 
 
@@ -20,12 +18,20 @@ namespace data_structures {
 
 
 
+/**
+  * @brief This structure can be passed on Names list and represents Name and the default type value
+  *
+  * @tparam Name
+  * @tparam Default
+  */
 template <typename Name, typename Default>
 struct NameWithDefault;
 
-namespace detail {
 
-    
+/**
+ * @brief This namespace block contains implementation of the main class Components<Names,Types> and needed meta functions
+ */
+namespace detail {
     template <typename T>
     struct WrapToConstructable {
         typedef T type;
@@ -38,8 +44,8 @@ namespace detail {
         typedef typename TypeForName<Name, NewNames, NewTypes>::type type;
     };
 
-    template <typename Name,typename Type, typename... Args1, typename... Args2>
-    struct TypeForName<Name, TypesVector<Name, Args1...>, TypesVector<Type, Args2...>>{
+    template <typename Name,typename Type, typename... NamesRest, typename... TypesRest>
+    struct TypeForName<Name, TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>>{
         typedef Type type;
     };
 
@@ -153,27 +159,35 @@ namespace detail {
         base m_base;
         Type m_component;
     };
-    
+} // detail
+
+
+
+/**
+ * @brief This namespace contains class which sets all defaults and all needed meta functions.
+ */
+namespace detail_set_defaults {
+    /**
+     * @brief GetName, gets name for either Name, or NamesWithDefaults struct
+     *        this is the Name case
+     *
+     * @tparam T
+     */
     template <typename T>
     struct GetName {
         typedef T type;
     };
 
+    /**
+     * @brief GetName, gets name for either Name, or NamesWithDefaults struct
+     *        this is the NamesWithDefaults case
+     *
+     * @tparam Name 
+     * @tparam Default
+     */
     template <typename Name, typename Default>
     struct GetName<NameWithDefault<Name, Default>> {
         typedef Name type;
-    };
-
-    struct NoDefault;
-
-    template <typename T>
-    struct GetDefault {
-        typedef NoDefault type;
-    };
-
-    template <typename Name, typename Default>
-    struct GetDefault<NameWithDefault<Name, Default>> {
-        typedef Default type;
     };
 
     struct PushBackName {
@@ -184,21 +198,19 @@ namespace detail {
     };
     
     struct PushBackDefault {
-        template <typename Vector, typename NameWithDefault>
+        template <typename Vector, typename Name>
         struct apply {
-            typedef typename GetDefault<NameWithDefault>::type Default;
+            typedef Vector type;
+        };
 
-            typedef typename 
-                boost::mpl::if_<std::is_same<Default, NoDefault>,
-                            Vector, //then
-                            typename push_back<Vector, Default>::type //else
-                        >::type  type;
+        template <typename Vector, typename Name, typename Default>
+        struct apply<Vector, NameWithDefault<Name, Default>> {
+            typedef typename push_back<Vector, Default>::type type;
         };
     };
     
     template <typename NamesWithDefaults, typename TypesPrefix>
     class SetDefaults {
-    public:
         static const int N = size<NamesWithDefaults>::value;
         static const int TYPES_NR = size<TypesPrefix>::value;
         static_assert(TYPES_NR <= N, "Incrrect number of parameters");
@@ -221,12 +233,13 @@ namespace detail {
 
         typedef typename remove_n_first<DEFAULTS_NR + TYPES_NR - N, Defaults>::type NeededDefaults;
 
-        public:
         typedef typename join<TypesPrefix, NeededDefaults>::type Types;
-        typedef Components<Names, Types> type;
+    public:
+        typedef detail::Components<Names, Types> type;
+    private:
+        //in this block we check if the defaults are on the last positions in the NamesWithDefaults
     };
-
-};
+} //detail_set_defaults
 
 
 //direct implementation on variadic templates is imposible because of
@@ -236,7 +249,7 @@ class Components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
 public:
     template <typename... ComponentTypes>
-    using type = typename detail::SetDefaults<NamesWithDefaults, TypesVector<ComponentTypes...>>::type;
+    using type = typename detail_set_defaults::SetDefaults<NamesWithDefaults, TypesVector<ComponentTypes...>>::type;
 
     template <typename... Components>
     static 
@@ -246,72 +259,6 @@ public:
     }
 };
 
-
-template <typename Name, typename NewType, typename Components> class SwapType;
-
-template <typename Name, typename NewType, typename Names, typename Types> 
-class SwapType<Name, NewType, detail::Components<Names, Types>> {
-    static const int p =  pos<Name, Names>::value; // position to insert
-    typedef typename replace_at_pos<p, NewType, Types>::type TypesSwapped;
-public:
-    typedef detail::Components<Names, TypesSwapped> type;
-};
-
-namespace detail {
-    template <typename Comp>
-    struct get_types;
-    
-    template <typename Names, typename Types>
-    struct get_types<Components<Names, Types>> {
-        typedef Types type;
-    };
-    
-
-    template <typename Name, typename NewType, typename Names, typename Types> 
-    class TempSwapped {
-        typedef detail::Components<Names, Types> Comps;
-        typedef typename SwapType<Name, NewType, Comps>::type Swapped;
-        typedef typename detail::get_types<Swapped>::type NewTypes;
-
-    public:
-        TempSwapped(const Comps & comps, const NewType & comp) :
-            m_comps(comps), m_comp(comp) {}
-
-        template <typename ComponentName>
-        const typename detail::TypeForName<ComponentName, Names, NewTypes>::type & get() const {
-            return get(detail::WrapToConstructable<ComponentName>());
-        }
-    private:
-
-        template <typename ComponentName>
-        auto get(detail::WrapToConstructable<ComponentName> w) const ->
-        decltype(std::declval<const Comps>().template get<ComponentName>()) {
-            return m_comps.template get<ComponentName>();
-        }
-
-        const NewType & get(detail::WrapToConstructable<Name>) const {
-            return m_comp;
-        }
-
-        const Comps & m_comps; 
-        const NewType & m_comp; 
-    };
-}
-
-
-template <typename Name, typename NewType, typename Names, typename Types> 
-typename SwapType<Name, NewType, detail::Components<Names, Types> >::type
-swap(NewType comp, detail::Components<Names, Types> components){
-    typedef detail::Components<Names, Types> Comps;
-    typedef typename SwapType<Name, NewType, Comps>::type Swapped;
-//    detail::TempSwapped<Name, NewType, Names, Types> st(components, comp);
-
-    Swapped resComponents(
-              detail::TempSwapped<Name, NewType, Names, Types>
-                          (components, comp));
-
-    return std::move(resComponents);
-}
 
 } //data_structures
 }//paal

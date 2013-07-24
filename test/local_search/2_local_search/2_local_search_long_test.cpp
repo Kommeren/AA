@@ -8,6 +8,7 @@
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
+#include "paal/data_structures/components/components_swap.hpp"
 #include "paal/local_search/custom_components.hpp"
 
 #include "utils/read_tsplib.h"

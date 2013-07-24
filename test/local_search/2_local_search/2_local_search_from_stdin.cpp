@@ -9,6 +9,7 @@
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/data_structures/cycle/splay_cycle.hpp"
 #include "paal/local_search/custom_components.hpp"
+#include "paal/data_structures/components/components_swap.hpp"
 
 #include "utils/read_tsplib.h"
 #include "2_local_search_logger.hpp"

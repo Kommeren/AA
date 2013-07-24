@@ -13,8 +13,7 @@
 #include <boost/mpl/equal.hpp>
 
 #include "paal/data_structures/components/components.hpp"
-
-
+#include "paal/data_structures/components/components_swap.hpp"
 
 namespace names {
     struct A;
@@ -78,32 +77,25 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     BOOST_CHECK_EQUAL(swap.get<names::C>(), 17);
 }
 
-template <typename... Args>
-using CompsWithDefaults = typename  ds::Components<
-        names::A, names::B, ds::NameWithDefault<names::C, int>>::type<Args...> ;
-
-BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
-    typedef ds::detail::SetDefaults<ds::TypesVector<names::A, names::B, ds::NameWithDefault<names::C, int>>, 
-                                ds::TypesVector<int, double, float>> SetD;
-    CompsWithDefaults<int, double, float> comps;
-    CompsWithDefaults<int, double> comps2(1,2, 3.5);
-    BOOST_CHECK_EQUAL(comps2.get<names::C>(), 3);
-    BOOST_CHECK_EQUAL(comps.get<names::C>(), 0);
-    
-    //This won't compile
-    //CompsWithDefaults<int> comps3;
-}
-
-
-
 struct A {
+    explicit
     A(int x) : a(x) {}
     A()  = delete;
+    bool operator==(A aa) const {
+        return a== aa.a;
+    }
+
+    template <typename ostream>
+    friend ostream & operator<<(ostream & o, A a) {
+        o << a.a;
+        return o;
+    }
 
     int a;
 };
 
 struct B {
+    explicit
     B(int x) : b(x) {}
     B()  = delete;
 
@@ -111,18 +103,40 @@ struct B {
 };
 
 struct C {
+    explicit
     C(int x) : c(x) {}
     C()  = delete;
 
     int c;
 };
 
+template <typename... Args>
+using CompsWithDefaults = typename  ds::Components<
+        names::A, names::B, ds::NameWithDefault<names::C, A>>::type<Args...> ;
+
+BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
+    typedef ds::detail_set_defaults::SetDefaults<ds::TypesVector<names::A, names::B, ds::NameWithDefault<names::C, int>>, 
+                                ds::TypesVector<int, double, int>> SetD;
+    CompsWithDefaults<int, double, float> comps;
+    CompsWithDefaults<int, double> comps2(1, 2, 3);
+    BOOST_CHECK_EQUAL(comps2.get<names::C>(), A(3));
+    BOOST_CHECK_EQUAL(comps.get<names::C>(), 0);
+    
+    //This won't compile
+    //CompsWithDefaults<int> comps3;
+}
+
+template <typename... Args>
+using CompsToSwap = typename  ds::Components<
+        names::A, names::B>::type<Args...> ;
+
+
 BOOST_AUTO_TEST_CASE(ComponentsSwapNotDefConstructible) {
     A a(1);
     B b(2);
     C c(3);
 
-    CompsWithDefaults<A, B> comps(a, b);
+    CompsToSwap<A, B> comps(a, b);
     BOOST_CHECK_EQUAL(comps.get<names::A>().a, 1);
     auto s = ds::swap<names::A>(c, comps);
     BOOST_CHECK_EQUAL(s.get<names::A>().c, 3);
