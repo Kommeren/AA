@@ -118,8 +118,6 @@ using CompsWithDefaults = typename  ds::Components<
         names::A, names::B, ds::NameWithDefault<names::C, X>>::type<Args...> ;
 
 BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
-    typedef ds::detail_set_defaults::SetDefaults<ds::TypesVector<names::A, names::B, ds::NameWithDefault<names::C, int>>, 
-                                ds::TypesVector<int, double, int>> SetD;
     CompsWithDefaults<int, double, float> comps;
     CompsWithDefaults<int, double> comps2(1, 2, 3);
     BOOST_CHECK_EQUAL(comps2.get<names::C>(), X(3));
@@ -146,11 +144,13 @@ BOOST_AUTO_TEST_CASE(ComponentsSwapNotDefConstructible) {
     
     auto s2 = ds::swap<names::B>(z, comps);
     BOOST_CHECK_EQUAL(s2.get<names::B>().z, 3);
+
+    //typedef typename  ds::detail_set_defaults::SetDefaults<ds::TypesVector<names::A, ds::NameWithDefault<names::B, X>, names::C>, ds::TypesVector<int ,int ,int>>::type t;
 }
 
 
 //this shouldn't compile
-template <typename... Args>
-using CompsWithDefaultsIncorrect = typename  ds::Components<
-        names::A, ds::NameWithDefault<names::B, X>, names::C>::type<Args...> ;
+//template <typename... Args>
+//using CompsWithDefaultsIncorrect = typename  ds::Components<
+//        names::A, ds::NameWithDefault<names::B, X>, names::C>::type<Args...> ;
 

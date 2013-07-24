@@ -170,7 +170,31 @@ namespace detail {
 /**
  * @brief This namespace contains class which sets all defaults and all needed meta functions.
  */
-namespace detail_set_defaults {
+namespace detail {
+
+    template <typename Names, typename Defaults, typename TypesPrefix>
+    class SetDefaults {
+        static const int N = size<Names>::value;
+        static const int TYPES_NR = size<TypesPrefix>::value;
+        static_assert(TYPES_NR <= N, "Incrrect number of parameters");
+        
+        static const int DEFAULTS_NR = size<Defaults>::value;
+        static_assert(DEFAULTS_NR + TYPES_NR >= N, "Incrrect number of parameters");
+
+        typedef typename remove_n_first<DEFAULTS_NR + TYPES_NR - N, Defaults>::type NeededDefaults;
+
+        typedef typename join<TypesPrefix, NeededDefaults>::type Types;
+    public:
+        typedef detail::Components<Names, Types> type;
+    };
+} //detail
+
+
+
+/**
+ * @brief Here are some meta functions, to parse the arguments 
+ */
+namespace detail {
     /**
      * @brief GetName, gets name for either Name, or NamesWithDefaults struct
      *        this is the Name case
@@ -211,39 +235,9 @@ namespace detail_set_defaults {
         struct apply<Vector, NameWithDefault<Name, Default>> {
             typedef typename push_back<Vector, Default>::type type;
         };
-    };
     
-    template <typename NamesWithDefaults, typename TypesPrefix>
-    class SetDefaults {
-        static const int N = size<NamesWithDefaults>::value;
-        static const int TYPES_NR = size<TypesPrefix>::value;
-        static_assert(TYPES_NR <= N, "Incrrect number of parameters");
-
-
-        typedef typename fold<
-                NamesWithDefaults,
-                TypesVector<>,
-                PushBackName
-            >::type Names;
-
-        typedef typename fold<
-                NamesWithDefaults,
-                TypesVector<>,
-                PushBackDefault
-            >::type Defaults;
-        
-        static const int DEFAULTS_NR = size<Defaults>::value;
-        static_assert(DEFAULTS_NR + TYPES_NR >= N, "Incrrect number of parameters");
-
-        typedef typename remove_n_first<DEFAULTS_NR + TYPES_NR - N, Defaults>::type NeededDefaults;
-
-        typedef typename join<TypesPrefix, NeededDefaults>::type Types;
-    public:
-        typedef detail::Components<Names, Types> type;
-    private:
-        //in this block we check if the defaults are on the last positions in the NamesWithDefaults
     };
-} //detail_set_defaults
+ } //detail
 
 
 //direct implementation on variadic templates is imposible because of
@@ -251,9 +245,20 @@ namespace detail_set_defaults {
 template <typename... ComponentNamesWithDefaults>
 class Components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
+    typedef typename fold<
+            NamesWithDefaults,
+            TypesVector<>,
+            detail::PushBackName
+        >::type Names;
+
+    typedef typename fold<
+            NamesWithDefaults,
+            TypesVector<>,
+            detail::PushBackDefault
+        >::type Defaults;
 public:
     template <typename... ComponentTypes>
-    using type = typename detail_set_defaults::SetDefaults<NamesWithDefaults, TypesVector<ComponentTypes...>>::type;
+    using type = typename detail::SetDefaults<Names, Defaults, TypesVector<ComponentTypes...>>::type;
 
     template <typename... Components>
     static 
@@ -261,6 +266,17 @@ public:
     make_components(Components... comps) {
         return type<Components...>(std::move(comps)...);
     }
+private:
+    //in this block we check if the defaults are on the last positions in the NamesWithDefaults
+    static const int N = size<NamesWithDefaults>::value;
+    static const int DEFAULTS_NR = size<Defaults>::value;
+    typedef typename remove_n_first<N - DEFAULTS_NR, NamesWithDefaults>::type DefaultPart;
+    typedef typename fold<
+            DefaultPart,
+            TypesVector<>,
+            detail::PushBackDefault
+        >::type DefaultsTest;
+    static_assert(std::is_same<DefaultsTest, Defaults>::value, "Defaults values could be only on subsequent number of last parameters");
 };
 
 

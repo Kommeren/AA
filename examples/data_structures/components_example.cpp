@@ -31,12 +31,6 @@ struct X {
         return x == xx.x;
     }
 
-    template <typename ostream>
-    friend ostream & operator<<(ostream & o, X x) {
-        o << x.x;
-    return o;
-    }
-
     int x;
 };
 
@@ -74,6 +68,12 @@ using CompsWithDefaults = typename  ds::Components<
 template <typename... Args>
 using CompsToSwap = typename  ds::Components<
     names::A, names::B>::type<Args...> ;
+
+//this shouldn't compile
+//template <typename... Args>
+//using CompsWithDefaultsIncorrect = typename  ds::Components<
+//        names::A, ds::NameWithDefault<names::B, X>, names::C>::type<Args...> ;
+
 
 int main() {
     //constructor has default agruments
