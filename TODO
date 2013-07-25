@@ -1,2 +1,13 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
+* iterative rounding
+** separate solution and component class usage
+** framework documentation
+** columns iterator is invalidated when we remove column (see rounding code)
+** function style
+** cost function
+** reoving rows/cols strategy
+** resolving, solution by moving a point
+** cplex support ???
+
+

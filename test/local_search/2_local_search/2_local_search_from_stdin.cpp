@@ -9,7 +9,7 @@
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/data_structures/cycle/splay_cycle.hpp"
 #include "paal/local_search/custom_components.hpp"
-#include "paal/data_structures/components/components_swap.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
 
 #include "utils/read_tsplib.h"
 #include "2_local_search_logger.hpp"
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     typedef local_search::GainCutSmallImproves<GainT, int> CIC;
     double epsilon = 0.001;
     CIC  cut(lsc.get<paal::local_search::Gain>(), startLen, epsilon);
-    auto cutLsc = data_structures::swap<local_search::Gain>(std::move(cut), lsc);
+    auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
     
     //setting logger
     auto logger = utils::make_twoLSLogger(mtx);

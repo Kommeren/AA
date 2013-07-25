@@ -12,7 +12,7 @@
 #include <type_traits>
 
 #include "paal/data_structures/components/components.hpp"
-#include "paal/data_structures/components/components_swap.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
 
 namespace names {
     struct A;
@@ -65,19 +65,19 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
 
     BOOST_CHECK_EQUAL(comps5.call<names::A>(2), 2);
 
-    typedef ds::SwapType<names::A, std::pair<int, int>, CompsF>::type Swapped;
+    typedef ds::ReplacedType<names::A, std::pair<int, int>, CompsF>::type Replaced;
 
     //This was not true when using mpl::vector
-    typedef Comps<std::pair<int, int>, double, int> SwappedCheck;
-    static_assert(std::is_same<Swapped, SwappedCheck>::value, "Invalid swapped type");
+    typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
+    static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
-    Swapped swap = ds::swap<names::A>(std::make_pair(11, 12), comps5);
+    Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
     
-    auto p = swap.get<names::A>();
+    auto p = replace.get<names::A>();
     BOOST_CHECK_EQUAL(p.first, 11);
     BOOST_CHECK_EQUAL(p.second, 12);
-    BOOST_CHECK_EQUAL(swap.get<names::B>(), 2);
-    BOOST_CHECK_EQUAL(swap.get<names::C>(), 17);
+    BOOST_CHECK_EQUAL(replace.get<names::B>(), 2);
+    BOOST_CHECK_EQUAL(replace.get<names::C>(), 17);
 }
 
     struct X {
@@ -128,21 +128,21 @@ BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
 }
 
 template <typename... Args>
-using CompsToSwap = typename  ds::Components<
+using CompsToReplace = typename  ds::Components<
         names::A, names::B>::type<Args...> ;
 
 
-BOOST_AUTO_TEST_CASE(ComponentsSwapNotDefConstructible) {
+BOOST_AUTO_TEST_CASE(ComponentsReplaceNotDefConstructible) {
     X x(1);
     Y y(2);
     Z z(3);
 
-    CompsToSwap<X, Y> comps(x, y);
+    CompsToReplace<X, Y> comps(x, y);
     BOOST_CHECK_EQUAL(comps.get<names::A>().x, 1);
-    auto s = ds::swap<names::A>(z, comps);
+    auto s = ds::replace<names::A>(z, comps);
     BOOST_CHECK_EQUAL(s.get<names::A>().z, 3);
     
-    auto s2 = ds::swap<names::B>(z, comps);
+    auto s2 = ds::replace<names::B>(z, comps);
     BOOST_CHECK_EQUAL(s2.get<names::B>().z, 3);
 
     //typedef typename  ds::detail_set_defaults::SetDefaults<ds::TypesVector<names::A, ds::NameWithDefault<names::B, X>, names::C>, ds::TypesVector<int ,int ,int>>::type t;

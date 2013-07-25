@@ -11,7 +11,7 @@
 #include <cassert>
 
 #include "paal/data_structures/components/components.hpp"
-#include "paal/data_structures/components/components_swap.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
 
 namespace names {
     struct A;
@@ -66,7 +66,7 @@ using CompsWithDefaults = typename  ds::Components<
     
 //definition of Comps with names names::A, names::B
 template <typename... Args>
-using CompsToSwap = typename  ds::Components<
+using CompsToReplace = typename  ds::Components<
     names::A, names::B>::type<Args...> ;
 
 //this shouldn't compile
@@ -115,19 +115,19 @@ int main() {
     //call the first argument
     assert(comps5.call<names::A>(2) == 2);
 
-    //components with swapped type
-    typedef ds::SwapType<names::A, std::pair<int, int>, CompsF>::type Swapped;
-    typedef Comps<std::pair<int, int>, double, int> SwappedCheck;
-    static_assert(std::is_same<Swapped, SwappedCheck>::value, "Invalid swapped type");
+    //components with replaceped type
+    typedef ds::ReplacedType<names::A, std::pair<int, int>, CompsF>::type Replaced;
+    typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
+    static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
-    //swap components
-    Swapped swap = ds::swap<names::A>(std::make_pair(11, 12), comps5);
+    //replace components
+    Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
     
-    auto p = swap.get<names::A>();
+    auto p = replace.get<names::A>();
     assert(p.first == 11);
     assert(p.second == 12);
-    assert(swap.get<names::B>() == 2);
-    assert(swap.get<names::C>() == 17);
+    assert(replace.get<names::B>() == 2);
+    assert(replace.get<names::C>() == 17);
 
 
     //normal definition
@@ -146,11 +146,11 @@ int main() {
     Y y(2);
     Z z(3);
 
-    CompsToSwap<X, Y> compsToSwap(x, y);
-    //swap, X, Y, Z doesn't have default constructors
-    auto s = ds::swap<names::A>(z, compsToSwap);
+    CompsToReplace<X, Y> compsToReplace(x, y);
+    //replace, X, Y, Z doesn't have default constructors
+    auto s = ds::replace<names::A>(z, compsToReplace);
     assert(s.get<names::A>().z == 3);
     
-    auto s2 = ds::swap<names::B>(z, compsToSwap);
+    auto s2 = ds::replace<names::B>(z, compsToReplace);
     assert(s2.get<names::B>().z == 3);
 }
