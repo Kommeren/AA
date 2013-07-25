@@ -50,8 +50,6 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     Comps<int, double, int> comps3(5,4);
     BOOST_CHECK_EQUAL(comps3.get<names::A>(), 5);
     BOOST_CHECK_EQUAL(comps3.get<names::B>(), 4);
-    BOOST_CHECK_EQUAL(comps3.get<names::C>(), 0);
-    
     
     typedef Comps<int(*)(int), double, int> CompsF;
     

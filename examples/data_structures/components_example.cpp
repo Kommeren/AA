@@ -96,7 +96,6 @@ int main() {
     Comps<int, double, int> comps3(5,4);
     assert(comps2.get<names::A>() == 5);
     assert(comps2.get<names::B>() == 4);
-    assert(comps2.get<names::C>() == 0);
     
     //declaration components with function 
     typedef Comps<int(*)(int), double, int> CompsF;
