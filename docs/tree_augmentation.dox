@@ -1,0 +1,56 @@
+/*! \page ta Tree Augmentation
+
+\section def Problem definition.  
+
+The Tree Augmentation problem is the
+following: given a 2-edge-connected graph \f$G=(V,T\cup E)\f$, in
+which a spanning tree \f$T\f$ is specified. The edges of this tree are
+called _tree edges_, or simply _edges_, while non-tree edges are
+called _links_. Links have associated nonnegative costs \f$c:E\to
+{R}_+\f$. The target is to find a minimum cost subset of links that
+together with the tree edges give a 2-edge-connected subgraph.  The
+problem is NP-complete, the best known approximation algorithms have
+factor 2.
+
+An IP formulation of the problem is as follows. We introduce a binary
+variable \f$x_e\f$ for every link \f$e\f$. For a tree edge \f$t\f$, let
+\f$\delta_E(t)\f$ denote the set of links that connect the 2 components of
+the graph \f$(V,T-t)\f$.  Minimize
+\f{eqnarray*}& \sum_{e\in E} \ x_{e} * c_e \\ 
+where:&\\
+&x(\delta_E(t))\ge 1\mbox{ for every } t\in T\\ 
+&x_e \in \{0,1\}\mbox{ for every }e\in E\\ 
+\f}
+
+
+
+\section Solution
+
+The Tree Augmentation problem is a special case of the Generaised
+Steiner Network Problem. The solution presented here is the iterative
+rounding 2-approximation algorithm by Jain \cite jain2001factor.  The main
+characteristic of this special case is that the LP relaxation that we
+use has polynomial size: we use the following natural relaxation of
+the above formulation.
+ Minimize
+\f{eqnarray*}& \sum_{e\in E} \ x_{e} * c_e \\ 
+where:&\\
+&x(\delta_E(t))\ge 1\mbox{ for every } t\in T\\ 
+&x_e \ge 0\mbox{ for every }e\in E\\ 
+\f}
+
+ 
+An  example of the usage can be found in file tree_aumentation_example.cpp
+
+\subsection app Approximation Ratio equals 2.
+
+\subsection References
+
+Jain's iterative rounding 2-approximation algorithm is described in
+\cite jain2001factor.  The book \cite lau2011iterative contains a nice description
+of this algorithm (Chapter 10), along with many other iterative
+algorithms. However, these references do not detail the Tree
+Augmentation Problem separately.
+
+
+*/
