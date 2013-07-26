@@ -41,7 +41,7 @@ struct EdgeToVertexPairsIterator {
         return *this;
     }
 
-    std::pair<Vertex, Vertex> & operator=(Edge e) {
+    std::pair<unsigned, unsigned> & operator=(Edge e) {
         m_restrictionsVec->push_back(std::make_pair(boost::source(e, *m_g), boost::target(e, *m_g)));
         return m_restrictionsVec->back();
     }
