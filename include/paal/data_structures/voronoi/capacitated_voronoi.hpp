@@ -13,9 +13,9 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
-#include "paal/min_cost_max_flow/cycle_cancellation.hpp"
-#include "paal/min_cost_max_flow/path_augmentation.hpp"
-#include "paal/min_cost_max_flow/edmonds_karp_no_init.hpp"
+#include "paal/min_cost_max_flow/cycle_canceling.hpp"
+#include "paal/min_cost_max_flow/successive_shortest_path.hpp"
+//#include "paal/min_cost_max_flow/edmonds_karp_no_init.hpp"
 #include "paal/utils/iterator_utils.hpp"
 
 
@@ -186,7 +186,7 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        boost::path_augmentation(m_g, m_s, m_t,                                 //not in boost yet 
+        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
                 boost::predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
                                                                     
 
@@ -221,8 +221,11 @@ public:
         boost::remove_vertex(genGraph, m_g);
         restoreIndex();
         
-        boost::edmonds_karp_no_init(m_g, m_s, m_t);
-        boost::cycle_cancellation(m_g);
+//        boost::edmonds_karp_no_init(m_g, m_s, m_t);
+//        boost::cycle_cancellation(m_g);
+        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
+                boost::predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+                                                                    
 
         return getCost() - costStart;
     }
@@ -365,7 +368,7 @@ private:
     typedef std::vector<DistI> VPropMap;
     VPropMap m_dist;
     VPropMap m_dist_prev;
-    std::vector<VD> m_pred;
+    std::vector<ED> m_pred;
 
 
     Graph m_g;

@@ -1,12 +1,13 @@
-/**
- * @file path_augmentation.hpp
- * @brief 
- * @author Piotr Wygocki
- * @version 1.0
- * @date 2013-06-14
- */
-#ifndef PATH_AUGMENTATION_HPP
-#define PATH_AUGMENTATION_HPP 
+//=======================================================================
+// Copyright 2013 University of Warsaw.
+// Authors: Piotr Wygocki 
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
+#ifndef BOOST_GRAPH_SUCCESSIVE_SHORTEST_PATH_HPP
+#define BOOST_GRAPH_SUCCESSIVE_SHORTEST_PATH_HPP 
 
 #include <numeric>
 
@@ -15,11 +16,11 @@
 #include <boost/graph/graph_concepts.hpp>
 #include <boost/pending/indirect_cmp.hpp>
 #include <boost/pending/relaxed_heap.hpp>
-#include <boost/graph/edmonds_karp_max_flow.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/properties.hpp>
+#include <boost/graph/iteration_macros.hpp>
 
-#include "vertices_to_edges.hpp"
+#include "detail/augment.hpp"
 
 namespace boost {
 
@@ -28,7 +29,7 @@ namespace detail {
     
 template <class Graph, class Weight, class Distance, class Reversed>
 class MapReducedWeight : 
-    public put_get_helper<typename property_traits<Weight>::value_type, MapReducedWeight<Graph, Weight, Distance, Reversed>> {
+    public put_get_helper<typename property_traits<Weight>::value_type, MapReducedWeight<Graph, Weight, Distance, Reversed> > {
     typedef graph_traits<Graph> gtraits;
 public:
     typedef boost::readable_property_map_tag category;
@@ -57,73 +58,75 @@ make_mapReducedWeight(const Graph & g, Weight w, Distance d, Reversed r)  {
 }//detail
 
 
-template <class Graph, class Capacity, class ResidualCapacity, class Reversed, class Pred, class Weight, class Distance, class Distance2>
-void path_augmentation(
-        Graph &g, 
+template <class Graph, class Capacity, class ResidualCapacity, class Reversed, class Pred, class Weight, class Distance, class Distance2, class VertexIndex>
+void successive_shortest_path(
+        const Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
         Capacity capacity,
         ResidualCapacity residual_capacity,
         Weight weight, 
         Reversed rev,
+        VertexIndex index,
         Pred pred, 
         Distance distance,
         Distance2 distance_prev) {
-    typedef typename graph_traits < Graph>::edge_descriptor ED;
-    typedef typename graph_traits < Graph>::vertex_descriptor VD;
-    typedef typename graph_traits < Graph>::edge_iterator EI;
-    typedef typename graph_traits < Graph>::vertex_iterator VI;
-    typedef typename property_traits<Weight>::value_type Dist;
-
-    filtered_graph<Graph, is_residual_edge<ResidualCapacity> >
+    filtered_graph<const Graph, is_residual_edge<ResidualCapacity> >
         gres = detail::residual_graph(g, residual_capacity);
+    typedef typename graph_traits<Graph>::edge_descriptor edge_descriptor;
     
-    VI u_iter, u_end;
-    EI ei, e_end;
-    for (tie(ei, e_end) = edges(g); ei != e_end; ++ei) {
-        put(residual_capacity, *ei, get(capacity, *ei));
+    BGL_FORALL_EDGES_T(e, g, Graph) {
+        put(residual_capacity, e, get(capacity, e));
     }
 
-    for(tie(u_iter, u_end) = vertices(g); u_iter != u_end; ++u_iter) {
-        put(distance_prev, *u_iter, 0);
+    BGL_FORALL_VERTICES_T(v, g, Graph) {
+        put(distance_prev, v, 0);
     }
 
     while(true) {
+        BGL_FORALL_VERTICES_T(v, g, Graph) {
+            put(pred, v, edge_descriptor());
+        }
         dijkstra_shortest_paths(gres, s, 
-                weight_map(detail::make_mapReducedWeight(gres, weight, distance_prev, rev)).distance_map(distance).predecessor_map(pred));
+                weight_map(detail::make_mapReducedWeight(gres, weight, distance_prev, rev)).
+                distance_map(distance).
+                vertex_index_map(index).
+                visitor(make_dijkstra_visitor(record_edge_predecessors(pred, on_edge_relaxed()))));
 
-        if(VD(get(pred, t)) == t) {
+        if(get(pred, t) == edge_descriptor()) {
             break;
         }
 
-        for(tie(u_iter, u_end) = vertices(g); u_iter != u_end; ++u_iter) {
-            put(distance_prev, *u_iter, get(distance_prev, *u_iter) + get(distance, *u_iter));
+        BGL_FORALL_VERTICES_T(v, g, Graph) {
+            put(distance_prev, v, get(distance_prev, v) + get(distance, v));
         }
 
-        detail::augment(g, s, t, detail::make_mapVerticesToEdges(pred, g), residual_capacity, rev);
+        detail::augment(g, s, t, pred, residual_capacity, rev);
     }
 }
 
+//in this namespace argument dispatching tak place
 namespace detail {
 
-template <class Graph, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance, class Distance2>
-void path_augmentation_dispatch3(
-        Graph &g, 
+template <class Graph, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance, class Distance2, class VertexIndex>
+void successive_shortest_path_dispatch3(
+        const Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
         Capacity capacity,
         ResidualCapacity residual_capacity,
         Weight weight,
         Reversed rev,
+        VertexIndex index,
         Pred pred,
         Distance dist,
         Distance2 dist_pred) {
-    path_augmentation(g, s, t, capacity, residual_capacity, weight, rev, pred, dist, dist_pred);
+    successive_shortest_path(g, s, t, capacity, residual_capacity, weight, rev, index, pred, dist, dist_pred);
 }
 
 //setting default distance map
-template <class Graph, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance>
-void path_augmentation_dispatch3(
+template <class Graph, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance, class VertexIndex>
+void successive_shortest_path_dispatch3(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
@@ -131,6 +134,7 @@ void path_augmentation_dispatch3(
         ResidualCapacity residual_capacity,
         Weight weight,
         Reversed rev,
+        VertexIndex index,
         Pred pred,
         Distance dist,
         param_not_found) {
@@ -138,11 +142,12 @@ void path_augmentation_dispatch3(
 
     std::vector<D> d_map(num_vertices(g));
 
-    path_augmentation(g, s, t, capacity, residual_capacity, weight, rev, pred, dist, &d_map[0]);
+    successive_shortest_path(g, s, t, capacity, residual_capacity, weight, rev, index, pred, dist,
+                             make_iterator_property_map(d_map.begin(), index));
 }
 
-template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance>
-void path_augmentation_dispatch2(
+template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class Distance, class VertexIndex>
+void successive_shortest_path_dispatch2(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
@@ -150,15 +155,16 @@ void path_augmentation_dispatch2(
         ResidualCapacity residual_capacity,
         Weight weight,
         Reversed rev,
+        VertexIndex index,
         Pred pred,
         Distance dist,
         const bgl_named_params<P, T, R>& params) {
-    path_augmentation_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, pred, dist, get_param(params, vertex_distance2));
+    successive_shortest_path_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, index, pred, dist, get_param(params, vertex_distance2));
 }
 
 //setting default distance map
-template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred>
-void path_augmentation_dispatch2(
+template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class VertexIndex>
+void successive_shortest_path_dispatch2(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
@@ -166,6 +172,7 @@ void path_augmentation_dispatch2(
         ResidualCapacity residual_capacity,
         Weight weight,
         Reversed rev,
+        VertexIndex index,
         Pred pred,
         param_not_found, 
         const bgl_named_params<P, T, R>& params) {
@@ -173,11 +180,13 @@ void path_augmentation_dispatch2(
 
     std::vector<D> d_map(num_vertices(g));
 
-    path_augmentation_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, pred, &d_map[0], get_param(params, vertex_distance2));
+    successive_shortest_path_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, index, pred,
+            make_iterator_property_map(d_map.begin(), index),
+            get_param(params, vertex_distance2));
 }
 
-template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred>
-void path_augmentation_dispatch1(
+template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class VertexIndex>
+void successive_shortest_path_dispatch1(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
@@ -185,15 +194,16 @@ void path_augmentation_dispatch1(
         ResidualCapacity residual_capacity,
         Weight weight, 
         Reversed rev,
+        VertexIndex index,
         Pred pred,
         const bgl_named_params<P, T, R>& params) {
-    path_augmentation_dispatch2(g, s, t, capacity, residual_capacity, weight,  rev, pred,
+    successive_shortest_path_dispatch2(g, s, t, capacity, residual_capacity, weight,  rev, index, pred,
                                 get_param(params, vertex_distance), params);
 }
 
 //setting default predecessors map
-template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed>
-void path_augmentation_dispatch1(
+template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class VertexIndex>
+void successive_shortest_path_dispatch1(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
@@ -201,44 +211,47 @@ void path_augmentation_dispatch1(
         ResidualCapacity residual_capacity,
         Weight weight, 
         Reversed rev,
+        VertexIndex index,
         param_not_found,
         const bgl_named_params<P, T, R>& params) {
-    typedef  typename graph_traits<Graph>::vertex_descriptor VD; 
-    std::vector<VD> p_map(num_vertices(g)); 
+    typedef typename graph_traits<Graph>::edge_descriptor edge_descriptor;
+    std::vector<edge_descriptor> pred_vec(num_vertices(g));
 
-    path_augmentation_dispatch2(g, s, t, capacity, residual_capacity, weight, rev, &p_map[0], 
-                                get_param(params, vertex_distance), params); 
+    successive_shortest_path_dispatch2(g, s, t, capacity, residual_capacity, weight, rev, index, 
+            make_iterator_property_map(pred_vec.begin(), index),
+            get_param(params, vertex_distance), params); 
 }
 
 }//detail
 
 
 template <class Graph, class P, class T, class R>
-void path_augmentation(
+void successive_shortest_path(
         Graph &g, 
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t,
         const bgl_named_params<P, T, R>& params) {
            
-    return detail::path_augmentation_dispatch1(g, s, t, 
+    return detail::successive_shortest_path_dispatch1(g, s, t, 
            choose_const_pmap(get_param(params, edge_capacity), g, edge_capacity),
            choose_pmap(get_param(params, edge_residual_capacity), 
                        g, edge_residual_capacity),
            choose_const_pmap(get_param(params, edge_weight), g, edge_weight),
            choose_const_pmap(get_param(params, edge_reverse), g, edge_reverse),
+           choose_const_pmap(get_param(params, vertex_index), g, vertex_index),
            get_param(params, vertex_predecessor), 
            params);
 }
 
 template <class Graph>
-void path_augmentation(
+void successive_shortest_path(
         Graph &g,
         typename graph_traits<Graph>::vertex_descriptor s, 
         typename graph_traits<Graph>::vertex_descriptor t) {
     bgl_named_params<int, buffer_param_t> params(0);
-    path_augmentation(g, s, t, params);
+    successive_shortest_path(g, s, t, params);
 }
 
 
 }//boost
-#endif /* PATH_AUGMENTATION_HPP */
+#endif /* BOOST_GRAPH_SUCCESSIVE_SHORTEST_PATH_HPP */

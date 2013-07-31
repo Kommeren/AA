@@ -1,25 +1,27 @@
-/**
- * @file find_flow_cost.hpp
- * @brief 
- * @author Piotr Wygocki
- * @version 1.0
- * @date 2013-06-14
- */
-#ifndef FIND_FLOW_COST_HPP
+//=======================================================================
+// Copyright 2013 University of Warsaw.
+// Authors: Piotr Wygocki 
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
+#ifndef BOOST_GRAPH_FIND_FLOW_COST_HPP
+#define BOOST_GRAPH_FIND_FLOW_COST_HPP
+
+#include <boost/graph/iteration_macros.hpp>
+
 namespace boost {
 
 template<class Graph, class Capacity, class ResidualCapacity, class Weight>
 typename property_traits<typename property_map < Graph, edge_capacity_t >::type>::value_type
-find_flow_cost(const Graph & g, Capacity capacity, ResidualCapacity residual_capacity, Weight weight)
-{
-    typename graph_traits<Graph>::edge_iterator ei, end;
-
+find_flow_cost(const Graph & g, Capacity capacity, ResidualCapacity residual_capacity, Weight weight) {
     typedef typename property_traits<typename property_map<Graph, edge_weight_t>::const_type>::value_type Cost;
+
     Cost cost = 0;
-    tie(ei, end) = edges(g);
-    for(;ei != end; ++ei) {
-        if((capacity[*ei]) > Cost(0)) {
-            cost +=  (capacity[*ei] - residual_capacity[*ei]) * weight[*ei];
+    BGL_FORALL_EDGES_T(e, g, Graph) {
+        if(get(capacity, e) > Cost(0)) {
+            cost +=  (get(capacity, e) - get(residual_capacity, e)) * get(weight, e);
         } 
     }
     return cost;
@@ -46,5 +48,4 @@ find_flow_cost(const Graph &g) {
 
 } //boost
 
-#define FIND_FLOW_COST_HPP 
-#endif /* FIND_FLOW_COST_HPP */
+#endif /* BOOST_GRAPH_FIND_FLOW_COST_HPP */
