@@ -159,7 +159,7 @@ void successive_shortest_path_dispatch2(
         Pred pred,
         Distance dist,
         const bgl_named_params<P, T, R>& params) {
-    successive_shortest_path_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, index, pred, dist, get_param(params, vertex_distance2));
+    successive_shortest_path_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, index, pred, dist, get_param(params, distance_zero_t()));
 }
 
 //setting default distance map
@@ -182,7 +182,7 @@ void successive_shortest_path_dispatch2(
 
     successive_shortest_path_dispatch3(g, s, t, capacity, residual_capacity, weight, rev, index, pred,
             make_iterator_property_map(d_map.begin(), index),
-            get_param(params, vertex_distance2));
+            get_param(params, distance_zero_t()));
 }
 
 template <class Graph, class P, class T, class R, class Capacity, class ResidualCapacity, class Weight, class Reversed, class Pred, class VertexIndex>

@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(path_augmentation_test) {
     boost::successive_shortest_path(g, s, t, 
             boost::distance_map(&dist[0]).
             predecessor_map(&pred[0]).
-            distance_map2(&dist_prev[0]).
+            distance_zero(&dist_prev[0]).
             vertex_index_map(boost::identity_property_map()));
 
     int cost =  boost::find_flow_cost(g);
