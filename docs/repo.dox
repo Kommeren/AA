@@ -30,5 +30,8 @@ and follow the instructions.
 <b>Particularly never use git pull</b>
 <li> If you have no experience in using git or in case of any problems please contact wygos@mimuw.edu.pl
 </ul>
+\section Misc
+Developers mailing list:
+http://lists.mimuw.edu.pl/listinfo/paal_developers
 */
 
