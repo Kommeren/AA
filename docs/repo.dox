@@ -5,7 +5,7 @@
 <pre>
 ssh-keygen -t rsa
 </pre>
-   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to sank@mimuw.edu.pl).
+   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Update id_rsa.pub to contain your real email address. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to sank@mimuw.edu.pl).
 
    After getting access you can clone paal repository: 
 <pre>
