@@ -21,7 +21,7 @@ Facility Location (FL) problem is solved by local search. Given a move which ope
  
   full example is k_median_example.cpp
 
-\subsection app Approximation Ration equals 5.
+\subsection app Approximation Ratio equals 5.
 
 \subsection References
 
