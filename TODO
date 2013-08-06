@@ -1,6 +1,6 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
-* iterative rounding
+* ITERATIVE ROUNDING
 ** separate solution and component class usage
 ** framework documentation
 ** columns iterator is invalidated when we remove column (see rounding code)
@@ -10,4 +10,14 @@
 ** resolving, solution by moving a point
 ** cplex support ???
 
+* GREEDY
+** max cover (AA)
+** max coverage (AA)
+** knapsack
+** Scheduling jobs on identical parallel machines (tDoAA) 
+** scheduling jobs with deadlines on a single machine (tDoAA)
+** k-center
+** the multiway cut
+** the k multi way cut
+** shortest superstring (conjecture)
 
