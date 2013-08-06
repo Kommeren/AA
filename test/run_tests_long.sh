@@ -21,6 +21,9 @@ exit_on_error
 #echo ------------------------------------------- bounded_degree_mst_long_test 	 -------------------------------------------------------------------------------------
 #./${build_dir}/bounded_degree_mst_long_test
 #exit_on_error
+echo ------------------------------------------- tree_augmentation_long_test     -------------------------------------------------------------------------------------
+./${build_dir}/test/tree_augmentation_long_test
+exit_on_error
 echo ------------------------------------------- capacitated_facility_location_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/capacitated_facility_location_long_test --run_test=FacilityLocationLong
 exit_on_error

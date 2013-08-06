@@ -1,5 +1,5 @@
 /**
- * @file tree_aug_test.cpp
+ * @file tree_augmentation_test.cpp
  * @brief 
  * @author Attila Bernath
  * @version 1.0
@@ -12,7 +12,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "utils/logger.hpp"
-#include "paal/iterative_rounding/treeaug/tree_aug.hpp"
+#include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -33,18 +33,18 @@ struct LogVisitor : public TrivialVisitor {
 
 // create a typedef for the Graph type
 typedef adjacency_list<vecS, vecS, undirectedS,
-		       //property < vertex_index_t, int >,
-		       no_property,
-		       property < edge_weight_t, double,  
-				  property < edge_color_t, bool> > > Graph;
+            //property < vertex_index_t, int >,
+            no_property,
+            property < edge_weight_t, double,
+            property < edge_color_t, bool> > > Graph;
 
 typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
 typedef graph_traits < Graph >::edge_descriptor Edge;
 
 template <typename Graph, typename TreeMap, typename Cost>
 Edge addEdge(Graph & g,  int u, int v, 
-	     TreeMap tree, bool inT, 
-	     Cost & cost, double c) {
+        TreeMap tree, bool inT, 
+        Cost & cost, double c) {
     bool b;
     Traits::edge_descriptor e;
     std::tie(e, b) = add_edge(u, v, g);
@@ -58,7 +58,7 @@ typedef property_map < Graph, vertex_index_t >::type Index;
 typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
-BOOST_AUTO_TEST_CASE(tree_aug) {
+BOOST_AUTO_TEST_CASE(tree_augmentation) {
   Graph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap      = get(edge_color, g);

@@ -39,8 +39,12 @@ where:&\\
 &x_e \ge 0\mbox{ for every }e\in E\\ 
 \f}
 
+example: 
+   \snippet tree_augmentation_example.cpp Tree Augmentation Example
  
-An  example of the usage can be found in file tree_aumentation_example.cpp
+
+
+An  example of the usage can be found in file tree_augmentation_example.cpp
 
 \subsection app Approximation Ratio equals 2.
 

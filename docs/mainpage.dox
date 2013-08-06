@@ -28,10 +28,14 @@
             <li>\ref fl 
             <li>\ref kmedian
             <li>\ref cfl
-        </ul>
+            </ul>
         <li> miscellaneous
             <ul>
             <li>\ref stein
+            </ul>
+        <li> iterative rounding
+            <ul>
+            <li>\ref ta
             </ul>
         </ul>
     <li> Concepts
