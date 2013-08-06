@@ -15,8 +15,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
     //define voronoi and solution
     const int k = 2;
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
-    typedef paal::local_search::k_median::KMedianSolution
-        <k, VorType> Sol;
+    typedef paal::data_structures::KMedianSolution
+        <VorType> Sol;
     typedef paal::data_structures::VoronoiTraits<VorType> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
 
     //create voronoi and solution
     VorType voronoi(GSet{SGM::B, SGM::D}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-    Sol sol(std::move(voronoi), USet{SGM::A, SGM::C});
+    Sol sol(std::move(voronoi), USet{SGM::A, SGM::C}, k);
 
     //create facility location local search components
     paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;

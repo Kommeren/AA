@@ -36,3 +36,6 @@ exit_on_error
 echo ------------------------------------------- steiner_tree_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/steiner_tree_long_test
 exit_on_error
+echo ------------------------------------------- k_median_long_test          -------------------------------------------------------------------------------------
+./${build_dir}/test/k_median_long_test
+exit_on_error

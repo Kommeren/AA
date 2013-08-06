@@ -10,6 +10,7 @@
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/iterator_utils.hpp"
+#include "paal/utils/do_nothing_functor.hpp"
 
 namespace paal {
 namespace simple_algo {
@@ -54,6 +55,13 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     return d;
 }
 
-}//paal
+template <typename Metric, typename FLSolution>
+        typename data_structures::MetricTraits<Metric>::DistanceType
+getKMCost(const Metric & m, const FLSolution & fls){
+    utils::ReturnZeroFunctor m_zeroFunc;
+    return paal::simple_algo::getFLCost(std::move(m), m_zeroFunc, std::move(fls));
+}
+
 }//simple_algo
+}//paal
 #endif /* FL_ALGO_HPP */

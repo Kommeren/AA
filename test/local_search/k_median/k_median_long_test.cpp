@@ -46,40 +46,28 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         LOG(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname+".txt");
-        std::vector<long long> facCost;
-        std::vector<int> facCap;
-        std::vector<int> demands;
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_KM<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
-        auto cost = make_Array2Function(facCost);
+        auto metric = paal::readORLIB_KM(ifs, fac, clients);
     
         typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
-
-        typedef paal::data_structures::FacilityLocationSolution
-            <decltype(cost), VorType> Sol;
+        typedef paal::data_structures::KMedianSolution
+            <VorType> Sol;
         typedef paal::data_structures::VoronoiTraits<VorType> VT;
         typedef typename VorType::GeneratorsSet GSet;
         typedef typename VT::VerticesSet VSet;
         typedef typename Sol::UnchosenFacilitiesSet USet;
         VorType voronoi( GSet{fac.begin(), fac.end()},  VSet(fac.begin(), clients.end()), metric);
-        Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()), cost);
+        Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),fac.size());
         paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
 
         facility_location_local_search_simple(sol, swap);
 
-        double c = simple_algo::getFLCost(metric, cost, sol);
-        //LOG("SOL.size="<<(sol.getChosenFacilities()).size()<<" / "<<(sol.getUnchosenFacilities()).size()+(sol.getChosenFacilities()).size());
-        /*LOG("chosen");
+        double c = simple_algo::getKMCost(metric, sol);
+        LOG("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
         VSet chosen=sol.getChosenFacilities();
-        for(decltype(chosen.begin()) i=chosen.begin();i!=chosen.end();i++){
-        LOG(*i);
-        }*/
-        /*LOG("unchosen");
-        VSet unchosen=sol.getUnchosenFacilities();
-        for(decltype(unchosen.begin()) i=unchosen.begin();i!=unchosen.end();i++){
-        LOG(*i);
-        }*/
+        LOG_COPY_DEL(chosen.begin(),chosen.end()," ");
+        
         LOG(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
         LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);

@@ -12,16 +12,15 @@
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 
 namespace paal {
-namespace local_search {
-namespace k_median {
+namespace data_structures {
 
-template <int k, typename VoronoiType>
+template <typename VoronoiType>
 class KMedianSolution : 
     public data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> {
     typedef data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> base;
 public:
     KMedianSolution(VoronoiType voronoi,
-                    typename base::UnchosenFacilitiesSet uf) : 
+                    typename base::UnchosenFacilitiesSet uf, int k) : 
         base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(base::getChosenFacilities().size() == k);}
     
     KMedianSolution(const KMedianSolution & kmsol) : base(kmsol) {}
@@ -32,14 +31,14 @@ private:
         
 };
 
-} //k_median
-} //local search
+
+} //data_structures
 
 namespace data_structures {
-    template <int k, typename Voronoi>
-    class FacilityLocationSolutionTraits<local_search::k_median::KMedianSolution<k, Voronoi>> {
+    template <typename Voronoi>
+    class FacilityLocationSolutionTraits<data_structures::KMedianSolution< Voronoi>> {
         typedef VoronoiTraits<Voronoi> VT;
-        typedef local_search::k_median::KMedianSolution<k, Voronoi> KMS;
+        typedef data_structures::KMedianSolution< Voronoi> KMS;
     public:
         typedef typename VT::VertexType VertexType;
         typedef typename VT::DistanceType Dist;
