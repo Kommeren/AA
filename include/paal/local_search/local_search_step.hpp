@@ -19,7 +19,7 @@ Index:
 
 
 \section Preliminaries 
-Let us consider maximization problem	: <br><br>
+Let us consider maximization problem : <br><br>
 
 max f(x) over x in X. <br><br>
 
@@ -42,7 +42,7 @@ Let us write the pseudo code for this operation:  <br><br>
          if(gain(apply u on x) > 0) 
          {
              x -> apply u on x 
-         }	
+         }
      }
      return x
  }
@@ -67,7 +67,7 @@ In this cases it is more convenient to proceed in the following way:<br>
          if(gain(apply u on x) > 0) 
          {
              x -> apply u on x 
-         }	
+         }
       }
      }
      return x
