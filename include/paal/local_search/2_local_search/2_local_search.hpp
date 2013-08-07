@@ -40,11 +40,20 @@ namespace two_local_search {
 * @tparam SearchComponents this is model MultiSearchComponents
 */
 
+
+
+typedef data_structures::Components<
+            Gain, 
+            data_structures::NameWithDefault<GetNeighborhood, TrivialNeighborGetter>,
+            data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
+            data_structures::NameWithDefault<UpdateSolution, TwoLocalSearchUpdater>
+                > TwoLocalSearchComponentsCreator;
+
 template <typename Gain, 
           typename GetNeighborhood = TrivialNeighborGetter, 
           typename StopCondition = utils::ReturnFalseFunctor> 
-class TwoLocalComponents : 
-    public MultiSearchComponents<
+using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetNeighborhood, StopCondition>;
+/*    public MultiSearchComponents<
             GetNeighborhood, 
             Gain, 
             TwoLocalSearchUpdater, 
@@ -61,7 +70,7 @@ public :
                        StopCondition sc = StopCondition()) : 
             base(std::move(ng), std::move(ic), TwoLocalSearchUpdater(), std::move(sc)) {}
 
-};
+};*/
 
 /**
  * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
@@ -84,6 +93,19 @@ TwoLocalComponents<Gain, GetNeighborhood, StopCondition>
             StopCondition sc = utils::ReturnFalseFunctor()) {
 
     return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
+}
+
+
+/**
+ * @brief get default two local search components
+ *
+ * @tparam Metric is model of \ref metric concept
+ * @param m metric
+ */
+template <typename Metric>
+decltype(make_TwoLocalSearchComponents(Gain2Opt<Metric>(std::declval<Metric>())))
+getDefaultTwoLocalComponents(const Metric & m) {
+    return make_TwoLocalSearchComponents(Gain2Opt<Metric>(m));
 }
 
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
@@ -109,26 +131,14 @@ bool two_local_search_simple(Cycle & cycle, Components... components) {
     return two_local_search(cycle, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
 }
 
-/**
- * @brief get default two local search components
- *
- * @tparam Metric is model of \ref metric concept
- * @param m metric
- */
-template <typename Metric>
-decltype(make_TwoLocalSearchComponents(Gain2Opt<Metric>(std::declval<Metric>())))
-getDefaultTwoLocalComponents(const Metric & m) {
-    return make_TwoLocalSearchComponents(Gain2Opt<Metric>(m));
-}
-
 
 } //two_local_search
 
-template <typename Gain, typename GetNeighborhood, typename StopCondition> 
+/*template <typename Gain, typename GetNeighborhood, typename StopCondition> 
 struct SearchComponentsTraits<two_local_search::TwoLocalComponents<Gain, GetNeighborhood, StopCondition>> 
         : SearchComponentsTraits<
             MultiSearchComponents<GetNeighborhood, Gain, two_local_search::TwoLocalSearchUpdater, StopCondition>
-                               > {};
+                               > {};*/
 
 
 

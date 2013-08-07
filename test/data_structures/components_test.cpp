@@ -24,6 +24,15 @@ int f(int i) {
     return i;
 }
 
+class constf {
+int operator()(int i) const {
+    return i;
+}
+};
+
+namespace ds = paal::data_structures;
+
+
 namespace ds = paal::data_structures;
 
 
@@ -54,14 +63,16 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     typedef Comps<int(*)(int), double, int> CompsF;
     
     CompsF comps4;
-    const CompsF & alias = comps4;
+    const CompsF & constAlias = comps4;
 
     comps4.get<names::B>();
-    alias.get<names::B>();
+    constAlias.get<names::B>();
 
     CompsF comps5(f, 2, 17);
+    const CompsF & constAlias5 = comps5;
 
     BOOST_CHECK_EQUAL(comps5.call<names::A>(2), 2);
+    BOOST_CHECK_EQUAL(constAlias5.call<names::A>(2), 2);
 
     typedef ds::ReplacedType<names::A, std::pair<int, int>, CompsF>::type Replaced;
 
@@ -69,13 +80,14 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
     static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
-    Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
+   Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
     
     auto p = replace.get<names::A>();
     BOOST_CHECK_EQUAL(p.first, 11);
     BOOST_CHECK_EQUAL(p.second, 12);
     BOOST_CHECK_EQUAL(replace.get<names::B>(), 2);
     BOOST_CHECK_EQUAL(replace.get<names::C>(), 17);
+
 }
 
     struct X {
@@ -142,10 +154,27 @@ BOOST_AUTO_TEST_CASE(ComponentsReplaceNotDefConstructible) {
     
     auto s2 = ds::replace<names::B>(z, comps);
     BOOST_CHECK_EQUAL(s2.get<names::B>().z, 3);
-
-    //typedef typename  ds::detail_set_defaults::SetDefaults<ds::TypesVector<names::A, ds::NameWithDefault<names::B, X>, names::C>, ds::TypesVector<int ,int ,int>>::type t;
 }
 
+BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
+    typedef Comps<int, double, float> SomeComps;
+    SomeComps someComps = SomeComps::make<names::A, names::C>(1,2);
+    BOOST_CHECK_EQUAL(someComps.get<names::A>(), 1);
+    BOOST_CHECK_EQUAL(someComps.get<names::C>(), 2);
+    
+    SomeComps someComps2 = SomeComps::make<names::C, names::A>(1,2);
+    BOOST_CHECK_EQUAL(someComps2.get<names::C>(), 1);
+    BOOST_CHECK_EQUAL(someComps2.get<names::A>(), 2);
+    
+    SomeComps someComps3 = SomeComps::make<names::C, names::B>(1,2);
+    BOOST_CHECK_EQUAL(someComps3.get<names::C>(), 1);
+    BOOST_CHECK_EQUAL(someComps3.get<names::B>(), 2);
+
+    SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
+    BOOST_CHECK_EQUAL(someComps4.get<names::A>(), 1);
+    BOOST_CHECK_EQUAL(someComps4.get<names::B>(), 2);
+}    
+    
 
 //this shouldn't compile
 //template <typename... Args>

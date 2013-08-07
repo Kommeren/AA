@@ -78,7 +78,6 @@ using CompsToReplace = typename  ds::Components<
 int main() {
     //constructor has default agruments
     Comps<int, double, int> comps;
-
     //getter
     comps.get<names::A>();
 
@@ -152,4 +151,20 @@ int main() {
     
     auto s2 = ds::replace<names::B>(z, compsToReplace);
     assert(s2.get<names::B>().z == 3);
+
+    //constructing objects providing names for objects
+    typedef Comps<int, double, float> SomeComps;
+    SomeComps someComps = SomeComps::make<names::A, names::C>(1,2);
+    assert(someComps.get<names::A>() == 1);
+    assert(someComps.get<names::C>() == 2);
+    
+    
+    SomeComps someComps2 = SomeComps::make<names::C, names::A>(1,2);
+    assert(someComps2.get<names::C>() == 1);
+    assert(someComps2.get<names::A>() == 2);
+    
+    SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
+    assert(someComps4.get<names::A>() == 1);
+    assert(someComps4.get<names::B>() == 2);
+    
 }

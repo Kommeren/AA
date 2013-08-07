@@ -128,6 +128,58 @@ struct replace_at_pos<0, NewType, TypesVector<TypesPrefix, TypesSufix...>> {
 };
 
 
+template <bool b, typename ThenType, typename ElseType> 
+struct if_;
+
+template <typename ThenType, typename ElseType> 
+struct if_<true, ThenType, ElseType> {
+    typedef ThenType type;
+};
+
+template <typename ThenType, typename ElseType> 
+struct if_<false, ThenType, ElseType> {
+    typedef ElseType type;
+};
+
+template <typename Type, typename Vector, typename Order>
+class sorted_insert;
+
+template <typename Type, typename Order>
+class sorted_insert<Type, TypesVector<>, Order> {
+public:
+    typedef TypesVector<Type> type;
+};
+
+
+template <typename Type, typename Element, typename... Elements, typename Order>
+class sorted_insert<Type, TypesVector<Element, Elements...>, Order> {
+    static const int posType = pos<Type, Order>::value;
+    static const int posElem = pos<Element, Order>::value;
+public:
+    typedef typename if_<posType < posElem,
+                         TypesVector<Type, Element, Elements...>,
+                         typename join<TypesVector<Element>, typename sorted_insert<Type, TypesVector<Elements...>, Order>::type>::type
+            >::type type;
+};
+
+
+template <typename Vector, typename Order>
+class sort;
+
+template <typename Type, typename... Types, typename Order>
+class sort<TypesVector<Type, Types...>, Order> {
+    typedef typename sort<TypesVector<Types...>, TypesVector<Order>>::type SortedSufix;
+public:
+    typedef typename sorted_insert<Type, SortedSufix, Order>::type type;
+};
+
+template <typename Order>
+class sort<TypesVector<>, Order> {
+public:
+    typedef TypesVector<> type;
+};
+
+
 } // data_structures
 } //paal
 

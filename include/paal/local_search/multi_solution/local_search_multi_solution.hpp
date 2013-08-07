@@ -107,6 +107,12 @@ private:
         return m_searchComponents.template call<Action>(args...);
     }
     
+/*    template <typename Action, typename... Args> 
+    auto call(Args&&... args) const -> 
+    decltype(std::declval<const MultiSearchComponents>().template call<Action>(args...)){
+        return m_searchComponents.template call<Action>(args...);
+    }*/
+    
     MultiSearchComponents m_searchComponents;
 };
 

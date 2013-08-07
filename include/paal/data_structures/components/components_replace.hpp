@@ -102,32 +102,32 @@ namespace detail {
     }
 
 
-    /**
-     * @brief This function, for a specific Name, replaces compoonent in the Components class.
-     *        The comonent should have deifferent type than prevoius component for this Name 
-     *        (If the type is the same, set member function from Components class chould be used).
-     *        The function returns Components class fo type ReplaceType<Name, NewType, OldComponents >::type.
-     *        The function creates temporary object wich behaves like result Components 
-     *        and creates final object calling special Copy constructor.
-     *
-     * @tparam Name
-     * @tparam NewType
-     * @tparam Names
-     * @tparam Types
-     * @param comp
-     * @param components
-     *
-     * @return 
-     */
-    template <typename Name, typename NewType, typename Names, typename Types> 
-    typename ReplacedType<Name, NewType, detail::Components<Names, Types> >::type
-    replace(NewType comp, detail::Components<Names, Types> components){
-        typedef detail::Components<Names, Types> Comps;
-        typedef typename ReplacedType<Name, NewType, Comps>::type Replaced;
+/**
+ * @brief This function, for a specific Name, replaces compoonent in the Components class.
+ *        The comonent should have deifferent type than prevoius component for this Name 
+ *        (If the type is the same, set member function from Components class chould be used).
+ *        The function returns Components class fo type ReplaceType<Name, NewType, OldComponents >::type.
+ *        The function creates temporary object wich behaves like result Components 
+ *        and creates final object calling special Copy constructor.
+ *
+ * @tparam Name
+ * @tparam NewType
+ * @tparam Names
+ * @tparam Types
+ * @param comp
+ * @param components
+ *
+ * @return 
+ */
+template <typename Name, typename NewType, typename Names, typename Types> 
+typename ReplacedType<Name, NewType, detail::Components<Names, Types> >::type
+replace(NewType comp, detail::Components<Names, Types> components){
+    typedef detail::Components<Names, Types> Comps;
+    typedef typename ReplacedType<Name, NewType, Comps>::type Replaced;
 
-        return Replaced(
-                  detail::TempReplacedComponents<Name, NewType, Names, Types>
-                          (components, comp));
+    return Replaced(
+              detail::TempReplacedComponents<Name, NewType, Names, Types>
+                      (components, comp), CopyTag());
 }
 
 } //data_structures
