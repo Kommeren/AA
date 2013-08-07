@@ -45,22 +45,22 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiConceptsBase {
     typedef typename utils::SolToElem<Solution>::type SolutionElement;
 protected:
-    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
+    typedef typename MultiMove<SearchComponents, Solution>::type Move;
     X x;
     Solution  s;
     SolutionElement e;
-    Update u;
+    Move u;
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  MultiGetNeighborhood : public MultiConceptsBase<X, Solution, SearchComponents> {
+class  MultiGetMoves : public MultiConceptsBase<X, Solution, SearchComponents> {
     public:
-        BOOST_CONCEPT_USAGE(MultiGetNeighborhood) {
+        BOOST_CONCEPT_USAGE(MultiGetMoves) {
             auto i = this->x(this->s, this->e);
             auto b = i.first;
             auto e = i.second;
             for(auto x = b; x != e; ++x) {
-                const typename MultiConceptsBase<X,Solution,SearchComponents>::Update & u = *x;
+                const typename MultiConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
                 use(u);
             }
         }
@@ -76,9 +76,9 @@ class MultiGain : public MultiConceptsBase<X, Solution, SearchComponents>{
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiUpdateSolution : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiCommit : public MultiConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(MultiUpdateSolution) {
+        BOOST_CONCEPT_USAGE(MultiCommit) {
             this->x(this->s,this-> e, this->u);
         }
 };
@@ -95,14 +95,14 @@ class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponent
 template <typename X, typename Solution> 
 class MultiSearchComponents {
     typedef SearchComponentsTraits<X> Traits; 
-    typedef typename Traits::GetNeighborhoodT NG;
+    typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
-    typedef typename Traits::UpdateSolutionT SU;
+    typedef typename Traits::CommitT SU;
     typedef typename Traits::StopConditionT SC;
 public:
-    BOOST_CONCEPT_ASSERT((MultiGetNeighborhood<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiGetMoves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiGain<IC, Solution, X>));
-    BOOST_CONCEPT_ASSERT((MultiUpdateSolution<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiCommit<SU, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiStopCondition<SC, Solution, X>));
 };
 

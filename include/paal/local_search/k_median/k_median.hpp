@@ -28,9 +28,9 @@ namespace k_median {
 template <typename VertexType> 
 struct DefaultKMedianComponents {
     typedef MultiSearchComponents<
-                facility_location::FacilityLocationGetNeighborhoodSwap <VertexType>,
+                facility_location::FacilityLocationGetMovesSwap <VertexType>,
                 facility_location::FacilityLocationCheckerSwap         <VertexType>,
-                facility_location::FacilityLocationUpdaterSwap         <VertexType>> type;
+                facility_location::FacilityLocationCommitSwap         <VertexType>> type;
 };
 
 
@@ -38,7 +38,7 @@ struct DefaultKMedianComponents {
  * @class KMedianLocalSearchStep
  * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.<br>
  * KMedian implementation is based on facility location solution. <br>
- * The Update is facility_location::Update. <br>
+ * The Move is facility_location::Move. <br>
  * The Solution is adapted KMedianSolution. <br>
  * The SolutionElement is facility_location::Facility  <br>
  * Use DefaultKMedianComponents for default search components.

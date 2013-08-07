@@ -23,7 +23,7 @@ const float UPPER_BOUND = 1;
 //basic types
 typedef float SolutionElement;
 typedef std::vector<SolutionElement> Solution;
-typedef SolutionElement Update;
+typedef SolutionElement Move;
 typedef float Fitness;
 
 
@@ -35,14 +35,14 @@ Fitness f(const Solution & x) {
 
 
 //returns range of new possible values for given SolutionElement
-struct GetNeigh {
-    typedef std::vector<Update> Neigh;
+struct GetMoves {
+    typedef std::vector<Move> Neigh;
     typedef typename Neigh::const_iterator Iter;
     const Neigh neighb;
     Neigh neighbCut;
 public:
 
-    GetNeigh() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
+    GetMoves() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
 
     std::pair<Iter, Iter> operator()(const Solution & s, SolutionElement i) {
         for(int j : boost::irange(size_t(0), neighb.size())) {
@@ -58,7 +58,7 @@ public:
 //and assigns the old value to the solution element 
 //solution remains the same
 struct Gain {
-    Fitness operator()(const Solution & s, SolutionElement & se, Update u) {
+    Fitness operator()(const Solution & s, SolutionElement & se, Move u) {
         SolutionElement oldSE = se;
         Fitness oldValue = f(s);
         se = u;
@@ -68,16 +68,16 @@ struct Gain {
     }
 };
 
-//assigns the solution to the given update 
-struct UpdateSolution {
-    void operator()(Solution & s, SolutionElement & se, Update u) {
+//assigns the solution to the given move 
+struct Commit {
+    void operator()(Solution & s, SolutionElement & se, Move u) {
         se = u;
     }
 };
 //! [Local Search Components Example]
 
 //creates random 0-1 vector
-typedef  local_search::MultiSearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(SolutionElement & el : s) {

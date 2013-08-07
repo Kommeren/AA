@@ -26,21 +26,21 @@ const float UPPER_BOUND = 1;
 
 typedef  std::vector<float> Solution;
 typedef  float SolutionElement;
-typedef  SolutionElement Update;
+typedef  SolutionElement Move;
 
 float f(const Solution & x) {
     float x1(x.at(0)), x2(x.at(1)), x3(x.at(2));
     return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3;
 }
 
-struct GetNeigh {
-    typedef std::vector<Update> Neigh;
+struct GetMoves {
+    typedef std::vector<Move> Neigh;
     typedef typename Neigh::const_iterator Iter;
     const Neigh neighb;
     Neigh neighbCut;
 public:
 
-    GetNeigh() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
+    GetMoves() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
 
     std::pair<Iter, Iter> operator()(const Solution & s, SolutionElement i) {
         for(int j : boost::irange(size_t(0), neighb.size())) {
@@ -52,25 +52,25 @@ public:
 };
 
 struct Gain {
-    float operator()(Solution & s, const SolutionElement & i, Update u) {
+    float operator()(Solution & s, const SolutionElement & i, Move u) {
         auto & el = const_cast<SolutionElement &>(i);
         auto old = i;
         auto val = f(s);
         el = u;
-        auto valUpdate = f(s);
+        auto valMove = f(s);
         el = old;
-        return valUpdate - val;
+        return valMove - val;
     }
 };
 
-struct UpdateSolution {
-    void operator()(Solution & s, const SolutionElement & i, Update u) {
+struct Commit {
+    void operator()(Solution & s, const SolutionElement & i, Move u) {
         auto & el = const_cast<SolutionElement &>(i);
         el = u;
     }
 };
 
-typedef  local_search::MultiSearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(float & el : s) {

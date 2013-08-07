@@ -29,7 +29,7 @@ namespace facility_location {
 struct Add {};
 
 template <typename VertexType> 
-class FacilityLocationUpdaterAdd {
+class FacilityLocationCommitAdd {
 public:
     template <typename Solution> 
     void operator()(
@@ -43,25 +43,25 @@ public:
 
     
 template <typename VertexType> 
-class FacilityLocationGetNeighborhoodAdd {
-    typedef std::vector<Add> Updates;
-    typedef typename Updates::iterator Iter;
+class FacilityLocationGetMovesAdd {
+    typedef std::vector<Add> Moves;
+    typedef typename Moves::iterator Iter;
 
 public: 
-    FacilityLocationGetNeighborhoodAdd() : m_add(1) {}
+    FacilityLocationGetMovesAdd() : m_add(1) {}
     typedef Facility<VertexType> Fac;
 
     template <typename Solution> 
         std::pair<Iter, Iter>
     operator()(const Solution &, Fac & el) {
         if(el.getIsChosen() == UNCHOSEN) {
-            //the update of UNCHOSEN could be added to the solution
+            //the move of UNCHOSEN could be added to the solution
             return std::make_pair(m_add.begin(), m_add.end());
         }
         return std::pair<Iter, Iter>();
     }
 private:
-    Updates m_add;
+    Moves m_add;
 };
 
 

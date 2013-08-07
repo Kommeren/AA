@@ -53,7 +53,7 @@ public:
             ++m_begin;
         }
 
-        updateCurr();
+        moveCurr();
     }
     
     SubsetsIterator()  {}
@@ -68,7 +68,7 @@ public:
             }
             ++m_begin;
         }
-        updateCurr();
+        moveCurr();
 
         return *this;
     }
@@ -104,7 +104,7 @@ public:
     }
     
 private:
-    void updateCurr() {
+    void moveCurr() {
         if(m_begin != m_end) {
             m_return = std::tuple_cat(base::operator*(), std::tuple<Element>(*m_begin));
         }
@@ -128,7 +128,7 @@ public:
     SubsetsIterator(Iterator begin, Iterator end ) : 
         m_begin(begin), m_end(end) {
 
-        updateCurr();
+        moveCurr();
     }
     
     SubsetsIterator()  {}
@@ -137,7 +137,7 @@ public:
         assert(m_begin != m_end);
         ++m_begin;
     
-        updateCurr();
+        moveCurr();
 
         return *this;
     }
@@ -171,7 +171,7 @@ public:
     }
     
 private:
-    void updateCurr() {
+    void moveCurr() {
         if(m_begin != m_end) {
             m_return = SubsetType(*m_begin);
         }

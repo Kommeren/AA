@@ -37,7 +37,7 @@ Let us write the pseudo code for this operation:  <br><br>
  local_search() 
  {
      x -> random_solution(X)  
-     for_each(Update u in N(x)) 
+     for_each(Move u in N(x)) 
      { 
          if(gain(apply u on x) > 0) 
          {
@@ -48,8 +48,8 @@ Let us write the pseudo code for this operation:  <br><br>
  }
 </pre>
 
-Note that we are working on updates (not on the full solution). This idea is going to be used in the c++ code. <br> 
-The reason of this is the fact that usually the updates are much lighter than the full solutions. <br>
+Note that we are working on moves (not on the full solution). This idea is going to be used in the c++ code. <br> 
+The reason of this is the fact that usually the moves are much lighter than the full solutions. <br>
 <br>
 Note that in many cases, eg. k-local search or facility location, our solution is  the collection of the elements.<br>
 In many cases for such solutions we search the neighborhood of each solution element and try to improve it by changing some part of the solution near the chosen solution element. <br>
@@ -62,7 +62,7 @@ In this cases it is more convenient to proceed in the following way:<br>
      x -> random_solution(X) 
      for_each(Element e of x)
      {
-      for_each(Update u in N(e)) 
+      for_each(Move u in N(e)) 
       { 
          if(gain(apply u on x) > 0) 
          {
@@ -79,7 +79,7 @@ We will refer to this schema as LocalSearchMultiSolution. <br>
 Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 \section local_search_interface  LOCAL SEARCH INTERFACE
-Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we understand one lookup of the neighborhood. The lookup is finished by one update if the better solution is found.
+Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we understand one lookup of the neighborhood. The lookup is finished by one move if the better solution is found.
 So the LocalSearchStep archetype is of the form:
 <pre>
    class LocalSearchStepArchetype {
@@ -119,29 +119,29 @@ bool search(LocalSearchStep & lss,
 \subsection local_search_single LOCAL SEARCH SINGLE SOLUTION STEP
 
 In order to present the local search step interface we need to introduce several concepts.<br>
-Note that <i>Solution</i> is the solution type and <i>Update</i> is the type of single update. <br>
-<i>UpdateIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the updates collection. <br><br>
+Note that <i>Solution</i> is the solution type and <i>Move</i> is the type of single move. <br>
+<i>MoveIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the moves collection. <br><br>
 
 Concepts:
 <ol>
-    <li> <i>GetNeighborhood</i>  is a concept class responsible for getting the neighborhood of the current solution  
+    <li> <i>GetMoves</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
-    GetNeighborhoodArchetype {
-        UpdateIteratorsRange operator()(const Solution & s)
+    GetMovesArchetype {
+        MoveIteratorsRange operator()(const Solution & s)
     }
     </li>
     </pre>
-    <li> <i>Gain</i> is a concept class responsible for checking if the specific update element improve the solution.
+    <li> <i>Gain</i> is a concept class responsible for checking if the specific move element improve the solution.
     <pre>
     GainArchetype {
-        int operator()(const Solution & s, const Update & update);
+        int operator()(const Solution & s, const Move & move);
     }
     </pre>
     </li>
-    <li> <i>UpdateSolution</i> is a concept class responsible for updating the solution with the Update.
+    <li> <i>Commit</i> is a concept class responsible for updating the solution with the Move.
     <pre>
-    UpdateSolutionArchetype {
-        int operator()(Solution & s, const Update & update);
+    CommitArchetype {
+        int operator()(Solution & s, const Move & move);
     }
     </pre>
     
@@ -149,35 +149,35 @@ Concepts:
     <li> <i>StopCondition</i> is a concept class responsible for stop condition.
     <pre>
     StopConditionArchetype {
-        bool operator()(const Solution & s, const Update & update);
+        bool operator()(const Solution & s, const Move & move);
     }
     </pre>
     </li>
     <li> <i>SearchComponents</i>All of the previous concepts are grouped together into one class.
     <pre>
     SearchComponentsArchetype {
-        GetNeighborhood & getNeighborhood();
+        GetMoves & getMoves();
         Gain & gain();
-        UpdateSolution & updateSolution();
+        Commit & commit();
         StopCondition & stopCondition();
     }
     </pre>
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Update types it might be usefull to provide SearchComponents for each type of Update.
+Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
 
 \subsubsection Example
 full example: local_search_example.cpp
 
 In this example we are going to maximize function -x^2 + 12x -27 for integral x. 
-In this problem solution is just a integral and update is also a number which denotes the shift on the solution.
-So new potential solution is just old solution plus the update.
+In this problem solution is just a integral and move is also a number which denotes the shift on the solution.
+So new potential solution is just old solution plus the move.
 We start with defining search components, that is:
 <ol>
-<li> GetNeighborhood functor </li>
+<li> GetMoves functor </li>
 <li> Gain functor </li>
-<li> UpdateSolution functor </li>
+<li> Commit functor </li>
 </ol>
 Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
 
@@ -206,56 +206,56 @@ Concepts:
                              // If this member function is provided, the LocalSearchStep getSolution() returns InnerSolution.
     }
     </pre>
-    <li> <i>MultiGetNeighborhood</i>  is a concept class responsible for getting the neighborhood of the current solution  
+    <li> <i>MultiGetMoves</i>  is a concept class responsible for getting the neighborhood of the current solution  
     <pre>
-    MultiGetNeighborhoodArchetype {
-        UpdateIteratorsRange operator()(const Solution & s, const SolutionElement &)
+    MultiGetMovesArchetype {
+        MoveIteratorsRange operator()(const Solution & s, const SolutionElement &)
     }
     </pre>
-    <li> <i>MultiGain</i> is a concept class responsible for checking if the specific update element improve the solution.
+    <li> <i>MultiGain</i> is a concept class responsible for checking if the specific move element improve the solution.
     <pre>
     MultiGainArchetype {
-        int operator()(const Solution & s, const SolutionElement &, const Update & update);
+        int operator()(const Solution & s, const SolutionElement &, const Move & move);
     }
     </pre>
-    <li> <i>MultiUpdateSolution</i> is a concept class responsible for updating the solution with the Update.
+    <li> <i>MultiCommit</i> is a concept class responsible for updating the solution with the Move.
     <pre>
     MultiSolutionUdaterArchetype {
-        int operator()(Solution & s, const SolutionElement &, const Update & update);
+        int operator()(Solution & s, const SolutionElement &, const Move & move);
     }
     </pre>
     
     <li> <i>MultiStopCondition</i> is a concept class responsible for stop condition.
     <pre>
     StopCondition {
-        bool operator()(const Solution & s, const SolutionElement & se, const Update & update);
+        bool operator()(const Solution & s, const SolutionElement & se, const Move & move);
     }
     </pre>
     
     <li> <i>MultiSearchComponents</i>All of the previous concepts are grouped together into one class.
     <pre>
     MultiSearchComponentsArchetype {
-        MultiGetNeighborhood & getNeighborhood();
+        MultiGetMoves & getMoves();
         MultiGain & gain();
-        MultiUpdateSolution & updateSolution();
+        MultiCommit & commit();
         MultiStopCondition & stopCondition();
     }
     </pre>
 
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Update types it might be usefull to provide SearchComponents for each type of Update.
+Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
 
 \subsubsection Example
 full example: local_search_multi_solution_example.cpp
 
 In this example we are going to maximize function<br> x1*x2 + x2*x3 + x3*x1 -3*x1*x2*x3<br> for  x1, x2, x3 in <0,1> interval.<br> 
-In this problem solution is just a float vector, solution element is float and update is also a float which denotes the new value for solution element.
+In this problem solution is just a float vector, solution element is float and move is also a float which denotes the new value for solution element.
 We start with defining search components, that is:
 <ol>
-<li> GetNeighborhood functor
+<li> GetMoves functor
 <li> Gain functor
-<li> UpdateSolution functor
+<li> Commit functor
 </ol>
 Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
 

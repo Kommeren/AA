@@ -48,7 +48,7 @@ public:
 };
 
 template <typename VertexType> 
-class FacilityLocationUpdaterRemove {
+class FacilityLocationCommitRemove {
 public:
         template <typename Solution> 
     void operator()(
@@ -60,26 +60,26 @@ public:
 };
 
 template <typename VertexType> 
-class FacilityLocationGetNeighborhoodRemove {
-    typedef std::vector<Remove> Updates;
-    typedef typename Updates::iterator Iter;
+class FacilityLocationGetMovesRemove {
+    typedef std::vector<Remove> Moves;
+    typedef typename Moves::iterator Iter;
 
 public: 
 
-    FacilityLocationGetNeighborhoodRemove() : m_remove(1) {}
+    FacilityLocationGetMovesRemove() : m_remove(1) {}
 
     template <typename Solution> 
         typename std::pair<Iter, Iter>
     operator()(const Solution &, 
             typename utils::SolToElem<Solution>::type & el) {
         if(el.getIsChosen() == CHOSEN) { 
-            //the update of CHOSEN could be remove
+            //the move of CHOSEN could be remove
             return std::make_pair(m_remove.begin(), m_remove.end());
         }
         return std::pair<Iter, Iter>();
     }
 private:
-    Updates m_remove;
+    Moves m_remove;
 };
 
 } // facility_location

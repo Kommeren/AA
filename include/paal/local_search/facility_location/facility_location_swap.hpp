@@ -50,14 +50,14 @@ private:
     T m_to;
 };
 
-template <typename VertexType> class VertexToSwapUpdate {
+template <typename VertexType> class VertexToSwapMove {
 public:
-    VertexToSwapUpdate(VertexType v) : m_from(v) {}
+    VertexToSwapMove(VertexType v) : m_from(v) {}
     
-    VertexToSwapUpdate() = default;
-    VertexToSwapUpdate(const VertexToSwapUpdate & u) = default;
+    VertexToSwapMove() = default;
+    VertexToSwapMove(const VertexToSwapMove & u) = default;
     
-    VertexToSwapUpdate & operator=(const VertexToSwapUpdate & u)  { 
+    VertexToSwapMove & operator=(const VertexToSwapMove & u)  { 
         m_from = u.m_from;
         return *this;
     }
@@ -94,7 +94,7 @@ public:
 
 
 template <typename VertexType> 
-class FacilityLocationUpdaterSwap {
+class FacilityLocationCommitSwap {
 public:
     template <typename Solution> 
     void operator()(Solution & sol, 
@@ -106,12 +106,12 @@ public:
 };
 
 template <typename VertexType> 
-class FacilityLocationGetNeighborhoodSwap {
+class FacilityLocationGetMovesSwap {
     template <typename Solution>
     struct IterType {
         typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen; 
         typedef typename utils::SolToIter<const Unchosen>::type UchIter; 
-        typedef boost::transform_iterator<VertexToSwapUpdate<VertexType>, 
+        typedef boost::transform_iterator<VertexToSwapMove<VertexType>, 
                  UchIter, const Swap<VertexType> &> TransIter;
         typedef std::pair<TransIter, TransIter> TransRange;
     };
@@ -119,7 +119,7 @@ class FacilityLocationGetNeighborhoodSwap {
 public: 
     typedef Facility<VertexType> Fac;
 
-    //Due to the memory optimization at one moment only one Update is valid
+    //Due to the memory optimization at one moment only one Move is valid
     template <typename Solution> typename IterType<Solution>::TransRange
     operator()(const Solution &s, const Fac & el) {
         auto e = el.getElem();
@@ -127,9 +127,9 @@ public:
         typedef typename IterType<Solution>::TransIter TransIter;
 
         if(el.getIsChosen() == CHOSEN) {
-            //the update of CHOSEN could be swap with some unchosen
+            //the move of CHOSEN could be swap with some unchosen
             auto const & uch = s.getUnchosenCopy();
-            VertexToSwapUpdate<VertexType> uchToUE(e);
+            VertexToSwapMove<VertexType> uchToUE(e);
             return std::make_pair(TransIter(uch.begin(), uchToUE), 
                                   TransIter(uch.end()  , uchToUE)); 
         }

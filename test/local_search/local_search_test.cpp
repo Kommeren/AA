@@ -22,12 +22,12 @@ int f(int x) {
     return -x*x + 12 * x -27;
 }
 
-struct GetNeigh {
+struct GetMoves {
     typedef typename std::vector<int>::const_iterator Iter;
     const std::vector<int> neighb;
 public:
 
-    GetNeigh() : neighb{10, -10, 1, -1} {}
+    GetMoves() : neighb{10, -10, 1, -1} {}
 
     std::pair<Iter, Iter> operator()(int x) {
         return std::make_pair(neighb.begin(), neighb.end());
@@ -40,13 +40,13 @@ struct Gain {
     }
 };
 
-struct UpdateSolution {
+struct Commit {
     void operator()(int & s, int u) {
         s = s + u;
     }
 };
 
-typedef  ls::SearchComponents<GetNeigh, Gain, UpdateSolution> SearchComp;
+typedef  ls::SearchComponents<GetMoves, Gain, Commit> SearchComp;
    
 ON_LOG(int i = 0);
 auto logAction = [&](int s) {

@@ -5,7 +5,7 @@
 <pre>
 ssh-keygen -t rsa
 </pre>
-   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Update id_rsa.pub to contain your real email address. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to sank@mimuw.edu.pl).
+   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to sank@mimuw.edu.pl).
 
    After getting access you can clone paal repository: 
 <pre>
@@ -21,7 +21,7 @@ git clone git@siekiera.mimuw.edu.pl:paal.git
 <ul>
 <li> Each developer works on his own branch. <b> Only assigned developers have rights to push comits to master </b>.
 <li> Before pushing to master code goes through code review process.
-<li> Each developer is responsible for his own branch. If you to update your current branch with the newest changes from master use 
+<li> Each developer is responsible for his own branch. If you to move your current branch with the newest changes from master use 
 <pre>
 git fetch
 git rebase origin/master

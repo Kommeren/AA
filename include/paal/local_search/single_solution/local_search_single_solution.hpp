@@ -62,7 +62,7 @@ private:
     
     typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
     using base::m_solution;
-    typedef typename  Update<SearchComponents, Solution>::type Update;
+    typedef typename  Move<SearchComponents, Solution>::type Move;
 
 public:
     LocalSearchStep(Solution & solution) :
@@ -72,14 +72,14 @@ public:
         base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
 
     bool search() {
-        auto adjustmentSet = call<GetNeighborhood>(m_solution);
+        auto adjustmentSet = call<GetMoves>(m_solution);
 
-        for(const Update & update : utils::make_range(adjustmentSet)) {
-            if(call<Gain>(m_solution, update) > 0) {
-                call<UpdateSolution>(m_solution, update);
+        for(const Move & move : utils::make_range(adjustmentSet)) {
+            if(call<Gain>(m_solution, move) > 0) {
+                call<Commit>(m_solution, move);
                 return true;
             } else {
-                if(call<StopCondition>(m_solution, update)) {
+                if(call<StopCondition>(m_solution, move)) {
                     break;
                 }
             }
@@ -116,7 +116,7 @@ class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponen
     typedef LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...> base;
     typedef typename Fitness<SearchComponents, Solution>::type Fitness;
     using base::m_solution;
-    typedef typename  Update<SearchComponents, Solution>::type Update;
+    typedef typename  Move<SearchComponents, Solution>::type Move;
 
 public:
     LocalSearchStep(Solution & solution) :
@@ -129,27 +129,27 @@ public:
         return base::searchAndPassBest(best());
     }
 private:
-    typedef std::tuple<Fitness, SearchComponents &, Update> BestDesc;
+    typedef std::tuple<Fitness, SearchComponents &, Move> BestDesc;
     BestDesc best() {
         Fitness max = Fitness();
         bool init = false;
-        auto adjustmentSet = call<GetNeighborhood>(m_solution);
-        auto currUpdate = adjustmentSet.first;
-        Update bestUpdate = Update();
+        auto adjustmentSet = call<GetMoves>(m_solution);
+        auto currMove = adjustmentSet.first;
+        Move bestMove = Move();
 
-        for(;currUpdate !=  adjustmentSet.second; ++currUpdate) {
-            Fitness gain = call<Gain>(m_solution, *currUpdate);
+        for(;currMove !=  adjustmentSet.second; ++currMove) {
+            Fitness gain = call<Gain>(m_solution, *currMove);
             if(!init || gain > max) {
-                bestUpdate = *currUpdate;
+                bestMove = *currMove;
                 max = gain;
                 init = true;
             } 
-            if(call<StopCondition>(m_solution, *currUpdate)) {
+            if(call<StopCondition>(m_solution, *currMove)) {
                 break;
             }
         }
 
-        return BestDesc(max, m_searchComponents, bestUpdate);
+        return BestDesc(max, m_searchComponents, bestMove);
     }
 protected:
     
@@ -182,7 +182,7 @@ public:
     template <typename Best>
     bool searchAndPassBest(const Best &b) {
         if(std::get<0>(b) > 0) {
-            std::get<1>(b).template call<UpdateSolution>(this->m_solution, std::get<2>(b));
+            std::get<1>(b).template call<Commit>(this->m_solution, std::get<2>(b));
         }
         return std::get<0>(b) > 0;
         

@@ -16,35 +16,35 @@ namespace local_search {
 
 template <typename SearchComponents> 
 struct SearchComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetNeighborhood>::type GetNeighborhoodT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT; 
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<UpdateSolution>::type UpdateSolutionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StopCondition>::type StopConditionT; 
 };
 
 template <typename SearchComponents, typename Solution> 
-class Update {
+class Move {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::GetNeighborhoodT NG;
+                SearchComponents>::GetMovesT NG;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>()
-                                ).first) UpdateIterator;
+                                ).first) MoveIterator;
 public:
-   typedef typename utils::IterToElem<UpdateIterator>::type type;
+   typedef typename utils::IterToElem<MoveIterator>::type type;
 
 };
 
 template <typename SearchComponents, typename Solution> 
-class MultiUpdate {
+class MultiMove {
     typedef typename SearchComponentsTraits<
-                SearchComponents>::GetNeighborhoodT NG;
+                SearchComponents>::GetMovesT NG;
     typedef typename utils::SolToElem<Solution>::type Element;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>(),
                                 std::declval<Element &>()
-                                ).first) UpdateIterator;
+                                ).first) MoveIterator;
 public:
-   typedef typename utils::IterToElem<UpdateIterator>::type type;
+   typedef typename utils::IterToElem<MoveIterator>::type type;
 
 };
 
@@ -52,10 +52,10 @@ template <typename SearchComponents, typename Solution>
 class Fitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;
-    typedef typename Update<SearchComponents, Solution>::type Update;
+    typedef typename Move<SearchComponents, Solution>::type Move;
 public:
     typedef decltype(std::declval<Gain>()(
-                        std::declval<Solution &>(), std::declval<Update &>())
+                        std::declval<Solution &>(), std::declval<Move &>())
                     ) type;
 };
 
@@ -64,11 +64,11 @@ template <typename SearchComponents, typename Solution>
 class MultiFitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;
-    typedef typename MultiUpdate<SearchComponents, Solution>::type Update;
+    typedef typename MultiMove<SearchComponents, Solution>::type Move;
     typedef typename utils::SolToElem<Solution>::type SolutionElement;
 public:
     typedef decltype(std::declval<Gain>()(
-                        std::declval<Solution &>(), std::declval<SolutionElement>(), std::declval<Update &>())
+                        std::declval<Solution &>(), std::declval<SolutionElement>(), std::declval<Move &>())
                     ) type;
 };
 

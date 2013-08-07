@@ -34,14 +34,14 @@ public:
 
     VertexToEdgeIterator(VertexIterator b, VertexIterator e) : 
         m_idx(b), m_begin(b), m_end(e) {
-            updateCurr();
+            moveCurr();
         }
 
     VertexToEdgeIterator()  {}
 
     VertexToEdgeIterator & operator++(){
         ++m_idx;
-        updateCurr();
+        moveCurr();
 
         return *this;
     }
@@ -76,7 +76,7 @@ public:
     }
 
 private:
-    void updateCurr() {
+    void moveCurr() {
         if(m_idx != m_end) {
             m_curr.first = *m_idx;
             VertexIterator next = m_idx;

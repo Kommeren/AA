@@ -20,8 +20,8 @@ class  ConceptsBase {
     protected:
         X x;
         Solution s;
-        typedef typename Update<SearchComponents, Solution>::type Update;
-        Update u;
+        typedef typename Move<SearchComponents, Solution>::type Move;
+        Move u;
 };
 
 //avoid unused variable warning
@@ -29,14 +29,14 @@ template <typename T>
 int use(const T & t);
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  GetNeighborhood : protected ConceptsBase<X, Solution, SearchComponents> {
+class  GetMoves : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
-        BOOST_CONCEPT_USAGE(GetNeighborhood) {
+        BOOST_CONCEPT_USAGE(GetMoves) {
             auto i = this->x(this->s);
             auto b = i.first;
             auto e = i.second;
             for(auto x = b; x != e; ++x) {
-                const typename ConceptsBase<X,Solution,SearchComponents>::Update & u = *x;
+                const typename ConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
                 use(u);
             }
         }
@@ -52,9 +52,9 @@ class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class UpdateSolution : protected ConceptsBase<X, Solution, SearchComponents>{
+class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(UpdateSolution) {
+        BOOST_CONCEPT_USAGE(Commit) {
             this->x(this->s, this->u);
         }
 };
@@ -71,14 +71,14 @@ class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
 template <typename X, typename Solution> 
 class SearchComponents {
     typedef SearchComponentsTraits<X> Traits; 
-    typedef typename Traits::GetNeighborhoodT NG;
+    typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
-    typedef typename Traits::UpdateSolutionT SU;
+    typedef typename Traits::CommitT SU;
     typedef typename Traits::StopConditionT SC;
 public:
-    BOOST_CONCEPT_ASSERT((GetNeighborhood<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((GetMoves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((Gain<IC, Solution, X>));
-    BOOST_CONCEPT_ASSERT((UpdateSolution<SU, Solution, X>));
+    BOOST_CONCEPT_ASSERT((Commit<SU, Solution, X>));
     BOOST_CONCEPT_ASSERT((StopCondition<SC, Solution, X>));
 };
 

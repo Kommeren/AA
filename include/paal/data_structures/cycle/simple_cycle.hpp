@@ -167,14 +167,14 @@ public:
             EdgeIterator(const SimpleCycle & cm, CycleEl ce ) : 
                 m_cycle(&cm), m_idx(m_cycle->toIdx(ce)), m_first(m_idx) {
 
-                updateCurr();
+                moveCurr();
             }
             
             EdgeIterator() : m_cycle(NULL) ,m_idx(-1) {}
 
             EdgeIterator & operator++(){
                 m_idx = nextIdx(m_idx);
-                updateCurr();
+                moveCurr();
 
                 if(m_idx == m_first) {
                     m_idx = -1;    
@@ -213,7 +213,7 @@ public:
             }
             
         private:
-            void updateCurr() {
+            void moveCurr() {
                 m_curr.first = m_cycle->fromIdx(m_idx);
                 m_curr.second = m_cycle->fromIdx(nextIdx(m_idx));
             }

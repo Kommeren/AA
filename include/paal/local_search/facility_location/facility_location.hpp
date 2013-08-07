@@ -27,31 +27,31 @@ namespace facility_location {
 template <typename VertexType> 
 struct DefaultRemoveFLComponents {
     typedef MultiSearchComponents<
-                FacilityLocationGetNeighborhoodRemove<VertexType>,
+                FacilityLocationGetMovesRemove<VertexType>,
                 FacilityLocationCheckerRemove        <VertexType>,
-                FacilityLocationUpdaterRemove        <VertexType>> type;
+                FacilityLocationCommitRemove        <VertexType>> type;
 };
 
 template <typename VertexType> 
 struct DefaultAddFLComponents {
     typedef MultiSearchComponents<
-                FacilityLocationGetNeighborhoodAdd<VertexType>,
+                FacilityLocationGetMovesAdd<VertexType>,
                 FacilityLocationCheckerAdd        <VertexType>,
-                FacilityLocationUpdaterAdd        <VertexType>> type;
+                FacilityLocationCommitAdd        <VertexType>> type;
 };
 
 template <typename VertexType> 
 struct DefaultSwapFLComponents {
     typedef MultiSearchComponents<
-                FacilityLocationGetNeighborhoodSwap<VertexType>,
+                FacilityLocationGetMovesSwap<VertexType>,
                 FacilityLocationCheckerSwap        <VertexType>,
-                FacilityLocationUpdaterSwap        <VertexType>> type;
+                FacilityLocationCommitSwap        <VertexType>> type;
 };
 
 /**
  * @class FacilityLocationLocalSearchStep
  * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.<br>
- * The Update is facility_location::Update. <br>
+ * The Move is facility_location::Move. <br>
  * The Solution is adapted data_structures::FacilityLocationSolution. <br>
  * The SolutionElement is facility_location::Facility  <br>
  * Use DefaultFLComponents for default search components.

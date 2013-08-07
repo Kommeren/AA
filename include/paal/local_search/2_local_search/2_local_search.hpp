@@ -12,7 +12,7 @@
 #include "paal/local_search/multi_solution/trivial_neighbor.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
-#include "paal/local_search/2_local_search/2_local_search_updater.hpp"
+#include "paal/local_search/2_local_search/2_local_search_commit.hpp"
 #include "paal/local_search/2_local_search/2_local_search_checker.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
 #include "paal/data_structures/cycle/cycle_start_from_last_change.hpp"
@@ -23,7 +23,7 @@ namespace local_search {
 namespace two_local_search {
 
 /**
- @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Update type is pair of vertices.
+ @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Move type is pair of vertices.
  See \ref local_search. There are three ways to provide search components
  <ul>
        <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
@@ -44,31 +44,31 @@ namespace two_local_search {
 
 typedef data_structures::Components<
             Gain, 
-            data_structures::NameWithDefault<GetNeighborhood, TrivialNeighborGetter>,
+            data_structures::NameWithDefault<GetMoves, TrivialNeighborGetter>,
             data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
-            data_structures::NameWithDefault<UpdateSolution, TwoLocalSearchUpdater>
+            data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
                 > TwoLocalSearchComponentsCreator;
 
 template <typename Gain, 
-          typename GetNeighborhood = TrivialNeighborGetter, 
+          typename GetMoves = TrivialNeighborGetter, 
           typename StopCondition = utils::ReturnFalseFunctor> 
-using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetNeighborhood, StopCondition>;
+using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetMoves, StopCondition>;
 /*    public MultiSearchComponents<
-            GetNeighborhood, 
+            GetMoves, 
             Gain, 
-            TwoLocalSearchUpdater, 
+            TwoLocalSearchCommit, 
             StopCondition> {
 
     typedef MultiSearchComponents<
-            GetNeighborhood, 
+            GetMoves, 
             Gain, 
-            TwoLocalSearchUpdater, 
+            TwoLocalSearchCommit, 
             StopCondition> base; 
 public : 
     TwoLocalComponents(Gain ic = Gain(), 
-                       GetNeighborhood ng = GetNeighborhood(), 
+                       GetMoves ng = GetMoves(), 
                        StopCondition sc = StopCondition()) : 
-            base(std::move(ng), std::move(ic), TwoLocalSearchUpdater(), std::move(sc)) {}
+            base(std::move(ng), std::move(ic), TwoLocalSearchCommit(), std::move(sc)) {}
 
 };*/
 
@@ -76,7 +76,7 @@ public :
  * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
  *
  * @tparam Gain
- * @tparam GetNeighborhood
+ * @tparam GetMoves
  * @param c
  * @param ich
  * @param ng
@@ -84,15 +84,15 @@ public :
  * @return 
  */
 template <typename Gain, 
-          typename GetNeighborhood = TrivialNeighborGetter,
+          typename GetMoves = TrivialNeighborGetter,
           typename StopCondition = utils::ReturnFalseFunctor>
-TwoLocalComponents<Gain, GetNeighborhood, StopCondition>  
+TwoLocalComponents<Gain, GetMoves, StopCondition>  
 
     make_TwoLocalSearchComponents(Gain ch, 
-            GetNeighborhood ng = TrivialNeighborGetter(),
+            GetMoves ng = TrivialNeighborGetter(),
             StopCondition sc = utils::ReturnFalseFunctor()) {
 
-    return TwoLocalComponents<Gain, GetNeighborhood, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
+    return TwoLocalComponents<Gain, GetMoves, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }
 
 
@@ -134,10 +134,10 @@ bool two_local_search_simple(Cycle & cycle, Components... components) {
 
 } //two_local_search
 
-/*template <typename Gain, typename GetNeighborhood, typename StopCondition> 
-struct SearchComponentsTraits<two_local_search::TwoLocalComponents<Gain, GetNeighborhood, StopCondition>> 
+/*template <typename Gain, typename GetMoves, typename StopCondition> 
+struct SearchComponentsTraits<two_local_search::TwoLocalComponents<Gain, GetMoves, StopCondition>> 
         : SearchComponentsTraits<
-            MultiSearchComponents<GetNeighborhood, Gain, two_local_search::TwoLocalSearchUpdater, StopCondition>
+            MultiSearchComponents<GetMoves, Gain, two_local_search::TwoLocalSearchCommit, StopCondition>
                                > {};*/
 
 

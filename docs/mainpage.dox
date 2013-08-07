@@ -67,7 +67,7 @@
       The are delegating the specific tasks to the algorithm helpers.
   ___________________________________________________________________________________________________
   
-      ALGORITHMS COMPONENTS - eg. NeighborhoodGetter, SolutionUpdater.
+      ALGORITHMS COMPONENTS - eg. NeighborhoodGetter, Commit.
       This are the bricks  working on specific data structures concepts.
   ___________________________________________________________________________________________________
   

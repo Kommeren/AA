@@ -26,17 +26,17 @@ const float UPPER_BOUND = 1;
 
 typedef boost::integer_range<int> Solution;
 typedef  int SolutionElement;
-typedef  SolutionElement Update;
+typedef  SolutionElement Move;
 
 
-/*struct GetNeigh {
-    typedef std::vector<Update> Neigh;
+/*struct GetMoves {
+    typedef std::vector<Move> Neigh;
     typedef typename Neigh::const_iterator Iter;
     const Neigh neighb;
     Neigh neighbCut;
 public:
 
-    GetNeigh() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
+    GetMoves() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
 
     std::pair<Iter, Iter> operator()(const Solution & s, SolutionElement i) {
         for(int j : boost::irange(size_t(0), neighb.size())) {
@@ -68,20 +68,20 @@ BOOST_AUTO_TEST_CASE(local_search__multi_lamdas_choose_first_better_test) {
         return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3 + G * (2- (x1 + x2 + x3));
     }
 
-    auto gain [&](Solution & s, SolutionElement i, Update u) {
+    auto gain [&](Solution & s, SolutionElement i, Move u) {
         auto old = x[i];
         auto val = f(s);
         x[i] = u;
-        auto valUpdate = f(s);
+        auto valMove = f(s);
         x[i] = old;
-        return valUpdate - val;
+        return valMove - val;
     }
 
-    auto us = [&](Solution & _, SolutionElement se, Update u) {
+    auto us = [&](Solution & _, SolutionElement se, Move u) {
         x[se] = u;
     }
         
-    typedef  local_search::MultiSearchComponents<GetNeigh, decltype(gain), decltype(su)> SearchComp;
+    typedef  local_search::MultiSearchComponents<GetMoves, decltype(gain), decltype(su)> SearchComp;
     local_search::LocalSearchStepMultiSolution<Solution, SearchComp> ls(boost::irange(0,3));
 
     //printing

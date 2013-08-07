@@ -55,7 +55,7 @@ template <typename Solution,
 class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponents, MultiSearchComponentsRest...> : 
         public LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> {
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
-    typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
+    typedef typename MultiMove<MultiSearchComponents, Solution>::type Move;
     
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> base;
     typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
@@ -86,12 +86,12 @@ public:
     bool search() {
 
         for(SolElementRef r : m_solution) {
-            auto adjustmentSet = call<GetNeighborhood>(m_solution, r);
-            for(const Update & update : utils::make_range(adjustmentSet)) {
-                if(call<Gain>(m_solution, r, update) > 0) {
-                    call<UpdateSolution>(m_solution, r, update);
+            auto adjustmentSet = call<GetMoves>(m_solution, r);
+            for(const Move & move : utils::make_range(adjustmentSet)) {
+                if(call<Gain>(m_solution, r, move) > 0) {
+                    call<Commit>(m_solution, r, move);
                     return true;
-                } else if(call<StopCondition>(m_solution, r, update)) {
+                } else if(call<StopCondition>(m_solution, r, move)) {
                     return false;
                 }
             }
@@ -147,7 +147,7 @@ class LocalSearchStepMultiSolution<
       public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> { 
 
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
-    typedef typename MultiUpdate<MultiSearchComponents, Solution>::type Update;
+    typedef typename MultiMove<MultiSearchComponents, Solution>::type Move;
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> base;
 public:
 
@@ -188,7 +188,7 @@ protected:
     }
 private:
     
-    typedef std::tuple<Fitness, MultiSearchComponents &, SolutionIterator, Update> BestDesc;
+    typedef std::tuple<Fitness, MultiSearchComponents &, SolutionIterator, Move> BestDesc;
 
     BestDesc best() {
         Fitness max = Fitness();
@@ -197,24 +197,24 @@ private:
         auto currSE = m_solution.begin();
         auto endSE =  m_solution.end();
         auto bestSE = currSE;
-        Update bestUpdate = Update();
+        Move bestMove = Move();
         for(;currSE != endSE && !stop; ++currSE) {
-            auto adjustmentSet = call<GetNeighborhood>(m_solution, *currSE);
-            auto currUpdate = adjustmentSet.first;
-            for(;currUpdate !=  adjustmentSet.second && !stop; ++currUpdate) {
-                Fitness gain = call<Gain>(m_solution, *currSE, *currUpdate); 
+            auto adjustmentSet = call<GetMoves>(m_solution, *currSE);
+            auto currMove = adjustmentSet.first;
+            for(;currMove !=  adjustmentSet.second && !stop; ++currMove) {
+                Fitness gain = call<Gain>(m_solution, *currSE, *currMove); 
                 
                 if(!init || gain > max) {
                     init = true;
                     bestSE = currSE;
-                    bestUpdate = *currUpdate;
+                    bestMove = *currMove;
                     max = gain;
                 } 
-                stop = call<StopCondition>(m_solution, *currSE, *currUpdate);
+                stop = call<StopCondition>(m_solution, *currSE, *currMove);
             }
         }
           
-        return BestDesc(max, m_searchComponents, bestSE, bestUpdate);
+        return BestDesc(max, m_searchComponents, bestSE, bestMove);
     }
     
     template <typename Action, typename... Args> 
@@ -244,7 +244,7 @@ public:
     template <typename Best>
     bool searchAndPassBest(Best b) {
         if(std::get<0>(b) > 0) {
-            std::get<1>(b).template call<UpdateSolution>(m_solution, *std::get<2>(b), std::get<3>(b));
+            std::get<1>(b).template call<Commit>(m_solution, *std::get<2>(b), std::get<3>(b));
         }
         return std::get<0>(b) > 0;
     }

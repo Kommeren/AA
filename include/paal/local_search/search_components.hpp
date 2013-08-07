@@ -13,15 +13,15 @@
 
 namespace paal {
     namespace local_search {
-        struct GetNeighborhood;
+        struct GetMoves;
         struct Gain;
-        struct UpdateSolution;
+        struct Commit;
         struct StopCondition;
 
         typedef data_structures::Components<
-                    GetNeighborhood, 
+                    GetMoves, 
                     Gain, 
-                    UpdateSolution, 
+                    Commit, 
                     data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>
                         > Components;
 

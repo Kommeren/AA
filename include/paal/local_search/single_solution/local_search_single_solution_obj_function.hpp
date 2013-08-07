@@ -9,7 +9,7 @@
 #define LOCAL_SEARCH_SINGLE_SOLUTION_OBJ_FUNCTION_HPP
 
 #include "local_search_single_solution.hpp"
-#include "trivial_solution_updater.hpp"
+#include "trivial_solution_commit.hpp"
 #include "search_obj_func_components.hpp"
 
 namespace paal {
@@ -17,28 +17,28 @@ namespace local_search {
 
 template <typename SearchComponentsObjFun> 
 struct SearchObjFunctionComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetNeighborhood>::type GetNeighborhoodT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT; 
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT; 
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<UpdateSolution>::type UpdateSolutionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<Commit>::type CommitT; 
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<StopCondition>::type StopConditionT; 
 };
 
 namespace detail {
-    template <typename F, typename Solution, typename UpdateSolution> class Fun2Check {
+    template <typename F, typename Solution, typename Commit> class Fun2Check {
             typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
         public:
-            Fun2Check(F f, const UpdateSolution & su) : m_f(std::move(f)), m_solutionUpdaterFunctor(su) {}
+            Fun2Check(F f, const Commit & su) : m_f(std::move(f)), m_commitFunctor(su) {}
 
-            template <typename Update> Dist operator()(const Solution &s , const Update &u) {
+            template <typename Move> Dist operator()(const Solution &s , const Move &u) {
                 Solution newS(s);
-                m_solutionUpdaterFunctor(newS, u);
+                m_commitFunctor(newS, u);
                 return m_f(newS) - m_f(s);
             }
 
         private:
 
             F m_f;
-            const UpdateSolution & m_solutionUpdaterFunctor;
+            const Commit & m_commitFunctor;
     };
 
     template <typename SearchObjFunctionComponents, typename Solution>
@@ -50,11 +50,11 @@ namespace detail {
         typedef detail::Fun2Check< 
                         typename traits::ObjFunctionT, 
                         Solution, 
-                        typename traits::UpdateSolutionT> GainType;
+                        typename traits::CommitT> GainType;
         typedef SearchComponents<
-                    typename traits::GetNeighborhoodT, 
+                    typename traits::GetMovesT, 
                              GainType,
-                    typename traits::UpdateSolutionT, 
+                    typename traits::CommitT, 
                     typename traits::StopConditionT>  type;
     };
 }
@@ -87,9 +87,9 @@ class LocalSearchFunctionStep :
         base(sol, 
              SearchComponents
                    (
-                    std::move(s.template get<GetNeighborhood>()),
-                    Gain(std::move(s.template get<ObjFunction>()), base::m_searchComponents.template get<UpdateSolution>()),
-                    std::move(s.template get<UpdateSolution>()),
+                    std::move(s.template get<GetMoves>()),
+                    Gain(std::move(s.template get<ObjFunction>()), base::m_searchComponents.template get<Commit>()),
+                    std::move(s.template get<Commit>()),
                     std::move(s.template get<StopCondition>())
                    )
             ) {} 

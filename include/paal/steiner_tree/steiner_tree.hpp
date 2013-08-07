@@ -54,7 +54,7 @@ public:
     static const int SUSBSET_SIZE = 3;
 
     typedef typename utils::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
-    typedef std::tuple<ThreeTuple, Dist> Update;
+    typedef std::tuple<ThreeTuple, Dist> Move;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     /**
@@ -81,13 +81,13 @@ public:
             auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
             auto removeRefFromTuple = 
                 [](const boost::tuple<const ThreeTuple &, int &> & t){
-                    return Update(boost::get<0>(t), boost::get<1>(t));
+                    return Move(boost::get<0>(t), boost::get<1>(t));
             };
 
             typedef boost::transform_iterator<
                         decltype(removeRefFromTuple),
                         decltype(boost::make_zip_iterator(boost::make_tuple(subsets.first, m_subsDists.begin()))),
-                        Update> TI;
+                        Move> TI;
 
             return std::make_pair(TI(boost::make_zip_iterator(boost::make_tuple(subsets.first, 
                                                                              m_subsDists.begin())), removeRefFromTuple), 
@@ -95,9 +95,9 @@ public:
                                                                              m_subsDists.end())), removeRefFromTuple));
         };
         
-        auto obj_fun = [&](const AMatrix & m, const Update &t) {return this->gain(t);};
+        auto obj_fun = [&](const AMatrix & m, const Move &t) {return this->gain(t);};
 
-        auto su = [&](AMatrix & m, const Update & t) {
+        auto su = [&](AMatrix & m, const Move & t) {
             this->contract(m, std::get<0>(t));
             res.push_back(m_nearestVertex[std::get<0>(t)]);
         };
@@ -156,7 +156,7 @@ private:
         utils::contract(am, std::get<1>(t), std::get<2>(t));
     }
         
-    Dist gain(const Update & t){
+    Dist gain(const Move & t){
         auto const  & m = m_save;
         VertexType a,b,c;
         std::tie(a, b, c) = std::get<0>(t);
@@ -262,7 +262,7 @@ private:
         }
     }
 
-    void updateSave(const SpanningTree & G1, const SpanningTree & G2, Dist maxDist) {
+    void moveSave(const SpanningTree & G1, const SpanningTree & G2, Dist maxDist) {
         auto v1 = vertices(G1);
         auto v2 = vertices(G2);
         for(VertexType v : utils::make_range(v1)) {
@@ -299,7 +299,7 @@ private:
             SpanningTree & G2 = g.create_subgraph();
             createSubgraphs(g, G1, G2);
     
-            updateSave(G1, G2, maxDist);
+            moveSave(G1, G2, maxDist);
 
             s.push(&G1);
             s.push(&G2);

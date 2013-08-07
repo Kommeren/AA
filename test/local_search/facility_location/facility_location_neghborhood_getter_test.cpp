@@ -30,42 +30,42 @@ BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     Facility<int> facUnchosen(UNCHOSEN, SGM::B);
 
     {
-        FacilityLocationGetNeighborhoodRemove<int> ng;
+        FacilityLocationGetMovesRemove<int> ng;
         auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
-        FacilityLocationGetNeighborhoodRemove<int> ng;
+        FacilityLocationGetMovesRemove<int> ng;
         auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
     }
     {
-        FacilityLocationGetNeighborhoodAdd<int> ng;
+        FacilityLocationGetMovesAdd<int> ng;
         auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
     }
     {
-        FacilityLocationGetNeighborhoodAdd<int> ng;
+        FacilityLocationGetMovesAdd<int> ng;
         auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
-        FacilityLocationGetNeighborhoodSwap<int> ng;
+        FacilityLocationGetMovesSwap<int> ng;
         auto r = ng(sa, facUnchosen);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 0);
     }
     {
-        FacilityLocationGetNeighborhoodSwap<int> ng;
+        FacilityLocationGetMovesSwap<int> ng;
         auto r = ng(sa, facChosen);
         auto b = r.first;
         auto e = r.second;
