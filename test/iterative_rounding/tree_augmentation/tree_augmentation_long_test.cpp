@@ -89,6 +89,15 @@ void readTreeAugFromStream(  std::ifstream & is,
   }
 }
 
+template <typename TA>
+//the copy is intended
+double getLowerBound(TA ta) {
+    paal::ir::TAComponents<> comps;
+    GLPBase lp;
+    comps.call<Init>(ta, lp);
+    return comps.call<SolveLPToExtremePoint>(ta, lp);
+}
+
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
     std::string testDir = "test/data/TREEAUG/";
@@ -121,30 +130,28 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
             return;
         }
 
-
         Graph g;
         Cost cost      = get(edge_weight, g);
         TreeMap treeMap      = get(edge_color, g);
 
         readTreeAugFromStream(ifs,g,cost,treeMap);
+        typedef std::set< Edge> SetEdge;
+        SetEdge solution;
 
-        paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
+
+        paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g,treeMap,cost, solution);
 
         std::string error;
         BOOST_ASSERT_MSG(treeaug.checkInputValidity(error),error.c_str());
         std::cerr<<"Inputvalidation "<<filename<<" ends."<<std::endl;
 
-        paal::ir::IterativeRounding<decltype(treeaug)> irw(treeaug);
+        paal::ir::TAComponents<> comps;
+    
+        double lplowerbd = getLowerBound(treeaug);
+        paal::ir::solve_iterative_rounding(treeaug, comps);
 
-        double lplowerbd=irw.solveLPToExtremePoint();
-
-
-        paal::ir::solve_iterative_rounding(irw);
-
-        auto & ircomp=irw.getIRComponents();
-        double solval =ircomp.getSolutionValue();
+        double solval = treeaug.getSolutionValue();
         LOG("Cost of solution found: "<<solval<<", LP lower bound: "<<lplowerbd);
         BOOST_CHECK(solval<=2*lplowerbd);
-
     }
 }

@@ -19,13 +19,13 @@ using namespace  paal::ir;
 
 struct LogVisitor : public TrivialVisitor {
 
-    template <typename LP>
-    void roundCol(LP & lp, ColId col, double val) {
+    template <typename Solution, typename LP>
+    void roundCol(const Solution &, LP & lp, ColId col, double val) {
         LOG("Column "<< col.get() << " rounded to " << val);
     }
     
-    template <typename LP>
-    void relaxRow(LP & lp, RowId row) {
+    template <typename Solution, typename LP>
+    void relaxRow(const Solution &, LP & lp, RowId row) {
         LOG("Relax row " << row.get());
     }
 };
@@ -57,18 +57,22 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     Graph g;
     Cost costs = boost::get(boost::edge_weight, g);
     
-    std::map<Edge, bool> correctBdmst;
+    std::set<Edge> correctBdmst;
+    
+    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    typedef std::set<Edge> ResultTree;
+    ResultTree resultTree;
    
-    correctBdmst[addEdge(g, costs, 1, 0, 173)] = true;
-    correctBdmst[addEdge(g, costs, 4, 2, 176)] = true;
-    correctBdmst[addEdge(g, costs, 2, 3, 176)] = false;
-    correctBdmst[addEdge(g, costs, 4, 3, 190)] = false;
-    correctBdmst[addEdge(g, costs, 3, 1, 37)] = true;
-    correctBdmst[addEdge(g, costs, 4, 1, 260)] = false;
-    correctBdmst[addEdge(g, costs, 5, 3, 105)] = true;
-    correctBdmst[addEdge(g, costs, 2, 1, 84)] = true;
-    correctBdmst[addEdge(g, costs, 5, 4, 243)] = false;
-    correctBdmst[addEdge(g, costs, 4, 0, 259)] = false;
+    correctBdmst.insert(addEdge(g, costs, 1, 0, 173));
+    correctBdmst.insert(addEdge(g, costs, 4, 2, 176));
+                        addEdge(g, costs, 2, 3, 176);
+                        addEdge(g, costs, 4, 3, 190);
+    correctBdmst.insert(addEdge(g, costs, 3, 1, 37));
+                        addEdge(g, costs, 4, 1, 260);
+    correctBdmst.insert(addEdge(g, costs, 5, 3, 105));
+    correctBdmst.insert(addEdge(g, costs, 2, 1, 84));
+                        addEdge(g, costs, 5, 4, 243);
+                        addEdge(g, costs, 4, 0, 259);
     
     Bound degBounds = boost::get(boost::vertex_degree, g);
     Index indices = boost::get(boost::vertex_index, g);
@@ -80,23 +84,26 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     degBounds[4] = 1;
     degBounds[5] = 1;
     
-    auto bdmst = make_BoundedDegreeMST(g, costs, degBounds);
+    auto bdmst = make_BoundedDegreeMST(g, costs, degBounds, resultTree);
+   
+    typedef BDMSTIRComponents<Graph> Comps;
+    Comps comps(Comps::make<SolveLPToExtremePoint, RoundCondition, SetSolution>
+            (make_RowGenerationSolveLP(bdmst.getSeparationOracle()), bdmst.getEpsilon(), bdmst.getEpsilon()));
+    solve_iterative_rounding(bdmst, std::move(comps), LogVisitor());
+//    IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
     
-    IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
-    
-    LOG(ir.solveLPToExtremePoint());
+    /*LOG(ir.solveLPToExtremePoint());
     ir.round();
     ir.relax();
     
-    BOOST_CHECK(ir.integerSolution());
+    BOOST_CHECK(ir.integerSolution());*/
     
-    auto const & tree = ir.getSolution();
-    for (const std::pair<Edge, bool> & e : tree) {
-        LOG("Edge (" << indices[source(e.first, g)] << ", " << indices[target(e.first, g)]
-              << ") "<< (e.second ? "" : "not ") << "in tree");
-        
-        BOOST_CHECK(e.second == correctBdmst[e.first]);
+    for (auto const & e : resultTree) {
+        LOG("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
+              << ") " << "in tree");
     }
-    
+
+    BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
+    BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
 }
 

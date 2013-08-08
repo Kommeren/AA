@@ -59,7 +59,7 @@ typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
 BOOST_AUTO_TEST_CASE(tree_augmentation) {
-  Graph g(6);
+    Graph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap      = get(edge_color, g);
 
@@ -75,11 +75,11 @@ BOOST_AUTO_TEST_CASE(tree_augmentation) {
     addEdge(g, 2, 5, treeMap, false, cost,1 );
     addEdge(g, 4, 5, treeMap, false, cost,1 );
 
-    paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
+    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    SolutionTree solutionTree;
 
-      
-    paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
-    paal::ir::solve_iterative_rounding(ir);
-    BOOST_CHECK(ir.integerSolution());
+    paal::ir::TreeAug<Graph, TreeMap, Cost, SolutionTree> treeaug(g, treeMap, cost, solutionTree);
+    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
+    BOOST_CHECK(!solutionTree.empty());
 }
 

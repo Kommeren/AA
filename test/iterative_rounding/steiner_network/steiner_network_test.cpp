@@ -35,6 +35,9 @@ int restrictions(int i, int j) {
 BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
     Graph g(3);
+    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    typedef std::set<Edge> ResultNetwork;
+    ResultNetwork resultNetwork;
     bool b;
     b = boost::add_edge(0 , 1, EdgeProp(1), g).second;
     assert(b);
@@ -50,16 +53,14 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     auto cost = boost::get(boost::edge_weight, g);
 
     //solve it
-    auto steiner = make_SteinerNetwork(g, cost, restrictions);
+    auto steiner = make_SteinerNetwork(g, cost, restrictions, resultNetwork);
 
-    IterativeRounding<decltype(steiner)> ir(std::move(steiner));
-
-    solve_iterative_rounding(ir);
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(steiner.getSeparationOracle()));
+    solve_iterative_rounding(steiner, std::move(comps));
 
     // printing result
     LOG("Edges in steiner network");
-    auto const & edges = ir.getSolution();
-    for(auto const  & e : edges) {
+    for(auto const  & e : resultNetwork) {
         LOG("Edge " << e);
     }
 }

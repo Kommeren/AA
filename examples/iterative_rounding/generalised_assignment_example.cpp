@@ -6,14 +6,12 @@
  * @date 2013-02-04
  */
 
-
 #include <vector>
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
-using namespace  paal;
-using namespace  paal::ir;
+//using namespace  paal;
+//using namespace  paal::ir;
 
 int main() {
     //sample problem
@@ -38,19 +36,18 @@ int main() {
     std::vector<int> T = {2, 2};
     auto  Tf = [&](int i){return T[i];}; 
 
+    std::map<int, int> jobsToMachines;
 
     //solve it
-    auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
+    auto gaSolution = paal::ir::make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
-                    costf, timef, Tf);
+                    costf, timef, Tf, jobsToMachines);
 
-    IterativeRounding<decltype(ga)> ir(std::move(ga));
 
-    solve_iterative_rounding(ir);
+    paal::ir::solve_iterative_rounding(gaSolution, paal::ir::GeneralAssignmentIRComponents<>());
 
     // printing result
-    auto const & j2m = ir.getSolution();
-    for(const std::pair<int, int> & jm : j2m) {
+    for(const std::pair<int, int> & jm : jobsToMachines) {
         std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
     }
 

@@ -64,9 +64,7 @@ void readTreeAugFromFile(const std::string & filename,
 
 }
 ///The main entry point
-int main(int argc, char* argv[])
-{
-
+int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Usage: " << std::endl;
         std::cerr << argv[0] << " <problem_instance> " << std::endl;   
@@ -80,8 +78,11 @@ int main(int argc, char* argv[])
     TreeMap treeMap      = get(edge_color, g);
 
     readTreeAugFromFile(argv[1],g,cost,treeMap);
+            
+    typedef std::set< Edge> SetEdge;
+    SetEdge solution;
 
-    paal::ir::TreeAug<Graph, TreeMap, Cost> treeaug(g,treeMap,cost);
+    paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g, treeMap, cost, solution);
 
     std::string error;
     if (!treeaug.checkInputValidity(error)){
@@ -90,34 +91,25 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    paal::ir::IterativeRounding<decltype(treeaug)> ir(treeaug);
-
-
-
-    paal::ir::solve_iterative_rounding(ir);
+    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
 
     std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
-
-    typename boost::property_map<Graph, boost::vertex_index_t>::type  index = get(boost::vertex_index, g);
-
-    auto & sol = ir.getSolution();
+    auto index = get(boost::vertex_index, g);
 
     std::cout<<"The solution found contains the following nontree edges:"<<std::endl;
 
     int numEdges(0);
     double totalCost(0);
-    for (const Edge & e : sol) {
+    for (const Edge & e : solution) {
         //TODO change after adding of cost computation to the IR
         ++numEdges;
         totalCost += cost[e];
-        std::cout << index[source(e,g)]<<"-"<<index[target(e,g)] << " ";
+        std::cout << get(index, source(e,g)) << "-" << get(index, target(e,g)) << " ";
     }
     std::cout<<std::endl;
     std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
-    auto & irc=ir.getIRComponents();
-    std::cout<<"The total cost of the solution is "<<irc.getSolutionValue()<<std::endl;
-
+    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
     return 0;
 }

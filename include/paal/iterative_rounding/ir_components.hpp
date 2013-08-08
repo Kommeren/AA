@@ -11,20 +11,25 @@
 #include <cmath>
 
 #include <boost/optional.hpp>
+#include <boost/tuple/tuple.hpp>
 
+#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/double_rounding.hpp"
 #include "paal/utils/do_nothing_functor.hpp"
 
+#include "paal/data_structures/components/components.hpp"
+#include "paal/iterative_rounding/ids.hpp"
+#include "bound_type.hpp"
+
 namespace paal {
 namespace ir {
-  
 
 class DefaultRoundCondition {
 public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
-    template <typename LP>
-    boost::optional<double> operator()(const LP & lp, ColId col) {
+    template <typename Solution, typename LP>
+    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
@@ -49,8 +54,8 @@ class RoundConditionEquals<arg, args...>  :
 public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
     
-    template <typename LP>
-    boost::optional<double> operator()(const LP & lp, ColId col) {
+    template <typename Solution, typename LP>
+    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 protected:
@@ -85,9 +90,8 @@ public:
     RoundConditionToFun(Cond c = Cond(), F f = F()) : 
         m_cond(c), m_f(f) {}
 
-    template <typename LP>
-
-    boost::optional<double> operator()(const LP & lp, ColId col) {
+    template <typename Solution, typename LP>
+    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
             return m_f(x);
@@ -124,8 +128,8 @@ struct RoundConditionGreaterThanHalf  :
 
 
 struct DefaultSolveLPToExtremePoint {
-    template <typename LP>
-    double operator()(LP & lp) {
+    template <typename Solution, typename LP>
+    double operator()(Solution &, LP & lp) {
         return lp.solveToExtremePoint();
     };
 };
@@ -143,7 +147,7 @@ struct DeleteCol {
         auto column = lp.getRowsInColumn(col);
         RowId row;
         double coef;
-        for(const boost::tuple<RowId, double> & c : utils::make_range(column)) {
+        for(auto const & c : utils::make_range(column)) {
             boost::tie(row, coef) = c;
             double currUb = lp.getRowUb(row);
             double currLb = lp.getRowLb(row);
@@ -170,60 +174,33 @@ struct FixCol {
     };
 };*/
 
-template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint, 
-          typename RoundCondition = DefaultRoundCondition, 
-          typename RelaxContition = utils::ReturnFalseFunctor, 
-          typename Init = utils::DoNothingFunctor,
-          typename DeleteRowStrategy = DeleteRow,
-          typename DeleteColStrategy = DeleteCol> 
-class IRComponents {
-public:
-    IRComponents(SolveLPToExtremePoint solve = SolveLPToExtremePoint(), RoundCondition round = RoundCondition(),
-                 RelaxContition relax = RelaxContition(), Init i = Init(),
-                 DeleteRowStrategy deleteRow = DeleteRowStrategy(), DeleteColStrategy deleteCol = DeleteColStrategy()) 
-        : m_solveLP(solve), m_roundCondition(round), m_relaxCondition(relax), m_init(i), m_deleteRow(deleteRow), m_deleteCol(deleteCol) {}
+class SolveLPToExtremePoint;
+class RoundCondition;
+class RelaxCondition;
+class Init;
+class SetSolution;
+class DeleteRowStrategy;
+class DeleteColStrategy;
 
-    template <typename LP>
-    double solveLPToExtremePoint(LP & lp) {
-        return m_solveLP(lp);
-    }
+typedef data_structures::Components<   
+        data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
+        data_structures::NameWithDefault<RoundCondition, DefaultRoundCondition>,
+        data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
+        data_structures::NameWithDefault<Init, utils::DoNothingFunctor>,
+        data_structures::NameWithDefault<SetSolution, utils::DoNothingFunctor>,
+        data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
+        data_structures::NameWithDefault<DeleteColStrategy, DeleteCol>> Components;
+        
+template <typename... Args>
+    using IRComponents = typename Components::type<Args...> ;
 
-    template <typename LP>
-    boost::optional<double> roundCondition(const LP & lp, ColId col) {
-        return m_roundCondition(lp, col);
-    }
+template <typename... Args>
+auto make_IRComponents(Args&&... args) -> decltype(Components::make_components(std::forward<Args>(args)...)) {
+      return Components::make_components(std::forward<Args>(args)...);
+}
 
-    template <typename LP>
-    bool relaxCondition(const LP & lp, RowId row) {
-        return m_relaxCondition(lp, row); 
-    };
-    
-    template <typename LP>
-    bool init(LP & lp) {
-        return m_init(lp); 
-    };
-    
-    template <typename LP>
-    void deleteRow(LP & lp, RowId row) {
-        return m_deleteRow(lp, row);
-    };
-    
-    template <typename LP>
-    void deleteCol(LP & lp, ColId col, double value) {
-        return m_deleteCol(lp, col, value);
-    };
-
-private:
-    SolveLPToExtremePoint m_solveLP;
-    RoundCondition m_roundCondition;
-    RelaxContition m_relaxCondition;
-    Init m_init;
-    DeleteRowStrategy m_deleteRow;
-    DeleteColStrategy m_deleteCol;
-};
-
-} //paal
 } //ir
+} //paal
 
 
 #endif /* IR_COMPONENTS_HPP */

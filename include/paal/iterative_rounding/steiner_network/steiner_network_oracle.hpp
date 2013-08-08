@@ -20,7 +20,7 @@
 namespace paal {
 namespace ir {
 
-template <typename Graph, typename Restrictions>
+template <typename Graph, typename Restrictions, typename ResultNetworkSet>
 class SteinerNetworkOracle {
     typedef utils::Compare<double> Compare;
 public:
@@ -28,7 +28,6 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef boost::bimap<Edge, ColId> EdgeMap;
-    typedef std::set<Edge> ResultNetwork;
     typedef std::vector<Vertex> VertexList;
 
     
@@ -36,7 +35,7 @@ public:
             const Graph & g, 
             const Restrictions & restrictions, 
             const EdgeMap & edgeMap,
-            const ResultNetwork & res,
+            const ResultNetworkSet & res,
             const Compare & comp)
              : m_g(g), 
                m_restrictions(restrictions), 
@@ -49,8 +48,8 @@ public:
 
     bool checkIfSolutionExists() {
         for (auto const & e : m_edgeMap) {
-            Vertex u = source(e.left, m_g);
-            Vertex v = target(e.left, m_g);
+            Vertex u = boost::source(e.left, m_g);
+            Vertex v = boost::target(e.left, m_g);
             addEdge(u, v, 1);
         }
         return !findAnyViolatedConstraint();
@@ -113,14 +112,14 @@ private:
             double colVal = lp.getColPrim(colIdx);
 
             if(m_compare.g(colVal, 0)) {
-                Vertex u = source(e.left, m_g);
-                Vertex v = target(e.left, m_g);
+                Vertex u = boost::source(e.left, m_g);
+                Vertex v = boost::target(e.left, m_g);
                 addEdge(u, v, colVal);
             }
         }
         for (auto const & e : m_resultNetwork) {
-            Vertex u = source(e, m_g);
-            Vertex v = target(e, m_g);
+            Vertex u = boost::source(e, m_g);
+            Vertex v = boost::target(e, m_g);
             addEdge(u, v, 1);
         }
     }
@@ -204,7 +203,7 @@ private:
     Dist                m_violatedRestriction;
     
     const EdgeMap       &  m_edgeMap;
-    const ResultNetwork &  m_resultNetwork;
+    const ResultNetworkSet &  m_resultNetwork;
     const utils::Compare<double> & m_compare;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;

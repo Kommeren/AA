@@ -69,12 +69,15 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         Cost costs      = boost::get(boost::edge_weight, g);
         Bound degBounds = boost::get(boost::vertex_degree, g);
         Index indices   = boost::get(boost::vertex_index, g);
+        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+        typedef std::set<Edge> ResultNetwork;
+        ResultNetwork resultNetwork;
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics
-        auto ga = paal::ir::make_SteinerNetwork(g, costs, restrictions);
-        paal::ir::IterativeRounding<decltype(ga)> ir(std::move(ga));
-        paal::ir::solve_iterative_rounding(ir);
+        auto steiner = paal::ir::make_SteinerNetwork(g, costs, restrictions, resultNetwork);
+        paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(steiner.getSeparationOracle()));
+        paal::ir::solve_iterative_rounding(steiner, std::move(comps));
     }
 }

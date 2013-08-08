@@ -21,13 +21,13 @@ using namespace  paal::ir;
 
 struct LogVisitor : public TrivialVisitor {
 
-    template <typename LP>
-    void roundCol(LP & lp, ColId col, double val) {
+    template <typename Solution, typename LP>
+    void roundCol(const Solution &, LP & lp, ColId col, double val) {
         LOG("Column "<< col.get() << " rounded to " << val);
     }
     
-    template <typename LP>
-    void relaxRow(LP & lp, RowId row) {
+    template <typename Solution, typename LP>
+    void relaxRow(const Solution &, LP & lp, RowId row) {
         LOG("Relax row " << row.get());
     }
 };
@@ -57,36 +57,31 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     auto  Tf = [&](int i){return T[i];}; 
 
 
+    
+    std::map<int, int> jobsToMachines;
     auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
-                    costf, timef, Tf);
+                    costf, timef, Tf, jobsToMachines);
 
-    IterativeRounding<decltype(ga), LogVisitor> ir(std::move(ga));
-    LOG(ir.solveLPToExtremePoint());
-    ir.round();
-    ir.relax();
-    LOG(ir.solveLPToExtremePoint());
-    ir.round();
-    ir.relax();
+    paal::ir::solve_iterative_rounding(ga, paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
 
-    auto const & j2m = ir.getSolution();
-    for(const std::pair<int, int> & jm : j2m) {
+    for(const std::pair<int, int> & jm : jobsToMachines) {
         LOG("Job " << jm.first << " assigned to Machine " << jm.second);
     }
 
-   auto j0 = j2m.find(0);
-   BOOST_CHECK(j0 != j2m.end() && j0->second == 0);
+   auto j0 = jobsToMachines.find(0);
+   BOOST_CHECK(j0 != jobsToMachines.end() && j0->second == 0);
 
-   auto j1 = j2m.find(1);
-   BOOST_CHECK(j1 != j2m.end() && j1->second == 0);
+   auto j1 = jobsToMachines.find(1);
+   BOOST_CHECK(j1 != jobsToMachines.end() && j1->second == 0);
    
    //compile with trivial visitor
    {
-         auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
+        std::map<int, int> jobsToMachines2;
+        auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
-                    costf, timef, Tf);
-        IterativeRounding<decltype(ga)> irdef(ga);
-        irdef.getSolution();
+                    costf, timef, Tf, jobsToMachines2);
+        paal::ir::solve_iterative_rounding(ga, paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
    }
 
 }

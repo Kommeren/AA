@@ -333,6 +333,11 @@ private:
     boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
 };
 
+
+/*template <typename Graph, typename OracleComponents = BoundedDegreeMSTOracle<>>
+BoundedDegreeMSTOracle<Graph, OracleComponents>
+make_BoundedDegreeMSTOracle()*/
+
 } //ir
 } //paal
 #endif /* BOUNDED_DEGREE_MST_ORACLE_HPP */

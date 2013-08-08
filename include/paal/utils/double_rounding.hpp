@@ -30,6 +30,10 @@ public:
     bool le(T a, T b) const {
         return a <= b + m_epsilon;
     }
+
+    double getEpsilon() const {
+        return m_epsilon;
+    }
     
     static T defaultEpsilon() {
         return std::numeric_limits<T>::epsilon();

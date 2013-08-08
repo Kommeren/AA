@@ -16,8 +16,8 @@ class RowGenerationSolveLP {
 public:
     RowGenerationSolveLP(Oracle & oracle) : m_oracle(oracle) {}
   
-    template <typename LP>
-    double operator()(LP & lp) {
+    template <typename Solution, typename LP>
+    double operator()(const Solution &, LP & lp) {
         double res;
         res = lp.solveToExtremePoint();
         while (!m_oracle.feasibleSolution(lp)) {
@@ -30,6 +30,13 @@ public:
 private:
     Oracle & m_oracle;
 };
+
+
+template <typename Oracle>
+RowGenerationSolveLP<Oracle>
+make_RowGenerationSolveLP(Oracle & o) {
+    return RowGenerationSolveLP<Oracle>(o);
+}
 
 } //paal
 } //ir

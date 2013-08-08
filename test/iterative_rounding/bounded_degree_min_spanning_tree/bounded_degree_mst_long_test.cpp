@@ -34,18 +34,14 @@ typedef boost::graph_traits < Graph >::vertex_descriptor Vertex;
 typedef boost::property_map < Graph, boost::vertex_degree_t >::type Bound;
 typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
 typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
+typedef std::set<Edge> ResultTree;
 
-void checkResult(Graph & g, std::map<Edge, bool> & tree,
+void checkResult(Graph & g, std::set<Edge> & tree,
                  Cost & costs, Bound & degBounds,
                  int verticesNum, double bestCost) {
-    int treeEdges(0);
-    double treeCost(0);
-    for (const std::pair<Edge, bool> & e : tree) {
-        if (e.second) {
-            ++treeEdges;
-            treeCost += costs[e.first];
-        }
-    }
+    int treeEdges(tree.size());
+    double treeCost = std::accumulate(tree.begin(), tree.end(), 0., 
+                        [&](double cost, Edge e){return cost + costs[e];});
 
     LOG("tree edges: " << treeEdges);
     BOOST_CHECK(treeEdges == verticesNum - 1);
@@ -63,7 +59,7 @@ void checkResult(Graph & g, std::map<Edge, bool> & tree,
             std::tie(e, b) = boost::edge(v, u, g);
             assert(b);
             
-            if (tree[e]) {
+            if (tree.count(e)) {
                 ++treeDeg;
             }
         }
@@ -79,10 +75,8 @@ void checkResult(Graph & g, std::map<Edge, bool> & tree,
         
     Graph treeG(verticesNum);
         
-    for (const std::pair<Edge, bool> & e : tree) {
-        if (e.second) {
-            add_edge(source(e.first, g), target(e.first, g), treeG);
-        }
+    for (auto const & e : tree) {
+        add_edge(source(e, g), target(e, g), treeG);
     }
         
     std::vector<int> component(verticesNum);
@@ -121,22 +115,36 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         Index indices   = boost::get(boost::vertex_index, g);
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
+        
+    
 
         // default heuristics
-        auto ga = paal::ir::make_BoundedDegreeMST(g, costs, degBounds);
-        paal::ir::IterativeRounding<decltype(ga)> ir(std::move(ga));
-        paal::ir::solve_iterative_rounding(ir);
+        {
+            namespace ir = paal::ir;
+            ResultTree tree;
+            typedef ir::BDMSTIRComponents<Graph> Comps;
+            
+            auto bdmst = ir::make_BoundedDegreeMST(g, costs, degBounds, tree);
+            Comps comps(Comps::make<ir::SolveLPToExtremePoint, ir::RoundCondition, ir::SetSolution>
+                (make_RowGenerationSolveLP(bdmst.getSeparationOracle()), bdmst.getEpsilon(), bdmst.getEpsilon()));
+
+            paal::ir::solve_iterative_rounding(bdmst, std::move(comps));
     
-        auto & tree = ir.getSolution();
-        checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
+            checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
+        }
+        
         
         // non-default heuristics
-        auto ga2 = paal::ir::BoundedDegreeMST<Graph, Cost, Bound,
+        /*{
+            ResultTree tree;
+            typedef BDMSTIRComponents<Graph, paal::ir::RowGenerationSolveLP<paal::ir::BoundedDegreeMSTOracleComponents<paal::ir::FindMostViolated>>> CompsMostViolated;
+            auto ga2 = paal::ir::BoundedDegreeMST<Graph, Cost, Bound,
                                               paal::ir::BoundedDegreeMSTOracleComponents<paal::ir::FindMostViolated> >(g, costs, degBounds);
-        paal::ir::IterativeRounding<decltype(ga2)> ir2(std::move(ga2));
-        paal::ir::solve_iterative_rounding(ir2);
+            paal::ir::IterativeRounding<decltype(ga2)> ir2(std::move(ga2));
+            paal::ir::solve_iterative_rounding(ir2);
     
-        auto & tree2 = ir2.getSolution();
-        checkResult(g, tree2, costs, degBounds, verticesNum, bestCost);
+            auto & tree2 = ir2.getSolution();
+            checkResult(g, tree2, costs, degBounds, verticesNum, bestCost);
+        }*/
     }
 }

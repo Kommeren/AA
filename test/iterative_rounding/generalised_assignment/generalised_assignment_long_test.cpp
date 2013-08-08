@@ -70,19 +70,16 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             boost::integer_range<int> jobs(0,0);
             paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
             auto  Tf = [&](int i){return machinesBounds[i];}; 
+            std::map<int, int> jobsToMachines;
             auto ga = make_GeneralAssignment(machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(), 
-                    costs, times, Tf);
+                    costs, times, Tf, jobsToMachines);
             times(0, 0);
-            IterativeRounding<decltype(ga)> ir(std::move(ga));
-            paal::ir::solve_iterative_rounding(ir);
-    
-    
+            paal::ir::solve_iterative_rounding(ga, paal::ir::GeneralAssignmentIRComponents<>());
 
-            auto & s = ir.getSolution();
             int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);
-            for(const std::pair<int, int> & jm : s ) {
+            for(const std::pair<int, int> & jm : jobsToMachines ) {
         //        LOG("job " << jm.first << " assigned to machine " << jm.second);
                 c += costs(jm.first, jm.second);
                 machinesLoad[jm.second] += times(jm.first, jm.second);
@@ -94,7 +91,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             }
 
             for(int j : jobs) {
-                BOOST_CHECK(s.find(j) != s.end());
+                BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
             }
 
             LOG("cost " << c);
