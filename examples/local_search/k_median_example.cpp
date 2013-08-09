@@ -7,6 +7,7 @@
  */
 #include <iostream>
 #include "paal/local_search/k_median/k_median.hpp"
+#include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "test/utils/sample_graph.hpp"
 
 
@@ -41,6 +42,8 @@ int main() {
     auto const & ch = sol.getChosenFacilities();
     std::cout << "Solution:" << std::endl;
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout,","));
+    std::cout << std::endl << "Cost " << paal::simple_algo::getKMCost(gm, sol) << std::endl;
+
     std::cout << std::endl;
 //! [K Median Search Example]
 
