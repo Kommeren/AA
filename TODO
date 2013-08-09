@@ -11,7 +11,7 @@
 ** cplex support ???
 
 * GREEDY
-** max cover (AA)
+** set cover (AA)
 ** max coverage (AA)
 ** knapsack
 ** Scheduling jobs on identical parallel machines (tDoAA) 
@@ -20,5 +20,5 @@
 ** the multiway cut
 ** the k multi way cut
 ** shortest superstring (conjecture)
-** steiner forest)
+** steiner forest (conjecture)
 
