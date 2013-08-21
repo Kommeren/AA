@@ -48,3 +48,6 @@ exit_on_error
 echo ------------------------------------------- k_median_long_test          -------------------------------------------------------------------------------------
 ./${build_dir}/test/k_median_long_test
 exit_on_error
+echo ------------------------------------------- scheduling_jobs_on_identical_parallel_machines_long_test      -------------------------------------------------------------------------------------
+./${build_dir}/test/scheduling_jobs_on_identical_parallel_machines_long_test
+exit_on_error

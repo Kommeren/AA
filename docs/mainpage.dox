@@ -36,6 +36,7 @@
         <li> Greedy
             <ul>
             <li> \ref shortestsuperstring
+            <li> \ref sjoipm
             </ul>
         <li> Miscellaneous
             <ul>

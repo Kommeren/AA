@@ -23,6 +23,15 @@ struct ReturnSomethingFunctor {
     } 
 };
 
+struct ReturnSameFunctor {
+    template <typename Arg> 
+    auto  operator()(Arg&& arg) const ->
+    Arg
+    { 
+        return std::forward<Arg>(arg);
+    }
+};
+
 struct ReturnFalseFunctor : 
     public ReturnSomethingFunctor<bool, false> {};
 

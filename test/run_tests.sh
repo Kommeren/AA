@@ -93,4 +93,6 @@ exit_on_error
 echo ------------------------------------------- tree_augmentation_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/tree_augmentation_test
 exit_on_error
-
+echo ------------------------------------------- scheduling_jobs_on_identical_parallel_machines_test      -------------------------------------------------------------------------------------
+./${build_dir}/test/scheduling_jobs_on_identical_parallel_machines_test
+exit_on_error
