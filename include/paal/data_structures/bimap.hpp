@@ -1,9 +1,9 @@
 /**
  * @file bimap.hpp
  * @brief 
- * @author Piotr Wygocki
- * @version 1.0
- * @date 2013-02-14
+ * @author Piotr Wygocki, Piotr Smulewicz
+ * @version 1.1
+ * @date 2013-09-12
  */
 #ifndef BIMAP_HPP
 #define BIMAP_HPP 
@@ -178,15 +178,14 @@ public:
     template <typename Iter> BiMapOfConsecutive(Iter b, Iter e) {
         if(b == e)
             return;
-        size_t size = *max_element(b, e);
+        
+        size_t size = std::distance(b, e);
         m_idToT.resize(size);
-        m_tToID.resize(size, INVALID_IDX);
         std::copy(b, e, m_idToT.begin());
-        for(size_t i = 0; i < size; ++i) {
-            Idx & idx = m_tToID[m_idToT[i]]; 
-            assert(m_idToT[i] < size && idx == INVALID_IDX);
-            idx = i;
-        }
+        
+        m_tToID.resize(size, INVALID_IDX);
+        rank(m_idToT,m_tToID,INVALID_IDX);
+        
     }
 
     Idx getIdx(const T & t) const {
@@ -205,6 +204,17 @@ private:
     std::vector<T>   m_idToT;
     std::vector<Idx> m_tToID;
 };
+
+template <typename T, typename Idx = int>
+void rank(std::vector<T> const& m_idToT,std::vector<Idx> &m_tToID,int INVALID_IDX=0){
+    static_assert(std::is_integral<T>::value, "Type T has to be integral");
+    unsigned long size = m_tToID.size();
+    for(auto i : boost::irange(0ul,size)) {
+            Idx & idx = m_tToID[m_idToT[i]]; 
+            assert(m_idToT[i] < int(size) && idx == INVALID_IDX);
+            idx = i;
+            }
+}
 
 } //data_structures
 } //paal

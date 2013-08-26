@@ -12,6 +12,9 @@ exit_on_error() {
 }
 
 build_dir=$1
+echo ------------------------------------------- shortest_superstring_long_test          -------------------------------------------------------------------------------------
+./${build_dir}/test/shortest_superstring_long_test
+exit_on_error
 echo ------------------------------------------- 2_local_search_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/2_local_search_long_test --run_test=TSPLIB
 exit_on_error

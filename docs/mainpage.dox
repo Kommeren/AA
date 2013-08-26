@@ -33,6 +33,10 @@
             <ul>
             <li>\ref ta
             </ul>
+        <li> Greedy
+            <ul>
+            <li> \ref shortestsuperstring
+            </ul>
         <li> Miscellaneous
             <ul>
             <li>\ref stein

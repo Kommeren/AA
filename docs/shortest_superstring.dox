@@ -1,0 +1,25 @@
+/*! \page shortestsuperstring Shortest Superstring
+
+\section def Problem definition.
+In shortest superstring problem we have set of words, we want to find shortest string containing all given words
+
+
+\section Solution
+Shortest Superstring is solved by greedy algorithm.
+First we remove all repeat words, and proper substring of other words.
+Then we merge pair of words with maximum overlap until 1 words left.
+  example: 
+\snippet shortest_superstring_example.cpp Shortest Superstring Example
+ 
+  full example is shortest_superstring_example.cpp
+
+\subsection app_shortest_superstring Approximation Ratio is 3.5, but is conjecture that is 2.
+
+\subsection Complexity
+O(max(n,k)) 
+n is size of input
+k is size max letter in alphabet
+\subsection References
+
+The algorithm is described in the \cite journals/ipl/KaplanS05
+*/
