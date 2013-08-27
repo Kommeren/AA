@@ -8,14 +8,14 @@
   \section Installation
    There is no need to install anything because the PAAl is header only. 
    All you have to do is to download the library and include appropriate headers.
+   Only, if you use linear programming you must link your executable agains glpk.
 
-   Only, if you'd like to develop the library, you must compile the unit test.
+   If you'd like to develop the library, you must compile the unit test.
 
   \section get_repo Download
     In order to download repository please run the following command:
     
-    <B>    git clone git://siekiera.mimuw.edu.pl/paal.git/ </B>
-
+    <B>    git clone http://siekiera.mimuw.edu.pl:8082/paal </B>
 
   \section Contents
     The library consists of several sublibraries

@@ -7,11 +7,6 @@ ssh-keygen -t rsa
 </pre>
    after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to piotr.smulewicz@students.mimuw.edu.pl).
 
-   After getting access you can clone paal repository: 
-<pre>
-git clone git@siekiera.mimuw.edu.pl:paal.git
-</pre>
-
 \section gerrit Working with gerrit
 
 To configure Gerrit, do the following steps:
@@ -21,18 +16,18 @@ http://siekiera.mimuw.edu.pl:8082/
 
 <li> In settings, open SSH Public Keys tab. Add the public key from the machine you're using for development (cat .ssh/id_rsa.pub)
 
+<li> Clone write access version of the repository
+git clone ssh://siekiera.mimuw.edu.pl:29418/paal
+
 <li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit. 
 scp -p -P 29418 <login>@siekiera.mimuw.edu.pl:hooks/commit-msg <projectDir>/.git/hooks/
 
-<li> Add another remote host in git.
-git remote add gerrit ssh://<login>@siekiera.mimuw.edu.pl:29418/paal
-
 <li> To send something for review, use a command:
-git push gerrit HEAD:refs/for/master
+git push origin HEAD:refs/for/master
 
 <li> If you want to update your commit (e.g. reviewers requested some changes) do: 
 git commit -a --amend
-git push gerrit HEAD:refs/for/master
+git push origin HEAD:refs/for/master
 
 <li> When commit is accepted, and you have the privileges to push to master, do: 
 git push origin HEAD:master
