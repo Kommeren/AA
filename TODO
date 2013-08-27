@@ -4,10 +4,11 @@
 * ITERATIVE ROUNDING
 ** separate solution and component class usage
 ** framework documentation
+** remove some debug output
 ** columns iterator is invalidated when we remove column (see rounding code)
 ** function style
 ** cost function
-** reoving rows/cols strategy
+** removing rows/cols strategy
 ** resolving, solution by moving a point
 ** cplex support ???
 
