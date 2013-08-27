@@ -12,28 +12,42 @@ ssh-keygen -t rsa
 To configure Gerrit, do the following steps:
 <ol>
 <li> Enter Gerrit site and register (using OpenID, e.g. Google Account)
+<pre>
 http://siekiera.mimuw.edu.pl:8082/
+</pre>
 
 <li> In settings, open SSH Public Keys tab. Add the public key from the machine you're using for development (cat .ssh/id_rsa.pub)
 
 <li> Clone write access version of the repository
+<pre>
 git clone ssh://siekiera.mimuw.edu.pl:29418/paal
+</pre>
 
-<li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit. 
+<li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit.
+<pre>
 scp -p -P 29418 <login>@siekiera.mimuw.edu.pl:hooks/commit-msg <projectDir>/.git/hooks/
+</pre>
 
 <li> To send something for review, use a command:
+<pre>
 git push origin HEAD:refs/for/master
+</pre>
 
 <li> If you want to update your commit (e.g. reviewers requested some changes) do: 
+<pre>
 git commit -a --amend
 git push origin HEAD:refs/for/master
+</pre>
 
 <li> When commit is accepted, and you have the privileges to push to master, do: 
+<pre>
 git push origin HEAD:master
+</pre>
 
 <li> You can find more info about using Gerrit here:
+<pre>
 http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.html
+</pre>
 </ol>
 
 \section gr General rules
