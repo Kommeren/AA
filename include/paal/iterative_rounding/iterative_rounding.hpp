@@ -145,7 +145,7 @@ private:
 //TODO add resolve
 template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
 void solve_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
-    IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, components, vis);
+    IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, std::move(components), std::move(vis));
     bool irsol=false;
     do {
 

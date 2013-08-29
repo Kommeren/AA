@@ -122,8 +122,8 @@ private:
 ///A variable is rounded up to 1, if it has value at least half in the solution
 struct RoundConditionGreaterThanHalf  : 
     public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnSomethingFunctor<int, 1> > {
-        RoundConditionGreaterThanHalf() : 
-            RoundConditionToFun(CondBiggerEqualThan(0.5)) {}
+        RoundConditionGreaterThanHalf(double epsilon = utils::Compare<double>::defaultEpsilon()) : 
+            RoundConditionToFun(CondBiggerEqualThan(0.5, epsilon)) {}
 };
 
 

@@ -27,45 +27,41 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef boost::bimap<Edge, ColId> EdgeMap;
-    typedef std::vector<Vertex> VertexList;
-
     
     SteinerNetworkOracle(
             const Graph & g, 
             const Restrictions & restrictions, 
-            const EdgeMap & edgeMap,
-            const ResultNetworkSet & res,
-            const Compare & comp)
+            const ResultNetworkSet & res)
              : m_g(g), 
                m_restrictions(restrictions), 
                m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, boost::num_vertices(m_g))),
                m_auxGraph(boost::num_vertices(g)),
-               m_edgeMap(edgeMap),
-               m_resultNetwork(res),
-               m_compare(comp) { 
+               m_resultNetwork(res)
+               { 
                }
 
-    bool checkIfSolutionExists() {
-        for (auto const & e : m_edgeMap) {
+    
+    template <typename Solution, typename LP>
+    bool checkIfSolutionExists(Solution & sol) {
+        for (auto const & e : sol.getEdgeMap()) {
             Vertex u = boost::source(e.left, m_g);
             Vertex v = boost::target(e.left, m_g);
             addEdge(u, v, 1);
         }
-        return !findAnyViolatedConstraint();
+        return !findAnyViolatedConstraint(sol);
     }
                            
-    template <typename LP>
-    bool feasibleSolution(const LP & lp) {
-        fillAuxiliaryDigraph(lp);
-        return !findMostViolatedConstraint();
+    template <typename Solution, typename LP>
+    bool feasibleSolution(Solution & sol, const LP & lp) {
+        fillAuxiliaryDigraph(sol, lp);
+        return !findMostViolatedConstraint(sol);
     }
     
-    template <typename LP>
-    void addViolatedConstraint(LP & lp) {
+    template <typename Solution, typename LP>
+    void addViolatedConstraint(Solution & sol, LP & lp) {
         lp.addRow(LO, m_violatedRestriction);
         
-        for (auto const & e : m_edgeMap) {
+        for (auto const & e : sol.getEdgeMap()) {
             const Vertex & u = boost::source(e.left, m_g);
             const Vertex & v = boost::target(e.left, m_g);
                 
@@ -100,18 +96,18 @@ private:
     typedef std::vector < AuxEdge > AuxEdgeList;
     typedef std::set < AuxVertex > ViolatingSet;
                                   
-    template <typename LP>
-    void fillAuxiliaryDigraph(const LP & lp) {
+    template <typename Solution, typename LP>
+    void fillAuxiliaryDigraph(Solution &sol, const LP & lp) {
         boost::remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
         m_cap = boost::get(boost::edge_capacity, m_auxGraph);
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (auto const & e : m_edgeMap) {
+        for (auto const & e : sol.getEdgeMap()) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
 
-            if(m_compare.g(colVal, 0)) {
+            if(sol.getCompare().g(colVal, 0)) {
                 Vertex u = boost::source(e.left, m_g);
                 Vertex v = boost::target(e.left, m_g);
                 addEdge(u, v, colVal);
@@ -142,13 +138,14 @@ private:
         
         return e;
     }
-    
-    bool findAnyViolatedConstraint() {
+   
+    template <typename Solution>
+    bool findAnyViolatedConstraint(Solution & sol) {
         // TODO random source node
         
         for (auto const & src_trg : m_restrictionsVec) {
             assert(src_trg.first != src_trg.second);
-            if(m_compare.g(checkViolationBiggerThan(src_trg.first, src_trg.second), 0)) {
+            if(sol.getCompare().g(checkViolationBiggerThan(sol, src_trg.first, src_trg.second), 0)) {
                 return true;
             }
         }
@@ -156,23 +153,25 @@ private:
         return false;
     }
     
-    bool findMostViolatedConstraint() {
+    template <typename Solution>
+    bool findMostViolatedConstraint(Solution & sol) {
         double max = 0;
 
         for (auto const & src_trg : m_restrictionsVec) {
             assert(src_trg.first != src_trg.second);
-            max = std::max(checkViolationBiggerThan(src_trg.first, src_trg.second), max);
+            max = std::max(checkViolationBiggerThan(sol, src_trg.first, src_trg.second), max);
         }
         
-        return m_compare.g(max, 0);
+        return sol.getCompare().g(max, 0);
     }
     
-    double checkViolationBiggerThan(Vertex  src, Vertex trg, double maximumViolation = 0) {
+    template <typename Solution>
+    double checkViolationBiggerThan(Solution & sol, Vertex  src, Vertex trg, double maximumViolation = 0) {
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = m_restrictions(src, trg);
         double violation = restriction - minCut;
         
-        if (m_compare.g(violation, maximumViolation)) {
+        if (sol.getCompare().g(violation, maximumViolation)) {
             m_violatedRestriction = restriction;
             m_violatingSet.clear();
             maximumViolation = violation;
@@ -202,14 +201,19 @@ private:
     ViolatingSet        m_violatingSet;
     Dist                m_violatedRestriction;
     
-    const EdgeMap       &  m_edgeMap;
     const ResultNetworkSet &  m_resultNetwork;
-    const utils::Compare<double> & m_compare;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
     boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
 };
+
+template <typename Graph, typename Restrictions, typename ResultNetworkSet>
+SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet>
+make_SteinerNetworkSeparationOracle(const Graph & g, const Restrictions & restrictions, const ResultNetworkSet & res) {
+    return SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet>(g, restrictions, res);
+}
+
 
 } //ir
 } //paal

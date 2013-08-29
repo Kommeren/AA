@@ -26,7 +26,6 @@ typedef  boost::property < boost::edge_weight_t, int> EdgeProp;
 typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
                             boost::no_property,  EdgeProp> Graph;
 
-
 int restrictions(int i, int j) {
     return 2;
 }
@@ -53,10 +52,9 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     auto cost = boost::get(boost::edge_weight, g);
 
     //solve it
-    auto steiner = make_SteinerNetwork(g, cost, restrictions, resultNetwork);
-
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(steiner.getSeparationOracle()));
-    solve_iterative_rounding(steiner, std::move(comps));
+    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    steiner_network_iterative_rounding(g, cost, resultNetwork, std::move(comps));
 
     // printing result
     LOG("Edges in steiner network");

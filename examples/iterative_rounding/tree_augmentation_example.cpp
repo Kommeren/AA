@@ -82,18 +82,18 @@ int main(int argc, char* argv[]) {
     typedef std::set< Edge> SetEdge;
     SetEdge solution;
 
-    paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g, treeMap, cost, solution);
-
     std::string error;
-    if (!treeaug.checkInputValidity(error)){
+    //TODO handle
+/*    if (!treeaug.checkInputValidity(error)){
         std::cerr<<"The input is not valid!"<<std::endl;
         std::cerr<<error<<std::endl;
         return -1;
-    }
+    }*/
 
-    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
+    paal::ir::tree_augmentation_iterative_rounding(g, treeMap, cost, solution, paal::ir::TAComponents<>());
 
-    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+    //TODO handle
+//    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
     auto index = get(boost::vertex_index, g);
 
@@ -109,7 +109,8 @@ int main(int argc, char* argv[]) {
     }
     std::cout<<std::endl;
     std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
-    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+    //TODO handle
+//    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
 
     return 0;
 }

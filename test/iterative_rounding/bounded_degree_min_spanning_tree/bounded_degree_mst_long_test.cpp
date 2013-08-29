@@ -115,36 +115,35 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         Index indices   = boost::get(boost::vertex_index, g);
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
-        
-    
 
+        namespace ir = paal::ir;
         // default heuristics
         {
-            namespace ir = paal::ir;
-            ResultTree tree;
             typedef ir::BDMSTIRComponents<Graph> Comps;
+            ResultTree tree;
+            auto oracle(ir::make_BoundedDegreeMSTOracle(g));
             
-            auto bdmst = ir::make_BoundedDegreeMST(g, costs, degBounds, tree);
-            Comps comps(Comps::make<ir::SolveLPToExtremePoint, ir::RoundCondition, ir::SetSolution>
-                (make_RowGenerationSolveLP(bdmst.getSeparationOracle()), bdmst.getEpsilon(), bdmst.getEpsilon()));
+            Comps comps(ir::make_RowGenerationSolveLP(oracle));
 
-            paal::ir::solve_iterative_rounding(bdmst, std::move(comps));
+            ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(comps));
     
             checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
         }
         
         
         // non-default heuristics
-        /*{
-            ResultTree tree;
-            typedef BDMSTIRComponents<Graph, paal::ir::RowGenerationSolveLP<paal::ir::BoundedDegreeMSTOracleComponents<paal::ir::FindMostViolated>>> CompsMostViolated;
-            auto ga2 = paal::ir::BoundedDegreeMST<Graph, Cost, Bound,
-                                              paal::ir::BoundedDegreeMSTOracleComponents<paal::ir::FindMostViolated> >(g, costs, degBounds);
-            paal::ir::IterativeRounding<decltype(ga2)> ir2(std::move(ga2));
-            paal::ir::solve_iterative_rounding(ir2);
+        {
+            typedef ir::BoundedDegreeMSTOracleComponents<ir::FindMostViolated> OracleComps;
+            typedef ir::BoundedDegreeMSTOracle < Graph, OracleComps> Oracle;
+            typedef ir::BDMSTIRComponents<Graph, ir::RowGenerationSolveLP <Oracle >> Comps;
+            ResultTree tree2;
+            Oracle oracle(g);
+            Comps comps(ir::make_RowGenerationSolveLP(oracle));
+            ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree2, std::move(comps));
     
-            auto & tree2 = ir2.getSolution();
             checkResult(g, tree2, costs, degBounds, verticesNum, bestCost);
-        }*/
+        }
+
+        //TODO check 3rd strategy
     }
 }

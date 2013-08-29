@@ -13,6 +13,7 @@
 #include <boost/bimap.hpp>
 
 #include "paal/utils/double_rounding.hpp"
+#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle_components.hpp"
 
 
 namespace paal {
@@ -24,19 +25,13 @@ namespace ir {
  *
  * @tparam Graph input graph, has to be a model of boost::Graph
  */
-template <typename Graph, typename OracleComponents>
+template <typename Graph, typename OracleComponents = BoundedDegreeMSTOracleComponents<> >
 class BoundedDegreeMSTOracle {
 public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef boost::bimap<Edge, ColId> EdgeMap;
-    typedef std::vector<Vertex> VertexList;
-    
-    BoundedDegreeMSTOracle(const Graph & g, const EdgeMap & edgeMap,
-                           const VertexList & vertexList, const utils::Compare<double> & compare)
-                           : m_g(g), m_edgeMap(edgeMap), m_vertexList(vertexList), m_compare(compare)
-    { }
+    BoundedDegreeMSTOracle(const Graph & g) : m_g(g)  { }
 
     /**
      * @brief checks if the current LP solution is feasible
@@ -45,15 +40,15 @@ public:
      *
      * @tparam LP
      */
-    template <typename LP>
-    bool feasibleSolution(const LP & lp) {
-        fillAuxiliaryDigraph(lp);
+    template <typename Solution, typename LP>
+    bool feasibleSolution(const Solution &sol, const LP & lp) {
+        fillAuxiliaryDigraph(sol, lp);
         
         if (m_oracleComponents.initialTest(*this)) {
             return true;
         }
         else {
-            return !m_oracleComponents.findViolated(*this, boost::num_vertices(m_g));
+            return !m_oracleComponents.findViolated(sol, *this, boost::num_vertices(m_g));
         }
     }
     
@@ -63,11 +58,11 @@ public:
      *
      * @tparam LP
      */
-    template <typename LP>
-    void addViolatedConstraint(LP & lp) {
+    template <typename Solution, typename LP>
+    void addViolatedConstraint(Solution & sol, LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
-        for (auto const & e : m_edgeMap) {
+        for (auto const & e : sol.getEdgeMap()) {
             const Vertex & u = boost::source(e.left, m_g);
             const Vertex & v = boost::target(e.left, m_g);
             
@@ -86,7 +81,8 @@ public:
      * @param srcVertexIndex index of the source vertex
      * @return true iff a violated consrtaint was found
      */
-    bool findAnyViolatedConstraint(int srcVertexIndex) {
+    template <typename Solution>
+    bool findAnyViolatedConstraint(Solution & sol, int srcVertexIndex) {
         auto vertices = boost::vertices(m_auxGraph);
         const Vertex & src = boost::vertex(srcVertexIndex, m_auxGraph);
         assert(src != m_src && src != m_trg);
@@ -95,12 +91,12 @@ public:
                 
         for (const Vertex & trg : utils::make_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(src, trg);
+                violation = checkViolationGreaterThan(sol, src, trg);
                 if (violation.first) {
                     return true;
                 }
                 
-                violation = checkViolationGreaterThan(trg, src);
+                violation = checkViolationGreaterThan(sol, trg, src);
                 if (violation.first) {
                     return true;
                 }
@@ -114,7 +110,8 @@ public:
      * @brief finds the most violated constraint
      * @return true iff a violated consrtaint was found
      */
-    bool findMostViolatedConstraint() {
+    template <typename Solution>
+    bool findMostViolatedConstraint(Solution & sol) {
         auto vertices = boost::vertices(m_auxGraph);
         const Vertex & src = *(vertices.first);
         assert(src != m_src && src != m_trg);
@@ -125,13 +122,13 @@ public:
         
         for (const Vertex & trg : utils::make_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(src, trg, maximumViolation);
+                violation = checkViolationGreaterThan(sol, src, trg, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
                 if (violation.first) {
                     violatedConstraintFound = true;
                 }
                 
-                violation = checkViolationGreaterThan(trg, src, maximumViolation);
+                violation = checkViolationGreaterThan(sol, trg, src, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
                 if (violation.first) {
                     violatedConstraintFound = true;
@@ -167,8 +164,8 @@ private:
      *
      * @tparam LP
      */
-    template <typename LP>
-    void fillAuxiliaryDigraph(const LP & lp) {
+    template <typename Solution, typename LP>
+    void fillAuxiliaryDigraph(Solution & sol, const LP & lp) {
         int numVertices(boost::num_vertices(m_g));
         
         m_auxGraph.clear();
@@ -181,11 +178,11 @@ private:
         m_rev = boost::get(boost::edge_reverse, m_auxGraph);
         m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (auto const & e : m_edgeMap) {
+        for (auto const & e : sol.getEdgeMap()) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx) / 2;
             
-            if (!m_compare.e(colVal, 0)) {
+            if (!sol.getCompare().e(colVal, 0)) {
                 Vertex u = source(e.left, m_g);
                 Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);
@@ -195,8 +192,8 @@ private:
         m_src = boost::add_vertex(m_auxGraph);
         m_trg = boost::add_vertex(m_auxGraph);
         
-        for (const Vertex & v : m_vertexList) {
-            m_srcToV[v] = addEdge(m_src, v, degreeOf(v, lp) / 2, true);
+        for (const Vertex & v : sol.getVertices()) {
+            m_srcToV[v] = addEdge(m_src, v, degreeOf(sol, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
     }
@@ -248,14 +245,14 @@ private:
      * @tparam SrcVertex
      * @tparam TrgVertex
      */
-    template <typename LP>
-    double degreeOf(const Vertex & v, const LP & lp) {
+    template <typename Solution, typename LP>
+    double degreeOf(Solution &sol, const Vertex & v, const LP & lp) {
         double res = 0;
         auto adjEdges = boost::out_edges(v, m_g);
             
         for (Edge e : utils::make_range(adjEdges)) {
-            auto i = m_edgeMap.left.find(e);
-            if(i != m_edgeMap.left.end()) {
+            auto i = sol.getEdgeMap().left.find(e);
+            if(i != sol.getEdgeMap().left.end()) {
                 res += lp.getColPrim(i->second);
             }
         }
@@ -269,7 +266,8 @@ private:
      * @param minViolation minimum violation that a set should have to be saved
      * @return a pair of bool (if a violated set was found) and the violation of the found set
      */
-    std::pair<bool, double> checkViolationGreaterThan(const Vertex & src, const Vertex & trg, double minViolation = 0) {
+    template <typename Solution>
+    std::pair<bool, double> checkViolationGreaterThan(Solution & sol, const Vertex & src, const Vertex & trg, double minViolation = 0) {
         int numVertices(boost::num_vertices(m_g));
         double origVal = boost::get(m_cap, m_srcToV[src]);
         bool violated = false;
@@ -283,7 +281,7 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > minViolation && !m_compare.e(violation, 0)) {
+        if (violation > minViolation && !sol.getCompare().e(violation, 0)) {
             violated = true;
             m_violatingSetSize = 0;
             
@@ -314,9 +312,6 @@ private:
     OracleComponents    m_oracleComponents;
     
     const Graph &               m_g;
-    const EdgeMap &         m_edgeMap;
-    const VertexList &          m_vertexList;
-    const utils::Compare<double> & m_compare;
     
     AuxGraph    m_auxGraph;
     Vertex      m_src;
@@ -334,9 +329,11 @@ private:
 };
 
 
-/*template <typename Graph, typename OracleComponents = BoundedDegreeMSTOracle<>>
+template <typename OracleComponents = BoundedDegreeMSTOracleComponents<>, typename Graph>
 BoundedDegreeMSTOracle<Graph, OracleComponents>
-make_BoundedDegreeMSTOracle()*/
+make_BoundedDegreeMSTOracle(const Graph & g) {
+    return  BoundedDegreeMSTOracle<Graph, OracleComponents>(g);
+}
 
 } //ir
 } //paal

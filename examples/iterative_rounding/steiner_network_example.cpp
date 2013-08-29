@@ -47,9 +47,9 @@ int main() {
     auto cost = boost::get(boost::edge_weight, g);
 
     //solve it
-    auto steiner = make_SteinerNetwork(g, cost, restrictions, resultNetwork);
-
-    solve_iterative_rounding(steiner, SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork>(make_RowGenerationSolveLP(steiner.getSeparationOracle())));
+    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    steiner_network_iterative_rounding(g, cost, resultNetwork, std::move(comps));
 
     // printing result
     std::cout << "Edges in steiner network" << std::endl;

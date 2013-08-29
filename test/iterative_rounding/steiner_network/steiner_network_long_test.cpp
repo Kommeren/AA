@@ -76,8 +76,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics
-        auto steiner = paal::ir::make_SteinerNetwork(g, costs, restrictions, resultNetwork);
-        paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(steiner.getSeparationOracle()));
-        paal::ir::solve_iterative_rounding(steiner, std::move(comps));
+        auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
+        paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+        paal::ir::steiner_network_iterative_rounding(g, costs, resultNetwork, std::move(comps));
     }
 }

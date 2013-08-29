@@ -14,23 +14,23 @@ namespace paal {
 namespace ir {
 
 struct FindMostViolated {
-    template <typename Oracle>
-    bool operator()(Oracle & oracle, int verticesNum) {
-        return oracle.findMostViolatedConstraint();
+    template <typename Solution, typename Oracle>
+    bool operator()(Solution & solution, Oracle & oracle, int verticesNum) {
+        return oracle.findMostViolatedConstraint(solution);
     };
 };
 
 struct FindAnyViolated {
-    template <typename Oracle>
-    bool operator()(Oracle & oracle, int verticesNum) {
+    template <typename Solution, typename Oracle>
+    bool operator()(Solution & solution, Oracle & oracle, int verticesNum) {
         return oracle.findAnyViolatedConstraint(1);
     };
 };
 
 struct FindRandViolated {
-    template <typename Oracle>
-    bool operator()(Oracle & oracle, int verticesNum) {
-        return oracle.findAnyViolatedConstraint(rand() % verticesNum + 1);
+    template <typename Solution, typename Oracle>
+    bool operator()(Solution & solution, Oracle & oracle, int verticesNum) {
+        return oracle.findAnyViolatedConstraint(solution, rand() % verticesNum + 1);
     };
 };
 
@@ -53,9 +53,9 @@ template <typename FindViolated = FindRandViolated,
           typename InitialTest = utils::ReturnFalseFunctor>
 class BoundedDegreeMSTOracleComponents {
 public:
-    template <typename Oracle>
-    bool findViolated(Oracle & oracle, int verticesNum) {
-        return m_findViolated(oracle, verticesNum);
+    template <typename Solution, typename Oracle>
+    bool findViolated(Solution & solution, Oracle & oracle, int verticesNum) {
+        return m_findViolated(solution, oracle, verticesNum);
     };
     
     template <typename Oracle>

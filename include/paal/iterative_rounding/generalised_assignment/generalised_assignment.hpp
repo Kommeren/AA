@@ -216,6 +216,19 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
                 mbegin, mend, jbegin, jend, c, t, T, jobsToMachines);
     }
 
+template <typename MachineIter, typename JobIter, typename Cost, 
+          typename ProceedingTime, typename MachineAvailableTime, 
+          typename JobsToMachines, typename Components, typename Visitor = TrivialVisitor>
+void generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
+                    JobIter jbegin, JobIter jend,
+                    const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, 
+                    JobsToMachines & jobToMachines, Components comps, Visitor vis = Visitor()) {
+    auto gaSolution = make_GeneralAssignment(
+            mbegin, mend, jbegin, jend, 
+            c, t, T, jobToMachines);
+    solve_iterative_rounding(gaSolution, std::move(comps), std::move(vis));
+}
+
 
 } //ir
 } //paal

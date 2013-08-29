@@ -39,12 +39,9 @@ int main() {
     std::map<int, int> jobsToMachines;
 
     //solve it
-    auto gaSolution = paal::ir::make_GeneralAssignment(machines.begin(), machines.end(),
-                    jobs.begin(), jobs.end(), 
-                    costf, timef, Tf, jobsToMachines);
-
-
-    paal::ir::solve_iterative_rounding(gaSolution, paal::ir::GeneralAssignmentIRComponents<>());
+    paal::ir::generalised_assignment_iterative_rounding(
+            machines.begin(), machines.end(), jobs.begin(), jobs.end(),
+            costf, timef, Tf, jobsToMachines, paal::ir::GeneralAssignmentIRComponents<>());
 
     // printing result
     for(const std::pair<int, int> & jm : jobsToMachines) {
