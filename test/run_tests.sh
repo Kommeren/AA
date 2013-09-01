@@ -24,6 +24,9 @@ exit_on_error
 echo ------------------------------------------- cycle_canceling_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/cycle_canceling_test
 exit_on_error
+echo ------------------------------------------- dreyfus_wagner_test 	 -------------------------------------------------------------------------------------
+./${build_dir}/test/dreyfus_wagner_test
+exit_on_error
 echo ------------------------------------------- facility_location_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/facility_location_test
 exit_on_error

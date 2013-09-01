@@ -46,7 +46,7 @@ namespace metric_fillers {
         public:
         template <typename Graph, typename ResultMatrix> 
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
-            boost::floyd_warshall_initialized_all_pairs_shortest_paths(g, rm);
+            boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
         }
     };
 }

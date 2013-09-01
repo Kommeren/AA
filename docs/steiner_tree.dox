@@ -3,8 +3,8 @@
 \section def Problem definition.
 In the Steiner tree problem  we are given the set of nonterminals, the set of terminals and the metric \a m. Our goal is to find minimum spanning tree consisting all terminals (and possibly some nonterminals).
 
-\section Solution
-We solve this problem using zelikovsky 11/6 approximation algorithm. The algorithm exploit model of the WeakVoronoi concept (see \ref voronoi), where the generators are the terminals and the vertices are nonterminals.  There is one additional assumption on metric i.e.  we only use this metric only for distances (Nonterminal, Terminal) and (Terminal, Terminal).
+\section sol1 Solution 1
+We solve this problem using Zelikovsky 11/6 approximation algorithm. The algorithm exploit model of the WeakVoronoi concept (see \ref voronoi), where the generators are the terminals and the vertices are nonterminals.  There is one additional assumption on metric i.e.  we only use this metric only for distances (Nonterminal, Terminal) and (Terminal, Terminal).
 
   example: 
    \snippet steiner_tree_example.cpp Steiner Tree Example
@@ -19,4 +19,17 @@ Complexity of the algorithm is \f$O(|V|*|E| + |T|^4)\f$ where \a T is the set of
 \subsection References
 The algorithm is described in the \cite Zelikovsky93.
 
+\section sol2 Solution 2
+Another implemented solution is Dreyfus Wagner algorithm. 
+It solves exact SteinerTree problem in exponential time in respect of number of terminals.
+Not an approximation algorithm by itself, it is used to solve subproblems in many other algorithms.
+
+Example:
+ \snippet dreyfus_wagner_example.cpp Dreyfus Wagner Example
+ 
+\subsection com The complexity
+ Complexity of the algorithm is \f$O(3^{|T|} * |V| + 2^{|T|} * |V|^2)\f$, where \a T is the set of terminals.
+
+\subsection ref References
+The algorithm is described in the \cite Ding2000.
 */

@@ -27,7 +27,10 @@ exit_on_error
 echo ------------------------------------------- capacitated_facility_location_long_test 	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/capacitated_facility_location_long_test --run_test=FacilityLocationLong
 exit_on_error
-echo ------------------------------------------- facility_location_long_test 	 -------------------------------------------------------------------------------------
+echo ------------------------------------------- dreyfus_wagner_long_test	 -------------------------------------------------------------------------------------
+./${build_dir}/test/dreyfus_wagner_long_test
+exit_on_error
+echo ------------------------------------------- facility_location_long_test	 -------------------------------------------------------------------------------------
 ./${build_dir}/test/facility_location_long_test
 exit_on_error
 echo ------------------------------------------- generalised_assignment_long_test 	 -------------------------------------------------------------------------------------

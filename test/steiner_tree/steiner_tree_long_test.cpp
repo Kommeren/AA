@@ -21,52 +21,35 @@
 #include "utils/read_steinlib.hpp"
 #include "utils/sample_graph.hpp"
 
-void readLine(std::istream & is, std::string & fname, int & OPT) {
-    int dummy;
-    std::string dummys;
-    is >> fname >> dummy >> dummy >> dummy >> dummys >> OPT;
-    fname += ".stp";
-}
-
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
-    std::string testDir = "test/data/STEINLIB/";
-    std::ifstream is_test_cases(testDir + "/index");
-    assert(is_test_cases.good());
-    while(is_test_cases.good()) {
-        std::string fname;
-        int opt;
-        readLine(is_test_cases, fname, opt);
-        if(fname == ".stp")
-            return;
-        std::vector<int> terminals;
-        std::vector<int> steinerPoints;
-        LOG("TEST " << fname);
-        LOG("OPT " << opt);
+    std::vector<paal::SteinerTreeTest> data;
+    LOG("READING INPUT...");
+    readSTEINLIBtests(data);
+    for (paal::SteinerTreeTest& test : data) {
+        LOG("TEST " << test.testName);
+        LOG("OPT " << test.optimal);
 
-        std::ifstream ifs(testDir + "/I080/" + fname);
-        assert(ifs.good());
-        auto m = paal::readSTEINLIB(ifs, terminals, steinerPoints);
-        typedef decltype(m) Metric;
+        typedef decltype(test.metric) Metric;
         typedef paal::data_structures::Voronoi<Metric> VoronoiT;
         typedef typename VoronoiT::GeneratorsSet FSet;
-        VoronoiT voronoi(FSet(terminals.begin(), terminals.end()),
-                         FSet(steinerPoints.begin(), steinerPoints.end()), m);
-        std::vector<int> selectedSteinerPoints = paal::steiner_tree::getSteinerVertices(m, voronoi); 
+        VoronoiT voronoi(FSet(test.terminals.begin(), test.terminals.end()),
+                         FSet(test.steinerPoints.begin(), test.steinerPoints.end()), test.metric);
+        std::vector<int> selectedSteinerPoints = paal::steiner_tree::getSteinerVertices(test.metric, voronoi);
 
-        auto resRange = boost::join(terminals, selectedSteinerPoints);
+        auto resRange = boost::join(test.terminals, selectedSteinerPoints);
         LOG_COPY_DEL(boost::begin(resRange), boost::end(resRange), ",");
         paal::data_structures::BiMap<int> idx;
-        auto g = paal::data_structures::metricToBGLWithIndex(m, boost::begin(resRange), boost::end(resRange), idx);
+        auto g = paal::data_structures::metricToBGLWithIndex(test.metric, boost::begin(resRange), boost::end(resRange), idx);
         std::vector<int> pm(resRange.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
-        auto idxM = paal::data_structures::make_metricOnIdx(m, idx);
+        auto idxM = paal::data_structures::make_metricOnIdx(test.metric, idx);
         int res(0);
         for(int i : boost::irange(0, int(pm.size()))) {
             res += idxM(i, pm[i]);
         }
         LOG("RES " << res);
 
-        LOG("APPROXIMATION_RATIO:" << double(res) / double(opt));
+        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal));
     }
 
    //BOOST_CHECK_EQUAL(s, 6);
