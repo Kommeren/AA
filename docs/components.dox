@@ -1,9 +1,9 @@
-/*! \page Components
+/*! \page comps Components
 
 \section mot Motivation. 
 
-The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but only some of them are realy needed.
-The other motivation is that somethimes we'd  like to keep all the arguments groupped toghether. This way arguemnts can be easiely moved around.
+The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but only some of them are really needed.
+The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around.
 
 \subsection mot_exmpl Motivating example
 Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
@@ -39,7 +39,7 @@ Later on user can run the function
     DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
     do_stuff(doStuffComponents);
 </pre>
-Here we assume that all the implementations have the default constructor, this is not mandatory. There are different ways of initializing components(see section:  for more details).
+Here we assume that all the implementations have the default constructor, this is not mandatory. There are different ways of initializing components(see section:\ref const_comp for more details).
     
 How to get the parameters back from DoStuffComponents:
 <pre>
@@ -70,8 +70,8 @@ Later on user can construct the DoStuffComponents as follows
 This is the main motivation but the library consists of much more handy ways of manipulating the Components.
 
 \section def_comp Defining Components 
-The type of the component can be any type exept references(TODO). Default parameters can be specified for any number of last components.
-One can define compoenents using template aliasing (prefered)
+The type of the component can be any type except references(TODO). Default parameters can be specified for any number of last components.
+One can define components using template aliasing (preferred)
 <pre>
     //inside library:
     template <typename... Args>
@@ -107,7 +107,7 @@ There are three ways of contructing components:
     int a;
     MyDoStuffComponents doStuffComponents(a);
 </pre>
-<li> One can provide any object and a CopyTag. This tag indicates, that passed object has  get<Name> member fuctions for some Names.
+<li> One can provide any object and a CopyTag. This tag indicates, that passed object has  get<Name> member functions for some Names.
 <pre>
     template <typename... Args>
     using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
@@ -123,14 +123,14 @@ There are three ways of contructing components:
     Small small2(big);
 </pre>
 
-<li> One can make object providding some arguents by name.
+<li> One can make object providing some arguments by name.
 
 <pre>
     template <typename... Args>
     using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
     typedef DoStuffComponents<int, int, int> MyDoStuffComps;
 
-    auto m = MyDoStuffComps::make<Init, Stop>(7, 2); // The start component has default int value (acctually as build in it might be unitialized);
+    auto m = MyDoStuffComps::make<Init, Stop>(7, 2); // The start component has default int value (actually as build in it might be uninitialized);
     
 </pre>
 </ul>

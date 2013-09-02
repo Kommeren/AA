@@ -8,7 +8,7 @@
   \section Installation
    There is no need to install anything because the PAAl is header only. 
    All you have to do is to download the library and include appropriate headers.
-   Only, if you use linear programming you must link your executable agains glpk.
+   Only, if you use linear programming you must link your executable against glpk.
 
    If you'd like to develop the library, you must compile the unit test.
 
@@ -62,20 +62,29 @@
 
   \section general_design General Design  
    
-  The library is divided into the three layers:
-   
+  The algorithms are written as functions:
+  <pre>
+      algorithm(ProblemDescription)
+  </pre>
+  Very often algorithms can customized, extended and takes many different arguments. This arguments are handled by Components class(see \ref comps). 
+  <pre>
+      algorithm(ProblemDescription, Components)
+  </pre>
+
+  Generally The library is divided into the three layers: 
   <pre>
    ___________________________________________________________________________________________________
   
-      ALGORITHMS  - eg. LocalSearch. The algorithms are written in very general way.
+      ALGORITHMS  - e. g. LocalSearch. The algorithms are written in very general way.
       The are delegating the specific tasks to the algorithm helpers.
   ___________________________________________________________________________________________________
   
-      ALGORITHMS COMPONENTS - eg. NeighborhoodGetter, Commit.
+      ALGORITHMS COMPONENTS - e. g. GetNeighborhood, Commit in local search.
       This are the bricks  working on specific data structures concepts.
   ___________________________________________________________________________________________________
   
       DATA_STRUCTURES - e.g. Metric, Cycle. The data structure used by algorithm helpers. 
+      This data structures might be of independent interest.
   ___________________________________________________________________________________________________
   
   </pre>
@@ -83,7 +92,7 @@
   Our library is delivering default implementations of components from each layer. <br>
   The strength of this design is that the user is allowed to change components from each layer. <br><br>
   
-  For example the user can easily swap the implementation of the NeighborhoodGetter to provide his own way of searching the neighborhood. <br>
+  For example the user can easily swap the implementation of the GetNeighborhood to provide his own way of searching the neighborhood. <br>
   Also note that the same algorithm helpers that are used by local search can be used to produced the simulated annealing algorithm. <br>
   If the user want to swap implementation of the metric to use specific properties of his topology is not the problem at all! <br>
   
