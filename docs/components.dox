@@ -1,0 +1,158 @@
+/*! \page Components
+
+\section mot Motivation. 
+
+The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but only some of them are realy needed.
+The other motivation is that somethimes we'd  like to keep all the arguments groupped toghether. This way arguemnts can be easiely moved around.
+
+\subsection mot_exmpl Motivating example
+Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
+
+
+<b> Very basic usage: </b>
+
+As library developer introduce a interface
+
+<pre>
+    template \<typename DoStuffComponents\>
+    do_stuff(DoStuffComponents comps);
+</pre>
+
+We introduce the names of the needed components 
+
+<pre>
+    struct Init;
+    struct Start;
+    struct Stop;
+</pre>
+
+And define appropriate components class
+
+<pre>
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+</pre>
+
+
+Later on user can run the function
+<pre>
+    DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
+    do_stuff(doStuffComponents);
+</pre>
+Here we assume that all the implementations have the default constructor, this is not mandatory. There are different ways of initializing components(see section:  for more details).
+    
+How to get the parameters back from DoStuffComponents:
+<pre>
+    doStuffComponents.get<Init>(); //getting Init component
+
+    MyInitImpl anotherImplementation(42);
+    doStuffComponents.set<Init>(anotherImplementation); //setting Init component
+
+    doStuffComponents.call<Start>("hello world"); // you can directly call component if it is a functor
+</pre>
+
+
+<b> How to provide default parameter: </b>
+
+You can define DoStuffComponents as follows
+<pre>
+    template <typename... Args>
+    using Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\> DoStuffComponents;
+</pre>
+
+Later on user can construct the DoStuffComponents as follows
+<pre>
+    DoStuffComponents<MyInitImpl> doStuffComponents1;
+    DoStuffComponents<MyInitImpl, MyStartImpl> doStuffComponents2;
+    DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents3;
+</pre>
+
+This is the main motivation but the library consists of much more handy ways of manipulating the Components.
+
+\section def_comp Defining Components 
+The type of the component can be any type exept references(TODO). Default parameters can be specified for any number of last components.
+One can define compoenents using template aliasing (prefered)
+<pre>
+    //inside library:
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+
+    //user:
+    DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
+
+</pre>
+This can be done without template aliasing
+<pre>
+    //inside library:
+    typedef Components<Init, Start, Stop> DoStuffComponents;
+
+    //user:
+    DoStuffComponents::type<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
+</pre>
+
+\section const_comp Constructing Components
+There are three ways of contructing components:
+<ul>
+<li> One can provide any number of arguments. The kth argument has to be convertible kth component.
+<pre>
+    //inside library:
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+
+    //user:
+    typedef DoStuffComponents::type<double, int, int> MyDoStuffComponents;
+
+    MyDoStuffComponents doStuffComponents;
+    MyDoStuffComponents doStuffComponents(1,2);
+    int a;
+    MyDoStuffComponents doStuffComponents(a);
+</pre>
+<li> One can provide any object and a CopyTag. This tag indicates, that passed object has  get<Name> member fuctions for some Names.
+<pre>
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    typedef DoStuffComponents<int, int, int> Big;
+    
+    template <typename... Args>
+    using Components<Start, Stop>::type<Args...> SmallerDoStuffComponents;
+    typedef SmallDoStuffComponents<int, int> Small;
+
+    Small small(1,2);
+    Big big(small);
+
+    Small small2(big);
+</pre>
+
+<li> One can make object providding some arguents by name.
+
+<pre>
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    typedef DoStuffComponents<int, int, int> MyDoStuffComps;
+
+    auto m = MyDoStuffComps::make<Init, Stop>(7, 2); // The start component has default int value (acctually as build in it might be unitialized);
+    
+</pre>
+</ul>
+The important thing is that components do not have to be default constructible unless we default constructed.
+
+\section repl_comps Replacing Components
+There is a way to replace component for given components.  
+
+<pre>
+    template <typename... Args>
+    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    typedef DoStuffComponents<int, int, int> SomeDoStuffComps;
+
+    typedef ReplacedType<Start, double, SomeDoStuffComps>::type Replaced; // Start type is changed from int to double
+
+    SomeDoStuffComps comps;
+    double d(5);
+    Replaced replace<Start>(d, comps); //replacing component
+</pre> 
+
+
+
+
+
+*/
