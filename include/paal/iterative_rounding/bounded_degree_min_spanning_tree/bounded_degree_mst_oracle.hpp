@@ -36,6 +36,7 @@ public:
     /**
      * @brief checks if the current LP solution is feasible
      * @param lp LP object
+     * @param sol Solution object
      * @return true iff the current LP solution is feasible
      *
      * @tparam LP
@@ -55,6 +56,7 @@ public:
     /**
      * @brief adds a violated constraint to the LP
      * @param lp LP object
+     * @param sol Solution object
      *
      * @tparam LP
      */
@@ -79,6 +81,7 @@ public:
     /**
      * @brief finds any violated constraint
      * @param srcVertexIndex index of the source vertex
+     * @param sol Solution object
      * @return true iff a violated consrtaint was found
      */
     template <typename Solution>

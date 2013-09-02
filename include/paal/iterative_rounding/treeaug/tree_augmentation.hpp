@@ -239,6 +239,7 @@ namespace paal {
             ///@param _g  the graph to work with
             ///@param _treeMap designate a spanning tree in \c _g
             ///@param _costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
+            ///@param _resultSetEdge Result set of edges
             TreeAug(const Graph & _g, const TreeMap & _treeMap, const CostMap & _costMap, SetEdge & _resultSetEdge) :
                 m_g(_g),m_treeMap(_treeMap),m_costMap(_costMap),
                 m_Solution(_resultSetEdge),

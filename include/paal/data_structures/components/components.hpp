@@ -103,9 +103,15 @@ namespace detail {
 
         Components& operator=(Components &&) = default;
 
+        //TODO this does not work, examine
+/*        template <typename T, typename... TypesPrefix>
+        Components(T&& t, TypesPrefix&&... types) : 
+            base(std::forward<TypesPrefix>(types)...), m_component(std::forward<T>(t)) 
+        {}*/
+
         template <typename T, typename... TypesPrefix>
-        Components(T t, TypesPrefix... types) : 
-            base(std::move(types)...), m_component(std::move(t)) 
+        Components(T t, TypesPrefix&&... types) : 
+            base(std::forward<TypesPrefix>(types)...), m_component(std::move(t)) 
         {}
 
         //     copy constructor takes class wich has get<Name> member function

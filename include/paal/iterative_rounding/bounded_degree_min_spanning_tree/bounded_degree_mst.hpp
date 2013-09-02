@@ -301,7 +301,8 @@ struct BDMSTSetSolution {
         : m_compare(epsilon) {}
     /**
      * @brief returns the generated spanning tree
-     * @param sol GetSolution object
+     * @param getsol GetSolution object
+     * @param sol Solution object
      * @return generated spanning tree: map from input Graph edges to bool values (if the edge belongs to the tree)
      *
      * @tparam GetSolution

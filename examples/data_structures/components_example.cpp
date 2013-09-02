@@ -166,5 +166,10 @@ int main() {
     SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
     assert(someComps4.get<names::A>() == 1);
     assert(someComps4.get<names::B>() == 2);
+
+
+    // not supported
+//    int a;
+//    Comps<int &, int &, int &> compsWithRefs(a, a, a);
     
 }
