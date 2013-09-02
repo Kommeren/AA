@@ -134,7 +134,7 @@ There are three ways of contructing components:
     
 </pre>
 </ul>
-The important thing is that components do not have to be default constructible unless we default constructed.
+The important thing is that components do not have to be default constructible unless it is acctually default constructed.
 
 \section repl_comps Replacing Components
 There is a way to replace component for given components.  
