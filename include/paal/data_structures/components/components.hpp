@@ -120,12 +120,9 @@ namespace detail {
             Components(comps, WrapToConstructable<NotMovable>()) {}
 
         //   move  constructor takes class wich has get<Name> member function
-        template <typename Comps,
-        typename std::enable_if<
-            !std::is_reference<Comps>::value
-            >::type* = nullptr>
-        Components(Comps && comps, CopyTag) : 
-                Components(comps, WrapToConstructable<Movable>()) {}
+        template <typename Comps>
+        Components(Comps&& comps, CopyTag) : 
+                Components(std::move(comps), WrapToConstructable<Movable>()) {}
 
         template <typename ComponentName, typename = typename std::enable_if<std::is_same<ComponentName, Name>::value>::type>
         Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) {
