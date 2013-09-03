@@ -70,7 +70,7 @@ Later on user can construct the DoStuffComponents as follows
 This is the main motivation but the library consists of much more handy ways of manipulating the Components.
 
 \section def_comp Defining Components 
-The type of the component can be any type except references(TODO). Default parameters can be specified for any number of last components.
+The type of the component can be any type including references. Default parameters can be specified for any number of last components.
 One can define components using template aliasing (preferred)
 <pre>
     //inside library:

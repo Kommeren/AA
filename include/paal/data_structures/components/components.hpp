@@ -96,22 +96,29 @@ namespace detail {
         Components() = default;
 
         Components(const Components &) = default;
-
+        
+        //doesn't work on clang 3.2 // change in the standard
+        //Components(Components &) = default;
+        Components(Components & comps) : 
+            base(static_cast<base &>(comps)), 
+            m_component(comps.get<Name>()) {}
+        
         Components(Components &&) = default;
 
         Components& operator=(const Components &) = default;
 
+        //doesn't work on clang 3.2 // change in the standard
+        //Components& operator=(Components &) = default;
+        Components& operator=(Components & comps) {
+            static_cast<base &>(*this) = static_cast<base &>(comps); 
+            m_component = comps.get<Name>();
+        }
+
         Components& operator=(Components &&) = default;
 
-        //TODO this does not work, examine
-/*        template <typename T, typename... TypesPrefix>
+        template <typename T, typename... TypesPrefix>
         Components(T&& t, TypesPrefix&&... types) : 
             base(std::forward<TypesPrefix>(types)...), m_component(std::forward<T>(t)) 
-        {}*/
-
-        template <typename T, typename... TypesPrefix>
-        Components(T t, TypesPrefix&&... types) : 
-            base(std::forward<TypesPrefix>(types)...), m_component(std::move(t)) 
         {}
 
         //     copy constructor takes class wich has get<Name> member function
@@ -122,7 +129,7 @@ namespace detail {
         //   move  constructor takes class wich has get<Name> member function
         template <typename Comps>
         Components(Comps&& comps, CopyTag) : 
-                Components(std::move(comps), WrapToConstructable<Movable>()) {}
+                Components(comps, WrapToConstructable<Movable>()) {}
 
         template <typename ComponentName, typename = typename std::enable_if<std::is_same<ComponentName, Name>::value>::type>
         Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) {
@@ -161,27 +168,30 @@ namespace detail {
 
 
     protected:
+        //All of this constructor takes Comps as r-value reference, 
+        //because they have to win specialization race with normal constructor.
+
         //case: movable object, has the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(const Comps & comps, WrapToConstructable<Movable> m, dummy d = dummy()) : 
-            base(comps, m), 
+        Components(Comps && comps, WrapToConstructable<Movable> m, dummy d = dummy()) : 
+            base(std::forward<Comps>(comps), std::move(m)), 
             m_component(std::move(comps.template get<Name>())) {} 
 
         //case: movable object, does not have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(const Comps & comps, WrapToConstructable<Movable> m) : 
-            base(comps, m) {} 
+        Components(Comps && comps, WrapToConstructable<Movable> m) : 
+            base(std::forward<Comps>(comps), std::move(m)) {} 
 
         //case: not movable object, has the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(const Comps & comps, WrapToConstructable<NotMovable> m, dummy d = dummy()) : 
-            base(comps, m), 
+        Components(Comps && comps, WrapToConstructable<NotMovable> m, dummy d = dummy()) : 
+            base(std::forward<Comps>(comps), std::move(m)), 
             m_component(comps.template get<Name>()) {} 
 
         //case: not movable object, does not  have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(const Comps & comps, WrapToConstructable<NotMovable> m) : 
-            base(comps, m) {} 
+        Components(Comps && comps, WrapToConstructable<NotMovable> m) : 
+            base(std::forward<Comps>(comps), std::move(m)) {} 
     private:
         Type m_component;
     };

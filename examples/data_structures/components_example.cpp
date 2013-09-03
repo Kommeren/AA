@@ -118,6 +118,9 @@ int main() {
     typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
     static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
+
+//    CompsF comps777(comps5, ds::detail::WrapToConstructable<ds::detail::Movable>());
+
     //replace components
     Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
     
@@ -168,8 +171,8 @@ int main() {
     assert(someComps4.get<names::B>() == 2);
 
 
-    // not supported
-//    int a;
-//    Comps<int &, int &, int &> compsWithRefs(a, a, a);
+    // references works also
+    int a;
+    Comps<int &, const int &, int &> compsWithRefs(a, a, a);
     
 }

@@ -175,6 +175,15 @@ BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
     BOOST_CHECK_EQUAL(someComps4.get<names::B>(), 2);
 }    
     
+BOOST_AUTO_TEST_CASE(ComponentsReferences) {
+    int a(3);
+    Comps<int &, const int &, int &> compsWithRefs(a, a, a);
+    BOOST_CHECK_EQUAL(compsWithRefs.get<names::A>(), 3);
+    BOOST_CHECK_EQUAL(compsWithRefs.get<names::B>(), 3);
+    BOOST_CHECK_EQUAL(compsWithRefs.get<names::C>(), 3);
+}
+    
+    
 
 //this shouldn't compile
 //template <typename... Args>
