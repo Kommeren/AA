@@ -1,4 +1,6 @@
 include(const.cmake)
+set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+
 set(SOURCE_DIR ${PROJECT_DIR}/include) 
 set(BIN_DIR ${PROJECT_DIR}/bin) 
 set(TEST_DIR ${PROJECT_DIR}/test) 

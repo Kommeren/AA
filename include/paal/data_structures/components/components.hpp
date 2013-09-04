@@ -112,6 +112,7 @@ namespace detail {
         Components& operator=(Components & comps) {
             static_cast<base &>(*this) = static_cast<base &>(comps); 
             m_component = comps.get<Name>();
+            return *this;
         }
 
         Components& operator=(Components &&) = default;
