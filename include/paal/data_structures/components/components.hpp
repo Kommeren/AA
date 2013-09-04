@@ -27,6 +27,9 @@ template <typename Name, typename Default>
 struct NameWithDefault;
 
 
+/**
+ * @brief Indicates that Components constructor is in fact a Copy/Move Constructor
+ */
 struct CopyTag {};
 
 
@@ -34,11 +37,24 @@ struct CopyTag {};
  * @brief This namespace block contains implementation of the main class Components<Names,Types> and needed meta functions
  */
 namespace detail {
+
+    /**
+     * @brief wraps type to constructible type
+     *
+     * @tparam T
+     */
     template <typename T>
     struct WrapToConstructable {
         typedef T type;
     };
 
+    /**
+     * @brief If Name is kth on Names list, returns kth Type.
+     *
+     * @tparam Name
+     * @tparam Names
+     * @tparam Types
+     */
     template <typename Name, typename Names, typename Types>
     struct TypeForName {
         typedef typename remove_n_first<1, Names>::type NewNames;
@@ -46,49 +62,101 @@ namespace detail {
         typedef typename TypeForName<Name, NewNames, NewTypes>::type type;
     };
 
+    /**
+     * @brief Specialization when found
+     *
+     * @tparam Name
+     * @tparam Type
+     * @tparam NamesRest
+     * @tparam TypesRest
+     */
     template <typename Name,typename Type, typename... NamesRest, typename... TypesRest>
     struct TypeForName<Name, TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>>{
         typedef Type type;
     };
 
+
+    /**
+     * @brief SFINAE check if the given type has get<Name>() member function.
+     *
+     * @tparam T
+     * @tparam Name
+     */
     template <typename T, typename Name> 
     class HasTemplateGet {  
     private: 
-        template <typename U> 
-            class check 
-            { }; 
-
+        /**
+         * @brief positive case
+         *
+         * @tparam C given type
+         *
+         * @return return type is char 
+         */
         template <typename C>
-            static char f(check<decltype(std::declval<const C>().template get<Name>()) (C::*)() const>*);
+            static char f(WrapToConstructable<decltype(std::declval<const C>().template get<Name>()) (C::*)() const>*);
 
+        /**
+         * @brief negative case
+         *
+         * @tparam C given type
+         *
+         * @return return type is long
+         */
         template <typename C>
             static long f(...); 
 
     public:
+        /**
+         * @brief tels if given type has get<Name>() memer function. 
+         *
+         */
         static  const bool value = (sizeof(f<typename std::decay<T>::type>(nullptr)) == sizeof(char));
     }; 
 
-    struct Movable;
-    struct NotMovable;
 
+
+    /**
+     * @brief Tag indicating that given object is movable
+     */
+    struct Movable{};
+    /**
+     * @brief Tag indicating that given object is not movable
+     */
+    struct NotMovable{};
+
+
+    //declaration of main class Components
     template <typename Names, typename Types>
     class Components;
 
+    //specialization for empty Names list
     template <>
     class Components<TypesVector<>, TypesVector<>> {
     public:
         void get() const;
+        void call() const;
+        void call2() const;
 
         template <typename... Unused>
         Components(const Unused &... ) {} 
     };
 
+    //specialization for nonempty types list
     template <typename Name, typename Type, typename... NamesRest, typename... TypesRest>
     class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> : 
     public Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> { 
         typedef Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> base;
         typedef TypesVector<Name, NamesRest...> Names;
         typedef TypesVector<Type, TypesRest...> Types;
+        
+        
+        /**
+         * @brief Evaluates to valid type iff ComponentsName == Name
+         *
+         * @tparam ComponentName
+         */
+        template <typename ComponentName>
+        using is_my_name = typename std::enable_if<std::is_same<ComponentName, Name>::value>::type;
 
     public:
         using base::get;
@@ -125,19 +193,19 @@ namespace detail {
         //     copy constructor takes class wich has get<Name> member function
         template <typename Comps>
         Components(const Comps & comps, CopyTag) : 
-            Components(comps, WrapToConstructable<NotMovable>()) {}
+            Components(comps, NotMovable()) {}
 
         //   move  constructor takes class wich has get<Name> member function
         template <typename Comps>
         Components(Comps&& comps, CopyTag) : 
-                Components(comps, WrapToConstructable<Movable>()) {}
+                Components(comps, Movable()) {}
 
-        template <typename ComponentName, typename = typename std::enable_if<std::is_same<ComponentName, Name>::value>::type>
+        template <typename ComponentName, typename = is_my_name<ComponentName>>
         Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) {
             return m_component;
         }
 
-        template <typename ComponentName, typename = typename std::enable_if<std::is_same<ComponentName, Name>::value>::type>
+        template <typename ComponentName, typename = is_my_name<ComponentName>>
         const Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) const{
             return m_component;
         }
@@ -174,24 +242,24 @@ namespace detail {
 
         //case: movable object, has the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(Comps && comps, WrapToConstructable<Movable> m, dummy d = dummy()) : 
+        Components(Comps && comps, Movable m, dummy d = dummy()) : 
             base(std::forward<Comps>(comps), std::move(m)), 
             m_component(std::move(comps.template get<Name>())) {} 
 
         //case: movable object, does not have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, WrapToConstructable<Movable> m) : 
+        Components(Comps && comps, Movable m) : 
             base(std::forward<Comps>(comps), std::move(m)) {} 
 
         //case: not movable object, has the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(Comps && comps, WrapToConstructable<NotMovable> m, dummy d = dummy()) : 
+        Components(Comps && comps, NotMovable m, dummy d = dummy()) : 
             base(std::forward<Comps>(comps), std::move(m)), 
             m_component(comps.template get<Name>()) {} 
 
         //case: not movable object, does not  have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, WrapToConstructable<NotMovable> m) : 
+        Components(Comps && comps, NotMovable m) : 
             base(std::forward<Comps>(comps), std::move(m)) {} 
     private:
         Type m_component;

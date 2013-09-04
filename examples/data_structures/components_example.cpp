@@ -169,6 +169,12 @@ int main() {
     SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
     assert(someComps4.get<names::A>() == 1);
     assert(someComps4.get<names::B>() == 2);
+    
+    typedef Comps<int(*)(int), int(*)(int), int> CompsFF;
+
+    CompsFF ff(f,f);
+    ff.call<names::A>(2);
+    ff.call<names::B>(2);
 
 
     // references works also

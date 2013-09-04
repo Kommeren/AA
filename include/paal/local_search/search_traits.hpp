@@ -38,7 +38,7 @@ template <typename SearchComponents, typename Solution>
 class MultiMove {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
-    typedef typename utils::SolToElem<Solution>::type Element;
+    typedef typename utils::CollectionToElem<Solution>::type Element;
     typedef decltype(std::declval<NG>()(
                                 std::declval<Solution &>(),
                                 std::declval<Element &>()
@@ -65,7 +65,7 @@ class MultiFitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;
     typedef typename MultiMove<SearchComponents, Solution>::type Move;
-    typedef typename utils::SolToElem<Solution>::type SolutionElement;
+    typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 public:
     typedef decltype(std::declval<Gain>()(
                         std::declval<Solution &>(), std::declval<SolutionElement>(), std::declval<Move &>())

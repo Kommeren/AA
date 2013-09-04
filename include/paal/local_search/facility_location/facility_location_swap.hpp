@@ -78,7 +78,7 @@ class FacilityLocationCheckerSwap {
 public:
         template <class Solution> 
     auto operator()(Solution & sol, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             const Swap<VertexType> & s) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
         typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
@@ -98,7 +98,7 @@ class FacilityLocationCommitSwap {
 public:
     template <typename Solution> 
     void operator()(Solution & sol, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             const Swap<VertexType> & s) {
         sol.addFacility(sol.getFacility(s.getTo()));
         sol.removeFacility(sol.getFacility(s.getFrom()));
@@ -110,7 +110,7 @@ class FacilityLocationGetMovesSwap {
     template <typename Solution>
     struct IterType {
         typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen; 
-        typedef typename utils::SolToIter<const Unchosen>::type UchIter; 
+        typedef typename utils::CollectionToIter<const Unchosen>::type UchIter; 
         typedef boost::transform_iterator<VertexToSwapMove<VertexType>, 
                  UchIter, const Swap<VertexType> &> TransIter;
         typedef std::pair<TransIter, TransIter> TransRange;

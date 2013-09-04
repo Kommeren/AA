@@ -19,11 +19,11 @@ namespace local_search{
 
 struct TrivialNeighborGetter {
     template <typename SolutionElement, typename Solution> 
-                          std::pair<utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type>, 
-                                    utils::IteratorWithExcludedElement<typename utils::SolToConstIter<Solution>::type> > 
+                          std::pair<utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type>, 
+                                    utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type> > 
             
             operator()(const Solution & sol, const SolutionElement &e) {
-                typedef typename utils::SolToConstIter<Solution>::type SolutionIterator;
+                typedef typename utils::CollectionToConstIter<Solution>::type SolutionIterator;
                 typedef utils::IteratorWithExcludedElement<SolutionIterator> OutIter;
                 SolutionIterator begin = sol.begin();
                 SolutionIterator end = sol.end();

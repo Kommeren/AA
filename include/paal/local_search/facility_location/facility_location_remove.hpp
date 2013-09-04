@@ -33,7 +33,7 @@ class FacilityLocationCheckerRemove {
 public:
         template <class Solution> 
     auto operator()(Solution & s, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             Remove) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
 
@@ -53,7 +53,7 @@ public:
         template <typename Solution> 
     void operator()(
             Solution & s, 
-            typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             Remove) {
         s.removeFacility(se);
     }
@@ -71,7 +71,7 @@ public:
     template <typename Solution> 
         typename std::pair<Iter, Iter>
     operator()(const Solution &, 
-            typename utils::SolToElem<Solution>::type & el) {
+            typename utils::CollectionToElem<Solution>::type & el) {
         if(el.getIsChosen() == CHOSEN) { 
             //the move of CHOSEN could be remove
             return std::make_pair(m_remove.begin(), m_remove.end());

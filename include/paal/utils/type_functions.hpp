@@ -22,17 +22,17 @@ template <typename Iter> struct IterToElem {
     typedef puretype(*std::declval<Iter>()) type; 
 };
 
-template <typename Solution> struct SolToIter {
-    typedef decltype(std::declval<Solution>().begin()) type; 
+template <typename Collection> struct CollectionToIter {
+    typedef decltype(std::declval<Collection>().begin()) type; 
 };
 
-template <typename Solution> struct SolToConstIter {
-    typedef decltype(std::declval<const Solution>().begin()) type; 
+template <typename Collection> struct CollectionToConstIter {
+    typedef decltype(std::declval<const Collection>().begin()) type; 
 };
 
 
-template <typename Solution> struct SolToElem {
-  typedef typename IterToElem<typename SolToIter<Solution>::type>::type type; 
+template <typename Collection> struct CollectionToElem {
+  typedef typename IterToElem<typename CollectionToIter<Collection>::type>::type type; 
 };
 
 

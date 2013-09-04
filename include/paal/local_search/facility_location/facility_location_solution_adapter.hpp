@@ -44,7 +44,7 @@ private:
     typedef std::function<Fac(VertexType)> TransFunct;
     template <typename Col> 
     struct Traits {
-        typedef typename utils::SolToIter<Col>::type ColIter;
+        typedef typename utils::CollectionToIter<Col>::type ColIter;
         typedef boost::transform_iterator<TransFunct, ColIter> ColTIter;
         typedef std::pair<ColTIter, ColTIter> ColTIterRange;
     };

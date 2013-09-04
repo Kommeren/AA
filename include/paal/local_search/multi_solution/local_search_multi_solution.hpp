@@ -29,7 +29,7 @@ namespace search_strategies {
 template <typename Solution>
 class LocalSearchStepMultiSolutionBase {
 protected:    
-    typedef typename utils::SolToElem<Solution>::type SolutionElement;
+    typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 
     LocalSearchStepMultiSolutionBase(Solution & solution) : 
         m_solution(solution) {}
@@ -58,7 +58,7 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBette
     typedef typename MultiMove<MultiSearchComponents, Solution>::type Move;
     
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> base;
-    typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
+    typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
 public:
 
     LocalSearchStepMultiSolution(
@@ -103,8 +103,8 @@ public:
 private:
     template <typename Action, typename... Args> 
     auto call(Args&&... args) -> 
-    decltype(std::declval<MultiSearchComponents>().template call<Action>(args...)){
-        return m_searchComponents.template call<Action>(args...);
+    decltype(std::declval<MultiSearchComponents>().template call<Action>(std::forward<Args>(args)...)){
+        return m_searchComponents.template call<Action>(std::forward<Args>(args)...);
     }
     
 /*    template <typename Action, typename... Args> 
@@ -121,7 +121,7 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBette
         public LocalSearchStepMultiSolutionBase<Solution> {
       
     typedef LocalSearchStepMultiSolutionBase<Solution> base;
-    typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
+    typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
 //TODO change after redesign
@@ -158,7 +158,7 @@ public:
         base(solution, rest...), m_searchComponents(std::move(sc)) {}
 
     typedef typename base::SolutionElement SolutionElement;
-    typedef typename utils::SolToIter<Solution>::type SolutionIterator;
+    typedef typename utils::CollectionToIter<Solution>::type SolutionIterator;
     typedef typename MultiFitness<MultiSearchComponents, Solution>::type Fitness;
     using base::m_solution;
     
@@ -231,7 +231,7 @@ class LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope> :
         public LocalSearchStepMultiSolutionBase<Solution> {
       
     typedef LocalSearchStepMultiSolutionBase<Solution> base;
-    typedef typename std::iterator_traits<typename utils::SolToIter<Solution>::type>::reference SolElementRef;
+    typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
 

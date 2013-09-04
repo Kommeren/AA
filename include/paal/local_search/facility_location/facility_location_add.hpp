@@ -34,7 +34,7 @@ public:
     template <typename Solution> 
     void operator()(
             Solution & s, 
-            typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             Add) {
 
         s.addFacility(se);
@@ -70,7 +70,7 @@ class FacilityLocationCheckerAdd {
 public:
         template <class Solution> 
     auto operator()(Solution & s, 
-            const  typename utils::SolToElem<Solution>::type & se,  //SolutionElement 
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
             Add ) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
         auto ret = s.addFacilityTentative(se.getElem());

@@ -43,7 +43,7 @@ class MultiSolution  {
 
 template <typename X, typename Solution, typename SearchComponents> 
 class MultiConceptsBase {
-    typedef typename utils::SolToElem<Solution>::type SolutionElement;
+    typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 protected:
     typedef typename MultiMove<SearchComponents, Solution>::type Move;
     X x;
