@@ -12,7 +12,7 @@ We solve this problem using zelikovsky 11/6 approximation algorithm. The algorit
 
   full example is steiner_tree_example.cpp
 
-\subsection apps Approximation Ratio equals 11/6
+\subsection apps_st Approximation Ratio equals 11/6
 \subsection com The complexity 
 Complexity of the algorithm is \f$O(|V|*|E| + |T|^4)\f$ where \a T is the set of terminals.
 

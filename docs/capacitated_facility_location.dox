@@ -24,7 +24,7 @@ Capacitated Facility Location (CFL) problem is solved in the same way as uncapac
  
   full example is capacitated_facility_location_example.cpp
 
-\subsection app Approximation Ratio equals 6.
+\subsection app_cfl Approximation Ratio equals 6.
 
 \subsection References
 The algorithm is described in the \cite Korupolu1998. The Approximation ratio analysis is in \cite Chudak1047770.

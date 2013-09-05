@@ -20,7 +20,7 @@ Facility Location (FL) problem is solved by local search. For given solution we 
  
   full example is facility_location_example.cpp
 
-\subsection app Approximation Ratio equals 3.
+\subsection app_fl Approximation Ratio equals 3.
 
 \subsection References
 
