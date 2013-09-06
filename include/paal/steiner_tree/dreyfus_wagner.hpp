@@ -21,7 +21,7 @@ namespace steiner_tree {
  * Implements Dreyfus-Wagner algorithm.
  * The algorithm finds optimal Steiner Tree in exponential time, 3^k * n.
  */
-template<typename Metric, typename Terminals, unsigned int TerminalsLimit>
+template<typename Metric, typename Terminals, unsigned int TerminalsLimit = 32>
 class DreyfusWagner {
 public:
     typedef data_structures::MetricTraits<Metric> MT;
@@ -74,14 +74,14 @@ public:
     /**
      * Gets edges belonging to optimal tree.
      */
-    std::vector<Edge> getEdges() {
+    const std::vector<Edge> & getEdges() {
         return m_edges;
     }
 
     /**
      * Gets selected Steiner vertices.
      */
-    std::set<Vertex> getSteinerVertices() {
+    const std::set<Vertex> & getSteinerVertices() {
         return m_steinerElements;
     }
 
@@ -267,7 +267,7 @@ private:
     std::unordered_map<State, StateBM, StateHash> m_bestSplit; // stores result of wagner method for given state
 };
 
-template <typename Metric, typename Terminals, unsigned int TerminalsLimit = 32>
+template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals>
 DreyfusWagner<Metric, Terminals, TerminalsLimit>
 make_DreyfusWagner(const Metric& metric, const Terminals& terminals, const Terminals& nonTerminals) {
     return DreyfusWagner<Metric, Terminals, TerminalsLimit>(metric, terminals, nonTerminals);
