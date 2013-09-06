@@ -12,7 +12,7 @@
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
-#include "paal/iterative_rounding/lp_row_generation.hpp"
+#include "paal/lp/lp_row_generation.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network_oracle.hpp"
 
 

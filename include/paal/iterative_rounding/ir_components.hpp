@@ -18,8 +18,8 @@
 #include "paal/utils/do_nothing_functor.hpp"
 
 #include "paal/data_structures/components/components.hpp"
-#include "paal/iterative_rounding/ids.hpp"
-#include "bound_type.hpp"
+#include "paal/lp/ids.hpp"
+#include "paal/lp/bound_type.hpp"
 
 namespace paal {
 namespace ir {

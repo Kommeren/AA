@@ -1,5 +1,5 @@
 /**
- * @file glp_lpbase.hpp
+ * @file glp.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -14,9 +14,8 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/data_structures/bimap.hpp"
-#include "paal/iterative_rounding/ids.hpp"
-
-#include "bound_type.hpp"
+#include "paal/lp/ids.hpp"
+#include "paal/lp/bound_type.hpp"
 
 namespace paal {
 namespace ir {

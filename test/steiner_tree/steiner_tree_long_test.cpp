@@ -15,7 +15,7 @@
 
 #include "utils/logger.hpp"
 
-#include "paal/steiner_tree/steiner_tree.hpp"
+#include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 #include "paal/data_structures/bimap.hpp"
 
 #include "utils/read_steinlib.hpp"

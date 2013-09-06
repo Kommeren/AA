@@ -1,5 +1,5 @@
 /**
- * @file steiner_tree.hpp
+ * @file zelikovsky_11_per_6.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

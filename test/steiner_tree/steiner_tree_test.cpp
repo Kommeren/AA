@@ -12,7 +12,7 @@
 
 #include "utils/logger.hpp"
 
-#include "paal/steiner_tree/steiner_tree.hpp"
+#include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 #include "utils/sample_graph.hpp"
 
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
