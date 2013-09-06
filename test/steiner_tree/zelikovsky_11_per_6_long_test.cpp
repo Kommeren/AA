@@ -1,5 +1,5 @@
 /**
- * @file steiner_tree_long_test.cpp
+ * @files zelikovsky_11_per_6_long_test.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

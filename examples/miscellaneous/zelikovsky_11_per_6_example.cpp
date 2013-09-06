@@ -1,5 +1,5 @@
 /**
- * @file steiner_tree_example.cpp
+ * @file zelikovksy_11_per_6_example.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

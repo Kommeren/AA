@@ -1,5 +1,5 @@
 /**
- * @file metric_to_bgl_mst_test.cpp
+ * @file zelikovsky_11_per_6_test.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
