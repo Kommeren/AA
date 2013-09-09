@@ -8,3 +8,6 @@ The minimal version of g++ is 4.7.2.
 
 In order to build automatic documentation run doxygen in the paal root directory.
 The minimal doxygen version is 1.8.3.
+
+Library does NOT compile on Visual Studio 2013. Last check 09.09.13 - template aliasing missing.
+

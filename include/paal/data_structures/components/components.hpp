@@ -118,11 +118,11 @@ namespace detail {
     /**
      * @brief Tag indicating that given object is movable
      */
-    struct Movable{};
+    struct MovableTag{};
     /**
      * @brief Tag indicating that given object is not movable
      */
-    struct NotMovable{};
+    struct NotMovableTag{};
 
 
     //declaration of main class Components
@@ -142,6 +142,8 @@ namespace detail {
     };
 
     //specialization for nonempty types list
+    //class keeps first component as data memer
+    //rest of the components are kept in superclass.
     template <typename Name, typename Type, typename... NamesRest, typename... TypesRest>
     class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> : 
     public Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> { 
@@ -161,78 +163,164 @@ namespace detail {
     public:
         using base::get;
 
+        //default constructor
         Components() = default;
 
+        //default copy constructor
         Components(const Components &) = default;
         
         //doesn't work on clang 3.2 // change in the standard
         //Components(Components &) = default;
+        //constructor taking nonconst lvalue reference
         Components(Components & comps) : 
             base(static_cast<base &>(comps)), 
             m_component(comps.get<Name>()) {}
         
+        //default move constructor
         Components(Components &&) = default;
 
+        //default assignemnt operator
         Components& operator=(const Components &) = default;
 
         //doesn't work on clang 3.2 // change in the standard
         //Components& operator=(Components &) = default;
+        //assignemnt operator taking nonconst lvalue reference
         Components& operator=(Components & comps) {
             static_cast<base &>(*this) = static_cast<base &>(comps); 
             m_component = comps.get<Name>();
             return *this;
         }
 
+        //default move operator
         Components& operator=(Components &&) = default;
 
+        
+        /**
+         * @brief constructor takes some number of arguments,
+         *      This arguments has to be convertible to the same number of the first components in Components class.
+         *      Arguments can be both rvalue and lvalue references
+         *
+         * @tparam T, first component, it must be convertible to Type.
+         * @tparam TypesPrefix, rest of the components
+         * @param t
+         * @param types
+         */
         template <typename T, typename... TypesPrefix>
         Components(T&& t, TypesPrefix&&... types) : 
             base(std::forward<TypesPrefix>(types)...), m_component(std::forward<T>(t)) 
         {}
 
         //     copy constructor takes class wich has get<Name> member function
+        //     the get<> function dosn't have to be available for all names.
+        //     @param CopyTag is helps identify  this constructor
         template <typename Comps>
         Components(const Comps & comps, CopyTag) : 
-            Components(comps, NotMovable()) {}
+            Components(comps, NotMovableTag()) {}
 
         //   move  constructor takes class wich has get<Name> member function
+        //     the get<> function dosn't have to be available for all names.
+        //     In this version each of the components taken from comps 
+        //     is going to be moved.
+        //     @param CopyTag is helps identify  this constructor
         template <typename Comps>
         Components(Comps&& comps, CopyTag) : 
-                Components(comps, Movable()) {}
+                Components(comps, MovableTag()) {}
 
+        /**
+         * @brief This fucntion returns Component for name Name, nonconst version
+         *
+         * @tparam ComponentName
+         * @tparam typename
+         * @param dummy
+         *
+         * @return 
+         */
         template <typename ComponentName, typename = is_my_name<ComponentName>>
         Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) {
             return m_component;
         }
 
+        /**
+         * @brief This fucntion returns Component for name Name, const version
+         *
+         * @tparam ComponentName
+         * @tparam typename
+         * @param dummy
+         *
+         * @return 
+         */
         template <typename ComponentName, typename = is_my_name<ComponentName>>
         const Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) const{
             return m_component;
         }
 
+        /**
+         * @brief This function directly calls component.
+         *        m_component(args) has to be valid expresion
+         *        nonconst version
+         *
+         * @tparam ComponentName
+         * @tparam Args
+         * @param std::declval(
+         *
+         * @return 
+         */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) ->
         decltype(std::declval<typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
             return this->template get<ComponentName>()(std::forward<Args>(args)...);
         }
 
+        /**
+         * @brief This function directly calls component.
+         *        m_component(args) has to be valid expresion
+         *        const version
+         *
+         * @tparam ComponentName
+         *
+         * @tparam ComponentName
+         * @tparam Args
+         * @param std::declval(
+         *
+         * @return 
+         */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) const ->
         decltype(std::declval<const typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
             return get<ComponentName>()(std::forward<Args>(args)...);
         }
 
+        /**
+         * @brief setter for component assigned to Name.
+         *
+         * @tparam ComponentName
+         * @param comp
+         */
         template <typename ComponentName>
         void set(const typename TypeForName<ComponentName, Names, Types>::type  comp) {
             get<ComponentName>() = std::move(comp);
         }
 
 
+        /**
+         * @brief function creating Components class,
+         *        takes arguments only for assigned Names
+         *
+         * @tparam NamesSubset
+         * @tparam SomeTypes
+         * @param types
+         *
+         * @return 
+         */
         template <typename... NamesSubset, typename... SomeTypes>
         static Components<Names, Types>
-        make(SomeTypes... types) {
+        //make(SomeTypes... types) {
+          //  static_assert(sizeof...(NamesSubset) == sizeof...(SomeTypes), "Incorrect number of arguments.");
+            //return Components<Names, Types>(Components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>>(std::move(types)...), CopyTag());
+        make(SomeTypes&&... types) {
             static_assert(sizeof...(NamesSubset) == sizeof...(SomeTypes), "Incorrect number of arguments.");
-            return Components<Names, Types>(Components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>>(std::move(types)...), CopyTag());
+            Components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>> comps(std::forward<SomeTypes>(types)...);
+            return Components<Names, Types>(std::move(comps), CopyTag());
         }
 
 
@@ -240,26 +328,36 @@ namespace detail {
         //All of this constructor takes Comps as r-value reference, 
         //because they have to win specialization race with normal constructor.
 
-        //case: movable object, has the appropriate get member function
-        template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(Comps && comps, Movable m, dummy d = dummy()) : 
+        //case: movable object, has the appropriate get member function, Type is not reference
+        template <typename Comps, 
+                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name    >::value, int>::type,
+                  typename dummy_ref = typename std::enable_if<!std::is_lvalue_reference<Type>::value>::type>
+        Components(Comps && comps, MovableTag m, dummy d = dummy()) : 
             base(std::forward<Comps>(comps), std::move(m)), 
             m_component(std::move(comps.template get<Name>())) {} 
+        
+        //case: movable object, has the appropriate get member function, Type is reference
+        template <typename Comps, 
+                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name   >::value, int>::type,
+                  typename dummy_ref = typename std::enable_if<std::is_lvalue_reference<Type>::value, int>::type>
+        Components(Comps && comps, MovableTag m, dummy d = dummy(), dummy_ref dr = dummy_ref()) : 
+            base(std::forward<Comps>(comps), std::move(m)), 
+            m_component(comps.template get<Name>()) {} 
 
         //case: movable object, does not have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, Movable m) : 
+        Components(Comps && comps, MovableTag m) : 
             base(std::forward<Comps>(comps), std::move(m)) {} 
 
         //case: not movable object, has the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(Comps && comps, NotMovable m, dummy d = dummy()) : 
+        Components(Comps && comps, NotMovableTag m, dummy d = dummy()) : 
             base(std::forward<Comps>(comps), std::move(m)), 
             m_component(comps.template get<Name>()) {} 
 
         //case: not movable object, does not  have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, NotMovable m) : 
+        Components(Comps && comps, NotMovableTag m) : 
             base(std::forward<Comps>(comps), std::move(m)) {} 
     private:
         Type m_component;

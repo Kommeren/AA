@@ -179,6 +179,9 @@ int main() {
 
     // references works also
     int a;
-    Comps<int &, const int &, int &> compsWithRefs(a, a, a);
+    typedef Comps<int, const int &, int &> CompsWithRefs;
+    CompsWithRefs compsWithRefs(a, a, a);
+
+    CompsWithRefs::make<names::B, names::C>(a, a);
     
 }
