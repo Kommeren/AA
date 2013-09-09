@@ -1,0 +1,36 @@
+/*! \page sjwdoasm Scheduling Jobs with deadlines on a single machine
+
+\section def Problem definition.
+In scheduling Jobs with deadlines on a single machine we have the machine and N jobs to be processed.
+Each job must be processed for \f$p_{j}\f$ time units without interruption,
+and each job is available for processing at time \f$r_{j}\f$.
+Each job have due date \f$d_{j}\f$ .
+
+If we stop computing job \a j on time \f$c_{j}\f$
+leteness of job is \f$c_{j}-d_{j}\f$ 
+
+The aim is to minimalize maximum leteness.
+
+\section Solution
+
+Scheduling Jobs with deadlines on a single machine problem is solved by greedy algorithm.
+
+at wach moment that machine is idle, we start procesing naxt available job with the earliest due date.
+
+
+  example: 
+\snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs Example
+ 
+  full example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
+
+\subsection app_sjoipm Approximation Ratio equals 2 when all due dates are negative.
+
+\subsection com_sjoipm The complexity
+Complexity of the algorithm is \f$O(|N|*|log(N)|)\f$ where \a N is size of input
+
+\subsection References
+
+The algorithm analysis is described in \cite Williamson:2011:DAA:1971947
+
+
+*/

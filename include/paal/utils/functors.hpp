@@ -72,25 +72,34 @@ Array2Functor<Array> make_Array2Functor(const Array &a, int offset = 0) {
     return Array2Functor<Array>(a, offset);
 }
 
-template <typename Functor>
+struct Greater{
+    template<class T>bool operator() (const T& x,const T& y) const{return x>y;};
+};
+
+struct Less{
+    template<class T>bool operator() (const T& x,const T& y) const{return x<y;};
+};
+
+template <typename Functor,typename Compare=Less>
 struct FunctorToComparator {
-    FunctorToComparator(Functor f) : m_f(f) {}
+    FunctorToComparator(Functor f,Compare c=Compare()) : m_f(f),m_c(c){}
 
     template <typename T>
-    bool operator()(const T & left, const T & right) /*const*/ { //TODO investigate
-        return m_f(left) < m_f(right);
+    bool operator()(const T & left, const T & right) /*const*/ {
+        return m_c(m_f(left), m_f(right));
     }
 
 private:
     Functor m_f;
+    Compare m_c;
 };
 
-template <typename Functor>
-FunctorToComparator<Functor>
-make_FunctorToComparator(Functor functor) {
-    return FunctorToComparator<Functor>(functor);
-}
 
+template <typename Functor,typename Compare = Less>
+FunctorToComparator<Functor,Compare>
+make_FunctorToComparator(Functor functor,Compare compare=Compare()) {
+    return FunctorToComparator<Functor,Compare>(functor,compare);
+};
 template <typename Functor>
 struct FunctorToOutputIterator {
     FunctorToOutputIterator(Functor functor= Functor()) :
@@ -120,6 +129,7 @@ FunctorToOutputIterator<Functor>
 make_FunctorToOutputIterator(Functor functor) {
     return FunctorToOutputIterator<Functor>(functor);
 }
+
 
 
 template <typename Functor>

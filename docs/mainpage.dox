@@ -39,6 +39,7 @@
             <li> \ref shortestsuperstring
             <li> \ref sjoipm
             <li> \ref knapsack_greedy
+            <li> \ref sjwdoasm
             </ul>
         <li> Dynamic
             <ul>
