@@ -15,7 +15,7 @@ As library developer introduce a interface
 
 <pre>
     template \<typename DoStuffComponents\>
-    do_stuff(DoStuffComponents comps);
+    void do_stuff(DoStuffComponents comps);
 </pre>
 
 We introduce the names of the needed components 
@@ -100,7 +100,7 @@ There are several ways of contructing components:
     using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
 
     //user:
-    typedef DoStuffComponents::type<double, int, int> MyDoStuffComponents;
+    typedef DoStuffComponents<double, int, int> MyDoStuffComponents;
 
     MyDoStuffComponents doStuffComponents;
     MyDoStuffComponents doStuffComponents(1,2);
@@ -114,13 +114,13 @@ There are several ways of contructing components:
     typedef DoStuffComponents<int, int, int> Big;
     
     template <typename... Args>
-    using Components<Start, Stop>::type<Args...> SmallerDoStuffComponents;
+    using SmallDoStuffComponents = Components<Start, Stop>::type<Args...>;
     typedef SmallDoStuffComponents<int, int> Small;
 
     Small small(1,2);
-    Big big(small);
+    Big big(small, CopyTag());
 
-    Small small2(big);
+    Small small2(big, CopyTag());
 </pre>
 
 <li> One can make object providing some arguments by name.
@@ -150,14 +150,14 @@ There is a way to replace component for given components.
 
 <pre>
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
     typedef DoStuffComponents<int, int, int> SomeDoStuffComps;
 
     typedef ReplacedType<Start, double, SomeDoStuffComps>::type Replaced; // Start type is changed from int to double
 
     SomeDoStuffComps comps;
     double d(5);
-    Replaced replace<Start>(d, comps); //replacing component
+    Replaced replaced = replace<Start>(d, comps); //replacing component
 </pre> 
 
 \section iterot Iterating Over Components class (TODO)
