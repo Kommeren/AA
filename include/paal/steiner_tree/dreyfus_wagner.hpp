@@ -21,7 +21,7 @@ namespace steiner_tree {
  * Implements Dreyfus-Wagner algorithm.
  * The algorithm finds optimal Steiner Tree in exponential time, 3^k * n.
  */
-template<typename Metric, typename Terminals, unsigned int TerminalsLimit = 32>
+template<typename Metric, typename Terminals, typename NonTerminals, unsigned int TerminalsLimit = 32>
 class DreyfusWagner {
 public:
     typedef data_structures::MetricTraits<Metric> MT;
@@ -34,12 +34,9 @@ public:
     /**
      * Constructor used for solving Steiner Tree problem.
      */
-    DreyfusWagner(const Metric & costMap, const Terminals & term, const Terminals & nonTerminals) :
+    DreyfusWagner(const Metric & costMap, const Terminals & term, const NonTerminals & nonTerminals) :
             m_costMap(costMap), m_terminals(term), m_nonTerminals(nonTerminals) {
 
-        for (Vertex v: nonTerminals) {
-            m_elementsMap[v] = -1;
-        }
         for (int i = 0; i < (int)m_terminals.size(); i++) {
             m_elementsMap[m_terminals[i]] = i;
         }
@@ -50,7 +47,7 @@ public:
      * @param start Vertex to start the recurrence from.
      */
     void solve(int start = 0) {
-        int n = m_terminals.size();
+        int n = m_elementsMap.size();
         assert(start >= 0 && start < n);
         TerminalsBitSet remaining;
         // set all terminals except 'start' to 1
@@ -116,12 +113,13 @@ private:
                 cand = w;
             }
         }
-        for (Vertex w: m_terminals) {
-            int terminalId = m_elementsMap[w];
+        for (auto vertexAndTerminalId: m_elementsMap) {
+            Vertex w = vertexAndTerminalId.first;
+            int terminalId = vertexAndTerminalId.second;
             if (!remaining.test(terminalId)) continue;
             remaining.reset(terminalId);
-            Dist val = connectVertex(m_terminals[terminalId], remaining);
-            val += m_costMap(v, m_terminals[terminalId]);
+            Dist val = connectVertex(w, remaining);
+            val += m_costMap(v, w);
             remaining.set(terminalId);
 
             if (best < 0 || val < best) {
@@ -185,16 +183,16 @@ private:
             return;
         Vertex next = m_bestCand.at(codeState(v, remaining)).second;
 
-        int terminalId = m_elementsMap.at(next);
+        auto terminalIdIter = m_elementsMap.find(next);
         if (v == next) { // called wagner directly from dreyfus
             retrieveSolutionSplit(next, remaining);
-        } else if (terminalId == -1) { // nonterminal
+        } else if (terminalIdIter == m_elementsMap.end()) { // nonterminal
             addVertex(next);
             addEdge(v, next);
             retrieveSolutionSplit(next, remaining);
         } else { // terminal
             addEdge(v, next);
-            remaining.flip(terminalId);
+            remaining.flip(terminalIdIter->second);
             retrieveSolutionConnect(next, remaining);
         }
     }
@@ -254,23 +252,23 @@ private:
 
     const Metric& m_costMap; // stores the cost for each edge
     const Terminals& m_terminals; // terminals to be connected
-    const Terminals& m_nonTerminals; // list of all non-terminals
+    const NonTerminals& m_nonTerminals; // list of all non-terminals
 
     Dist m_cost; // cost of optimal Steiner Tree
     std::set<Vertex> m_steinerElements; // non-terminals selected for spanning tree
     std::vector<Edge> m_edges; // edges spanning the component
 
-    std::unordered_map<Vertex, int> m_elementsMap; // maps Vertex to position in m_terminals vector, or -1 if nonterminal
+    std::unordered_map<Vertex, int> m_elementsMap; // maps Vertex to position in m_terminals vector
     typedef std::pair<Dist, Vertex> StateV;
     typedef std::pair<Dist, TerminalsBitSet> StateBM;
     std::unordered_map<State, StateV, StateHash> m_bestCand; // stores result of dreyfus method for given state
     std::unordered_map<State, StateBM, StateHash> m_bestSplit; // stores result of wagner method for given state
 };
 
-template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals>
-DreyfusWagner<Metric, Terminals, TerminalsLimit>
-make_DreyfusWagner(const Metric& metric, const Terminals& terminals, const Terminals& nonTerminals) {
-    return DreyfusWagner<Metric, Terminals, TerminalsLimit>(metric, terminals, nonTerminals);
+template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals, typename NonTerminals>
+DreyfusWagner<Metric, Terminals, NonTerminals, TerminalsLimit>
+make_DreyfusWagner(const Metric& metric, const Terminals& terminals, const NonTerminals& nonTerminals) {
+    return DreyfusWagner<Metric, Terminals, NonTerminals, TerminalsLimit>(metric, terminals, nonTerminals);
 }
 
 } // steiner_tree
