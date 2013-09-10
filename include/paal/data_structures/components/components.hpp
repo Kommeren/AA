@@ -261,7 +261,7 @@ namespace detail {
          *
          * @tparam ComponentName
          * @tparam Args
-         * @param std::declval(
+         * @param args call arguments 
          *
          * @return 
          */
@@ -280,14 +280,14 @@ namespace detail {
          *
          * @tparam ComponentName
          * @tparam Args
-         * @param std::declval(
+         * @param call arguments
          *
          * @return 
          */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) const ->
         decltype(std::declval<const typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
-            return get<ComponentName>()(std::forward<Args>(args)...);
+            return this->template get<ComponentName>()(std::forward<Args>(args)...);
         }
 
         /**
@@ -383,7 +383,7 @@ namespace detail {
         typedef typename remove_n_first<DEFAULTS_NR + TYPES_NR - N, Defaults>::type NeededDefaults;
 
         typedef typename join<TypesPrefix, NeededDefaults>::type Types;
-        public:
+    public:
         typedef detail::Components<Names, Types> type;
     };
 } //detail
@@ -417,6 +417,10 @@ namespace detail {
         typedef Name type;
     };
 
+    /**
+     * @brief Meta function takes NameWithDefault and Vector
+     *        the result is new vector with new Name appended Name
+     */
     struct PushBackName {
     template <typename Vector, typename NameWithDefault>
         struct apply {
@@ -424,46 +428,71 @@ namespace detail {
         };
     };
 
+    /*
+     * @brief Meta function takes NameWithDefault and Vector
+     *        the result is new vector with new Name appended Default
+     */
     struct PushBackDefault {
-    template <typename Vector, typename Name>
-    struct apply {
-        typedef Vector type;
-    };
-
-    template <typename Vector, typename Name, typename Default>
-    struct apply<Vector, NameWithDefault<Name, Default>> {
-        typedef typename push_back<Vector, Default>::type type;
-    };
+        //  This case applies to when NameWithDefault is only name
+        template <typename Vector, typename Name>
+        struct apply {
+            typedef Vector type;
+        };
+   
+        // This case applies when NameWithDefault contains Default
+        template <typename Vector, typename Name, typename Default>
+        struct apply<Vector, NameWithDefault<Name, Default>> {
+            typedef typename push_back<Vector, Default>::type type;
+        };
 
     };
 } //detail
 
 
+//this is class sets all defaults and return as type detail::Components<Names, Types>
 //direct implementation on variadic templates is imposible because of
 //weak support for type detection for inner template classes
 template <typename... ComponentNamesWithDefaults>
 class Components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
+
+    //get Names list from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
         detail::PushBackName
             >::type Names;
 
+    //get Defaults from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
         detail::PushBackDefault
             >::type Defaults;
+
+    template <class T>
+    struct special_decay {
+        using type = typename std::decay<T>::type;
+    };
+     
+    template <class T>
+    struct special_decay<std::reference_wrapper<T>> {
+        using type = T&;
+    };
+
+    template <class T>
+         using special_decay_t = typename special_decay<T>::type;
+
 public:
     template <typename... ComponentTypes>
     using type = typename detail::SetDefaults<Names, Defaults, TypesVector<ComponentTypes...>>::type;
 
+
     template <typename... Components>
     static 
-    type<Components...>
-    make_components(Components... comps) {
-        return type<Components...>(std::move(comps)...);
+    type<special_decay_t<Components>...>
+    make_components(Components&&... comps) {
+        return type<special_decay_t<Components>...>(std::forward<Components>(comps)...);
     }
 private:
     //in this block we check if the defaults are on the last positions in the NamesWithDefaults

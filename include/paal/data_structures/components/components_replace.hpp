@@ -87,7 +87,7 @@ namespace detail {
         private:
 
             template <typename ComponentName>
-            auto get(detail::WrapToConstructable<ComponentName> w) const ->
+            auto get(detail::WrapToConstructable<ComponentName>) const ->
             decltype(std::declval<const Comps>().template get<ComponentName>()) {
                 return m_comps.template get<ComponentName>();
             }

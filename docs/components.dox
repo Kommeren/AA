@@ -30,7 +30,7 @@ And define appropriate components class
 
 <pre>
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
 </pre>
 
 
@@ -57,7 +57,7 @@ How to get the parameters back from DoStuffComponents:
 You can define DoStuffComponents as follows
 <pre>
     template <typename... Args>
-    using Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\> DoStuffComponents;
+    using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\>;
 </pre>
 
 Later on user can construct the DoStuffComponents as follows
@@ -75,7 +75,7 @@ One can define components using template aliasing (preferred)
 <pre>
     //inside library:
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
 
     //user:
     DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
@@ -91,13 +91,13 @@ This can be done without template aliasing
 </pre>
 
 \section const_comp Constructing Components
-There are three ways of contructing components:
+There are several ways of contructing components:
 <ul>
 <li> One can provide any number of arguments. The kth argument has to be convertible kth component.
 <pre>
     //inside library:
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
 
     //user:
     typedef DoStuffComponents::type<double, int, int> MyDoStuffComponents;
@@ -110,7 +110,7 @@ There are three ways of contructing components:
 <li> One can provide any object and a CopyTag. This tag indicates, that passed object has  get<Name> member functions for some Names.
 <pre>
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
     typedef DoStuffComponents<int, int, int> Big;
     
     template <typename... Args>
@@ -127,12 +127,21 @@ There are three ways of contructing components:
 
 <pre>
     template <typename... Args>
-    using Components<Init, Start, Stop>::type<Args...> DoStuffComponents;
+    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
     typedef DoStuffComponents<int, int, int> MyDoStuffComps;
 
     auto m = MyDoStuffComps::make<Init, Stop>(7, 2); // The start component has default int value (actually as build in it might be uninitialized);
     
 </pre>
+<li> The user does not have to provide any type at all.
+<pre>
+    typedef Components<Init, Start, Stop> DoStuffComponents;
+    
+    int a;
+    auto myComps = DoStuffComponents::make_components(1, a, std::ref(a));
+</pre>
+If the deduced type should be reference, the std::ref wraper should be used.
+
 </ul>
 The important thing is that components do not have to be default constructible unless it is acctually default constructed.
 
@@ -151,7 +160,7 @@ There is a way to replace component for given components.
     Replaced replace<Start>(d, comps); //replacing component
 </pre> 
 
-
+\section iterot Iterating Over Components class (TODO)
 
 
 
