@@ -1,6 +1,10 @@
 /**
  * @file types_vector.hpp
- * @brief 
+ * @brief This is implementation of type vector taking advantage of variadic template.
+ *        This implementation is NOT  c++11 adaptation of mpl. 
+ *        It is small set of functon needed for Components class purpose.
+ *        It is also less general than mpl. The implementation is create to avoid
+ *        some problems with mpl. The c++11 techniques makes it much simpler and clearer.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-18
@@ -15,6 +19,7 @@ namespace data_structures {
 template <typename... Args>
 struct TypesVector;
 
+//Computes size of TypesVector
 template<typename Vec>
 struct size;
 
@@ -23,6 +28,7 @@ struct size<TypesVector<Args...>> {
     enum { value = sizeof...(Args)};
 };
 
+//Standard fold function implementation
 template <typename Vector, typename StartValue, typename Functor>
 struct fold;
 
@@ -40,6 +46,7 @@ struct fold<TypesVector<>, StartValue, Functor> {
     typedef StartValue type;
 };
 
+//push back given val to TypesVector
 template <typename Vector, typename Val>
 struct push_back;
 
@@ -48,29 +55,21 @@ struct push_back<TypesVector<Args...>, Val> {
     typedef TypesVector<Args..., Val> type;
 };
 
-template <typename C, C c> struct integer_c;
-
+//gives element on id in TypesVector
 template <typename Vector, typename Id>
 struct at;
 
 template <typename C, C i, typename Arg, typename... Args>
-struct at<TypesVector<Arg, Args...>, integer_c<C, i>> {
-    typedef typename at<Args..., integer_c<C, i - 1 >>::type type;
+struct at<TypesVector<Arg, Args...>, std::integral_constant<C, i>> {
+    typedef typename at<Args..., std::integral_constant<C, i - 1 >>::type type;
 };
 
 template <typename C, typename Arg, typename... Args>
-struct at<TypesVector<Arg, Args...>, integer_c<C, 0>> {
+struct at<TypesVector<Arg, Args...>, std::integral_constant<C, 0>> {
     typedef Arg type;
 };
 
-template <template <class... > class F>
-struct template_to_meta_function {
-    template <typename... Args>
-    struct apply {
-        typedef F<Args...> type;
-    };
-};
-
+//joins to TypesVectors
 template <typename V1, typename V2>
 struct join;
 
@@ -79,6 +78,7 @@ struct join<TypesVector<Args1...>, TypesVector<Args2...>>{
     typedef TypesVector<Args1..., Args2...> type;
 };
 
+//removes first n elements from given TypesVector
 template <int n, typename V>
 struct remove_n_first;
 
@@ -99,7 +99,7 @@ struct remove_n_first<0, TypesVector<>>{
     typedef TypesVector<> type;
 };
 
-
+//returns pos of the element in the TypesVector
 template <typename Type, typename TypesVector>
 struct pos;
     
@@ -113,6 +113,7 @@ struct pos<Type, TypesVector<Type, TypesSufix...>> {
     enum { value = 0 }; 
 };
 
+//replace element at pos to NewType
 template <int pos, typename NewType, typename TypesVector>
 struct replace_at_pos;
     
@@ -126,59 +127,6 @@ template <typename NewType, typename TypesPrefix, typename... TypesSufix>
 struct replace_at_pos<0, NewType, TypesVector<TypesPrefix, TypesSufix...>> {
     typedef TypesVector<NewType, TypesSufix...> type; 
 };
-
-
-template <bool b, typename ThenType, typename ElseType> 
-struct if_;
-
-template <typename ThenType, typename ElseType> 
-struct if_<true, ThenType, ElseType> {
-    typedef ThenType type;
-};
-
-template <typename ThenType, typename ElseType> 
-struct if_<false, ThenType, ElseType> {
-    typedef ElseType type;
-};
-
-template <typename Type, typename Vector, typename Order>
-class sorted_insert;
-
-template <typename Type, typename Order>
-class sorted_insert<Type, TypesVector<>, Order> {
-public:
-    typedef TypesVector<Type> type;
-};
-
-
-template <typename Type, typename Element, typename... Elements, typename Order>
-class sorted_insert<Type, TypesVector<Element, Elements...>, Order> {
-    static const int posType = pos<Type, Order>::value;
-    static const int posElem = pos<Element, Order>::value;
-public:
-    typedef typename if_<posType < posElem,
-                         TypesVector<Type, Element, Elements...>,
-                         typename join<TypesVector<Element>, typename sorted_insert<Type, TypesVector<Elements...>, Order>::type>::type
-            >::type type;
-};
-
-
-template <typename Vector, typename Order>
-class sort;
-
-template <typename Type, typename... Types, typename Order>
-class sort<TypesVector<Type, Types...>, Order> {
-    typedef typename sort<TypesVector<Types...>, TypesVector<Order>>::type SortedSufix;
-public:
-    typedef typename sorted_insert<Type, SortedSufix, Order>::type type;
-};
-
-template <typename Order>
-class sort<TypesVector<>, Order> {
-public:
-    typedef TypesVector<> type;
-};
-
 
 } // data_structures
 } //paal
