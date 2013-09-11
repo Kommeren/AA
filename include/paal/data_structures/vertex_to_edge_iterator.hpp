@@ -23,7 +23,7 @@ namespace data_structures {
 template <typename VertexIterator>
 class VertexToEdgeIterator  {
 public:
-    typedef typename utils::IterToElem<VertexIterator>::type Vertex;
+    typedef typename std::iterator_traits<VertexIterator>::value_type Vertex;
     typedef std::pair<Vertex, Vertex> Edge;
 
     typedef std::forward_iterator_tag iterator_category;

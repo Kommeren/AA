@@ -18,9 +18,9 @@ namespace paal {
 namespace utils {
 
 template <typename Iterator> class IteratorWithExcludedElement : 
-    public boost::filter_iterator<std::function<bool(const typename IterToElem<Iterator>::type &)>, Iterator> {
+    public boost::filter_iterator<std::function<bool(const typename std::iterator_traits<Iterator>::value_type &)>, Iterator> {
 public:
-    typedef typename IterToElem<Iterator>::type Element;
+    typedef typename std::iterator_traits<Iterator>::value_type Element;
     IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e) 
         : boost::filter_iterator<std::function<bool(const Element &)>, Iterator >
           (std::bind(std::not_equal_to<Element>(), e, std::placeholders::_1), i, end )  {}

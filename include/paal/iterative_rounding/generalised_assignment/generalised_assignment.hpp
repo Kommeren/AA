@@ -118,8 +118,8 @@ template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime, typename JobsToMachines>
     class GeneralAssignment {
         public:
-            typedef typename utils::IterToElem<JobIter>::type Job;
-            typedef typename utils::IterToElem<MachineIter>::type Machine;
+            typedef typename std::iterator_traits<JobIter>::value_type Job;
+            typedef typename std::iterator_traits<MachineIter>::value_type Machine;
 
             typedef typename std::iterator_traits<JobIter>::reference JobRef;
             typedef typename std::iterator_traits<MachineIter>::reference MachineRef;

@@ -29,7 +29,7 @@ template <typename Iterator,int k> class SubsetsIterator :
     private SubsetsIterator<Iterator, k-1>{
     
 public:
-    typedef typename utils::IterToElem<Iterator>::type Element;
+    typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef typename utils::kTuple<Element, k>::type SubsetType; 
     typedef SubsetsIterator<Iterator, k-1> base;
     typedef std::iterator<std::forward_iterator_tag, 
@@ -117,12 +117,12 @@ protected:
 
 template <typename Iterator> class SubsetsIterator<Iterator, 1> : 
     public std::iterator<std::forward_iterator_tag, 
-                         std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator>,
+                         std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator>,
                          ptrdiff_t, 
-                         std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator> *,
-                         const std::pair<std::tuple<typename utils::IterToElem<Iterator>::type>, Iterator> &> {
+                         std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator> *,
+                         const std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator> &> {
 public:    
-    typedef typename utils::IterToElem<Iterator>::type Element;
+    typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef std::tuple<Element> SubsetType;
 
     SubsetsIterator(Iterator begin, Iterator end ) : 

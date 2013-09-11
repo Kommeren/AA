@@ -11,9 +11,9 @@
 namespace paal {
 namespace data_structures {
 
-template <typename Iterator, typename hash = std::hash<typename utils::IterToElem<Iterator>::type>> 
+template <typename Iterator, typename hash = std::hash<typename std::iterator_traits<Iterator>::value_type>> 
 class CollectionStartsFromLastChange {
-    typedef typename utils::IterToElem<Iterator>::type Element;
+    typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef std::unordered_map<Element, Iterator, hash> ElemToIter;
     typedef std::pair<Iterator, Iterator> Range;
     typedef boost::joined_range<Range, Range> JoinedRange;

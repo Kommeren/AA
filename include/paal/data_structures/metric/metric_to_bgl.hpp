@@ -46,7 +46,7 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
 template <typename Metric, typename VertexIter>                
  typename   AdjacencyMatrix<Metric>::type
 metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
-                     BiMap<typename utils::IterToElem<VertexIter>::type> & idx) {
+                     BiMap<typename std::iterator_traits<VertexIter>::value_type> & idx) {
     typedef data_structures::MetricTraits<Metric> MT;
     typedef typename MT::VertexType VertexType;
     idx = data_structures::BiMap<VertexType>(vbegin, vend); 

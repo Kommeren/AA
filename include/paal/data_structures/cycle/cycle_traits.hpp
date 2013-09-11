@@ -16,7 +16,7 @@ namespace data_structures {
 template <typename Cycle>
 struct CycleTraits {
     typedef decltype(std::declval<Cycle>().vbegin()) VertexIterator;
-    typedef typename utils::IterToElem<VertexIterator>::type CycleElem;
+    typedef typename std::iterator_traits<VertexIterator>::value_type CycleElem;
 };
 
 }

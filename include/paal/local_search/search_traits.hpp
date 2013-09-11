@@ -30,7 +30,7 @@ class Move {
                                 std::declval<Solution &>()
                                 ).first) MoveIterator;
 public:
-   typedef typename utils::IterToElem<MoveIterator>::type type;
+   typedef typename std::iterator_traits<MoveIterator>::value_type type;
 
 };
 
@@ -44,7 +44,7 @@ class MultiMove {
                                 std::declval<Element &>()
                                 ).first) MoveIterator;
 public:
-   typedef typename utils::IterToElem<MoveIterator>::type type;
+   typedef typename std::iterator_traits<MoveIterator>::value_type type;
 
 };
 

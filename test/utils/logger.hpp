@@ -16,10 +16,10 @@
 #       define LOG(x) std::cout<< x <<std::endl << std::flush
 #       define ON_LOG(x) x
 #       define LOG_COPY(b, e) \
-            std::copy(b, e, std::ostream_iterator<typename paal::utils::IterToElem<decltype(b)>::type>(std::cout, "\n"));\
+            std::copy(b, e, std::ostream_iterator<typename std::iterator_traits<decltype(b)>::value_type>(std::cout, "\n"));\
             LOG("")
 #       define LOG_COPY_DEL(b, e, del) \
-            std::copy(b, e, std::ostream_iterator<typename paal::utils::IterToElem<decltype(b)>::type>(std::cout, del));\
+            std::copy(b, e, std::ostream_iterator<typename std::iterator_traits<decltype(b)>::value_type>(std::cout, del));\
             LOG("")
 #else
 #       define LOG(x)
