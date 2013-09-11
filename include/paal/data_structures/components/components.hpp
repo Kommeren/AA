@@ -325,24 +325,35 @@ namespace detail {
 
 
     protected:
+
+        //object is moved if move = true, otherwise passed by reference
+        template <bool move, typename A> 
+        A moveOrPassReference(const A & a) {
+            return std::move(a);
+        }
+        
+        // const reference case
+        template <bool move, typename A, typename = typename std::enable_if<!move>::type> 
+        const A & moveOrPassReference(const A & a) {
+            return a;
+        }
+        
+        //nonconst reference case
+        template <bool move, typename A, typename = typename std::enable_if<!move>::type> 
+        A & moveOrPassReference(A & a) {
+            return a;
+        }
+
         //All of this constructor takes Comps as r-value reference, 
         //because they have to win specialization race with normal constructor.
 
-        //case: movable object, has the appropriate get member function, Type is not reference
+        //case: movable object, has the appropriate get member function
         template <typename Comps, 
-                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name    >::value, int>::type,
-                  typename dummy_ref = typename std::enable_if<!std::is_lvalue_reference<Type>::value>::type>
+                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name    >::value, int>::type>
         Components(Comps && comps, MovableTag m, dummy d = dummy()) : 
-            base(std::forward<Comps>(comps), std::move(m)), 
-            m_component(std::move(comps.template get<Name>())) {} 
-        
-        //case: movable object, has the appropriate get member function, Type is reference
-        template <typename Comps, 
-                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name   >::value, int>::type,
-                  typename dummy_ref = typename std::enable_if<std::is_lvalue_reference<Type>::value, int>::type>
-        Components(Comps && comps, MovableTag m, dummy d = dummy(), dummy_ref dr = dummy_ref()) : 
-            base(std::forward<Comps>(comps), std::move(m)), 
-            m_component(comps.template get<Name>()) {} 
+            base(std::forward<Comps>(comps), std::move(m)),
+            //if Type is not reference type, comps.get<Name>() is moved otherwise reference is  passed
+            m_component(moveOrPassReference<!std::is_lvalue_reference<Type>::value>(comps.template get<Name>())) {} 
 
         //case: movable object, does not have the appropriate get member function
         template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
