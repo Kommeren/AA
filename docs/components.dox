@@ -2,8 +2,7 @@
 
 \section mot Motivation. 
 
-The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but only some of them are really needed.
-The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around.
+The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around.
 
 \subsection mot_exmpl Motivating example
 Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
