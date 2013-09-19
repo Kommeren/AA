@@ -115,18 +115,24 @@ private:
         m_lengthToPos.resize(m_length);
         
         m_length=1;
-        for(auto word : boost::irange(0,m_nuWords)){
-            m_lengthWords.push_back(words[word].size());
-            m_lengthToPos[m_lengthWords[word]].push_back(m_length);
-            for(auto noLetterInWord : boost::irange(0,m_lengthWords[word])){
-                m_sumWords[m_length+noLetterInWord]=words[word][noLetterInWord];
-                assert(words[word][noLetterInWord]!=0);
-                m_posToWord[m_length+noLetterInWord]=word;
-                m_lengthSuffixWord[m_length+noLetterInWord]=m_lengthWords[word]-noLetterInWord;
+        int wordsId = 0;
+        for(auto word : words){
+            auto wordSize = std::distance(std::begin(word), std::end(word));
+            m_lengthWords.push_back(wordSize);
+            m_lengthToPos[wordSize].push_back(m_length);
+            int noLetterInWord = 0;
+            for(auto letter : word) {
+                assert(letter != 0);
+                auto globalLetterId = m_length + noLetterInWord;
+                m_sumWords[globalLetterId] = letter;
+                m_posToWord[globalLetterId] = wordsId;
+                m_lengthSuffixWord[globalLetterId] = wordSize - noLetterInWord;
+                ++noLetterInWord;
             }
             m_firstWordInBlockToLastWordInBlock[m_length]=m_length;
             m_lastWordInBlockToFirstWordInBlock[m_length]=m_length;
-            m_length+=m_lengthWords[word]+1;
+            m_length += wordSize + 1;
+            ++wordsId;
         }
     }
     
@@ -152,12 +158,6 @@ private:
             }
         }
     }
-    
-    
-
-    
-
-    
 
     void joinWord(int ps,int overlap){
         if(m_isJoinedPrefix[m_posToWord[ps]]==JOINED){
