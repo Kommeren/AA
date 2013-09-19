@@ -16,6 +16,9 @@ We solve this problem by local search, using well  known 2-opt moves (see paal::
 Approximation ratio equals \f$4\sqrt{n}\f$ and \f$O(log(n)/log(log(n)))\f$ for euclidean instances in \f$R^2\f$. 
 Although the approximation ratio is weak, the algorithm works well in many practical instances.
 
+\subsection comto Complexity
+The complexity of each round of the algorithm is \f$O(n^2)\f$, where \a n is nuber of vertices in the space.
+
 \subsection References
 The algorithm is described in \cite shmoys1985traveling.
 The approximation ratio is proved in \cite ChandraKT99.

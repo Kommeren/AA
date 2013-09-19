@@ -25,6 +25,10 @@ Capacitated Facility Location (CFL) problem is solved in the same way as uncapac
   full example is capacitated_facility_location_example.cpp
 
 \subsection app_cfl Approximation Ratio equals 6.
+The approximation ratio is proved to be  equal 6 when we use all three move types: add, remove and swap.
+
+\subsection com_cfl Complexity
+The complexity of the algorithm equals to the complexity of the min_cost_max_flow on the graph with number of edges equals \$fO(|Clients| * |Facilities|)\$f and number of vertices equals O\$fO(|Clients|  + |Facilities|)\$. Currently we use boost::successive_shortest_path_nonnegative_weights (to appear).
 
 \subsection References
 The algorithm is described in the \cite Korupolu1998. The Approximation ratio analysis is in \cite Chudak1047770.
