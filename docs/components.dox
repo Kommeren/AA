@@ -10,14 +10,14 @@ Assume that we'd like to write a function which takes three functors Init, Start
 
 <b> Very basic usage: </b>
 
-As library developer introduce a interface
+As library developer (or function provider) we introduce a interface
 
 <pre>
     template \<typename DoStuffComponents\>
     void do_stuff(DoStuffComponents comps);
 </pre>
 
-We introduce the names of the needed components 
+we introduce the names of the needed components 
 
 <pre>
     struct Init;
@@ -25,7 +25,7 @@ We introduce the names of the needed components
     struct Stop;
 </pre>
 
-And define appropriate components class
+and define appropriate components class
 
 <pre>
     template <typename... Args>
