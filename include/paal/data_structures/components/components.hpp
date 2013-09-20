@@ -277,12 +277,11 @@ namespace detail {
          *        const version
          *
          * @tparam ComponentName
-         *
          * @tparam ComponentName
          * @tparam Args
-         * @param call arguments
+         * @param args call arguments
          *
-         * @return 
+         * @return the same as m_component return type 
          */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) const ->

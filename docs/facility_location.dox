@@ -22,6 +22,10 @@ Facility Location (FL) problem is solved by local search. For given solution we 
 
 \subsection app_fl Approximation Ratio equals 3.
 
+\subsection com_fl Complexity
+The complexity of cheking the gain of the  add equals \$fO(|Clients|)\$f. Although the complexity of checking the gain of the remove operation of  algorithm equals to \f$O(|Clients| * |Facilities|)\f$, the amortized cost of  this check for each facility is \f$O(|Clients| * |Facilities|)\f$.
+Swap operation is performed by one add and one remove.
+
 \subsection References
 
 The algorithm an analises is described in \cite Arya01localsearch 

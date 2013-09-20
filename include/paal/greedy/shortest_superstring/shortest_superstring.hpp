@@ -61,7 +61,6 @@ public:
     
     
 /**
- * @param Words
  * @brief return word contains all words as subwords,
  * of lenght at most 3.5 larger than shortest superstring.
  * 

@@ -9,6 +9,7 @@
 ** remove some debug output
 ** columns iterator is invalidated when we remove column (see rounding code)
 ** cost function
+** complexities
 ** removing rows/cols strategy
 ** resolving, solution by moving a point
 ** cplex support ???

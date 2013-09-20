@@ -1,5 +1,5 @@
 /**
- * @file zelikovksy_11_per_6_example.cpp
+ * @file zelikovsky_11_per_6_example.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

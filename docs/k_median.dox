@@ -23,6 +23,9 @@ Facility Location (FL) problem is solved by local search. Given a move which ope
 
 \subsection app_km Approximation Ratio equals 5.
 
+\subsection com_kmedian Complexity
+The complexity of the computing the gain for eachmove equals complexity of the swap for facility location (see \ref fl).
+
 \subsection References
 
 The algorithm an analises is described in \cite Arya01localsearch 

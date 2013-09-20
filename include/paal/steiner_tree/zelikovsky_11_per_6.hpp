@@ -37,7 +37,7 @@ namespace steiner_tree {
  * @brief This is Alexander Zelikovsky 11/6 approximation algorithm for steiner tree.
  *
  * Example: <br>
-   \snippet steiner_tree_example.cpp Steiner Tree Example
+   \snippet zelikovsky_11_per_6_example.cpp Steiner Tree Example
  *
  * full example is steiner_tree_example.cpp
  *

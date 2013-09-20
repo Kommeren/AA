@@ -56,7 +56,7 @@ How to get the parameters back from DoStuffComponents:
 You can define DoStuffComponents as follows
 <pre>
     template <typename... Args>
-    using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\>;
+    using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>\:\:type\<Args...\>;
 </pre>
 
 Later on user can construct the DoStuffComponents as follows
