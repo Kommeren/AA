@@ -14,7 +14,7 @@
 #include <utility>
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <paal/utils/do_nothing_functor.hpp>
+#include <paal/utils/functors.hpp>
 
 namespace paal{
 namespace greedy{

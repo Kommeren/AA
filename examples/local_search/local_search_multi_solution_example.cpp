@@ -92,11 +92,8 @@ int main() {
     Solution sol{DIM, 0};
     fillRand(sol);
 
-    //creating components
-    SearchComp comps;
-
     //search
-    local_search::local_search_multi_solution_simple(sol, comps);
+    local_search::local_search_multi_solution_simple(sol, SearchComp());
 
     //print solution
     std::cout << "Solution: " <<  std::endl;

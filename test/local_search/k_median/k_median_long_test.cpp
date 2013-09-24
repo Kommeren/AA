@@ -17,7 +17,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/local_search/k_median/k_median.hpp"
-#include "paal/utils/array2function.hpp"
+#include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
 #include "utils/logger.hpp"

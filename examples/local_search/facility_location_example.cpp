@@ -8,7 +8,7 @@
 #include <iostream>
 
 #include "paal/local_search/facility_location/facility_location.hpp"
-#include "paal/utils/array2function.hpp"
+#include "paal/utils/functors.hpp"
 #include "test/utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
@@ -21,7 +21,7 @@ int main() {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    typedef Array2Function<std::vector<int>> Cost;  
+    typedef paal::utils::Array2Functor<std::vector<int>> Cost;  
 
     //define voronoi and solution
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
@@ -35,7 +35,7 @@ int main() {
 
     //create voronoi and solution
     VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, make_Array2Function(fcosts));
+    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, paal::utils::make_Array2Functor(fcosts));
 
     //create facility location local search components
     DefaultRemoveFLComponents<int>::type rem;

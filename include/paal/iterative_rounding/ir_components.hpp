@@ -15,7 +15,7 @@
 
 #include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/double_rounding.hpp"
-#include "paal/utils/do_nothing_functor.hpp"
+#include "paal/utils/functors.hpp"
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/lp/ids.hpp"

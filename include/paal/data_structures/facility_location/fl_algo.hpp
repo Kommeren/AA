@@ -10,7 +10,7 @@
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/iterator_utils.hpp"
-#include "paal/utils/do_nothing_functor.hpp"
+#include "paal/utils/functors.hpp"
 
 namespace paal {
 namespace simple_algo {

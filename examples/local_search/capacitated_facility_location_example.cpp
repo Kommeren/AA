@@ -7,7 +7,7 @@
  */
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
-#include "paal/utils/array2function.hpp"
+#include "paal/utils/functors.hpp"
 #include "test/utils/sample_graph.hpp"
 
 using namespace paal::local_search::facility_location;
@@ -19,13 +19,13 @@ int main() {
     auto gm = SGM::getGraphMetricSmall();
    
     std::vector<int> fcostsv{7,8};
-    auto facilityCost = make_Array2Function(fcostsv);
+    auto facilityCost = paal::utils::make_Array2Functor(fcostsv);
 
     std::vector<int> fcapv{2, 2};
-    auto facilityCapacity = make_Array2Function(fcapv);
+    auto facilityCapacity = paal::utils::make_Array2Functor(fcapv);
     
     std::vector<int> cdemv{2, 2, 1, 3, 3};
-    auto clientDemand = make_Array2Function(cdemv);
+    auto clientDemand = paal::utils::make_Array2Functor(cdemv);
     
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<

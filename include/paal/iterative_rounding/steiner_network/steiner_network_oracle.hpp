@@ -14,7 +14,7 @@
 
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/utils/double_rounding.hpp"
-#include "paal/utils/do_nothing_functor.hpp"
+#include "paal/utils/functors.hpp"
 
 
 namespace paal {

@@ -8,7 +8,7 @@
 #ifndef BOUNDED_DEGREE_MST_ORACLE_COMPONENTS_HPP
 #define BOUNDED_DEGREE_MST_ORACLE_COMPONENTS_HPP
 
-#include "paal/utils/do_nothing_functor.hpp"
+#include "paal/utils/functors.hpp"
 
 namespace paal {
 namespace ir {

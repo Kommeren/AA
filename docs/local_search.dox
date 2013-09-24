@@ -1,19 +1,12 @@
-/**
- * @file local_search_step.hpp
- * @brief consists different kinds of local search steps.
- * @author Piotr Wygocki
- * @version 1.0
- * @date 2013-02-01
- */
-
 /*! \page local_search Local Search
 Index:
 <ul>
     <li> \ref Preliminaries - containing preliminaries to Local Search and our interpretation of it.
-    <li> LOCAL SEARCH INTERFACE - containing c++ interfaces of Local Search classes.
+    <li> \ref local_search_interface - containing c++ interfaces of Local Search classes.
     <ul>
-    <li> LOCAL SEARCH SINGLE SOLUTION
-    <li> LOCALC SEARCH MULTI SOLUTION
+    <li> \ref local_search_single
+    <li> \ref local_search_multi
+    <li> \ref custom_components
     </ul>
 </ul>
 
@@ -116,7 +109,7 @@ bool search(LocalSearchStep & lss,
             GlobalStopCondition gsc = utils::ReturnFalseFunctor());
 </pre>
 
-\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION STEP
+\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION
 
 In order to present the local search step interface we need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Move</i> is the type of single move. <br>
@@ -153,19 +146,11 @@ Concepts:
     }
     </pre>
     </li>
-    <li> <i>SearchComponents</i>All of the previous concepts are grouped together into one class.
-    <pre>
-    SearchComponentsArchetype {
-        GetMoves & getMoves();
-        Gain & gain();
-        Commit & commit();
-        StopCondition & stopCondition();
-    }
-    </pre>
+    <li> <i>SearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
+Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one local search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
 
 \subsubsection Example
 full example: local_search_example.cpp
@@ -232,16 +217,8 @@ Concepts:
     }
     </pre>
     
-    <li> <i>MultiSearchComponents</i>All of the previous concepts are grouped together into one class.
-    <pre>
-    MultiSearchComponentsArchetype {
-        MultiGetMoves & getMoves();
-        MultiGain & gain();
-        MultiCommit & commit();
-        MultiStopCondition & stopCondition();
-    }
-    </pre>
-
+    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
+    </li>
 </ol>
 
 Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
@@ -264,7 +241,16 @@ Note that we don't define StopCondition i.e. we're using default TrivialStopCond
 After we've defined components we run LS.
 
 \snippet local_search_multi_solution_example.cpp Local Search Example
- 
+
+\section custom_components CUSTOM COMPONENTS
+
+The library provides a number of custom components which might be very helpful.
+<ol>
+<li> paal::local_search::GainCutSmallImproves
+<li> paal::local_search::StopConditionTimeLimit
+<li> paal::local_search::StopConditionCountLimit
+<li> paal::local_search::ComputeGainWrapper
+</ol>
 */
 
 

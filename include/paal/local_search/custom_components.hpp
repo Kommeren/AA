@@ -8,6 +8,8 @@
 #ifndef CUSTOM_COMPONENTS_HPP
 #define CUSTOM_COMPONENTS_HPP 
 
+#include <chrono>
+
 namespace paal {
 namespace local_search {
 
@@ -58,6 +60,25 @@ private:
     const unsigned m_limit;
 
 };
+
+template <typename duration = std::chrono::duration<int, std::chrono::seconds> ,typename clock = std::chrono::system_clock>
+class StopConditionTimeLimit {
+public:
+    StopConditionTimeLimit(duration d) :  m_duration(d), m_start(clock::now()) {}
+
+    template <typename... Args> 
+    bool operator()(Args&&... ) {
+        return m_start + m_duration < clock::now() ;
+    }
+
+    void restart() {
+        m_start = clock::now();
+    }
+private:
+    typename clock::time_point m_start;
+    const duration m_duration;
+};
+
 
 template <typename Gain, typename ValueType>
 class ComputeGainWrapper {

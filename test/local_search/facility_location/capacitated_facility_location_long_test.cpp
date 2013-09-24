@@ -18,7 +18,7 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
-#include "paal/utils/array2function.hpp"
+#include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
 #include "utils/logger.hpp"
@@ -87,9 +87,9 @@ void runTests(const std::string & fname, Solve solve) {
         auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
     
-        auto cost = make_Array2Function(facCost);
-        auto verticesDemands = make_Array2Function(demands, -firstClient);
-        auto facCapacities = make_Array2Function(facCap);
+        auto cost = paal::utils::make_Array2Functor(facCost);
+        auto verticesDemands = paal::utils::make_Array2Functor(demands, -firstClient);
+        auto facCapacities = paal::utils::make_Array2Functor(facCap);
         std::cout << std::accumulate(clients.begin(), clients.end(), 
                                     0, [&](int d, int v){return d + verticesDemands(v);}) << std::endl;
     
