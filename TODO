@@ -1,5 +1,3 @@
-* components to sum te updates values in LS
-* add complexities
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING

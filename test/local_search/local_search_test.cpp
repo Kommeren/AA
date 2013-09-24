@@ -12,7 +12,7 @@
 
 #include <vector>
 
-#include "paal/local_search/local_search_step.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "utils/logger.hpp"
 
 namespace ls = paal::local_search;

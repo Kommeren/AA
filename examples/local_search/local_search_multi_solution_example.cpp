@@ -11,7 +11,7 @@
 
 #include <boost/range/irange.hpp>
 
-#include "paal/local_search/local_search_step.hpp"
+#include "paal/local_search/local_search.hpp"
 
 using namespace  paal;
 
@@ -38,18 +38,18 @@ Fitness f(const Solution & x) {
 struct GetMoves {
     typedef std::vector<Move> Neigh;
     typedef typename Neigh::const_iterator Iter;
-    const Neigh neighb;
-    Neigh neighbCut;
+    const Neigh m_neighb;
+    Neigh m_neighbCut;
 public:
 
-    GetMoves() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
+    GetMoves() : m_neighb{.01, -.01, .001, -.001}, m_neighbCut(m_neighb.size()) {}
 
     std::pair<Iter, Iter> operator()(const Solution & s, SolutionElement i) {
-        for(int j : boost::irange(size_t(0), neighb.size())) {
-            neighbCut[j] = std::max(neighb[j] + i, LOWER_BOUND);
-            neighbCut[j] = std::min(neighbCut[j], UPPER_BOUND);
+        for(int j : boost::irange(size_t(0), m_neighb.size())) {
+            m_neighbCut[j] = std::max(m_neighb[j] + i, LOWER_BOUND);
+            m_neighbCut[j] = std::min(m_neighbCut[j], UPPER_BOUND);
         }
-        return std::make_pair(neighbCut.begin(), neighbCut.end());
+        return std::make_pair(m_neighbCut.begin(), m_neighbCut.end());
     }
 };
 
@@ -76,8 +76,9 @@ struct Commit {
 };
 //! [Local Search Components Example]
 
-//creates random 0-1 vector
 typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
+
+//creates random 0-1 vector
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(SolutionElement & el : s) {
@@ -88,19 +89,18 @@ void fillRand(Solution &s) {
 int main() {
 //! [Local Search Example]
     //creating local search
-    Solution initSol{DIM, 0};
-    fillRand(initSol);
-    local_search::LocalSearchStepMultiSolution<
-        Solution, 
-        local_search::search_strategies::ChooseFirstBetter, 
-        SearchComp> ls(initSol);
+    Solution sol{DIM, 0};
+    fillRand(sol);
+
+    //creating components
+    SearchComp comps;
 
     //search
-    search(ls); 
+    local_search::local_search_multi_solution_simple(sol, comps);
 
     //print solution
     std::cout << "Solution: " <<  std::endl;
-    std::copy(ls.getSolution().begin(), ls.getSolution().end(),
+    std::copy(sol.begin(), sol.end(),
                 std::ostream_iterator<SolutionElement>(std::cout, "\n"));
 //! [Local Search Example]
     return 0;

@@ -11,18 +11,18 @@
 namespace paal {
 namespace local_search {
 
-template <typename Gain, typename Dist>
+template <typename Gain, typename ValueType>
 class GainCutSmallImproves {
 public:    
     GainCutSmallImproves() = default; 
     GainCutSmallImproves(GainCutSmallImproves && ) = default; 
     GainCutSmallImproves(const GainCutSmallImproves & ) = default; 
 
-    GainCutSmallImproves(Gain ic, Dist currOpt, double epsilon) :
+    GainCutSmallImproves(Gain ic, ValueType currOpt, double epsilon) :
                 m_improveChecker(std::move(ic)), m_currOpt(currOpt), m_epsilon(epsilon)  {}
-    template <typename... Args> Dist 
+    template <typename... Args> ValueType 
         operator()(Args&&... args) { 
-        Dist dist = m_improveChecker(std::forward<Args>(args)...);
+        ValueType dist = m_improveChecker(std::forward<Args>(args)...);
         if(dist > m_epsilon * m_currOpt) {
             m_currOpt -= dist;
             return dist;
@@ -34,13 +34,13 @@ public:
         m_epsilon = e;
     }
     
-    void setCurrentOpt(Dist opt) {
+    void setCurrentOpt(ValueType opt) {
         m_currOpt = opt;
     }
 
 private:
     Gain m_improveChecker;
-    Dist m_currOpt;    
+    ValueType m_currOpt;    
     double m_epsilon;    
 };
 
@@ -58,6 +58,25 @@ private:
     const unsigned m_limit;
 
 };
+
+template <typename Gain, typename ValueType>
+class ComputeGainWrapper {
+public:
+    ComputeGainWrapper(ComputeGainWrapper gain, ValueType & val) : m_gain(gain), m_val(val) {}
+
+    template <typename... Args> 
+    bool operator()(Args&&... args) {
+        auto diff = m_gain(std::forward<Args>(args)...);
+        m_val += diff;
+        return diff;
+    }
+
+private:
+    Gain m_gain;
+    ValueType & m_val;
+};
+
+
 
 } // local_search
 } // paal

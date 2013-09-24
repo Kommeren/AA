@@ -9,7 +9,7 @@
 #include <vector>
 #include <iostream>
 
-#include "paal/local_search/local_search_step.hpp"
+#include "paal/local_search/local_search.hpp"
 
 //! [Local Search Components Example]
 namespace ls =  paal::local_search;

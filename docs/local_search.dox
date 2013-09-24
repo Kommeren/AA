@@ -268,7 +268,4 @@ After we've defined components we run LS.
 */
 
 
-#include "single_solution/local_search_single_solution.hpp"
-#include "single_solution/local_search_single_solution_obj_function.hpp"
-#include "multi_solution/local_search_multi_solution.hpp"
 

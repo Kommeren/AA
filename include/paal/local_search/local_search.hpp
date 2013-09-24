@@ -8,6 +8,9 @@
 #ifndef LOCAL_SEARCH_HPP
 #define LOCAL_SEARCH_HPP 
 #include "paal/utils/do_nothing_functor.hpp"
+#include "single_solution/local_search_single_solution.hpp"
+#include "single_solution/local_search_single_solution_obj_function.hpp"
+#include "multi_solution/local_search_multi_solution.hpp"
 
 namespace paal {
 namespace local_search {

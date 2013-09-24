@@ -27,7 +27,7 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
-#include "paal/local_search/local_search_step.hpp"
+#include "paal/local_search/local_search.hpp"
 
 namespace paal {
 namespace steiner_tree {
