@@ -2,7 +2,7 @@
 
 \section mot Motivation. 
 
-The main motivation for components class is handling default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around.
+The main motivation for \a Components class is handling default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around. From now on each of the argument is called comonent. Componenets group togheter in one class are called just  \a Components.
 
 \subsection mot_exmpl Motivating example
 Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
@@ -66,7 +66,7 @@ Later on user can construct the DoStuffComponents as follows
     DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents3;
 </pre>
 
-This is the main motivation but the library consists of much more handy ways of manipulating the Components.
+This is the main motivation but the library consists of much more handy ways of manipulating the \a Components.
 
 \section def_comp Defining Components 
 The type of the component can be any type including references. Default parameters can be specified for any number of last components.
@@ -89,7 +89,7 @@ This can be done without template aliasing
     DoStuffComponents::type<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
 </pre>
 
-\section const_comp Constructing Components
+\section const_comp Constructing \a Components
 There are several ways of contructing components:
 <ul>
 <li> One can provide any number of arguments. The kth argument has to be convertible kth component.
