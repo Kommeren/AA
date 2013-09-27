@@ -11,3 +11,7 @@ The minimal doxygen version is 1.8.3.
 
 Library does NOT compile on Visual Studio 2013. Last check 09.09.13 - template aliasing missing.
 
+In order to run automatic test run
+
+./test/run_tests.sh
+./test/run_tests_long.sh

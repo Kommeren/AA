@@ -1,0 +1,29 @@
+/*! \page knapsack Knapsack
+
+\section def Problem definition.
+In the knapsack problem we are given set of objects and capacity of the knapsack. Each object has its size and value.
+We should choose some objects of the total size not exceeding the capacity and maximizing the sum of the objects values.
+
+There are to variants of this problem. In the standard Knapsack (which is called just Knapsack) problem, each objects can be chosen many times.
+In the Knapsack 0/1 problem each object from the objects set can be chosen only once.
+
+
+\section Solution
+Both variants of Knapsack are solved using the dynamic approach.
+We construct a table of size \f$[0-capacity]\f$. Each cell of the table contains information about the best value for this size of knapsack.
+In each round we update the table adding new objects from object set. 
+In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
+  example: 
+\snippet knapsack_example.cpp Knapsack Example
+ 
+  full example is knapsack_example.cpp
+
+The library provides function paal::knapsack function which solves standard knapsack problem. And to overload of paal::knapsack_0_1 problem. One solves the Knapsack 0/1 with retrieving solution and one omitting this procedure.
+
+\subsection Complexity
+The algorithms works in \f$O(Capacity * NumberOfObjects)\f$ and in \f$O(c)\f$ memory.
+
+\subsection References
+
+The algorithm is described in the \cite conf/asap/NibbelinkRM07
+*/

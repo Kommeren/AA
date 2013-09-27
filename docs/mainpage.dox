@@ -39,6 +39,10 @@
             <li> \ref shortestsuperstring
             <li> \ref sjoipm
             </ul>
+        <li> Dynamic
+            <ul>
+            <li> \ref knapsack
+            </ul>
         <li> Miscellaneous
             <ul>
             <li>\ref stein
@@ -92,13 +96,13 @@
   ___________________________________________________________________________________________________
   
       DATA_STRUCTURES - The data-structures used by algorithm helpers. 
-      Our data-structures introduce usefull and interesting higher level concepts, e.g., Metric or Cycle.
+      Our data-structures introduce useful and interesting higher level concepts, e.g., Metric or Cycle.
   ___________________________________________________________________________________________________
   
   </pre>
   <br>
   For each solution concept our library is delivering default implementations of components from each layer. <br>
-  The strength of this design is that the user is allowed to change components from each layer freelly. <br><br>
+  The strength of this design is that the user is allowed to change components from each layer freely. <br><br>
   
   For example the user can easily swap the implementation of the GetNeighborhood to provide his own way of searching the neighborhood
   in local search. <br>
@@ -108,8 +112,5 @@
  \section Platforms
  Currently the library compiles on the gcc 4.7.3. and clang 3.2. Unfortunately, the library does not 
  compile on the newest Microsoft Visual Studio 2013 due to its poor support of c++0x.
-
-//  \section  Testing
-//TODO
  
 */

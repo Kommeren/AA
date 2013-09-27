@@ -41,6 +41,12 @@ struct ReturnTrueFunctor :
 struct ReturnZeroFunctor :
     public ReturnSomethingFunctor<int, 0> {};
 
+/**    
+ * @brief Adapts array as function, providing operator()().      
+ *       
+ * @tparam Array input array type 
+*/
+
 template <typename Array> 
 class Array2Functor{
 public:

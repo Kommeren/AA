@@ -96,3 +96,7 @@ exit_on_error
 echo ------------------------------------------- scheduling_jobs_on_identical_parallel_machines_test      -------------------------------------------------------------------------------------
 ./${build_dir}/test/scheduling_jobs_on_identical_parallel_machines_test
 exit_on_error
+echo ------------------------------------------- knapsack_test 	 -------------------------------------------------------------------------------------
+./${build_dir}/test/knapsack_test
+exit_on_error
+
