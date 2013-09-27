@@ -1,16 +1,17 @@
 /*! \mainpage This is the Practical Approximation Algorithms library. 
  
   \section Introduction
-    The PAAl is a header-only, general library consisting of general algorithms, 
+    The PAAl is a header-only, generic library consisting of approximation algorithms, 
     data structures and several complete solution for the various optimization problems.
-    The PAAl is implemented taking advantage of the new fabulous features of C++ introduced in the c++0x standard.
+    The PAAl is implemented taking advantage of the new features of C++ introduced in the c++0x standard,
+    which in many cases simplify greatly creation of generic code.
  
   \section Installation
    There is no need to install anything because the PAAl is header only. 
    All you have to do is to download the library and include appropriate headers.
    Only, if you use linear programming you must link your executable against glpk.
 
-   If you'd like to develop the library, you must compile the unit test.
+   If you'd like to alter the library, we encourage you to compile the unit test.
 
   \section get_repo Download
     In order to download repository please run the following command:
@@ -71,41 +72,44 @@
   <pre>
       algorithm(ProblemDescription)
   </pre>
-  Very often algorithms can customized, extended and takes many different arguments. This arguments are handled by Components class(see \ref comps). 
+  Very often algorithms can be customized or extended, as they support many different arguments. These arguments are 
+  usually wrapped using Components class (see \ref comps), which allows to specify named arguments. In such 
+  a case the algorithms is called as follows:
   <pre>
       algorithm(ProblemDescription, Components)
   </pre>
 
-  Generally The library is divided into the three layers: 
+  Generally the library is divided into the following three layers: 
   <pre>
    ___________________________________________________________________________________________________
   
-      ALGORITHMS  - e. g. LocalSearch. The algorithms are written in very general way.
-      The are delegating the specific tasks to the algorithm helpers.
+      ALGORITHMS  - e. g., LocalSearch. The algorithms are written in very generic way by 
+      delegating the specific tasks to the algorithm helpers.
   ___________________________________________________________________________________________________
   
-      ALGORITHMS COMPONENTS - e. g. GetNeighborhood, Commit in local search.
-      This are the bricks  working on specific data structures concepts.
+      ALGORITHMS COMPONENTS - e. g., GetNeighborhood or Commit in local search.
+      This are the bricks that directly manipulate the specific data-structure concepts.
   ___________________________________________________________________________________________________
   
-      DATA_STRUCTURES - e.g. Metric, Cycle. The data structure used by algorithm helpers. 
-      This data structures might be of independent interest.
+      DATA_STRUCTURES - The data-structures used by algorithm helpers. 
+      Our data-structures introduce usefull and interesting higher level concepts, e.g., Metric or Cycle.
   ___________________________________________________________________________________________________
   
   </pre>
   <br>
-  Our library is delivering default implementations of components from each layer. <br>
-  The strength of this design is that the user is allowed to change components from each layer. <br><br>
+  For each solution concept our library is delivering default implementations of components from each layer. <br>
+  The strength of this design is that the user is allowed to change components from each layer freelly. <br><br>
   
-  For example the user can easily swap the implementation of the GetNeighborhood to provide his own way of searching the neighborhood. <br>
+  For example the user can easily swap the implementation of the GetNeighborhood to provide his own way of searching the neighborhood
+  in local search. <br>
   Also note that the same algorithm helpers that are used by local search can be used to produced the simulated annealing algorithm. <br>
-  If the user want to swap implementation of the metric to use specific properties of his topology is not the problem at all! <br>
+  Similarly, if the user wants to swap the metric implementation to use specific properties of his topology, this is not a problem at all! <br>
   
  \section Platforms
- Currently the library compiles on the gcc 4.7.3. and clang 3.2 Unfortunately the library does not compile on the newest Microsoft Visual Studio 2013 due to the poor support of c++0x.
+ Currently the library compiles on the gcc 4.7.3. and clang 3.2. Unfortunately, the library does not 
+ compile on the newest Microsoft Visual Studio 2013 due to its poor support of c++0x.
 
-  \section  Testing
-
-  //TODO
+//  \section  Testing
+//TODO
  
 */
