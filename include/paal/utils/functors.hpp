@@ -7,10 +7,12 @@
  */
 #ifndef FUNCTORS_HPP
 #define FUNCTORS_HPP 
+#include <cassert>
+
 namespace paal {
 namespace utils {
 
-struct DoNothingFunctor {
+struct SkipFunctor {
     template <typename ... Args > 
     void  operator()(Args&&... args) const {}
 };
@@ -23,7 +25,7 @@ struct ReturnSomethingFunctor {
     } 
 };
 
-struct ReturnSameFunctor {
+struct IdentityFunctor {
     template <typename Arg> 
     auto  operator()(Arg&& arg) const ->
     Arg
@@ -40,6 +42,13 @@ struct ReturnTrueFunctor :
 
 struct ReturnZeroFunctor :
     public ReturnSomethingFunctor<int, 0> {};
+
+struct AssertFunctor {
+    template <typename ... Args > 
+    void  operator()(Args&&... args) const {
+        assert(false);
+    } 
+};
 
 /**    
  * @brief Adapts array as function, providing operator()().      

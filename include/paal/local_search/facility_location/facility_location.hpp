@@ -88,7 +88,7 @@ template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename FacilityLocationSolution, 
           typename... Components>
 bool facility_location_local_search_simple(FacilityLocationSolution & fls, Components... components) {
-    return facility_location_local_search(fls, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return facility_location_local_search(fls, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
 }
 
 

@@ -208,7 +208,7 @@ template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename Solution, 
           typename... Components>
 bool local_search_simple(Solution & solution, Components... components) {
-    return local_search<SearchStrategy>(solution, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return local_search<SearchStrategy>(solution, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
 }
 
 

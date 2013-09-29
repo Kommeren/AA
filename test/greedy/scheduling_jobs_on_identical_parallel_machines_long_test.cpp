@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
             
             LOG("jobs: "<<jobs.size());
             paal::greedy::scheduling_jobs_on_identical_parallel_machines::
-                    schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result),paal::utils::ReturnSameFunctor());
+                    schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result),paal::utils::IdentityFunctor());
             std::vector<Time> sumOfMachine;
             sumOfMachine.resize(numberOfMachines);
             for(auto jobMachinePair:result){

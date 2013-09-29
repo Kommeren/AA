@@ -193,7 +193,7 @@ namespace paal {
             typename RoundCondition = TARoundCondition, 
             typename RelaxContition = TARelaxCondition, 
             typename Init = TAInit,
-            typename SetSolution = utils::DoNothingFunctor>
+            typename SetSolution = utils::SkipFunctor>
                 using  TAComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
         /**

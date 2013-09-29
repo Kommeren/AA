@@ -14,6 +14,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/dynamic/knapsack.hpp"
+#include "paal/dynamic/knapsack_0_1.hpp"
 #include "paal/utils/double_rounding.hpp"
 #include "utils/logger.hpp"
 
@@ -85,7 +86,7 @@ void read(const std::string & testDir,
 }
 
 
-BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
+BOOST_AUTO_TEST_CASE(KnapSackLong) {
     std::string testDir = "test/data/KNAPSACK/";
     std::ifstream is_test_cases(testDir + "cases.txt");
 

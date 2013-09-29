@@ -16,10 +16,10 @@ namespace paal {
 namespace local_search {
 
 template <typename LocalSearchStep, 
-          typename PostSearchAction = utils::DoNothingFunctor,
+          typename PostSearchAction = utils::SkipFunctor,
           typename GlobalStopCondition = utils::ReturnFalseFunctor>
 bool search(LocalSearchStep & lss, 
-            PostSearchAction psa = utils::DoNothingFunctor(),
+            PostSearchAction psa = utils::SkipFunctor(),
             GlobalStopCondition gsc = utils::ReturnFalseFunctor()) {
     bool ret = false;  
     while(lss.search() && !gsc(lss.getSolution())) {

@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
     typedef double Time;
     std::vector<Time> j={2.1,3.1,4.1,5.1,6.1,7.1,8.1};
     std::vector< std::pair<int, Time> > result;
-    paal::greedy::scheduling_jobs_on_identical_parallel_machines::schedulingJobsOnIdenticalParallelMachines(numberOfMachines,j.begin(),j.end(),back_inserter(result),paal::utils::ReturnSameFunctor());
+    paal::greedy::scheduling_jobs_on_identical_parallel_machines::schedulingJobsOnIdenticalParallelMachines(numberOfMachines,j.begin(),j.end(),back_inserter(result),paal::utils::IdentityFunctor());
     std::vector<Time> sumOfMachine;
     sumOfMachine.resize(numberOfMachines);
     for(auto jobMachinePair:result){

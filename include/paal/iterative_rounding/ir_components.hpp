@@ -186,8 +186,8 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
         data_structures::NameWithDefault<RoundCondition, DefaultRoundCondition>,
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
-        data_structures::NameWithDefault<Init, utils::DoNothingFunctor>,
-        data_structures::NameWithDefault<SetSolution, utils::DoNothingFunctor>,
+        data_structures::NameWithDefault<Init, utils::SkipFunctor>,
+        data_structures::NameWithDefault<SetSolution, utils::SkipFunctor>,
         data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
         data_structures::NameWithDefault<DeleteColStrategy, DeleteCol>> Components;
         

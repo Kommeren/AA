@@ -1,11 +1,5 @@
 /*! \page repo Using git resitory in paal
- \section gda Getting developer access to repository
   
-   In order to have developer access to repository the the ssh key is required. If you don't have one it can be generate using
-<pre>
-ssh-keygen -t rsa
-</pre>
-   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address. The id_rsa.pub which is your public key has to be send to wygos@mimuw.edu.pl (optionally to piotr.smulewicz@students.mimuw.edu.pl).
 
 \section gerrit Working with gerrit
 
@@ -17,6 +11,11 @@ http://siekiera.mimuw.edu.pl:8082/
 </pre>
 
 <li> In settings, open SSH Public Keys tab. Add the public key from the machine you're using for development (cat .ssh/id_rsa.pub)
+     If you don't have one it can be generate using
+<pre>
+ssh-keygen -t rsa
+</pre>
+   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address. 
 
 <li> Clone write access version of the repository
 <pre>
@@ -58,7 +57,7 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
     </ul>
 \section Workflow
 <ul>
-<li> Each developer works on his own branch. <b> Only assigned developers have rights to push comits to master </b>.
+<li> Each developer works on his own branch. <b> Only assigned developers have rights to push commits to master </b>.
 <li> Before pushing to master code goes through code review process.
 <li> Each developer is responsible for his own branch. If you to move your current branch with the newest changes from master use 
 <pre>

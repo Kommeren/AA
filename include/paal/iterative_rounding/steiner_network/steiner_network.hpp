@@ -169,7 +169,7 @@ template <
          typename RoundCondition = SteinerNetworkRoundCondition, 
          typename RelaxContition = utils::ReturnFalseFunctor, 
          typename Init = SteinerNetworkInit,
-         typename SetSolution = utils::DoNothingFunctor>
+         typename SetSolution = utils::SkipFunctor>
              using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 

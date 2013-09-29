@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     DefaultRemoveFLComponents<int>::type rem;
     DefaultAddFLComponents<int>::type    add;
     DefaultSwapFLComponents<int>::type   swap;
-    paal::utils::DoNothingFunctor nop;
+    paal::utils::SkipFunctor nop;
     paal::local_search::StopConditionCountLimit oneRoundSearch(1);
 
     BOOST_CHECK(facility_location_local_search(

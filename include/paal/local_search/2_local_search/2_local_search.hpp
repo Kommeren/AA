@@ -128,7 +128,7 @@ template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename Cycle, 
           typename... Components>
 bool two_local_search_simple(Cycle & cycle, Components... components) {
-    return two_local_search(cycle, utils::DoNothingFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return two_local_search(cycle, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
 }
 
 
