@@ -74,7 +74,7 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
             l /= double(demands[i]);
             m(i+F, j) = cast(l);
             m(j, i+F) = cast(l);
-    //        LOG(i+F << " "<< j << " " << l);
+    //        LOGLN(i+F << " "<< j << " " << l);
         }
     }
 

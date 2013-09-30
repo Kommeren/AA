@@ -57,9 +57,9 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     steiner_network_iterative_rounding(g, cost, resultNetwork, std::move(comps));
 
     // printing result
-    LOG("Edges in steiner network");
+    LOGLN("Edges in steiner network");
     for(auto const  & e : resultNetwork) {
-        LOG("Edge " << e);
+        LOGLN("Edge " << e);
     }
 }
 

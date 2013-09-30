@@ -30,7 +30,7 @@ void testGetVal(const Bimap & b) {
             t+=b.getVal(i); //has to do addition, because without it compiler removes the whole loop
         }
     }
-    LOG(t);
+    LOGLN(t);
 }
 
 template <typename Bimap>
@@ -45,16 +45,16 @@ void test() {
     ON_LOG(time_t t1 = time(NULL));
     Bimap b(vec.begin(), vec.end());
     ON_LOG(time_t t2 = time(NULL));
-    LOG("construction time " << t2 - t1);
+    LOGLN("construction time " << t2 - t1);
     ON_LOG(t1 = t2);
     testGetVal(b);
     ON_LOG(t2 = time(NULL));
-    LOG("getval time " << t2 - t1);
+    LOGLN("getval time " << t2 - t1);
     
     ON_LOG(t1 = t2);
     testGetIdx(b);
     ON_LOG(t2 = time(NULL));
-    LOG("getidx time " << t2 - t1);
+    LOGLN("getidx time " << t2 - t1);
 }
 
 BOOST_AUTO_TEST_CASE(bimap) {
@@ -66,8 +66,8 @@ BOOST_AUTO_TEST_CASE(bimap) {
         i = rand() % s;
     }
 
-    LOG("boost::mulit_index Bimap");
+    LOGLN("boost::mulit_index Bimap");
     test<paal::data_structures::BiMapMIC<int>>();
-    LOG("paal Bimap");
+    LOGLN("paal Bimap");
     test<paal::data_structures::BiMap<int>>();
 }

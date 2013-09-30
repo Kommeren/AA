@@ -86,17 +86,17 @@ BOOST_AUTO_TEST_CASE(local_search__multi_lamdas_choose_first_better_test) {
 
     //printing
     auto const & s = ls.getSolution();
-    LOG("f(");
+    LOGLN("f(");
     LOG_COPY_DEL(s.begin(), s.end(), ","); 
-    LOG(") \t" << f(s));
+    LOGLN(") \t" << f(s));
     ON_LOG(int i = 0);
 
     //search
     while(ls.search()) {
         //printing
-        LOG("f(");
+        LOGLN("f(");
         LOG_COPY_DEL(s.begin(), s.end(), ","); 
-        LOG(") \t" << f(s) << " after " << i++ );
+        LOGLN(") \t" << f(s) << " after " << i++ );
     }*/
     /*   BOOST_CHECK_EQUAL(s, 6);*/
 }

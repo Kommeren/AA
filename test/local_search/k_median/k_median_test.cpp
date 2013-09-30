@@ -35,6 +35,6 @@ BOOST_AUTO_TEST_CASE(test_1) {
 
     //print result
     auto const & ch = sol.getChosenFacilities();
-    LOG("Solution:");
+    LOGLN("Solution:");
     LOG_COPY_DEL(ch.begin(), ch.end(), ",");
 }

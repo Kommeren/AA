@@ -44,7 +44,7 @@ void operator()(Sol & sol) {
            ON_LOG(auto const & ch =  sol.get().getChosenFacilities());
            LOG_COPY_DEL(ch.begin(), ch.end(), ",");
            ON_LOG(auto c = sol.get().getVoronoi().getCost());
-           LOG("current cost " << simple_algo::getCFLCost(m_metric, m_cost, sol.get()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
+           LOGLN("current cost " << simple_algo::getCFLCost(m_metric, m_cost, sol.get()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
         };
 
 private:
@@ -74,8 +74,8 @@ void runTests(const std::string & fname, Solve solve) {
         if(fname == "")
             return;
 
-        LOG("TEST " << fname);
-        LOG(std::setprecision(20) <<  "OPT " << opt);
+        LOGLN("TEST " << fname);
+        LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
         assert(ifs.good());
@@ -109,9 +109,9 @@ void runTests(const std::string & fname, Solve solve) {
         solve.template operator()<VorType>(sol, metric, cost, opt, make_fLLogger(metric, cost));
 
         double c = simple_algo::getCFLCost(metric, cost, sol);
-        LOG(std::setprecision(20) <<  "cost " << c);
+        LOGLN(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
-        LOG(std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        LOGLN(std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
     }
 }
 
@@ -126,7 +126,7 @@ struct SolveAddRemove {
         facility_location_local_search(sol, a, nop, rem, add);
         
         double c = simple_algo::getCFLCost(metric, cost, sol);
-        LOG(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
+        LOGLN(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
     }
 };
 

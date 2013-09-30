@@ -42,8 +42,8 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         is_test_cases >> fname >> opt;
         if(fname == "")
             return;
-        LOG("TEST " << fname);
-        LOG(std::setprecision(20) <<  "OPT " << opt);
+        LOGLN("TEST " << fname);
+        LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname+".txt");
         boost::integer_range<int> fac(0,0);
@@ -64,13 +64,13 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         facility_location_local_search_simple(sol, swap);
 
         double c = simple_algo::getKMCost(metric, sol);
-        LOG("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
+        LOGLN("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
         VSet chosen=sol.getChosenFacilities();
         LOG_COPY_DEL(chosen.begin(),chosen.end()," ");
         
-        LOG(std::setprecision(20) <<  "cost " << c);
+        LOGLN(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
-        LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
 
     }
 }

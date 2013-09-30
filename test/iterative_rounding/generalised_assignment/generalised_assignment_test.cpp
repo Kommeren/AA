@@ -23,12 +23,12 @@ struct LogVisitor : public TrivialVisitor {
 
     template <typename Solution, typename LP>
     void roundCol(const Solution &, LP & lp, ColId col, double val) {
-        LOG("Column "<< col.get() << " rounded to " << val);
+        LOGLN("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename Solution, typename LP>
     void relaxRow(const Solution &, LP & lp, RowId row) {
-        LOG("Relax row " << row.get());
+        LOGLN("Relax row " << row.get());
     }
 };
 
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
         paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
 
     for(const std::pair<int, int> & jm : jobsToMachines) {
-        LOG("Job " << jm.first << " assigned to Machine " << jm.second);
+        LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);
     }
 
    auto j0 = jobsToMachines.find(0);

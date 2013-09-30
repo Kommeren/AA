@@ -82,9 +82,9 @@ ON_LOG(int i);
     
 auto logger = [&](const Solution & s) {
     //printing
-    LOG("f(");
+    LOGLN("f(");
     LOG_COPY_DEL(s.begin(), s.end(), ","); 
-    LOG(") \t" << f(s) << " after " << i++ );
+    LOGLN(") \t" << f(s) << " after " << i++ );
 };
 
 BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
@@ -93,9 +93,9 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
     fillRand(sol);
 
     //printing
-    LOG("f(");
+    LOGLN("f(");
     LOG_COPY_DEL(sol.begin(), sol.end(), ","); 
-    LOG(") \t" << f(sol));
+    LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 
     //search
@@ -110,9 +110,9 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
     fillRand(sol);
 
     //printing 
-    LOG("f(");
+    LOGLN("f(");
     LOG_COPY_DEL(sol.begin(), sol.end(), ","); 
-    LOG(") \t" << f(sol));
+    LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 
     //search

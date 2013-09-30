@@ -36,18 +36,18 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
         is_test_cases >> fname >> opt;
         if(fname == "")
             return;
-        LOG("TEST " << fname);
-        LOG(std::setprecision(20) <<  "OPT " << opt);
+        LOGLN("TEST " << fname);
+        LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname+".in");
         auto words= read_SS(ifs);
         std::string res=shortestSuperstring(words);
         double s = res.size();
 
-        LOG(res);
-        LOG(std::setprecision(20) <<  "GREEDY " << s);
+        LOGLN(res);
+        LOGLN(std::setprecision(20) <<  "GREEDY " << s);
         BOOST_CHECK(utils::Compare<double>(0.001).le(opt,s));
-        LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
+        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
 
     }
 }

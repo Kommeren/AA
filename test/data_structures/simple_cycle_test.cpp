@@ -47,10 +47,10 @@ class CheckAllSizes : public T {
 };
 
 template  <typename I> void  pe(I b, I e) {
-    LOG("Edges:");
+    LOGLN("Edges:");
 
     for(;b != e; ++b) {
-        LOG(b->first << "," << b->second);
+        LOGLN(b->first << "," << b->second);
     }
 
 }

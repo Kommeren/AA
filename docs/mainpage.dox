@@ -40,6 +40,7 @@
             <li> \ref sjoipm
             <li> \ref knapsack_greedy
             <li> \ref sjwdoasm
+            <li> \ref kcut
             </ul>
         <li> Dynamic
             <ul>

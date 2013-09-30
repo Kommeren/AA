@@ -102,4 +102,6 @@ exit_on_error
 echo ------------------------------------------- scheduling_jobs_with_deadlines_on_a_single_machine_test      -------------------------------------------------------------------------------------
 ./${build_dir}/test/scheduling_jobs_with_deadlines_on_a_single_machine_test
 exit_on_error
-
+echo ------------------------------------------- k_cut_test      -------------------------------------------------------------------------------------
+./${build_dir}/test/k_cut_test
+exit_on_error

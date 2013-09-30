@@ -43,7 +43,7 @@ void checkResult(Graph & g, std::set<Edge> & tree,
     double treeCost = std::accumulate(tree.begin(), tree.end(), 0., 
                         [&](double cost, Edge e){return cost + costs[e];});
 
-    LOG("tree edges: " << treeEdges);
+    LOGLN("tree edges: " << treeEdges);
     BOOST_CHECK(treeEdges == verticesNum - 1);
     BOOST_CHECK(treeCost <= bestCost);
     
@@ -70,8 +70,8 @@ void checkResult(Graph & g, std::set<Edge> & tree,
         }
     }
         
-    LOG("Found cost = " << treeCost << ", cost upper bound = " << bestCost);
-    LOG("Number of violated constraints = " << numOfViolations);
+    LOGLN("Found cost = " << treeCost << ", cost upper bound = " << bestCost);
+    LOGLN("Number of violated constraints = " << numOfViolations);
         
     Graph treeG(verticesNum);
         
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         
         ss >> fname >> verticesNum >> edgesNum;
 
-        LOG(fname);
+        LOGLN(fname);
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
         
         Graph g(verticesNum);

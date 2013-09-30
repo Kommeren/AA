@@ -54,13 +54,13 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
 
     //printing 
     int s(0);
-    LOG("f("<< s <<") \t" << f(s));
+    LOGLN("f("<< s <<") \t" << f(s));
     ON_LOG(int i = 0);
 
     //setting logger
     auto logger =  [&](int s) {
         //printing
-        LOG("f("<< s <<") \t" << f(s)  << " after " << ++i);
+        LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
         };
 
     //search

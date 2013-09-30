@@ -31,12 +31,12 @@ BOOST_AUTO_TEST_CASE(test_1) {
     Time sumAllLoads=std::accumulate(sumOfMachine.begin(),sumOfMachine.end(),0.0);
     //print result
     
-    LOG("Solution:");
-    LOG(maximumLoad);
-    LOG("Upper Bound Aproxmimation Ratio:");
+    LOGLN("Solution:");
+    LOGLN(maximumLoad);
+    LOGLN("Upper Bound Aproxmimation Ratio:");
     auto upperBoundAproxmiationRatio=(maximumLoad*numberOfMachines)/double(sumAllLoads);
-    LOG(upperBoundAproxmiationRatio);
-    LOG("");
+    LOGLN(upperBoundAproxmiationRatio);
+    LOGLN("");
     BOOST_CHECK(upperBoundAproxmiationRatio<=4.0/3.0);
     BOOST_CHECK((maximumLoad*numberOfMachines)/double(sumAllLoads)>=1);
     

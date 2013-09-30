@@ -1,0 +1,32 @@
+/*! \page kcut Minimum K-Cut
+
+\section def Problem definition.
+In minimum k-cut we have graph G and number k.
+The goal is to find minimum cost set of edges whose removal leaves k components.
+
+\section Solution
+
+Minimum  K-Cut problem is solved by greedy algorithm.
+We start from graph G.
+and in each step we remove lightest cut to increase number components by 1
+
+  example: 
+\snippet k_cut_example.cpp K Cut Example
+ 
+  full example is k_cut_example.cpp
+
+\subsection app_kcut Approximation Ratio equals 2-2/k.
+
+\subsection com_kcut The complexity
+Complexity of the algorithm is \f$O(|K|*|V|*|E|*log(|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges 
+
+\subsection mem_kcut The memory
+Memory complexity of the algorithm is \f$O(|K|*(|V|+|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges 
+
+
+\subsection References
+
+The algorithm analysis is described in \cite Vazirani:2001:AA:500776
+
+
+*/

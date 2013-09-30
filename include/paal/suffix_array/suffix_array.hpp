@@ -111,7 +111,7 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
 
     // find lexicographic names of triples
     int name = 0;
-    Letter c0 , c1 , c2 ;
+    Letter c0=Letter() , c1=Letter() , c2=Letter() ;
     for (auto i : boost::irange (0,n02)){
         if (text[SA12[i]] != c0 || text[SA12[i]+1] != c1 || text[SA12[i]+2] != c2 || name==0) {
             name++;

@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         auto lsc = getDefaultTwoLocalComponents(mtx);
 
         //printing 
-        LOG("Graph:\t" << fname);
-        LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
+        LOGLN("Graph:\t" << fname);
+        LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
         
         //setting logger
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //search
         two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
-        LOG(std::setprecision(20) << "APPROXIMATION RATIO: " << float(simple_algo::getLength(mtx, cycle)) / opt);
+        LOGLN(std::setprecision(20) << "APPROXIMATION RATIO: " << float(simple_algo::getLength(mtx, cycle)) / opt);
     }
 }
 
@@ -90,18 +90,18 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         auto logger = utils::make_twoLSLogger(mtx, 100);
 
         //printing 
-        LOG("Graph:\t" << fname);
-        LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
+        LOGLN("Graph:\t" << fname);
+        LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
         //search
         for(int j = 0; j < 20; ++j) {
             epsilon /= 2;
-            LOG("epsilon = " << epsilon);
+            LOGLN("epsilon = " << epsilon);
             cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
             two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
         }
 
-        LOG("Normal search at the end");
+        LOGLN("Normal search at the end");
         two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
     }
 }

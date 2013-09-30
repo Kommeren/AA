@@ -41,13 +41,13 @@ BOOST_AUTO_TEST_CASE(test_1) {
         for(double minJobsOnMachine=minJobsOnMachineStart;
                 minJobsOnMachine<minJobsOnMachineEnd;
                 minJobsOnMachine+=minJobsOnMachineStep){
-            LOG("machines: "<<numberOfMachines);
+            LOGLN("machines: "<<numberOfMachines);
             
             std::vector< std::pair<int, Time> > result;
             
             std::vector<Time> jobs=ingen(numberOfMachines,minJobsOnMachine);
             
-            LOG("jobs: "<<jobs.size());
+            LOGLN("jobs: "<<jobs.size());
             paal::greedy::scheduling_jobs_on_identical_parallel_machines::
                     schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result),paal::utils::IdentityFunctor());
             std::vector<Time> sumOfMachine;
@@ -61,9 +61,9 @@ BOOST_AUTO_TEST_CASE(test_1) {
             Time sumAllLoads=std::accumulate(sumOfMachine.begin(),sumOfMachine.end(),0.0);
             auto upperBoundAproxmiationRatio=(maximumLoad*numberOfMachines)/double(sumAllLoads);
             //print result
-            LOG("Solution: "<<maximumLoad);
-            LOG("Aproxmimation Ratio: "<<upperBoundAproxmiationRatio);
-            LOG("");
+            LOGLN("Solution: "<<maximumLoad);
+            LOGLN("Aproxmimation Ratio: "<<upperBoundAproxmiationRatio);
+            LOGLN("");
             BOOST_CHECK(upperBoundAproxmiationRatio<=4.0/3.0);
             BOOST_CHECK(upperBoundAproxmiationRatio>=1);
         }

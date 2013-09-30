@@ -9,7 +9,7 @@ using namespace paal::data_structures;
 
 
 BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
-    LOG("Test 0");
+    LOGLN("Test 0");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
 }
 
 BOOST_AUTO_TEST_CASE(test_1) {
-    LOG("Test 1");
+    LOGLN("Test 1");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
@@ -53,7 +53,7 @@ void remAdd(Voronoi & v, int g) {
 }
 
 BOOST_AUTO_TEST_CASE(test_2) {
-    LOG("Test 2");
+    LOGLN("Test 2");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 

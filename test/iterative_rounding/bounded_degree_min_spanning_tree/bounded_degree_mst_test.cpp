@@ -21,12 +21,12 @@ struct LogVisitor : public TrivialVisitor {
 
     template <typename Solution, typename LP>
     void roundCol(const Solution &, LP & lp, ColId col, double val) {
-        LOG("Column "<< col.get() << " rounded to " << val);
+        LOGLN("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename Solution, typename LP>
     void relaxRow(const Solution &, LP & lp, RowId row) {
-        LOG("Relax row " << row.get());
+        LOGLN("Relax row " << row.get());
     }
 };
 
@@ -90,14 +90,14 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(comps), LogVisitor());
 //    IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
     
-    /*LOG(ir.solveLPToExtremePoint());
+    /*LOGLN(ir.solveLPToExtremePoint());
     ir.round();
     ir.relax();
     
     BOOST_CHECK(ir.integerSolution());*/
     
     for (auto const & e : resultTree) {
-        LOG("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
+        LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
               << ") " << "in tree");
     }
 

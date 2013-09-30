@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         if(fname == "")
             return;
 
-        LOG("TEST " << fname);
-        LOG(std::setprecision(20) <<  "OPT " << opt);
+        LOGLN("TEST " << fname);
+        LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname);
         std::vector<long long> facCost;
@@ -73,9 +73,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         facility_location_local_search(sol, nop, nop, rem, add, swap);
 
         double c = simple_algo::getFLCost(metric, cost, sol);
-        LOG(std::setprecision(20) <<  "cost " << c);
+        LOGLN(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(le(opt, c));
-        LOG( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
     }
     
 }

@@ -17,7 +17,7 @@ auto cdem = [&](int i){ return cdemv[i];};
     
 
 BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
-    LOG("Test 0");
+    LOGLN("Test 0");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
@@ -28,10 +28,10 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
     /*for(int i = 0; i < 5; ++i)
-        LOG(gm(SGM::A, i));
+        LOGLN(gm(SGM::A, i));
     
     for(int i = 0; i < 5; ++i)
-        LOG(gm(SGM::B, i));*/
+        LOGLN(gm(SGM::B, i));*/
 
     voronoi.addGenerator(SGM::A);
     auto ab_min_a = voronoi.addGenerator(SGM::B);
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
 }
 
 BOOST_AUTO_TEST_CASE(test_1) {
-    LOG("Test 1");
+    LOGLN("Test 1");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
@@ -79,7 +79,7 @@ void remAddOWC(paal::data_structures::ObjectWithCopy<Voronoi> & v, int g) {
 }
 
 BOOST_AUTO_TEST_CASE(test_2) {
-    LOG("Test 2");
+    LOGLN("Test 2");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricMedium();
 
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(test_2) {
 }
 
 BOOST_AUTO_TEST_CASE(test_3) {
-    LOG("Test 3");
+    LOGLN("Test 3");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
 
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(test_3) {
 }
 
 BOOST_AUTO_TEST_CASE(test_4) {
-    LOG("Test 4");
+    LOGLN("Test 4");
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricMedium();
 

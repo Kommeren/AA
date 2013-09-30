@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         
         ss >> fname >> verticesNum >> edgesNum;
 
-        LOG(fname);
+        LOGLN(fname);
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
         
         Graph g(verticesNum);

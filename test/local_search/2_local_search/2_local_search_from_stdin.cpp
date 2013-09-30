@@ -38,7 +38,7 @@ void test() {
 
     //printing 
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
-    LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
+    LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
     //setting logger
     auto logger = utils::make_twoLSLogger(mtx);
@@ -85,17 +85,17 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     auto logger = utils::make_twoLSLogger(mtx);
 
     //printing 
-    LOG("Length before\t" << simple_algo::getLength(mtx, cycle));
+    LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
     //search
     for(int j = 0; j < 20; ++j) {
         epsilon /= 2;
-        LOG("epsilon = " << epsilon);
+        LOGLN("epsilon = " << epsilon);
         cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
         two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
     }
 
-    LOG("Normal search at the end");
+    LOGLN("Normal search at the end");
     two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
 }
 

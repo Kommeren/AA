@@ -22,12 +22,12 @@ struct LogVisitor : public TrivialVisitor {
 
     template <typename LP>
     void roundCol(LP & lp, int col, double val) {
-        LOG("Column "<< col << " rounded to " << val);
+        LOGLN("Column "<< col << " rounded to " << val);
     }
     
     template <typename LP>
     void relaxRow(LP & lp, int row) {
-        LOG("Relax row " << row);
+        LOGLN("Relax row " << row);
     }
 };
 

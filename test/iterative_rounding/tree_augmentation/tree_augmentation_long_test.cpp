@@ -68,7 +68,7 @@ void readTreeAugFromStream(  std::ifstream & is,
     nodes[nlabel]=add_vertex(g);
     }
 
-    LOG(num_vertices(g));
+    LOGLN(num_vertices(g));
 
     is >> s; is>>edgesNum; is >> s; is >> s; is >> s;
 
@@ -121,7 +121,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
 
         ss >> fname;
 
-        LOG(fname);
+        LOGLN(fname);
         std::string filename=testDir + "/cases/" + fname + ".lgf";
         std::ifstream ifs(filename);
 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         paal::ir::solve_iterative_rounding(treeaug, comps);
 
         double solval = treeaug.getSolutionValue();
-        LOG("Cost of solution found: "<<solval<<", LP lower bound: "<<lplowerbd);
+        LOGLN("Cost of solution found: "<<solval<<", LP lower bound: "<<lplowerbd);
         BOOST_CHECK(solval<=2*lplowerbd);
     }
 }

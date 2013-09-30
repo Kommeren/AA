@@ -35,51 +35,53 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         if(line == "")
             return;
         testId = std::stoi(line);
-        LOG("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
+        LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
         
         int capacity;
         std::vector<int> sizes;
         std::vector<int> values;
         std::vector<int> optimal;
        
+
         read(testDir + "cases/", testId, capacity, sizes, values, optimal);
-        LOG("capacity " << capacity);
-        LOG("sizes ");
+        LOGLN("capacity " << capacity);
+        LOGLN("sizes ");
+
         LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
-        LOG("values ");
+        LOGLN("values ");
         LOG_COPY_DEL(values.begin(), values.end(), " ");
         auto objects = boost::irange(size_t(0), values.size());
         //KNAPSACK
         {
             std::vector<int> result;
-            LOG("Knapsack");
+            LOGLN("Knapsack");
             auto maxValue = knapsack(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
                    make_Array2Functor(sizes), 
                    make_Array2Functor(values));
 
-            LOG("Max value " << maxValue.first << ", Total size "  << maxValue.second);
+            LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
         }
         
         //KNAPSACK 0/1
         {
             std::vector<int> result;
-            LOG("Knapsack 0/1");
+            LOGLN("Knapsack 0/1");
             auto maxValue = knapsack_0_1(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
                    make_Array2Functor(sizes), 
                    make_Array2Functor(values));
 
-            LOG("Max value " << maxValue.first << ", Total size "  << maxValue.second);
+            LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
-            LOG("Optimal");
+            LOGLN("Optimal");
             LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
             auto optSize = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + sizes[i];});
-            LOG("Opt size " << optSize);
+            LOGLN("Opt size " << optSize);
             BOOST_CHECK_EQUAL(opt, maxValue.first);
         }
 

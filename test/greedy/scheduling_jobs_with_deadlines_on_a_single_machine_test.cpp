@@ -37,15 +37,15 @@ BOOST_AUTO_TEST_CASE(test_1) {
     for(auto jobStartTime:jobsToStartDates){
         Time startTime=jobStartTime.second;
         jobId=(*(jobStartTime.first) );
-        LOG("Job "<<jobId<<" Start time: "<<startTime);
+        LOGLN("Job "<<jobId<<" Start time: "<<startTime);
         if((startTime+time[jobId]-dueDate[jobId])>maxDelay)
             maxDelay=startTime+time[jobId]-dueDate[jobId];
     }
     //print result
-    LOG("Solution:");
-    LOG(delay);
-    LOG("Aproximation ratio:");
-    LOG(delay/bestDelay);
+    LOGLN("Solution:");
+    LOGLN(delay);
+    LOGLN("Aproximation ratio:");
+    LOGLN(delay/bestDelay);
     BOOST_CHECK(delay>=bestDelay);
     BOOST_CHECK(delay<=bestDelay*2);
     BOOST_CHECK_EQUAL(delay,maxDelay);

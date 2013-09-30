@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-07-15
  */
-#ifndef TWO_LOCAL_SEARCH_LOGGER_HPP
-#define TWO_LOCAL_SEARCH_LOGGER_HPP 
+#ifndef TWO_LOCAL_SEARCH_LOGLNGER_HPP
+#define TWO_LOCAL_SEARCH_LOGLNGER_HPP 
 
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "utils/logger.hpp"
@@ -26,7 +26,7 @@ public:
     template <typename Cycle>
     void operator()(const Cycle & cycle) {
         if(m_cnt++ % m_actionPerLog == 0) {
-            LOG("Length after\t" << m_cnt << ": " << simple_algo::getLength(m_mtx, cycle.get()));
+            LOGLN("Length after\t" << m_cnt << ": " << simple_algo::getLength(m_mtx, cycle.get()));
         }
     }
 private:
@@ -42,4 +42,4 @@ TwoLSLogger<Matrix> make_twoLSLogger(Matrix & mtx, int actionsPerLog = 1) {
 
 } //utils
 } //paal
-#endif /* TWO_LOCAL_SEARCH_LOGGER_HPP */
+#endif /* TWO_LOCAL_SEARCH_LOGLNGER_HPP */

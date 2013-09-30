@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
     auto lsc = getDefaultTwoLocalComponents(gm);
 
     //printing
-    LOG("Length \t" << simple_algo::getLength(gm, cycle));
+    LOGLN("Length \t" << simple_algo::getLength(gm, cycle));
     
     //setting logger
     auto logger = utils::make_twoLSLogger(gm, 100);

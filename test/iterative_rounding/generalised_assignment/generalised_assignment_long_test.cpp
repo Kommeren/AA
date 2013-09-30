@@ -53,14 +53,14 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         ss >> fname;
         ss >> numberOfCases;
 
-        LOG(fname << " " << numberOfCases);
+        LOGLN(fname << " " << numberOfCases);
         std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
         int num;
         ifs >> num;
         assert(num == numberOfCases);
         for(int i : boost::irange(0, numberOfCases)) {
             is_test_cases >> opt;
-            LOG("case " << i << " opt "<< opt);
+            LOGLN("case " << i << " opt "<< opt);
         
 
             paal::M costs;
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);
             for(const std::pair<int, int> & jm : jobsToMachines ) {
-        //        LOG("job " << jm.first << " assigned to machine " << jm.second);
+        //        LOGLN("job " << jm.first << " assigned to machine " << jm.second);
                 c += costs(jm.first, jm.second);
                 machinesLoad[jm.second] += times(jm.first, jm.second);
             }
@@ -95,9 +95,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
                 BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
             }
 
-            LOG("cost " << c);
+            LOGLN("cost " << c);
             BOOST_CHECK(le(c, opt));
-            LOG( std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
+            LOGLN( std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
         is_test_cases.getline(buf, MAX_LINE);
     }

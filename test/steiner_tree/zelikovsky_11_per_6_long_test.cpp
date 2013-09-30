@@ -23,11 +23,11 @@
 
 BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
     std::vector<paal::SteinerTreeTest> data;
-    LOG("READING INPUT...");
+    LOGLN("READING INPUT...");
     readSTEINLIBtests(data);
     for (paal::SteinerTreeTest& test : data) {
-        LOG("TEST " << test.testName);
-        LOG("OPT " << test.optimal);
+        LOGLN("TEST " << test.testName);
+        LOGLN("OPT " << test.optimal);
 
         typedef decltype(test.metric) Metric;
         typedef paal::data_structures::Voronoi<Metric> VoronoiT;
@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE(metric_to_bgl_mst_test) {
         for(int i : boost::irange(0, int(pm.size()))) {
             res += idxM(i, pm[i]);
         }
-        LOG("RES " << res);
+        LOGLN("RES " << res);
 
-        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal));
+        LOGLN("APPROXIMATION_RATIO:" << double(res) / double(test.optimal));
     }
 
    //BOOST_CHECK_EQUAL(s, 6);
