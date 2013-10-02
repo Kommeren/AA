@@ -73,6 +73,26 @@ Array2Functor<Array> make_Array2Functor(const Array &a, int offset = 0) {
 }
 
 template <typename Functor>
+struct FunctorToComparator {
+    FunctorToComparator(Functor f) : m_f(f) {}
+
+    template <typename T>
+    bool operator()(const T & left, const T & right) const {
+        return m_f(left) < m_f(right);
+    }
+
+private:
+    Functor m_f;
+};
+
+template <typename Functor>
+FunctorToComparator<Functor>
+make_FunctorToComparator(Functor functor) {
+    return FunctorToComparator<Functor>(functor);
+}
+
+
+template <typename Functor>
 struct NotFunctor {
     NotFunctor(Functor functor= Functor()) :
         m_functor(functor) {}
@@ -85,6 +105,7 @@ struct NotFunctor {
 private:
     Functor m_functor;
 };
+
 
 template <typename Functor>
 NotFunctor<Functor>
