@@ -20,18 +20,13 @@ int main() {
     typedef double Time;
     typedef pair<Time,char> Job;
 
-    struct ReturnJobTimeFunctor {
-        auto  operator()(Job job) const -> Time
-        { 
-            return job.first;
-        }
-    };
+    auto returnJobTimeFunctor = [](Job job) {return job.first;};
     // sample data
     int numberOfMachines = 3;
     vector<Job> jobs={{2.1,'a'},{3.1,'b'},{4.1,'c'},{5.1,'d'},{6.1,'e'},{7.1,'f'},{8.1,'g'}};
     vector<pair<int,Job> > result;
     
-    schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result),ReturnJobTimeFunctor());
+    schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result), returnJobTimeFunctor);
     
     vector<Time> sumOfMachine;
     sumOfMachine.resize(numberOfMachines);
