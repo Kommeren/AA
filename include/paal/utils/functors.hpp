@@ -77,7 +77,7 @@ struct FunctorToComparator {
     FunctorToComparator(Functor f) : m_f(f) {}
 
     template <typename T>
-    bool operator()(const T & left, const T & right) const {
+    bool operator()(const T & left, const T & right) /*const*/ { //TODO investigate
         return m_f(left) < m_f(right);
     }
 
@@ -89,6 +89,36 @@ template <typename Functor>
 FunctorToComparator<Functor>
 make_FunctorToComparator(Functor functor) {
     return FunctorToComparator<Functor>(functor);
+}
+
+template <typename Functor>
+struct FunctorToOutputIterator {
+    FunctorToOutputIterator(Functor functor= Functor()) :
+        m_functor(functor) {}
+    
+    template <typename Arg> 
+    decltype(std::declval<Functor>()(std::declval<Arg>()))
+    operator=(Arg&& arg) {
+        return m_functor(std::forward<Arg>(arg));
+    }
+    
+    FunctorToOutputIterator & operator++() {
+        return *this;
+    }
+
+    FunctorToOutputIterator & operator*() {
+        return *this;
+    }
+
+private:
+    Functor m_functor;
+};
+
+
+template <typename Functor>
+FunctorToOutputIterator<Functor>
+make_FunctorToOutputIterator(Functor functor) {
+    return FunctorToOutputIterator<Functor>(functor);
 }
 
 
@@ -175,6 +205,9 @@ XorFunctor<FunctorLeft, FunctorRight>
 make_XorFunctor(FunctorLeft left, FunctorRight right) {
     return XorFunctor<FunctorLeft, FunctorRight>(left, right);
 }
+
+
+
 
 } //utils
 } //paal

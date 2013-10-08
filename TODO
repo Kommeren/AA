@@ -1,11 +1,12 @@
+* alternative kanpsack algorithm (n*(1/epsilon)^2)
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
 ** resolve BDMST problems
-** there is some common code in the steiner network and DBMST
 ** framework documentation
+** there is some common code in the steiner network and DBMST
 ** remove some debug output
-** columns iterator is invalidated when we remove column (see rounding code)
+** columns iterator is invalidated when we remove column (see relaxing code)
 ** cost function
 ** complexities
 ** removing rows/cols strategy

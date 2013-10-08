@@ -1,0 +1,24 @@
+/*! \page knapsack_greedy Knapsack
+
+\section def Problem definition.
+In the knapsack problem we are given set of objects and capacity of the knapsack. Each object has its size and value.
+We should choose some objects of the total size not exceeding the capacity and maximizing the sum of the objects values.
+
+There are to variants of this problem. In the standard Knapsack (which is called just Knapsack) problem, each objects can be chosen many times.
+In the Knapsack 0/1 problem each object from the objects set can be chosen only once.
+
+\section Solution 
+This solution implements standard greedy algorithm. 
+  example: 
+\snippet knapsack_0_1_two_app_example.cpp Knapsack Example
+ 
+  full example is knapsack_0_1_two_app_example.cpp
+
+\subsection Complexity
+The algorithms works in \f$O(n log(n))\f$ and in \f$O(n)\f$ memory where \a n is the number of objects.
+
+\subsection References
+
+The algorithm is described in the \cite Williamson:2011:DAA:1971947
+
+*/

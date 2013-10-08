@@ -89,7 +89,7 @@ This can be done without template aliasing
     DoStuffComponents::type<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
 </pre>
 
-\section const_comp Constructing \a Components
+\section const_comp Constructing Components
 There are several ways of contructing components:
 <ul>
 <li> One can provide any number of arguments. The kth argument has to be convertible kth component.

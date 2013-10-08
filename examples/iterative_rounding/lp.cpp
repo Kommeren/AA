@@ -8,6 +8,7 @@
 
 
 #include <vector>
+#include <boost/type_traits/is_convertible.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
@@ -42,6 +43,8 @@ int main() {
     fun();
 
 //    addRow();
+//
+    static_assert(boost::is_convertible<double, int>::value, "bu!");
 
     return 0;
 }

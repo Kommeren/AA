@@ -38,10 +38,11 @@
             <ul>
             <li> \ref shortestsuperstring
             <li> \ref sjoipm
+            <li> \ref knapsack_greedy
             </ul>
         <li> Dynamic
             <ul>
-            <li> \ref knapsack
+            <li> \ref knapsack_dynamic
             </ul>
         <li> Miscellaneous
             <ul>
@@ -56,6 +57,7 @@
         </ul>
     <li> Data Structures
         <ul>
+        <li>\ref comps
         <li>\ref paal::data_structures::GraphMetric
         <li>\ref paal::data_structures::ArrayMetric
         <li>\ref paal::data_structures::SimpleCycle
@@ -112,5 +114,8 @@
  \section Platforms
  Currently the library compiles on the gcc 4.7.3. and clang 3.2. Unfortunately, the library does not 
  compile on the newest Microsoft Visual Studio 2013 due to its poor support of c++0x.
+
+ \section Contact 
+ In case of any questions / suggestions / pull requests / contribution please contact Piotr Wygocki (wygos at mimuw.edu.pl).
  
 */

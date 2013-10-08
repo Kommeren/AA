@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <boost/range/irange.hpp>
-#include "paal/dynamic/knapsack.hpp"
+#include "paal/dynamic/knapsack_fptas.hpp"
 
 int main() {
 //! [Knapsack Example]
@@ -22,15 +22,19 @@ int main() {
 
     //Knapsack
     std::vector<int> result;
-    std::cout << "Knapsack" << std::endl;
-    auto maxValue = paal::knapsack(std::begin(objects), std::end(objects), 
+    std::cout << "Knapsack FPTAS" << std::endl;
+
+    double epsilon = 1./4.;
+    auto maxValue = paal::knapsack_on_value_fptas(epsilon, std::begin(objects), std::end(objects), 
                capacity,
                std::back_inserter(result), 
                paal::utils::make_Array2Functor(sizes), 
                paal::utils::make_Array2Functor(values));
 
     std::cout << "Max value " << maxValue.first << ", Total size "  << maxValue.second << std::endl;
-    std::copy(result.begin(), result.end(), std::ostream_iterator<int>(std::cout, " "));
+    for(auto r : result) {
+        std::cout <<  r << " " ;
+    }
     std::cout << std::endl;
 
 //! [Knapsack Example]
