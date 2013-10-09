@@ -92,7 +92,7 @@ public:
         
         std::pair<bool, double> violation;
                 
-        for (const Vertex & trg : utils::make_range(vertices)) {
+        for (const Vertex & trg : boost::make_iterator_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(sol, src, trg);
                 if (violation.first) {
@@ -123,7 +123,7 @@ public:
         double maximumViolation = 0;
         std::pair<bool, double> violation;
         
-        for (const Vertex & trg : utils::make_range(vertices)) {
+        for (const Vertex & trg : boost::make_iterator_range(vertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(sol, src, trg, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
@@ -253,7 +253,7 @@ private:
         double res = 0;
         auto adjEdges = boost::out_edges(v, m_g);
             
-        for (Edge e : utils::make_range(adjEdges)) {
+        for (Edge e : boost::make_iterator_range(adjEdges)) {
             auto i = sol.getEdgeMap().left.find(e);
             if(i != sol.getEdgeMap().left.end()) {
                 res += lp.getColPrim(i->second);
@@ -291,7 +291,7 @@ private:
             auto vertices = boost::vertices(m_auxGraph);
             auto colors = boost::get(boost::vertex_color, m_auxGraph);
             auto srcColor = boost::get(colors, m_src);
-            for (const Vertex & v : utils::make_range(vertices.first, vertices.second)) {
+            for (const Vertex & v : boost::make_iterator_range(vertices.first, vertices.second)) {
                 if (v != m_src && v != m_trg && boost::get(colors, v) == srcColor) {
                     m_violatingSet[v] = true;
                     ++m_violatingSetSize;

@@ -28,7 +28,7 @@ namespace k_cut{
  * example: 
  *  \snippet k_cut_example.cpp K Cut Example
  *
- * full example is k_cut.cpp
+ * complete example is k_cut.cpp
  * @param Graph graph
  * @param int numberOfParts
  * @param OutputIterator result

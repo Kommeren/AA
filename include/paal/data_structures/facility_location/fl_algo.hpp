@@ -9,7 +9,6 @@
 #define FL_ALGO_HPP 
 
 #include "paal/data_structures/metric/metric_traits.hpp"
-#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/functors.hpp"
 
 namespace paal {
@@ -27,7 +26,7 @@ getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
 
     for(VertexType f : ch) {
-        for(std::pair<VertexType, Dist> v : utils::make_range(fls.getClientsForFacility(f))) {
+        for(std::pair<VertexType, Dist> v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
             d += m(v.first, f) * v.second; 
         }
     }
@@ -47,7 +46,7 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
 
     for(VertexType f : ch) {
-        for(VertexType v : utils::make_range(fls.getClientsForFacility(f))) {
+        for(VertexType v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
             d += m(v, f); 
         }
     }

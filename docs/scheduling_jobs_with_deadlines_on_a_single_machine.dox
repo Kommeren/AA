@@ -21,7 +21,7 @@ at wach moment that machine is idle, we start procesing naxt available job with 
   example: 
 \snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs Example
  
-  full example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
+  complete example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
 
 \subsection app_sjoipm Approximation Ratio equals 2 when all due dates are negative.
 

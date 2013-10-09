@@ -50,11 +50,11 @@ void checkResult(Graph & g, std::set<Edge> & tree,
     auto verts = vertices(g);
     int numOfViolations(0);
     
-    for (const Vertex & v : paal::utils::make_range(verts.first, verts.second)) {
+    for (const Vertex & v : boost::make_iterator_range(verts.first, verts.second)) {
         int treeDeg(0);
         auto adjVertices = adjacent_vertices(v, g);
         
-        for(const Vertex & u : paal::utils::make_range(adjVertices.first, adjVertices.second)) {
+        for(const Vertex & u : boost::make_iterator_range(adjVertices.first, adjVertices.second)) {
             bool b; Edge e;
             std::tie(e, b) = boost::edge(v, u, g);
             assert(b);

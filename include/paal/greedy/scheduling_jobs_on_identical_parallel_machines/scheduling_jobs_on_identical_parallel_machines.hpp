@@ -26,7 +26,7 @@ namespace scheduling_jobs_on_identical_parallel_machines{
  * example: 
  *  \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs Example
  *
- * full example is scheduling_jobs_on_identical_parallel_machines_example.cpp
+ * complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
  * @param int n_machines
  * @param _RandomAccessIter first
  * @param _RandomAccessIter last

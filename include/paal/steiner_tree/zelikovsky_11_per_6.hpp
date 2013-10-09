@@ -19,7 +19,6 @@
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
-#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/contract_bgl_adjacency_matrix.hpp"
 
 #include "paal/data_structures/subset_iterator.hpp"
@@ -39,7 +38,7 @@ namespace steiner_tree {
  * Example: <br>
    \snippet zelikovsky_11_per_6_example.cpp Steiner Tree Example
  *
- * full example is steiner_tree_example.cpp
+ * complete example is steiner_tree_example.cpp
  *
  * @tparam Metric we only use this metric for distances  (Steiner, Terminal) and (Terminal, Terminal)
  * @tparam Voronoi models WeakVronoi (see \ref voronoi). This is a voronoi division where generators are terminals  of the steiner tree.
@@ -172,7 +171,7 @@ private:
         m_subsDists.reserve(std::distance(subRange.first, subRange.second));
         
         //finding nearest vertex to subset
-        for(const ThreeTuple & subset : utils::make_range(subRange)) {
+        for(const ThreeTuple & subset : boost::make_iterator_range(subRange)) {
             //TODO awfull coding, need to be changed to loop
             //There is possible problem, one point could belong to two Voronoi regions
             //In our implementation the poin will be in exactly one region and there 
@@ -265,8 +264,8 @@ private:
     void moveSave(const SpanningTree & G1, const SpanningTree & G2, Dist maxDist) {
         auto v1 = vertices(G1);
         auto v2 = vertices(G2);
-        for(VertexType v : utils::make_range(v1)) {
-            for(VertexType w : utils::make_range(v2)) {
+        for(VertexType v : boost::make_iterator_range(v1)) {
+            for(VertexType w : boost::make_iterator_range(v2)) {
                 auto vg = G1.local_to_global(v);
                 auto wg = G2.local_to_global(w);
                 m_save(vg, wg) =  maxDist;

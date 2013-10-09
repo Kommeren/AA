@@ -9,6 +9,7 @@
 #define CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 
 #include <boost/graph/adjacency_matrix.hpp>
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace utils {
@@ -32,7 +33,7 @@ boost::adjacency_matrix<Directed,
     typedef typename mtraits::edge_descriptor MEdge;
     auto const & weight_map = boost::get(boost::edge_weight, amatrix);
     weight_map[boost::edge(v, w, amatrix).first] = 0;
-    for(const MEdge & e : utils::make_range(boost::out_edges(v, amatrix))) {
+    for(const MEdge & e : boost::make_iterator_range(boost::out_edges(v, amatrix))) {
         MEdge  f = boost::edge(w, boost::target(e, amatrix), amatrix).first;
         auto & we = weight_map[e];
         auto & wf = weight_map[f];

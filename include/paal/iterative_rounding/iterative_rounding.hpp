@@ -14,7 +14,6 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/double_rounding.hpp"
 #include "paal/lp/glp.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -52,7 +51,7 @@ public:
     }
 
     bool integerSolution() {
-        for(ColId col :utils::make_range(m_lpBase.getColumns())) {
+        for(ColId col :boost::make_iterator_range(m_lpBase.getColumns())) {
             double colVal = m_lpBase.getColPrim(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;

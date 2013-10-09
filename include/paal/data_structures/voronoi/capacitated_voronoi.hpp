@@ -15,7 +15,6 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/min_cost_max_flow/successive_shortest_path.hpp"
 #include "paal/min_cost_max_flow/find_flow_cost.hpp"
-#include "paal/utils/iterator_utils.hpp"
 
 
 namespace paal {
@@ -166,7 +165,7 @@ public:
         m_gToGraphV(other.m_gToGraphV) {
             auto edges =  boost::edges(m_g);
             auto rev = boost::get(boost::edge_reverse, m_g);
-            for(auto e : utils::make_range(edges)) {
+            for(auto e : boost::make_iterator_range(edges)) {
                 auto eb =  boost::edge(boost::target(e, m_g), boost::source(e, m_g), m_g);
                 assert(eb.second);
                 rev[e] = eb.first;
@@ -201,7 +200,7 @@ public:
         auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
         
         //removing flow from the net
-        for(const ED & e : utils::make_range(boost::in_edges(genGraph, m_g))) {
+        for(const ED & e : boost::make_iterator_range(boost::in_edges(genGraph, m_g))) {
             bool b;
             VD v = boost::source(e, m_g);
             if(v == m_t) {
@@ -275,11 +274,11 @@ public:
         auto capacity = boost::get(boost::edge_capacity, v.m_g);
         auto residual_capacity = boost::get(boost::edge_residual_capacity, v.m_g);
         auto name = boost::get(boost::vertex_name, v.m_g);
-        for(int v : utils::make_range(vertices)) {
+        for(int v : boost::make_iterator_range(vertices)) {
             s << v << "-> " << name[v]<< ", ";
         }
         s <<  "\n";
-        for(auto e : utils::make_range(edges)) {
+        for(auto e : boost::make_iterator_range(edges)) {
             s << e << "-> " << residual_capacity[e] << "-> " << capacity[e]<< ", ";
         }
         s <<  "\n";

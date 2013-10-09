@@ -12,8 +12,8 @@
 
 #include <boost/optional.hpp>
 #include <boost/tuple/tuple.hpp>
+#include <boost/range/iterator_range.hpp>
 
-#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/double_rounding.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -147,7 +147,7 @@ struct DeleteCol {
         auto column = lp.getRowsInColumn(col);
         RowId row;
         double coef;
-        for(auto const & c : utils::make_range(column)) {
+        for(auto const & c : boost::make_iterator_range(column)) {
             boost::tie(row, coef) = c;
             double currUb = lp.getRowUb(row);
             double currLb = lp.getRowLb(row);

@@ -65,8 +65,8 @@ class GAInit {
             void addVariables(Solution & solution, LP &lp) {
                 auto & colIdx = solution.getColIdx();
                 colIdx.reserve(solution.getMachinesCnt() * solution.getJobsCnt());
-                for(typename Solution::JobRef j : utils::make_range(solution.getJobs())) {
-                    for(typename Solution::MachineRef m : utils::make_range(solution.getMachines())) {
+                for(typename Solution::JobRef j : boost::make_iterator_range(solution.getJobs())) {
+                    for(typename Solution::MachineRef m : boost::make_iterator_range(solution.getMachines())) {
                         colIdx.push_back(lp.addColumn(solution.getCost()(j,m)));
                     }
                 }
@@ -90,13 +90,13 @@ class GAInit {
             void addConstraintsForMachines(Solution & solution, LP & lp)  {
                 auto & colIdx = solution.getColIdx();
                 int mIdx(0);
-                for(typename Solution::MachineRef m : utils::make_range(solution.getMachines())) {
+                for(typename Solution::MachineRef m : boost::make_iterator_range(solution.getMachines())) {
                     auto T = solution.getMachineAvailableTime()(m);
                     RowId rowIdx = lp.addRow(UP, 0.0, T);
                     solution.getMachineRows().insert(rowIdx);
                     int jIdx(0);
 
-                    for(typename Solution::JobRef j : utils::make_range(solution.getJobs())) {
+                    for(typename Solution::JobRef j : boost::make_iterator_range(solution.getJobs())) {
                         auto t = solution.getProceedingTime()(j, m);
                         assert(t <= T);
                         lp.addConstraintCoef(rowIdx, colIdx[solution.idx(jIdx, mIdx)], t);

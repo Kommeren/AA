@@ -15,7 +15,6 @@
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/iterator_utils.hpp"
 #include "paal/utils/less_pointees.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
 #include "paal/dynamic/knapsack/knapsack_base.hpp"

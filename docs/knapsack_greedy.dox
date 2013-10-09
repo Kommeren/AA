@@ -9,15 +9,22 @@ In the Knapsack 0/1 problem each object from the objects set can be chosen only 
 
 \section Solution 
 This solution implements standard greedy algorithm. 
-  example: 
+Knapsack 0/1  example: 
 \snippet knapsack_0_1_two_app_example.cpp Knapsack Example
  
-  full example is knapsack_0_1_two_app_example.cpp
+  complete example is knapsack_0_1_two_app_example.cpp
 
-\subsection Complexity
+Knapsack  example: 
+\snippet knapsack_two_app_example.cpp Knapsack Example
+ 
+  complete example is knapsack_two_app_example.cpp
+
+\subsection knapsack_greedy_app Approximation ratio equals 2.
+
+\subsection knapsack_greedy_compl Complexity
 The algorithms works in \f$O(n log(n))\f$ and in \f$O(n)\f$ memory where \a n is the number of objects.
 
-\subsection References
+\subsection knapsack_greedy_ref References
 
 The algorithm is described in the \cite Williamson:2011:DAA:1971947
 

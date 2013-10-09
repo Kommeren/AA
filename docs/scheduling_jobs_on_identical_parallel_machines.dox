@@ -14,7 +14,7 @@ And we assign longest not assigned job to machine which has smallest load, until
   example: 
 \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs Example
  
-  full example is scheduling_jobs_on_identical_parallel_machines_example.cpp
+  complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
 
 \subsection app_sjoipm Approximation Ratio equals 4/3.
 

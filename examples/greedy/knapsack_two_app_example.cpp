@@ -1,5 +1,5 @@
 /**
- * @file knapsack_0_1_two_app_example.cpp
+ * @file knapsack_two_app_example.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -8,7 +8,7 @@
 
 #include <vector>
 #include <boost/range/irange.hpp>
-#include "paal/greedy/knapsack_0_1_two_app.hpp"
+#include "paal/greedy/knapsack_two_app.hpp"
 
 int main() {
 //! [Knapsack Example]
@@ -20,8 +20,8 @@ int main() {
 
     //Knapsack 0/1
     std::vector<int> result;
-    std::cout << "Knapsack 0 / 1" << std::endl;
-    auto maxValue = paal::knapsack_0_1_two_app(std::begin(objects), std::end(objects), 
+    std::cout << "Knapsack" << std::endl;
+    auto maxValue = paal::knapsack_two_app(std::begin(objects), std::end(objects), 
             capacity,
             std::back_inserter(result), 
             paal::utils::make_Array2Functor(sizes), 

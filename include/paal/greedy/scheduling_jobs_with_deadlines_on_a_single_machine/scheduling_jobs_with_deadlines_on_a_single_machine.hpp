@@ -28,7 +28,7 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine{
  * example: 
  *  \snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs Example
  *
- * full example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
+ * complete example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
  * @param ImputIterator first - jobs begin
  * @param ImputIterator last - jobs end
  * @param GetTime getTime

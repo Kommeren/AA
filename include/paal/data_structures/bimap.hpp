@@ -15,9 +15,6 @@
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/range/irange.hpp>
 
-#include "paal/utils/iterator_utils.hpp"
-
-
 namespace paal {
 namespace data_structures {
 
@@ -37,7 +34,7 @@ public:
     template <typename Iter> BiMapMIC(Iter b, Iter e) {
         size_t s = std::distance(b, e);
         m_index.reserve(s);
-        for(const T & t : utils::make_range(b,e)) {
+        for(const T & t : boost::make_iterator_range(b,e)) {
             add(t);
         }
     }
@@ -100,7 +97,7 @@ public:
         size_t s = std::distance(b, e);
         m_idToT.reserve(s);
         m_tToID.reserve(s);
-        for(const T & t : utils::make_range(b,e)) {
+        for(const T & t : boost::make_iterator_range(b,e)) {
             add(t);
         }
     }

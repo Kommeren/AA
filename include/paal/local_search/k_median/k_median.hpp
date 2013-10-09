@@ -50,7 +50,7 @@ struct DefaultKMedianComponents {
  * example: 
     \snippet k_median_example.cpp K Median Search Example
  *
- * full example is k_median_example.cpp
+ * complete example is k_median_example.cpp
  *
  * @tparam Voronoi
  * @tparam MultiSearchComponents

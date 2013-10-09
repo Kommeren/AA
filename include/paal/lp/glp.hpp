@@ -266,19 +266,19 @@ public:
     friend ostream & operator<<(ostream & o, const  GLP & glp) {
         o << "Problem name: " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
 
-        for(ColId col : utils::make_range(glp.getColumns())) {
+        for(ColId col : boost::make_iterator_range(glp.getColumns())) {
             o << glp_get_obj_coef(glp.m_lp, glp.getCol(col)) << ", ";
         }
         o << std::endl << "Rows" << std::endl;
 
-        for(RowId row : utils::make_range(glp.getRows())) {
+        for(RowId row : boost::make_iterator_range(glp.getRows())) {
             auto cols = glp.getColumnsInRow(row);
             if(cols.first == cols.second) {
                 continue;
             }
             o << "Row " << glp.getRowName(row) << std::endl;
             o << "Bounds " << "type =  " << glp.getRowBoundType(row) << " lb = " << glp.getRowLb(row) << " ub = " << glp.getRowUb(row) << std::endl;
-            for(auto colAndVal : utils::make_range(cols)) {
+            for(auto colAndVal : boost::make_iterator_range(cols)) {
                 ColId  col = boost::get<0>(colAndVal);
                 double val = boost::get<1>(colAndVal);
                 o << "(col = " << col.get() << " name = " << glp.getColName(col) << ", coef = " << val << ") - "; 
@@ -286,7 +286,7 @@ public:
             o << std::endl;
         }
         o << "Current solution: "<<std::endl;
-        for(ColId col : utils::make_range(glp.getColumns())) {
+        for(ColId col : boost::make_iterator_range(glp.getColumns())) {
             o  << glp.getColPrim(col) << ", ";
         }
         o << std::endl;

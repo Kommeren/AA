@@ -15,12 +15,12 @@ In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set
  Knapsack example: 
 \snippet knapsack_example.cpp Knapsack Example
  
-  full example is knapsack_example.cpp
+  complete example is knapsack_example.cpp
  
 Knapsack 0/1 example: 
 \snippet knapsack_0_1_example.cpp Knapsack Example
  
-  full example is knapsack_0_1_example.cpp
+  complete example is knapsack_0_1_example.cpp
 
 The library provides function paal::knapsack function which solves standard knapsack problem. And to overload of paal::knapsack_0_1 problem. One solves the Knapsack 0/1 with retrieving solution and one omitting this procedure.
 

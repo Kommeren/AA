@@ -1,12 +1,12 @@
 /**
- * @file knapsack_0_1_two_app.hpp
+ * @file knapsack_two_app.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-10-07
  */
-#ifndef KNAPSACK_0_1_TWO_APP_HPP
-#define KNAPSACK_0_1_TWO_APP_HPP 
+#ifndef KNAPSACK_TWO_APP_HPP
+#define KNAPSACK_TWO_APP_HPP 
 
 #include <type_traits>
 #include <utility>
@@ -26,7 +26,7 @@ template <typename OutputIterator,
           typename ObjectValueFunctor>
 std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
           puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
-knapsack_0_1_two_app(ObjectsIter oBegin, 
+knapsack_two_app(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
         OutputIterator out, 
@@ -38,10 +38,14 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
     auto starValue = [=](ObjectsIter oi){return value(*oi);};
     auto starSize = [=](ObjectsIter oi){return size(*oi);};
     auto density = make_Density(starValue, starSize);
-    auto compare = utils::make_FunctorToComparator(density, utils::Greater());
+    auto compare = utils::make_FunctorToComparator(density);
     std::vector<ObjectsIter> objects(
             boost::make_counting_iterator(oBegin), 
             boost::make_counting_iterator(oEnd));
+    
+    if(oBegin == oEnd) {
+        return std::pair<ValueType, SizeType>();
+    }
 
     //removing to big elements
     objects.erase(
@@ -49,21 +53,12 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
             [=](ObjectsIter objIter){return size(*objIter) > capacity;}), 
         objects.end());
 
-    //finding the biggest set elements with the greatest density
-    std::sort(objects.begin(), objects.end(), compare);
+    //finding the element with the greatest density
+    auto mostDenseIter = std::max_element(objects.begin(), objects.end(), compare);
 
-    ValueType valueSum = ValueType();
-    SizeType sizeSum = SizeType();
-    auto end = std::find_if(objects.begin(), objects.end(), 
-            [=, &sizeSum, &valueSum](ObjectsIter objIter){
-                auto newSize = sizeSum + size(*objIter);
-                if(newSize > capacity) {
-                    return true;
-                } 
-                sizeSum = newSize;
-                valueSum += value(*objIter);
-                return false;   
-            });
+    auto nr = capacity / size(**mostDenseIter);
+    ValueType valueSum = nr * value(**mostDenseIter);
+    SizeType sizeSum = nr * size(**mostDenseIter);
 
     //finding the biggest set elements with the greatest density
     //this is actually small optimization compare to original algorithm
@@ -73,8 +68,8 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
         *out = **largest;
         return std::make_pair(value(**largest), size(**largest));
     } else {
-        for(auto obj : boost::make_iterator_range(objects.begin(), end)) {
-            *out = *obj;
+        for(auto i : boost::irange(0, nr)) {
+            *out = **mostDenseIter;
             ++out;
         }
         return std::make_pair(valueSum, sizeSum);
@@ -82,4 +77,4 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
 }
 
 }
-#endif /* KNAPSACK_0_1_TWO_APP_HPP */
+#endif /* KNAPSACK_TWO_APP_HPP */

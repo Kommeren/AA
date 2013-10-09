@@ -38,7 +38,7 @@ template <typename Cycle, typename Stream> void print(const Cycle & cm, Stream &
     auto eend = data_structures::make_VertexToEdgeIterator(cm.vend(), cm.vend());
     typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
 
-    for(const std::pair<El, El> & p : utils::make_range(ebegin, eend)){ 
+    for(const std::pair<El, El> & p : boost::make_iterator_range(ebegin, eend)){ 
         o <<  "(" << p.first << "," << p.second << ")->";
     }
         

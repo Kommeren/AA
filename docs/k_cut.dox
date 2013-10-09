@@ -13,7 +13,7 @@ and in each step we remove lightest cut to increase number components by 1
   example: 
 \snippet k_cut_example.cpp K Cut Example
  
-  full example is k_cut_example.cpp
+  complete example is k_cut_example.cpp
 
 \subsection app_kcut Approximation Ratio equals 2-2/k.
 

@@ -30,7 +30,7 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     typedef typename MT::VertexType VertexType;
     typedef typename MT::DistanceType Dist;
     Graph g(N);
-    auto r = utils::make_range(vbegin, vend);
+    auto r = boost::make_iterator_range(vbegin, vend);
     for(VertexType v : r){
         for(VertexType w : r){
             if(v < w) {

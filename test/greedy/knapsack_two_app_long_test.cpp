@@ -14,6 +14,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
+#include "paal/greedy/knapsack_two_app.hpp"
 #include "paal/utils/double_rounding.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
@@ -60,14 +61,17 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
+            LOG("APPROXIMATION RATIO " << double(opt) /  double(maxValue.first));
+            LOG("OPT");
+            LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
             BOOST_CHECK(opt <= 2 * maxValue.first);
         }
         
-        //KNAPSACK 0/1
-/*        {
+        //KNAPSACK 
+        {
             std::vector<int> result;
-            LOGLN("Knapsack 0/1");
-            auto maxValue = knapsack_0_1(std::begin(objects), std::end(objects), 
+            LOGLN("Knapsack");
+            auto maxValue = knapsack_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
                    make_Array2Functor(sizes), 
@@ -75,12 +79,6 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
-            LOGLN("Optimal");
-            LOGLN_COPY_DEL(optimal.begin(), optimal.end(), " ");
-            auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
-            auto optSize = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + sizes[i];});
-            LOGLN("Opt size " << optSize);
-            BOOST_CHECK_EQUAL(opt, maxValue.first);
-        }*/
+        }
     }
 }

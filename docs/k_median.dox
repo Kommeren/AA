@@ -19,7 +19,7 @@ Facility Location (FL) problem is solved by local search. Given a move which ope
   example: 
 \snippet k_median_example.cpp K Median Search Example
  
-  full example is k_median_example.cpp
+  complete example is k_median_example.cpp
 
 \subsection app_km Approximation Ratio equals 5.
 

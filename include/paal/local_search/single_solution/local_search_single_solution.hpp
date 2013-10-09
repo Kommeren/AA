@@ -13,7 +13,8 @@
 #include <algorithm>
 #include <functional>
 
-#include "paal/utils/iterator_utils.hpp"
+#include <boost/range/iterator_range.hpp>
+
 #include "paal/local_search/local_search.hpp"
 #include "local_search_concepts.hpp"
 
@@ -74,7 +75,7 @@ public:
     bool search() {
         auto adjustmentSet = call<GetMoves>(m_solution);
 
-        for(const Move & move : utils::make_range(adjustmentSet)) {
+        for(const Move & move : boost::make_iterator_range(adjustmentSet)) {
             if(call<Gain>(m_solution, move) > 0) {
                 call<Commit>(m_solution, move);
                 return true;

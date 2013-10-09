@@ -179,7 +179,7 @@ private:
             auto vertices = boost::vertices(m_auxGraph);
             auto colors = boost::get(boost::vertex_color, m_auxGraph);
             auto srcColor = boost::get(colors, src);
-            for (const Vertex & v : utils::make_range(vertices.first, vertices.second)) {
+            for (const Vertex & v : boost::make_iterator_range(vertices.first, vertices.second)) {
                 if (boost::get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }

@@ -247,7 +247,7 @@ private:
     void addVariables(Solution & sol, LP & lp) {
         auto edges = boost::edges(sol.getGraph());
         
-        for(auto e : utils::make_range(edges)) {
+        for(auto e : boost::make_iterator_range(edges)) {
             auto eIdx = sol.addEdge(e);
             std::string colName = getEdgeName(eIdx);
             ColId col =  lp.addColumn( sol.getCost(e), DB, 0, 1, colName);
@@ -266,12 +266,12 @@ private:
         auto const & g = sol.getGraph();
         auto vertices = boost::vertices(g);
         
-        for(auto v : utils::make_range(vertices)) {
+        for(auto v : boost::make_iterator_range(vertices)) {
             auto dbIdx = sol.addVertex(v);
             RowId rowIdx = lp.addRow(UP, 0, sol.getDegree(v) , getDegBoundDesc(dbIdx));
             auto adjEdges = boost::out_edges(v, g);
             
-            for(auto e : utils::make_range(adjEdges)) {
+            for(auto e : boost::make_iterator_range(adjEdges)) {
                 lp.addConstraintCoef(rowIdx, sol.edgeToCol(e));
             }
         }
@@ -289,7 +289,7 @@ private:
         int vCnt = boost::num_vertices(g);
         RowId rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
         
-        for (ColId colIdx : utils::make_range(lp.getColumns())) {
+        for (ColId colIdx : boost::make_iterator_range(lp.getColumns())) {
             lp.addConstraintCoef(rowIdx, colIdx);
         }
     }

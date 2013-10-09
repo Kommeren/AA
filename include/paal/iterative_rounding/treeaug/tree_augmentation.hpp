@@ -148,7 +148,7 @@ namespace paal {
                 int eIdx(0);
                 int whatever=-1;
 
-                for(auto e : utils::make_range(edges)) {
+                for(auto e : boost::make_iterator_range(edges)) {
                     std::string colName = getEdgeName(eIdx);
                     ColId colIdx=lp.addColumn(sol. getCost(e), LO, 0, whatever, colName);
                     sol.bindEdgeWithCol(e, colIdx);

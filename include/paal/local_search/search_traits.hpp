@@ -10,6 +10,7 @@
 
 #include "paal/data_structures/components/component_traits.hpp"
 #include "paal/local_search/search_components.hpp"
+#include "paal/utils/type_functions.hpp"
 
 namespace paal {
 namespace local_search {

@@ -129,7 +129,7 @@ private:
     void addVariables(Solution & solution, LP & lp) {
         auto edges = boost::edges(solution.getGraph());
         
-        for(auto e : utils::make_range(edges)) {
+        for(auto e : boost::make_iterator_range(edges)) {
             ColId col = lp.addColumn(solution.getCost(e), DB, 0, 1);
             solution.bindEdgeToCol(e, col);
         }

@@ -16,7 +16,6 @@
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_traits.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/iterator_utils.hpp"
 
 namespace paal {
 namespace local_search {
@@ -87,7 +86,7 @@ public:
 
         for(SolElementRef r : m_solution) {
             auto adjustmentSet = call<GetMoves>(m_solution, r);
-            for(const Move & move : utils::make_range(adjustmentSet)) {
+            for(const Move & move : boost::make_iterator_range(adjustmentSet)) {
                 if(call<Gain>(m_solution, r, move) > 0) {
                     call<Commit>(m_solution, r, move);
                     return true;
