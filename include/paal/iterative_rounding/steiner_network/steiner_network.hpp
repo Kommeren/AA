@@ -127,9 +127,7 @@ private:
     //adding variables
     template <typename Solution, typename LP>
     void addVariables(Solution & solution, LP & lp) {
-        auto edges = boost::edges(solution.getGraph());
-        
-        for(auto e : boost::make_iterator_range(edges)) {
+        for(auto e : boost::make_iterator_range(edges(solution.getGraph()))) {
             ColId col = lp.addColumn(solution.getCost(e), DB, 0, 1);
             solution.bindEdgeToCol(e, col);
         }

@@ -38,7 +38,7 @@ namespace metric_fillers {
         public:
         template <typename Graph, typename ResultMatrix> 
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
-            boost::johnson_all_pairs_shortest_paths(g, rm); 
+            johnson_all_pairs_shortest_paths(g, rm); 
         }
     };
     
@@ -46,7 +46,7 @@ namespace metric_fillers {
         public:
         template <typename Graph, typename ResultMatrix> 
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
-            boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
+            floyd_warshall_all_pairs_shortest_paths(g, rm);
         }
     };
 }
@@ -70,7 +70,7 @@ struct  GraphMetric : public ArrayMetric<DistanceType>,
       typedef metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> GMFBase;
 
     GraphMetric(const Graph & g)  
-        : GMBase(boost::num_vertices(g)) {
+        : GMBase(num_vertices(g)) {
             GMFBase::fillMatrix(g, GMBase::m_matrix);
     }
 };

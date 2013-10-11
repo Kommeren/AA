@@ -163,10 +163,9 @@ public:
         m_costOfNoGenerator(other.m_costOfNoGenerator),
         m_vToGraphV(other.m_vToGraphV),
         m_gToGraphV(other.m_gToGraphV) {
-            auto edges =  boost::edges(m_g);
-            auto rev = boost::get(boost::edge_reverse, m_g);
-            for(auto e : boost::make_iterator_range(edges)) {
-                auto eb =  boost::edge(boost::target(e, m_g), boost::source(e, m_g), m_g);
+            auto rev = get(boost::edge_reverse, m_g);
+            for(auto e : boost::make_iterator_range(edges(m_g))) {
+                auto eb =  edge(target(e, m_g), source(e, m_g), m_g);
                 assert(eb.second);
                 rev[e] = eb.first;
             }
@@ -184,8 +183,8 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
-                boost::predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+        successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
+                predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
                                                                     
 
         return getCost() - costStart;
@@ -197,30 +196,30 @@ public:
         m_generators.erase(gen);
         auto genGraph = m_gToGraphV.at(gen);
         auto rev = get(boost::edge_reverse, m_g);
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         
         //removing flow from the net
-        for(const ED & e : boost::make_iterator_range(boost::in_edges(genGraph, m_g))) {
+        for(const ED & e : boost::make_iterator_range(in_edges(genGraph, m_g))) {
             bool b;
-            VD v = boost::source(e, m_g);
+            VD v = source(e, m_g);
             if(v == m_t) {
                 continue;
             }
             DistI cap = residual_capacity[rev[e]];
             ED edgeFromStart;
-            std::tie(edgeFromStart, b) =  boost::edge(m_s, v, m_g);
+            std::tie(edgeFromStart, b) =  edge(m_s, v, m_g);
             assert(b);
             residual_capacity[edgeFromStart] += cap;
             residual_capacity[rev[edgeFromStart]] -= cap;
         }
-        boost::clear_vertex(genGraph, m_g);
-        assert(!boost::edge(m_t, genGraph, m_g).second);
-        assert(!boost::edge(genGraph, m_t, m_g).second);
-        boost::remove_vertex(genGraph, m_g);
+        clear_vertex(genGraph, m_g);
+        assert(!edge(m_t, genGraph, m_g).second);
+        assert(!edge(genGraph, m_t, m_g).second);
+        remove_vertex(genGraph, m_g);
         restoreIndex();
         
-        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
-                boost::predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+        successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
+                predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
                                                                     
 
         return getCost() - costStart;
@@ -245,7 +244,7 @@ public:
     getVerticesForGenerator(VertexType gen) const {
         IEI ei, end;
         VD v = m_gToGraphV.at(gen);
-        auto r = boost::in_edges(v, m_g);
+        auto r = in_edges(v, m_g);
         Trans t; 
         t.m_v = this;
         return std::make_pair(VForGenerator(r.first,  t),
@@ -254,31 +253,31 @@ public:
 
 
     Dist getCost() const  {
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         OEI ei, end;
-        std::tie(ei, end) = boost::out_edges(m_s, m_g);
+        std::tie(ei, end) = out_edges(m_s, m_g);
         DistI resCap =  std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e) {
             return d + residual_capacity[e];
         });
 
-        DistI cost =  boost::find_flow_cost(m_g);
+        DistI cost =  find_flow_cost(m_g);
         return Dist(cost, resCap);
     }
 
     template <typename OStream> 
     friend OStream & operator<<(OStream & s, CapacitatedVoronoi & v) {
-        s << boost::num_vertices(v.m_g) << ", ";
+        s << num_vertices(v.m_g) << ", ";
         s <<  v.m_s <<", " << v.m_t << "\n";
-        auto vertices = boost::vertices(v.m_g);
-        auto edges = boost::edges(v.m_g);
-        auto capacity = boost::get(boost::edge_capacity, v.m_g);
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, v.m_g);
-        auto name = boost::get(boost::vertex_name, v.m_g);
-        for(int v : boost::make_iterator_range(vertices)) {
+        auto verticesToDisplay = vertices(v.m_g);
+        auto edgesToDisplay = edges(v.m_g);
+        auto capacity = get(boost::edge_capacity, v.m_g);
+        auto residual_capacity = get(boost::edge_residual_capacity, v.m_g);
+        auto name = get(boost::vertex_name, v.m_g);
+        for(int v : boost::make_iterator_range(verticesToDisplay)) {
             s << v << "-> " << name[v]<< ", ";
         }
         s <<  "\n";
-        for(auto e : boost::make_iterator_range(edges)) {
+        for(auto e : boost::make_iterator_range(edgesToDisplay)) {
             s << e << "-> " << residual_capacity[e] << "-> " << capacity[e]<< ", ";
         }
         s <<  "\n";
@@ -307,9 +306,9 @@ public:
 private:
 
     void restoreIndex() {
-        const unsigned N = boost::num_vertices(m_g);
+        const unsigned N = num_vertices(m_g);
         m_gToGraphV.clear();
-        auto name = boost::get(boost::vertex_name, m_g);
+        auto name = get(boost::vertex_name, m_g);
         for(unsigned i : boost::irange(unsigned(m_firstGeneratorId), N)) {
             m_gToGraphV[name[i]] = i;
         }
@@ -317,7 +316,7 @@ private:
 
     
     VD addVertex(VertexType v = VertexType()) {
-        VD vG = boost::add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
+        VD vG = add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
         int N = num_vertices(m_g);
         
         m_dist.resize(N);
@@ -339,9 +338,9 @@ private:
     ED addDirEdge(VD v, VD w, DistI weight, DistI capacity) {
         bool b;
         ED e;
-        auto weightMap = boost::get(boost::edge_weight, m_g);
-        auto capacityMap = boost::get(boost::edge_capacity, m_g);
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto weightMap = get(boost::edge_weight, m_g);
+        auto capacityMap = get(boost::edge_capacity, m_g);
+        auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         std::tie(e, b) = add_edge(v, w, m_g);
         assert(b);
         capacityMap[e] = capacity;
@@ -351,14 +350,14 @@ private:
     }
     
     DistI getFlowOnEdge(const ED & e) const {
-        auto capacityMap = boost::get(boost::edge_capacity, m_g);
-        auto residual_capacity = boost::get(boost::edge_residual_capacity, m_g);
+        auto capacityMap = get(boost::edge_capacity, m_g);
+        auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         return capacityMap[e] - residual_capacity[e];
     }
     
     VertexType getVertexForEdge(const ED & e) const  {
-        auto name = boost::get(boost::vertex_name, m_g);
-        return name[boost::source(e, m_g)];
+        auto name = get(boost::vertex_name, m_g);
+        return name[source(e, m_g)];
     }
 
     typedef std::vector<DistI> VPropMap;

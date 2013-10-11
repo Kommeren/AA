@@ -42,7 +42,7 @@ struct EdgeToVertexPairsIterator {
     }
 
     std::pair<unsigned, unsigned> & operator=(Edge e) {
-        m_restrictionsVec->push_back(std::make_pair(boost::source(e, *m_g), boost::target(e, *m_g)));
+        m_restrictionsVec->push_back(std::make_pair(source(e, *m_g), target(e, *m_g)));
         return m_restrictionsVec->back();
     }
     
@@ -62,12 +62,12 @@ RestrictionsVector pruneRestrictionsToTree(Restrictions res,  int N) {
     TGraph g(N);
     for(int i : boost::irange(0, N)) {
         for(int j : boost::irange(i, N)) {
-            boost::add_edge(i, j, 
+            add_edge(i, j, 
                     EdgeProp(-std::max(res(i, j), res(j, i))),  g);
         }
     }
         
-    boost::kruskal_minimum_spanning_tree(g, EdgeToVertexPairsIterator<TGraph>(g, resVec));
+    kruskal_minimum_spanning_tree(g, EdgeToVertexPairsIterator<TGraph>(g, resVec));
     return resVec;
 }
 

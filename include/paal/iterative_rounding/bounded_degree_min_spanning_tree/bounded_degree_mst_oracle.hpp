@@ -49,7 +49,7 @@ public:
             return true;
         }
         else {
-            return !m_oracleComponents.findViolated(sol, *this, boost::num_vertices(m_g));
+            return !m_oracleComponents.findViolated(sol, *this, num_vertices(m_g));
         }
     }
     
@@ -65,8 +65,8 @@ public:
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
         for (auto const & e : sol.getEdgeMap()) {
-            const Vertex & u = boost::source(e.left, m_g);
-            const Vertex & v = boost::target(e.left, m_g);
+            const Vertex & u = source(e.left, m_g);
+            const Vertex & v = target(e.left, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
                 ColId colIdx = e.right;
@@ -86,13 +86,12 @@ public:
      */
     template <typename Solution>
     bool findAnyViolatedConstraint(Solution & sol, int srcVertexIndex) {
-        auto vertices = boost::vertices(m_auxGraph);
-        const Vertex & src = boost::vertex(srcVertexIndex, m_auxGraph);
+        const Vertex & src = vertex(srcVertexIndex, m_auxGraph);
         assert(src != m_src && src != m_trg);
         
         std::pair<bool, double> violation;
                 
-        for (const Vertex & trg : boost::make_iterator_range(vertices)) {
+        for (const Vertex & trg : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(sol, src, trg);
                 if (violation.first) {
@@ -115,15 +114,15 @@ public:
      */
     template <typename Solution>
     bool findMostViolatedConstraint(Solution & sol) {
-        auto vertices = boost::vertices(m_auxGraph);
-        const Vertex & src = *(vertices.first);
+        auto graphVertices = vertices(m_auxGraph);
+        const Vertex & src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
         
         bool violatedConstraintFound = false;
         double maximumViolation = 0;
         std::pair<bool, double> violation;
         
-        for (const Vertex & trg : boost::make_iterator_range(vertices)) {
+        for (const Vertex & trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 violation = checkViolationGreaterThan(sol, src, trg, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
@@ -169,7 +168,7 @@ private:
      */
     template <typename Solution, typename LP>
     void fillAuxiliaryDigraph(Solution & sol, const LP & lp) {
-        int numVertices(boost::num_vertices(m_g));
+        int numVertices(num_vertices(m_g));
         
         m_auxGraph.clear();
         m_srcToV.resize(numVertices);
@@ -177,9 +176,9 @@ private:
         
         AuxGraph tmpGraph(numVertices);
         std::swap(tmpGraph, m_auxGraph);
-        m_cap = boost::get(boost::edge_capacity, m_auxGraph);
-        m_rev = boost::get(boost::edge_reverse, m_auxGraph);
-        m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
+        m_cap = get(boost::edge_capacity, m_auxGraph);
+        m_rev = get(boost::edge_reverse, m_auxGraph);
+        m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
         for (auto const & e : sol.getEdgeMap()) {
             ColId colIdx = e.right;
@@ -192,8 +191,8 @@ private:
             }
         }
         
-        m_src = boost::add_vertex(m_auxGraph);
-        m_trg = boost::add_vertex(m_auxGraph);
+        m_src = add_vertex(m_auxGraph);
+        m_trg = add_vertex(m_auxGraph);
         
         for (const Vertex & v : sol.getVertices()) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(sol, v, lp) / 2, true);
@@ -217,21 +216,21 @@ private:
         bool b, bRev;
         AuxEdge e, eRev;
         
-        std::tie(e, b) = boost::add_edge(vSrc, vTrg, m_auxGraph);
-        std::tie(eRev, bRev) = boost::add_edge(vTrg, vSrc, m_auxGraph);
+        std::tie(e, b) = add_edge(vSrc, vTrg, m_auxGraph);
+        std::tie(eRev, bRev) = add_edge(vTrg, vSrc, m_auxGraph);
         
         assert(b && bRev);
         
-        boost::put(m_cap, e, cap);
+        put(m_cap, e, cap);
         if (noRev) {
-            boost::put(m_cap, eRev, 0);
+            put(m_cap, eRev, 0);
         }
         else {
-            boost::put(m_cap, eRev, cap);
+            put(m_cap, eRev, cap);
         }
         
-        boost::put(m_rev, e, eRev);
-        boost::put(m_rev, eRev, e);
+        put(m_rev, e, eRev);
+        put(m_rev, eRev, e);
         
         return e;
     }
@@ -251,7 +250,7 @@ private:
     template <typename Solution, typename LP>
     double degreeOf(Solution &sol, const Vertex & v, const LP & lp) {
         double res = 0;
-        auto adjEdges = boost::out_edges(v, m_g);
+        auto adjEdges = out_edges(v, m_g);
             
         for (Edge e : boost::make_iterator_range(adjEdges)) {
             auto i = sol.getEdgeMap().left.find(e);
@@ -271,28 +270,27 @@ private:
      */
     template <typename Solution>
     std::pair<bool, double> checkViolationGreaterThan(Solution & sol, const Vertex & src, const Vertex & trg, double minViolation = 0) {
-        int numVertices(boost::num_vertices(m_g));
-        double origVal = boost::get(m_cap, m_srcToV[src]);
+        int numVertices(num_vertices(m_g));
+        double origVal = get(m_cap, m_srcToV[src]);
         bool violated = false;
 
-        boost::put(m_cap, m_srcToV[src], numVertices);
+        put(m_cap, m_srcToV[src], numVertices);
         // capacity of srcToV[trg] does not change
-        boost::put(m_cap, m_vToTrg[src], 0);
-        boost::put(m_cap, m_vToTrg[trg], numVertices);
+        put(m_cap, m_vToTrg[src], 0);
+        put(m_cap, m_vToTrg[trg], numVertices);
         
         // TODO better flow algorithm
-        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
+        double minCut = boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
         if (violation > minViolation && !sol.getCompare().e(violation, 0)) {
             violated = true;
             m_violatingSetSize = 0;
             
-            auto vertices = boost::vertices(m_auxGraph);
-            auto colors = boost::get(boost::vertex_color, m_auxGraph);
-            auto srcColor = boost::get(colors, m_src);
-            for (const Vertex & v : boost::make_iterator_range(vertices.first, vertices.second)) {
-                if (v != m_src && v != m_trg && boost::get(colors, v) == srcColor) {
+            auto colors = get(boost::vertex_color, m_auxGraph);
+            auto srcColor = get(colors, m_src);
+            for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
+                if (v != m_src && v != m_trg && get(colors, v) == srcColor) {
                     m_violatingSet[v] = true;
                     ++m_violatingSetSize;
                 }
@@ -303,10 +301,10 @@ private:
         }
         
         // reset the original values for the capacities
-        boost::put(m_cap, m_srcToV[src], origVal);
+        put(m_cap, m_srcToV[src], origVal);
         // capacity of srcToV[trg] does not change
-        boost::put(m_cap, m_vToTrg[src], 1);
-        boost::put(m_cap, m_vToTrg[trg], 1);
+        put(m_cap, m_vToTrg[src], 1);
+        put(m_cap, m_vToTrg[trg], 1);
         
         return std::make_pair(violated, violation);
     }

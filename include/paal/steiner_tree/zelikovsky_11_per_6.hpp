@@ -219,15 +219,15 @@ private:
     SpanningTree getSpanningTree(const AMatrix & am) {
         //compute spanning tree and write it to  vector
         std::vector<VertexType> pm(N);
-        boost::prim_minimum_spanning_tree(am, &pm[0]);
+        prim_minimum_spanning_tree(am, &pm[0]);
         
         //transform vector intto SpanningTree object
-        auto const  & weight_map = boost::get(boost::edge_weight, am);
+        auto const  & weight_map = get(boost::edge_weight, am);
         SpanningTree spanningTree(N);
         for(VertexType from = 0; from < N; ++from){
             if(from != pm[from]) {
-                bool succ =boost::add_edge(from, pm[from], 
-                    SpanningTreeEdgeProp(from, boost::get(weight_map, boost::edge(from, pm[from], am).first)), spanningTree).second;
+                bool succ =add_edge(from, pm[from], 
+                    SpanningTreeEdgeProp(from, get(weight_map, edge(from, pm[from], am).first)), spanningTree).second;
                 assert(succ);
             }
         }
@@ -238,15 +238,15 @@ private:
     SEdge maxEdge(EdgeRange range, const WeightMap & weight_map) const {
         assert(range.first != range.second);
         return *std::max_element(range.first, range.second, [&](SEdge e, SEdge f){
-            return boost::get(weight_map, e) < 
-                   boost::get(weight_map, f);
+            return get(weight_map, e) < 
+                   get(weight_map, f);
         });
     }
 
     void createSubgraphs(SpanningTree & g, SpanningTree & G1, SpanningTree & G2) {
-        int n = boost::num_vertices(g);
+        int n = num_vertices(g);
         std::vector<VertexType> comps(n);
-        boost::connected_components(g, &comps[0]);
+        connected_components(g, &comps[0]);
         int c1 = comps[0];
         int c2 = -1;
         
@@ -284,16 +284,16 @@ private:
             //TODO delete children at once
             SpanningTree & g = *s.top();
             s.pop();
-            int n = boost::num_vertices(g);
+            int n = num_vertices(g);
             if(n == 1) {   
                 continue;
             }
-            auto eRange = boost::edges(g);
+            auto eRange = edges(g);
             assert(eRange.first != eRange.second);
-            auto const  & weight_map = boost::get(boost::edge_weight, g);
+            auto const  & weight_map = get(boost::edge_weight, g);
             SEdge maxEl = maxEdge(eRange, weight_map);
-            Dist maxDist = boost::get(weight_map, maxEl);
-            boost::remove_edge(maxEl, g);
+            Dist maxDist = get(weight_map, maxEl);
+            remove_edge(maxEl, g);
             SpanningTree & G1 = g.create_subgraph();
             SpanningTree & G2 = g.create_subgraph();
             createSubgraphs(g, G1, G2);

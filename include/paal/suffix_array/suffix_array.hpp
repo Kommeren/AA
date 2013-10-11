@@ -112,7 +112,7 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
     // find lexicographic names of triples
     int name = 0;
     Letter c0=Letter() , c1=Letter() , c2=Letter() ;
-    for (auto i : boost::irange (0,n02)){
+    for (auto i : boost::irange(0,n02)){
         if (text[SA12[i]] != c0 || text[SA12[i]+1] != c1 || text[SA12[i]+2] != c2 || name==0) {
             name++;
             c0 = text[SA12[i]];
@@ -131,18 +131,18 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
     if (name < n02) {
         _suffixArray<int>(text12, SA12/*, n02*/, name);//parametrized by int intentionally
         // store unique names in s12 using the suffix array
-        for (auto i : boost::irange (0,n02)){
+        for (auto i : boost::irange(0,n02)){
             text12[SA12[i]] = i + 1;
         }
     } 
     else{ // generate the suffix array of s12 directly
-        for (auto i : boost::irange (0,n02)){
+        for (auto i : boost::irange(0,n02)){
             SA12[text12[i] - 1] = i;
         }
     }
     
     // stably sort the mod 0 suffixes from SA12 by their first character
-    for (auto i : boost::irange (0,n02)){
+    for (auto i : boost::irange(0,n02)){
         if (SA12[i] < n0) {
             text0.push_back(3*SA12[i]);
         }

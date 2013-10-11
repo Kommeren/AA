@@ -34,8 +34,8 @@ public:
             const ResultNetworkSet & res)
              : m_g(g), 
                m_restrictions(restrictions), 
-               m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, boost::num_vertices(m_g))),
-               m_auxGraph(boost::num_vertices(g)),
+               m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, num_vertices(m_g))),
+               m_auxGraph(num_vertices(g)),
                m_resultNetwork(res)
                { 
                }
@@ -44,8 +44,8 @@ public:
     template <typename Solution, typename LP>
     bool checkIfSolutionExists(Solution & sol) {
         for (auto const & e : sol.getEdgeMap()) {
-            Vertex u = boost::source(e.left, m_g);
-            Vertex v = boost::target(e.left, m_g);
+            Vertex u = source(e.left, m_g);
+            Vertex v = target(e.left, m_g);
             addEdge(u, v, 1);
         }
         return !findAnyViolatedConstraint(sol);
@@ -62,8 +62,8 @@ public:
         lp.addRow(LO, m_violatedRestriction);
         
         for (auto const & e : sol.getEdgeMap()) {
-            const Vertex & u = boost::source(e.left, m_g);
-            const Vertex & v = boost::target(e.left, m_g);
+            const Vertex & u = source(e.left, m_g);
+            const Vertex & v = target(e.left, m_g);
                 
             if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
                 (m_violatingSet.find(v) != m_violatingSet.end())) {
@@ -98,24 +98,24 @@ private:
                                   
     template <typename Solution, typename LP>
     void fillAuxiliaryDigraph(Solution &sol, const LP & lp) {
-        boost::remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
-        m_cap = boost::get(boost::edge_capacity, m_auxGraph);
-        m_rev = boost::get(boost::edge_reverse, m_auxGraph);
-        m_resCap = boost::get(boost::edge_residual_capacity, m_auxGraph);
+        remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
+        m_cap = get(boost::edge_capacity, m_auxGraph);
+        m_rev = get(boost::edge_reverse, m_auxGraph);
+        m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
         for (auto const & e : sol.getEdgeMap()) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
 
             if(sol.getCompare().g(colVal, 0)) {
-                Vertex u = boost::source(e.left, m_g);
-                Vertex v = boost::target(e.left, m_g);
+                Vertex u = source(e.left, m_g);
+                Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);
             }
         }
         for (auto const & e : m_resultNetwork) {
-            Vertex u = boost::source(e, m_g);
-            Vertex v = boost::target(e, m_g);
+            Vertex u = source(e, m_g);
+            Vertex v = target(e, m_g);
             addEdge(u, v, 1);
         }
     }
@@ -125,8 +125,8 @@ private:
         bool b, bRev;
         AuxEdge e, eRev;
         
-        std::tie(e, b) = boost::add_edge(vSrc, vTrg, m_auxGraph);
-        std::tie(eRev, bRev) = boost::add_edge(vTrg, vSrc, m_auxGraph);
+        std::tie(e, b) = add_edge(vSrc, vTrg, m_auxGraph);
+        std::tie(eRev, bRev) = add_edge(vTrg, vSrc, m_auxGraph);
         
         assert(b && bRev);
         
@@ -167,7 +167,7 @@ private:
     
     template <typename Solution>
     double checkViolationBiggerThan(Solution & sol, Vertex  src, Vertex trg, double maximumViolation = 0) {
-        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
+        double minCut = boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = m_restrictions(src, trg);
         double violation = restriction - minCut;
         
@@ -176,11 +176,10 @@ private:
             m_violatingSet.clear();
             maximumViolation = violation;
             
-            auto vertices = boost::vertices(m_auxGraph);
-            auto colors = boost::get(boost::vertex_color, m_auxGraph);
-            auto srcColor = boost::get(colors, src);
-            for (const Vertex & v : boost::make_iterator_range(vertices.first, vertices.second)) {
-                if (boost::get(colors, v) == srcColor) {
+            auto colors = get(boost::vertex_color, m_auxGraph);
+            auto srcColor = get(colors, src);
+            for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
+                if (get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }
             }

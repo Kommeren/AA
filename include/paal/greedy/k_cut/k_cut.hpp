@@ -52,10 +52,10 @@ typename boost::property_traits<puretype(get(boost::edge_weight,g))>::value_type
     // x is a cost cut 
     // y and y+1 are index parts of graph after make a cut
     std::priority_queue<std::pair<int,int> >cuts;
-    Graph G0(boost::num_vertices(g));
+    Graph G0(num_vertices(g));
     {
         auto weight= get(boost::edge_weight, g);
-        for(auto edge : make_iterator_range(edges(g))){
+        for(auto edge : boost::make_iterator_range(edges(g))){
             add_edge(source(edge,g),target(edge,g),weight(edge),G0);
         }
     }
@@ -75,8 +75,8 @@ typename boost::property_traits<puretype(get(boost::edge_weight,g))>::value_type
         parts.push_back(&G1);
         parts.push_back(&G2);
         auto parities=boost::make_one_bit_color_map(num_vertices(G0), get(boost::vertex_index, G0));
-        auto cutCost=boost::stoer_wagner_min_cut(G0,get(boost::edge_weight, G0), boost::parity_map(parities));
-        for (auto i :  boost::irange(0,int(boost::num_vertices(G0)))) {
+        auto cutCost=stoer_wagner_min_cut(G0,get(boost::edge_weight, G0), boost::parity_map(parities));
+        for (auto i :  boost::irange(0,int(num_vertices(G0)))) {
             int w=G0.local_to_global(i);
             if (get(parities, i)){
                 add_vertex(w,G1);

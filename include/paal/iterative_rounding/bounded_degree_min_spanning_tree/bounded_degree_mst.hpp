@@ -95,14 +95,14 @@ public:
         return m_vertexList.size() - 1;
     }
     
-    decltype(boost::get(std::declval<CostMap>(), std::declval<Edge>()))
+    decltype(get(std::declval<CostMap>(), std::declval<Edge>()))
     getCost(Edge e) {
-        return boost::get(m_costMap, e);
+        return get(m_costMap, e);
     }
     
-    decltype(boost::get(std::declval<DegreeBoundMap>(), std::declval<Vertex>()))
+    decltype(get(std::declval<DegreeBoundMap>(), std::declval<Vertex>()))
     getDegree(Vertex v) {
-        return boost::get(m_degBoundMap, v);
+        return get(m_degBoundMap, v);
     }
     
     ColId edgeToCol(Edge e) {
@@ -245,9 +245,7 @@ private:
      */
     template <typename Solution, typename LP>
     void addVariables(Solution & sol, LP & lp) {
-        auto edges = boost::edges(sol.getGraph());
-        
-        for(auto e : boost::make_iterator_range(edges)) {
+        for(auto e : boost::make_iterator_range(edges(sol.getGraph()))) {
             auto eIdx = sol.addEdge(e);
             std::string colName = getEdgeName(eIdx);
             ColId col =  lp.addColumn( sol.getCost(e), DB, 0, 1, colName);
@@ -264,12 +262,11 @@ private:
     template <typename Solution, typename LP>
     void addDegreeBoundConstraints(Solution & sol, LP & lp) {
         auto const & g = sol.getGraph();
-        auto vertices = boost::vertices(g);
         
-        for(auto v : boost::make_iterator_range(vertices)) {
+        for(auto v : boost::make_iterator_range(vertices(g))) {
             auto dbIdx = sol.addVertex(v);
             RowId rowIdx = lp.addRow(UP, 0, sol.getDegree(v) , getDegBoundDesc(dbIdx));
-            auto adjEdges = boost::out_edges(v, g);
+            auto adjEdges = out_edges(v, g);
             
             for(auto e : boost::make_iterator_range(adjEdges)) {
                 lp.addConstraintCoef(rowIdx, sol.edgeToCol(e));
@@ -286,7 +283,7 @@ private:
     template <typename Solution, typename LP>
     void addAllSetEquality(Solution & sol, LP & lp) {
         auto const & g = sol.getGraph();
-        int vCnt = boost::num_vertices(g);
+        int vCnt = num_vertices(g);
         RowId rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
         
         for (ColId colIdx : boost::make_iterator_range(lp.getColumns())) {

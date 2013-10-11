@@ -144,11 +144,10 @@ namespace paal {
             //returns the number of variables
             template <typename Solution, typename LP>
             void addVariables(Solution & sol,LP & lp) {
-                auto edges = boost::edges(sol.getLinksGraph());
                 int eIdx(0);
                 int whatever=-1;
 
-                for(auto e : boost::make_iterator_range(edges)) {
+                for(auto e : boost::make_iterator_range(edges(sol.getLinksGraph()))) {
                     std::string colName = getEdgeName(eIdx);
                     ColId colIdx=lp.addColumn(sol. getCost(e), LO, 0, whatever, colName);
                     sol.bindEdgeWithCol(e, colIdx);
@@ -281,7 +280,7 @@ namespace paal {
                 {
                     ConstIntMap<Edge, 1> const1EdgeMap;
                     //This stoer-wagner algorithm is unnecessarily slow for some reason
-                    int w = boost::stoer_wagner_min_cut(m_g, const1EdgeMap);
+                    int w = stoer_wagner_min_cut(m_g, const1EdgeMap);
                     if (w<2){
                         errorMsg="The graph is not 2-edge-connected.";
                         return false;
@@ -299,9 +298,9 @@ namespace paal {
                 return m_tree;
             }
             
-            decltype(boost::get(std::declval<CostMap>(), std::declval<Edge>()))
+            decltype(get(std::declval<CostMap>(), std::declval<Edge>()))
             getCost(Edge e) {
-                return boost::get(m_costMap, e);
+                return get(m_costMap, e);
             }
 
             void addToSolution(ColId col) {
