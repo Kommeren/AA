@@ -58,6 +58,7 @@ public:
     boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
         return get(lp, lp.getColPrim(col));
     }
+
 protected:
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
@@ -98,6 +99,7 @@ public:
         }
         return boost::optional<double>();
     }
+
 private:
     Cond m_cond;
     F m_f;

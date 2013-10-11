@@ -23,14 +23,14 @@ struct FindMostViolated {
 struct FindAnyViolated {
     template <typename Solution, typename Oracle>
     bool operator()(Solution & solution, Oracle & oracle, int verticesNum) {
-        return oracle.findAnyViolatedConstraint(1);
+        return oracle.findAnyViolatedConstraint(solution);
     };
 };
 
 struct FindRandViolated {
     template <typename Solution, typename Oracle>
     bool operator()(Solution & solution, Oracle & oracle, int verticesNum) {
-        return oracle.findAnyViolatedConstraint(solution, rand() % verticesNum + 1);
+        return oracle.findAnyViolatedConstraint(solution, rand() % verticesNum);
     };
 };
 

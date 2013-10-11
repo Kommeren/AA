@@ -131,6 +131,19 @@ public:
         return m_compare;
     }
 
+    std::string getDegBoundDesc(int dbIdx) const {
+        return getDegBoundPrefix() + std::to_string(dbIdx);
+    }
+    
+    bool isRowDegreeBound(const std::string & rowName) const {
+        return rowName.compare(0, getDegBoundPrefix().size(), getDegBoundPrefix()) == 0;
+    }
+
+    Vertex degreeBoundNameToVertex(const std::string & degreeBoundName) {
+        auto index = std::stoi(degreeBoundName.substr(getDegBoundPrefix().size(), degreeBoundName.size() - getDegBoundPrefix().size()));
+        return getVertices()[index];
+    }
+
 private: 
     Edge colToEdge(ColId col) {
         auto i = m_edgeMap.right.find(col);
@@ -138,6 +151,10 @@ private:
         return i->second;
     }
 
+    std::string getDegBoundPrefix() const {
+        return "degBound ";
+    }
+  
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
@@ -177,36 +194,58 @@ void bounded_degree_mst_iterative_rounding(
         const CostMap & costMap, 
         const DegreeBoundMap & degBoundMap, 
         ResultSpanningTree & resultSpanningTree, 
-        IRComponents comps,
-        Visitor vis = Visitor()) {
+        IRComponents components,
+        Visitor visitor = Visitor()) {
 
         auto bdmst = make_BoundedDegreeMST(g, costMap, degBoundMap, resultSpanningTree);
-        return solve_iterative_rounding(bdmst, std::move(comps), std::move(vis));
+        return solve_iterative_rounding(bdmst, std::move(components), std::move(visitor));
 }
 
     /**
-     * @brief checks if the row of the LP can be rounded
+     * @brief checks if the column of the LP can be rounded
      * @param lp LP object
-     * @param col row number
-     * @return true iff row can be rounded
+     * @param col column number
+     * @return true iff column can be rounded
      *
      * @tparam LP
      */
 struct BDMSTRoundCondition {
     BDMSTRoundCondition(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) : m_roundZero(epsilon) {}
+    
     template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution & sol, const LP & lp, ColId col) {
-        auto ret = m_roundZero(sol, lp, col);
-        if(ret) {
-            sol.removeColumn(col);
+    boost::optional<double> operator()(Solution & solution, const LP & lp, ColId col) {
+        auto ret = m_roundZero(solution, lp, col);
+        if (ret) {
+            solution.removeColumn(col);
         }
         return ret;
     }
+
 private:
     RoundConditionEquals<0> m_roundZero;
 };
 
-/**
+    /**
+     * @brief checks if the row of the LP can be relaxed
+     * @param lp LP object
+     * @param row row number
+     * @return true iff row can be relaxed
+     *
+     * @tparam LP
+     */
+struct BDMSTRelaxCondition {
+    template <typename Solution, typename LP>
+    bool operator()(Solution & solution, const LP & lp, RowId row) {
+        auto rowName = lp.getRowName(row);
+        if (solution.isRowDegreeBound(rowName)) {
+            return (lp.getRowDegree(row) <= solution.getDegree(solution.degreeBoundNameToVertex(rowName)) + 1);
+        }
+        else
+            return false;
+    }
+};
+
+    /**
      * @brief initializes the LP (variables for edges, degree bound constraints and constraint for all edges) 
      * @param lp LP object
      *
@@ -214,7 +253,7 @@ private:
      */
 struct BDMSTInit {
     template <typename Solution, typename LP>
-    void operator()(Solution &sol, LP & lp) {
+    void operator()(Solution & sol, LP & lp) {
         lp.setLPName("bounded degree minimum spanning tree");
         lp.setMinObjFun(); 
         
@@ -224,15 +263,8 @@ struct BDMSTInit {
         
         lp.loadMatrix();
     }
+
 private:
-    std::string getDegBoundPrefix() const {
-        return "degBound ";
-    }
-  
-    std::string getDegBoundDesc(int dbIdx) const {
-        return getDegBoundPrefix() + std::to_string(dbIdx);
-    }
-    
     std::string getEdgeName(int eIdx) const {
         return std::to_string(eIdx);
     }
@@ -265,7 +297,7 @@ private:
         
         for(auto v : boost::make_iterator_range(vertices(g))) {
             auto dbIdx = sol.addVertex(v);
-            RowId rowIdx = lp.addRow(UP, 0, sol.getDegree(v) , getDegBoundDesc(dbIdx));
+            RowId rowIdx = lp.addRow(UP, 0, sol.getDegree(v), sol.getDegBoundDesc(dbIdx));
             auto adjEdges = out_edges(v, g);
             
             for(auto e : boost::make_iterator_range(adjEdges)) {
@@ -296,6 +328,7 @@ private:
 struct BDMSTSetSolution {
     BDMSTSetSolution(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) 
         : m_compare(epsilon) {}
+
     /**
      * @brief returns the generated spanning tree
      * @param getsol GetSolution object
@@ -312,6 +345,7 @@ struct BDMSTSetSolution {
             }
         }
     }
+
 private:
     const utils::Compare<double>   m_compare;
 };
@@ -320,7 +354,7 @@ template <
          typename Graph,
          typename SolveLPToExtremePoint = RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >, 
          typename RoundCondition = BDMSTRoundCondition, 
-         typename RelaxContition = utils::ReturnFalseFunctor, 
+         typename RelaxContition = BDMSTRelaxCondition, 
          typename Init = BDMSTInit,
          typename SetSolution = BDMSTSetSolution>
              using  BDMSTIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;

@@ -24,10 +24,13 @@ namespace ir {
 
 struct TrivialVisitor {
     template <typename Solution, typename LP>
-    void roundCol(Solution & sol, LP &lp, ColId col, double val) {}
+    void solveLPToExtremePoint(Solution & sol, LP & lp) {}
+
+    template <typename Solution, typename LP>
+    void roundCol(Solution & sol, LP & lp, ColId col, double val) {}
     
     template <typename Solution, typename LP>
-    void relaxRow(Solution & sol, LP &lp, RowId row) {}
+    void relaxRow(Solution & sol, LP & lp, RowId row) {}
 };
 
 template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
@@ -40,6 +43,7 @@ class IterativeRounding  {
             return i->second;
         }
     }
+
 public:
     IterativeRounding(Solution & sol, IRComponents e, Visitor vis = Visitor()) 
         : m_irComponents(std::move(e)), m_visitor(vis), m_solution(sol) {
@@ -47,7 +51,9 @@ public:
     }
     
     double solveLPToExtremePoint() {
-        return call<SolveLPToExtremePoint>(m_solution, m_lpBase);
+        auto objVal = call<SolveLPToExtremePoint>(m_solution, m_lpBase);
+        m_visitor.solveLPToExtremePoint(m_solution, m_lpBase);
+        return objVal;
     }
 
     bool integerSolution() {
@@ -143,17 +149,16 @@ private:
 
 //TODO add resolve
 template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
-void solve_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
+void solve_iterative_rounding(Solution & solution, IRComponents components, Visitor vis = Visitor()) {
     IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, std::move(components), std::move(vis));
-    bool irsol=false;
+    bool irSolved = false;
     do {
-
         ir.solveLPToExtremePoint();
         bool rounded{ir.round()};
         bool relaxed{ir.relax()};
-        irsol=ir.integerSolution();
-        assert(irsol || rounded || relaxed);
-    } while (!irsol);
+        irSolved = ir.integerSolution();
+        assert(irSolved || rounded || relaxed);
+    } while (!irSolved);
     ir.setSolution();
 }
 

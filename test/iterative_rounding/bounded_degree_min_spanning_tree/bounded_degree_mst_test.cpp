@@ -18,6 +18,10 @@ using namespace  paal;
 using namespace  paal::ir;
 
 struct LogVisitor : public TrivialVisitor {
+    template <typename Solution, typename LP>
+    void solveLPToExtremePoint(const Solution &, LP & lp) {
+        LOGLN(lp);
+    }
 
     template <typename Solution, typename LP>
     void roundCol(const Solution &, LP & lp, ColId col, double val) {
@@ -84,10 +88,10 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     degBounds[4] = 1;
     degBounds[5] = 1;
     
-    typedef BDMSTIRComponents<Graph> Comps;
+    typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Comps comps(make_RowGenerationSolveLP(oracle));
-    bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(comps), LogVisitor());
+    Components components(make_RowGenerationSolveLP(oracle));
+    bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(components), LogVisitor());
 //    IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
     
     /*LOGLN(ir.solveLPToExtremePoint());

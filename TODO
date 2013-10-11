@@ -2,7 +2,7 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** resolve BDMST problems
+** primal/dual simplex (and other glpk settings?)
 ** framework documentation
 ** there is some common code in the steiner network and DBMST
 ** remove some debug output
@@ -10,7 +10,7 @@
 ** cost function
 ** complexities
 ** removing rows/cols strategy
-** resolving, solution by moving a point
+** resolving, solution by moving a point ?
 ** cplex support ???
 
 * GREEDY

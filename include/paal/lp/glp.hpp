@@ -30,7 +30,7 @@ namespace ir {
 class GLPBase {
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
-        m_lp(glp_create_prob()) {
+        m_lp(glp_create_prob()), m_totalColNr(0), m_totalRowNr(0) {
         glp_create_index(m_lp);
         initVec(m_row, numberOfNonZerosInMatrix);
         initVec(m_col, numberOfNonZerosInMatrix);
@@ -47,7 +47,7 @@ public:
         glp_delete_prob(m_lp);
     }
      
-    void setLPName(const std::string &s ){
+    void setLPName(const std::string & s){
         glp_set_prob_name(m_lp, s.c_str());
     }
     
@@ -70,8 +70,9 @@ public:
         }
         glp_set_col_bnds(m_lp, colNr, boundTypeToGLP(b), lb, ub);
         glp_set_obj_coef(m_lp, colNr, costCoef);
-        m_colIdx.add(colNr - 1);
-        return ColId(colNr - 1);
+        ++m_totalColNr;
+        m_colIdx.add(m_totalColNr - 1);
+        return ColId(m_totalColNr - 1);
     }
    
     RowId addRow(BoundType b=UP, double lb=0, double ub=0, const std::string & name = "") {
@@ -80,8 +81,9 @@ public:
             glp_set_row_name(m_lp, rowNr, name.c_str());
         }
         glp_set_row_bnds(m_lp, rowNr, boundTypeToGLP(b), lb, ub);
-        m_rowIdx.add(rowNr - 1);
-        return RowId(rowNr - 1);
+        ++m_totalRowNr;
+        m_rowIdx.add(m_totalRowNr - 1);
+        return RowId(m_totalRowNr - 1);
     }
     
     void addConstraintCoef(RowId row, ColId col, double coef = 1) {
@@ -199,6 +201,8 @@ private:
     Ids m_newRowCol;
     Vals m_newRowVal;
     glp_smcp m_glpkControl;
+    int m_totalColNr;
+    int m_totalRowNr;
 };
 
 

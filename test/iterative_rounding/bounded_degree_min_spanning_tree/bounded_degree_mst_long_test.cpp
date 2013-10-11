@@ -22,6 +22,7 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
+
 typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
                         boost::property < boost::vertex_degree_t, int,
                             boost::property < boost::vertex_index_t, int >
@@ -36,8 +37,8 @@ typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
 typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 typedef std::set<Edge> ResultTree;
 
-void checkResult(Graph & g, std::set<Edge> & tree,
-                 Cost & costs, Bound & degBounds,
+void checkResult(const Graph & g, const std::set<Edge> & tree,
+                 const Cost & costs, const Bound & degBounds,
                  int verticesNum, double bestCost) {
     int treeEdges(tree.size());
     double treeCost = std::accumulate(tree.begin(), tree.end(), 0., 
@@ -83,6 +84,21 @@ void checkResult(Graph & g, std::set<Edge> & tree,
     BOOST_CHECK(connected_components(treeG, &component[0]) == 1);
 }
 
+template <typename FindViolated = paal::ir::FindRandViolated>
+void runTest(const Graph & g, const Cost & costs, const Bound & degBounds, const int verticesNum, const double bestCost) {
+    namespace ir = paal::ir;
+
+    typedef ir::BoundedDegreeMSTOracleComponents<FindViolated> OracleComponents;
+    typedef ir::BoundedDegreeMSTOracle<Graph, OracleComponents> Oracle;
+    typedef ir::BDMSTIRComponents<Graph, ir::RowGenerationSolveLP<Oracle> > Components;
+    ResultTree tree;
+    Oracle oracle(g);
+    Components components(ir::make_RowGenerationSolveLP(oracle));
+    ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
+    
+    checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
+}
+
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
     std::string testDir = "test/data/BOUNDED_DEGREE_MST/";
     std::ifstream is_test_cases(testDir + "bdmst.txt");
@@ -116,34 +132,15 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
-        namespace ir = paal::ir;
         // default heuristics
-        {
-            typedef ir::BDMSTIRComponents<Graph> Comps;
-            ResultTree tree;
-            auto oracle(ir::make_BoundedDegreeMSTOracle(g));
-            
-            Comps comps(ir::make_RowGenerationSolveLP(oracle));
+        runTest(g, costs, degBounds, verticesNum, bestCost);
 
-            ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(comps));
-    
-            checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
-        }
-        
-        
         // non-default heuristics
-        {
-            typedef ir::BoundedDegreeMSTOracleComponents<ir::FindMostViolated> OracleComps;
-            typedef ir::BoundedDegreeMSTOracle < Graph, OracleComps> Oracle;
-            typedef ir::BDMSTIRComponents<Graph, ir::RowGenerationSolveLP <Oracle >> Comps;
-            ResultTree tree2;
-            Oracle oracle(g);
-            Comps comps(ir::make_RowGenerationSolveLP(oracle));
-            ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree2, std::move(comps));
-    
-            checkResult(g, tree2, costs, degBounds, verticesNum, bestCost);
-        }
+        runTest<paal::ir::FindMostViolated>(g, costs, degBounds, verticesNum, bestCost);
 
-        //TODO check 3rd strategy
+        // non-default heuristics (slow, only for smaller instances)
+        if (verticesNum <= 80) {
+            runTest<paal::ir::FindAnyViolated>(g, costs, degBounds, verticesNum, bestCost);
+        }
     }
 }

@@ -85,8 +85,10 @@ public:
      * @return true iff a violated consrtaint was found
      */
     template <typename Solution>
-    bool findAnyViolatedConstraint(Solution & sol, int srcVertexIndex) {
-        const Vertex & src = vertex(srcVertexIndex, m_auxGraph);
+    bool findAnyViolatedConstraint(Solution & sol, int srcVertexIndex = 0) {
+        auto vert = vertices(m_auxGraph);
+        std::advance(vert.first, srcVertexIndex);
+        auto src = *(vert.first);
         assert(src != m_src && src != m_trg);
         
         std::pair<bool, double> violation;
@@ -115,7 +117,7 @@ public:
     template <typename Solution>
     bool findMostViolatedConstraint(Solution & sol) {
         auto graphVertices = vertices(m_auxGraph);
-        const Vertex & src = *(graphVertices.first);
+        auto src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
         
         bool violatedConstraintFound = false;
@@ -236,8 +238,6 @@ private:
     }
    
 
-
-    //CR taka funkcja juz chyba jest w GLP i nazywa sie getColSum/getRowSum
     /**
      * @brief calculates the sum of the variables for edges incident with a given vertex
      * @param v vertex
