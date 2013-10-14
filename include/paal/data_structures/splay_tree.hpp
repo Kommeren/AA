@@ -365,7 +365,7 @@ namespace splay_tree {
         root_ = build_tree(b, e);
       }
       
-      SplayTree(SplayTree && splay) : root_(splay.root_), t2node_(std::move(splay.t2node_)), rotation_cnt_(0) {
+      SplayTree(SplayTree && splay) : root_(splay.root_), tTonode_(std::move(splay.tTonode_)), rotation_cnt_(0) {
           splay.root_ = NULL;
       }
       
@@ -373,7 +373,7 @@ namespace splay_tree {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
-              t2node_.insert(std::make_pair(*i, i.current_));
+              tTonode_.insert(std::make_pair(*i, i.current_));
           }
       }
 
@@ -427,7 +427,7 @@ namespace splay_tree {
       
       /** @param t referenced element */
       size_t getIdx(const T & t) const {
-        node_type *node = t2node_.at(t);
+        node_type *node = tTonode_.at(t);
         if(node == NULL) {
             return -1;
         }
@@ -707,7 +707,7 @@ namespace splay_tree {
         }
         ssize_t m = (e - b) / 2;
         node_type *node = new node_type(*(b + m));
-        t2node_.insert(std::make_pair(*(b + m), node));
+        tTonode_.insert(std::make_pair(*(b + m), node));
         node->set_left(build_tree(b, b + m));
         node->set_right(build_tree(b + m + 1, e));
         return node;
@@ -727,7 +727,7 @@ namespace splay_tree {
         }
         ssize_t m = (e + b) / 2;
         node_type *node = new node_type(array[m]);
-        t2node_.insert(std::make_pair(array[m], node));
+        tTonode_.insert(std::make_pair(array[m], node));
         node->set_left(build_tree(array, b, m));
         node->set_right(build_tree(array, m + 1, e));
         return node;
@@ -783,7 +783,7 @@ namespace splay_tree {
 
       /** root node of a tree */
       mutable node_type *root_ = NULL;
-      std::map<T, node_type *> t2node_;
+      std::map<T, node_type *> tTonode_;
       size_t rotation_cnt_;
   };
 }

@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
     
-        auto cost = paal::utils::make_Array2Functor(facCost);
+        auto cost = paal::utils::make_ArrayToFunctor(facCost);
     
         typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
 

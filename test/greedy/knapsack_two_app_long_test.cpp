@@ -55,8 +55,8 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             auto maxValue = knapsack_0_1_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
-                   make_Array2Functor(sizes), 
-                   make_Array2Functor(values));
+                   make_ArrayToFunctor(sizes), 
+                   make_ArrayToFunctor(values));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
@@ -74,8 +74,8 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             auto maxValue = knapsack_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
-                   make_Array2Functor(sizes), 
-                   make_Array2Functor(values));
+                   make_ArrayToFunctor(sizes), 
+                   make_ArrayToFunctor(values));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");

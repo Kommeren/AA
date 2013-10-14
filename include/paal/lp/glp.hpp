@@ -68,7 +68,7 @@ public:
         if(name != "") {
             glp_set_col_name(m_lp, colNr, name.c_str());
         }
-        glp_set_col_bnds(m_lp, colNr, boundType2GLP(b), lb, ub);
+        glp_set_col_bnds(m_lp, colNr, boundTypeToGLP(b), lb, ub);
         glp_set_obj_coef(m_lp, colNr, costCoef);
         m_colIdx.add(colNr - 1);
         return ColId(colNr - 1);
@@ -79,7 +79,7 @@ public:
         if(name != "") {
             glp_set_row_name(m_lp, rowNr, name.c_str());
         }
-        glp_set_row_bnds(m_lp, rowNr, boundType2GLP(b), lb, ub);
+        glp_set_row_bnds(m_lp, rowNr, boundTypeToGLP(b), lb, ub);
         m_rowIdx.add(rowNr - 1);
         return RowId(rowNr - 1);
     }
@@ -150,11 +150,11 @@ public:
     }*/
 
     void setRowBounds(RowId row, BoundType b, double lb, double ub) {
-        glp_set_row_bnds(m_lp, getRow(row), boundType2GLP(b), lb, ub);
+        glp_set_row_bnds(m_lp, getRow(row), boundTypeToGLP(b), lb, ub);
     }
     
     void setColBounds(ColId col, BoundType b, double lb, double ub) {
-        glp_set_col_bnds(m_lp, getCol(col), boundType2GLP(b), lb, ub);
+        glp_set_col_bnds(m_lp, getCol(col), boundTypeToGLP(b), lb, ub);
     }
     
 protected:
@@ -184,7 +184,7 @@ protected:
         v.push_back(0);
     }
 
-    static int boundType2GLP(BoundType b) {
+    static int boundTypeToGLP(BoundType b) {
         switch(b) {
             case FR:
                 return GLP_FR;
@@ -202,7 +202,7 @@ protected:
         }
     }
     
-    static BoundType glp2BoundType(int b) {
+    static BoundType glpToBoundType(int b) {
         switch(b) {
             case GLP_FR:
                 return FR;
@@ -389,11 +389,11 @@ public:
     }
     
     BoundType getRowBoundType(RowId row) const {
-        return glp2BoundType(glp_get_row_type(m_lp, getRow(row)));
+        return glpToBoundType(glp_get_row_type(m_lp, getRow(row)));
     }
     
     BoundType getColBoundType(ColId col) const {
-        return glp2BoundType(glp_get_col_type(m_lp, getCol(col)));
+        return glpToBoundType(glp_get_col_type(m_lp, getCol(col)));
     }
    
 

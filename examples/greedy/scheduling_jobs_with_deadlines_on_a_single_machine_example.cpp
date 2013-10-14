@@ -32,9 +32,9 @@ int main() {
     
     Time delay=schedulingJobsWithDeadlinesOnASingleMachine(
             jobs.begin(),jobs.end(),
-            make_Array2Functor(time),
-            make_Array2Functor(relase),
-            make_Array2Functor(dueDate),
+            make_ArrayToFunctor(time),
+            make_ArrayToFunctor(relase),
+            make_ArrayToFunctor(dueDate),
             back_inserter(jobsToStartDates));
     for(auto jobStartTime:jobsToStartDates){
         cout<<"Job "<<(*jobStartTime.first)<<" Start time: "<<jobStartTime.second<<endl;

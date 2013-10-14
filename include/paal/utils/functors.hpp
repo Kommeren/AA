@@ -57,9 +57,9 @@ struct AssertFunctor {
 */
 
 template <typename Array> 
-class Array2Functor{
+class ArrayToFunctor{
 public:
-    Array2Functor(const Array & array, int offset = 0) : m_array(array), m_offset(offset) {}
+    ArrayToFunctor(const Array & array, int offset = 0) : m_array(array), m_offset(offset) {}
     typedef decltype(std::declval<const Array>()[0]) Value;
     Value operator()(int a) const {return m_array[a + m_offset];}
 private:
@@ -68,8 +68,8 @@ private:
 };
 
 template <typename Array>
-Array2Functor<Array> make_Array2Functor(const Array &a, int offset = 0) {
-    return Array2Functor<Array>(a, offset);
+ArrayToFunctor<Array> make_ArrayToFunctor(const Array &a, int offset = 0) {
+    return ArrayToFunctor<Array>(a, offset);
 }
 
 struct Greater{

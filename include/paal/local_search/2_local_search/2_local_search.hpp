@@ -103,9 +103,9 @@ TwoLocalComponents<Gain, GetMoves, StopCondition>
  * @param m metric
  */
 template <typename Metric>
-decltype(make_TwoLocalSearchComponents(Gain2Opt<Metric>(std::declval<Metric>())))
+decltype(make_TwoLocalSearchComponents(GainToOpt<Metric>(std::declval<Metric>())))
 getDefaultTwoLocalComponents(const Metric & m) {
-    return make_TwoLocalSearchComponents(Gain2Opt<Metric>(m));
+    return make_TwoLocalSearchComponents(GainToOpt<Metric>(m));
 }
 
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,

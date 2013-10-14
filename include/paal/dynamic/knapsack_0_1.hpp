@@ -119,7 +119,7 @@ namespace detail {
                 fillTable(m_objectOnSize, oBegin, midle, capacity);
                 fillTable(m_objectOnSizeRec, midle, oEnd, capacity);
 
-                SizeType capacityLeftPartInOptimalSolution;
+                SizeType capacityLeftPartInOptimalSolution = SizeType();
                 for(auto capacityLeftPart : boost::irange(SizeType(), capacity + 1)) {
                     auto left  = m_objectOnSize[capacityLeftPart];
                     auto right = m_objectOnSizeRec[capacity - capacityLeftPart];

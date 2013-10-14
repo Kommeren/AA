@@ -28,9 +28,9 @@ BOOST_AUTO_TEST_CASE(test_1) {
     
     Time delay=paal::greedy::scheduling_jobs_with_deadlines_on_a_single_machine::schedulingJobsWithDeadlinesOnASingleMachine(
             jobs.begin(),jobs.end(),
-            paal::utils::make_Array2Functor(time),
-            paal::utils::make_Array2Functor(relase),
-            paal::utils::make_Array2Functor(dueDate),
+            paal::utils::make_ArrayToFunctor(time),
+            paal::utils::make_ArrayToFunctor(relase),
+            paal::utils::make_ArrayToFunctor(dueDate),
             back_inserter(jobsToStartDates));
     Time maxDelay=0;
     int jobId;

@@ -87,9 +87,9 @@ void runTests(const std::string & fname, Solve solve) {
         auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
     
-        auto cost = paal::utils::make_Array2Functor(facCost);
-        auto verticesDemands = paal::utils::make_Array2Functor(demands, -firstClient);
-        auto facCapacities = paal::utils::make_Array2Functor(facCap);
+        auto cost = paal::utils::make_ArrayToFunctor(facCost);
+        auto verticesDemands = paal::utils::make_ArrayToFunctor(demands, -firstClient);
+        auto facCapacities = paal::utils::make_ArrayToFunctor(facCap);
         std::cout << std::accumulate(clients.begin(), clients.end(), 
                                     0, [&](int d, int v){return d + verticesDemands(v);}) << std::endl;
     

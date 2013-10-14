@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    auto cost = paal::utils::make_Array2Functor(fcosts);
+    auto cost = paal::utils::make_ArrayToFunctor(fcosts);
     
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
     typedef paal::data_structures::FacilityLocationSolution

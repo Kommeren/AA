@@ -21,7 +21,7 @@ int main() {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    typedef paal::utils::Array2Functor<std::vector<int>> Cost;  
+    typedef paal::utils::ArrayToFunctor<std::vector<int>> Cost;  
 
     //define voronoi and solution
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
@@ -35,7 +35,7 @@ int main() {
 
     //create voronoi and solution
     VorType voronoi(GSet{}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, paal::utils::make_Array2Functor(fcosts));
+    Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, paal::utils::make_ArrayToFunctor(fcosts));
 
     //create facility location local search components
     DefaultRemoveFLComponents<int>::type rem;

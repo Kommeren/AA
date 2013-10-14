@@ -24,10 +24,10 @@ struct SearchObjFunctionComponentsTraits {
 };
 
 namespace detail {
-    template <typename F, typename Solution, typename Commit> class Fun2Check {
+    template <typename F, typename Solution, typename Commit> class FunToCheck {
             typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
         public:
-            Fun2Check(F f, const Commit & su) : m_f(std::move(f)), m_commitFunctor(su) {}
+            FunToCheck(F f, const Commit & su) : m_f(std::move(f)), m_commitFunctor(su) {}
 
             template <typename Move> Dist operator()(const Solution &s , const Move &u) {
                 Solution newS(s);
@@ -47,7 +47,7 @@ namespace detail {
         typedef SearchObjFunctionComponentsTraits<
                     SearchObjFunctionComponents> traits; 
     public:
-        typedef detail::Fun2Check< 
+        typedef detail::FunToCheck< 
                         typename traits::ObjFunctionT, 
                         Solution, 
                         typename traits::CommitT> GainType;

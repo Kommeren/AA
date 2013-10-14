@@ -19,13 +19,13 @@ int main() {
     auto gm = SGM::getGraphMetricSmall();
    
     std::vector<int> fcostsv{7,8};
-    auto facilityCost = paal::utils::make_Array2Functor(fcostsv);
+    auto facilityCost = paal::utils::make_ArrayToFunctor(fcostsv);
 
     std::vector<int> fcapv{2, 2};
-    auto facilityCapacity = paal::utils::make_Array2Functor(fcapv);
+    auto facilityCapacity = paal::utils::make_ArrayToFunctor(fcapv);
     
     std::vector<int> cdemv{2, 2, 1, 3, 3};
-    auto clientDemand = paal::utils::make_Array2Functor(cdemv);
+    auto clientDemand = paal::utils::make_ArrayToFunctor(cdemv);
     
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<

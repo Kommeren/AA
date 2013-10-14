@@ -26,8 +26,8 @@ int main() {
     auto maxValue = paal::knapsack(std::begin(objects), std::end(objects), 
                capacity,
                std::back_inserter(result), 
-               paal::utils::make_Array2Functor(sizes), 
-               paal::utils::make_Array2Functor(values));
+               paal::utils::make_ArrayToFunctor(sizes), 
+               paal::utils::make_ArrayToFunctor(values));
 
     std::cout << "Max value " << maxValue.first << ", Total size "  << maxValue.second << std::endl;
     std::copy(result.begin(), result.end(), std::ostream_iterator<int>(std::cout, " "));

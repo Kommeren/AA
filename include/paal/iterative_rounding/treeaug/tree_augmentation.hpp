@@ -231,7 +231,7 @@ namespace paal {
 
             //cross reference between links and column names
             typedef boost::bimap< Edge, ColId> EdgeToColId;
-            typedef std::map<RowId, Edge> RowId2Edge;
+            typedef std::map<RowId, Edge> RowIdToEdge;
 
             ///Constructor.
             ///
@@ -315,7 +315,7 @@ namespace paal {
             }
             
             void bindEdgeWithRow(Edge e, RowId row) {
-                auto tmp=m_rowId2Edge.insert(typename RowId2Edge::value_type(row, e));
+                auto tmp=m_rowIdToEdge.insert(typename RowIdToEdge::value_type(row, e));
                 assert(tmp.second);
             }
 
@@ -354,7 +354,7 @@ namespace paal {
             }
 
             Edge rowToEdge(RowId row) const {
-                return m_rowId2Edge.at(row);
+                return m_rowIdToEdge.at(row);
             }
 
             ColId edgeToCol(Edge e) const {
@@ -397,7 +397,7 @@ namespace paal {
             //Structures for the "m_coveredBy" relations
             CoverMap m_coveredBy;
             //reference between tree edges and row names
-            RowId2Edge m_rowId2Edge;
+            RowIdToEdge m_rowIdToEdge;
         };
 
 
