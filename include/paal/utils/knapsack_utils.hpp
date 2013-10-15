@@ -16,8 +16,8 @@ struct Density {
     Density(Value value, Size size) : m_value(value), m_size(size) {}
 
     template <typename ObjectRef>
-    double operator()(ObjectRef obj) {
-        return double(m_value(obj))/double(m_size(obj));
+    double operator()(ObjectRef obj) const {
+        return double(m_value(obj)) / double(m_size(obj));
     }
 private:
     Value m_value;
