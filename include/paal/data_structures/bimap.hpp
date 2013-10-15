@@ -20,7 +20,7 @@ namespace data_structures {
 
 /**
  * @class BiMapMIC
- * @brief the same as Bimap, but implemented using boost::multi_index_container. Unfortunately slover
+ * @brief the same as Bimap, but implemented using boost::multi_index_container. Unfortunately slower
  *
  * @tparam T
  * @tparam Idx
@@ -166,7 +166,7 @@ public:
 };
 
 template <typename T, typename Idx = int> class BiMapOfConsecutive {
-    //TODO mayby it should be passed but only on debug
+    //TODO maybe it should be passed but only on debug
     static const Idx INVALID_IDX = -1;
 public:
     static_assert(std::is_integral<T>::value, "Type T has to be integral");

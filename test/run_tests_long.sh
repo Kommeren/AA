@@ -54,3 +54,7 @@ exit_on_error
 echo ------------------------------------------- knapsack_long_test          -------------------------------------------------------------------------------------
 ./${build_dir}/test/knapsack_long_test
 exit_on_error
+echo ------------------------------------------- knapsack_two_app_long_test  -------------------------------------------------------------------------------------
+./${build_dir}/test/knapsack_two_app_long_test
+exit_on_error
+

@@ -23,7 +23,7 @@ namespace ir {
    
 /**
  * class GLPBase
- * @brief This class contains member functions needeed to initialize LP
+ * @brief This class contains member functions needed to initialize LP
  */
 
 
@@ -97,14 +97,11 @@ public:
     }
    
 
-    //CR dopisałem, opis klasy, te metode bym przeniosl do nowej klasy pomiedzy GLPBase GLP, 
-    //Jak to zrobimy w ten sposob i opiszemy to jest mniejsz szansa, ze ktos bedzie wolal te metody, w inicie
     void addNewRowCoef(ColId col, double coef = 1) {
         m_newRowCol.push_back(getCol(col));
         m_newRowVal.push_back(coef);
     }
     
-    //CR jak wyzej
     void loadNewRow() {
         int rowNr = glp_get_num_rows(m_lp);
         glp_set_mat_row(m_lp, rowNr, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
@@ -113,41 +110,6 @@ public:
         initVec(m_newRowCol);
         initVec(m_newRowVal);
     }
-
-
-/*    template <typename RoundCondition>
-    bool roundGen(RoundCondition  rc) {
-        int delelted(0);
-        int size = glp_get_num_cols(m_lp);
-        for(int i = 1; i <= size; ++i) {
-            double x = glp_get_col_prim(m_lp, i);
-            auto doRound = rc(x, i);
-            if(doRound.first) {
-                roundColToValue(i, doRound.second);
-                --size;
-                --i;
-            }
-        }
-        
-        return delelted > 0;
-    }
-
-    
-    template <typename RelaxCondition>
-    bool relaxGen(RelaxCondition  rc) {
-        int delelted(0);
-        int size = glp_get_num_rows(m_lp);
-        for(int i = 1; i <= size; ++i) {
-            double x = glp_get_row_prim(m_lp, i);
-            if(rc(x,i)) {
-                glp_del_rows(m_lp, 1, &i-1);
-                --size;
-                --i;
-            }
-        }
-        
-        return delelted > 0;
-    }*/
 
     void setRowBounds(RowId row, BoundType b, double lb, double ub) {
         glp_set_row_bnds(m_lp, getRow(row), boundTypeToGLP(b), lb, ub);
@@ -234,7 +196,6 @@ private:
     Ids m_row;
     Ids m_col;
     Vals m_val;
-    //CR jak wyzej
     Ids m_newRowCol;
     Vals m_newRowVal;
     glp_smcp m_glpkControl;
