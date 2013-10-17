@@ -4,9 +4,10 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** primal/dual simplex (and other glpk settings?)
 ** framework documentation
+** infeasible LP handling and input validation
 ** there is some common code in the steiner network and DBMST
+** primal/dual simplex (and other glpk settings?)
 ** remove some debug output
 ** columns iterator is invalidated when we remove column (see relaxing code)
 ** cost function

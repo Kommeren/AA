@@ -17,12 +17,16 @@ namespace ir {
         Id() {}
         explicit Id(int id) : m_id(id) {}
     public:
-        int get() {
+        int get() const {
             return m_id;
         }
 
         bool operator<(Id id) const {
             return m_id < id.m_id;
+        }
+        
+        bool operator==(Id id) const {
+            return m_id == id.m_id;
         }
     private:
         int m_id;
@@ -48,4 +52,23 @@ namespace ir {
 
 } // ir
 } // paal
+
+namespace std {
+
+    template <>
+    struct hash<paal::ir::Id> {
+        size_t operator()(const paal::ir::Id & x) const
+        {
+            return hash<int>()(x.get());
+        }
+    };
+
+    template <>
+    struct hash<paal::ir::RowId> : public hash<paal::ir::Id> {};
+
+    template <>
+    struct hash<paal::ir::ColId> : public hash<paal::ir::Id> {};
+
+} //std
+
 #endif /* IDS_HPP */

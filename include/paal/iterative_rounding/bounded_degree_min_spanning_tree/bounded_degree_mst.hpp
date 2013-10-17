@@ -42,15 +42,18 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
 template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree>
 class BoundedDegreeMST { 
 public:
-    BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap, ResultSpanningTree & resultSpanningTree) :
-              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap), m_resultSpanningTree(resultSpanningTree),
+    BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap,
+                     ResultSpanningTree & resultSpanningTree) :
+              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
+              m_resultSpanningTree(resultSpanningTree),
               m_compare(BoundedDegreeMSTCompareTraits::EPSILON)
     {}
               
     BoundedDegreeMST(BoundedDegreeMST && o) :
               m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
               m_resultSpanningTree(o.m_resultSpanningTree),
-              m_edgeMap(std::move(o.m_edgeMap)), m_edgeList(std::move(o.m_edgeList)), m_vertexList(std::move(o.m_vertexList)),
+              m_edgeMap(std::move(o.m_edgeMap)), m_edgeList(std::move(o.m_edgeList)),
+              m_vertexMap(std::move(o.m_vertexMap)), m_vertexList(std::move(o.m_vertexList)),
               m_compare(std::move(o.m_compare))
     {}
                            
@@ -58,6 +61,7 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
     typedef boost::bimap<Edge, ColId> EdgeMap;
+    typedef std::unordered_map<RowId, Vertex> VertexMap;
     typedef std::vector<Vertex> VertexList;
     
     typedef std::map<Edge, ColId> EdgeMapOriginal;
@@ -71,7 +75,7 @@ public:
         return m_compare.getEpsilon();
     }
     
-    void removeColumn(ColId colId) {        
+    void removeColumn(ColId colId) {
         auto ret = m_edgeMap.right.erase(colId);
         assert(ret == 1);
     }
@@ -101,7 +105,7 @@ public:
     }
     
     decltype(get(std::declval<DegreeBoundMap>(), std::declval<Vertex>()))
-    getDegree(Vertex v) {
+    getDegreeBound(Vertex v) {
         return get(m_degBoundMap, v);
     }
     
@@ -131,17 +135,23 @@ public:
         return m_compare;
     }
 
-    std::string getDegBoundDesc(int dbIdx) const {
-        return getDegBoundPrefix() + std::to_string(dbIdx);
-    }
-    
-    bool isRowDegreeBound(const std::string & rowName) const {
-        return rowName.compare(0, getDegBoundPrefix().size(), getDegBoundPrefix()) == 0;
+    void bindVertexToRow(Vertex v, RowId row) {
+        m_vertexMap.insert(typename VertexMap::value_type(row, v));
     }
 
-    Vertex degreeBoundNameToVertex(const std::string & degreeBoundName) {
-        auto index = std::stoi(degreeBoundName.substr(getDegBoundPrefix().size(), degreeBoundName.size() - getDegBoundPrefix().size()));
-        return getVertices()[index];
+    void removeRow(RowId rowId) {
+        auto ret = m_vertexMap.erase(rowId);
+        assert(ret == 1);
+    }
+
+    boost::optional<Vertex> rowToVertex(RowId row) {
+        auto i = m_vertexMap.find(row);
+        if (i != m_vertexMap.end()) {
+            return boost::optional<Vertex>(i->second);
+        }
+        else {
+            return boost::optional<Vertex>();
+        }
     }
 
 private: 
@@ -151,10 +161,6 @@ private:
         return i->second;
     }
 
-    std::string getDegBoundPrefix() const {
-        return "degBound ";
-    }
-  
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
@@ -163,6 +169,7 @@ private:
     EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
     EdgeList        m_edgeList;
+    VertexMap       m_vertexMap;
     VertexList      m_vertexList;
     
     const utils::Compare<double>   m_compare;
@@ -184,11 +191,14 @@ private:
  */
 template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree>
 BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, ResultSpanningTree>
-make_BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap, ResultSpanningTree & resultSpanningTree) {
+make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
+                      const DegreeBoundMap & degBoundMap, ResultSpanningTree & resultSpanningTree) {
     return BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, ResultSpanningTree>(g, costMap, degBoundMap, resultSpanningTree);
 }
 
-template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree, typename IRComponents, typename Visitor = TrivialVisitor>
+template <typename Graph, typename CostMap, typename DegreeBoundMap,
+          typename ResultSpanningTree, typename IRComponents,
+          typename Visitor = TrivialVisitor>
 void bounded_degree_mst_iterative_rounding(
         const Graph & g, 
         const CostMap & costMap, 
@@ -236,9 +246,13 @@ private:
 struct BDMSTRelaxCondition {
     template <typename Solution, typename LP>
     bool operator()(Solution & solution, const LP & lp, RowId row) {
-        auto rowName = lp.getRowName(row);
-        if (solution.isRowDegreeBound(rowName)) {
-            return (lp.getRowDegree(row) <= solution.getDegree(solution.degreeBoundNameToVertex(rowName)) + 1);
+        auto vertex = solution.rowToVertex(row);
+        if (vertex) {
+            auto ret = (lp.getRowDegree(row) <= solution.getDegreeBound(*vertex) + 1);
+            if (ret) {
+                solution.removeRow(row);
+            }
+            return ret;
         }
         else
             return false;
@@ -269,6 +283,10 @@ private:
         return std::to_string(eIdx);
     }
     
+    std::string getDegreeBoundName(int vIdx) const {
+        return "degBound" + std::to_string(vIdx);
+    }
+
     /**
      * @brief adds a variable to the LP for each edge in the input graph
      * @param lp LP object
@@ -280,7 +298,7 @@ private:
         for(auto e : boost::make_iterator_range(edges(sol.getGraph()))) {
             auto eIdx = sol.addEdge(e);
             std::string colName = getEdgeName(eIdx);
-            ColId col =  lp.addColumn( sol.getCost(e), DB, 0, 1, colName);
+            ColId col = lp.addColumn(sol.getCost(e), DB, 0, 1, colName);
             sol.bindEdgeToCol(e, col);
         }
     }
@@ -296,8 +314,9 @@ private:
         auto const & g = sol.getGraph();
         
         for(auto v : boost::make_iterator_range(vertices(g))) {
-            auto dbIdx = sol.addVertex(v);
-            RowId rowIdx = lp.addRow(UP, 0, sol.getDegree(v), sol.getDegBoundDesc(dbIdx));
+            auto vIdx = sol.addVertex(v);
+            RowId rowIdx = lp.addRow(UP, 0, sol.getDegreeBound(v), getDegreeBoundName(vIdx));
+            sol.bindVertexToRow(v, rowIdx);
             auto adjEdges = out_edges(v, g);
             
             for(auto e : boost::make_iterator_range(adjEdges)) {

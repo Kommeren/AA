@@ -37,7 +37,7 @@ typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
 typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 typedef std::set<Edge> ResultTree;
 
-void checkResult(const Graph & g, const std::set<Edge> & tree,
+void checkResult(const Graph & g, const ResultTree & tree,
                  const Cost & costs, const Bound & degBounds,
                  int verticesNum, double bestCost) {
     int treeEdges(tree.size());
@@ -139,7 +139,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         runTest<paal::ir::FindMostViolated>(g, costs, degBounds, verticesNum, bestCost);
 
         // non-default heuristics (slow, only for smaller instances)
-        if (verticesNum <= 80) {
+        if (verticesNum <= 40) {
             runTest<paal::ir::FindAnyViolated>(g, costs, degBounds, verticesNum, bestCost);
         }
     }
