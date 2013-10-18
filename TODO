@@ -1,3 +1,5 @@
+* doxygen does not see some of the references 
+    (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. ) 
 * alternative kanpsack algorithm (n*(1/epsilon)^2)
 * make better traits, maybe it supposed to look like std::iterator traits
 
