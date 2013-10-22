@@ -1,7 +1,7 @@
 if [[ $# != 1 ]]; then
-echo help:
-echo "$0 <build_dir>"
-exit
+    echo help:
+    echo "$0 <build_dir>"
+    exit
 fi
 
 exit_on_error() {
@@ -11,50 +11,31 @@ exit_on_error() {
     fi
 }
 
+option() {
+    ret=""
+    case $1 in
+        "2_local_search_long_test")
+            ret="--run_test=TSPLIB"
+            ;;
+        "capacitated_facility_location_long_test")
+            ret="--run_test=FacilityLocationLong"
+            ;;
+        *) 
+            ;;
+    esac
+    echo $ret
+}
+
+tests="shortest_superstring_long_test 2_local_search_long_test bimap_perf_test bounded_degree_mst_long_test tree_augmentation_long_test 
+       capacitated_facility_location_long_test dreyfus_wagner_long_test facility_location_long_test generalised_assignment_long_test
+       steiner_network_long_test zelikovsky_11_per_6_long_test k_median_long_test scheduling_jobs_on_identical_parallel_machines_long_test
+       knapsack_two_app_long_test knapsack_long_test"
+
 build_dir=$1
-echo ------------------------------------------- shortest_superstring_long_test          -------------------------------------------------------------------------------------
-./${build_dir}/test/shortest_superstring_long_test
-exit_on_error
-echo ------------------------------------------- 2_local_search_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/2_local_search_long_test --run_test=TSPLIB
-exit_on_error
-echo ------------------------------------------- bimap_perf_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/bimap_perf_test
-exit_on_error
-#echo ------------------------------------------- bounded_degree_mst_long_test     -------------------------------------------------------------------------------------
-#./${build_dir}/bounded_degree_mst_long_test
-#exit_on_error
-echo ------------------------------------------- tree_augmentation_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/tree_augmentation_long_test
-exit_on_error
-echo ------------------------------------------- capacitated_facility_location_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/capacitated_facility_location_long_test --run_test=FacilityLocationLong
-exit_on_error
-echo ------------------------------------------- dreyfus_wagner_long_test    -------------------------------------------------------------------------------------
-./${build_dir}/test/dreyfus_wagner_long_test
-exit_on_error
-echo ------------------------------------------- facility_location_long_test    -------------------------------------------------------------------------------------
-./${build_dir}/test/facility_location_long_test
-exit_on_error
-echo ------------------------------------------- generalised_assignment_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/generalised_assignment_long_test
-exit_on_error
-echo ------------------------------------------- steiner_network_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/steiner_network_long_test
-exit_on_error
-echo -------------------------------------------zelikovsky_11_per_6_long_test     -------------------------------------------------------------------------------------
-./${build_dir}/test/zelikovsky_11_per_6_long_test
-exit_on_error
-echo ------------------------------------------- k_median_long_test          -------------------------------------------------------------------------------------
-./${build_dir}/test/k_median_long_test
-exit_on_error
-echo ------------------------------------------- scheduling_jobs_on_identical_parallel_machines_long_test      -------------------------------------------------------------------------------------
-./${build_dir}/test/scheduling_jobs_on_identical_parallel_machines_long_test
-exit_on_error
-echo ------------------------------------------- knapsack_long_test          -------------------------------------------------------------------------------------
-./${build_dir}/test/knapsack_long_test
-exit_on_error
-echo ------------------------------------------- knapsack_two_app_long_test  -------------------------------------------------------------------------------------
-./${build_dir}/test/knapsack_two_app_long_test
-exit_on_error
+
+for t in $tests; do
+    echo ------------------------------------------- $t 	 -------------------------------------------------------------------------------------
+    ./${build_dir}/test/$t $(option $t)
+    exit_on_error
+done
 

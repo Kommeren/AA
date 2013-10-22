@@ -4,6 +4,7 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
+** steiner_network_long_test runs infinite loop on siekiera
 ** framework documentation
 ** infeasible LP handling and input validation
 ** there is some common code in the steiner network and DBMST
