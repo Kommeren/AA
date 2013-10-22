@@ -114,62 +114,77 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
     check_0_1(maxValue, result);
 }
 
-//Knapsack 0/1 value
-BOOST_AUTO_TEST_CASE(Knapsack_0_1_value) {
+std::string to_string(paal::detail::IntegralValueAndSizeTag) {
+    return "value and size";
+}
+
+std::string to_string(paal::detail::IntegralValueTag) {
+    return "value";
+}
+
+std::string to_string(paal::detail::IntegralSizeTag) {
+    return "size";
+}
+
+template <typename T>
+std::string to_string(T) {
+    return "";
+}
+
+std::string to_string(paal::detail::RetrieveSolution) {
+    return "with output";
+}
+
+template <typename IntegralTag, typename RetrieveSolution> 
+void detail_knapsack_0_1() {
     std::vector<int> result;
-    LOGLN("Knapsack 0/1 on value");
-    auto maxValue = paal::knapsack_0_1_on_value(std::begin(objects), std::end(objects), 
+    LOGLN("Knapsack 0/1 on " + to_string(IntegralTag()) + to_string(RetrieveSolution()));
+    auto maxValue = paal::detail::knapsack_0_1(std::begin(objects), std::end(objects), 
             capacity,
             std::back_inserter(result), 
             sizesFunctor, 
-            valuesFunctor);
+            valuesFunctor,
+            IntegralTag(),
+            RetrieveSolution());
 
     check_0_1(maxValue, result);
+}
+
+//Knapsack 0/1 value
+BOOST_AUTO_TEST_CASE(Knapsack_0_1_value) {
+    detail_knapsack_0_1<paal::detail::IntegralValueTag, paal::detail::RetrieveSolution>();
 }
 
 //Knapsack 0/1  size
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_size) {
-    std::vector<int> result;
-    LOGLN("Knapsack 0/1 on size");
-    auto maxValue = paal::knapsack_0_1_on_size(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor);
-
-    check_0_1(maxValue, result);
+    detail_knapsack_0_1<paal::detail::IntegralSizeTag, paal::detail::RetrieveSolution>();
 }
 
+//Knapsack 0/1  size and value
+BOOST_AUTO_TEST_CASE(Knapsack_0_1_value_size) {
+    detail_knapsack_0_1<paal::detail::IntegralValueAndSizeTag, paal::detail::RetrieveSolution>();
+}
+
+//Knapsack 0/1 value no_output
+BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_) {
+    detail_knapsack_0_1<paal::detail::IntegralValueTag, paal::utils::SkipFunctor>();
+}
+
+//Knapsack 0/1  size no_output
+BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size) {
+    detail_knapsack_0_1<paal::detail::IntegralSizeTag, paal::utils::SkipFunctor>();
+}
+
+//Knapsack 0/1  size and value no_output
+BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_size) {
+    detail_knapsack_0_1<paal::detail::IntegralValueAndSizeTag, paal::utils::SkipFunctor>();
+}
 
 //Knapsack 0/1: no output iterator
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 no output");
     auto maxValue = paal::knapsack_0_1_no_output(std::begin(objects), std::end(objects), 
-            capacity,
-            sizesFunctor, 
-            valuesFunctor);
-
-    check_0_1_no_output(maxValue, result);
-}
-
-//Knapsack 0/1: no output iterator size
-BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size) {
-    std::vector<int> result;
-    LOGLN("Knapsack 0/1 no output size");
-    auto maxValue = paal::knapsack_0_1_no_output_on_size(std::begin(objects), std::end(objects), 
-            capacity,
-            sizesFunctor, 
-            valuesFunctor);
-
-    check_0_1_no_output(maxValue, result);
-}
-
-//Knapsack 0/1: no output iterator value
-BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value) {
-    std::vector<int> result;
-    LOGLN("Knapsack 0/1 no output value");
-    auto maxValue = paal::knapsack_0_1_no_output_on_value(std::begin(objects), std::end(objects), 
             capacity,
             sizesFunctor, 
             valuesFunctor);

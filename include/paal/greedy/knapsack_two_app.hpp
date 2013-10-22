@@ -35,6 +35,10 @@ knapsack_two_app(ObjectsIter oBegin,
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) SizeType;
 
+    static_assert(std::is_arithmetic<ValueType>::value &&
+                  std::is_arithmetic<SizeType>::value, 
+                  "SizeType and Value type must be arithmetic types");
+
     auto starValue = [=](ObjectsIter oi){return value(*oi);};
     auto starSize = [=](ObjectsIter oi){return size(*oi);};
     auto density = make_Density(starValue, starSize);

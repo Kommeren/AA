@@ -5,6 +5,7 @@
  *        It is small set of functon needed for Components class purpose.
  *        It is also less general than mpl. The implementation is create to avoid
  *        some problems with mpl. The c++11 techniques makes it much simpler and clearer.
+ *        When boost::mpl11 apears this code should be removed
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-18

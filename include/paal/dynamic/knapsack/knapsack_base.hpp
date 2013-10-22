@@ -7,6 +7,9 @@
  */
 #ifndef KNAPSACK_BASE_HPP
 #define KNAPSACK_BASE_HPP 
+
+#include "boost/mpl/if.hpp"
+
 namespace paal {
 namespace detail {
 
@@ -58,6 +61,23 @@ namespace detail {
                 return std::max_element(begin, end, make_less_pointees_t(compare));
             }
     };
+
+    struct IntegralValueAndSizeTag {};
+    struct IntegralValueTag {};
+    struct IntegralSizeTag {};
+    struct NonIntegralValueAndSizeTag {};
+
+    template <typename SizeType, typename ValueType>
+    using IntegralTag =  
+            typename boost::mpl::if_c<std::is_integral<SizeType>::value && 
+                           std::is_integral<ValueType>::value, IntegralValueAndSizeTag, 
+                                typename boost::mpl::if_c<std::is_integral<SizeType>::value, IntegralSizeTag,
+                                    typename boost::mpl::if_c<std::is_integral<ValueType>::value, 
+                                                              IntegralValueTag,
+                                                              NonIntegralValueAndSizeTag
+                                                             >::type
+                                                          >::type
+                          >::type;
 
 
 

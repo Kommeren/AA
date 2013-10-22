@@ -37,7 +37,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
     if(multiplier  > SMALLEST_MULTIPLIER) {
-        return knapsack_0_1_on_value(oBegin, oEnd, capacity, out, size, value);
+        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
     }
     
     ValueType realValue = ValueType();
@@ -47,7 +47,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
     
     auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * multiplier); };
 
-    auto reducedReturn = knapsack_0_1_on_value(oBegin, oEnd, capacity, newOut, size, newValue);
+    auto reducedReturn = knapsack_0_1(oBegin, oEnd, capacity, newOut, size, newValue);
     return std::make_pair(realValue, reducedReturn.second);
 }
 
@@ -75,11 +75,11 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
     if(multiplier > SMALLEST_MULTIPLIER) {
-        return knapsack_0_1_on_size(oBegin, oEnd, capacity, out, size, value);
+        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
     }
     
     auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * multiplier); };
-    return knapsack_0_1_on_size(oBegin, oEnd, SizeType(capacity / multiplier) , out, newSize, value);
+    return knapsack_0_1(oBegin, oEnd, SizeType(capacity / multiplier) , out, newSize, value);
 }
 
 template <typename ObjectsIter, 
@@ -106,11 +106,11 @@ knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin,
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
     if(multiplier  > SMALLEST_MULTIPLIER) {
-        return knapsack_0_1_no_output_on_value(oBegin, oEnd, capacity, size, value);
+        return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
     }
     
     auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * multiplier); };
-    auto ret = knapsack_0_1_no_output_on_value(oBegin, oEnd, capacity, size, newValue);
+    auto ret = knapsack_0_1_no_output(oBegin, oEnd, capacity, size, newValue);
     return std::make_pair((double(ret.first) / multiplier), ret.second);
 }
 
@@ -136,11 +136,11 @@ knapsack_0_1_no_output_on_size_fptas(double epsilon, ObjectsIter oBegin,
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
     if(multiplier > SMALLEST_MULTIPLIER) {
-        return knapsack_0_1_no_output_on_size(oBegin, oEnd, capacity, size, value);
+        return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
     }
     
     auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * multiplier); };
-    return knapsack_0_1_no_output_on_size(oBegin, oEnd, SizeType(capacity / multiplier), newSize, value);
+    return knapsack_0_1_no_output(oBegin, oEnd, SizeType(capacity / multiplier), newSize, value);
 }
 
 } //paal

@@ -48,8 +48,10 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOGLN("sizes ");
 
         LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
+        LOGLN("");
         LOGLN("values ");
         LOG_COPY_DEL(values.begin(), values.end(), " ");
+        LOGLN("");
         auto objects = boost::irange(size_t(0), values.size());
         //KNAPSACK
         {
@@ -63,6 +65,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOGLN("");
         }
         
         //KNAPSACK 0/1
@@ -77,6 +80,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOGLN("");
             LOGLN("Optimal");
             LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
