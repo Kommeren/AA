@@ -37,7 +37,10 @@
             </ul>
         <li> Iterative Rounding
             <ul>
-            <li>\ref ta
+            <li>\ref bdmst
+            <li>\ref gen_ass
+            <li>\ref steiner_network
+            <li>\ref tree_aug
             </ul>
         <li> Greedy
             <ul>

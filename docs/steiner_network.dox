@@ -1,0 +1,52 @@
+/*! \page steiner_network Steiner Network
+
+\section def Problem definition.  
+
+In the Steiner Network problem we are given an undirected graph \f$G=(V,E)\f$
+with edge costs \f$c:E\to R\f$ and connectivity requirements \f$r_{uv}\f$
+for all vertex pairs \f$u,v\f$.
+A Steiner Network is a subgraph of \f$G\f$ with at least \f$r_{uv}\f$
+edge-disjoint paths between each pair of vertices \f$u\f$ and \f$v\f$.
+The goal is to find a Steiner Network with the minimum cost.
+
+An LP relaxation of the problem is as follows. We introduce a binary
+variable \f$x_e\f$ for every edge \f$e\in E\f$.
+For a set of vertices \f$S\f$, let \f$\delta(S)\f$ denote the set of edges
+of \f$G\f$ with exactly one endpoint in \f$S\f$. Also, let \f$x(A) =
+\sum_{e\in A} x_e\f$.
+\f{eqnarray*}
+\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\ 
+\mbox{subject to:} & & \\
+& x(\delta(S))\geq\max_{u\in S, v\notin S}r_{uv} & \mbox{ for every } S \subseteq V \\
+& 0 \leq x_e \leq 1 & \mbox{ for every } e\in E\\ 
+\f}
+
+
+
+\section Solution
+
+We solve the problem using Jain's iterative rounding 2-approximation
+algorithm (using the above LP formulation).
+
+As the LP formulation has got an exponential number of constraints, we need
+to use a separation oracle and the row generation technique to solve it. The
+implemented separation oracle differs from the one described in \cite jain2001factor .
+It is easy to prove that, given a clique with edge weights equal \f$r_{uv}\f$, the
+separation oracle only has to check the minimum cut values between pairs of vertices
+which are the endpoints of edges of a maximum spanning tree in this clique.
+
+example: 
+   \snippet steiner_network_example.cpp Steiner Network Example
+ 
+complete example of the usage can be found in file tree_augmentation_example.cpp
+
+\subsection app_ta Approximation Ratio equals 2.
+
+\subsection References
+
+Jain's iterative rounding 2-approximation algorithm is described in
+\cite jain2001factor. The book \cite lau2011iterative contains a nice description
+of this algorithm (Chapter 10), along with many other iterative
+algorithms.
+
+*/

@@ -1,0 +1,44 @@
+/*! \page gen_ass Generalised Assignment
+
+\section def Problem definition.  
+
+In the Generalized Assignment problem we are given a set of jobs \f$J\f$
+and a set of machines \f$M\f$. For each job \f$j\in J\f$ and machine
+\f$i\in M\f$ we are given a processing time \f$t_{ij}\f$ and cost \f$c_{ij}\f$.
+For each machine \f$i\f$ we are also given a maximum time \f$T_{i}\f$ for
+which the machine is available. The goal is to assign each job to some machine,
+so that the total cost is minimized and no machine is used for more than its
+available time. Both finding the optimal assignment and deciding whether a
+feasible assignment exists are NP-complete problems.
+
+An LP relaxation of the problem is as follows. We introduce a binary variable
+\f$x_e\f$ for every \f$e=(i,j)\f$ job-machine pair such that \f$t_{ij} \leq T_i\f$.
+\f{eqnarray*}
+\mbox{minimize:} & & \\
+& \sum_{e=(i,j)} c_e x_e & \\ 
+\mbox{subject to:} & & \\
+& \sum_{e\in\delta(j)} x_e = 1 & \mbox{ for every } j\in J\\ 
+& \sum_{e\in\delta(i)} t_e x_e \leq T_i & \mbox{ for every } i\in M\\ 
+& x_e \geq 0 & \mbox{ for every } e\\
+\f}
+
+\section Solution
+
+We solve the problem using the Shmoys and Tardos 2-approximation iterative
+rounding algorithm (using the above LP formulation).
+
+example: 
+   \snippet generalised_assignment_example.cpp Generalised Assignment Example
+ 
+complete example of the usage can be found in file generalised_assignment_example.cpp
+
+\subsection app_gen_ass Approximation Ratio equals 2.
+The cost of the solution is at most the cost of the optimal solution
+and each time limit \f$T_i\f$ is violated at most by a factor of 2.
+
+\subsection References
+
+The iterative rounding 2-approximation by Shmoys and Tardos is described in
+\cite ShmoysTardosGAP.
+
+*/

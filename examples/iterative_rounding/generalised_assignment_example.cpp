@@ -10,11 +10,9 @@
 
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
-//using namespace  paal;
-//using namespace  paal::ir;
-
 int main() {
-    //sample problem
+//! [Generalised Assignment Example]
+    // sample problem
     auto machines = boost::irange(0,2);
     auto jobs = boost::irange(0,2);
 
@@ -24,7 +22,6 @@ int main() {
     cost[1][0] = 1;
     cost[1][1] = 3;
     auto  costf = [&](int i, int j){return cost[i][j];}; 
-
 
     std::vector<std::vector<int>> time(2, std::vector<int>(2));
     time[0][0] = 2;
@@ -38,15 +35,21 @@ int main() {
 
     std::map<int, int> jobsToMachines;
 
-    //solve it
-    paal::ir::generalised_assignment_iterative_rounding(
+    // solve it
+    auto resultType = paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(), jobs.begin(), jobs.end(),
             costf, timef, Tf, jobsToMachines, paal::ir::GeneralAssignmentIRComponents<>());
 
-    // printing result
-    for(const std::pair<int, int> & jm : jobsToMachines) {
-        std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
+    // print result
+    if (resultType == paal::lp::OPTIMAL) {
+        for (const std::pair<int, int> & jm : jobsToMachines) {
+            std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
+        }
     }
+    else {
+        std::cout << "The instance is infeasible" << std::endl;
+    }
+//! [Generalised Assignment Example]
 
     paal::lp::GLP::freeEnv();
 

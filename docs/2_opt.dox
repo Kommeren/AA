@@ -1,7 +1,7 @@
 /*! \page twoopt 2-opt for Traveling Salesman Problem
 
 \section def Problem definition.
-Int the Traveling Salesman Problem (TSP) we are given set of nodes and metric \a m. Our goal is to find such permutation of nodes \f$(a_1, a_2, ... ,a_n)\f$ such that the sum  \f$m(a_1, a_2) + m(a_2, a_3) + ... + m(a_(n-1),a_n) + m(a_n, a_1)\f$ is minimized.
+In the Traveling Salesman Problem (TSP) we are given set of nodes and metric \a m. Our goal is to find such permutation of nodes \f$(a_1, a_2, ... ,a_n)\f$ such that the sum  \f$m(a_1, a_2) + m(a_2, a_3) + ... + m(a_(n-1),a_n) + m(a_n, a_1)\f$ is minimized.
 
 \section Solution
 We solve this problem by local search, using well  known 2-opt moves (see paal::local_search::two_local_search::TwoLocalSearchStep for more details).

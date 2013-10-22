@@ -1,7 +1,7 @@
 /*! \page fl Facility Location
 
 \section def Problem definition.
-In facility location we have set of possible facilities locations, set of clients. Each facility \a j has specific facilityCost(j), additionally for each client \a i and facility \a j, there is a cost of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to determine the set of open facilities and  assign each client to some set of open facilities to minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients (the transportation cost).
+In the facility location problem we have a set of possible facilities locations and set of clients. Each facility \a j has a specific facilityCost(j), additionally for each client \a i and facility \a j, there is a cost of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to determine the set of open facilities and  assign each client to some set of open facilities to minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients (the transportation cost).
 
 More formally, let \f$x_{ij}\f$ indicates if  client \a i is assigned to facility \a j and \f$y_i\f$ indicates if the facility is open, we want to minimize 
 \f{eqnarray*}{&\sum_{x_{ij}}x_{ij} * m(i,j) + \sum_{y_i}y_i * facilityCost(i) \\
