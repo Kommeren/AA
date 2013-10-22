@@ -66,9 +66,9 @@ namespace detail {
     struct IntegralValueTag {};
     struct IntegralSizeTag {};
     struct NonIntegralValueAndSizeTag {};
-
+    
     template <typename SizeType, typename ValueType>
-    using IntegralTag =  
+    using GetIntegralTag =  
             typename boost::mpl::if_c<std::is_integral<SizeType>::value && 
                            std::is_integral<ValueType>::value, IntegralValueAndSizeTag, 
                                 typename boost::mpl::if_c<std::is_integral<SizeType>::value, IntegralSizeTag,
@@ -79,6 +79,14 @@ namespace detail {
                                                           >::type
                           >::type;
 
+    struct ArithmeticSizeTag {};
+    struct NonArithmeticSizeTag {};
+
+    template <typename SizeType>
+    using GetArithmeticSizeTag =  
+            typename boost::mpl::if_c<std::is_arithmetic<SizeType>::value, 
+                                     ArithmeticSizeTag,
+                                     NonArithmeticSizeTag>::type;
 
 
 }//detail

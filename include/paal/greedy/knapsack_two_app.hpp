@@ -30,8 +30,8 @@ knapsack_two_app(ObjectsIter oBegin,
         ObjectsIter oEnd, 
         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
         OutputIterator out, 
-        ObjectSizeFunctor size, 
-        ObjectValueFunctor value) {
+        ObjectValueFunctor value, 
+        ObjectSizeFunctor size) {
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) SizeType;
 
@@ -72,7 +72,7 @@ knapsack_two_app(ObjectsIter oBegin,
         *out = **largest;
         return std::make_pair(value(**largest), size(**largest));
     } else {
-        for(auto i : boost::irange(0, nr)) {
+        for(auto i = 0; i < nr; ++i) {
             *out = **mostDenseIter;
             ++out;
         }

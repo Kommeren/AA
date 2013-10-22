@@ -14,10 +14,11 @@
 #include <boost/optional.hpp>
 
 #include "paal/utils/functors.hpp"
-#include "paal/utils/type_functions.hpp"
 #include "paal/utils/less_pointees.hpp"
+#include "paal/utils/knapsack_utils.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
 #include "paal/dynamic/knapsack/knapsack_base.hpp"
+#include "paal/greedy/knapsack_0_1_two_app.hpp"
 
 namespace paal {
 
@@ -155,24 +156,41 @@ namespace detail {
     };
     
         
-    //TODO produce better bound based on approximation algorithm 
+    
     template <typename ObjectsIter,
               typename ObjectSizeFunctor, 
               typename ObjectValueFunctor>
     puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>()))
-    getSizeBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+    getValueBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+     ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag) {
+         auto out = utils::make_FunctorToOutputIterator(utils::SkipFunctor());
+
+         return std::min(2 * knapsack_0_1_two_app(oBegin, oEnd, capacity, out, value, size).first,
+                         getDensityValueBound(oBegin, oEnd, capacity, value, size));
+    }
+    
+    template <typename ObjectsIter,
+              typename ObjectSizeFunctor, 
+              typename ObjectValueFunctor>
+    puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>()))
+    getValueBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+     ObjectValueFunctor value, ObjectSizeFunctor size, NonIntegralValueAndSizeTag) {
+         return getDensityValueBound(oBegin, oEnd, capacity, value, size);
+    }
+
+    template <typename ObjectsIter,
+              typename ObjectSizeFunctor, 
+              typename ObjectValueFunctor>
+    puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>()))
+    getValueBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
      puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
      ObjectValueFunctor value, ObjectSizeFunctor size) {
-         typedef KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-         typedef typename base::ObjectRef  ObjectRef;
-         typedef typename base::SizeType   SizeType;
-         typedef typename base::ValueType  ValueType;
-
-         auto density = [&](ObjectRef obj){return double(value(obj))/double(size(obj));};
-         auto maxElement = density(*std::max_element(oBegin, oEnd, 
-                          [&](ObjectRef left, ObjectRef right){return density(left) < density(right);}));
-         return capacity * maxElement;
+         typedef puretype(std::declval<ObjectSizeFunctor >()(*std::declval<ObjectsIter>())) SizeType;
+         return getValueBound_0_1(oBegin, oEnd, capacity, value, size, GetArithmeticSizeTag<SizeType>());
     }
+
 
 } //detail 
 
@@ -246,7 +264,7 @@ knapsack_0_1(ObjectsIter oBegin,
     typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
 
     detail::Knapsack_0_1<ObjectsIter, ObjectValueFunctor, ObjectSizeFunctor, std::greater<SizeType>> knapsack(value, size);
-    auto maxValue = detail::getSizeBound_0_1(oBegin, oEnd, capacity, value, size);
+    auto maxValue = detail::getValueBound_0_1(oBegin, oEnd, capacity, value, size);
     auto maxValueAndSize = knapsack.solve(oBegin, oEnd, maxValue, 
             detail::GetMaxElementOnValueIndexedCollection<boost::optional<SizeType>, ValueType>(boost::optional<SizeType>(capacity + 1)));
     retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out);
@@ -276,7 +294,7 @@ knapsack_0_1(ObjectsIter oBegin,
 
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     detail::Knapsack_0_1<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor, std::less<ValueType>> knapsack(size, value);
-    if(detail::getSizeBound_0_1(oBegin, oEnd, capacity, value, size) > capacity) {
+    if(detail::getValueBound_0_1(oBegin, oEnd, capacity, value, size) > capacity) {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag(), retrieveSolution);
     } else {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralValueTag(), retrieveSolution);
@@ -336,7 +354,7 @@ knapsack_0_1(ObjectsIter oBegin,
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
     return detail::knapsack_0_1(oBegin, oEnd, capacity, out, size, value, 
-                detail::IntegralTag<SizeType, ValueType>(),
+                detail::GetIntegralTag<SizeType, ValueType>(),
                 detail::RetrieveSolution());
 }
 
@@ -368,7 +386,7 @@ knapsack_0_1_no_output(ObjectsIter oBegin,
                 oBegin, oEnd, capacity, 
                 utils::make_FunctorToOutputIterator(utils::SkipFunctor()), 
                 size, value, 
-                detail::IntegralTag<SizeType, ValueType>(),
+                detail::GetIntegralTag<SizeType, ValueType>(),
                 utils::SkipFunctor());
 }
 

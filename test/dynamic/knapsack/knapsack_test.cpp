@@ -76,44 +76,6 @@ BOOST_AUTO_TEST_CASE(Knapsack) {
     check(maxValue, result);
 }
 
-//Knapsack on size
-BOOST_AUTO_TEST_CASE(KnapsackSize) {
-    std::vector<int> result;
-    LOGLN("Knapsack Size");
-    auto maxValue = paal::knapsack_on_size(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor);
-
-    check(maxValue, result);
-}
-
-//Knapsack on value
-BOOST_AUTO_TEST_CASE(KnapsackValue) {
-    std::vector<int> result;
-    LOGLN("Knapsack Value");
-    auto maxValue = paal::knapsack_on_value(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor);
-
-    check(maxValue, result);
-}
-
-//Knapsack 0/1
-BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
-    std::vector<int> result;
-    LOGLN("Knapsack 0/1");
-    auto maxValue = paal::knapsack_0_1(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor);
-    check_0_1(maxValue, result);
-}
-
 std::string to_string(paal::detail::IntegralValueAndSizeTag) {
     return "value and size";
 }
@@ -135,10 +97,51 @@ std::string to_string(paal::detail::RetrieveSolution) {
     return "with output";
 }
 
+template <typename IntegralTag> 
+void detail_knapsack() {
+    std::vector<int> result;
+    LOGLN("Knapsack on " + to_string(IntegralTag()));
+    auto maxValue = paal::detail::knapsack(std::begin(objects), std::end(objects), 
+            capacity,
+            std::back_inserter(result), 
+            sizesFunctor, 
+            valuesFunctor,
+            IntegralTag());
+
+    check(maxValue, result);
+}
+
+//Knapsack on value
+BOOST_AUTO_TEST_CASE(KnapsackValue) {
+    detail_knapsack<paal::detail::IntegralValueTag>();
+}
+
+//Knapsack on size
+BOOST_AUTO_TEST_CASE(KnapsackSize) {
+    detail_knapsack<paal::detail::IntegralSizeTag>();
+}
+
+//Knapsack on size and value
+BOOST_AUTO_TEST_CASE(KnapsackSizeValue) {
+    detail_knapsack<paal::detail::IntegralValueAndSizeTag>();
+}
+
+//Knapsack 0/1
+BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
+    std::vector<int> result;
+    LOGLN("Knapsack 0/1");
+    auto maxValue = paal::knapsack_0_1(std::begin(objects), std::end(objects), 
+            capacity,
+            std::back_inserter(result), 
+            sizesFunctor, 
+            valuesFunctor);
+    check_0_1(maxValue, result);
+}
+
 template <typename IntegralTag, typename RetrieveSolution> 
 void detail_knapsack_0_1() {
     std::vector<int> result;
-    LOGLN("Knapsack 0/1 on " + to_string(IntegralTag()) + to_string(RetrieveSolution()));
+    LOGLN("Knapsack 0/1 on " + to_string(IntegralTag()) + " " + to_string(RetrieveSolution()));
     auto maxValue = paal::detail::knapsack_0_1(std::begin(objects), std::end(objects), 
             capacity,
             std::back_inserter(result), 

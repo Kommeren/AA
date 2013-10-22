@@ -8,6 +8,8 @@
 #ifndef KNAPSACK_UTILS_HPP
 #define KNAPSACK_UTILS_HPP 
 
+#include "paal/utils/type_functions.hpp"
+
 namespace paal {
 
 template <typename Value, typename Size>
@@ -28,6 +30,21 @@ template <typename Value, typename Size>
 Density<Value, Size>
 make_Density(Value value, Size size) {
     return Density<Value, Size>(value, size);
+}
+    
+template <typename ObjectsIter,
+           typename ObjectSizeFunctor, 
+           typename ObjectValueFunctor>
+ puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>()))
+ getDensityValueBound(ObjectsIter oBegin, ObjectsIter oEnd, 
+  puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+  ObjectValueFunctor value, ObjectSizeFunctor size) {
+      typedef typename std::iterator_traits<ObjectsIter>::reference  ObjectRef;
+
+      auto density = make_Density(value, size);
+      auto maxElement = density(*std::max_element(oBegin, oEnd, 
+                       [&](ObjectRef left, ObjectRef right){return density(left) < density(right);}));
+      return capacity * maxElement;
 }
 
 }

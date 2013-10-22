@@ -156,18 +156,19 @@ template <typename Functor,typename Compare = Less>
 template <typename Functor>
     struct FunctorToOutputIterator {
         typedef std::output_iterator_tag iterator_category;
-        typedef void   value_type;
-        typedef void   difference_type;
-        typedef void * pointer;
-        typedef void   reference;
+        typedef FunctorToOutputIterator   value_type;
+        typedef void                      difference_type;
+        typedef FunctorToOutputIterator * pointer;
+        typedef FunctorToOutputIterator & reference;
 
 
         FunctorToOutputIterator(Functor functor= Functor()) :
             m_functor(functor) {}
 
         template <typename Arg> 
-            void operator=(Arg&& arg) {
+            FunctorToOutputIterator & operator=(Arg&& arg) {
                 m_functor(std::forward<Arg>(arg));
+                return *this;
             }
 
         FunctorToOutputIterator & operator++() {

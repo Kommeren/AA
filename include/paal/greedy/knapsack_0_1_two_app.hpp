@@ -30,8 +30,8 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
         ObjectsIter oEnd, 
         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
         OutputIterator out, 
-        ObjectSizeFunctor size, 
-        ObjectValueFunctor value) {
+        ObjectValueFunctor value,
+        ObjectSizeFunctor size) {
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) SizeType;
 

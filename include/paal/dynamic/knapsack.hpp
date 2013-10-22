@@ -98,7 +98,7 @@ namespace detail {
               typename ObjectValueFunctor>
     //TODO produce better bound
     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))
-    getSizeBound(ObjectsIter oBegin, ObjectsIter oEnd, 
+    getValueBound(ObjectsIter oBegin, ObjectsIter oEnd, 
      puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
      ObjectValueFunctor value, ObjectSizeFunctor size) {
          typedef KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
@@ -112,7 +112,6 @@ namespace detail {
          return capacity * maxElement;
     }
 
-} //detail 
 
 /**
  * @brief Solution to the knapsack problem 
@@ -129,12 +128,13 @@ template <typename OutputIterator,
           typename ObjectSizeFunctor, 
           typename ObjectValueFunctor>
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
-knapsack_on_value(ObjectsIter oBegin, 
+knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
         OutputIterator out, 
         ObjectSizeFunctor size, 
-        ObjectValueFunctor value) {
+        ObjectValueFunctor value,
+        IntegralValueTag) {
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ObjectRef ObjectRef;
     typedef typename base::ReturnType ReturnType;
@@ -144,7 +144,7 @@ knapsack_on_value(ObjectsIter oBegin,
     if(oBegin == oEnd) {
         return ReturnType();
     }
-    auto maxSize = detail::getSizeBound(oBegin, oEnd, capacity, value, size);
+    auto maxSize = detail::getValueBound(oBegin, oEnd, capacity, value, size);
     auto ret = knapsack_dynamic(oBegin, oEnd, maxSize, out, value, size, 
             detail::GetMaxElementOnValueIndexedCollection<TableElementType, SizeType>(
                 TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
@@ -167,18 +167,62 @@ template <typename ObjectsIter,
          typename ObjectSizeFunctor, 
          typename ObjectValueFunctor>
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
-knapsack_on_size(ObjectsIter oBegin, 
+knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
-        ObjectValueFunctor value) {
+        ObjectValueFunctor value,
+        IntegralSizeTag) {
     typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
     return knapsack_dynamic(oBegin, oEnd, capacity, out, size, value, 
             detail::GetMaxElementOnCapacityIndexedCollection<ValueType>(), std::less<ValueType>());
 }
+    
+template <typename ObjectsIter, 
+         typename OutputIterator, 
+         typename ObjectSizeFunctor, 
+         typename ObjectValueFunctor,
+         typename IntegralTag> //always equals NonIntegralValueAndSizeTag
+typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+knapsack(ObjectsIter oBegin, 
+        ObjectsIter oEnd, 
+        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+        OutputIterator out, 
+        ObjectSizeFunctor size, 
+        ObjectValueFunctor value,
+        IntegralTag) {
+    //trick to avoid checking assert on template definition parse
+    static_assert(std::is_same<IntegralTag, NonIntegralValueAndSizeTag>::value, 
+            "At least one of the value or size must return integral value");
+}
 
 
+/**
+ * @brief Solution to the knapsack problem 
+ * overload for IntegralValueAndSizeTag
+ */
+template <typename ObjectsIter, 
+         typename OutputIterator, 
+         typename ObjectSizeFunctor, 
+         typename ObjectValueFunctor>
+             std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
+         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
+             knapsack(ObjectsIter oBegin, 
+                     ObjectsIter oEnd, 
+                     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+                     OutputIterator out, 
+                     ObjectSizeFunctor size, 
+                     ObjectValueFunctor value,
+                     IntegralValueAndSizeTag) {
+                 if(detail::getValueBound(oBegin, oEnd, capacity, value, size) > capacity) {
+                     return knapsack(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag());
+                 } else {
+                     return knapsack(oBegin, oEnd, capacity, out, size, value, IntegralValueTag());
+                 }
+             }
+
+} //detail 
 /**
  * @brief Solution to the knapsack problem 
  *
@@ -204,13 +248,10 @@ template <typename ObjectsIter,
                      OutputIterator out, 
                      ObjectSizeFunctor size, 
                      ObjectValueFunctor value = ObjectValueFunctor()) {
-                 if(detail::getSizeBound(oBegin, oEnd, capacity, value, size) > capacity) {
-                     return knapsack_on_size(oBegin, oEnd, capacity, out, size, value);
-                 } else {
-                     return knapsack_on_value(oBegin, oEnd, capacity, out, size, value);
-                 }
-             }
-
+            typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
+            typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
+            return detail::knapsack(oBegin, oEnd, capacity, out, size, value, detail::GetIntegralTag<SizeType, ValueType>());
+        }
 
 }//paal
 
