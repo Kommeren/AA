@@ -85,17 +85,6 @@ void comparator_functor() {
     assert(compareFirstDesc(std::make_pair(1,2), std::make_pair(0,1)));
 }
 
-void output_iterator_functor() {
-    int nr(0);
-    auto count = [&](int){++nr;};
-    //this iterator counts number of operator= calls
-    auto countingOutputIter = make_FunctorToOutputIterator(count);
-
-    std::vector<int> v(10);
-    std::copy(v.begin(), v.end(), countingOutputIter);
-    assert(nr == 10);
-}
-
 void boolean_functors() {
     Not notFun;
     Or orFun;
@@ -166,7 +155,6 @@ int main() {
     functors_example();
     boolean_functors();
     comparator_functor();
-    output_iterator_functor();
     boolean_functors();
     lift_operator_functor();
     boolean_functors_on_functors();

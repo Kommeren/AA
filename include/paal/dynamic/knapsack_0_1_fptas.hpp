@@ -43,7 +43,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
     ValueType realValue = ValueType();
     auto addValue = [&](ObjectRef obj){realValue += value(obj); return *out = obj;};
 
-    auto newOut =  utils::make_FunctorToOutputIterator(addValue);
+    auto newOut =  boost::make_function_output_iterator(addValue);
     
     auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * multiplier); };
 

@@ -11,6 +11,7 @@
 #include <vector>
 
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/function_output_iterator.hpp>
 #include <boost/optional.hpp>
 
 #include "paal/utils/functors.hpp"
@@ -164,7 +165,7 @@ namespace detail {
     getValueBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
      puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
      ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag) {
-         auto out = utils::make_FunctorToOutputIterator(utils::SkipFunctor());
+         auto out = boost::make_function_output_iterator(utils::SkipFunctor());
 
          return std::min(2 * knapsack_0_1_two_app(oBegin, oEnd, capacity, out, value, size).first,
                          getDensityValueBound(oBegin, oEnd, capacity, value, size));
@@ -384,7 +385,7 @@ knapsack_0_1_no_output(ObjectsIter oBegin,
     typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
     return detail::knapsack_0_1(
                 oBegin, oEnd, capacity, 
-                utils::make_FunctorToOutputIterator(utils::SkipFunctor()), 
+                boost::make_function_output_iterator(utils::SkipFunctor()), 
                 size, value, 
                 detail::GetIntegralTag<SizeType, ValueType>(),
                 utils::SkipFunctor());

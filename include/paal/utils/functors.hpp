@@ -151,45 +151,6 @@ template <typename Functor,typename Compare = Less>
         return FunctorToComparator<Functor,Compare>(std::move(functor), std::move(compare));
     };
 
-//The output Iterator takes functor and
-//each time the operator= is called the given function is called
-template <typename Functor>
-    struct FunctorToOutputIterator {
-        typedef std::output_iterator_tag iterator_category;
-        typedef FunctorToOutputIterator   value_type;
-        typedef void                      difference_type;
-        typedef FunctorToOutputIterator * pointer;
-        typedef FunctorToOutputIterator & reference;
-
-
-        FunctorToOutputIterator(Functor functor= Functor()) :
-            m_functor(functor) {}
-
-        template <typename Arg> 
-            FunctorToOutputIterator & operator=(Arg&& arg) {
-                m_functor(std::forward<Arg>(arg));
-                return *this;
-            }
-
-        FunctorToOutputIterator & operator++() {
-            return *this;
-        }
-
-        FunctorToOutputIterator & operator*() {
-            return *this;
-        }
-
-    private:
-        Functor m_functor;
-    };
-
-
-template <typename Functor>
-    FunctorToOutputIterator<Functor>
-    make_FunctorToOutputIterator(Functor functor) {
-        return FunctorToOutputIterator<Functor>(std::move(functor));
-    }
-
 
 //****************************** This is set of functors representing standard boolean operation
 //that is !, &&, ||, !=(xor).
