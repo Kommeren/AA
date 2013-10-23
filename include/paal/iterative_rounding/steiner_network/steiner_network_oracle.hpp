@@ -37,11 +37,9 @@ public:
                m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, num_vertices(m_g))),
                m_auxGraph(num_vertices(g)),
                m_resultNetwork(res)
-               { 
-               }
+               {}
 
-    
-    template <typename Solution, typename LP>
+    template <typename Solution>
     bool checkIfSolutionExists(Solution & sol) {
         for (auto const & e : sol.getEdgeMap()) {
             Vertex u = source(e.left, m_g);
@@ -97,7 +95,7 @@ private:
     typedef std::set < AuxVertex > ViolatingSet;
                                   
     template <typename Solution, typename LP>
-    void fillAuxiliaryDigraph(Solution &sol, const LP & lp) {
+    void fillAuxiliaryDigraph(Solution & sol, const LP & lp) {
         remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
@@ -107,7 +105,7 @@ private:
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
 
-            if(sol.getCompare().g(colVal, 0)) {
+            if (sol.getCompare().g(colVal, 0)) {
                 Vertex u = source(e.left, m_g);
                 Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);

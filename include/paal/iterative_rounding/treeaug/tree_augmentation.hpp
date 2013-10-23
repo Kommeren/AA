@@ -36,11 +36,11 @@ namespace paal {
         ///function does not work properly for filtered_graph.  See
         ///http://www.boost.org/doc/libs/1_54_0/libs/graph/doc/filtered_graph.html#2
         template <class EdgeListGraph>
-        int my_num_edges(const EdgeListGraph& G)
+        int my_num_edges(const EdgeListGraph & G)
         {
-            typename boost::graph_traits<EdgeListGraph>::edge_iterator ei,ei_end;
-            boost::tie(ei,ei_end)=edges(G);
-            return std::distance(ei,ei_end);
+            typename boost::graph_traits<EdgeListGraph>::edge_iterator ei, ei_end;
+            boost::tie(ei, ei_end) = edges(G);
+            return std::distance(ei, ei_end);
         }
 
 
@@ -53,7 +53,7 @@ namespace paal {
             BoolMapToTreeFilter() { }
             BoolMapToTreeFilter(EdgeBoolMap  m) : ebmap(m) { }
             template <typename Edge>
-            bool operator()(const Edge& e) const {
+            bool operator()(const Edge & e) const {
                     return get(ebmap, e);
             }
             EdgeBoolMap ebmap;
@@ -64,7 +64,7 @@ namespace paal {
             BoolMapToNonTreeFilter() { }
             BoolMapToNonTreeFilter(EdgeBoolMap  m) : ebmap(m) { }
             template <typename Edge>
-            bool operator()(const Edge& e) const {
+            bool operator()(const Edge & e) const {
                     return !get(ebmap, e);
             }
             EdgeBoolMap ebmap;
@@ -116,7 +116,7 @@ namespace paal {
             ///fine, too.
             template <typename Solution, typename LP>
             bool operator()(Solution & sol, const LP & lp, RowId row) {
-                for (auto e: sol.getCoveredBy(sol.rowToEdge(row))) {
+                for (auto e : sol.getCoveredBy(sol.rowToEdge(row))) {
                     if (sol.isInSolution(e))
                         return true;
                 }
@@ -144,12 +144,11 @@ namespace paal {
             //returns the number of variables
             template <typename Solution, typename LP>
             void addVariables(Solution & sol,LP & lp) {
-                int eIdx(0);
-                int whatever=-1;
+                int eIdx{0};
 
                 for(auto e : boost::make_iterator_range(edges(sol.getLinksGraph()))) {
                     std::string colName = getEdgeName(eIdx);
-                    ColId colIdx=lp.addColumn(sol. getCost(e), LO, 0, whatever, colName);
+                    ColId colIdx = lp.addColumn(sol. getCost(e), LO, 0, -1, colName);
                     sol.bindEdgeWithCol(e, colIdx);
                     ++eIdx;
                 }
@@ -159,12 +158,11 @@ namespace paal {
             //returns the number of rows added
             template <typename Solution, typename LP>
             void addCutConstraints(Solution & sol,LP & lp) {
-                int whatever=-1;
-                int dbIndex=0;
+                int dbIndex = 0;
                 auto const & tree = sol.getTreeGraph();
                 BGL_FORALL_EDGES_T(e, tree, puretype(tree)){
                     std::string rowName = getRowName(dbIndex);
-                    RowId rowIdx = lp.addRow(LO, 1, whatever, rowName );
+                    RowId rowIdx = lp.addRow(LO, 1, -1, rowName);
                     sol.bindEdgeWithRow(e, rowIdx);
 
                     for (auto pe : sol.getCoveredBy(e)){
@@ -207,13 +205,13 @@ namespace paal {
          * minimum cost subset of links which, together with the
          * tree-edges give a 2-edge-connected graph.
          *
-         * Example:  tree_augumentaation_example.cpp
+         * Example:  tree_augumentation_example.cpp
          *
          * @tparam Graph the graph type used
          * @tparam TreeMap it is assumed to be a bool map on the edges of a graph of type Graph. It is used for designating a spanning tree in the graph.
          * @tparam CostMap type for the costs of the links.
          */
-        template <typename Graph, typename TreeMap, typename CostMap, typename SetEdge >
+        template <typename Graph, typename TreeMap, typename CostMap, typename SetEdge>
         class TreeAug {
         public:
 
@@ -221,73 +219,70 @@ namespace paal {
             typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
             typedef double CostValue;
 
-            typedef std::map< Edge, bool > EdgeBoolMap;
+            typedef std::map<Edge, bool> EdgeBoolMap;
             
             typedef boost::filtered_graph<Graph, BoolMapToTreeFilter<TreeMap> > TreeGraph;
             typedef boost::filtered_graph<Graph, BoolMapToNonTreeFilter<TreeMap> > NonTreeGraph;
 
-            typedef std::vector< Edge > EdgeList;
-            typedef std::map< Edge , EdgeList > CoverMap;
+            typedef std::vector<Edge> EdgeList;
+            typedef std::map<Edge, EdgeList> CoverMap;
 
             //cross reference between links and column names
-            typedef boost::bimap< Edge, ColId> EdgeToColId;
-            typedef std::map<RowId, Edge> RowIdToEdge;
+            typedef boost::bimap<Edge, ColId> EdgeToColId;
+            typedef std::map<RowId, Edge> RowIdToEdge; 
+
+            typedef boost::optional<std::string> ErrorMessage;
 
             ///Constructor.
             ///
-            ///@param _g  the graph to work with
-            ///@param _treeMap designate a spanning tree in \c _g
-            ///@param _costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
-            ///@param _resultSetEdge Result set of edges
-            TreeAug(const Graph & _g, const TreeMap & _treeMap, const CostMap & _costMap, SetEdge & _resultSetEdge) :
-                m_g(_g),m_treeMap(_treeMap),m_costMap(_costMap),
-                m_Solution(_resultSetEdge),
+            ///@param g  the graph to work with
+            ///@param treeMap designate a spanning tree in \c g
+            ///@param costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
+            ///@param resultSetEdge Result set of edges
+            TreeAug(const Graph & g, const TreeMap & treeMap, const CostMap & costMap, SetEdge & resultSetEdge) :
+                m_g(g), m_treeMap(treeMap), m_costMap(costMap),
+                m_Solution(resultSetEdge),
                 m_tree(m_g, BoolMapToTreeFilter<TreeMap>(m_treeMap)),
                 m_ntree(m_g, BoolMapToNonTreeFilter<TreeMap>(m_treeMap)),
                 m_solCost(0)
-            { }//end of Constructor
+            { }
 
-            ///Check validity of the input
-            /**This function can be used to check validity of the
-               input. The input is valid if it consists of a
-               2-edge-connected, in which a spanning tree is
-               designated. The input validity is not checked by
-               default.
-            */
-            bool checkInputValidity(std::string & errorMsg){
-                //Num of edges == num of nodes-1 in the tree?
-                {
-                    int nV=num_vertices(m_g);
-                    //This is not very nice, but BGL sucks for filtered_graph
-                    int nE=my_num_edges(m_tree);
+            /// Checks validity of the input
+            ErrorMessage checkInputValidity() {
+                // Num of edges == num of nodes-1 in the tree?
+                int nV = num_vertices(m_g);
+                // This is not very nice, but BGL sucks for filtered_graph
+                int nE = my_num_edges(m_tree);
 
-                    if (nE != nV-1){
-                        errorMsg="The number of edges in the spanning tree is not good. It is "+std::to_string(nE)+", and it should be "+std::to_string(nV-1)+".";
-                        return false;
-                    }
+                if (nE != nV - 1) {
+                    return ErrorMessage(
+                                "Incorrect number of edges in the spanning tree. "
+                                + std::string("Should be ") + std::to_string(nV - 1)
+                                + ", but it is " + std::to_string(nE) + "."
+                            );
                 }
-                //Is the tree connected?
-                {
-                    std::vector<int> component(num_vertices(m_g));
-                    int num = connected_components(m_tree, &component[0]);
 
-                    if (num>1){
-                        errorMsg="The spanning tree is not connected.";
-                        return false;
-                    }
+                // Is the tree connected?
+                std::vector<int> component(num_vertices(m_g));
+                int num = connected_components(m_tree, &component[0]);
+
+                if (num > 1) {
+                    return ErrorMessage(
+                                "The spanning tree is not connected."
+                            );
                 }
-                //Is the graph 2-edge-connected?
-                {
-                    ConstIntMap<Edge, 1> const1EdgeMap;
-                    //This stoer-wagner algorithm is unnecessarily slow for some reason
-                    int w = stoer_wagner_min_cut(m_g, const1EdgeMap);
-                    if (w<2){
-                        errorMsg="The graph is not 2-edge-connected.";
-                        return false;
-                    }
+
+                // Is the graph 2-edge-connected?
+                ConstIntMap<Edge, 1> const1EdgeMap;
+                // TODO This stoer-wagner algorithm is unnecessarily slow for some reason
+                int minCut = stoer_wagner_min_cut(m_g, const1EdgeMap);
+                if (minCut < 2) {
+                    return ErrorMessage(
+                                "The graph is not 2-edge-connected."
+                            );
                 }
-                errorMsg="";
-                return true;
+
+                return ErrorMessage();
             }
 
             const NonTreeGraph & getLinksGraph() const {
@@ -304,18 +299,18 @@ namespace paal {
             }
 
             void addToSolution(ColId col) {
-                auto tmp=m_Solution.insert(m_edgeToColId.right.at(col));
+                auto tmp = m_Solution.insert(m_edgeToColId.right.at(col));
                 assert(tmp.second);
-                m_solCost+=m_costMap[m_edgeToColId.right.at(col)];
+                m_solCost += m_costMap[m_edgeToColId.right.at(col)];
             }
                     
             void bindEdgeWithCol(Edge e, ColId col) {
-                auto tmp=m_edgeToColId.insert(typename EdgeToColId::value_type(e, col));
+                auto tmp = m_edgeToColId.insert(typename EdgeToColId::value_type(e, col));
                 assert(tmp.second);
             }
             
             void bindEdgeWithRow(Edge e, RowId row) {
-                auto tmp=m_rowIdToEdge.insert(typename RowIdToEdge::value_type(row, e));
+                auto tmp = m_rowIdToEdge.insert(typename RowIdToEdge::value_type(row, e));
                 assert(tmp.second);
             }
 
@@ -326,7 +321,7 @@ namespace paal {
                 //contains the list of links covering \c t.
                 
                 //First we erase the previous contents
-                BGL_FORALL_EDGES_T(ei,m_tree,TreeGraph){
+                BGL_FORALL_EDGES_T(ei, m_tree, TreeGraph){
                     m_coveredBy[ei].clear();
                 }
                 
@@ -334,18 +329,18 @@ namespace paal {
                 std::vector< Edge > pred(num_vertices(m_g));
                 std::set< Vertex > seen;
                 BGL_FORALL_VERTICES_T(ui, m_g, Graph){
-                    auto tmp=seen.insert(ui);
+                    auto tmp = seen.insert(ui);
                     assert(tmp.second);
                     breadth_first_search(m_tree, ui,
                                          visitor(make_bfs_visitor(record_edge_predecessors(&pred[0], boost::on_tree_edge()))));
 
                     typename boost::graph_traits<NonTreeGraph>::out_edge_iterator ei, ei_end;
-                    for(boost::tie(ei,ei_end) = out_edges(ui,m_ntree); ei != ei_end; ++ei){
-                        Vertex node=target(*ei,m_ntree);
+                    for(boost::tie(ei, ei_end) = out_edges(ui,m_ntree); ei != ei_end; ++ei){
+                        Vertex node = target(*ei, m_ntree);
                         if (!seen.count(node)){
-                            while (node!=ui){
+                            while (node != ui){
                                 m_coveredBy[pred[node]].push_back(*ei);
-                                node=source(pred[node],m_tree);
+                                node = source(pred[node], m_tree);
                             }
                         }
                     }
@@ -374,7 +369,6 @@ namespace paal {
                 return m_solCost;
             }
 
-
         private:
 
             ///The input
@@ -400,29 +394,25 @@ namespace paal {
             RowIdToEdge m_rowIdToEdge;
         };
 
-
-        template <typename Graph, typename TreeMap, typename CostMap, typename EdgeSet >
-        TreeAug<Graph,  TreeMap,  CostMap, EdgeSet >
-        makeTreeAug(const Graph & _g, const TreeMap & _treeMap, const CostMap & _costMap, EdgeSet & solution) {
-            return TreeAug< Graph,  TreeMap,  CostMap, EdgeSet >(_g,  _treeMap,  _costMap, solution);
-
+        template <typename Graph, typename TreeMap, typename CostMap, typename EdgeSet>
+        TreeAug<Graph, TreeMap, CostMap, EdgeSet>
+        make_TreeAug(const Graph & g, const TreeMap & treeMap, const CostMap & costMap, EdgeSet & solution) {
+            return TreeAug<Graph, TreeMap, CostMap, EdgeSet>(g, treeMap, costMap, solution);
         }
         
         template <typename Graph, typename TreeMap, 
                   typename CostMap, typename EdgeSet, 
                   typename IRComponents, typename Visitor = TrivialVisitor>
         void tree_augmentation_iterative_rounding(
-                const Graph & _g, 
-                const TreeMap & _treeMap, 
-                const CostMap & _costMap, 
-                EdgeSet & _resultSetEdge, 
-                IRComponents comps, 
+                const Graph & g,
+                const TreeMap & treeMap,
+                const CostMap & costMap,
+                EdgeSet & resultSetEdge,
+                IRComponents comps,
                 Visitor vis = Visitor()) {
-            paal::ir::TreeAug<Graph, TreeMap, CostMap, EdgeSet> treeaug(_g, _treeMap, _costMap, _resultSetEdge);
+            paal::ir::TreeAug<Graph, TreeMap, CostMap, EdgeSet> treeaug(g, treeMap, costMap, resultSetEdge);
             solve_iterative_rounding(treeaug, std::move(comps), std::move(vis));
         }
-
-
 
     } //ir
 } //paal

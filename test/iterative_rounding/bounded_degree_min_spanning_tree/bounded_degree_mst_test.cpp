@@ -6,10 +6,11 @@
  * @date 2013-06-04
  */
 
-#define BOOST_TEST_MODULE bounded_degree_mst_test
+#define BOOST_TEST_MODULE bounded_degree_mst
 
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/range/counting_range.hpp>
 
 #include "utils/logger.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
@@ -56,10 +57,12 @@ typedef boost::property_map < Graph, boost::vertex_degree_t >::type Bound;
 typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
 typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 
-BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
+
+BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     //sample problem
+    LOGLN("Sample problem:");
     Graph g;
-    Cost costs = boost::get(boost::edge_weight, g);
+    Cost costs = get(boost::edge_weight, g);
     
     std::set<Edge> correctBdmst;
     
@@ -78,8 +81,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
                         addEdge(g, costs, 5, 4, 243);
                         addEdge(g, costs, 4, 0, 259);
     
-    Bound degBounds = boost::get(boost::vertex_degree, g);
-    Index indices = boost::get(boost::vertex_index, g);
+    Bound degBounds = get(boost::vertex_degree, g);
+    Index indices = get(boost::vertex_index, g);
     
     degBounds[0] = 1;
     degBounds[1] = 3;
@@ -92,13 +95,6 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
     auto oracle(make_BoundedDegreeMSTOracle(g));
     Components components(make_RowGenerationSolveLP(oracle));
     bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(components), LogVisitor());
-//    IterativeRounding<decltype(bdmst), LogVisitor> ir(std::move(bdmst));
-    
-    /*LOGLN(ir.solveLPToExtremePoint());
-    ir.round();
-    ir.relax();
-    
-    BOOST_CHECK(ir.integerSolution());*/
     
     for (auto const & e : resultTree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
@@ -107,5 +103,40 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst) {
 
     BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
     BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
+}
+
+BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
+    // invalid problem (disconnected graph)
+    LOGLN("Invalid problem (disconnected graph):");
+    Graph g;
+    Cost costs = get(boost::edge_weight, g);
+
+    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    typedef std::set<Edge> ResultTree;
+    ResultTree resultTree;
+
+    addEdge(g, costs, 0, 1, 1);
+    addEdge(g, costs, 0, 2, 16);
+    addEdge(g, costs, 0, 3, 76);
+    addEdge(g, costs, 1, 2, 90);
+    addEdge(g, costs, 1, 3, 37);
+    addEdge(g, costs, 4, 5, 20);
+    addEdge(g, costs, 4, 6, 15);
+    addEdge(g, costs, 5, 6, 4);
+
+    Bound degBounds = get(boost::vertex_degree, g);
+
+    for (int i : boost::counting_range(0,6)) {
+        degBounds[i] = 6;
+    }
+
+    typedef BDMSTIRComponents<Graph> Components;
+    auto oracle(make_BoundedDegreeMSTOracle(g));
+    Components components(make_RowGenerationSolveLP(oracle));
+    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
+    auto invalid = bdmst.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
 }
 

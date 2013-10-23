@@ -66,9 +66,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
         
         Graph g(verticesNum);
-        Cost costs      = boost::get(boost::edge_weight, g);
-        Bound degBounds = boost::get(boost::vertex_degree, g);
-        Index indices   = boost::get(boost::vertex_index, g);
+        Cost costs      = get(boost::edge_weight, g);
+        Bound degBounds = get(boost::vertex_degree, g);
+        Index indices   = get(boost::vertex_index, g);
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
         typedef std::set<Edge> ResultNetwork;
         ResultNetwork resultNetwork;
@@ -78,6 +78,6 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // default heuristics
         auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
         paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
-        paal::ir::steiner_network_iterative_rounding(g, costs, resultNetwork, std::move(comps));
+        paal::ir::steiner_network_iterative_rounding(g, restrictions, costs, resultNetwork, std::move(comps));
     }
 }

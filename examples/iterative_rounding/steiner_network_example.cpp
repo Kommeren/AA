@@ -49,7 +49,7 @@ int main() {
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
     SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
-    steiner_network_iterative_rounding(g, cost, resultNetwork, std::move(comps));
+    steiner_network_iterative_rounding(g, restrictions, cost, resultNetwork, std::move(comps));
 
     // printing result
     std::cout << "Edges in steiner network" << std::endl;

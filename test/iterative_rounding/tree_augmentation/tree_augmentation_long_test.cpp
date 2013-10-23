@@ -55,38 +55,38 @@ typedef property_map < Graph, edge_color_t >::type TreeMap;
 // 2       4       2       0       1
 // 2       5       3       0       1
 // 4       5       4       0       1
-void readTreeAugFromStream(  std::ifstream & is, 
+void readTreeAugFromStream(std::ifstream & is,
         Graph & g, Cost & cost, TreeMap & treeMap) {
     std::string s;
-    std::map< std::string, Vertex> nodes;
+    std::map<std::string, Vertex> nodes;
     int verticesNum, edgesNum;
-    is >> s; is>>verticesNum; is >> s;
+    is >> s; is >> verticesNum; is >> s;
 
     for (int i = 0; i < verticesNum; i++) {
         std::string nlabel;
-    is >> nlabel;
-    nodes[nlabel]=add_vertex(g);
+        is >> nlabel;
+        nodes[nlabel] = add_vertex(g);
     }
 
     LOGLN(num_vertices(g));
 
-    is >> s; is>>edgesNum; is >> s; is >> s; is >> s;
+    is >> s; is >> edgesNum; is >> s; is >> s; is >> s;
 
     for (int i = 0; i < edgesNum; i++) {
-    //read from the file
+        // read from the file
         std::string u, v;
         double c;
         int dummy;
         bool inT;
         is >> u >> v >> dummy >> inT >> c;
 
-    bool b;
-    Traits::edge_descriptor e;
-    std::tie(e, b) = add_edge(nodes[u], nodes[v], g);
-    assert(b);
-    put(cost,e,c);
-    put(treeMap,e,inT);
-  }
+        bool b;
+        Traits::edge_descriptor e;
+        std::tie(e, b) = add_edge(nodes[u], nodes[v], g);
+        assert(b);
+        put(cost, e, c);
+        put(treeMap, e, inT);
+    }
 }
 
 template <typename TA>
@@ -104,17 +104,17 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
     std::ifstream is_test_cases(testDir + "tree_aug.txt");
 
     assert(is_test_cases.good());
-    while(is_test_cases.good()) {
+    while (is_test_cases.good()) {
         std::string fname;
         int MAX_LINE = 256;
         char buf[MAX_LINE];
 
         is_test_cases.getline(buf, MAX_LINE);
-        if(buf[0] == 0) {
+        if (buf[0] == 0) {
             return;
         }
 
-        if(buf[0] == '#')
+        if (buf[0] == '#')
             continue;
         std::stringstream ss;
         ss << buf;
@@ -122,28 +122,28 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         ss >> fname;
 
         LOGLN(fname);
-        std::string filename=testDir + "/cases/" + fname + ".lgf";
+        std::string filename = testDir + "cases/" + fname + ".lgf";
         std::ifstream ifs(filename);
 
-        if (!ifs){
-            std::cerr<<"File "<<filename<<" could not be opened."<<std::endl;
+        if (!ifs) {
+            std::cerr << "File " << filename << " could not be opened." << std::endl;
             return;
         }
 
         Graph g;
-        Cost cost      = get(edge_weight, g);
-        TreeMap treeMap      = get(edge_color, g);
+        Cost cost       = get(edge_weight, g);
+        TreeMap treeMap = get(edge_color, g);
 
-        readTreeAugFromStream(ifs,g,cost,treeMap);
-        typedef std::set< Edge> SetEdge;
+        readTreeAugFromStream(ifs, g, cost, treeMap);
+        typedef std::set<Edge> SetEdge;
         SetEdge solution;
 
 
-        paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g,treeMap,cost, solution);
+        paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g, treeMap, cost, solution);
 
-        std::string error;
-        BOOST_ASSERT_MSG(treeaug.checkInputValidity(error),error.c_str());
-        std::cerr<<"Inputvalidation "<<filename<<" ends."<<std::endl;
+        auto invalid = treeaug.checkInputValidity();
+        BOOST_ASSERT_MSG(!invalid, invalid->c_str());
+        std::cerr << "Input validation " << filename << " ends." << std::endl;
 
         paal::ir::TAComponents<> comps;
     
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         paal::ir::solve_iterative_rounding(treeaug, comps);
 
         double solval = treeaug.getSolutionValue();
-        LOGLN("Cost of solution found: "<<solval<<", LP lower bound: "<<lplowerbd);
-        BOOST_CHECK(solval<=2*lplowerbd);
+        LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);
+        BOOST_CHECK(solval <= 2 * lplowerbd);
     }
 }

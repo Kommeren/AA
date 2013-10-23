@@ -8,6 +8,8 @@
 #ifndef BOUNDED_DEGREE_MST_HPP
 #define BOUNDED_DEGREE_MST_HPP
 
+#include <boost/graph/connected_components.hpp>
+
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/lp_row_generation.hpp"
@@ -66,6 +68,20 @@ public:
     
     typedef std::map<Edge, ColId> EdgeMapOriginal;
     typedef std::vector<Edge> EdgeList;
+
+    typedef boost::optional<std::string> ErrorMessage;
+
+    ErrorMessage checkInputValidity() {
+        // Is g connected?
+        std::vector<int> components(num_vertices(m_g));
+        int num = boost::connected_components(m_g, &components[0]);
+
+        if (num > 1) {
+            return ErrorMessage("The graph is not connected.");
+        }
+
+        return ErrorMessage();
+    }
     
     const Graph & getGraph() {
         return m_g;

@@ -1,7 +1,7 @@
 /**
  * @file steiner_network_test.cpp
  * @brief 
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-06-24
  */
@@ -21,7 +21,7 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-typedef  boost::property < boost::edge_weight_t, int> EdgeProp;
+typedef boost::property < boost::edge_weight_t, int> EdgeProp;
 
 typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
                             boost::no_property,  EdgeProp> Graph;
@@ -30,9 +30,9 @@ int restrictions(int i, int j) {
     return 2;
 }
 
-
 BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
+    LOGLN("Sample problem:");
     Graph g(3);
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef std::set<Edge> ResultNetwork;
@@ -49,17 +49,42 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     b = boost::add_edge(2 , 0, EdgeProp(7), g).second;
     assert(b);
 
-    auto cost = boost::get(boost::edge_weight, g);
+    auto cost = get(boost::edge_weight, g);
 
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
     SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
-    steiner_network_iterative_rounding(g, cost, resultNetwork, std::move(comps));
+    steiner_network_iterative_rounding(g, restrictions, cost, resultNetwork, std::move(comps));
 
     // printing result
     LOGLN("Edges in steiner network");
     for(auto const  & e : resultNetwork) {
         LOGLN("Edge " << e);
     }
+}
+
+BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
+    // invalid problem (restrictions cannot be satisfied)
+    LOGLN("Invalid problem (restrictions cannot be satisfied):");
+    Graph g(3);
+    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    typedef std::set<Edge> ResultNetwork;
+    ResultNetwork resultNetwork;
+    bool b;
+    b = boost::add_edge(0, 1, EdgeProp(1), g).second;
+    assert(b);
+    b = boost::add_edge(1, 2, EdgeProp(1), g).second;
+    assert(b);
+
+    auto cost = get(boost::edge_weight, g);
+
+    //solve it
+    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    auto steinerNetwork(make_SteinerNetwork(g, restrictions, cost, resultNetwork));
+    auto invalid = steinerNetwork.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
 }
 

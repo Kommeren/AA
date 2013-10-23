@@ -1,12 +1,12 @@
 /**
  * @file tree_augmentation_test.cpp
  * @brief 
- * @author Attila Bernath
+ * @author Attila Bernath, Piotr Godlewski
  * @version 1.0
  * @date 2013-07-10
  */
 
-#define BOOST_TEST_MODULE bounded_degree_mst_test
+#define BOOST_TEST_MODULE tree_augmentation
 
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -58,22 +58,23 @@ typedef property_map < Graph, vertex_index_t >::type Index;
 typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
-BOOST_AUTO_TEST_CASE(tree_augmentation) {
+BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
+    // sample problem
+    LOGLN("Sample problem:");
     Graph g(6);
     Cost cost = get(edge_weight, g);
-    TreeMap treeMap      = get(edge_color, g);
+    TreeMap treeMap = get(edge_color, g);
 
-    //Example G2.lgf=tree_aug_example_input.lgfmod
-    addEdge(g, 0, 1, treeMap, true, cost,0 );
-    addEdge(g, 1, 2, treeMap, true, cost,0 );
-    addEdge(g, 1, 3, treeMap, true, cost,0 );
-    addEdge(g, 3, 4, treeMap, true, cost,0 );
-    addEdge(g, 3, 5, treeMap, true, cost,0 );
-    addEdge(g, 0, 3, treeMap, false, cost,1 );
-    addEdge(g, 0, 2, treeMap, false, cost,1 );
-    addEdge(g, 2, 4, treeMap, false, cost,1 );
-    addEdge(g, 2, 5, treeMap, false, cost,1 );
-    addEdge(g, 4, 5, treeMap, false, cost,1 );
+    addEdge(g, 0, 1, treeMap, true, cost, 0);
+    addEdge(g, 1, 2, treeMap, true, cost, 0);
+    addEdge(g, 1, 3, treeMap, true, cost, 0);
+    addEdge(g, 3, 4, treeMap, true, cost, 0);
+    addEdge(g, 3, 5, treeMap, true, cost, 0);
+    addEdge(g, 0, 3, treeMap, false, cost, 1);
+    addEdge(g, 0, 2, treeMap, false, cost, 1);
+    addEdge(g, 2, 4, treeMap, false, cost, 1);
+    addEdge(g, 2, 5, treeMap, false, cost, 1);
+    addEdge(g, 4, 5, treeMap, false, cost, 1);
 
     typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
     SolutionTree solutionTree;
@@ -83,3 +84,77 @@ BOOST_AUTO_TEST_CASE(tree_augmentation) {
     BOOST_CHECK(!solutionTree.empty());
 }
 
+BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
+    // invalid problem (wrong number of spanning tree edges)
+    LOGLN("Invalid problem (wrong number of spanning tree edges):");
+    Graph g(6);
+    Cost cost = get(edge_weight, g);
+    TreeMap treeMap = get(edge_color, g);
+
+    addEdge(g, 0, 1, treeMap, true, cost, 0);
+    addEdge(g, 1, 2, treeMap, true, cost, 0);
+    addEdge(g, 1, 3, treeMap, false, cost, 0);
+    addEdge(g, 3, 4, treeMap, false, cost, 0);
+    addEdge(g, 3, 5, treeMap, false, cost, 0);
+
+    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    SolutionTree solutionTree;
+
+    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto invalid = treeaug.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
+}
+
+BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
+    // invalid problem (spanning tree not connected)
+    LOGLN("Invalid problem (spanning tree not connected):");
+    Graph g(6);
+    Cost cost = get(edge_weight, g);
+    TreeMap treeMap = get(edge_color, g);
+
+    addEdge(g, 0, 1, treeMap, true, cost, 0);
+    addEdge(g, 1, 2, treeMap, true, cost, 0);
+    addEdge(g, 1, 3, treeMap, false, cost, 0);
+    addEdge(g, 3, 4, treeMap, true, cost, 0);
+    addEdge(g, 3, 5, treeMap, true, cost, 0);
+    addEdge(g, 1, 4, treeMap, false, cost, 0);
+    addEdge(g, 5, 4, treeMap, true, cost, 0);
+    addEdge(g, 2, 3, treeMap, false, cost, 0);
+
+    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    SolutionTree solutionTree;
+
+    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto invalid = treeaug.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
+}
+
+BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
+    // invalid problem (graph not 2-edge-connected)
+    LOGLN("Invalid problem (graph not 2-edge-connected):");
+    Graph g(6);
+    Cost cost = get(edge_weight, g);
+    TreeMap treeMap = get(edge_color, g);
+
+    addEdge(g, 0, 1, treeMap, true, cost, 0);
+    addEdge(g, 1, 2, treeMap, true, cost, 0);
+    addEdge(g, 1, 3, treeMap, true, cost, 0);
+    addEdge(g, 3, 4, treeMap, true, cost, 0);
+    addEdge(g, 3, 5, treeMap, true, cost, 0);
+    addEdge(g, 1, 4, treeMap, false, cost, 0);
+    addEdge(g, 5, 4, treeMap, false, cost, 0);
+    addEdge(g, 2, 3, treeMap, false, cost, 0);
+
+    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    SolutionTree solutionTree;
+
+    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto invalid = treeaug.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
+}

@@ -28,24 +28,24 @@ const double SteinerNetworkCompareTraits::EPSILON = 1e-10;
 }
 
 
-template <typename Graph, typename CostMap, typename ResultNetworkSet>
+template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet>
 class SteinerNetwork {
 public:
   
-    SteinerNetwork(const Graph & g, const CostMap & costMap, ResultNetworkSet & resultNetwork) :
-            m_g(g), m_costMap(costMap), 
-            m_resultNetwork(resultNetwork),
-            m_compare(SteinerNetworkCompareTraits::EPSILON) {
-            }
+    SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+                   const CostMap & costMap, ResultNetworkSet & resultNetwork) :
+            m_g(g), m_restrictions(restrictions),
+            m_costMap(costMap), m_resultNetwork(resultNetwork),
+            m_compare(SteinerNetworkCompareTraits::EPSILON) {}
     
     SteinerNetwork(SteinerNetwork && other) :
-            m_g(other.m_g), m_costMap(other.m_costMap), 
-            m_resultNetwork(other.m_resultNetwork),
+            m_g(other.m_g), m_restrictions(other.m_restrictions),
+            m_costMap(other.m_costMap), m_resultNetwork(other.m_resultNetwork),
             m_compare(std::move(other.m_compare)) {}
     
     SteinerNetwork(const SteinerNetwork & other) :
-            m_g(other.m_g), m_costMap(other.m_costMap), 
-            m_resultNetwork(other.m_resultNetwork),
+            m_g(other.m_g), m_restrictions(other.m_restrictions),
+            m_costMap(other.m_costMap), m_resultNetwork(other.m_resultNetwork),
             m_compare(other.m_compare) {}
                            
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -56,6 +56,18 @@ public:
 
     typedef std::map<Edge, ColId> OriginalEdgeMap;
     typedef utils::Compare<double> Compare;
+
+    typedef boost::optional<std::string> ErrorMessage;
+
+    ErrorMessage checkInputValidity() {
+        auto oracle = make_SteinerNetworkSeparationOracle(m_g, m_restrictions, m_resultNetwork);
+        if (!oracle.checkIfSolutionExists(*this)) {
+            return ErrorMessage("A Steiner network satisfying the restrictions does not exist.");
+        }
+        else {
+            return ErrorMessage();
+        }
+    }
 
     const EdgeMap & getEdgeMap() const  {
         return m_edgeMap;
@@ -97,6 +109,7 @@ private:
     }
 
     const Graph & m_g;
+    const Restrictions & m_restrictions;
     const CostMap & m_costMap;
     ResultNetworkSet  &   m_resultNetwork;
     
@@ -106,10 +119,12 @@ private:
     Compare m_compare;
 };
 
-template <typename Graph, typename CostMap, typename ResultNetworkSet>
-SteinerNetwork<Graph, CostMap, ResultNetworkSet>
-make_SteinerNetwork(const Graph & g, const CostMap & costMap, ResultNetworkSet & resultNetwork) {
-    return SteinerNetwork<Graph, CostMap, ResultNetworkSet>(g, costMap, resultNetwork);
+template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet>
+SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkSet>
+make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+                    const CostMap & costMap, ResultNetworkSet & resultNetwork) {
+    return SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkSet>(
+                                                g, restrictions, costMap, resultNetwork);
 }
 
 class SteinerNetworkInit {
@@ -120,9 +135,8 @@ public:
         lp.setMinObjFun();
         addVariables(solution, lp);
         lp.loadMatrix();
-        //TODO put it somwhere
-        //assert(solution.checkIfSolutionExists());
     }
+
 private:
     //adding variables
     template <typename Solution, typename LP>
@@ -171,9 +185,11 @@ template <
              using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
-template <typename Graph, typename CostMap, typename ResultNetworkSet, typename IRComponents, typename Visitor = TrivialVisitor>
-void steiner_network_iterative_rounding(const Graph & g, const CostMap & cost, ResultNetworkSet & result, IRComponents comps, Visitor vis = Visitor()) {
-    auto steiner = paal::ir::make_SteinerNetwork(g, cost, result);
+template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet,
+          typename IRComponents, typename Visitor = TrivialVisitor>
+void steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+        const CostMap & cost, ResultNetworkSet & result, IRComponents comps, Visitor vis = Visitor()) {
+    auto steiner = paal::ir::make_SteinerNetwork(g, restrictions, cost, result);
     paal::ir::solve_iterative_rounding(steiner, std::move(comps), std::move(vis));
 }
 

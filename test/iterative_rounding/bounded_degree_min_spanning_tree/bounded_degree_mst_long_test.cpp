@@ -95,7 +95,7 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds, const
     Oracle oracle(g);
     Components components(ir::make_RowGenerationSolveLP(oracle));
     ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
-    
+
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
 }
 
@@ -126,9 +126,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
         
         Graph g(verticesNum);
-        Cost costs      = boost::get(boost::edge_weight, g);
-        Bound degBounds = boost::get(boost::vertex_degree, g);
-        Index indices   = boost::get(boost::vertex_index, g);
+        Cost costs      = get(boost::edge_weight, g);
+        Bound degBounds = get(boost::vertex_degree, g);
+        Index indices   = get(boost::vertex_index, g);
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
