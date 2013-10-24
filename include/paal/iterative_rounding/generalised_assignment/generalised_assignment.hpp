@@ -15,32 +15,32 @@ namespace paal {
 namespace ir {
 
 struct GARelaxCondition {
-    template <typename Solution, typename LP>
-        bool operator()(Solution & solution, const LP & lp, RowId row) {
-            auto & machineRows = solution.getMachineRows();
+    template <typename Problem, typename LP>
+        bool operator()(Problem & problem, const LP & lp, RowId row) {
+            auto & machineRows = problem.getMachineRows();
             return machineRows.find(row) != machineRows.end() && 
                 (
                  lp.getRowDegree(row) <= 1 ||
                  (
                   lp.getRowDegree(row) == 2 &&
-                  solution.getCompare().ge(lp.getRowSum(row), 1)
+                  problem.getCompare().ge(lp.getRowSum(row), 1)
                  )
                 );
         }
 };
 
 struct GASetSolution {
-    template <typename Solution, typename GetSolution>
-        void operator()(Solution & solution, const GetSolution & getsol) {
-            auto jbegin = solution.getJobs().first;
-            auto mbegin = solution.getMachines().first;
-            auto & colIdx = solution.getColIdx();
-            auto & jobToMachine = solution.getJobToMachines();
+    template <typename Problem, typename Solution>
+        void operator()(Problem & problem, const Solution & solution) {
+            auto jbegin = problem.getJobs().first;
+            auto mbegin = problem.getMachines().first;
+            auto & colIdx = problem.getColIdx();
+            auto & jobToMachine = problem.getJobToMachines();
 
             for(int idx : boost::irange(0, int(colIdx.size()))) { 
-                if(solution.getCompare().e(getsol(colIdx[idx]), 1)) {
-                    jobToMachine.insert(std::make_pair(*(jbegin + solution.getJIdx(idx)), 
-                                                         *(mbegin + solution.getMIdx(idx))));
+                if(problem.getCompare().e(solution(colIdx[idx]), 1)) {
+                    jobToMachine.insert(std::make_pair(*(jbegin + problem.getJIdx(idx)), 
+                                                         *(mbegin + problem.getMIdx(idx))));
                 }
             }
         }
@@ -48,58 +48,58 @@ struct GASetSolution {
 
 class GAInit {
     public:
-        template <typename Solution, typename LP>
-            void operator()(Solution & solution, LP & lp) {
+        template <typename Problem, typename LP>
+            void operator()(Problem & problem, LP & lp) {
                 lp.setLPName("generalized assignment problem");
                 lp.setMinObjFun(); 
 
-                addVariables(solution, lp);
-                addConstraintsForJobs(solution, lp);
-                addConstraintsForMachines(solution, lp);
+                addVariables(problem, lp);
+                addConstraintsForJobs(problem, lp);
+                addConstraintsForMachines(problem, lp);
                 lp.loadMatrix();
             }
 
     private:
         //adding varables
-        template <typename Solution, typename LP>
-            void addVariables(Solution & solution, LP &lp) {
-                auto & colIdx = solution.getColIdx();
-                colIdx.reserve(solution.getMachinesCnt() * solution.getJobsCnt());
-                for(typename Solution::JobRef j : boost::make_iterator_range(solution.getJobs())) {
-                    for(typename Solution::MachineRef m : boost::make_iterator_range(solution.getMachines())) {
-                        colIdx.push_back(lp.addColumn(solution.getCost()(j,m)));
+        template <typename Problem, typename LP>
+            void addVariables(Problem & problem, LP &lp) {
+                auto & colIdx = problem.getColIdx();
+                colIdx.reserve(problem.getMachinesCnt() * problem.getJobsCnt());
+                for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
+                    for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
+                        colIdx.push_back(lp.addColumn(problem.getCost()(j,m)));
                     }
                 }
             }
 
         //constraints for job
-        template <typename Solution, typename LP>
-            void addConstraintsForJobs(Solution & solution, LP & lp) {
-                auto & colIdx = solution.getColIdx();
-                for(int jIdx : boost::irange(0, solution.getJobsCnt())) {
+        template <typename Problem, typename LP>
+            void addConstraintsForJobs(Problem & problem, LP & lp) {
+                auto & colIdx = problem.getColIdx();
+                for(int jIdx : boost::irange(0, problem.getJobsCnt())) {
                     RowId rowIdx = lp.addRow(FX, 1.0, 1.0);
-                    for(int mIdx : boost::irange(0, solution.getMachinesCnt())) {
-                        lp.addConstraintCoef(rowIdx, colIdx[solution.idx(jIdx,mIdx)]);
+                    for(int mIdx : boost::irange(0, problem.getMachinesCnt())) {
+                        lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx,mIdx)]);
                         ++mIdx;
                     }
                 }
             }
 
         //constraints for machines
-        template <typename Solution, typename LP>
-            void addConstraintsForMachines(Solution & solution, LP & lp)  {
-                auto & colIdx = solution.getColIdx();
+        template <typename Problem, typename LP>
+            void addConstraintsForMachines(Problem & problem, LP & lp)  {
+                auto & colIdx = problem.getColIdx();
                 int mIdx(0);
-                for(typename Solution::MachineRef m : boost::make_iterator_range(solution.getMachines())) {
-                    auto T = solution.getMachineAvailableTime()(m);
+                for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
+                    auto T = problem.getMachineAvailableTime()(m);
                     RowId rowIdx = lp.addRow(UP, 0.0, T);
-                    solution.getMachineRows().insert(rowIdx);
+                    problem.getMachineRows().insert(rowIdx);
                     int jIdx(0);
 
-                    for(typename Solution::JobRef j : boost::make_iterator_range(solution.getJobs())) {
-                        auto t = solution.getProceedingTime()(j, m);
+                    for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
+                        auto t = problem.getProceedingTime()(j, m);
                         assert(t <= T);
-                        lp.addConstraintCoef(rowIdx, colIdx[solution.idx(jIdx, mIdx)], t);
+                        lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx, mIdx)], t);
                         ++jIdx;
                     }
                     ++mIdx;

@@ -39,27 +39,27 @@ public:
                m_resultNetwork(res)
                {}
 
-    template <typename Solution>
-    bool checkIfSolutionExists(Solution & sol) {
-        for (auto const & e : sol.getEdgeMap()) {
+    template <typename Problem>
+    bool checkIfSolutionExists(Problem & problem) {
+        for (auto const & e : problem.getEdgeMap()) {
             Vertex u = source(e.left, m_g);
             Vertex v = target(e.left, m_g);
             addEdge(u, v, 1);
         }
-        return !findAnyViolatedConstraint(sol);
+        return !findAnyViolatedConstraint(problem);
     }
                            
-    template <typename Solution, typename LP>
-    bool feasibleSolution(Solution & sol, const LP & lp) {
-        fillAuxiliaryDigraph(sol, lp);
-        return !findMostViolatedConstraint(sol);
+    template <typename Problem, typename LP>
+    bool feasibleSolution(Problem & problem, const LP & lp) {
+        fillAuxiliaryDigraph(problem, lp);
+        return !findMostViolatedConstraint(problem);
     }
     
-    template <typename Solution, typename LP>
-    void addViolatedConstraint(Solution & sol, LP & lp) {
+    template <typename Problem, typename LP>
+    void addViolatedConstraint(Problem & problem, LP & lp) {
         lp.addRow(LO, m_violatedRestriction);
         
-        for (auto const & e : sol.getEdgeMap()) {
+        for (auto const & e : problem.getEdgeMap()) {
             const Vertex & u = source(e.left, m_g);
             const Vertex & v = target(e.left, m_g);
                 
@@ -94,18 +94,18 @@ private:
     typedef std::vector < AuxEdge > AuxEdgeList;
     typedef std::set < AuxVertex > ViolatingSet;
                                   
-    template <typename Solution, typename LP>
-    void fillAuxiliaryDigraph(Solution & sol, const LP & lp) {
+    template <typename Problem, typename LP>
+    void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
         remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
         m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (auto const & e : sol.getEdgeMap()) {
+        for (auto const & e : problem.getEdgeMap()) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx);
 
-            if (sol.getCompare().g(colVal, 0)) {
+            if (problem.getCompare().g(colVal, 0)) {
                 Vertex u = source(e.left, m_g);
                 Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);
@@ -137,13 +137,13 @@ private:
         return e;
     }
    
-    template <typename Solution>
-    bool findAnyViolatedConstraint(Solution & sol) {
+    template <typename Problem>
+    bool findAnyViolatedConstraint(Problem & problem) {
         // TODO random source node
         
         for (auto const & src_trg : m_restrictionsVec) {
             assert(src_trg.first != src_trg.second);
-            if(sol.getCompare().g(checkViolationBiggerThan(sol, src_trg.first, src_trg.second), 0)) {
+            if(problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
                 return true;
             }
         }
@@ -151,25 +151,25 @@ private:
         return false;
     }
     
-    template <typename Solution>
-    bool findMostViolatedConstraint(Solution & sol) {
+    template <typename Problem>
+    bool findMostViolatedConstraint(Problem & problem) {
         double max = 0;
 
         for (auto const & src_trg : m_restrictionsVec) {
             assert(src_trg.first != src_trg.second);
-            max = std::max(checkViolationBiggerThan(sol, src_trg.first, src_trg.second), max);
+            max = std::max(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), max);
         }
         
-        return sol.getCompare().g(max, 0);
+        return problem.getCompare().g(max, 0);
     }
     
-    template <typename Solution>
-    double checkViolationBiggerThan(Solution & sol, Vertex  src, Vertex trg, double maximumViolation = 0) {
+    template <typename Problem>
+    double checkViolationBiggerThan(Problem & problem, Vertex  src, Vertex trg, double maximumViolation = 0) {
         double minCut = boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = m_restrictions(src, trg);
         double violation = restriction - minCut;
         
-        if (sol.getCompare().g(violation, maximumViolation)) {
+        if (problem.getCompare().g(violation, maximumViolation)) {
             m_violatedRestriction = restriction;
             m_violatingSet.clear();
             maximumViolation = violation;

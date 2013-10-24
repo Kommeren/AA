@@ -36,35 +36,35 @@ public:
     /**
      * @brief checks if the current LP solution is feasible
      * @param lp LP object
-     * @param sol Solution object
+     * @param problem Problem object
      * @return true iff the current LP solution is feasible
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    bool feasibleSolution(const Solution &sol, const LP & lp) {
-        fillAuxiliaryDigraph(sol, lp);
+    template <typename Problem, typename LP>
+    bool feasibleSolution(const Problem &problem, const LP & lp) {
+        fillAuxiliaryDigraph(problem, lp);
         
         if (m_oracleComponents.initialTest(*this)) {
             return true;
         }
         else {
-            return !m_oracleComponents.findViolated(sol, *this, num_vertices(m_g));
+            return !m_oracleComponents.findViolated(problem, *this, num_vertices(m_g));
         }
     }
     
     /**
      * @brief adds a violated constraint to the LP
      * @param lp LP object
-     * @param sol Solution object
+     * @param problem Problem object
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    void addViolatedConstraint(Solution & sol, LP & lp) {
+    template <typename Problem, typename LP>
+    void addViolatedConstraint(Problem & problem, LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
-        for (auto const & e : sol.getEdgeMap()) {
+        for (auto const & e : problem.getEdgeMap()) {
             const Vertex & u = source(e.left, m_g);
             const Vertex & v = target(e.left, m_g);
             
@@ -81,11 +81,11 @@ public:
     /**
      * @brief finds any violated constraint
      * @param srcVertexIndex index of the source vertex
-     * @param sol Solution object
+     * @param problem Problem object
      * @return true iff a violated consrtaint was found
      */
-    template <typename Solution>
-    bool findAnyViolatedConstraint(Solution & sol, int srcVertexIndex = 0) {
+    template <typename Problem>
+    bool findAnyViolatedConstraint(Problem & problem, int srcVertexIndex = 0) {
         auto vert = vertices(m_auxGraph);
         std::advance(vert.first, srcVertexIndex);
         auto src = *(vert.first);
@@ -95,12 +95,12 @@ public:
                 
         for (const Vertex & trg : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(sol, src, trg);
+                violation = checkViolationGreaterThan(problem, src, trg);
                 if (violation.first) {
                     return true;
                 }
                 
-                violation = checkViolationGreaterThan(sol, trg, src);
+                violation = checkViolationGreaterThan(problem, trg, src);
                 if (violation.first) {
                     return true;
                 }
@@ -114,8 +114,8 @@ public:
      * @brief finds the most violated constraint
      * @return true iff a violated consrtaint was found
      */
-    template <typename Solution>
-    bool findMostViolatedConstraint(Solution & sol) {
+    template <typename Problem>
+    bool findMostViolatedConstraint(Problem & problem) {
         auto graphVertices = vertices(m_auxGraph);
         auto src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
@@ -126,13 +126,13 @@ public:
         
         for (const Vertex & trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(sol, src, trg, maximumViolation);
+                violation = checkViolationGreaterThan(problem, src, trg, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
                 if (violation.first) {
                     violatedConstraintFound = true;
                 }
                 
-                violation = checkViolationGreaterThan(sol, trg, src, maximumViolation);
+                violation = checkViolationGreaterThan(problem, trg, src, maximumViolation);
                 maximumViolation = std::max(maximumViolation, violation.second);
                 if (violation.first) {
                     violatedConstraintFound = true;
@@ -168,8 +168,8 @@ private:
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    void fillAuxiliaryDigraph(Solution & sol, const LP & lp) {
+    template <typename Problem, typename LP>
+    void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
         int numVertices(num_vertices(m_g));
         
         m_auxGraph.clear();
@@ -182,11 +182,11 @@ private:
         m_rev = get(boost::edge_reverse, m_auxGraph);
         m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (auto const & e : sol.getEdgeMap()) {
+        for (auto const & e : problem.getEdgeMap()) {
             ColId colIdx = e.right;
             double colVal = lp.getColPrim(colIdx) / 2;
             
-            if (!sol.getCompare().e(colVal, 0)) {
+            if (!problem.getCompare().e(colVal, 0)) {
                 Vertex u = source(e.left, m_g);
                 Vertex v = target(e.left, m_g);
                 addEdge(u, v, colVal);
@@ -196,8 +196,8 @@ private:
         m_src = add_vertex(m_auxGraph);
         m_trg = add_vertex(m_auxGraph);
         
-        for (const Vertex & v : sol.getVertices()) {
-            m_srcToV[v] = addEdge(m_src, v, degreeOf(sol, v, lp) / 2, true);
+        for (const Vertex & v : problem.getVertices()) {
+            m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
     }
@@ -247,14 +247,14 @@ private:
      * @tparam SrcVertex
      * @tparam TrgVertex
      */
-    template <typename Solution, typename LP>
-    double degreeOf(Solution &sol, const Vertex & v, const LP & lp) {
+    template <typename Problem, typename LP>
+    double degreeOf(Problem &problem, const Vertex & v, const LP & lp) {
         double res = 0;
         auto adjEdges = out_edges(v, m_g);
             
         for (Edge e : boost::make_iterator_range(adjEdges)) {
-            auto i = sol.getEdgeMap().left.find(e);
-            if(i != sol.getEdgeMap().left.end()) {
+            auto i = problem.getEdgeMap().left.find(e);
+            if(i != problem.getEdgeMap().left.end()) {
                 res += lp.getColPrim(i->second);
             }
         }
@@ -268,8 +268,8 @@ private:
      * @param minViolation minimum violation that a set should have to be saved
      * @return a pair of bool (if a violated set was found) and the violation of the found set
      */
-    template <typename Solution>
-    std::pair<bool, double> checkViolationGreaterThan(Solution & sol, const Vertex & src, const Vertex & trg, double minViolation = 0) {
+    template <typename Problem>
+    std::pair<bool, double> checkViolationGreaterThan(Problem & problem, const Vertex & src, const Vertex & trg, double minViolation = 0) {
         int numVertices(num_vertices(m_g));
         double origVal = get(m_cap, m_srcToV[src]);
         bool violated = false;
@@ -283,7 +283,7 @@ private:
         double minCut = boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > minViolation && !sol.getCompare().e(violation, 0)) {
+        if (violation > minViolation && !problem.getCompare().e(violation, 0)) {
             violated = true;
             m_violatingSetSize = 0;
             

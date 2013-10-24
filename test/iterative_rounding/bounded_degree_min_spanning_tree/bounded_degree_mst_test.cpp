@@ -19,18 +19,18 @@ using namespace  paal;
 using namespace  paal::ir;
 
 struct LogVisitor : public TrivialVisitor {
-    template <typename Solution, typename LP>
-    void solveLPToExtremePoint(const Solution &, LP & lp) {
+    template <typename Problem, typename LP>
+    void solveLPToExtremePoint(const Problem &, LP & lp) {
         LOGLN(lp);
     }
 
-    template <typename Solution, typename LP>
-    void roundCol(const Solution &, LP & lp, ColId col, double val) {
+    template <typename Problem, typename LP>
+    void roundCol(const Problem &, LP & lp, ColId col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
     
-    template <typename Solution, typename LP>
-    void relaxRow(const Solution &, LP & lp, RowId row) {
+    template <typename Problem, typename LP>
+    void relaxRow(const Problem &, LP & lp, RowId row) {
         LOGLN("Relax row " << row.get());
     }
 };

@@ -129,21 +129,21 @@ make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
 
 class SteinerNetworkInit {
 public:
-    template <typename Solution, typename LP>
-    void operator()(Solution & solution, LP & lp) {
+    template <typename Problem, typename LP>
+    void operator()(Problem & problem, LP & lp) {
         lp.setLPName("steiner network");
         lp.setMinObjFun();
-        addVariables(solution, lp);
+        addVariables(problem, lp);
         lp.loadMatrix();
     }
 
 private:
     //adding variables
-    template <typename Solution, typename LP>
-    void addVariables(Solution & solution, LP & lp) {
-        for(auto e : boost::make_iterator_range(edges(solution.getGraph()))) {
-            ColId col = lp.addColumn(solution.getCost(e), DB, 0, 1);
-            solution.bindEdgeToCol(e, col);
+    template <typename Problem, typename LP>
+    void addVariables(Problem & problem, LP & lp) {
+        for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
+            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1);
+            problem.bindEdgeToCol(e, col);
         }
     }
 };
@@ -153,17 +153,17 @@ struct SteinerNetworkRoundCondition {
     SteinerNetworkRoundCondition(double epsilon = SteinerNetworkCompareTraits::EPSILON) :
         m_roundHalf(epsilon), m_roundZero(epsilon) {}
 
-    template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution & sol, const LP & lp, ColId colId) {
-        auto ret = m_roundZero(sol, lp, colId);
+    template <typename Problem, typename LP>
+    boost::optional<double> operator()(Problem & problem, const LP & lp, ColId colId) {
+        auto ret = m_roundZero(problem, lp, colId);
         if(ret) {
             //removing edge
-            sol.removeColumn(colId);
+            problem.removeColumn(colId);
             return ret;
         } else {
-            ret = m_roundHalf(sol, lp, colId);
+            ret = m_roundHalf(problem, lp, colId);
             if(ret) {
-                sol.addColumnToSolution(colId);
+                problem.addColumnToSolution(colId);
             }
             return ret;
         }

@@ -88,13 +88,13 @@ namespace paal {
         struct TARoundCondition {
             ///Round a coordinate up if it is at least half in the
             ///current solution.
-            template <typename Solution, typename LP>
-            boost::optional<double> operator()(Solution & sol, LP & lp, ColId col) {
+            template <typename Problem, typename LP>
+            boost::optional<double> operator()(Problem & problem, LP & lp, ColId col) {
                 ///Round a coordinate up if it is at least half.
-                auto res = m_roundHalf(sol, lp, col);
+                auto res = m_roundHalf(problem, lp, col);
                 //Save some auxiliary info
                 if(res) {
-                    sol.addToSolution(col);
+                    problem.addToSolution(col);
                 }
                 return res;
             }
@@ -114,10 +114,10 @@ namespace paal {
             ///these constraints became trivial after
             ///rounding. So returning always false should be
             ///fine, too.
-            template <typename Solution, typename LP>
-            bool operator()(Solution & sol, const LP & lp, RowId row) {
-                for (auto e : sol.getCoveredBy(sol.rowToEdge(row))) {
-                    if (sol.isInSolution(e))
+            template <typename Problem, typename LP>
+            bool operator()(Problem & problem, const LP & lp, RowId row) {
+                for (auto e : problem.getCoveredBy(problem.rowToEdge(row))) {
+                    if (problem.isInSolution(e))
                         return true;
                 }
                 return false;
@@ -127,46 +127,46 @@ namespace paal {
         class TAInit {
         public:
             ///Initialize the cut LP.
-            template <typename Solution, typename LP>
-            void operator()(Solution & sol, LP & lp) {    
-                sol.init();
+            template <typename Problem, typename LP>
+            void operator()(Problem & problem, LP & lp) {    
+                problem.init();
                 lp.setLPName("Tree augmentation");
                 lp.setMinObjFun(); 
 
-                addVariables(sol, lp);
+                addVariables(problem, lp);
 
-                addCutConstraints(sol, lp);
+                addCutConstraints(problem, lp);
 
                 lp.loadMatrix();
             }
         private:
             //adding variables
             //returns the number of variables
-            template <typename Solution, typename LP>
-            void addVariables(Solution & sol,LP & lp) {
+            template <typename Problem, typename LP>
+            void addVariables(Problem & problem, LP & lp) {
                 int eIdx{0};
 
-                for(auto e : boost::make_iterator_range(edges(sol.getLinksGraph()))) {
+                for(auto e : boost::make_iterator_range(edges(problem.getLinksGraph()))) {
                     std::string colName = getEdgeName(eIdx);
-                    ColId colIdx = lp.addColumn(sol. getCost(e), LO, 0, -1, colName);
-                    sol.bindEdgeWithCol(e, colIdx);
+                    ColId colIdx = lp.addColumn(problem.getCost(e), LO, 0, -1, colName);
+                    problem.bindEdgeWithCol(e, colIdx);
                     ++eIdx;
                 }
             }
 
             //adding the cut constraints
             //returns the number of rows added
-            template <typename Solution, typename LP>
-            void addCutConstraints(Solution & sol,LP & lp) {
+            template <typename Problem, typename LP>
+            void addCutConstraints(Problem & problem, LP & lp) {
                 int dbIndex = 0;
-                auto const & tree = sol.getTreeGraph();
+                auto const & tree = problem.getTreeGraph();
                 BGL_FORALL_EDGES_T(e, tree, puretype(tree)){
                     std::string rowName = getRowName(dbIndex);
                     RowId rowIdx = lp.addRow(LO, 1, -1, rowName);
-                    sol.bindEdgeWithRow(e, rowIdx);
+                    problem.bindEdgeWithRow(e, rowIdx);
 
-                    for (auto pe : sol.getCoveredBy(e)){
-                        lp.addConstraintCoef(rowIdx, sol.edgeToCol(pe));
+                    for (auto pe : problem.getCoveredBy(e)){
+                        lp.addConstraintCoef(rowIdx, problem.edgeToCol(pe));
                     }
                     ++dbIndex;
                 }

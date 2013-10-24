@@ -238,11 +238,11 @@ void bounded_degree_mst_iterative_rounding(
 struct BDMSTRoundCondition {
     BDMSTRoundCondition(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) : m_roundZero(epsilon) {}
     
-    template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution & solution, const LP & lp, ColId col) {
-        auto ret = m_roundZero(solution, lp, col);
+    template <typename Problem, typename LP>
+    boost::optional<double> operator()(Problem & problem, const LP & lp, ColId col) {
+        auto ret = m_roundZero(problem, lp, col);
         if (ret) {
-            solution.removeColumn(col);
+            problem.removeColumn(col);
         }
         return ret;
     }
@@ -260,13 +260,13 @@ private:
      * @tparam LP
      */
 struct BDMSTRelaxCondition {
-    template <typename Solution, typename LP>
-    bool operator()(Solution & solution, const LP & lp, RowId row) {
-        auto vertex = solution.rowToVertex(row);
+    template <typename Problem, typename LP>
+    bool operator()(Problem & problem, const LP & lp, RowId row) {
+        auto vertex = problem.rowToVertex(row);
         if (vertex) {
-            auto ret = (lp.getRowDegree(row) <= solution.getDegreeBound(*vertex) + 1);
+            auto ret = (lp.getRowDegree(row) <= problem.getDegreeBound(*vertex) + 1);
             if (ret) {
-                solution.removeRow(row);
+                problem.removeRow(row);
             }
             return ret;
         }
@@ -282,14 +282,14 @@ struct BDMSTRelaxCondition {
      * @tparam LP
      */
 struct BDMSTInit {
-    template <typename Solution, typename LP>
-    void operator()(Solution & sol, LP & lp) {
+    template <typename Problem, typename LP>
+    void operator()(Problem & problem, LP & lp) {
         lp.setLPName("bounded degree minimum spanning tree");
         lp.setMinObjFun(); 
         
-        addVariables(sol, lp);
-        addDegreeBoundConstraints(sol, lp);
-        addAllSetEquality(sol, lp);
+        addVariables(problem, lp);
+        addDegreeBoundConstraints(problem, lp);
+        addAllSetEquality(problem, lp);
         
         lp.loadMatrix();
     }
@@ -309,13 +309,13 @@ private:
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    void addVariables(Solution & sol, LP & lp) {
-        for(auto e : boost::make_iterator_range(edges(sol.getGraph()))) {
-            auto eIdx = sol.addEdge(e);
+    template <typename Problem, typename LP>
+    void addVariables(Problem & problem, LP & lp) {
+        for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
+            auto eIdx = problem.addEdge(e);
             std::string colName = getEdgeName(eIdx);
-            ColId col = lp.addColumn(sol.getCost(e), DB, 0, 1, colName);
-            sol.bindEdgeToCol(e, col);
+            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1, colName);
+            problem.bindEdgeToCol(e, col);
         }
     }
     
@@ -325,18 +325,18 @@ private:
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    void addDegreeBoundConstraints(Solution & sol, LP & lp) {
-        auto const & g = sol.getGraph();
+    template <typename Problem, typename LP>
+    void addDegreeBoundConstraints(Problem & problem, LP & lp) {
+        auto const & g = problem.getGraph();
         
         for(auto v : boost::make_iterator_range(vertices(g))) {
-            auto vIdx = sol.addVertex(v);
-            RowId rowIdx = lp.addRow(UP, 0, sol.getDegreeBound(v), getDegreeBoundName(vIdx));
-            sol.bindVertexToRow(v, rowIdx);
+            auto vIdx = problem.addVertex(v);
+            RowId rowIdx = lp.addRow(UP, 0, problem.getDegreeBound(v), getDegreeBoundName(vIdx));
+            problem.bindVertexToRow(v, rowIdx);
             auto adjEdges = out_edges(v, g);
             
             for(auto e : boost::make_iterator_range(adjEdges)) {
-                lp.addConstraintCoef(rowIdx, sol.edgeToCol(e));
+                lp.addConstraintCoef(rowIdx, problem.edgeToCol(e));
             }
         }
     }
@@ -347,9 +347,9 @@ private:
      *
      * @tparam LP
      */
-    template <typename Solution, typename LP>
-    void addAllSetEquality(Solution & sol, LP & lp) {
-        auto const & g = sol.getGraph();
+    template <typename Problem, typename LP>
+    void addAllSetEquality(Problem & problem, LP & lp) {
+        auto const & g = problem.getGraph();
         int vCnt = num_vertices(g);
         RowId rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
         
@@ -366,17 +366,17 @@ struct BDMSTSetSolution {
 
     /**
      * @brief returns the generated spanning tree
-     * @param getsol GetSolution object
-     * @param sol Solution object
+     * @param solution Solution object
+     * @param problem Problem object
      * @return generated spanning tree: map from input Graph edges to bool values (if the edge belongs to the tree)
      *
-     * @tparam GetSolution
+     * @tparam Solution
      */
-    template <typename Solution, typename GetSolution>
-    void operator()(Solution & sol, const GetSolution & getsol) {
-        for (auto edgeAndCol : sol.getOriginalEdgesMap()) {
-            if(m_compare.e(getsol(edgeAndCol.second), 1)) {
-                sol.addToResultSpanningTree(edgeAndCol.first);
+    template <typename Problem, typename GetSolution>
+    void operator()(Problem & problem, const GetSolution & solution) {
+        for (auto edgeAndCol : problem.getOriginalEdgesMap()) {
+            if(m_compare.e(solution(edgeAndCol.second), 1)) {
+                problem.addToResultSpanningTree(edgeAndCol.first);
             }
         }
     }

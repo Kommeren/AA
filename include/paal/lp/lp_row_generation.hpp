@@ -16,12 +16,12 @@ class RowGenerationSolveLP {
 public:
     RowGenerationSolveLP(Oracle & oracle) : m_oracle(oracle) {}
   
-    template <typename Solution, typename LP>
-    double operator()(const Solution & sol, LP & lp) {
+    template <typename Problem, typename LP>
+    double operator()(const Problem & problem, LP & lp) {
         double res;
         res = lp.solveToExtremePoint();
-        while (!m_oracle.feasibleSolution(sol, lp)) {
-            m_oracle.addViolatedConstraint(sol, lp);
+        while (!m_oracle.feasibleSolution(problem, lp)) {
+            m_oracle.addViolatedConstraint(problem, lp);
             res = lp.solveToExtremePoint();
         }
         return res;

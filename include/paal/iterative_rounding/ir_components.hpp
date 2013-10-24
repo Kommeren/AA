@@ -28,8 +28,8 @@ class DefaultRoundCondition {
 public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
-    template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
+    template <typename Problem, typename LP>
+    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
@@ -54,8 +54,8 @@ class RoundConditionEquals<arg, args...>  :
 public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
     
-    template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
+    template <typename Problem, typename LP>
+    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 
@@ -91,8 +91,8 @@ public:
     RoundConditionToFun(Cond c = Cond(), F f = F()) : 
         m_cond(c), m_f(f) {}
 
-    template <typename Solution, typename LP>
-    boost::optional<double> operator()(Solution &, const LP & lp, ColId col) {
+    template <typename Problem, typename LP>
+    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
             return m_f(x);
@@ -130,8 +130,8 @@ struct RoundConditionGreaterThanHalf  :
 
 
 struct DefaultSolveLPToExtremePoint {
-    template <typename Solution, typename LP>
-    double operator()(Solution &, LP & lp) {
+    template <typename Problem, typename LP>
+    double operator()(Problem &, LP & lp) {
         return lp.solveToExtremePoint();
     };
 };
