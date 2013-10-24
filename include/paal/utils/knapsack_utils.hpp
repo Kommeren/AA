@@ -9,6 +9,7 @@
 #define KNAPSACK_UTILS_HPP 
 
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/optional.hpp>
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
@@ -186,6 +187,17 @@ using GetArithmeticSizeTag =
                                  NonArithmeticSizeTag>::type;
 
 }//detail
+
+template <typename ObjectsIter>
+boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd, 
+                     double epsilon, double lowerBound) {
+    double n = std::distance(oBegin, oEnd);
+    auto ret =  n / (epsilon * lowerBound);
+    static const double SMALLEST_MULTIPLIER = 1.;
+    if(ret > SMALLEST_MULTIPLIER )
+        return boost::optional<double>();
+    return  ret;
+}
 
 }//paal
 #endif /* KNAPSACK_UTILS_HPP */

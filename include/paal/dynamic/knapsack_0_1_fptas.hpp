@@ -7,6 +7,7 @@
  */
 #ifndef KNAPSACK_0_1_FPTAS_HPP
 #define KNAPSACK_0_1_FPTAS_HPP 
+
 #include "paal/dynamic/knapsack.hpp"
 
 namespace paal {
@@ -64,13 +65,10 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
         return ReturnType();
     }
     
-    double n = std::distance(oBegin, oEnd);
-    //TODO use better guarantee
     double maxValue = detail::getValueLowerBound_0_1(oBegin, oEnd, capacity, value, size); 
-    auto multiplier = n / (epsilon * maxValue);
-    static const double SMALLEST_MULTIPLIER = 1./2.;
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
 
-    if(multiplier  > SMALLEST_MULTIPLIER) {
+    if(!multiplier) {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
     }
     
@@ -79,7 +77,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
 
     auto newOut =  boost::make_function_output_iterator(addValue);
     
-    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * multiplier); };
+    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * *multiplier); };
 
     auto reducedReturn = knapsack_0_1(oBegin, oEnd, capacity, newOut, size, newValue);
     return std::make_pair(realValue, reducedReturn.second);
@@ -103,12 +101,9 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
     if(oBegin == oEnd) {
         return ReturnType();
     }
-    
-    double n = std::distance(oBegin, oEnd);
-    auto multiplier = n / (epsilon * double(capacity));
-    static const double SMALLEST_MULTIPLIER = 1./2.;
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity);
 
-    if(multiplier > SMALLEST_MULTIPLIER) {
+    if(!multiplier) {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
     }
     
@@ -117,8 +112,8 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
     
     auto newOut =  boost::make_function_output_iterator(addSize);
     
-    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * multiplier); };
-    auto reducedReturn = knapsack_0_1(oBegin, oEnd, SizeType(capacity / multiplier) , newOut, newSize, value);
+    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * *multiplier); };
+    auto reducedReturn = knapsack_0_1(oBegin, oEnd, SizeType(capacity / *multiplier) , newOut, newSize, value);
     return std::make_pair(reducedReturn.first, realSize);
     
 }
@@ -140,19 +135,16 @@ knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin,
         return ReturnType();
     }
     
-    double n = std::distance(oBegin, oEnd);
-    //TODO use better guarantee
     double maxValue = detail::getValueLowerBound_0_1(oBegin, oEnd, capacity, value, size); 
-    auto multiplier = n / (epsilon * maxValue);
-    static const double SMALLEST_MULTIPLIER = 1./2.;
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
 
-    if(multiplier  > SMALLEST_MULTIPLIER) {
+    if(!multiplier) {
         return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
     }
     
-    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * multiplier); };
+    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * *multiplier); };
     auto ret = knapsack_0_1_no_output(oBegin, oEnd, capacity, size, newValue);
-    return std::make_pair((double(ret.first) / multiplier), ret.second);
+    return std::make_pair(ValueType(double(ret.first) / *multiplier), ret.second);
 }
 
 template <typename ObjectsIter, 
@@ -172,16 +164,15 @@ knapsack_0_1_no_output_on_size_fptas(double epsilon, ObjectsIter oBegin,
         return ReturnType();
     }
     
-    double n = std::distance(oBegin, oEnd);
-    auto multiplier = n / (epsilon * double(capacity));
-    static const double SMALLEST_MULTIPLIER = 1./2.;
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity);
 
-    if(multiplier > SMALLEST_MULTIPLIER) {
+    if(!multiplier) {
         return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
     }
     
-    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * multiplier); };
-    return knapsack_0_1_no_output(oBegin, oEnd, SizeType(capacity / multiplier), newSize, value);
+    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * *multiplier); };
+    auto ret = knapsack_0_1_no_output(oBegin, oEnd, SizeType(capacity / *multiplier), newSize, value);
+    return ReturnType(ret.first, double(ret.second) / *multiplier);
 }
 
 } //paal
