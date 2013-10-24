@@ -16,8 +16,8 @@
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/less_pointees.hpp"
+#include "paal/utils/knapsack_utils.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
-#include "paal/dynamic/knapsack/knapsack_base.hpp"
 
 namespace paal {
 
@@ -41,7 +41,7 @@ namespace detail {
     typename KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
     knapsack_dynamic(ObjectsIter oBegin, 
             ObjectsIter oEnd, 
-            puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) maxSize,
+            detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> maxSize,
             OutputIterator out, 
             ObjectSizeFunctor size,
             ObjectValueFunctor value,
@@ -97,9 +97,9 @@ namespace detail {
               typename ObjectSizeFunctor, 
               typename ObjectValueFunctor>
     //TODO produce better bound
-    puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))
+    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
     getValueBound(ObjectsIter oBegin, ObjectsIter oEnd, 
-     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+     detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
      ObjectValueFunctor value, ObjectSizeFunctor size) {
          typedef KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
          typedef typename base::ObjectRef  ObjectRef;
@@ -130,7 +130,7 @@ template <typename OutputIterator,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
@@ -138,8 +138,8 @@ knapsack(ObjectsIter oBegin,
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ObjectRef ObjectRef;
     typedef typename base::ReturnType ReturnType;
-    typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
+    typedef typename base::SizeType SizeType;
+    typedef typename base::ValueType ValueType;
     typedef boost::optional<std::pair<ObjectsIter, ValueType>> TableElementType;
     if(oBegin == oEnd) {
         return ReturnType();
@@ -148,7 +148,7 @@ knapsack(ObjectsIter oBegin,
     auto ret = knapsack_dynamic(oBegin, oEnd, maxSize, out, value, size, 
             detail::GetMaxElementOnValueIndexedCollection<TableElementType, SizeType>(
                 TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
-            std::greater<ValueType>());
+            utils::Greater());
     return std::make_pair(ret.second, ret.first);
 }
         
@@ -169,12 +169,12 @@ template <typename ObjectsIter,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
         IntegralSizeTag) {
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
+    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     return knapsack_dynamic(oBegin, oEnd, capacity, out, size, value, 
             detail::GetMaxElementOnCapacityIndexedCollection<ValueType>(), std::less<ValueType>());
 }
@@ -187,7 +187,7 @@ template <typename ObjectsIter,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
@@ -206,11 +206,11 @@ template <typename ObjectsIter,
          typename OutputIterator, 
          typename ObjectSizeFunctor, 
          typename ObjectValueFunctor>
-             std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
-         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
+             std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
+         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
              knapsack(ObjectsIter oBegin, 
                      ObjectsIter oEnd, 
-                     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+                     detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
                      OutputIterator out, 
                      ObjectSizeFunctor size, 
                      ObjectValueFunctor value,
@@ -240,16 +240,16 @@ template <typename ObjectsIter,
          typename OutputIterator, 
          typename ObjectSizeFunctor, 
          typename ObjectValueFunctor = utils::ReturnSomethingFunctor<int,1>>
-             std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
-         puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
+             std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
+         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
              knapsack(ObjectsIter oBegin, 
                      ObjectsIter oEnd, 
-                     puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity, //capacity is of size type
+                     detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
                      OutputIterator out, 
                      ObjectSizeFunctor size, 
                      ObjectValueFunctor value = ObjectValueFunctor()) {
-            typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
-            typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
+            typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
+            typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
             return detail::knapsack(oBegin, oEnd, capacity, out, size, value, detail::GetIntegralTag<SizeType, ValueType>());
         }
 

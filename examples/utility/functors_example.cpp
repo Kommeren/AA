@@ -89,7 +89,6 @@ void boolean_functors() {
     Not notFun;
     Or orFun;
     And andFun;
-    Xor xorFun;
 
     assert(!notFun(true));
     assert( notFun(false));
@@ -103,11 +102,6 @@ void boolean_functors() {
     assert(!andFun(true , false));
     assert(!andFun(false, true));
     assert( andFun(true , true));
-    
-    assert(!xorFun(false, false));
-    assert( xorFun(true , false));
-    assert( xorFun(false, true));
-    assert(!xorFun(true , true));
 }
 
 void lift_operator_functor() {

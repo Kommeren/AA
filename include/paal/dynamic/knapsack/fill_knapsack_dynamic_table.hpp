@@ -40,7 +40,7 @@ template <typename ValueIterator,
           typename Compare, 
           typename Init,
           typename GetPositionRange>
-puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))
+detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
 fillKnapsackDynamicTable(ValueIterator valuesBegin, ValueIterator valuesEnd, 
          ObjectsIter oBegin, ObjectsIter oEnd, 
          ObjectSizeFunctor size, 
@@ -50,7 +50,7 @@ fillKnapsackDynamicTable(ValueIterator valuesBegin, ValueIterator valuesEnd,
          GetPositionRange getRange) {
     typedef typename std::iterator_traits<ValueIterator>::value_type ValueOrNull;
     ValueOrNull nullVallue = ValueOrNull();
-    typedef puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) SizeType;
+    typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
     typedef typename std::iterator_traits<ObjectsIter>::reference ObjectRef;
 
     SizeType maxSize = std::distance(valuesBegin, valuesEnd);

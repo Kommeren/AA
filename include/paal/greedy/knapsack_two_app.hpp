@@ -24,16 +24,16 @@ template <typename OutputIterator,
           typename ObjectsIter, 
           typename ObjectSizeFunctor, 
           typename ObjectValueFunctor>
-std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
-          puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
+std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
+          detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
 knapsack_two_app(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
         OutputIterator out, 
         ObjectValueFunctor value, 
         ObjectSizeFunctor size) {
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) SizeType;
+    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
+    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
     static_assert(std::is_arithmetic<ValueType>::value &&
                   std::is_arithmetic<SizeType>::value, 

@@ -24,16 +24,15 @@ template <typename OutputIterator,
           typename ObjectsIter, 
           typename ObjectSizeFunctor, 
           typename ObjectValueFunctor>
-std::pair<puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())),
-          puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>()))>
+typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack_0_1_two_app(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
         OutputIterator out, 
         ObjectValueFunctor value,
         ObjectSizeFunctor size) {
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) ValueType;
-    typedef puretype(std::declval<ObjectValueFunctor>()(*std::declval<ObjectsIter>())) SizeType;
+    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
+    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
     auto starValue = [=](ObjectsIter oi){return value(*oi);};
     auto starSize = [=](ObjectsIter oi){return size(*oi);};

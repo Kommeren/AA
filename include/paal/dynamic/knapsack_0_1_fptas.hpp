@@ -10,6 +10,40 @@
 #include "paal/dynamic/knapsack.hpp"
 
 namespace paal {
+namespace detail {
+    template <typename ObjectsIter,
+              typename ObjectSizeFunctor, 
+              typename ObjectValueFunctor>
+    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
+    getValueLowerBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
+     ObjectValueFunctor value, ObjectSizeFunctor size, NonArithmeticSizeTag) {
+         return getTrivalValueLowerBound(oBegin, oEnd, value, size);
+    }
+    
+    template <typename ObjectsIter,
+              typename ObjectSizeFunctor, 
+              typename ObjectValueFunctor>
+    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
+    getValueLowerBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
+     ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag) {
+        auto out = boost::make_function_output_iterator(utils::SkipFunctor()); 
+        return knapsack_0_1_two_app(oBegin, oEnd, capacity, out, value, size).first;
+    }
+    
+    template <typename ObjectsIter,
+              typename ObjectSizeFunctor, 
+              typename ObjectValueFunctor>
+    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
+    getValueLowerBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
+     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
+     ObjectValueFunctor value, ObjectSizeFunctor size) {
+         typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
+         return getValueLowerBound_0_1(oBegin, oEnd, capacity, value, size, GetArithmeticSizeTag<SizeType>());
+    }
+}
+
 
 template <typename OutputIterator, 
           typename ObjectsIter, 
@@ -18,7 +52,7 @@ template <typename OutputIterator,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
@@ -32,7 +66,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
     
     double n = std::distance(oBegin, oEnd);
     //TODO use better guarantee
-    double maxValue = value(*std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(value)));
+    double maxValue = detail::getValueLowerBound_0_1(oBegin, oEnd, capacity, value, size); 
     auto multiplier = n / (epsilon * maxValue);
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
@@ -58,7 +92,7 @@ template <typename OutputIterator,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
@@ -78,8 +112,15 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
     }
     
+    SizeType realSize = SizeType();
+    auto addSize = [&](ObjectRef obj){realSize += size(obj); return *out = obj;};
+    
+    auto newOut =  boost::make_function_output_iterator(addSize);
+    
     auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * multiplier); };
-    return knapsack_0_1(oBegin, oEnd, SizeType(capacity / multiplier) , out, newSize, value);
+    auto reducedReturn = knapsack_0_1(oBegin, oEnd, SizeType(capacity / multiplier) , newOut, newSize, value);
+    return std::make_pair(reducedReturn.first, realSize);
+    
 }
 
 template <typename ObjectsIter, 
@@ -88,7 +129,7 @@ template <typename ObjectsIter,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
@@ -101,7 +142,7 @@ knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin,
     
     double n = std::distance(oBegin, oEnd);
     //TODO use better guarantee
-    double maxValue = value(*std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(value)));
+    double maxValue = detail::getValueLowerBound_0_1(oBegin, oEnd, capacity, value, size); 
     auto multiplier = n / (epsilon * maxValue);
     static const double SMALLEST_MULTIPLIER = 1./2.;
 
@@ -120,7 +161,7 @@ template <typename ObjectsIter,
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
 knapsack_0_1_no_output_on_size_fptas(double epsilon, ObjectsIter oBegin, 
         ObjectsIter oEnd, 
-        puretype(std::declval<ObjectSizeFunctor>()(*std::declval<ObjectsIter>())) capacity,
+        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
