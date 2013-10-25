@@ -43,15 +43,21 @@ struct RightSize {
         m_capacity(capacity), m_size(size) {}
 
     template <typename ObjectsIter>
-    bool operator()(ObjectsIter objIter) {
+    bool operator()(ObjectsIter objIter) const {
         return m_size(*objIter) <= m_capacity;
     }
 
 private:
     SizeType m_capacity;
     ObjectSizeFunctor m_size;
-
 };
+
+template <typename ObjectSizeFunctor, typename SizeType>
+RightSize<ObjectSizeFunctor, SizeType>
+make_RightSize(ObjectSizeFunctor size, SizeType capacity) {
+    return RightSize<ObjectSizeFunctor, SizeType>(size, capacity);
+}
+
 
 namespace detail {
 template <typename Functor, typename Iter>
@@ -93,7 +99,7 @@ std::pair<detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>,
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
   ObjectValueFunctor value, ObjectSizeFunctor size) {
       typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-      RightSize<ObjectSizeFunctor, SizeType> rightSize(size, capacity);
+      auto rightSize = make_RightSize(size, capacity);
       auto begin = boost::make_filter_iterator(rightSize, oBegin, oEnd);
       auto end =   boost::make_filter_iterator(rightSize, oEnd, oEnd);
       return std::make_pair(begin, end);

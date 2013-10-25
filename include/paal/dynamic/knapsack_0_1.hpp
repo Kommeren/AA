@@ -280,7 +280,6 @@ knapsack_0_1(ObjectsIter oBegin,
         ObjectValueFunctor value, 
         IntegralValueAndSizeTag,
         RetrieveSolution retrieveSolution) {
-    Knapsack_0_1<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor, utils::Less> knapsack(size, value);
     if(getValueUpperBound_0_1(oBegin, oEnd, capacity, value, size) > capacity) {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag(), retrieveSolution);
     } else {

@@ -11,42 +11,10 @@
 #include <boost/function_output_iterator.hpp>
 
 #include "paal/dynamic/knapsack.hpp"
+#include "paal/dynamic/knapsack/get_lower_bound.hpp"
 #include "paal/greedy/knapsack_two_app.hpp"
 
 namespace paal {
-namespace detail {
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-     ObjectValueFunctor value, ObjectSizeFunctor size, NonArithmeticSizeTag) {
-         return getTrivalValueLowerBound(oBegin, oEnd, value, size);
-    }
-    
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-     ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag) {
-        auto out = boost::make_function_output_iterator(utils::SkipFunctor()); 
-        return knapsack_two_app(oBegin, oEnd, capacity, out, value, size).first;
-    }
-    
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-     ObjectValueFunctor value, ObjectSizeFunctor size) {
-         typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-         return getValueLowerBound(oBegin, oEnd, capacity, value, size, GetArithmeticSizeTag<SizeType>());
-    }
-}//detail
 
 template <typename OutputIterator, 
           typename ObjectsIter, 
@@ -70,7 +38,7 @@ knapsack_on_value_fptas(double epsilon, ObjectsIter oBegin,
         return ReturnType();
     }
     
-    double maxValue = detail::getValueLowerBound(oBegin, oEnd, capacity, value, size);
+    double maxValue = detail::getValueLowerBound(oBegin, oEnd, capacity, value, size, detail::NoZeroOneTag());
     auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
 
     if(!multiplier) {

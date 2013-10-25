@@ -17,8 +17,72 @@
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/greedy/knapsack/knapsack_general.hpp"
 
 namespace paal {
+
+namespace detail {
+        template <
+          typename ObjectsIterIter, 
+          typename ObjectSizeFunctor, 
+          typename ObjectValueFunctor>
+              std::tuple<
+                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                        typename std::iterator_traits<ObjectsIterIter>::value_type>,
+                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                        typename std::iterator_traits<ObjectsIterIter>::value_type>,
+                    std::pair<ObjectsIterIter, ObjectsIterIter>>
+              getGreedyFill (
+                        ObjectsIterIter oBegin, 
+                        ObjectsIterIter oEnd, 
+                        FunctorOnIteratorPValue<ObjectSizeFunctor, 
+                            typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
+                        ObjectValueFunctor value, 
+                        ObjectSizeFunctor size,
+                        ZeroOneTag) 
+              {
+                    typedef typename std::iterator_traits<ObjectsIterIter>::value_type ObjectsIter;
+                    typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
+                    typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
+
+                    auto starValue = [=](ObjectsIter oi){return value(*oi);};
+                    auto starSize = [=](ObjectsIter oi){return size(*oi);};
+                    auto density = make_Density(starValue, starSize);
+                    auto compare = utils::make_FunctorToComparator(density);
+    
+                    //finding the biggest set elements with the greatest density
+                    std::sort(oBegin, oEnd, compare);
+
+                    ValueType valueSum = ValueType();
+                    SizeType sizeSum = SizeType();
+                    auto end = std::find_if(oBegin, oEnd, 
+                        [=, &sizeSum, &valueSum](ObjectsIter objIter){
+                            auto newSize = sizeSum + size(*objIter);
+                            if(newSize > capacity) {
+                                return true;
+                            } 
+                            sizeSum = newSize;
+                            valueSum += value(*objIter);
+                            return false;   
+                    });
+                    return std::make_tuple(valueSum, sizeSum, std::make_pair(oBegin, end));
+              }
+          
+        template <
+          typename ObjectsRange, 
+          typename OutputIter> 
+              void greedyToOutput (
+                        ObjectsRange range, 
+                        OutputIter out,
+                        ZeroOneTag)
+              {
+                    for(auto obj : boost::make_iterator_range(range)) {
+                        *out = *obj;
+                        ++out;
+                    }
+              }
+
+} // detail
 
 template <typename OutputIterator, 
           typename ObjectsIter, 
@@ -31,54 +95,9 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
         OutputIterator out, 
         ObjectValueFunctor value,
         ObjectSizeFunctor size) {
-    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
-    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
-
-    auto starValue = [=](ObjectsIter oi){return value(*oi);};
-    auto starSize = [=](ObjectsIter oi){return size(*oi);};
-    auto density = make_Density(starValue, starSize);
-    auto compare = utils::make_FunctorToComparator(density, utils::Greater());
-    std::vector<ObjectsIter> objects(
-            boost::make_counting_iterator(oBegin), 
-            boost::make_counting_iterator(oEnd));
-
-    //removing to big elements
-    objects.erase(
-        std::remove_if(objects.begin(), objects.end(), 
-            [=](ObjectsIter objIter){return size(*objIter) > capacity;}), 
-        objects.end());
-
-    //finding the biggest set elements with the greatest density
-    std::sort(objects.begin(), objects.end(), compare);
-
-    ValueType valueSum = ValueType();
-    SizeType sizeSum = SizeType();
-    auto end = std::find_if(objects.begin(), objects.end(), 
-            [=, &sizeSum, &valueSum](ObjectsIter objIter){
-                auto newSize = sizeSum + size(*objIter);
-                if(newSize > capacity) {
-                    return true;
-                } 
-                sizeSum = newSize;
-                valueSum += value(*objIter);
-                return false;   
-            });
-
-    //finding the biggest set elements with the greatest density
-    //this is actually small optimization compare to original algorithm
-    auto largest = std::max_element(objects.begin(), objects.end(), utils::make_FunctorToComparator(starValue));
-
-    if(largest != objects.end() && value(**largest) > valueSum) {
-        *out = **largest;
-        return std::make_pair(value(**largest), size(**largest));
-    } else {
-        for(auto obj : boost::make_iterator_range(objects.begin(), end)) {
-            *out = *obj;
-            ++out;
-        }
-        return std::make_pair(valueSum, sizeSum);
+        return detail::knapsack_general_two_app(oBegin, oEnd, capacity, 
+                    out, value, size, detail::ZeroOneTag());
     }
-}
 
 }
 #endif /* KNAPSACK_0_1_TWO_APP_HPP */
