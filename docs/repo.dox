@@ -54,10 +54,13 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
     <li> Use naming consistent with the rest of library. (camel classes and variables, _ names for files and namespaces).
     <li> Never use \<TAB\>, only spaces are legal!
     <li> Don't write macros.
+    <li> Code is header only
+    <li> Use desing patterns: traits, tag dispatching, visitors.
+    <li> Strong preference of static polymorphism.
     </ul>
 \section Workflow
 <ul>
-<li> Each developer works on his own branch. <b> Only assigned developers have rights to push commits to master </b>.
+<li> Each developer works on his own branch. 
 <li> Before pushing to master code goes through code review process.
 <li> Each developer is responsible for his own branch. If you to move your current branch with the newest changes from master use 
 <pre>
