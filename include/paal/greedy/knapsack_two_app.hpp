@@ -68,7 +68,7 @@ namespace detail {
               {
                     auto nr = mostDenseIterAndNr.second;
                     auto mostDenseIter = mostDenseIterAndNr.first;
-                    for(auto i = 0; i < nr; ++i) {
+                    for(unsigned i = 0; i < nr; ++i) {
                         *out = **mostDenseIter;
                         ++out;
                     }

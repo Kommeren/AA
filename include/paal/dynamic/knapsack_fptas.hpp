@@ -29,7 +29,8 @@ knapsack_on_value_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    return detail::knapsack_general_on_value_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::NoZeroOneTag());
+    return detail::knapsack_general_on_value_fptas_retrieve(
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::NoZeroOneTag());
 }
 
 template <typename OutputIterator, 
@@ -43,7 +44,8 @@ knapsack_on_size_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    return detail::knapsack_general_on_size_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::NoZeroOneTag());
+    return detail::knapsack_general_on_size_fptas_retrieve(
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::NoZeroOneTag());
 }
 
 } //paal

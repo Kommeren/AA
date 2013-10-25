@@ -25,7 +25,8 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    return detail::knapsack_general_on_value_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
+    return detail::knapsack_general_on_value_fptas_retrieve(
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
 }
 
 template <typename OutputIterator, 
@@ -39,7 +40,8 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    return detail::knapsack_general_on_size_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
+    return detail::knapsack_general_on_size_fptas_retrieve(
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
 }
 
 template <typename ObjectsIter, 
@@ -51,24 +53,9 @@ knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::ValueType ValueType;
-    typedef typename base::ReturnType ReturnType;
-    if(oBegin == oEnd) {
-        return ReturnType();
-    }
-    
-    double maxValue = detail::getValueLowerBound(oBegin, oEnd, capacity, value, size, detail::ZeroOneTag()); 
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
-
-    if(!multiplier) {
-        return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
-    }
-    
-    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * *multiplier); };
-    auto ret = knapsack_0_1_no_output(oBegin, oEnd, capacity, size, newValue);
-    return std::make_pair(ValueType(double(ret.first) / *multiplier), ret.second);
+    auto out = boost::make_function_output_iterator(utils::SkipFunctor());
+    return detail::knapsack_general_on_value_fptas(epsilon, oBegin, oEnd, 
+            capacity, out, size, value, detail::ZeroOneTag(), detail::NoRetrieveSolutionTag());
 }
 
 template <typename ObjectsIter, 
