@@ -18,6 +18,7 @@
 #include "paal/utils/less_pointees.hpp"
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
+#include "paal/dynamic/knapsack/get_upper_bound.hpp"
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 
 namespace paal {
@@ -154,43 +155,7 @@ namespace detail {
         mutable ValueOrNullVector  m_objectOnSize;
         mutable ValueOrNullVector  m_objectOnSizeRec;
     };
-    
         
-    
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-     ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag) {
-         auto out = boost::make_function_output_iterator(utils::SkipFunctor());
-
-         return std::min(2 * knapsack_0_1_two_app(oBegin, oEnd, capacity, out, value, size).first,
-                         getDensityBasedValueUpperBound(oBegin, oEnd, capacity, value, size));
-    }
-    
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-     ObjectValueFunctor value, ObjectSizeFunctor size, NonIntegralValueAndSizeTag) {
-         return getDensityValueBound(oBegin, oEnd, capacity, value, size);
-    }
-
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound_0_1(ObjectsIter oBegin, ObjectsIter oEnd, 
-     FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-     ObjectValueFunctor value, ObjectSizeFunctor size) {
-         typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-         return getValueUpperBound_0_1(oBegin, oEnd, capacity, value, size, GetArithmeticSizeTag<SizeType>());
-    }
-
 struct RetrieveSolution {
     template <typename Knapsack, typename IndexType, typename ValueType,
               typename ObjectsIter, typename OutputIterator>
@@ -254,7 +219,7 @@ knapsack_0_1(ObjectsIter oBegin,
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
 
     Knapsack_0_1<ObjectsIter, ObjectValueFunctor, ObjectSizeFunctor, utils::Greater> knapsack(value, size);
-    auto maxValue = getValueUpperBound_0_1(oBegin, oEnd, capacity, value, size);
+    auto maxValue = getValueUpperBound(oBegin, oEnd, capacity, value, size, ZeroOneTag());
     auto maxValueAndSize = knapsack.solve(oBegin, oEnd, maxValue, 
             GetMaxElementOnValueIndexedCollection<boost::optional<SizeType>, ValueType>(boost::optional<SizeType>(capacity + 1)));
     retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out);
@@ -280,7 +245,7 @@ knapsack_0_1(ObjectsIter oBegin,
         ObjectValueFunctor value, 
         IntegralValueAndSizeTag,
         RetrieveSolution retrieveSolution) {
-    if(getValueUpperBound_0_1(oBegin, oEnd, capacity, value, size) > capacity) {
+    if(getValueUpperBound(oBegin, oEnd, capacity, value, size, ZeroOneTag()) > capacity) {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag(), retrieveSolution);
     } else {
         return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralValueTag(), retrieveSolution);
