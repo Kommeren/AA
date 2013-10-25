@@ -10,6 +10,7 @@
 
 #include "paal/dynamic/knapsack_0_1.hpp"
 #include "paal/dynamic/knapsack/get_lower_bound.hpp"
+#include "paal/dynamic/knapsack/knapsack_fptas_common.hpp"
 
 namespace paal {
 
@@ -24,30 +25,7 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::ValueType ValueType;
-    typedef typename base::ReturnType ReturnType;
-    if(oBegin == oEnd) {
-        return ReturnType();
-    }
-    
-    double maxValue = detail::getValueLowerBound(oBegin, oEnd, capacity, value, size, detail::ZeroOneTag()); 
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
-
-    if(!multiplier) {
-        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
-    }
-    
-    ValueType realValue = ValueType();
-    auto addValue = [&](ObjectRef obj){realValue += value(obj); return *out = obj;};
-
-    auto newOut =  boost::make_function_output_iterator(addValue);
-    
-    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * *multiplier); };
-
-    auto reducedReturn = knapsack_0_1(oBegin, oEnd, capacity, newOut, size, newValue);
-    return std::make_pair(realValue, reducedReturn.second);
+    return detail::knapsack_general_on_value_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
 }
 
 template <typename OutputIterator, 
@@ -61,28 +39,7 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::SizeType SizeType;
-    typedef typename base::ReturnType ReturnType;
-    if(oBegin == oEnd) {
-        return ReturnType();
-    }
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity);
-
-    if(!multiplier) {
-        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value);
-    }
-    
-    SizeType realSize = SizeType();
-    auto addSize = [&](ObjectRef obj){realSize += size(obj); return *out = obj;};
-    
-    auto newOut =  boost::make_function_output_iterator(addSize);
-    
-    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * *multiplier); };
-    auto reducedReturn = knapsack_0_1(oBegin, oEnd, SizeType(capacity / *multiplier) , newOut, newSize, value);
-    return std::make_pair(reducedReturn.first, realSize);
-    
+    return detail::knapsack_general_on_size_fptas(epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
 }
 
 template <typename ObjectsIter, 

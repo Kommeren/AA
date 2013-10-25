@@ -17,11 +17,6 @@
 namespace paal {
 namespace detail {
 
-
-struct ZeroOneTag {};
-struct NoZeroOneTag {};
-
-
 template <typename OutputIterator, 
          typename ObjectsIter, 
          typename ObjectSizeFunctor, 

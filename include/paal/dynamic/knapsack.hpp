@@ -18,6 +18,9 @@
 #include "paal/utils/less_pointees.hpp"
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
+#include "paal/dynamic/knapsack/get_upper_bound.hpp"
+#include "paal/dynamic/knapsack/knapsack_common.hpp"
+#include "paal/greedy/knapsack_two_app.hpp"
 
 namespace paal {
 
@@ -92,25 +95,6 @@ namespace detail {
             return ReturnType(ValueType(), SizeType());
         }
     }
-                 
-    template <typename ObjectsIter,
-              typename ObjectSizeFunctor, 
-              typename ObjectValueFunctor>
-    //TODO produce better bound
-    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-    getValueBound(ObjectsIter oBegin, ObjectsIter oEnd, 
-     detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-     ObjectValueFunctor value, ObjectSizeFunctor size) {
-         typedef KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-         typedef typename base::ObjectRef  ObjectRef;
-         typedef typename base::SizeType   SizeType;
-         typedef typename base::ValueType  ValueType;
-
-         auto density = [&](ObjectRef obj){return double(value(obj))/double(size(obj));};
-         auto maxElement = density(*std::max_element(oBegin, oEnd, 
-                          [&](ObjectRef left, ObjectRef right){return density(left) < density(right);}));
-         return capacity * maxElement;
-    }
 
 
 /**
@@ -134,7 +118,9 @@ knapsack(ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
-        IntegralValueTag) {
+        NoZeroOneTag,
+        IntegralValueTag,
+        RetrieveSolutionTag) {
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ObjectRef ObjectRef;
     typedef typename base::ReturnType ReturnType;
@@ -144,9 +130,9 @@ knapsack(ObjectsIter oBegin,
     if(oBegin == oEnd) {
         return ReturnType();
     }
-    auto maxSize = detail::getValueBound(oBegin, oEnd, capacity, value, size);
+    auto maxSize = getValueUpperBound(oBegin, oEnd, capacity, value, size, NoZeroOneTag());
     auto ret = knapsack_dynamic(oBegin, oEnd, maxSize, out, value, size, 
-            detail::GetMaxElementOnValueIndexedCollection<TableElementType, SizeType>(
+            GetMaxElementOnValueIndexedCollection<TableElementType, SizeType>(
                 TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
             utils::Greater());
     return std::make_pair(ret.second, ret.first);
@@ -173,54 +159,13 @@ knapsack(ObjectsIter oBegin,
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
-        IntegralSizeTag) {
+        NoZeroOneTag,
+        IntegralSizeTag,
+        RetrieveSolutionTag) {
     typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     return knapsack_dynamic(oBegin, oEnd, capacity, out, size, value, 
             detail::GetMaxElementOnCapacityIndexedCollection<ValueType>(), std::less<ValueType>());
 }
-    
-template <typename ObjectsIter, 
-         typename OutputIterator, 
-         typename ObjectSizeFunctor, 
-         typename ObjectValueFunctor,
-         typename IntegralTag> //always equals NonIntegralValueAndSizeTag
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
-knapsack(ObjectsIter oBegin, 
-        ObjectsIter oEnd, 
-        detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-        OutputIterator out, 
-        ObjectSizeFunctor size, 
-        ObjectValueFunctor value,
-        IntegralTag) {
-    //trick to avoid checking assert on template definition parse
-    static_assert(std::is_same<IntegralTag, NonIntegralValueAndSizeTag>::value, 
-            "At least one of the value or size must return integral value");
-}
-
-
-/**
- * @brief Solution to the knapsack problem 
- * overload for IntegralValueAndSizeTag
- */
-template <typename ObjectsIter, 
-         typename OutputIterator, 
-         typename ObjectSizeFunctor, 
-         typename ObjectValueFunctor>
-             std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
-         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
-             knapsack(ObjectsIter oBegin, 
-                     ObjectsIter oEnd, 
-                     detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-                     OutputIterator out, 
-                     ObjectSizeFunctor size, 
-                     ObjectValueFunctor value,
-                     IntegralValueAndSizeTag) {
-                 if(detail::getValueBound(oBegin, oEnd, capacity, value, size) > capacity) {
-                     return knapsack(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag());
-                 } else {
-                     return knapsack(oBegin, oEnd, capacity, out, size, value, IntegralValueTag());
-                 }
-             }
 
 } //detail 
 /**
@@ -248,9 +193,8 @@ template <typename ObjectsIter,
                      OutputIterator out, 
                      ObjectSizeFunctor size, 
                      ObjectValueFunctor value = ObjectValueFunctor()) {
-            typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
-            typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-            return detail::knapsack(oBegin, oEnd, capacity, out, size, value, detail::GetIntegralTag<SizeType, ValueType>());
+            return detail::knapsack_check_integrality(oBegin, oEnd, capacity, out, size, value, 
+                    detail::NoZeroOneTag(), detail::RetrieveSolutionTag());
         }
 
 }//paal

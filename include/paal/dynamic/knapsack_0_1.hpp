@@ -19,11 +19,13 @@
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
 #include "paal/dynamic/knapsack/get_upper_bound.hpp"
+#include "paal/dynamic/knapsack/knapsack_common.hpp"
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 
 namespace paal {
 
 namespace detail {
+
     /**
      * @brief For 0/1 knapsack dynamic algorithm for given element the table has to be traversed from the highest to the lowest element
      */
@@ -156,19 +158,29 @@ namespace detail {
         mutable ValueOrNullVector  m_objectOnSizeRec;
     };
         
-struct RetrieveSolution {
+
     template <typename Knapsack, typename IndexType, typename ValueType,
               typename ObjectsIter, typename OutputIterator>
-    void operator()(const Knapsack & knapsack,
+    void retrieveSolution(const Knapsack & knapsack,
                     ValueType maxValue,
                     IndexType size,
                     ObjectsIter oBegin, 
                     ObjectsIter oEnd, 
-                    OutputIterator out 
-            ) const {
+                    OutputIterator out,
+                    RetrieveSolutionTag) {
         knapsack.retrieveSolution(maxValue, size, oBegin, oEnd, out);
     }
-};
+    
+    template <typename Knapsack, typename IndexType, typename ValueType,
+              typename ObjectsIter, typename OutputIterator>
+    void retrieveSolution(const Knapsack & knapsack,
+                    ValueType maxValue,
+                    IndexType size,
+                    ObjectsIter oBegin, 
+                    ObjectsIter oEnd, 
+                    OutputIterator out,
+                    NoRetrieveSolutionTag)  {
+    }
 
 /**
  * @brief Solution to Knapsack 0/1 problem
@@ -178,22 +190,23 @@ template <typename ObjectsIter,
           typename OutputIterator, 
           typename ObjectSizeFunctor, 
           typename ObjectValueFunctor, 
-          typename RetrieveSolution>
+          typename RetrieveSolutionTag>
     FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack_0_1(ObjectsIter oBegin, 
+knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
         FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value, 
+        ZeroOneTag,
         IntegralSizeTag,
-        RetrieveSolution retrieveSolution) {
+        RetrieveSolutionTag retrieveSolutionTag) {
     typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
 
     Knapsack_0_1<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor, utils::Less> knapsack(size, value);
     auto maxValueAndSize = knapsack.solve(oBegin, oEnd, capacity, 
             GetMaxElementOnCapacityIndexedCollection<ValueType>());
-    retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out);
+    retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out, retrieveSolutionTag);
     return maxValueAndSize; 
 }
 
@@ -205,16 +218,17 @@ template <typename ObjectsIter,
           typename OutputIterator, 
           typename ObjectSizeFunctor, 
           typename ObjectValueFunctor,
-          typename RetrieveSolution>
+          typename RetrieveSolutionTag>
     FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack_0_1(ObjectsIter oBegin, 
+knapsack(ObjectsIter oBegin, 
         ObjectsIter oEnd, 
         FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out, 
         ObjectSizeFunctor size, 
         ObjectValueFunctor value,
+        ZeroOneTag,
         IntegralValueTag,
-        RetrieveSolution retrieveSolution) {
+        RetrieveSolutionTag retrieveSolutionTag) {
     typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
 
@@ -222,55 +236,8 @@ knapsack_0_1(ObjectsIter oBegin,
     auto maxValue = getValueUpperBound(oBegin, oEnd, capacity, value, size, ZeroOneTag());
     auto maxValueAndSize = knapsack.solve(oBegin, oEnd, maxValue, 
             GetMaxElementOnValueIndexedCollection<boost::optional<SizeType>, ValueType>(boost::optional<SizeType>(capacity + 1)));
-    retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out);
+    retrieveSolution(knapsack, maxValueAndSize.first, maxValueAndSize.second, oBegin, oEnd, out, retrieveSolutionTag);
     return std::make_pair(maxValueAndSize.second, maxValueAndSize.first);
-}
-
-
-/**
- * @brief Solution to Knapsack 0/1 problem
- *  overload for integral Size and Value case
- */
-template <typename ObjectsIter, 
-          typename OutputIterator, 
-          typename ObjectSizeFunctor, 
-          typename ObjectValueFunctor,
-          typename RetrieveSolution>
-    FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack_0_1(ObjectsIter oBegin, 
-        ObjectsIter oEnd, 
-        FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-        OutputIterator out, 
-        ObjectSizeFunctor size, 
-        ObjectValueFunctor value, 
-        IntegralValueAndSizeTag,
-        RetrieveSolution retrieveSolution) {
-    if(getValueUpperBound(oBegin, oEnd, capacity, value, size, ZeroOneTag()) > capacity) {
-        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralSizeTag(), retrieveSolution);
-    } else {
-        return knapsack_0_1(oBegin, oEnd, capacity, out, size, value, IntegralValueTag(), retrieveSolution);
-    }
-}
-
-template <typename ObjectsIter, 
-          typename OutputIterator, 
-          typename ObjectSizeFunctor, 
-          typename ObjectValueFunctor,
-          typename IntegralTag, //always equals NonIntegralValueAndSizeTag
-          typename RetrieveSolution
-          >
-    FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack_0_1(ObjectsIter oBegin, 
-        ObjectsIter oEnd, 
-        FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-        OutputIterator out, 
-        ObjectSizeFunctor size, 
-        ObjectValueFunctor value, 
-        NonIntegralValueAndSizeTag,
-        RetrieveSolution retrieveSolution) {
-    //trick to avoid checking assert on template definition parse
-    static_assert(std::is_same<IntegralTag, NonIntegralValueAndSizeTag>::value, 
-            "At least one of the value or size must return integral value");
 }
 
 } //detail
@@ -300,11 +267,8 @@ knapsack_0_1(ObjectsIter oBegin,
         ObjectSizeFunctor size, 
         ObjectValueFunctor value = ObjectValueFunctor()) {
 
-    typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
-    return detail::knapsack_0_1(oBegin, oEnd, capacity, out, size, value, 
-                detail::GetIntegralTag<SizeType, ValueType>(),
-                detail::RetrieveSolution());
+    return detail::knapsack_check_integrality(oBegin, oEnd, capacity, out, 
+            size, value, detail::ZeroOneTag());
 }
 
 /**
@@ -329,14 +293,9 @@ knapsack_0_1_no_output(
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size, 
         ObjectValueFunctor value = ObjectValueFunctor()) {
-    typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
-    return detail::knapsack_0_1(
-                oBegin, oEnd, capacity, 
+    return detail::knapsack_check_integrality(oBegin, oEnd, capacity, 
                 boost::make_function_output_iterator(utils::SkipFunctor()), 
-                size, value, 
-                detail::GetIntegralTag<SizeType, ValueType>(),
-                utils::SkipFunctor());
+                size, value, detail::ZeroOneTag(),detail::NoRetrieveSolutionTag());
 }
 
 }//paal

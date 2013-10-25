@@ -166,10 +166,20 @@ struct GetMaxElementOnCapacityIndexedCollection {
         }
 };
 
+//various tags
 struct IntegralValueAndSizeTag {};
 struct IntegralValueTag {};
 struct IntegralSizeTag {};
 struct NonIntegralValueAndSizeTag {};
+
+struct ArithmeticSizeTag {};
+struct NonArithmeticSizeTag {};
+
+struct ZeroOneTag {};
+struct NoZeroOneTag {};
+
+struct RetrieveSolutionTag{};
+struct NoRetrieveSolutionTag{};
 
 template <typename SizeType, typename ValueType>
 using GetIntegralTag =  
@@ -183,8 +193,6 @@ using GetIntegralTag =
                                                       >::type
                       >::type;
 
-struct ArithmeticSizeTag {};
-struct NonArithmeticSizeTag {};
 
 template <typename SizeType>
 using GetArithmeticSizeTag =  

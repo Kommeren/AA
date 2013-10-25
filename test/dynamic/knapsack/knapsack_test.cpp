@@ -93,37 +93,43 @@ std::string to_string(T) {
     return "";
 }
 
-std::string to_string(paal::detail::RetrieveSolution) {
+std::string to_string(paal::detail::RetrieveSolutionTag) {
     return "with output";
 }
 
-template <typename IntegralTag> 
+std::string to_string(paal::detail::NoRetrieveSolutionTag) {
+    return "without output";
+}
+
+template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = paal::detail::RetrieveSolutionTag> 
 void detail_knapsack() {
     std::vector<int> result;
-    LOGLN("Knapsack on " + to_string(IntegralTag()));
+    LOGLN("Knapsack 0/1 on " + to_string(IntegralTag()) + " " + to_string(RetrieveSolution()));
     auto maxValue = paal::detail::knapsack(std::begin(objects), std::end(objects), 
             capacity,
             std::back_inserter(result), 
             sizesFunctor, 
             valuesFunctor,
-            IntegralTag());
+            IsZeroOne(),
+            IntegralTag(),
+            RetrieveSolution());
 
-    check(maxValue, result);
+    check_0_1(maxValue, result);
 }
 
 //Knapsack on value
 BOOST_AUTO_TEST_CASE(KnapsackValue) {
-    detail_knapsack<paal::detail::IntegralValueTag>();
+    detail_knapsack<paal::detail::IntegralValueTag, paal::detail::NoZeroOneTag>();
 }
 
 //Knapsack on size
 BOOST_AUTO_TEST_CASE(KnapsackSize) {
-    detail_knapsack<paal::detail::IntegralSizeTag>();
+    detail_knapsack<paal::detail::IntegralSizeTag, paal::detail::NoZeroOneTag>();
 }
 
 //Knapsack on size and value
 BOOST_AUTO_TEST_CASE(KnapsackSizeValue) {
-    detail_knapsack<paal::detail::IntegralValueAndSizeTag>();
+    detail_knapsack<paal::detail::IntegralValueAndSizeTag, paal::detail::NoZeroOneTag>();
 }
 
 //Knapsack 0/1
@@ -138,49 +144,34 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
     check_0_1(maxValue, result);
 }
 
-template <typename IntegralTag, typename RetrieveSolution> 
-void detail_knapsack_0_1() {
-    std::vector<int> result;
-    LOGLN("Knapsack 0/1 on " + to_string(IntegralTag()) + " " + to_string(RetrieveSolution()));
-    auto maxValue = paal::detail::knapsack_0_1(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor,
-            IntegralTag(),
-            RetrieveSolution());
-
-    check_0_1(maxValue, result);
-}
-
 //Knapsack 0/1 value
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_value) {
-    detail_knapsack_0_1<paal::detail::IntegralValueTag, paal::detail::RetrieveSolution>();
+    detail_knapsack<paal::detail::IntegralValueTag, paal::detail::ZeroOneTag, paal::detail::RetrieveSolutionTag>();
 }
 
 //Knapsack 0/1  size
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_size) {
-    detail_knapsack_0_1<paal::detail::IntegralSizeTag, paal::detail::RetrieveSolution>();
+    detail_knapsack<paal::detail::IntegralSizeTag, paal::detail::ZeroOneTag, paal::detail::RetrieveSolutionTag>();
 }
 
 //Knapsack 0/1  size and value
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_value_size) {
-    detail_knapsack_0_1<paal::detail::IntegralValueAndSizeTag, paal::detail::RetrieveSolution>();
+    detail_knapsack<paal::detail::IntegralValueAndSizeTag, paal::detail::ZeroOneTag, paal::detail::RetrieveSolutionTag>();
 }
 
 //Knapsack 0/1 value no_output
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_) {
-    detail_knapsack_0_1<paal::detail::IntegralValueTag, paal::utils::SkipFunctor>();
+    detail_knapsack<paal::detail::IntegralValueTag, paal::detail::ZeroOneTag, paal::detail::NoRetrieveSolutionTag>();
 }
 
 //Knapsack 0/1  size no_output
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size) {
-    detail_knapsack_0_1<paal::detail::IntegralSizeTag, paal::utils::SkipFunctor>();
+    detail_knapsack<paal::detail::IntegralSizeTag, paal::detail::ZeroOneTag, paal::detail::NoRetrieveSolutionTag>();
 }
 
 //Knapsack 0/1  size and value no_output
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_size) {
-    detail_knapsack_0_1<paal::detail::IntegralValueAndSizeTag, paal::utils::SkipFunctor>();
+    detail_knapsack<paal::detail::IntegralValueAndSizeTag, paal::detail::ZeroOneTag, paal::detail::NoRetrieveSolutionTag>();
 }
 
 //Knapsack 0/1: no output iterator
