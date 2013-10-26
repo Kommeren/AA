@@ -181,6 +181,7 @@ class RoundCondition;
 class RelaxCondition;
 class Init;
 class SetSolution;
+class StopCondition;
 class DeleteRowStrategy;
 class DeleteColStrategy;
 
@@ -190,8 +191,9 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<Init, utils::SkipFunctor>,
         data_structures::NameWithDefault<SetSolution, utils::SkipFunctor>,
+        data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
-        data_structures::NameWithDefault<DeleteColStrategy, DeleteCol>> Components;
+        data_structures::NameWithDefault<DeleteColStrategy, DeleteCol> > Components;
         
 template <typename... Args>
     using IRComponents = typename Components::type<Args...> ;

@@ -295,6 +295,21 @@ public:
         glp_del_cols(m_lp, 1, arr);
     }
     
+    void clear() {
+        while (true) {
+            auto rows = getRows();
+            if (rows.first == rows.second) break;
+            RowId row = *rows.first;
+            deleteRow(row);
+        }
+        while (true) {
+            auto cols = getColumns();
+            if (cols.first == cols.second) break;
+            ColId col = *cols.first;
+            deleteCol(col);
+        }
+    }
+
     int getColDegree(ColId col) const {
         return glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], &m_valTmp[0]); 
     }

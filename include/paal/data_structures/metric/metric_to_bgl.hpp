@@ -9,8 +9,9 @@ namespace data_structures {
 //TODO it would be nice to adapt Matrix + something to bgl
     
 template <typename Metric>  struct AdjacencyMatrix {
+    typedef data_structures::MetricTraits<Metric> MT;
     typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property, 
-                boost::property<boost::edge_weight_t, typename Metric::DistanceType> > type;
+                boost::property<boost::edge_weight_t, typename MT::DistanceType> > type;
 };
 
 

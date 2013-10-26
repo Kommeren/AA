@@ -10,6 +10,7 @@
 
 #include <boost/multi_array.hpp>
 #include <array>
+#include "metric_traits.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -38,6 +39,23 @@ class AssymetricArrayMetric {
         int size() const {
             return m_matrix.size();
         }
+    
+        template <typename OtherMetrics, typename XIterator, typename YIterator>
+        AssymetricArrayMetric(const OtherMetrics& other, 
+                   XIterator xBegin, XIterator xEnd, 
+                   YIterator yBegin, YIterator yEnd) : 
+                        AssymetricArrayMetric(std::distance(xBegin, xEnd),
+                                              std::distance(yBegin, yEnd)) {
+            int i = 0;
+            for (auto v: boost::make_iterator_range(xBegin, xEnd)) {
+                int j = 0;
+                for (auto w: boost::make_iterator_range(yBegin, yEnd)) {
+                    this->m_matrix[i][j] = other(v, w);
+                    ++j;
+                }
+                ++i;
+            }
+        }
 
         AssymetricArrayMetric & operator=(const AssymetricArrayMetric & am) {
             auto shape = am.m_matrix.shape();
@@ -47,7 +65,6 @@ class AssymetricArrayMetric {
             return *this; 
         }
 
-
     protected:
         static const int DIM_NR = 2;
         typedef boost::multi_array<DistanceType, DIM_NR> matrix_type; 
@@ -56,8 +73,13 @@ class AssymetricArrayMetric {
 
 template <typename DistanceTypeParam> 
 class ArrayMetric : public AssymetricArrayMetric<DistanceTypeParam> {
+    typedef AssymetricArrayMetric<DistanceTypeParam> base;
 public:
-    ArrayMetric(int N = 0) : AssymetricArrayMetric<DistanceTypeParam>(N, N) {}
+    ArrayMetric(int N = 0) : base(N, N) {}
+
+    template <typename OtherMetrics, typename ItemIterator>
+    ArrayMetric(const OtherMetrics& other, ItemIterator iBegin, ItemIterator iEnd) :
+        base(other, iBegin, iEnd, iBegin, iEnd) {}
 };
 
 }

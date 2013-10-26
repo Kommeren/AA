@@ -130,6 +130,14 @@ public:
         call<SetSolution>(m_problem, std::bind(&IterativeRounding::getVal, this, std::placeholders::_1));
     }
 
+    void dependentRound() {
+         call<RoundCondition>(m_problem, m_lpBase);
+    }
+
+    bool stopCondition() {
+        return call<StopCondition>(m_problem);
+    }
+
 private:   
     template <typename Action, typename... Args> 
     auto call(Args&&... args) -> 
@@ -145,8 +153,6 @@ private:
     Problem & m_problem;
 };
 
-
-
 //TODO add resolve
 template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
 void solve_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
@@ -159,6 +165,18 @@ void solve_iterative_rounding(Problem & problem, IRComponents components, Visito
         irSolved = ir.integerSolution();
         assert(irSolved || rounded || relaxed);
     } while (!irSolved);
+    ir.setSolution();
+}
+
+template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
+void solve_dependent_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
+    IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, std::move(components), std::move(vis));
+    do {
+        ir.solveLPToExtremePoint();
+        ir.dependentRound();
+        ir.relax();
+        if (ir.stopCondition()) break;
+    } while (true);
     ir.setSolution();
 }
 
