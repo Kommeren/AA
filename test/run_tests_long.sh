@@ -27,7 +27,7 @@ option() {
 }
 
 tests="shortest_superstring_long_test 2_local_search_long_test bimap_perf_test bounded_degree_mst_long_test tree_augmentation_long_test 
-       capacitated_facility_location_long_test dreyfus_wagner_long_test facility_location_long_test generalised_assignment_long_test
+       capacitated_facility_location_long_test dreyfus_wagner_long_test facility_location_long_test generalised_assignment_long_test ir_steiner_tree_long_test
        steiner_network_long_test zelikovsky_11_per_6_long_test k_median_long_test scheduling_jobs_on_identical_parallel_machines_long_test
        knapsack_two_app_long_test knapsack_long_test k_cut_long_test"
 
