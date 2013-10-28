@@ -20,6 +20,7 @@
 #include "paal/data_structures/components/components.hpp"
 #include "paal/lp/ids.hpp"
 #include "paal/lp/bound_type.hpp"
+#include "paal/lp/problem_type.hpp"
 
 namespace paal {
 namespace ir {
@@ -131,8 +132,8 @@ struct RoundConditionGreaterThanHalf  :
 
 struct DefaultSolveLPToExtremePoint {
     template <typename Problem, typename LP>
-    double operator()(Problem &, LP & lp) {
-        return lp.solveToExtremePoint();
+    ProblemType operator()(Problem &, LP & lp) {
+        return lp.solveToExtremePointPrimal();
     };
 };
 

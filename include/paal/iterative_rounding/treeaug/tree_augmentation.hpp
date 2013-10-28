@@ -403,7 +403,7 @@ namespace paal {
         template <typename Graph, typename TreeMap, 
                   typename CostMap, typename EdgeSet, 
                   typename IRComponents, typename Visitor = TrivialVisitor>
-        void tree_augmentation_iterative_rounding(
+        ProblemType tree_augmentation_iterative_rounding(
                 const Graph & g,
                 const TreeMap & treeMap,
                 const CostMap & costMap,
@@ -411,7 +411,7 @@ namespace paal {
                 IRComponents comps,
                 Visitor vis = Visitor()) {
             paal::ir::TreeAug<Graph, TreeMap, CostMap, EdgeSet> treeaug(g, treeMap, costMap, resultSetEdge);
-            solve_iterative_rounding(treeaug, std::move(comps), std::move(vis));
+            return solve_iterative_rounding(treeaug, std::move(comps), std::move(vis));
         }
 
     } //ir

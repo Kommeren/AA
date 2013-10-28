@@ -187,10 +187,10 @@ template <
 
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet,
           typename IRComponents, typename Visitor = TrivialVisitor>
-void steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
         const CostMap & cost, ResultNetworkSet & result, IRComponents comps, Visitor vis = Visitor()) {
     auto steiner = paal::ir::make_SteinerNetwork(g, restrictions, cost, result);
-    paal::ir::solve_iterative_rounding(steiner, std::move(comps), std::move(vis));
+    return paal::ir::solve_iterative_rounding(steiner, std::move(comps), std::move(vis));
 }
 
 

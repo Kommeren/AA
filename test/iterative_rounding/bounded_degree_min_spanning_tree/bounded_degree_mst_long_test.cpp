@@ -94,7 +94,8 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds, const
     ResultTree tree;
     Oracle oracle(g);
     Components components(ir::make_RowGenerationSolveLP(oracle));
-    ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
+    auto probType = ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
+    BOOST_CHECK(probType == ir::OPTIMAL);
 
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
 }

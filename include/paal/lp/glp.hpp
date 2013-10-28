@@ -16,6 +16,7 @@
 #include "paal/data_structures/bimap.hpp"
 #include "paal/lp/ids.hpp"
 #include "paal/lp/bound_type.hpp"
+#include "paal/lp/problem_type.hpp"
 
 namespace paal {
 namespace ir {
@@ -55,13 +56,20 @@ public:
         glp_set_obj_dir(m_lp, GLP_MIN);
     }
     
-    double solveToExtremePoint() {
-        glp_adv_basis(m_lp, 0);
-        int ret = glp_simplex(m_lp, &m_glpkControl);
-        assert(ret == 0);
+    ProblemType solveToExtremePointPrimal() {
+        m_glpkControl.meth = GLP_PRIMAL;
+        return solveToExtremePoint();
+    }
+
+    ProblemType solveToExtremePointDual() {
+        m_glpkControl.meth = GLP_DUAL;
+        return solveToExtremePoint();
+    }
+
+    double getObjValue() const {
         return glp_get_obj_val(m_lp);
     }
-    
+
 
     ColId addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
         int colNr = glp_add_cols(m_lp, 1);
@@ -122,6 +130,37 @@ public:
     }
     
 protected:
+
+    ProblemType solveToExtremePoint() {
+        glp_adv_basis(m_lp, 0);
+        int ret = glp_simplex(m_lp, &m_glpkControl);
+        assert(ret == 0);
+        return getPrimalType();
+    }
+
+    ProblemType getPrimalType() {
+        if (glp_get_status(m_lp) == GLP_OPT) {
+            return OPTIMAL;
+        }
+
+        switch (glp_get_prim_stat(m_lp)) {
+            case GLP_UNDEF:
+                return UNDEFINED;
+            case GLP_NOFEAS:
+                return INFEASIBLE;
+            case GLP_FEAS:
+            case GLP_INFEAS:
+                if (glp_get_dual_stat(m_lp) == GLP_NOFEAS) {
+                    return UNBOUNDED;
+                }
+                else {
+                    return UNDEFINED;
+                }
+            default:
+                assert(false);
+                return UNDEFINED;
+        }
+    }
 
     int getCol(ColId col) const {
         return m_colIdx.getIdx(col.get()) + 1;

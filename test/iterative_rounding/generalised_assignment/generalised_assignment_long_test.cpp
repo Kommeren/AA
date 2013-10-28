@@ -72,11 +72,13 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             auto  Tf = [&](int i){return machinesBounds[i];}; 
             std::map<int, int> jobsToMachines;
             times(0, 0);
-            paal::ir::generalised_assignment_iterative_rounding(
+            auto probType = paal::ir::generalised_assignment_iterative_rounding(
                 machines.begin(), machines.end(),
                 jobs.begin(), jobs.end(), 
                 costs, times, Tf, jobsToMachines,
                 paal::ir::GeneralAssignmentIRComponents<>());
+
+            BOOST_CHECK(probType == OPTIMAL);
 
             int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);

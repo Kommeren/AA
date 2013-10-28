@@ -95,7 +95,9 @@ double getLowerBound(TA ta) {
     paal::ir::TAComponents<> comps;
     GLPBase lp;
     comps.call<Init>(ta, lp);
-    return comps.call<SolveLPToExtremePoint>(ta, lp);
+    auto probType = comps.call<SolveLPToExtremePoint>(ta, lp);
+    BOOST_CHECK(probType == OPTIMAL);
+    return lp.getObjValue();
 }
 
 
@@ -148,7 +150,8 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         paal::ir::TAComponents<> comps;
     
         double lplowerbd = getLowerBound(treeaug);
-        paal::ir::solve_iterative_rounding(treeaug, comps);
+        auto probType = paal::ir::solve_iterative_rounding(treeaug, comps);
+        BOOST_CHECK(probType == OPTIMAL);
 
         double solval = treeaug.getSolutionValue();
         LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);

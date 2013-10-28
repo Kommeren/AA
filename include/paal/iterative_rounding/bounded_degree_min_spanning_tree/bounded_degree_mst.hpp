@@ -215,7 +215,7 @@ make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
 template <typename Graph, typename CostMap, typename DegreeBoundMap,
           typename ResultSpanningTree, typename IRComponents,
           typename Visitor = TrivialVisitor>
-void bounded_degree_mst_iterative_rounding(
+ProblemType bounded_degree_mst_iterative_rounding(
         const Graph & g, 
         const CostMap & costMap, 
         const DegreeBoundMap & degBoundMap, 

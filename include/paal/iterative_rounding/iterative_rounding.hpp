@@ -50,10 +50,11 @@ public:
         call<Init>(m_problem, m_lpBase);
     }
     
-    double solveLPToExtremePoint() {
-        auto objVal = call<SolveLPToExtremePoint>(m_problem, m_lpBase);
+    ProblemType solveLPToExtremePoint() {
+        auto probType = call<SolveLPToExtremePoint>(m_problem, m_lpBase);
+        assert(probType != UNDEFINED);
         m_visitor.solveLPToExtremePoint(m_problem, m_lpBase);
-        return objVal;
+        return probType;
     }
 
     bool integerSolution() {
@@ -155,29 +156,37 @@ private:
 
 //TODO add resolve
 template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
-void solve_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
+ProblemType solve_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
     IterativeRounding<Problem, IRComponents, Visitor, LPBase> ir(problem, std::move(components), std::move(vis));
     bool irSolved = false;
     do {
-        ir.solveLPToExtremePoint();
+        auto probType = ir.solveLPToExtremePoint();
+        if (probType != OPTIMAL) {
+            return probType;
+        }
         bool rounded{ir.round()};
         bool relaxed{ir.relax()};
         irSolved = ir.integerSolution();
         assert(irSolved || rounded || relaxed);
     } while (!irSolved);
     ir.setSolution();
+    return OPTIMAL;
 }
 
 template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
-void solve_dependent_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
+ProblemType solve_dependent_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
     IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, std::move(components), std::move(vis));
     do {
-        ir.solveLPToExtremePoint();
+        auto probType = ir.solveLPToExtremePoint();
+        if (probType != OPTIMAL) {
+            return probType;
+        }
         ir.dependentRound();
         ir.relax();
         if (ir.stopCondition()) break;
     } while (true);
     ir.setSolution();
+    return OPTIMAL;
 }
 
 } //ir

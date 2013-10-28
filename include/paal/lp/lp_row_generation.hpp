@@ -8,6 +8,8 @@
 #ifndef LP_ROW_GENERATION_HPP
 #define LP_ROW_GENERATION_HPP 
 
+#include "paal/lp/problem_type.hpp"
+
 namespace paal {
 namespace ir {
 
@@ -17,14 +19,13 @@ public:
     RowGenerationSolveLP(Oracle & oracle) : m_oracle(oracle) {}
   
     template <typename Problem, typename LP>
-    double operator()(const Problem & problem, LP & lp) {
-        double res;
-        res = lp.solveToExtremePoint();
-        while (!m_oracle.feasibleSolution(problem, lp)) {
+    ProblemType operator()(const Problem & problem, LP & lp) {
+        auto probType = lp.solveToExtremePointPrimal();
+        while (probType == OPTIMAL && !m_oracle.feasibleSolution(problem, lp)) {
             m_oracle.addViolatedConstraint(problem, lp);
-            res = lp.solveToExtremePoint();
+            probType = lp.solveToExtremePointPrimal();
         }
-        return res;
+        return probType;
     }
     
 private:

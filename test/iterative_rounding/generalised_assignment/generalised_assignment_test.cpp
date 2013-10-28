@@ -35,6 +35,7 @@ struct LogVisitor : public TrivialVisitor {
 
 BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     //sample problem
+    LOGLN("sample problem:");
     auto machines = boost::irange(0,2);
     auto jobs = boost::irange(0,2);
 
@@ -84,5 +85,39 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
            paal::ir::GeneralAssignmentIRComponents<>());
    }
 
+}
+
+BOOST_AUTO_TEST_CASE(generalized_assignemnt_infeasible_test) {
+    // infeasible problem
+    LOGLN("infeasible problem:");
+    auto machines = boost::irange(0,2);
+    auto jobs = boost::irange(0,2);
+
+    std::vector<std::vector<int>> cost(2, std::vector<int>(2));
+    cost[0][0] = 2;
+    cost[0][1] = 3;
+    cost[1][0] = 1;
+    cost[1][1] = 3;
+    auto  costf = [&](int i, int j){return cost[i][j];};
+
+    std::vector<std::vector<int>> time(2, std::vector<int>(2));
+    time[0][0] = 2;
+    time[0][1] = 4;
+    time[1][0] = 3;
+    time[1][1] = 3;
+    auto  timef = [&](int i, int j){return time[i][j];};
+
+    std::vector<int> T = {2, 2};
+    auto  Tf = [&](int i){return T[i];};
+
+    std::map<int, int> jobsToMachines;
+
+    auto probType = paal::ir::generalised_assignment_iterative_rounding(
+        machines.begin(), machines.end(),
+        jobs.begin(), jobs.end(),
+        costf, timef, Tf, jobsToMachines,
+        paal::ir::GeneralAssignmentIRComponents<>());
+
+    BOOST_CHECK(probType == INFEASIBLE);
 }
 

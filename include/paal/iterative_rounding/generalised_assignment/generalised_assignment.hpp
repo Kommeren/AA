@@ -62,12 +62,17 @@ class GAInit {
     private:
         //adding varables
         template <typename Problem, typename LP>
-            void addVariables(Problem & problem, LP &lp) {
+            void addVariables(Problem & problem, LP & lp) {
                 auto & colIdx = problem.getColIdx();
                 colIdx.reserve(problem.getMachinesCnt() * problem.getJobsCnt());
                 for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
                     for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
-                        colIdx.push_back(lp.addColumn(problem.getCost()(j,m)));
+                        if (problem.getProceedingTime()(j, m) <= problem.getMachineAvailableTime()(m)) {
+                            colIdx.push_back(lp.addColumn(problem.getCost()(j,m)));
+                        }
+                        else {
+                            colIdx.push_back(lp.addColumn(problem.getCost()(j,m), FX, 0, 0));
+                        }
                     }
                 }
             }
@@ -98,7 +103,6 @@ class GAInit {
 
                     for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
                         auto t = problem.getProceedingTime()(j, m);
-                        assert(t <= T);
                         lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx, mIdx)], t);
                         ++jIdx;
                     }
@@ -133,6 +137,12 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
                 m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
                 m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
                 m_c(c), m_t(t), m_T(T), m_jobToMachine(jobToMachines) {}
+
+            typedef boost::optional<std::string> ErrorMessage;
+
+            ErrorMessage checkInputValidity() {
+                return ErrorMessage();
+            }
 
             int idx(int jIdx, int mIdx) {
                 return jIdx * m_mCnt + mIdx;
@@ -219,14 +229,14 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
 template <typename MachineIter, typename JobIter, typename Cost, 
           typename ProceedingTime, typename MachineAvailableTime, 
           typename JobsToMachines, typename Components, typename Visitor = TrivialVisitor>
-void generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
+ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
                     JobIter jbegin, JobIter jend,
                     const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, 
                     JobsToMachines & jobToMachines, Components comps, Visitor vis = Visitor()) {
     auto gaSolution = make_GeneralAssignment(
             mbegin, mend, jbegin, jend, 
             c, t, T, jobToMachines);
-    solve_iterative_rounding(gaSolution, std::move(comps), std::move(vis));
+    return solve_iterative_rounding(gaSolution, std::move(comps), std::move(vis));
 }
 
 

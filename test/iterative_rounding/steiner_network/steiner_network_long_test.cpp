@@ -78,6 +78,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // default heuristics
         auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
         paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
-        paal::ir::steiner_network_iterative_rounding(g, restrictions, costs, resultNetwork, std::move(comps));
+        auto probType = paal::ir::steiner_network_iterative_rounding(g, restrictions, costs, resultNetwork, std::move(comps));
+        BOOST_CHECK(probType == paal::ir::OPTIMAL);
     }
 }

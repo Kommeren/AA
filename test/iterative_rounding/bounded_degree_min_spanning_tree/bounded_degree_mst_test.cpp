@@ -140,3 +140,49 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
     LOGLN(*invalid);
 }
 
+BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
+    // infeasible problem
+    LOGLN("Infeasible problem:");
+    Graph g;
+    Cost costs = get(boost::edge_weight, g);
+
+    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    typedef std::set<Edge> ResultTree;
+    ResultTree resultTree;
+
+    addEdge(g, costs, 0, 3, 5);
+    addEdge(g, costs, 3, 5, 15);
+    addEdge(g, costs, 5, 4, 7);
+    addEdge(g, costs, 5, 1, 2);
+    addEdge(g, costs, 1, 2, 78);
+    addEdge(g, costs, 5, 9, 56);
+    addEdge(g, costs, 8, 9, 13);
+    addEdge(g, costs, 9, 7, 6);
+    addEdge(g, costs, 5, 6, 1);
+
+    Bound degBounds = get(boost::vertex_degree, g);
+
+    degBounds[0] = 1;
+    degBounds[1] = 2;
+    degBounds[2] = 1;
+    degBounds[3] = 2;
+    degBounds[4] = 1;
+    degBounds[5] = 3;
+    degBounds[6] = 1;
+    degBounds[7] = 1;
+    degBounds[8] = 1;
+    degBounds[9] = 3;
+
+    typedef BDMSTIRComponents<Graph> Components;
+    auto oracle(make_BoundedDegreeMSTOracle(g));
+    Components components(make_RowGenerationSolveLP(oracle));
+    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
+    auto invalid = bdmst.checkInputValidity();
+
+    BOOST_CHECK(!invalid);
+
+    auto probType = solve_iterative_rounding(bdmst, std::move(components));
+
+    BOOST_CHECK(probType == INFEASIBLE);
+}
+
