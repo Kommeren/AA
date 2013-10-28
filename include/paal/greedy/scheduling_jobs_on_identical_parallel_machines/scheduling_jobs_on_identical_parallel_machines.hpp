@@ -15,6 +15,8 @@
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <paal/utils/functors.hpp>
+#include <paal/utils/type_functions.hpp>
+
 
 namespace paal{
 namespace greedy{
@@ -35,15 +37,14 @@ namespace scheduling_jobs_on_identical_parallel_machines{
  */
 template<class _RandomAccessIter, class OutputIterator,class GetTime>
 void schedulingJobsOnIdenticalParallelMachines(int n_machines,const _RandomAccessIter first,const _RandomAccessIter last, OutputIterator result,GetTime getTime){
-    typedef typename std::iterator_traits<_RandomAccessIter>::value_type Job;
-    typedef typename std::result_of<GetTime(Job)>::type Time;
-    std::sort(first,last,std::greater<Job>());
-    
+    typedef typename std::iterator_traits<_RandomAccessIter>::reference JobReference;
+    typedef typename utils::PureResultOf<GetTime(JobReference)>::type Time;
+    std::sort(first,last,utils::Greater());
     std::priority_queue<std::pair<Time,int> > machines;
     for(auto machineId : boost::irange(0, n_machines)){
         machines.push(std::make_pair(0,machineId));
     }
-    for(auto job: boost::make_iterator_range(first,last)){
+    for(JobReference job: boost::make_iterator_range(first,last)){
         auto leastLoadedMachine=machines.top();
         machines.pop();
         machines.push(std::make_pair(leastLoadedMachine.first-getTime(job),leastLoadedMachine.second));

@@ -280,7 +280,7 @@ private:
         put(m_cap, m_vToTrg[trg], numVertices);
         
         // TODO better flow algorithm
-        double minCut = boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
+        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
         if (violation > minViolation && !problem.getCompare().e(violation, 0)) {

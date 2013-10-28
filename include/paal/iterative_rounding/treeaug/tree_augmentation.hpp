@@ -264,7 +264,7 @@ namespace paal {
 
                 // Is the tree connected?
                 std::vector<int> component(num_vertices(m_g));
-                int num = connected_components(m_tree, &component[0]);
+                int num = boost::connected_components(m_tree, &component[0]);
 
                 if (num > 1) {
                     return ErrorMessage(
@@ -275,7 +275,7 @@ namespace paal {
                 // Is the graph 2-edge-connected?
                 ConstIntMap<Edge, 1> const1EdgeMap;
                 // TODO This stoer-wagner algorithm is unnecessarily slow for some reason
-                int minCut = stoer_wagner_min_cut(m_g, const1EdgeMap);
+                int minCut = boost::stoer_wagner_min_cut(m_g, const1EdgeMap);
                 if (minCut < 2) {
                     return ErrorMessage(
                                 "The graph is not 2-edge-connected."

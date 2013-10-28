@@ -44,11 +44,18 @@ template <typename T, int k> struct kTuple {
 template <typename T> struct kTuple<T, 1> {
     typedef std::tuple<T> type;
 };
-   
+
 //return type of the fucntion //TODO redundant with std::result_of
 template <typename T, typename F, typename... Args> 
 struct ReturnType {
     typedef  decltype(((std::declval<T*>())->*(std::declval<F>()))(std::declval<Args>()...)) type;
+};
+
+
+//return pure type of function (decays const and reference)
+template <class F> 
+struct PureResultOf {
+    typedef typename std::decay<typename std::result_of<F>::type >::type type;
 };
 
 } //utils

@@ -211,7 +211,7 @@ private:
     SpanningTree getSpanningTree(const AMatrix & am) {
         //compute spanning tree and write it to  vector
         std::vector<Idx> pm(N);
-        prim_minimum_spanning_tree(am, &pm[0]);
+        boost::prim_minimum_spanning_tree(am, &pm[0]);
         
         //transform vector into SpanningTree object
         auto const  & weight_map = get(boost::edge_weight, am);
@@ -237,8 +237,13 @@ private:
 
     void createSubgraphs(SpanningTree & g, SpanningTree & G1, SpanningTree & G2) {
         int n = num_vertices(g);
+<<<<<<< HEAD
         std::vector<Idx> comps(n);
         connected_components(g, &comps[0]);
+=======
+        std::vector<VertexType> comps(n);
+        boost::connected_components(g, &comps[0]);
+>>>>>>> scheduling jobs small fixes and long test for k_cut
         int c1 = comps[0];
         int c2 = -1;
         

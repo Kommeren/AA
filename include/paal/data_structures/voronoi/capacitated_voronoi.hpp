@@ -183,7 +183,7 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
+        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
                 predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
                                                                     
 
@@ -218,7 +218,7 @@ public:
         remove_vertex(genGraph, m_g);
         restoreIndex();
         
-        successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
+        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
                 predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
                                                                     
 
@@ -260,7 +260,7 @@ public:
             return d + residual_capacity[e];
         });
 
-        DistI cost =  find_flow_cost(m_g);
+        DistI cost =  boost::find_flow_cost(m_g);
         return Dist(cost, resCap);
     }
 

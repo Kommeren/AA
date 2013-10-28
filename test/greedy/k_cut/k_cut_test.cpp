@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(KCut) {
     
     for(auto i:boost::irange(2,9)){
         std::vector<std::pair<int,int> > verticesParts;
-        int costCut=paal::greedy::k_cut::kCut(graph,i,back_inserter(verticesParts));
+        int costCut=paal::greedy::kCut(graph,i,back_inserter(verticesParts));
         LOGLN("cost cut: "<<costCut);
         std::vector<int> verticesToParts;
         verticesToParts.resize(verticesParts.size());

@@ -1,4 +1,4 @@
-/*! \page sjwdoasm Scheduling Jobs with deadlines on a single machine
+/*! \page sjwdoasm Scheduling Jobs with Deadlines on a Single Machine
 
 \section def Problem definition.
 In scheduling Jobs with deadlines on a single machine we have the machine and N jobs to be processed.

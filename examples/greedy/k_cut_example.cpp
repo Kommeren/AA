@@ -23,7 +23,7 @@ int main(){
     int parts=3;
     //solve
     std::vector<std::pair<int,int> > verticesParts;
-    int costCut=paal::greedy::k_cut::kCut(graph,parts,back_inserter(verticesParts));
+    int costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts));
     
     //print result
     std::cout<<"cost cut:"<<costCut<<std::endl;

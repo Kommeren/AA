@@ -162,10 +162,10 @@ private:
         
         return problem.getCompare().g(max, 0);
     }
-    
+
     template <typename Problem>
     double checkViolationBiggerThan(Problem & problem, Vertex  src, Vertex trg, double maximumViolation = 0) {
-        double minCut = boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
+        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = m_restrictions(src, trg);
         double violation = restriction - minCut;
         
