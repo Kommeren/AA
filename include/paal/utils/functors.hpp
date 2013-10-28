@@ -14,6 +14,8 @@
 #include <cassert>
 #include <utility>
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 namespace paal {
 namespace utils {
 
@@ -80,6 +82,15 @@ struct AssertFunctor {
         void  operator()(Args&&... args) const {
             assert(false);
         } 
+};
+
+
+//removes reference
+struct RemoveReference {
+    template <typename T>
+    T operator()(const T & t) const {
+        return t;
+    }
 };
 
 

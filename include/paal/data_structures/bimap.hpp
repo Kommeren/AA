@@ -14,6 +14,7 @@
 #include <boost/multi_index/random_access_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/functional/hash.hpp>
 
 namespace paal {
 namespace data_structures {
@@ -87,7 +88,7 @@ private:
  */
 template <typename T, typename Idx = int> 
 class BiMap {
-    typedef std::unordered_map<T,Idx> TToID;
+    typedef std::unordered_map<T,Idx, boost::hash<T>> TToID;
 public:
     typedef typename TToID::const_iterator Iterator;
     

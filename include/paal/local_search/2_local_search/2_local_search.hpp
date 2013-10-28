@@ -53,24 +53,6 @@ template <typename Gain,
           typename GetMoves = TrivialNeighborGetter, 
           typename StopCondition = utils::ReturnFalseFunctor> 
 using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetMoves, StopCondition>;
-/*    public MultiSearchComponents<
-            GetMoves, 
-            Gain, 
-            TwoLocalSearchCommit, 
-            StopCondition> {
-
-    typedef MultiSearchComponents<
-            GetMoves, 
-            Gain, 
-            TwoLocalSearchCommit, 
-            StopCondition> base; 
-public : 
-    TwoLocalComponents(Gain ic = Gain(), 
-                       GetMoves ng = GetMoves(), 
-                       StopCondition sc = StopCondition()) : 
-            base(std::move(ng), std::move(ic), TwoLocalSearchCommit(), std::move(sc)) {}
-
-};*/
 
 /**
  * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
@@ -103,9 +85,9 @@ TwoLocalComponents<Gain, GetMoves, StopCondition>
  * @param m metric
  */
 template <typename Metric>
-decltype(make_TwoLocalSearchComponents(GainToOpt<Metric>(std::declval<Metric>())))
+decltype(make_TwoLocalSearchComponents(GainTwoOpt<Metric>(std::declval<Metric>())))
 getDefaultTwoLocalComponents(const Metric & m) {
-    return make_TwoLocalSearchComponents(GainToOpt<Metric>(m));
+    return make_TwoLocalSearchComponents(GainTwoOpt<Metric>(m));
 }
 
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
@@ -133,15 +115,6 @@ bool two_local_search_simple(Cycle & cycle, Components... components) {
 
 
 } //two_local_search
-
-/*template <typename Gain, typename GetMoves, typename StopCondition> 
-struct SearchComponentsTraits<two_local_search::TwoLocalComponents<Gain, GetMoves, StopCondition>> 
-        : SearchComponentsTraits<
-            MultiSearchComponents<GetMoves, Gain, two_local_search::TwoLocalSearchCommit, StopCondition>
-                               > {};*/
-
-
-
 } //local_search
 } //paal
 

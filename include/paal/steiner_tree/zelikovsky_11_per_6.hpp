@@ -8,8 +8,6 @@
 #include <map>
 #include <stack>
 
-#define BOOST_RESULT_OF_USE_DECLTYPE
-
 #include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
@@ -27,6 +25,7 @@
 #include "paal/data_structures/voronoi/voronoi.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search.hpp"
+#include "paal/utils/functors.hpp"
 
 namespace paal {
 namespace steiner_tree {
@@ -53,7 +52,7 @@ public:
     static const int SUSBSET_SIZE = 3;
 
     typedef typename utils::kTuple<Idx, SUSBSET_SIZE>::type ThreeTuple;
-    typedef std::tuple<ThreeTuple, Dist> Move;
+    typedef boost::tuple<ThreeTuple, Dist> Move;
     typedef std::vector<VertexType> ResultSteinerVertices;
        
     /**
@@ -75,30 +74,20 @@ public:
         }
 
         auto ti = boost::irange<int>(0, N);
+        auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
 
         auto ng = [&](const AMatrix & t) {
-            auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
-            auto removeRefFromTuple = 
-                [](const boost::tuple<const ThreeTuple &, int &> & t){
-                    return Move(boost::get<0>(t), boost::get<1>(t));
-            };
-
-            typedef boost::transform_iterator<
-                        decltype(removeRefFromTuple),
-                        decltype(boost::make_zip_iterator(boost::make_tuple(subsets.first, m_subsDists.begin()))),
-                        Move> TI;
-
-            return std::make_pair(TI(boost::make_zip_iterator(boost::make_tuple(subsets.first, 
-                                                                             m_subsDists.begin())), removeRefFromTuple), 
-                                  TI(boost::make_zip_iterator(boost::make_tuple(subsets.second, 
-                                                                             m_subsDists.end())), removeRefFromTuple));
+            return std::make_pair(boost::make_zip_iterator(boost::make_tuple(subsets.first, 
+                                        boost::make_transform_iterator(m_subsDists.begin(), utils::RemoveReference()))), 
+                                  boost::make_zip_iterator(boost::make_tuple(subsets.second, 
+                                        boost::make_transform_iterator(m_subsDists.end(), utils::RemoveReference())))); 
         };
         
         auto obj_fun = [&](const AMatrix & m, const Move &t) {return this->gain(t);};
 
         auto su = [&](AMatrix & m, const Move & t) {
-            this->contract(m, std::get<0>(t));
-            res.push_back(m_nearestVertex[std::get<0>(t)]);
+            this->contract(m, get<0>(t));
+            res.push_back(m_nearestVertex[get<0>(t)]);
         };
 
         auto sc = local_search::make_SearchComponents(ng, obj_fun, su);
@@ -121,7 +110,9 @@ public:
         uniqueRes(res);
         return std::move(res); 
     }
+
 private:
+
     //Spanning tree types
     typedef boost::property<boost::edge_index_t, int, boost::property<boost::edge_weight_t, Dist>>  SpanningTreeEdgeProp;
     typedef boost::subgraph<boost::adjacency_list<boost::listS, boost::vecS, 
@@ -138,10 +129,10 @@ private:
     typedef std::vector<Dist> ThreeSubsetsDists;
     typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
 
-        template <typename Iter> std::pair<data_structures::SubsetsIterator<Iter,SUSBSET_SIZE>, 
-                                           data_structures::SubsetsIterator<Iter,SUSBSET_SIZE>>        
+        template <typename Iter> std::pair<data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>, 
+                                           data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>>        
     makeThreeSubsetRange(Iter b, Iter e) {
-        return data_structures::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE>(b,e);
+        return data_structures::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE, ThreeTuple *, ThreeTuple>(b,e);
     }
 
     void uniqueRes(ResultSteinerVertices & res) {
@@ -151,17 +142,17 @@ private:
     }
 
     void contract(AMatrix & am ,const ThreeTuple & t) {
-        utils::contract(am, std::get<0>(t), std::get<1>(t));
-        utils::contract(am, std::get<1>(t), std::get<2>(t));
+        utils::contract(am, get<0>(t), std::get<1>(t));
+        utils::contract(am, get<1>(t), std::get<2>(t));
     }
         
     Dist gain(const Move & t){
-        auto const  & m = m_save;
-        VertexType a,b,c;
-        std::tie(a, b, c) = std::get<0>(t);
+        auto const & m = m_save; 
+        Idx a,b,c;
+        std::tie(a, b, c) = get<0>(t);
         
         assert(m(a,b) == m(b,c) || m(b,c) == m(c, a) || m(c,a) == m(a,b));
-        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - std::get<1>(t);
+        return this->max3(m(a, b), m(b, c), m(c,a)) + this->min3(m(a, b), m(b, c), m(c,a)) - get<1>(t);
     }
 
     void fillSubDists() {
@@ -172,9 +163,9 @@ private:
         
         //finding nearest vertex to subset
         for(const ThreeTuple & subset : boost::make_iterator_range(subRange)) {
-            //TODO awfull coding, need to be changed to loop
-            //There is possible problem, one point could belong to two Voronoi regions
-            //In our implementation the poin will be in exactly one region and there 
+            //TODO awful coding, need to be changed to loop
+            //TODO There is possible problem, one point could belong to two Voronoi regions
+            //In our implementation the point will be in exactly one region and there 
             //it will not be contained in the range
             auto vRange1 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<0>(subset)));
             auto vRange2 =  m_voronoi.getVerticesForGenerator(m_tIdx.getVal(std::get<1>(subset)));
@@ -184,19 +175,18 @@ private:
             if(boost::empty(range)) {
                 m_nearestVertex[subset] = *m_voronoi.getVertices().begin();
             } else {
-                m_nearestVertex[subset] =  *std::min_element(boost::begin(range), boost::end(range), [&](VertexType v1, VertexType v2) {
-                    return this->dist(v1, subset) < this->dist(v2, subset);
-                });
+                m_nearestVertex[subset] =  *std::min_element(boost::begin(range), boost::end(range), 
+                        utils::make_FunctorToComparator([&](VertexType v){return this->dist(v, subset);}));
             }
             m_subsDists.push_back(this->dist(m_nearestVertex[subset], subset));
         }
     }
 
-    VertexType max3(VertexType a, VertexType b, VertexType c) {
+    Dist max3(Dist a, Dist b, Dist c) {
         return std::max(std::max(a,b),c);
     }
     
-    VertexType min3(VertexType a, VertexType b, VertexType c) {
+    Dist min3(Dist a, Dist b, Dist c) {
         return std::min(std::min(a,b),c);
     }
 
@@ -212,19 +202,19 @@ private:
     }
 
     /**
-     * @brief Costructs spanning tree from curent am
+     * @brief Constructs spanning tree from current am
      *
      * @return 
      */
     SpanningTree getSpanningTree(const AMatrix & am) {
         //compute spanning tree and write it to  vector
-        std::vector<VertexType> pm(N);
+        std::vector<Idx> pm(N);
         prim_minimum_spanning_tree(am, &pm[0]);
         
-        //transform vector intto SpanningTree object
+        //transform vector into SpanningTree object
         auto const  & weight_map = get(boost::edge_weight, am);
         SpanningTree spanningTree(N);
-        for(VertexType from = 0; from < N; ++from){
+        for(Idx from = 0; from < N; ++from){
             if(from != pm[from]) {
                 bool succ =add_edge(from, pm[from], 
                     SpanningTreeEdgeProp(from, get(weight_map, edge(from, pm[from], am).first)), spanningTree).second;
@@ -245,7 +235,7 @@ private:
 
     void createSubgraphs(SpanningTree & g, SpanningTree & G1, SpanningTree & G2) {
         int n = num_vertices(g);
-        std::vector<VertexType> comps(n);
+        std::vector<Idx> comps(n);
         connected_components(g, &comps[0]);
         int c1 = comps[0];
         int c2 = -1;
@@ -261,11 +251,12 @@ private:
         }
     }
 
+    //setting m_save(v,w) = maxDist, for each v in G1 and w in G2
     void moveSave(const SpanningTree & G1, const SpanningTree & G2, Dist maxDist) {
         auto v1 = vertices(G1);
         auto v2 = vertices(G2);
-        for(VertexType v : boost::make_iterator_range(v1)) {
-            for(VertexType w : boost::make_iterator_range(v2)) {
+        for(auto v : boost::make_iterator_range(v1)) {
+            for(auto w : boost::make_iterator_range(v2)) {
                 auto vg = G1.local_to_global(v);
                 auto wg = G2.local_to_global(w);
                 m_save(vg, wg) =  maxDist;
@@ -274,6 +265,9 @@ private:
         }
     }
 
+    //finds the longest edge between each pair of vertices
+    //in the spanning tree
+    //preforms recursive procedure
     void findSave(const AMatrix & am) {
         auto spanningTree = getSpanningTree(am);
         

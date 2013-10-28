@@ -294,7 +294,8 @@ public:
         m_colIdx.erase(col.get());
         glp_del_cols(m_lp, 1, arr);
     }
-    
+   
+    //TODO rewrite
     void clear() {
         while (true) {
             auto rows = getRows();

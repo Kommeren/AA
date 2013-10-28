@@ -17,7 +17,7 @@
 namespace paal {
 namespace data_structures {
 
-//minor TODO could be more efficient in direct array of iterators inmplementation
+//minor TODO could be more efficient in direct array of iterators implementation
 /**
  * @class SubsetsIterator
  * @brief Iterator to all k-subsets of given collection.
@@ -25,7 +25,9 @@ namespace data_structures {
  * @tparam Iterator
  * @tparam k
  */
-template <typename Iterator,int k> class SubsetsIterator : 
+template <typename Iterator,int k, 
+          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *, 
+          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &> class SubsetsIterator : 
     private SubsetsIterator<Iterator, k-1>{
     
 public:
@@ -35,8 +37,8 @@ public:
     typedef std::iterator<std::forward_iterator_tag, 
                          SubsetType,
                          ptrdiff_t,
-                         SubsetType *,
-                         const SubsetType &> IterBase;
+                         Pointer,
+                         Reference> IterBase;
 
     //couldn't be done by inheritance from itarator
     typedef typename IterBase::iterator_category iterator_category;
@@ -88,7 +90,7 @@ public:
                (m_begin == m_end && ei.m_begin == m_end);
     }               
     
-    const SubsetType * const operator->() const {
+    pointer const operator->() const {
         return &m_return;
     }               
 
@@ -99,7 +101,7 @@ public:
         m_return = ei.m_return;
     }               
 
-    const SubsetType & operator*() const {
+    reference operator*() const {
         return m_return;
     }
     
@@ -183,10 +185,12 @@ protected:
 };
 
 
-template <typename Iterator,int k> 
-std::pair<SubsetsIterator<Iterator, k>, SubsetsIterator<Iterator, k>>
+template <typename Iterator,int k,
+          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *, 
+          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &> 
+std::pair<SubsetsIterator<Iterator, k, Pointer, Reference>, SubsetsIterator<Iterator, k, Pointer, Reference>>
 make_SubsetsIteratorrange(Iterator b, Iterator e)  {
-     typedef SubsetsIterator<Iterator, k> SI;
+     typedef SubsetsIterator<Iterator, k, Pointer, Reference> SI;
      return std::make_pair(SI(b,e), SI(e,e));
 }
 

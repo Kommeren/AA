@@ -19,7 +19,7 @@ class MetricOnIdx {
 public:
     typedef data_structures::MetricTraits<Metric> MT;
     typedef typename MT::DistanceType DistanceType;
-    typedef typename MT::VertexType   VertexType;
+    typedef int  VertexType;
 
     MetricOnIdx(const Metric & m, const Bimap & idx) : m_metric(m), m_idx(idx) {}
 
@@ -28,7 +28,7 @@ public:
     }
 private:
     const Metric & m_metric;
-    const data_structures::BiMap<VertexType> & m_idx;
+    const Bimap & m_idx;
 };
 
 template <typename Metric, typename Bimap>

@@ -9,9 +9,9 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename Metric> class GainToOpt {
+template <typename Metric> class GainTwoOpt {
     public:
-        GainToOpt(const Metric & m) : m_metric(m) {}
+        GainTwoOpt(const Metric & m) : m_metric(m) {}
 
         template <typename Solution, typename SolutionElement> 
         int operator()(const Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
