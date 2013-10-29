@@ -122,10 +122,9 @@ knapsack(ObjectsIter oBegin,
         IntegralValueTag,
         RetrieveSolutionTag) {
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::ReturnType ReturnType;
-    typedef typename base::SizeType SizeType;
     typedef typename base::ValueType ValueType;
+    typedef typename base::SizeType   SizeType;
+    typedef typename base::ReturnType ReturnType;
     typedef boost::optional<std::pair<ObjectsIter, ValueType>> TableElementType;
     if(oBegin == oEnd) {
         return ReturnType();

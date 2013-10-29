@@ -83,8 +83,6 @@ template <typename ObjectsIter,
  getDensityBasedValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd, 
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
   ObjectValueFunctor value, ObjectSizeFunctor size) {
-      typedef typename std::iterator_traits<ObjectsIter>::reference  ObjectRef;
-
       auto density = make_Density(value, size);
       auto maxElement = density(*std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(density)));
       return capacity * maxElement;
@@ -98,7 +96,6 @@ std::pair<detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>,
  filterToLarge(ObjectsIter oBegin, ObjectsIter oEnd, 
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
   ObjectValueFunctor value, ObjectSizeFunctor size) {
-      typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
       auto rightSize = make_RightSize(size, capacity);
       auto begin = boost::make_filter_iterator(rightSize, oBegin, oEnd);
       auto end =   boost::make_filter_iterator(rightSize, oEnd, oEnd);
@@ -111,7 +108,6 @@ template <typename ObjectsIter,
  detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
  getTrivalValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd, 
   ObjectValueFunctor value, ObjectSizeFunctor size) {
-      typedef typename std::iterator_traits<ObjectsIter>::reference  ObjectRef;
       auto density = make_Density(value, size);
       return *std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(density));
 }
@@ -140,7 +136,6 @@ struct GetMaxElementOnValueIndexedCollection {
 
     template <typename Iterator, typename Comparator>
         Iterator operator()(Iterator begin, Iterator end, Comparator compare) {
-            typedef std::pair<Iterator, SizeType> Return;
             auto compareOpt = make_less_pointees_t(compare);
             //traverse in reverse order, skip the first
             for(auto iter = end - 1; iter != begin; --iter ) {

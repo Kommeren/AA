@@ -48,7 +48,7 @@ namespace detail {
                     auto starValue = [=](ObjectsIter oi){return value(*oi);};
                     auto starSize = [=](ObjectsIter oi){return size(*oi);};
                     auto density = make_Density(starValue, starSize);
-                    auto compare = utils::make_FunctorToComparator(density);
+                    auto compare = utils::make_FunctorToComparator(density, utils::Greater());
     
                     //finding the biggest set elements with the greatest density
                     std::sort(oBegin, oEnd, compare);

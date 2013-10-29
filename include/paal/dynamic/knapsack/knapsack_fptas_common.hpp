@@ -97,7 +97,6 @@ knapsack_general_on_value_fptas_retrieve(double epsilon, ObjectsIter oBegin,
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ObjectRef ObjectRef;
     typedef typename base::ValueType ValueType;
-    typedef typename base::ReturnType ReturnType;
     
     ValueType realValue = ValueType();
     auto addValue = [&](ObjectRef obj){realValue += value(obj); return *out = obj;};
@@ -125,7 +124,6 @@ knapsack_general_on_size_fptas_retrieve(double epsilon, ObjectsIter oBegin,
     typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ObjectRef ObjectRef;
     typedef typename base::SizeType SizeType;
-    typedef typename base::ReturnType ReturnType;
     
     SizeType realSize = SizeType();
     auto addSize = [&](ObjectRef obj){realSize += size(obj); return *out = obj;};
