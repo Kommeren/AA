@@ -8,6 +8,7 @@
 * ITERATIVE ROUNDING
 ** steiner_network_long_test runs infinite loop on siekiera
 ** framework documentation
+** tree_augmentation example
 ** there is some common code in the steiner network and DBMST
 ** primal/dual simplex (and other glpk settings?)
 ** remove some debug output
