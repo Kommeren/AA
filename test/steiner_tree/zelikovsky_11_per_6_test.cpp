@@ -20,16 +20,13 @@
 #include "utils/sample_graph.hpp"
 #include "utils/euclidean_metric.hpp"
 
-template <typename T>
-std::ostream & operator<<(std::ostream & o, const std::pair<T, T> & p) {
-    o << p.first << "," << p.second;
-    return o;
+namespace std {
+    std::ostream & operator<<(std::ostream & o, const std::pair<int, int> & p) {
+        o << p.first << "," << p.second;
+        return o;
+    }
 }
 
-std::ostream & operator<<(std::ostream & o, const std::pair<int, int> & p) {
-    o << p.first << "," << p.second;
-    return o;
-}
 
 BOOST_AUTO_TEST_CASE(zelikowsky_test) {
     typedef  SampleGraphsMetrics SGM;
@@ -53,5 +50,5 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
 
     auto steiner = paal::steiner_tree::getSteinerVertices(em, voronoi); 
     BOOST_CHECK_EQUAL(steiner.size(), size_t(1));
-//    BOOST_CHECK_EQUAL(steiner.front(), make_pair(1,1));
+    BOOST_CHECK_EQUAL(steiner.front(), make_pair(1,1));
 }

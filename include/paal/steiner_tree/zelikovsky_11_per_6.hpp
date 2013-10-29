@@ -8,6 +8,8 @@
 #include <map>
 #include <stack>
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
