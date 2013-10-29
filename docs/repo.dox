@@ -19,7 +19,7 @@ ssh-keygen -t rsa
 
 <li> Clone write access version of the repository
 <pre>
-git clone ssh://siekiera.mimuw.edu.pl:29418/paal
+git clone ssh://\<login\>\@siekiera.mimuw.edu.pl:29418/paal
 </pre>
 
 <li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit.

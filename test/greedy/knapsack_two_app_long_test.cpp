@@ -45,8 +45,9 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
         LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
-        LOGLN("values ");
+        LOGLN("\nvalues ");
         LOG_COPY_DEL(values.begin(), values.end(), " ");
+        LOGLN("");
         auto objects = boost::irange(size_t(0), values.size());
         //KNAPSACK 0/1
         {
@@ -55,15 +56,17 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             auto maxValue = knapsack_0_1_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
-                   make_ArrayToFunctor(sizes), 
-                   make_ArrayToFunctor(values));
+                   make_ArrayToFunctor(values),
+                   make_ArrayToFunctor(sizes));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOGLN("");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
-            LOG("APPROXIMATION RATIO " << double(opt) /  double(maxValue.first));
-            LOG("OPT");
+            LOGLN("APPROXIMATION RATIO " << double(opt) /  double(maxValue.first));
+            LOGLN("OPT");
             LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
+            LOGLN("");
             BOOST_CHECK(opt <= 2 * maxValue.first);
         }
         
@@ -74,11 +77,12 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             auto maxValue = knapsack_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
-                   make_ArrayToFunctor(sizes), 
-                   make_ArrayToFunctor(values));
+                   make_ArrayToFunctor(values),
+                   make_ArrayToFunctor(sizes));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
             LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOGLN("");
         }
     }
 }
