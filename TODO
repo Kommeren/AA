@@ -22,9 +22,6 @@
 * GREEDY
 ** set cover (AA)
 ** max coverage (AA)
-** knapsack (Piotr W.)
-** Scheduling jobs on identical parallel machines (tDoAA) 
-** scheduling jobs with deadlines on a single machine (tDoAA)
 ** k-center
 ** the multiway cut
 ** the k multi way cut

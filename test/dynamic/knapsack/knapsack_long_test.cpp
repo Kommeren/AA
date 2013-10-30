@@ -15,7 +15,7 @@
 
 #include "paal/dynamic/knapsack.hpp"
 #include "paal/dynamic/knapsack_0_1.hpp"
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
 

@@ -14,7 +14,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "paal/lp/glp.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 

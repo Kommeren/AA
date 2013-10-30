@@ -14,7 +14,7 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
 
 #include "paal/data_structures/components/components.hpp"

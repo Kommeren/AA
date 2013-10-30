@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
     using std::make_pair;
     typedef paal::data_structures::Voronoi<paal::EuclideanMetric> VoronoiT;
     typedef typename VoronoiT::GeneratorsSet FSet;
-    VoronoiT voronoi(FSet{make_pair(0,0), make_pair(0,2), make_pair(2, 0), make_pair(2, 2)}, FSet{make_pair(1,1)}, em);
+    VoronoiT voronoi(FSet{{0,0}, {0,2}, {2, 0}, {2, 2}}, FSet{{1,1}}, em);
 
     auto steiner = paal::steiner_tree::getSteinerVertices(em, voronoi); 
     BOOST_CHECK_EQUAL(steiner.size(), size_t(1));

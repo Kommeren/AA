@@ -12,7 +12,7 @@
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 #include <boost/bimap.hpp>
 
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle_components.hpp"
 
 

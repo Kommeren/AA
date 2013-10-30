@@ -13,7 +13,7 @@
 #include <boost/bimap.hpp>
 
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
 
 

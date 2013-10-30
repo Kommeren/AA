@@ -15,7 +15,7 @@
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_two_app.hpp"
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
 

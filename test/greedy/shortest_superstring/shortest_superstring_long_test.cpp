@@ -17,7 +17,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
-#include "paal/utils/double_rounding.hpp"
+#include "paal/utils/floating.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_ss.hpp"
 

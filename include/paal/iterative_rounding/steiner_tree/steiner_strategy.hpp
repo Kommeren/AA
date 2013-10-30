@@ -9,7 +9,7 @@
 #define STEINER_STRATEGY_HPP
 
 #include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
-#include "paal/utils/random.hpp"
+#include "paal/utils/floating.hpp"
 
 namespace paal {
 namespace ir {
