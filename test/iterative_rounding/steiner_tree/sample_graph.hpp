@@ -16,23 +16,23 @@ typedef std::vector<int> Terminals;
 Graph createSmallGraph() {
     Graph g(6);
     bool b;
-    b = boost::add_edge(0, 1, EdgeProp(2), g).second;
+    b = add_edge(0, 1, EdgeProp(2), g).second;
     assert(b);
-    b = boost::add_edge(1, 2, EdgeProp(2), g).second;
+    b = add_edge(1, 2, EdgeProp(2), g).second;
     assert(b);
-    b = boost::add_edge(2, 3, EdgeProp(2), g).second;
+    b = add_edge(2, 3, EdgeProp(2), g).second;
     assert(b);
-    b = boost::add_edge(3, 0, EdgeProp(2), g).second;
+    b = add_edge(3, 0, EdgeProp(2), g).second;
     assert(b);
-    b = boost::add_edge(0, 4, EdgeProp(1), g).second;
+    b = add_edge(0, 4, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(1, 4, EdgeProp(1), g).second;
+    b = add_edge(1, 4, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(2, 4, EdgeProp(1), g).second;
+    b = add_edge(2, 4, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(3, 4, EdgeProp(1), g).second;
+    b = add_edge(3, 4, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(0, 5, EdgeProp(1), g).second;
+    b = add_edge(0, 5, EdgeProp(1), g).second;
     assert(b);
 
     return g;
@@ -59,7 +59,7 @@ Graph createBiggerGraph(int p = 3, int q = 2) {
             } else if ((j - p) / q == i) {
                 cost = 2;
             }
-            b = boost::add_edge(i, j, EdgeProp(cost), g).second;
+            b = add_edge(i, j, EdgeProp(cost), g).second;
             assert(b);
         }
     }

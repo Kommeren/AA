@@ -209,7 +209,7 @@ private:
      */
     template <typename Solution>
     double checkViolationBiggerThan(Solution & sol, Vertex  src, Vertex trg, double maximumViolation = 0) {
-        double minCut = boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
+        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double violation = 1 - minCut;
         if (sol.getCompare().g(violation, maximumViolation)) {
             maximumViolation = violation;
