@@ -13,6 +13,7 @@
 ** primal/dual simplex (and other glpk settings?)
 ** remove some debug output
 ** columns iterator is invalidated when we remove column (see relaxing code)
+** LP formulation in separate deal
 ** cost function
 ** complexities
 ** removing rows/cols strategy

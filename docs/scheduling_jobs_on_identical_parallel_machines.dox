@@ -19,7 +19,7 @@ And we assign longest not assigned job to machine which has smallest load, until
 \subsection app_sjoipm Approximation Ratio equals 4/3.
 
 \subsection com_sjoipm The complexity
-Complexity of the algorithm is \f$O(|N|*|log(N)|)\f$ where \a N is size of input
+Complexity of the algorithm is \f$O(|N|*log(|N|))\f$ where \a N is size of input
 
 \subsection References
 

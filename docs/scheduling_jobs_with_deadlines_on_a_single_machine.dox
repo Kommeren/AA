@@ -26,7 +26,7 @@ at wach moment that machine is idle, we start procesing naxt available job with 
 \subsection app_sjwdoasm Approximation Ratio equals 2 when all due dates are negative.
 
 \subsection com_sjwdoasm The complexity
-Complexity of the algorithm is \f$O(|N|*|log(N)|)\f$ where \a N is size of input
+Complexity of the algorithm is \f$O(|N|*log(|N|))\f$ where \a N is size of input
 
 \subsection References
 

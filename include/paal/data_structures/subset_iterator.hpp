@@ -40,7 +40,7 @@ public:
                          Pointer,
                          Reference> IterBase;
 
-    //couldn't be done by inheritance from itarator
+    //couldn't be done by inheritance from iterator
     typedef typename IterBase::iterator_category iterator_category;
     typedef typename IterBase::value_type        value_type;
     typedef typename IterBase::difference_type   difference_type;

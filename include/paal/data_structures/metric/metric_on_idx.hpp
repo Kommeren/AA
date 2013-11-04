@@ -9,7 +9,7 @@
 #define METRIC_ON_IDX_HPP 
 
 
-#include "paal/data_structures/bimap.hpp"
+#include "paal/data_structures/bimap_traits.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -19,7 +19,7 @@ class MetricOnIdx {
 public:
     typedef data_structures::MetricTraits<Metric> MT;
     typedef typename MT::DistanceType DistanceType;
-    typedef int  VertexType;
+    typedef typename BiMapTraits<Bimap>::Idx  VertexType;
 
     MetricOnIdx(const Metric & m, const Bimap & idx) : m_metric(m), m_idx(idx) {}
 

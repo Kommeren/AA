@@ -10,11 +10,14 @@
 
 #include <map>
 #include <unordered_map>
+
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/functional/hash.hpp>
+
+#include "paal/data_structures/bimap_traits.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -80,7 +83,7 @@ private:
 
 //minor TODO write specification when T is integral (copy instead of reference)
 /**
- * @class BiMapOld
+ * @class BiMap
  * @brief implements both sides mapping from the collection to (0,size(collection)) interval.
  *
  * @tparam T
@@ -201,6 +204,30 @@ public:
 private:
     std::vector<T>   m_idToT;
     std::vector<Idx> m_tToID;
+};
+
+template <typename ValT, typename IdxT>
+struct BiMapTraits<BiMap<ValT, IdxT>> {
+    typedef ValT Val;
+    typedef IdxT Idx;
+};
+
+template <typename ValT, typename IdxT>
+struct BiMapTraits<EraseableBiMap<ValT, IdxT>>  {
+    typedef ValT Val;
+    typedef IdxT Idx;
+};
+
+template <typename ValT, typename IdxT>
+struct BiMapTraits<BiMapOfConsecutive<ValT, IdxT>>  {
+    typedef ValT Val;
+    typedef IdxT Idx;
+};
+
+template <typename ValT, typename IdxT>
+struct BiMapTraits<BiMapMIC<ValT, IdxT>>  {
+    typedef ValT Val;
+    typedef IdxT Idx;
 };
 
 template <typename T, typename Idx = int>
