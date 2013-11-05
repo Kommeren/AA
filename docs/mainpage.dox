@@ -46,6 +46,7 @@
         <li> Dynamic
             <ul>
             <li> \ref knapsack_dynamic
+            <li> \ref knapsack_fptas
             </ul>
         <li> Miscellaneous
             <ul>
