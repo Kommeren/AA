@@ -42,8 +42,8 @@ public:
     template <typename Problem>
     bool checkIfSolutionExists(Problem & problem) {
         for (auto const & e : problem.getEdgeMap()) {
-            Vertex u = source(e.left, m_g);
-            Vertex v = target(e.left, m_g);
+            Vertex u = source(e.second, m_g);
+            Vertex v = target(e.second, m_g);
             addEdge(u, v, 1);
         }
         return !findAnyViolatedConstraint(problem);
@@ -52,6 +52,7 @@ public:
     template <typename Problem, typename LP>
     bool feasibleSolution(Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
+        // TODO other heuristics?
         return !findMostViolatedConstraint(problem);
     }
     
@@ -60,12 +61,12 @@ public:
         lp.addRow(LO, m_violatedRestriction);
         
         for (auto const & e : problem.getEdgeMap()) {
-            const Vertex & u = source(e.left, m_g);
-            const Vertex & v = target(e.left, m_g);
+            const Vertex & u = source(e.second, m_g);
+            const Vertex & v = target(e.second, m_g);
                 
             if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
                 (m_violatingSet.find(v) != m_violatingSet.end())) {
-                    lp.addNewRowCoef(e.right);
+                    lp.addNewRowCoef(e.first);
             }
         }
         
@@ -102,15 +103,16 @@ private:
         m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
         for (auto const & e : problem.getEdgeMap()) {
-            ColId colIdx = e.right;
+            ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx);
 
             if (problem.getCompare().g(colVal, 0)) {
-                Vertex u = source(e.left, m_g);
-                Vertex v = target(e.left, m_g);
+                Vertex u = source(e.second, m_g);
+                Vertex v = target(e.second, m_g);
                 addEdge(u, v, colVal);
             }
         }
+
         for (auto const & e : m_resultNetwork) {
             Vertex u = source(e, m_g);
             Vertex v = target(e, m_g);

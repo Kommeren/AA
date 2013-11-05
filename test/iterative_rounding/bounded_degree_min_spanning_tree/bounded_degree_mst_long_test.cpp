@@ -137,10 +137,12 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         runTest(g, costs, degBounds, verticesNum, bestCost);
 
         // non-default heuristics
-        runTest<paal::ir::FindMostViolated>(g, costs, degBounds, verticesNum, bestCost);
+        if (verticesNum <= 80) {
+            runTest<paal::ir::FindMostViolated>(g, costs, degBounds, verticesNum, bestCost);
+        }
 
         // non-default heuristics (slow, only for smaller instances)
-        if (verticesNum <= 40) {
+        if (verticesNum <= 60) {
             runTest<paal::ir::FindAnyViolated>(g, costs, degBounds, verticesNum, bestCost);
         }
     }

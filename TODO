@@ -6,7 +6,7 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** steiner_network_long_test runs infinite loop on siekiera
+** fix row generation
 ** framework documentation
 ** tree_augmentation example
 ** there is some common code in the steiner network and DBMST

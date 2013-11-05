@@ -51,10 +51,9 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef boost::bimap<Edge, ColId> EdgeMap;
+    typedef std::unordered_map<ColId, Edge> EdgeMap;
     typedef std::vector<Vertex> VertexList;
 
-    typedef std::map<Edge, ColId> OriginalEdgeMap;
     typedef utils::Compare<double> Compare;
 
     typedef boost::optional<std::string> ErrorMessage;
@@ -83,12 +82,11 @@ public:
     }
 
     void bindEdgeToCol(Edge e, ColId col) {
-        m_originalEdgeMap.insert(typename OriginalEdgeMap::value_type(e, col));
-        m_edgeMap.insert(typename EdgeMap::value_type(e, col));
+        m_edgeMap.insert(typename EdgeMap::value_type(col, e));
     }
 
     void removeColumn(ColId colId) {        
-        auto ret = m_edgeMap.right.erase(colId);
+        auto ret = m_edgeMap.erase(colId);
         assert(ret == 1);
     }
     
@@ -103,8 +101,8 @@ public:
 private:
     
     Edge colToEdge(ColId col) {
-        auto i = m_edgeMap.right.find(col);
-        assert(i != m_edgeMap.right.end());
+        auto i = m_edgeMap.find(col);
+        assert(i != m_edgeMap.end());
         return i->second;
     }
 
@@ -113,8 +111,7 @@ private:
     const CostMap & m_costMap;
     ResultNetworkSet  &   m_resultNetwork;
     
-    EdgeMap          m_edgeMap;
-    OriginalEdgeMap m_originalEdgeMap;
+    EdgeMap m_edgeMap;
     
     Compare m_compare;
 };

@@ -54,7 +54,7 @@ public:
     BoundedDegreeMST(BoundedDegreeMST && o) :
               m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
               m_resultSpanningTree(o.m_resultSpanningTree),
-              m_edgeMap(std::move(o.m_edgeMap)), m_edgeList(std::move(o.m_edgeList)),
+              m_edgeMap(std::move(o.m_edgeMap)),
               m_vertexMap(std::move(o.m_vertexMap)), m_vertexList(std::move(o.m_vertexList)),
               m_compare(std::move(o.m_compare))
     {}
@@ -66,8 +66,7 @@ public:
     typedef std::unordered_map<RowId, Vertex> VertexMap;
     typedef std::vector<Vertex> VertexList;
     
-    typedef std::map<Edge, ColId> EdgeMapOriginal;
-    typedef std::vector<Edge> EdgeList;
+    typedef std::vector<std::pair<ColId, Edge>> EdgeMapOriginal;
 
     typedef boost::optional<std::string> ErrorMessage;
 
@@ -101,13 +100,8 @@ public:
     }
 
     void bindEdgeToCol(Edge e, ColId col) {
-        m_edgeMapOriginal.insert(typename EdgeMapOriginal::value_type(e, col));
+        m_edgeMapOriginal.push_back(typename EdgeMapOriginal::value_type(col, e));
         m_edgeMap.insert(typename EdgeMap::value_type(e, col));
-    }
-
-    int addEdge(Edge e) {
-        m_edgeList.push_back(e);
-        return m_edgeList.size() - 1;
     }
 
     int addVertex(Vertex v) {
@@ -125,10 +119,14 @@ public:
         return get(m_degBoundMap, v);
     }
     
-    ColId edgeToCol(Edge e) {
+    boost::optional<ColId> edgeToCol(Edge e) const {
         auto i = m_edgeMap.left.find(e);
-        assert(i != m_edgeMap.left.end());
-        return i->second;
+        if (i != m_edgeMap.left.end()) {
+            return boost::optional<ColId>(i->second);
+        }
+        else {
+            return boost::optional<ColId>();
+        }
     }
 
     const EdgeMap & getEdgeMap() const {
@@ -184,7 +182,6 @@ private:
     
     EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
-    EdgeList        m_edgeList;
     VertexMap       m_vertexMap;
     VertexList      m_vertexList;
     
@@ -312,9 +309,7 @@ private:
     template <typename Problem, typename LP>
     void addVariables(Problem & problem, LP & lp) {
         for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
-            auto eIdx = problem.addEdge(e);
-            std::string colName = getEdgeName(eIdx);
-            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1, colName);
+            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1);
             problem.bindEdgeToCol(e, col);
         }
     }
@@ -336,7 +331,9 @@ private:
             auto adjEdges = out_edges(v, g);
             
             for(auto e : boost::make_iterator_range(adjEdges)) {
-                lp.addConstraintCoef(rowIdx, problem.edgeToCol(e));
+                auto colId = problem.edgeToCol(e);
+                assert(colId);
+                lp.addConstraintCoef(rowIdx, *colId);
             }
         }
     }
@@ -375,8 +372,8 @@ struct BDMSTSetSolution {
     template <typename Problem, typename GetSolution>
     void operator()(Problem & problem, const GetSolution & solution) {
         for (auto edgeAndCol : problem.getOriginalEdgesMap()) {
-            if(m_compare.e(solution(edgeAndCol.second), 1)) {
-                problem.addToResultSpanningTree(edgeAndCol.first);
+            if (m_compare.e(solution(edgeAndCol.first), 1)) {
+                problem.addToResultSpanningTree(edgeAndCol.second);
             }
         }
     }

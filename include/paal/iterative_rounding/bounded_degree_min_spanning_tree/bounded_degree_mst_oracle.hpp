@@ -64,12 +64,12 @@ public:
     void addViolatedConstraint(Problem & problem, LP & lp) {
         lp.addRow(UP, 0, m_violatingSetSize - 1);
         
-        for (auto const & e : problem.getEdgeMap()) {
-            const Vertex & u = source(e.left, m_g);
-            const Vertex & v = target(e.left, m_g);
+        for (auto const & e : problem.getEdgeMap().right) {
+            const Vertex & u = source(e.second, m_g);
+            const Vertex & v = target(e.second, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
-                ColId colIdx = e.right;
+                ColId colIdx = e.first;
                 lp.addNewRowCoef(colIdx);
             }
         }
@@ -182,13 +182,13 @@ private:
         m_rev = get(boost::edge_reverse, m_auxGraph);
         m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
         
-        for (auto const & e : problem.getEdgeMap()) {
-            ColId colIdx = e.right;
+        for (auto const & e : problem.getEdgeMap().right) {
+            ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx) / 2;
             
             if (!problem.getCompare().e(colVal, 0)) {
-                Vertex u = source(e.left, m_g);
-                Vertex v = target(e.left, m_g);
+                Vertex u = source(e.second, m_g);
+                Vertex v = target(e.second, m_g);
                 addEdge(u, v, colVal);
             }
         }
@@ -248,14 +248,14 @@ private:
      * @tparam TrgVertex
      */
     template <typename Problem, typename LP>
-    double degreeOf(Problem &problem, const Vertex & v, const LP & lp) {
+    double degreeOf(Problem & problem, const Vertex & v, const LP & lp) {
         double res = 0;
         auto adjEdges = out_edges(v, m_g);
             
         for (Edge e : boost::make_iterator_range(adjEdges)) {
-            auto i = problem.getEdgeMap().left.find(e);
-            if(i != problem.getEdgeMap().left.end()) {
-                res += lp.getColPrim(i->second);
+            auto colId = problem.edgeToCol(e);
+            if (colId) {
+                res += lp.getColPrim(*colId);
             }
         }
         return res;
@@ -283,7 +283,7 @@ private:
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
         
-        if (violation > minViolation && !problem.getCompare().e(violation, 0)) {
+        if (problem.getCompare().g(violation, minViolation)) {
             violated = true;
             m_violatingSetSize = 0;
             
