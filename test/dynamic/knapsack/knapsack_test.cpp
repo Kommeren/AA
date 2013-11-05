@@ -20,8 +20,8 @@
 #include "paal/utils/floating.hpp"
 
 #include "utils/logger.hpp"
+#include "utils/knapsack_tags_utils.hpp"
 
-namespace pd = paal::detail;
 using namespace paal;
 
 
@@ -78,47 +78,14 @@ BOOST_AUTO_TEST_CASE(Knapsack) {
     check(maxValue, result, pd::NoZeroOneTag());
 }
 
-template <typename T>
-std::string to_string(T) {
-    return "";
-}
-
-std::string to_string(pd::IntegralValueAndSizeTag) {
-    return "value and size";
-}
-
-std::string to_string(pd::IntegralValueTag) {
-    return "value";
-}
-
-std::string to_string(pd::IntegralSizeTag) {
-    return "size";
-}
-
-std::string to_string(pd::NoRetrieveSolutionTag) {
-    return "without output";
-}
-
-std::string to_string(pd::ZeroOneTag) {
-    return "0/1";
-}
-
 
 template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = pd::RetrieveSolutionTag> 
 void detail_knapsack() {
     std::vector<int> result;
-    LOGLN("Knapsack " << to_string(IsZeroOne())  <<  " on " + to_string(IntegralTag()) + " " + to_string(RetrieveSolution()));
-    auto maxValue = pd::knapsack(std::begin(objects), std::end(objects), 
-            capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
-            valuesFunctor,
-            IsZeroOne(),
-            IntegralTag(),
-            RetrieveSolution());
-
+    auto maxValue = detail_knapsack<IntegralTag, IsZeroOne, RetrieveSolution>(objects, capacity, result, sizesFunctor, valuesFunctor);
     check(maxValue, result, IsZeroOne());
 }
+
 
 
 BOOST_AUTO_TEST_CASE(KnapsackOverloads) {

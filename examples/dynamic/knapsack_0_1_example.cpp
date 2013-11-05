@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-09-20
  */
-#ifndef KNAPSACK_0_1_CPP
-#define KNAPSACK_0_1_CPP 
 
 #include <vector>
 #include <boost/range/irange.hpp>
@@ -37,5 +35,3 @@ int main() {
     return 0;
 }
 
-
-#endif /* KNAPSACK_0_1_CPP */
