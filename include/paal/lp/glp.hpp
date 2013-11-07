@@ -31,7 +31,8 @@ namespace ir {
 class GLPBase {
 public:
     GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
-        m_lp(glp_create_prob()), m_totalColNr(0), m_totalRowNr(0) {
+            m_lp(glp_create_prob()), m_totalColNr(0), m_totalRowNr(0) {
+        glp_term_out(GLP_OFF);
         glp_create_index(m_lp);
         initVec(m_row, numberOfNonZerosInMatrix);
         initVec(m_col, numberOfNonZerosInMatrix);
@@ -56,14 +57,15 @@ public:
         glp_set_obj_dir(m_lp, GLP_MIN);
     }
     
-    ProblemType solveToExtremePointPrimal() {
+    ProblemType solveToExtremePoint() {
         m_glpkControl.meth = GLP_PRIMAL;
-        return solveToExtremePoint();
+        glp_adv_basis(m_lp, 0);
+        return runSimplex();
     }
 
-    ProblemType solveToExtremePointDual() {
+    ProblemType resolveToExtremePoint() {
         m_glpkControl.meth = GLP_DUAL;
-        return solveToExtremePoint();
+        return runSimplex();
     }
 
     double getObjValue() const {
@@ -131,8 +133,7 @@ public:
     
 protected:
 
-    ProblemType solveToExtremePoint() {
-        glp_adv_basis(m_lp, 0);
+    ProblemType runSimplex() {
         int ret = glp_simplex(m_lp, &m_glpkControl);
         assert(ret == 0);
         return getPrimalType();

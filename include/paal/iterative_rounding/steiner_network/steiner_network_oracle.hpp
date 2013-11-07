@@ -11,6 +11,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 #include <boost/bimap.hpp>
+#include <unordered_set>
 
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/utils/floating.hpp"
@@ -20,7 +21,41 @@
 namespace paal {
 namespace ir {
 
-template <typename Graph, typename Restrictions, typename ResultNetworkSet>
+struct FindMostViolated {
+    template <typename Problem, typename Oracle>
+    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
+        return oracle.findMostViolatedConstraint(problem);
+    };
+};
+
+struct FindAnyViolated {
+    template <typename Problem, typename Oracle>
+    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
+        return oracle.findAnyViolatedConstraint(problem);
+    };
+};
+
+struct FindRandViolated {
+    template <typename Problem, typename Oracle>
+    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
+        return oracle.findAnyViolatedConstraint(problem, rand() % restrictionsNum);
+    };
+};
+
+template <typename FindViolated = FindRandViolated>
+class SteinerNetworkOracleComponents {
+public:
+    template <typename Problem, typename Oracle>
+    bool findViolated(Problem & problem, Oracle & oracle, int restrictionsNum) {
+        return m_findViolated(problem, oracle, restrictionsNum);
+    };
+
+private:
+    FindViolated m_findViolated;
+};
+
+template <typename Graph, typename Restrictions, typename ResultNetworkSet,
+            typename OracleComponents = SteinerNetworkOracleComponents<>>
 class SteinerNetworkOracle {
     typedef utils::Compare<double> Compare;
 public:
@@ -41,9 +76,13 @@ public:
 
     template <typename Problem>
     bool checkIfSolutionExists(Problem & problem) {
-        for (auto const & e : problem.getEdgeMap()) {
-            Vertex u = source(e.second, m_g);
-            Vertex v = target(e.second, m_g);
+        remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
+        m_cap = get(boost::edge_capacity, m_auxGraph);
+        m_rev = get(boost::edge_reverse, m_auxGraph);
+
+        for (auto const & e : boost::make_iterator_range(edges(m_g))) {
+            Vertex u = source(e, m_g);
+            Vertex v = target(e, m_g);
             addEdge(u, v, 1);
         }
         return !findAnyViolatedConstraint(problem);
@@ -52,8 +91,7 @@ public:
     template <typename Problem, typename LP>
     bool feasibleSolution(Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
-        // TODO other heuristics?
-        return !findMostViolatedConstraint(problem);
+        return !m_oracleComponents.findViolated(problem, *this, m_restrictionsVec.size());
     }
     
     template <typename Problem, typename LP>
@@ -63,7 +101,7 @@ public:
         for (auto const & e : problem.getEdgeMap()) {
             const Vertex & u = source(e.second, m_g);
             const Vertex & v = target(e.second, m_g);
-                
+
             if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
                 (m_violatingSet.find(v) != m_violatingSet.end())) {
                     lp.addNewRowCoef(e.first);
@@ -71,6 +109,40 @@ public:
         }
         
         lp.loadNewRow();
+    }
+
+    template <typename Problem>
+    bool findAnyViolatedConstraint(Problem & problem, int startIndex = 0) {
+        auto startIter = m_restrictionsVec.begin();
+        std::advance(startIter, startIndex);
+
+        for (auto const & src_trg : boost::make_iterator_range(startIter, m_restrictionsVec.end())) {
+            assert(src_trg.first != src_trg.second);
+            if (problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
+                return true;
+            }
+        }
+
+        for (auto const & src_trg : boost::make_iterator_range(m_restrictionsVec.begin(), startIter)) {
+            assert(src_trg.first != src_trg.second);
+            if (problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    template <typename Problem>
+    bool findMostViolatedConstraint(Problem & problem) {
+        double max = 0;
+
+        for (auto const & src_trg : m_restrictionsVec) {
+            assert(src_trg.first != src_trg.second);
+            max = std::max(checkViolationBiggerThan(problem, src_trg.first, src_trg.second, max), max);
+        }
+
+        return problem.getCompare().g(max, 0);
     }
 
 private:
@@ -92,16 +164,14 @@ private:
                                                         >
                                                     >
                                   > AuxGraph;
-    typedef std::vector < AuxEdge > AuxEdgeList;
-    typedef std::set < AuxVertex > ViolatingSet;
+    typedef std::unordered_set < AuxVertex > ViolatingSet;
                                   
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
         remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
-        m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
-        
+
         for (auto const & e : problem.getEdgeMap()) {
             ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx);
@@ -119,98 +189,73 @@ private:
             addEdge(u, v, 1);
         }
     }
-    
+
     template <typename SrcVertex, typename TrgVertex>
     AuxEdge addEdge(const SrcVertex & vSrc, const TrgVertex & vTrg, double cap) {
         bool b, bRev;
         AuxEdge e, eRev;
-        
+
         std::tie(e, b) = add_edge(vSrc, vTrg, m_auxGraph);
         std::tie(eRev, bRev) = add_edge(vTrg, vSrc, m_auxGraph);
-        
+
         assert(b && bRev);
-        
+
         m_cap[e] = cap;
         m_cap[eRev] = cap;
-        
+
         m_rev[e] = eRev;
         m_rev[eRev] = e;
-        
+
         return e;
     }
-   
-    template <typename Problem>
-    bool findAnyViolatedConstraint(Problem & problem) {
-        // TODO random source node
-        
-        for (auto const & src_trg : m_restrictionsVec) {
-            assert(src_trg.first != src_trg.second);
-            if(problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    template <typename Problem>
-    bool findMostViolatedConstraint(Problem & problem) {
-        double max = 0;
-
-        for (auto const & src_trg : m_restrictionsVec) {
-            assert(src_trg.first != src_trg.second);
-            max = std::max(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), max);
-        }
-        
-        return problem.getCompare().g(max, 0);
-    }
 
     template <typename Problem>
-    double checkViolationBiggerThan(Problem & problem, Vertex  src, Vertex trg, double maximumViolation = 0) {
+    double checkViolationBiggerThan(Problem & problem, Vertex src, Vertex trg,
+                double minViolation = 0.) {
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
-        double restriction = m_restrictions(src, trg);
+        double restriction = std::max(m_restrictions(src, trg), m_restrictions(trg, src));
         double violation = restriction - minCut;
-        
-        if (problem.getCompare().g(violation, maximumViolation)) {
+
+        if (problem.getCompare().g(violation, minViolation)) {
             m_violatedRestriction = restriction;
             m_violatingSet.clear();
-            maximumViolation = violation;
             
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, src);
+            assert(srcColor != get(colors, trg));
             for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
-                if (get(colors, v) == srcColor) {
+                if (v != trg && get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }
             }
         }
 
         return violation;
-        
     }
-    
-    const Graph &  m_g;
+
+    OracleComponents m_oracleComponents;
+
+    const Graph & m_g;
     
     const Restrictions & m_restrictions;
     RestrictionsVector m_restrictionsVec;
     
     AuxGraph    m_auxGraph;
-    
-    
+
     ViolatingSet        m_violatingSet;
     Dist                m_violatedRestriction;
     
     const ResultNetworkSet &  m_resultNetwork;
     
-    boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
-    boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
-    boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
+    boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
+    boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
 };
 
-template <typename Graph, typename Restrictions, typename ResultNetworkSet>
-SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet>
+template <typename OracleComponents = SteinerNetworkOracleComponents<>,
+            typename Graph, typename Restrictions, typename ResultNetworkSet>
+SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet, OracleComponents>
 make_SteinerNetworkSeparationOracle(const Graph & g, const Restrictions & restrictions, const ResultNetworkSet & res) {
-    return SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet>(g, restrictions, res);
+    return SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet, OracleComponents>(g, restrictions, res);
 }
 
 

@@ -39,6 +39,30 @@ int restrictions(int i, int j) {
     return 2;
 }
 
+template <typename FindViolated = paal::ir::FindRandViolated, typename Restrictions>
+void runTest(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
+    namespace ir = paal::ir;
+
+    typedef std::set<Edge> ResultNetwork;
+    typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
+    typedef ir::SteinerNetworkOracle<Graph, Restrictions, ResultNetwork,
+        OracleComponents> Oracle;
+    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, ResultNetwork,
+        ir::RowGenerationSolveLP<Oracle>> Components;
+
+    ResultNetwork resultNetwork;
+    Oracle oracle(g, restrictions, resultNetwork);
+    Components components(make_RowGenerationSolveLP(oracle));
+    auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions, costs,
+                                                    resultNetwork));
+    auto invalid = steinerNetwork.checkInputValidity();
+    BOOST_CHECK(!invalid);
+
+    auto probType = ir::solve_iterative_rounding(steinerNetwork,
+                        std::move(components));
+    BOOST_CHECK(probType == ir::OPTIMAL);
+}
+
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
     std::string testDir = "test/data/BOUNDED_DEGREE_MST/";
     std::ifstream is_test_cases("test/data/STEINER_NETWORK/cases.txt");
@@ -69,16 +93,26 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         Cost costs      = get(boost::edge_weight, g);
         Bound degBounds = get(boost::vertex_degree, g);
         Index indices   = get(boost::vertex_index, g);
-        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-        typedef std::set<Edge> ResultNetwork;
-        ResultNetwork resultNetwork;
         
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics
-        auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-        paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
-        auto probType = paal::ir::steiner_network_iterative_rounding(g, restrictions, costs, resultNetwork, std::move(comps));
-        BOOST_CHECK(probType == paal::ir::OPTIMAL);
+        for (int i : boost::irange(0, 5)) {
+            LOGLN("random violated, seed " << i);
+            srand(i);
+            runTest(g, costs, restrictions);
+        }
+
+        // non-default heuristics
+        if (verticesNum <= 80) {
+            LOGLN("most violated");
+            runTest<paal::ir::FindMostViolated>(g, costs, restrictions);
+        }
+
+        // non-default heuristics (slow, only for smaller instances)
+        if (verticesNum < 50) {
+            LOGLN("any violated");
+            runTest<paal::ir::FindAnyViolated>(g, costs, restrictions);
+        }
     }
 }

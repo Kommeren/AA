@@ -133,7 +133,7 @@ struct RoundConditionGreaterThanHalf  :
 struct DefaultSolveLPToExtremePoint {
     template <typename Problem, typename LP>
     ProblemType operator()(Problem &, LP & lp) {
-        return lp.solveToExtremePointPrimal();
+        return lp.solveToExtremePoint();
     };
 };
 

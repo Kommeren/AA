@@ -20,10 +20,10 @@ public:
   
     template <typename Problem, typename LP>
     ProblemType operator()(const Problem & problem, LP & lp) {
-        auto probType = lp.solveToExtremePointPrimal();
+        auto probType = lp.solveToExtremePoint();
         while (probType == OPTIMAL && !m_oracle.feasibleSolution(problem, lp)) {
             m_oracle.addViolatedConstraint(problem, lp);
-            probType = lp.solveToExtremePointPrimal();
+            probType = lp.resolveToExtremePoint();
         }
         return probType;
     }

@@ -134,15 +134,21 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics
-        runTest(g, costs, degBounds, verticesNum, bestCost);
+        for (int i : boost::irange(0, 5)) {
+            LOGLN("random violated, seed " << i);
+            srand(i);
+            runTest(g, costs, degBounds, verticesNum, bestCost);
+        }
 
         // non-default heuristics
         if (verticesNum <= 80) {
+            LOGLN("most violated");
             runTest<paal::ir::FindMostViolated>(g, costs, degBounds, verticesNum, bestCost);
         }
 
         // non-default heuristics (slow, only for smaller instances)
         if (verticesNum <= 60) {
+            LOGLN("any violated");
             runTest<paal::ir::FindAnyViolated>(g, costs, degBounds, verticesNum, bestCost);
         }
     }

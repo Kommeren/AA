@@ -31,7 +31,9 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    BoundedDegreeMSTOracle(const Graph & g) : m_g(g)  { }
+    BoundedDegreeMSTOracle(const Graph & g) : m_g(g)
+    { }
+
 
     /**
      * @brief checks if the current LP solution is feasible
@@ -69,8 +71,7 @@ public:
             const Vertex & v = target(e.second, m_g);
             
             if (m_violatingSet[u] && m_violatingSet[v]) {
-                ColId colIdx = e.first;
-                lp.addNewRowCoef(colIdx);
+                lp.addNewRowCoef(e.first);
             }
         }
         
@@ -90,18 +91,16 @@ public:
         std::advance(vert.first, srcVertexIndex);
         auto src = *(vert.first);
         assert(src != m_src && src != m_trg);
-        
-        std::pair<bool, double> violation;
-                
+
         for (const Vertex & trg : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(problem, src, trg);
-                if (violation.first) {
+                if (problem.getCompare().g(
+                        checkViolationGreaterThan(problem, src, trg), 0)) {
                     return true;
                 }
-                
-                violation = checkViolationGreaterThan(problem, trg, src);
-                if (violation.first) {
+
+                if (problem.getCompare().g(
+                        checkViolationGreaterThan(problem, trg, src), 0)) {
                     return true;
                 }
             }
@@ -120,27 +119,18 @@ public:
         auto src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
         
-        bool violatedConstraintFound = false;
         double maximumViolation = 0;
-        std::pair<bool, double> violation;
         
         for (const Vertex & trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
-                violation = checkViolationGreaterThan(problem, src, trg, maximumViolation);
-                maximumViolation = std::max(maximumViolation, violation.second);
-                if (violation.first) {
-                    violatedConstraintFound = true;
-                }
-                
-                violation = checkViolationGreaterThan(problem, trg, src, maximumViolation);
-                maximumViolation = std::max(maximumViolation, violation.second);
-                if (violation.first) {
-                    violatedConstraintFound = true;
-                }
+                maximumViolation = std::max(maximumViolation,
+                    checkViolationGreaterThan(problem, src, trg, maximumViolation));
+                maximumViolation = std::max(maximumViolation,
+                    checkViolationGreaterThan(problem, trg, src, maximumViolation));
             }
         }
-        
-        return violatedConstraintFound;
+
+        return problem.getCompare().g(maximumViolation, 0);
     }
 
 private:
@@ -160,7 +150,7 @@ private:
                                                     >
                                   > AuxGraph;
     typedef std::vector < AuxEdge > AuxEdgeList;
-    typedef std::map < AuxVertex, bool > ViolatingSet;
+    typedef std::unordered_map < AuxVertex, bool > ViolatingSet;
     
     /**
      * @brief creates the auxiliary directed graph used for feasibility testing
@@ -170,18 +160,13 @@ private:
      */
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
-        int numVertices(num_vertices(m_g));
-        
-        m_auxGraph.clear();
-        m_srcToV.resize(numVertices);
-        m_vToTrg.resize(numVertices);
-        
-        AuxGraph tmpGraph(numVertices);
-        std::swap(tmpGraph, m_auxGraph);
+        m_auxGraph = AuxGraph(num_vertices(m_g));
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
-        m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
-        
+
+        m_srcToV.resize(num_vertices(m_g));
+        m_vToTrg.resize(num_vertices(m_g));
+
         for (auto const & e : problem.getEdgeMap().right) {
             ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx) / 2;
@@ -266,13 +251,13 @@ private:
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @param minViolation minimum violation that a set should have to be saved
-     * @return a pair of bool (if a violated set was found) and the violation of the found set
+     * @return violation of the found set
      */
     template <typename Problem>
-    std::pair<bool, double> checkViolationGreaterThan(Problem & problem, const Vertex & src, const Vertex & trg, double minViolation = 0) {
+    double checkViolationGreaterThan(Problem & problem, Vertex src, Vertex trg,
+                double minViolation = 0.) {
         int numVertices(num_vertices(m_g));
         double origVal = get(m_cap, m_srcToV[src]);
-        bool violated = false;
 
         put(m_cap, m_srcToV[src], numVertices);
         // capacity of srcToV[trg] does not change
@@ -284,7 +269,6 @@ private:
         double violation = numVertices - 1 - minCut;
         
         if (problem.getCompare().g(violation, minViolation)) {
-            violated = true;
             m_violatingSetSize = 0;
             
             auto colors = get(boost::vertex_color, m_auxGraph);
@@ -306,27 +290,26 @@ private:
         put(m_cap, m_vToTrg[src], 1);
         put(m_cap, m_vToTrg[trg], 1);
         
-        return std::make_pair(violated, violation);
+        return violation;
     }
     
     
-    OracleComponents    m_oracleComponents;
+    OracleComponents m_oracleComponents;
     
-    const Graph &               m_g;
+    const Graph & m_g;
     
-    AuxGraph    m_auxGraph;
-    Vertex      m_src;
-    Vertex      m_trg;
+    AuxGraph m_auxGraph;
+    Vertex   m_src;
+    Vertex   m_trg;
     
-    AuxEdgeList       m_srcToV;
-    AuxEdgeList       m_vToTrg;
+    AuxEdgeList  m_srcToV;
+    AuxEdgeList  m_vToTrg;
     
-    ViolatingSet        m_violatingSet;
-    int                 m_violatingSetSize;
+    ViolatingSet m_violatingSet;
+    int          m_violatingSetSize;
     
-    boost::property_map < AuxGraph, boost::edge_capacity_t >::type              m_cap;
-    boost::property_map < AuxGraph, boost::edge_reverse_t >::type               m_rev;
-    boost::property_map < AuxGraph, boost::edge_residual_capacity_t >::type     m_resCap;
+    boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
+    boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
 };
 
 

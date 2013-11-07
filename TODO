@@ -6,14 +6,15 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** fix row generation
 ** framework documentation
-** tree_augmentation example
+** tree_augmentation, bdmst example
+** better tests for steiner network
 ** there is some common code in the steiner network and DBMST
-** primal/dual simplex (and other glpk settings?)
-** remove some debug output
+** improve row generation
 ** columns iterator is invalidated when we remove column (see relaxing code)
 ** LP formulation in separate deal
+** restriction(v, v) case in steiner network
+** resolve and stop_condition components in IR
 ** cost function
 ** complexities
 ** removing rows/cols strategy

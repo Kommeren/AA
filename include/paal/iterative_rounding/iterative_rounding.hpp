@@ -154,7 +154,6 @@ private:
     Problem & m_problem;
 };
 
-//TODO add resolve
 template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
 ProblemType solve_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
     IterativeRounding<Problem, IRComponents, Visitor, LPBase> ir(problem, std::move(components), std::move(vis));
@@ -173,9 +172,9 @@ ProblemType solve_iterative_rounding(Problem & problem, IRComponents components,
     return OPTIMAL;
 }
 
-template <typename Solution, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
-ProblemType solve_dependent_iterative_rounding(Solution& solution, IRComponents components, Visitor vis = Visitor()) {
-    IterativeRounding<Solution, IRComponents, Visitor, LPBase> ir(solution, std::move(components), std::move(vis));
+template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = GLP>
+ProblemType solve_dependent_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
+    IterativeRounding<Problem, IRComponents, Visitor, LPBase> ir(problem, std::move(components), std::move(vis));
     do {
         auto probType = ir.solveLPToExtremePoint();
         if (probType != OPTIMAL) {

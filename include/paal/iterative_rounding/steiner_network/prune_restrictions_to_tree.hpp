@@ -22,10 +22,8 @@ template <typename G>
         EdgeToVertexPairsIterator(const G & g, RestrictionsVector & resVec) :
             m_restrictionsVec(&resVec), m_g(&g) {}
 
-
         void operator()(Edge e) {
             m_restrictionsVec->push_back(std::make_pair(source(e, *m_g), target(e, *m_g)));
-            m_restrictionsVec->back();
         }
 
         RestrictionsVector * m_restrictionsVec;
@@ -34,16 +32,16 @@ template <typename G>
 
 
 template <typename Restrictions>
-    RestrictionsVector pruneRestrictionsToTree(Restrictions res,  int N) {
+    RestrictionsVector pruneRestrictionsToTree(Restrictions res, int N) {
         typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
         typedef boost::property < boost::edge_weight_t, Dist> EdgeProp;
         typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                boost::no_property,  EdgeProp> TGraph;
+                boost::no_property, EdgeProp> TGraph;
 
         RestrictionsVector resVec;
         TGraph g(N);
-        for(int i : boost::irange(0, N)) {
-            for(int j : boost::irange(i, N)) {
+        for (int i : boost::irange(0, N)) {
+            for (int j : boost::irange(i + 1, N)) {
                 add_edge(i, j, 
                         EdgeProp(-std::max(res(i, j), res(j, i))),  g);
             }
@@ -55,7 +53,6 @@ template <typename Restrictions>
                 boost::make_function_output_iterator(addEdge));
         return std::move(resVec);
     }
-
 
 }
 
