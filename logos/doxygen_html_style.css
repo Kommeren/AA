@@ -1,0 +1,9 @@
+div.image img
+{
+    width: 100px; 
+    display:inline-block;
+    margin:6px;
+    border:1px solid #ffffff;
+    float:left;
+}
+

@@ -1,4 +1,9 @@
-/*! \mainpage This is the Practical Approximation Algorithms library. 
+/*! \mainpage This is the Practical Approximation Algorithms library.
+  \image html LOGO-ERC.jpg
+  \image html FP7-ide-RGB.jpg
+
+<!-- Not very nice solution...-->
+  \n   \n   \n   \n   \n
  
   \section Introduction
     The PAAl is a header-only, generic library consisting of approximation algorithms, 
