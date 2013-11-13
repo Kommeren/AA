@@ -1,2 +1,2 @@
-set(BOOST_ROOT /home/wygos/libs/boost_1_52_0/)
+set(BOOST_ROOT /home/wygos/libs/boost_1_55_0/)
 

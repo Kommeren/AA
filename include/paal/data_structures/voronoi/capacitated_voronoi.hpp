@@ -11,10 +11,10 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/graph/successive_shortest_path_nonnegative_weights.hpp>
+#include <boost/graph/find_flow_cost.hpp>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
-#include "paal/min_cost_max_flow/successive_shortest_path.hpp"
-#include "paal/min_cost_max_flow/find_flow_cost.hpp"
 
 
 namespace paal {
@@ -183,8 +183,8 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
-                predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t,                              
+                predecessor_map(&m_pred[0]).distance_map(&m_dist[0]).distance_map2(&m_dist_prev[0]));
                                                                     
 
         return getCost() - costStart;
@@ -218,8 +218,8 @@ public:
         remove_vertex(genGraph, m_g);
         restoreIndex();
         
-        boost::successive_shortest_path(m_g, m_s, m_t,                                 //not in boost yet 
-                predecessor_map(&m_pred[0]).distance_map(&m_dist[0])/*.distance_map2(&m_dist_prev[0])*/);
+        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t, 
+                predecessor_map(&m_pred[0]).distance_map(&m_dist[0]).distance_map2(&m_dist_prev[0]));
                                                                     
 
         return getCost() - costStart;

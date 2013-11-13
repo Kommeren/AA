@@ -4,6 +4,7 @@ For more detals see:
 http://www.cmake.org/
 The project was teseted with cmake version 2.8.9.
 The minimal version of g++ is 4.7.2.
+The minimal version of boost is 1.55.
 
 
 In order to build automatic documentation run doxygen in the paal root directory.
