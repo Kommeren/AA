@@ -85,7 +85,7 @@ public:
                 }
             }
         }
-        return std::move(answer);
+        return answer;
     }
 
 private:

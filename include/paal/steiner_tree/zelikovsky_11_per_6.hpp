@@ -110,7 +110,7 @@ public:
                 sc);
 
         uniqueRes(res);
-        return std::move(res); 
+        return res; 
     }
 
 private:

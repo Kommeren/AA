@@ -32,7 +32,7 @@ std::vector<Time> ingen(int machinesLeft,double minJobsOnMachine){
             time-=jobTime;
         }
     }
-    return std::move(jobs);
+    return jobs;
 }
 
 BOOST_AUTO_TEST_CASE(test_1) {

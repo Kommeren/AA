@@ -51,7 +51,7 @@ template <typename Restrictions>
 
         boost::kruskal_minimum_spanning_tree(g, 
                 boost::make_function_output_iterator(addEdge));
-        return std::move(resVec);
+        return resVec;
     }
 
 }
