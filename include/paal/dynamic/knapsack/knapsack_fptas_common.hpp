@@ -7,6 +7,9 @@
  */
 #ifndef KNAPSACK_FPTAS_COMMON_HPP
 #define KNAPSACK_FPTAS_COMMON_HPP 
+
+#include "paal/dynamic/knapsack/get_lower_bound.hpp"
+
 namespace paal {
 namespace detail {
 
@@ -34,13 +37,13 @@ knapsack_general_on_value_fptas(double epsilon, ObjectsIter oBegin,
     }
     
     double maxValue = detail::getValueLowerBound(oBegin, oEnd, capacity, value, size, is_0_1_Tag); 
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue);
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, maxValue, value, is_0_1_Tag);
 
     if(!multiplier) {
         return knapsack_check_integrality(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, retrieveSolution);
     }
     
-    auto newValue = [=](ObjectRef obj){return ValueType(double(value(obj)) * *multiplier); };
+    auto newValue = utils::make_ScaleFunctor<double, ValueType>(value, *multiplier);
     auto ret = knapsack_check_integrality(oBegin, oEnd, capacity, out, size, newValue, is_0_1_Tag, retrieveSolution);
     return std::make_pair(ValueType(double(ret.first) / *multiplier), ret.second);
 }
@@ -68,14 +71,16 @@ knapsack_general_on_size_fptas(double epsilon, ObjectsIter oBegin,
         return ReturnType();
     }
     
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity);
+    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity, size, is_0_1_Tag);
 
     if(!multiplier) {
         return knapsack_check_integrality(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, retrieveSolution);
     }
+
+    std::cout << "multiplier " << *multiplier << std::endl;
     
-    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * *multiplier); };
-    auto ret = knapsack_check_integrality(oBegin, oEnd, SizeType(capacity / *multiplier), out, 
+    auto newSize = utils::make_ScaleFunctor<double, SizeType>(size, *multiplier);
+    auto ret = knapsack_check_integrality(oBegin, oEnd, SizeType(capacity * *multiplier), out, 
                 newSize, value, is_0_1_Tag, retrieveSolution);
     return ReturnType(ret.first, double(ret.second) / *multiplier);
 }

@@ -8,7 +8,7 @@ TODO this is not consistant
 
 \section solkd Solution
 Both variants of Knapsack are solved using standard dynamic approach on modified size or values.
-When the values are modified we get standard \f$(1+\epsilon)\f$ approximation of the knapsack problem.
+When the values are modified we get standard \f$(1-\epsilon)\f$ approximation of the knapsack problem.
 When the sizes are modified we get the optimal value of the knapsack but capacity can be  exceeded by \f$(1+\epsilon)\f$.
 In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
 

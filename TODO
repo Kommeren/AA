@@ -1,4 +1,5 @@
-* check existing algorithms on more sophisticated metrics (e.g. metric that take nonintegral)
+* remove std::move() on returns
+* knapsack (not 0/1) fptas is not realy fptas
 * doxygen does not see some of the references 
     (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. ) 
 * set up jenkins (run automatic tests, tests different builds and compilers)
@@ -6,6 +7,7 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
+** lp documentation
 ** framework documentation
 ** tree_augmentation, bdmst example
 ** better tests for steiner network
@@ -27,5 +29,5 @@
 ** k-center
 ** the multiway cut
 ** the k multi way cut
-** steiner forest (conjecture) (Piotr W.)
+** steiner forest (conjecture) 
 

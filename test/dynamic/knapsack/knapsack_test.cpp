@@ -38,31 +38,39 @@ static const double EPSILON = 1./4.;
 static const double VALUE_MULTIPLIER = 1. - EPSILON;
 static const double SIZE_MULTIPLIER = 1. + EPSILON;
 static const utils::Compare<double> compare(0.001);
+
     
 template <typename MaxValue> 
-void check(MaxValue maxValue, const std::vector<int> & result, pd::NoZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
+void check(MaxValue maxValue, pd::NoZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
     BOOST_CHECK(compare.ge(maxValue.first, OPT * valMultiplier));
     BOOST_CHECK(compare.ge(OPT_CAP * capMultiplier, maxValue.second));
-    LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
-    LOG_COPY_DEL(result.begin(), result.end(), " ");
-    LOGLN("");
 }
 
 template <typename MaxValue> 
-void check_no_output(MaxValue maxValue, const std::vector<int> & result, pd::ZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
+void check(MaxValue maxValue, pd::ZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
     BOOST_CHECK(compare.ge(maxValue.first, OPT_0_1 * valMultiplier));
     BOOST_CHECK(compare.ge(OPT_CAP * capMultiplier, maxValue.second));
-    LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
-    LOGLN("");
 }
 
-template <typename MaxValue> 
-void check(MaxValue maxValue, const std::vector<int> & result, pd::ZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
-    BOOST_CHECK(compare.ge(maxValue.first, OPT_0_1 * valMultiplier));
-    BOOST_CHECK(compare.ge(OPT_CAP * capMultiplier, maxValue.second));
-    LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
-    LOG_COPY_DEL(result.begin(), result.end(), " ");
-    LOGLN("");
+
+
+template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = pd::RetrieveSolutionTag> 
+void detail_knapsack_and_check() {
+    auto maxValue = detail_knapsack<IntegralTag, IsZeroOne, RetrieveSolution>(objects, capacity, sizesFunctor, valuesFunctor);
+    check(maxValue, IsZeroOne());
+}
+
+
+BOOST_AUTO_TEST_CASE(KnapsackOverloads) {
+    detail_knapsack_and_check<pd::IntegralValueTag,        pd::NoZeroOneTag>();
+    detail_knapsack_and_check<pd::IntegralSizeTag,         pd::NoZeroOneTag>();
+    detail_knapsack_and_check<pd::IntegralValueAndSizeTag, pd::NoZeroOneTag>();
+    detail_knapsack_and_check<pd::IntegralValueTag,        pd::ZeroOneTag, pd::RetrieveSolutionTag>();
+    detail_knapsack_and_check<pd::IntegralSizeTag,         pd::ZeroOneTag, pd::RetrieveSolutionTag>();
+    detail_knapsack_and_check<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::RetrieveSolutionTag>();
+    detail_knapsack_and_check<pd::IntegralValueTag,        pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
+    detail_knapsack_and_check<pd::IntegralSizeTag,         pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
+    detail_knapsack_and_check<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
 }
 
 //Knapsack 
@@ -75,29 +83,8 @@ BOOST_AUTO_TEST_CASE(Knapsack) {
             sizesFunctor, 
             valuesFunctor);
 
-    check(maxValue, result, pd::NoZeroOneTag());
-}
-
-
-template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = pd::RetrieveSolutionTag> 
-void detail_knapsack() {
-    std::vector<int> result;
-    auto maxValue = detail_knapsack<IntegralTag, IsZeroOne, RetrieveSolution>(objects, capacity, result, sizesFunctor, valuesFunctor);
-    check(maxValue, result, IsZeroOne());
-}
-
-
-
-BOOST_AUTO_TEST_CASE(KnapsackOverloads) {
-    detail_knapsack<pd::IntegralValueTag,        pd::NoZeroOneTag>();
-    detail_knapsack<pd::IntegralSizeTag,         pd::NoZeroOneTag>();
-    detail_knapsack<pd::IntegralValueAndSizeTag, pd::NoZeroOneTag>();
-    detail_knapsack<pd::IntegralValueTag,        pd::ZeroOneTag, pd::RetrieveSolutionTag>();
-    detail_knapsack<pd::IntegralSizeTag,         pd::ZeroOneTag, pd::RetrieveSolutionTag>();
-    detail_knapsack<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::RetrieveSolutionTag>();
-    detail_knapsack<pd::IntegralValueTag,        pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
-    detail_knapsack<pd::IntegralSizeTag,         pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
-    detail_knapsack<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
+    check(maxValue, pd::NoZeroOneTag());
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
 }
 
 
@@ -110,7 +97,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
             std::back_inserter(result), 
             sizesFunctor, 
             valuesFunctor);
-    check(maxValue, result, pd::ZeroOneTag());
+    check(maxValue, pd::ZeroOneTag());
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
 }
 
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output) {
@@ -121,7 +109,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output) {
             sizesFunctor, 
             valuesFunctor);
 
-    check_no_output(maxValue, result, pd::ZeroOneTag());
+    check(maxValue, pd::ZeroOneTag());
+    printMaxValue(maxValue);
 }
 
 //Knapsack fptas value
@@ -134,7 +123,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_fptas_value) {
             sizesFunctor, 
             valuesFunctor);
 
-    check(maxValue, result, pd::NoZeroOneTag(), VALUE_MULTIPLIER);
+    check(maxValue, pd::NoZeroOneTag(), VALUE_MULTIPLIER);
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
 }
 
 //TODO this tests is very weak because it runs standard algorithm no fptas
@@ -148,7 +138,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_fptas_size) {
             sizesFunctor, 
             valuesFunctor);
 
-    check(maxValue, result, pd::NoZeroOneTag(), 1., SIZE_MULTIPLIER);
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
+    check(maxValue, pd::NoZeroOneTag(), 1., SIZE_MULTIPLIER);
 }
 
 //Knapsack 0/1: no output iterator size fptas
@@ -160,7 +151,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size_fptas) {
             sizesFunctor, 
             valuesFunctor);
 
-    check_no_output(maxValue, result, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);
+    check(maxValue, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);
+    printMaxValue(maxValue);
 }
 
 //Knapsack 0/1: no output iterator value fptas
@@ -172,7 +164,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_fptas) {
             sizesFunctor, 
             valuesFunctor);
 
-    check_no_output(maxValue, result, pd::ZeroOneTag(), VALUE_MULTIPLIER);
+    check(maxValue, pd::ZeroOneTag(), VALUE_MULTIPLIER);
+    printMaxValue(maxValue);
 }
 
 //Knapsack 0/1 value fptas
@@ -185,7 +178,8 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_value_fptas) {
             sizesFunctor, 
             valuesFunctor);
 
-    check(maxValue, result, pd::ZeroOneTag(), VALUE_MULTIPLIER);
+    check(maxValue, pd::ZeroOneTag(), VALUE_MULTIPLIER);
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
 }
 
 //Knapsack 0/1  size fptas
@@ -198,6 +192,7 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_size_fptas) {
             sizesFunctor, 
             valuesFunctor);
 
-    check(maxValue, result, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);
+    check(maxValue, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);
+    printResult(maxValue, result, pd::RetrieveSolutionTag());
 }
 

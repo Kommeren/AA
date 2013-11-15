@@ -99,13 +99,16 @@ template <typename Array>
     class ArrayToFunctor{
         public:
             ArrayToFunctor(const Array & array, int offset = 0) : 
-                m_array(array), m_offset(offset) {}
+                m_array(&array), m_offset(offset) {}
 
             typedef decltype(std::declval<const Array>()[0]) Value;
-            Value operator()(int a) const {return m_array[a + m_offset];}
+
+            Value operator()(int a) const {
+                return (*m_array)[a + m_offset];
+            }
 
         private:
-            const Array & m_array;
+            const Array * m_array;
             int m_offset;
     };
 
@@ -193,6 +196,29 @@ template <typename Functor,typename Compare = Less>
     make_FunctorToComparator(Functor functor,Compare compare=Compare()) {
         return FunctorToComparator<Functor,Compare>(std::move(functor), std::move(compare));
     };
+
+//Functor that scales another functor
+template <typename Functor, typename ScaleType, typename ReturnType = ScaleType>
+struct ScaleFunctor {
+
+    ScaleFunctor(Functor f, ScaleType s) : 
+        m_f(std::move(f)), m_s(s) {}
+
+    template <typename Arg>
+    ReturnType operator()(Arg && arg) const {
+        return m_s * m_f(std::forward<Arg>(arg));
+    }
+
+private: 
+    Functor m_f;
+    ScaleType m_s;
+};
+
+template <typename ScaleType, typename ReturnType = ScaleType, typename Functor>
+ScaleFunctor<Functor, ScaleType, ReturnType>
+make_ScaleFunctor(Functor f, ScaleType s) {
+    return ScaleFunctor<Functor, ScaleType, ReturnType>(f, s);
+}
 
 //****************************** This is set of functors representing standard boolean operation
 //that is !, &&, ||. These are equivalent to standard std:: structs but are not templated 

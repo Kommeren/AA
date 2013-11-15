@@ -67,23 +67,9 @@ knapsack_0_1_no_output_on_size_fptas(double epsilon, ObjectsIter oBegin,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size, 
         ObjectValueFunctor value) {
-    typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::SizeType SizeType;
-    typedef typename base::ReturnType ReturnType;
-    if(oBegin == oEnd) {
-        return ReturnType();
-    }
-    
-    auto multiplier = getMultiplier(oBegin, oEnd, epsilon, capacity);
-
-    if(!multiplier) {
-        return knapsack_0_1_no_output(oBegin, oEnd, capacity, size, value);
-    }
-    
-    auto newSize = [=](ObjectRef obj){return SizeType(double(size(obj)) * *multiplier); };
-    auto ret = knapsack_0_1_no_output(oBegin, oEnd, SizeType(capacity / *multiplier), newSize, value);
-    return ReturnType(ret.first, double(ret.second) / *multiplier);
+    auto out = boost::make_function_output_iterator(utils::SkipFunctor());
+    return detail::knapsack_general_on_size_fptas(epsilon, oBegin, oEnd, 
+            capacity, out, size, value, detail::ZeroOneTag(), detail::NoRetrieveSolutionTag());
 }
 
 } //paal

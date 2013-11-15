@@ -1,5 +1,5 @@
 /**
- * @file get_lower_bound.hpp
+ * @file get_upper_bound.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0

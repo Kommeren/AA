@@ -14,6 +14,8 @@ if(${USE_CLANG})
     
     #    ADD_DEFINITIONS("-stdlib=libc++")
     #    set(LIBS c++)
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
 endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)

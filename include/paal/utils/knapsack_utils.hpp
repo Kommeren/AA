@@ -75,6 +75,20 @@ template <typename ObjectsIter,
              boost::filter_iterator<ObjectsIter, 
                   RightSize<ObjectSizeFunctor, FunctorOnIteratorPValue<ObjectsIter, ObjectSizeFunctor>>>;
 }
+           
+template <typename ObjectSizeFunctor> 
+struct NotZeroSize {
+    NotZeroSize(ObjectSizeFunctor size) : 
+        m_size(std::move(size)) {}
+    template <typename Object> 
+    bool operator()(Object && o) const {
+        typedef typename utils::PureResultOf<ObjectSizeFunctor(decltype(o))>::type SizeType;
+        return m_size(o) > SizeType();
+    }
+private:
+    ObjectSizeFunctor m_size;
+};
+
 
 template <typename ObjectsIter,
            typename ObjectSizeFunctor, 
@@ -83,9 +97,25 @@ template <typename ObjectsIter,
  getDensityBasedValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd, 
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
   ObjectValueFunctor value, ObjectSizeFunctor size) {
+      typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
+      typedef typename std::iterator_traits<ObjectsIter>::reference ObjectRef;
       auto density = make_Density(value, size);
-      auto maxElement = density(*std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(density)));
-      return capacity * maxElement;
+
+      //cannot use lambda because it is not copy assignable
+      //.also this filters are realy needed only in 0/1 case
+      //in not 0/1 case, there is a guarantee that sizes are not 0
+      NotZeroSize<ObjectSizeFunctor> notZeroSize(size);
+      auto zeroSize = utils::make_NotFunctor(notZeroSize);
+
+      auto b = boost::make_filter_iterator(notZeroSize, oBegin, oEnd);
+      auto e = boost::make_filter_iterator(notZeroSize, oEnd, oEnd);
+      
+      auto nb = boost::make_filter_iterator(zeroSize, oBegin, oEnd);
+      auto ne = boost::make_filter_iterator(zeroSize, oEnd, oEnd);
+
+      auto maxElement = density(*std::max_element(b, e, utils::make_FunctorToComparator(density)));
+      return capacity * maxElement +
+          std::accumulate(nb, ne, SizeType(), [=](SizeType s, ObjectRef o){return s + value(o);});
 }
 
 template <typename ObjectsIter,
@@ -197,10 +227,24 @@ using GetArithmeticSizeTag =
 
 }//detail
 
-template <typename ObjectsIter>
+template <typename ObjectsIter, typename Functor>
 boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd, 
-                     double epsilon, double lowerBound) {
+                     double epsilon, double lowerBound, Functor, detail::ZeroOneTag) {
     double n = std::distance(oBegin, oEnd);
+    auto ret =  n / (epsilon * lowerBound);
+    static const double SMALLEST_MULTIPLIER = 1.;
+    if(ret > SMALLEST_MULTIPLIER )
+        return boost::optional<double>();
+    return  ret;
+}
+
+
+//TODO this multiplier does not guarantee fptas
+template <typename ObjectsIter, typename Functor>
+boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd, 
+                     double epsilon, double lowerBound, Functor f, detail::NoZeroOneTag) {
+    double minF = f(*std::min_element(oBegin, oEnd, utils::make_FunctorToComparator(f)));
+    double n = int(double(lowerBound) * (1. + epsilon) / minF + 1.); //maximal number of elements in the found solution
     auto ret =  n / (epsilon * lowerBound);
     static const double SMALLEST_MULTIPLIER = 1.;
     if(ret > SMALLEST_MULTIPLIER )

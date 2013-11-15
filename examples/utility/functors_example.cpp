@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 #include "paal/utils/functors.hpp"
 
@@ -15,7 +16,7 @@ void functors_example() {
     //identity
     IdentityFunctor id;
 
-    assert(id("asd") == "asd");
+    assert(id("asd") == std::string("asd"));
     assert(id(7) == 7);
 
     //return something
