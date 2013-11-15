@@ -7,12 +7,18 @@ TODO this is not consistant
 \verbinclude knapsack_definition.dox
 
 \section solkd Solution
+<!--
 Both variants of Knapsack are solved using standard dynamic approach on modified size or values.
 When the values are modified we get standard \f$(1-\epsilon)\f$ approximation of the knapsack problem.
 When the sizes are modified we get the optimal value of the knapsack but capacity can be  exceeded by \f$(1+\epsilon)\f$.
 In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
+-->
+0/1 Knapsack is solved using standard dynamic approach on modified size or values.
+When the values are modified we get standard \f$(1-\epsilon)\f$ approximation of the knapsack problem.
+When the sizes are modified we get the optimal value of the knapsack but capacity can be  exceeded by \f$(1+\epsilon)\f$.
+The divide and conquer approach is used to retrieve the set of objects in the optimal solution.
 
-Knapsack example - modified values: 
+<!-- Knapsack example - modified values: 
 \snippet knapsack_on_value_fptas_example.cpp Knapsack Example
  
   complete example is knapsack_on_value_fptas_example.cpp
@@ -21,7 +27,8 @@ Knapsack example - modified sizes:
 \snippet knapsack_on_size_fptas_example.cpp Knapsack Example
  
   complete example is knapsack_on_size_fptas_example.cpp
- 
+-->
+
 Knapsack 0/1 example - modified values: 
 \snippet knapsack_0_1_on_value_fptas_example.cpp Knapsack Example
  
@@ -42,7 +49,7 @@ Knapsack 0/1 example - modified sizes (does not compute items in knapsack):
  
   complete example is knapsack_0_1_on_size_fptas_no_output_example.cpp
 
-The library provides functions paal::knapsack_on_size_fptas and function which solves standard knapsack problem. And two versions of knapsack 0/1 problem : knapsack_0_1 and knapsack_0_1_no_output . One solves the Knapsack 0/1 with retrieving solution and one omitting this procedure. Although retrieving solution does not increase the complexity, it is costly procedure.
+<!-- The library provides functions paal::knapsack_on_size_fptas and function which solves standard knapsack problem.--> There are two versions of knapsack 0/1 problem : knapsack_0_1 and knapsack_0_1_no_output . One solves the Knapsack 0/1 with retrieving solution and one omits this procedure. Although retrieving solution does not increase the complexity, it is costly procedure.
 
 \subsection Complexity
 The algorithms works in \f$O(n^2 / \epsilon)\f$ and in \f$O(n / \epsilon)\f$ memory.

@@ -25,7 +25,7 @@ Words read_SS(std::istream & ist) {
         ist >> word;
         m_words.push_back(std::move(word));
     }
-    return std::move(m_words);
+    return m_words;
 }
 }
 }//!paal

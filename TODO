@@ -1,4 +1,3 @@
-* remove std::move() on returns
 * knapsack (not 0/1) fptas is not realy fptas
 * doxygen does not see some of the references 
     (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. ) 
