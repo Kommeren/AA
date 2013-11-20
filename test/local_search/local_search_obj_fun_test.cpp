@@ -6,8 +6,6 @@
  * @date 2013-02-11
  */
 
-#define BOOST_TEST_MODULE local_search_obj_fun_test
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

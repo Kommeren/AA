@@ -125,7 +125,7 @@ struct SolveAddRemove {
         facility_location_local_search(sol, a, nop, rem);
         facility_location_local_search(sol, a, nop, rem, add);
         
-        double c = simple_algo::getCFLCost(metric, cost, sol);
+        ON_LOG(double c = simple_algo::getCFLCost(metric, cost, sol));
         LOGLN(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
     }
 };

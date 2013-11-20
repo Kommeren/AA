@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE splay_tree
-
 #include <boost/test/unit_test.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_int_distribution.hpp>

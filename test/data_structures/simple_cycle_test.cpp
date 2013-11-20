@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#define BOOST_TEST_MODULE cycle
-
 #include "utils/logger.hpp"
 #include "cycle.hpp"
 
@@ -64,7 +62,8 @@ void checkSwapEdge(T::iter b, T::iter e, const El & p1, const  El & p2, const El
     BOOST_CHECK(vecEquals(sol.begin(), sol.end(), r.first, r.second));
 }
 
-
+BOOST_AUTO_TEST_SUITE(simple_cycle)
+    
 BOOST_AUTO_TEST_CASE(iterator_size) {
     T::iter i = v.begin(); 
     T::iter end = v.end(); 
@@ -92,4 +91,4 @@ BOOST_AUTO_TEST_CASE(swap_edges_4_test) {
 
     swap_edges_4<SimplCycleTemp>();
 }
-
+BOOST_AUTO_TEST_SUITE_END()

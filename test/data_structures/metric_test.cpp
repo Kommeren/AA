@@ -5,7 +5,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#define BOOST_TEST_MODULE metric
 
 #include <boost/test/unit_test.hpp>
 #include "utils/sample_graph.hpp"

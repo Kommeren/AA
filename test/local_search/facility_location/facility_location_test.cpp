@@ -1,7 +1,3 @@
-#define BOOST_TEST_MODULE facility_location_local_search
-
-#include <iterator>
-
 #include <boost/test/unit_test.hpp>
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/local_search/custom_components.hpp"
@@ -11,7 +7,7 @@
 
 using namespace paal::local_search::facility_location;
 
-BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
+BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();

@@ -6,7 +6,6 @@
  * @date 2013-09-20
  */
 
-#define BOOST_TEST_MODULE knapsack_test
 #include <fstream>
 
 #include <boost/test/unit_test.hpp>

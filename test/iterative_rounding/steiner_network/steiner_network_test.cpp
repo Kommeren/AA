@@ -6,7 +6,6 @@
  * @date 2013-06-24
  */
 
-#define BOOST_TEST_MODULE steiner_network
 
 #include <vector>
 
@@ -58,9 +57,9 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
 
     // printing result
     LOGLN("Edges in steiner network");
-    for(auto const  & e : resultNetwork) {
+    ON_LOG(for(auto const  & e : resultNetwork) {
         LOGLN("Edge " << e);
-    }
+    })
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {

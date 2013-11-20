@@ -1,3 +1,10 @@
+/**
+ * @file 2_local_search_from_stdin.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-09-20
+ */
 #define BOOST_TEST_MODULE two_local_search_stdin
 
 #include <boost/test/unit_test.hpp>

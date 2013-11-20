@@ -8,7 +8,7 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-#define LOGGER_ON
+//#define LOGGER_ON
 
 #ifdef LOGGER_ON
 #       include <iostream>
@@ -23,7 +23,7 @@
             std::copy(b, e, std::ostream_iterator<typename std::iterator_traits<decltype(b)>::value_type>(std::cout, del));\
             LOG("")
 #else
-#       define LOGNL(x)
+#       define LOGLN(x)
 #       define LOG(x)
 #       define ON_LOG(x)
 #       define LOG_COPY(b, e)

@@ -6,7 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE local_search_multi_solution
 #include <vector>
 #include <string>
 #include <cstdlib>
@@ -28,6 +27,7 @@ typedef  std::vector<float> Solution;
 typedef  float SolutionElement;
 typedef  SolutionElement Move;
 
+namespace {
 float f(const Solution & x) {
     float x1(x.at(0)), x2(x.at(1)), x3(x.at(2));
     return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3;
@@ -71,6 +71,7 @@ struct Commit {
 };
 
 typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
+
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(float & el : s) {
@@ -78,7 +79,9 @@ void fillRand(Solution &s) {
     }
 }
     
-ON_LOG(int i);
+ON_LOG(
+int i;
+)
     
 auto logger = [&](const Solution & s) {
     //printing
@@ -86,8 +89,9 @@ auto logger = [&](const Solution & s) {
     LOG_COPY_DEL(s.begin(), s.end(), ","); 
     LOGLN(") \t" << f(s) << " after " << i++ );
 };
+} //anonymous namespace
 
-BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
     //creating local search
     Solution sol(DIM, 0);
     fillRand(sol);
@@ -104,7 +108,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 }
 
 
-BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
+BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
     //creating local search
     Solution sol(DIM, 0);
     fillRand(sol);

@@ -1,6 +1,3 @@
-#define BOOST_TEST_MODULE fl_neighborhood
-#include <iterator>
-
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"

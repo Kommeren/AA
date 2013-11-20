@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-08-04
  */
-#define BOOST_TEST_MODULE dreyfus_wagner
-
 #include <boost/test/unit_test.hpp>
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"

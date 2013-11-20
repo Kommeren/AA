@@ -5,7 +5,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#define BOOST_TEST_MODULE ir_steiner_tree_test
 
 #include <boost/test/unit_test.hpp>
 

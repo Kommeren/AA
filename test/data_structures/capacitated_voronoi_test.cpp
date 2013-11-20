@@ -1,4 +1,3 @@
-#define BOOST_TEST_MODULE voronoi
 
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
@@ -15,6 +14,8 @@ auto fcap = [&](int i){ return fcapv[i];};
 std::vector<long long> cdemv{2, 2, 1, 3, 3, 1, 1, 2};
 auto cdem = [&](int i){ return cdemv[i];};
     
+
+BOOST_AUTO_TEST_SUITE( capacitated_voronoi_test_suite )
 
 BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     LOGLN("Test 0");
@@ -129,3 +130,4 @@ BOOST_AUTO_TEST_CASE(test_4) {
         remAddOWC(owc, i);
     }
 }
+BOOST_AUTO_TEST_SUITE_END()

@@ -27,9 +27,8 @@ template <typename SearchComponents, typename Solution>
 class Move {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
-    typedef decltype(std::declval<NG>()(
-                                std::declval<Solution &>()
-                                ).first) MoveIterator;
+    typedef typename std::result_of<NG(Solution &)>::type MovesRange;
+    typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
 
@@ -40,10 +39,8 @@ class MultiMove {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
     typedef typename utils::CollectionToElem<Solution>::type Element;
-    typedef decltype(std::declval<NG>()(
-                                std::declval<Solution &>(),
-                                std::declval<Element &>()
-                                ).first) MoveIterator;
+    typedef typename std::result_of<NG(Solution &, Element &)>::type MovesRange;
+    typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
 
@@ -55,9 +52,7 @@ class Fitness {
                 SearchComponents>::GainT Gain;
     typedef typename Move<SearchComponents, Solution>::type Move;
 public:
-    typedef decltype(std::declval<Gain>()(
-                        std::declval<Solution &>(), std::declval<Move &>())
-                    ) type;
+    typedef typename utils::PureResultOf<Gain(Solution &, Move &)>::type type;
 };
 
 
@@ -68,9 +63,7 @@ class MultiFitness {
     typedef typename MultiMove<SearchComponents, Solution>::type Move;
     typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 public:
-    typedef decltype(std::declval<Gain>()(
-                        std::declval<Solution &>(), std::declval<SolutionElement>(), std::declval<Move &>())
-                    ) type;
+    typedef typename utils::PureResultOf<Gain(Solution &, SolutionElement &, Move &)>::type type;
 };
 
 } // local_search

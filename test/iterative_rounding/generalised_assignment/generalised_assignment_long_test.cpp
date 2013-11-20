@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         int num;
         ifs >> num;
         assert(num == numberOfCases);
-        for(int i : boost::irange(0, numberOfCases)) {
+        for(int i = 0; i < numberOfCases; ++i) {
             is_test_cases >> opt;
             LOGLN("case " << i << " opt "<< opt);
         

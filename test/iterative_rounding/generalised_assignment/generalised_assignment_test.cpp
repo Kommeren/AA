@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE generalized_assignment_test
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -65,9 +63,9 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
         costf, timef, Tf, jobsToMachines, 
         paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
 
-    for(const std::pair<int, int> & jm : jobsToMachines) {
+    ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
         LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);
-    }
+    })
 
    auto j0 = jobsToMachines.find(0);
    BOOST_CHECK(j0 != jobsToMachines.end() && j0->second == 0);

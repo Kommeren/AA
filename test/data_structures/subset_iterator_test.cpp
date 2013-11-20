@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE subset_iterator_test
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

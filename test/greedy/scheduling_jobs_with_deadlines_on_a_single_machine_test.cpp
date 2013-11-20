@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#define BOOST_TEST_MODULE scheduling_jobs_with_deadlines_on_a_single_machine
-
 #include <vector>
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
@@ -14,7 +12,7 @@
 #include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
 
 
-BOOST_AUTO_TEST_CASE(test_1) {
+BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     // sample data
     typedef double Time;
     std::vector<Time> time={2.1,3.1,4.1,5.1,6.1,7.1,8.1};

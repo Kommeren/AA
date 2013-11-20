@@ -36,8 +36,8 @@ namespace ir {
         ColId() {}
         explicit ColId(int id) : Id(id) {} 
     };
-
-    ColId make_ColId(int col) {
+    
+    inline ColId make_ColId(int col) {
         return ColId(col);
     }
 
@@ -46,7 +46,7 @@ namespace ir {
         explicit RowId(int id) : Id(id) {} 
     };
     
-    RowId make_RowId(int row) {
+    inline RowId make_RowId(int row) {
         return RowId(row);
     }
 

@@ -70,7 +70,8 @@ public:
         base(solution) {}
 
     LocalSearchStep(Solution & solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
-        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
+        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {
+        }
 
     bool search() {
         auto adjustmentSet = call<GetMoves>(m_solution);
@@ -102,7 +103,8 @@ class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter> :
     public LocalSearchStepBase<Solution> {
 public:
     typedef LocalSearchStepBase<Solution> base;
-    LocalSearchStep(Solution & sol) : base(sol) {}
+    LocalSearchStep(Solution & sol) : base(sol) {
+    }
 
     bool search() {
         return false;
@@ -124,7 +126,8 @@ public:
         base(solution) {}
 
     LocalSearchStep(Solution & solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
-        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {}
+        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {
+        }
 
     bool search() {
         return base::searchAndPassBest(best());

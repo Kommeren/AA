@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE k_median
-
 #include <boost/test/unit_test.hpp>
 
 #include "paal/local_search/k_median/k_median.hpp"
@@ -7,7 +5,7 @@
 #include "utils/logger.hpp"
 
 
-BOOST_AUTO_TEST_CASE(test_1) {
+BOOST_AUTO_TEST_CASE(kmedian_test) {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();

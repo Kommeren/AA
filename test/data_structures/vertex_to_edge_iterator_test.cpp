@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE cycle
-
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/vertex_to_edge_iterator.hpp"
 #include "utils/logger.hpp"

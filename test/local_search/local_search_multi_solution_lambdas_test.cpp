@@ -6,7 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE local_search_multi_solution
 #include <vector>
 #include <string>
 #include <cstdlib>

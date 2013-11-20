@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#define BOOST_TEST_MODULE components
-
 #include <boost/test/unit_test.hpp>
 
 #include <type_traits>
@@ -20,15 +18,19 @@ namespace names {
     struct C;
 }
 
+namespace {
+
 int f(int i) {
     return i;
 }
 
 class constf {
-int operator()(int i) const {
-    return i;
-}
+    int operator()(int i) const {
+        return i;
+    }
 };
+
+}
 
 namespace ds = paal::data_structures;
 
@@ -40,7 +42,9 @@ template <typename... Args>
 using Comps = typename  ds::Components<
         names::A, names::B, names::C>::type<Args...> ;
 
-        
+    
+BOOST_AUTO_TEST_SUITE(components)
+
 BOOST_AUTO_TEST_CASE(ComponentsTest) {
     //default arguments
     Comps<int, double, int> comps;
@@ -128,10 +132,9 @@ using CompsWithDefaults = typename  ds::Components<
         names::A, names::B, ds::NameWithDefault<names::C, X>>::type<Args...> ;
 
 BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
-    CompsWithDefaults<int, double, float> comps;
+    CompsWithDefaults<int, double, int> comps;
     CompsWithDefaults<int, double> comps2(1, 2, 3);
     BOOST_CHECK_EQUAL(comps2.get<names::C>(), X(3));
-    BOOST_CHECK_EQUAL(comps.get<names::C>(), 0);
     
     //This won't compile
     //CompsWithDefaults<int> comps3;
@@ -182,6 +185,8 @@ BOOST_AUTO_TEST_CASE(ComponentsReferences) {
     BOOST_CHECK_EQUAL(compsWithRefs.get<names::B>(), 3);
     BOOST_CHECK_EQUAL(compsWithRefs.get<names::C>(), 3);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
     
     
 

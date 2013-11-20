@@ -1,5 +1,10 @@
-#define BOOST_TEST_MODULE two_local_search_test
-
+/**
+ * @file 2_local_search_test.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-09-20
+ */
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

@@ -6,8 +6,6 @@
  * @date 2013-07-10
  */
 
-#define BOOST_TEST_MODULE tree_augmentation
-
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 

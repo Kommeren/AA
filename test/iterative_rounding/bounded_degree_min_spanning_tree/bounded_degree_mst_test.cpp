@@ -6,8 +6,6 @@
  * @date 2013-06-04
  */
 
-#define BOOST_TEST_MODULE bounded_degree_mst
-
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/counting_range.hpp>
@@ -82,7 +80,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
                         addEdge(g, costs, 4, 0, 259);
     
     Bound degBounds = get(boost::vertex_degree, g);
-    Index indices = get(boost::vertex_index, g);
+    ON_LOG(Index indices = get(boost::vertex_index, g));
     
     degBounds[0] = 1;
     degBounds[1] = 3;
@@ -96,10 +94,10 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     Components components(make_RowGenerationSolveLP(oracle));
     bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(components), LogVisitor());
     
-    for (auto const & e : resultTree) {
+    ON_LOG(for (auto const & e : resultTree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
               << ") " << "in tree");
-    }
+    })
 
     BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
     BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));

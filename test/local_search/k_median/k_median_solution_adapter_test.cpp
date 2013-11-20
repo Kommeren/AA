@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE facility_location_solution_adapter
-
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/k_median_solution.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"
@@ -11,7 +9,7 @@ using namespace paal::data_structures;
 using namespace paal::local_search::facility_location;
 
 
-BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
+BOOST_AUTO_TEST_CASE(KMedianSolutionAdapterTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
    

@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE local_search_test
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -18,6 +16,7 @@
 namespace ls = paal::local_search;
 using namespace  paal;
 
+namespace {
 int f(int x) {
     return -x*x + 12 * x -27;
 }
@@ -35,7 +34,7 @@ public:
 };
 
 struct Gain {
-    int operator()(int s, int u) {
+    int operator()(int s, int u) const {
         return f(s + u) - f(s);
     }
 };
@@ -47,14 +46,19 @@ struct Commit {
 };
 
 typedef  ls::SearchComponents<GetMoves, Gain, Commit> SearchComp;
-   
-ON_LOG(int i = 0);
+ 
+ON_LOG(  
+    int i = 0;
+)
+
 auto logAction = [&](int s) {
    LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
 };
 
+} //anonymous namespace
+BOOST_AUTO_TEST_SUITE( local_search )
 
-BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
+BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
    //printing
    int solution(0);
    LOGLN("f("<< solution <<") \t" << f(solution));
@@ -66,7 +70,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_choose_first_better_test) {
 }
 
 
-BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
+BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
    //printing 
    int s(0);
    LOGLN("f("<< s <<") \t" << f(s));
@@ -77,3 +81,5 @@ BOOST_AUTO_TEST_CASE(two_local_search_steepest_slope_test) {
    BOOST_CHECK(ls::local_search<ls::search_strategies::SteepestSlope>(s, logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(s, 6);
 }
+BOOST_AUTO_TEST_SUITE_END()
+

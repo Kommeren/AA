@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE splay_cycle
-
 #include <boost/test/unit_test.hpp>
 
 #include "paal/data_structures/cycle/splay_cycle.hpp"

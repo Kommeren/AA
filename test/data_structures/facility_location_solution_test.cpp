@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE facility_location
-
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"

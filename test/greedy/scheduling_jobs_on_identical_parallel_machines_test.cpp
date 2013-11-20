@@ -5,7 +5,6 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#define BOOST_TEST_MODULE scheduling_jobs_on_identical_parallel_machines
 
 #include <vector>
 #include <boost/test/unit_test.hpp>
@@ -13,7 +12,7 @@
 #include "utils/logger.hpp"
 
 
-BOOST_AUTO_TEST_CASE(test_1) {
+BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines) {
     // sample data
     int numberOfMachines = 3;
     typedef double Time;

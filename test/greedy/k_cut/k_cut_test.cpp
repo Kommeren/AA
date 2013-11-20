@@ -6,8 +6,6 @@
  * @date 2013-08-20
  */
 
-#define BOOST_TEST_MODULE k_cut_test
-
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/graph/adjacency_list.hpp>
