@@ -46,8 +46,8 @@ namespace detail {
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
-                    auto starValue = [=](ObjectsIter oi){return value(*oi);};
-                    auto starSize = [=](ObjectsIter oi){return size(*oi);};
+                    auto starValue = utils::make_LiftIteratorFunctor(value);
+                    auto starSize = utils::make_LiftIteratorFunctor(size);
                     auto density = make_Density(starValue, starSize);
                     auto compare = utils::make_FunctorToComparator(density);
                     auto mostDenseIter = std::max_element(oBegin, oEnd, compare);

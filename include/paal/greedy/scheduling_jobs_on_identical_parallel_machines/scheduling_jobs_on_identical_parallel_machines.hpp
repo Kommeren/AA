@@ -45,7 +45,7 @@ void schedulingJobsOnIdenticalParallelMachines(int n_machines,const InputIterato
     std::copy(boost::make_counting_iterator(first),
           boost::make_counting_iterator(last),
           std::back_inserter(jobs));
-    auto getTimeFromIterator=[=](InputIterator iter){return getTime(*iter);};
+    auto getTimeFromIterator=utils::make_LiftIteratorFunctor(getTime);
     std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getTimeFromIterator,utils::Greater()));
     
     //std::sort(first,last,utils::Greater());

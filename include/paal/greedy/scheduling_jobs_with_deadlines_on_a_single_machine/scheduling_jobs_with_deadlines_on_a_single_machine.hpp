@@ -32,7 +32,7 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine{
  * @param InputIterator first - jobs begin
  * @param InputIterator last - jobs end
  * @param GetTime getTime
- * @param GetRelaseDate getRelaseDate
+ * @param GetReleaseDate getReleaseDate
  * @param GetDueDate getDueDate
  * @param OutputIterator result
  * @tparam Time
@@ -40,12 +40,12 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine{
  * @tparam OutputIterator
  * @tparam GetTime
  * @tparam GetDueDate
- * @tparam GetRelaseDate
+ * @tparam GetReleaseDate
  */
-template<class InputIterator, class OutputIterator, class GetTime,class GetDueDate,class GetRelaseDate>
+template<class InputIterator, class OutputIterator, class GetTime,class GetDueDate,class GetReleaseDate>
 auto schedulingJobsWithDeadlinesOnASingleMachine(
         const InputIterator first,const InputIterator last
-        ,GetTime getTime,GetRelaseDate getRelaseDate,GetDueDate getDueDate
+        ,GetTime getTime,GetReleaseDate getReleaseDate,GetDueDate getDueDate
         ,OutputIterator result)-> puretype (getTime(*first)){
     typedef puretype( getTime(*first)) Time;
     std::vector<InputIterator> jobs;
@@ -53,26 +53,26 @@ auto schedulingJobsWithDeadlinesOnASingleMachine(
           boost::make_counting_iterator(last),
           std::back_inserter(jobs));
     
-    auto getDueDateFromIterator=[=](InputIterator iter){return getDueDate(*iter);};
+    auto getDueDateFromIterator=utils::make_LiftIteratorFunctor(getDueDate);
     auto dueDateCompatator=utils::make_FunctorToComparator(getDueDateFromIterator,utils::Greater());
     typedef std::priority_queue<InputIterator,std::vector<InputIterator>,decltype (dueDateCompatator)> QueueType; 
     QueueType activeJobsIters(dueDateCompatator);
     
-    auto getRelaseDateFromIterator=[=](InputIterator iter){return getRelaseDate(*iter);};
-    std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getRelaseDateFromIterator));
+    auto getReleaseDateFromIterator=utils::make_LiftIteratorFunctor(getReleaseDate);
+    std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getReleaseDateFromIterator));
     Time startIdle=Time();
     Time longestDelay=Time();
     auto doJob=[&](){
         auto jobIter=activeJobsIters.top();
         activeJobsIters.pop();
-        Time startTime=std::max(startIdle,getRelaseDate(*jobIter));
+        Time startTime=std::max(startIdle,getReleaseDate(*jobIter));
         startIdle=startTime+getTime(*jobIter);
         longestDelay=std::max(longestDelay,startIdle-getDueDate(*jobIter));
         *result=std::make_pair(jobIter,startTime);
         ++result;
     };
     for(auto jobIter:jobs){
-        while(!activeJobsIters.empty() && getRelaseDate(*jobIter)>startIdle )
+        while(!activeJobsIters.empty() && getReleaseDate(*jobIter)>startIdle )
             doJob();
         activeJobsIters.push(jobIter);
     }

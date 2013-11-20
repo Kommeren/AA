@@ -9,7 +9,7 @@ The aim is to complete all jobs as soon as possible.
 
 Scheduling Jobs on Identical Parallel Machines problem is solved by greedy algorithm.
 We sort all jobs from longest to shortest.
-And we assign longest not assigned job to machine which has smallest load, until all jobs as assigned.
+And we assign longest not assigned job to machine which has smallest load, until all jobs are assigned.
 
   example: 
 \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs Example

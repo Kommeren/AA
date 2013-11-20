@@ -1,0 +1,52 @@
+/*! \page scheduling_jobs Scheduling Jobs
+
+\section def Problem definition.
+In scheduling jobs, N jobs are to be assigned to M machines, where job \a j consumes
+\f$p_j\f$ time-units, and machine \a i has speed \f$s_i\f$. Thus machine \a i
+requires \f$\frac{p_j}{s_i}\f$ time-units to complete job \a j. Let
+\f$l_i = \sum_{\mbox{j: j is assigned to i}}p_j\f$ be the load on machine \a i. The aim is to
+minimize makespan \f$max_i\frac{l_i}{s_i}\f$.
+
+\section Solution
+
+We calculate the lower bound for the solution \f$T_{LB} = max_jT_j\f$ ,where
+\f$T_j = min_i max\{\frac{p_j}{s_i}, \frac{\sum_{k=1}^{j}p_k}{\sum_{l=1}^{i}s_k}\}\f$.
+We then obtain the fractional allocation in the following way:
+<ul>
+<li> Let \a j be the first job such that \f$\sum_{k=1}^{j}p_k > T_{LB} \cdot s_1\f$.
+<li> Assign to machine 1 jobs 1, \f$\dots\f$, \a j-1, plus a fraction of \a j in order to equate \f$l_1=T_{LB} \cdot s_1\f$.
+<li> Continue recursively with the unassigned fractions of jobs and machines 2, \f$\dots\f$, m.
+</ul>
+Finally we round to an integral schedule. Function scheduleDeterministic uses the
+natural rounding, of integrally placing each job on the first machine that got some
+fraction of it. Function scheduleRandomized uses the randomized rounding which works as
+follows. We first choose \f$\alpha \in [0,1]\f$ uniformly at random. Then for each
+job we either place it on the first machine that got some fraction of it, if this
+fraction is bigger than \f$alpha\f$, or otherwise we place it on the second machine that got
+some fraction of it.
+<br>
+<b> Attention </b> Our solution needs the value of \f$\sum_{j=1}^{N}p_j \cdot \sum_{i=1}^{M}s_i\f$
+to not overflow its value type.
+
+  example:
+\snippet scheduling_jobs_example.cpp Scheduling Jobs Example
+
+  complete example is scheduling_jobs_example.cpp
+
+\subsection app_scheduling_jobs Approximation Ratio equals 2.
+
+\subsection com_scheduling_jobs The complexity
+Time Complexity of the algorithm is \f$O(|N|*log(|N|) + |M|*log(|M|))\f$.
+Memory Complexity of the algorithm is \f$(O(|N| + |M|))\f$.
+
+\subsection gt_scheduling_jobs Game-theoretic Properties
+Randomized version of the algorithm is thruthful in expectation: i.e. expected
+load on any given machine is a monotone (decreasing) function of its speed (when all other machines'
+speeds are fixed).
+
+\subsection References
+
+The algorithm analysis is described in \cite AlgGameTheory, chapter 12.
+
+
+*/

@@ -7,15 +7,15 @@ and each job is available for processing at time \f$r_{j}\f$.
 Each job have due date \f$d_{j}\f$ .
 
 If we stop computing job \a j on time \f$c_{j}\f$
-leteness of job is \f$c_{j}-d_{j}\f$ 
+lateness of job is \f$c_{j}-d_{j}\f$ 
 
-The aim is to minimalize maximum leteness.
+The aim is to minimalize maximum lateness.
 
 \section Solution
 
 Scheduling Jobs with deadlines on a single machine problem is solved by greedy algorithm.
 
-at wach moment that machine is idle, we start procesing naxt available job with the earliest due date.
+at each moment that machine is idle, we start procesing next available job with the earliest due date.
 
 
   example: 

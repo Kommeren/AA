@@ -47,6 +47,7 @@
             <li> \ref kcut
             <li> \ref knapsack_greedy
             <li> \ref shortestsuperstring
+            <li> \ref scheduling_jobs
             <li> \ref sjoipm
             <li> \ref sjwdoasm
             

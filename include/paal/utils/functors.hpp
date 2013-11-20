@@ -11,10 +11,11 @@
 
 #ifndef BOOST_FUNCTORS_HPP
 #define BOOST_FUNCTORS_HPP 
-#include <cassert>
-#include <utility>
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
+
+#include <cassert>
+#include <utility>
 
 namespace paal {
 namespace utils {
@@ -116,6 +117,55 @@ template <typename Array>
     ArrayToFunctor<Array> make_ArrayToFunctor(const Array &a, int offset = 0) {
         return ArrayToFunctor<Array>(a, offset);
     }
+
+// Wrapper around a functor which adds assigmnent operator as well as default constructor.
+// Note, this struct might be dangerous. Using this struct correctly requires the underlying
+// functor to live at least as long as this wrapper.
+template <typename Functor>
+struct AssignableFunctor {
+   
+   AssignableFunctor() = default;
+   AssignableFunctor(const AssignableFunctor& af)  = default;
+   AssignableFunctor(AssignableFunctor&&) = default;
+   AssignableFunctor(Functor& f) : m_f(&f) {}
+ 
+   AssignableFunctor& operator=(AssignableFunctor&&) = default;
+   AssignableFunctor& operator=(const AssignableFunctor& af) = default;
+   AssignableFunctor& operator=(Functor& f) { m_f = f; }
+
+   template<typename ... Args>
+   auto operator()(Args&& ... args) const ->
+      decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
+      return (*m_f)(std::forward<Args>(args)...);
+   }
+
+   private:
+      const Functor* m_f;
+};
+
+template <typename Functor>
+AssignableFunctor<Functor>
+make_AssignableFunctor(Functor& f) {
+   return AssignableFunctor<Functor>(f);
+}
+
+template <typename Functor>
+struct LiftIteratorFunctor {
+   LiftIteratorFunctor(Functor f) : m_f(std::move(f)) {}
+
+   template <typename Iterator>
+   auto operator()(Iterator iter) const -> decltype(std::declval<Functor>()(*iter)) {
+      return m_f(*iter);
+   }
+   private:
+      Functor m_f;
+};
+
+template <typename Functor>
+LiftIteratorFunctor<Functor>
+make_LiftIteratorFunctor(Functor f) {
+   return LiftIteratorFunctor<Functor>(f);
+}
 
 //************ The set of comparison functors *******************
 //functors are equivalent to corresponding std functors (e.g. std::less) but are not templated
