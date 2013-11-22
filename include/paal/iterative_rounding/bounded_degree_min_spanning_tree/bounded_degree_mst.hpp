@@ -62,11 +62,11 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef boost::bimap<Edge, ColId> EdgeMap;
-    typedef std::unordered_map<RowId, Vertex> VertexMap;
+    typedef boost::bimap<Edge, lp::ColId> EdgeMap;
+    typedef std::unordered_map<lp::RowId, Vertex> VertexMap;
     typedef std::vector<Vertex> VertexList;
     
-    typedef std::vector<std::pair<ColId, Edge>> EdgeMapOriginal;
+    typedef std::vector<std::pair<lp::ColId, Edge>> EdgeMapOriginal;
 
     typedef boost::optional<std::string> ErrorMessage;
 
@@ -90,16 +90,16 @@ public:
         return m_compare.getEpsilon();
     }
     
-    void removeColumn(ColId colId) {
+    void removeColumn(lp::ColId colId) {
         auto ret = m_edgeMap.right.erase(colId);
         assert(ret == 1);
     }
     
-    void addColumnToSolution(ColId colId) {
+    void addColumnToSolution(lp::ColId colId) {
         m_resultSpanningTree.insert(colToEdge(colId));
     }
 
-    void bindEdgeToCol(Edge e, ColId col) {
+    void bindEdgeToCol(Edge e, lp::ColId col) {
         m_edgeMapOriginal.push_back(typename EdgeMapOriginal::value_type(col, e));
         m_edgeMap.insert(typename EdgeMap::value_type(e, col));
     }
@@ -119,13 +119,13 @@ public:
         return get(m_degBoundMap, v);
     }
     
-    boost::optional<ColId> edgeToCol(Edge e) const {
+    boost::optional<lp::ColId> edgeToCol(Edge e) const {
         auto i = m_edgeMap.left.find(e);
         if (i != m_edgeMap.left.end()) {
-            return boost::optional<ColId>(i->second);
+            return boost::optional<lp::ColId>(i->second);
         }
         else {
-            return boost::optional<ColId>();
+            return boost::optional<lp::ColId>();
         }
     }
 
@@ -149,16 +149,16 @@ public:
         return m_compare;
     }
 
-    void bindVertexToRow(Vertex v, RowId row) {
+    void bindVertexToRow(Vertex v, lp::RowId row) {
         m_vertexMap.insert(typename VertexMap::value_type(row, v));
     }
 
-    void removeRow(RowId rowId) {
+    void removeRow(lp::RowId rowId) {
         auto ret = m_vertexMap.erase(rowId);
         assert(ret == 1);
     }
 
-    boost::optional<Vertex> rowToVertex(RowId row) {
+    boost::optional<Vertex> rowToVertex(lp::RowId row) {
         auto i = m_vertexMap.find(row);
         if (i != m_vertexMap.end()) {
             return boost::optional<Vertex>(i->second);
@@ -169,7 +169,7 @@ public:
     }
 
 private: 
-    Edge colToEdge(ColId col) {
+    Edge colToEdge(lp::ColId col) {
         auto i = m_edgeMap.right.find(col);
         assert(i != m_edgeMap.right.end());
         return i->second;
@@ -212,7 +212,7 @@ make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
 template <typename Graph, typename CostMap, typename DegreeBoundMap,
           typename ResultSpanningTree, typename IRComponents,
           typename Visitor = TrivialVisitor>
-ProblemType bounded_degree_mst_iterative_rounding(
+lp::ProblemType bounded_degree_mst_iterative_rounding(
         const Graph & g, 
         const CostMap & costMap, 
         const DegreeBoundMap & degBoundMap, 
@@ -236,7 +236,7 @@ struct BDMSTRoundCondition {
     BDMSTRoundCondition(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) : m_roundZero(epsilon) {}
     
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem & problem, const LP & lp, ColId col) {
+    boost::optional<double> operator()(Problem & problem, const LP & lp, lp::ColId col) {
         auto ret = m_roundZero(problem, lp, col);
         if (ret) {
             problem.removeColumn(col);
@@ -258,7 +258,7 @@ private:
      */
 struct BDMSTRelaxCondition {
     template <typename Problem, typename LP>
-    bool operator()(Problem & problem, const LP & lp, RowId row) {
+    bool operator()(Problem & problem, const LP & lp, lp::RowId row) {
         auto vertex = problem.rowToVertex(row);
         if (vertex) {
             auto ret = (lp.getRowDegree(row) <= problem.getDegreeBound(*vertex) + 1);
@@ -309,7 +309,7 @@ private:
     template <typename Problem, typename LP>
     void addVariables(Problem & problem, LP & lp) {
         for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
-            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1);
+            lp::ColId col = lp.addColumn(problem.getCost(e), lp::DB, 0, 1);
             problem.bindEdgeToCol(e, col);
         }
     }
@@ -326,7 +326,7 @@ private:
         
         for(auto v : boost::make_iterator_range(vertices(g))) {
             auto vIdx = problem.addVertex(v);
-            RowId rowIdx = lp.addRow(UP, 0, problem.getDegreeBound(v), getDegreeBoundName(vIdx));
+            lp::RowId rowIdx = lp.addRow(lp::UP, 0, problem.getDegreeBound(v), getDegreeBoundName(vIdx));
             problem.bindVertexToRow(v, rowIdx);
             auto adjEdges = out_edges(v, g);
             
@@ -348,9 +348,9 @@ private:
     void addAllSetEquality(Problem & problem, LP & lp) {
         auto const & g = problem.getGraph();
         int vCnt = num_vertices(g);
-        RowId rowIdx = lp.addRow(FX, vCnt-1, vCnt-1);
+        lp::RowId rowIdx = lp.addRow(lp::FX, vCnt-1, vCnt-1);
         
-        for (ColId colIdx : boost::make_iterator_range(lp.getColumns())) {
+        for (lp::ColId colIdx : boost::make_iterator_range(lp.getColumns())) {
             lp.addConstraintCoef(rowIdx, colIdx);
         }
     }
@@ -384,7 +384,7 @@ private:
 
 template <
          typename Graph,
-         typename SolveLPToExtremePoint = RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >, 
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >, 
          typename RoundCondition = BDMSTRoundCondition, 
          typename RelaxContition = BDMSTRelaxCondition, 
          typename Init = BDMSTInit,

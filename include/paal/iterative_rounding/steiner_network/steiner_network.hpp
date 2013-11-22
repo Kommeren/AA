@@ -51,7 +51,7 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     
-    typedef std::unordered_map<ColId, Edge> EdgeMap;
+    typedef std::unordered_map<lp::ColId, Edge> EdgeMap;
     typedef std::vector<Vertex> VertexList;
 
     typedef utils::Compare<double> Compare;
@@ -81,16 +81,16 @@ public:
         return m_costMap[e];
     }
 
-    void bindEdgeToCol(Edge e, ColId col) {
+    void bindEdgeToCol(Edge e, lp::ColId col) {
         m_edgeMap.insert(typename EdgeMap::value_type(col, e));
     }
 
-    void removeColumn(ColId colId) {        
+    void removeColumn(lp::ColId colId) {        
         auto ret = m_edgeMap.erase(colId);
         assert(ret == 1);
     }
     
-    void addColumnToSolution(ColId colId) {
+    void addColumnToSolution(lp::ColId colId) {
         m_resultNetwork.insert(colToEdge(colId));
     }
 
@@ -100,7 +100,7 @@ public:
 
 private:
     
-    Edge colToEdge(ColId col) {
+    Edge colToEdge(lp::ColId col) {
         auto i = m_edgeMap.find(col);
         assert(i != m_edgeMap.end());
         return i->second;
@@ -139,7 +139,7 @@ private:
     template <typename Problem, typename LP>
     void addVariables(Problem & problem, LP & lp) {
         for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
-            ColId col = lp.addColumn(problem.getCost(e), DB, 0, 1);
+            lp::ColId col = lp.addColumn(problem.getCost(e), lp::DB, 0, 1);
             problem.bindEdgeToCol(e, col);
         }
     }
@@ -151,7 +151,7 @@ struct SteinerNetworkRoundCondition {
         m_roundHalf(epsilon), m_roundZero(epsilon) {}
 
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem & problem, const LP & lp, ColId colId) {
+    boost::optional<double> operator()(Problem & problem, const LP & lp, lp::ColId colId) {
         auto ret = m_roundZero(problem, lp, colId);
         if(ret) {
             //removing edge
@@ -174,7 +174,7 @@ template <
          typename Graph,
          typename Restrictions,
          typename ResultNetworkSet,
-         typename SolveLPToExtremePoint = RowGenerationSolveLP < SteinerNetworkOracle < Graph, Restrictions, ResultNetworkSet> >, 
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP < SteinerNetworkOracle < Graph, Restrictions, ResultNetworkSet> >, 
          typename RoundCondition = SteinerNetworkRoundCondition, 
          typename RelaxContition = utils::ReturnFalseFunctor, 
          typename Init = SteinerNetworkInit,
@@ -184,7 +184,7 @@ template <
 
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet,
           typename IRComponents, typename Visitor = TrivialVisitor>
-ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
         const CostMap & cost, ResultNetworkSet & result, IRComponents comps, Visitor vis = Visitor()) {
     auto steiner = paal::ir::make_SteinerNetwork(g, restrictions, cost, result);
     return paal::ir::solve_iterative_rounding(steiner, std::move(comps), std::move(vis));

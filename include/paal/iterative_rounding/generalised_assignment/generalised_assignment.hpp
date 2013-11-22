@@ -16,7 +16,7 @@ namespace ir {
 
 struct GARelaxCondition {
     template <typename Problem, typename LP>
-        bool operator()(Problem & problem, const LP & lp, RowId row) {
+        bool operator()(Problem & problem, const LP & lp, lp::RowId row) {
             auto & machineRows = problem.getMachineRows();
             return machineRows.find(row) != machineRows.end() && 
                 (
@@ -71,7 +71,7 @@ class GAInit {
                             colIdx.push_back(lp.addColumn(problem.getCost()(j,m)));
                         }
                         else {
-                            colIdx.push_back(lp.addColumn(problem.getCost()(j,m), FX, 0, 0));
+                            colIdx.push_back(lp.addColumn(problem.getCost()(j,m), lp::FX, 0, 0));
                         }
                     }
                 }
@@ -82,7 +82,7 @@ class GAInit {
             void addConstraintsForJobs(Problem & problem, LP & lp) {
                 auto & colIdx = problem.getColIdx();
                 for(int jIdx : boost::irange(0, problem.getJobsCnt())) {
-                    RowId rowIdx = lp.addRow(FX, 1.0, 1.0);
+                    lp::RowId rowIdx = lp.addRow(lp::FX, 1.0, 1.0);
                     for(int mIdx : boost::irange(0, problem.getMachinesCnt())) {
                         lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx,mIdx)]);
                         ++mIdx;
@@ -97,7 +97,7 @@ class GAInit {
                 int mIdx(0);
                 for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
                     auto T = problem.getMachineAvailableTime()(m);
-                    RowId rowIdx = lp.addRow(UP, 0.0, T);
+                    lp::RowId rowIdx = lp.addRow(lp::UP, 0.0, T);
                     problem.getMachineRows().insert(rowIdx);
                     int jIdx(0);
 
@@ -128,8 +128,8 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
             typedef typename std::iterator_traits<JobIter>::reference JobRef;
             typedef typename std::iterator_traits<MachineIter>::reference MachineRef;
             typedef utils::Compare<double> Compare;
-            typedef std::set<RowId> MachineRows;
-            typedef std::vector<ColId> ColIdx;
+            typedef std::set<lp::RowId> MachineRows;
+            typedef std::vector<lp::ColId> ColIdx;
 
             GeneralAssignment(MachineIter mbegin, MachineIter mend, 
                     JobIter jbegin, JobIter jend,
@@ -214,7 +214,7 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
             JobsToMachines & m_jobToMachine;
             const Compare m_compare;
             ColIdx m_colIdx;
-            std::set<RowId> m_machineRows;
+            std::set<lp::RowId> m_machineRows;
     };
 
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime, typename JobsToMachines>
@@ -229,7 +229,7 @@ template <typename MachineIter, typename JobIter, typename Cost, typename Procee
 template <typename MachineIter, typename JobIter, typename Cost, 
           typename ProceedingTime, typename MachineAvailableTime, 
           typename JobsToMachines, typename Components, typename Visitor = TrivialVisitor>
-ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
+lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
                     JobIter jbegin, JobIter jend,
                     const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, 
                     JobsToMachines & jobToMachines, Components comps, Visitor vis = Visitor()) {

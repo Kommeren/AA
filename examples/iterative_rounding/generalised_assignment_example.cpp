@@ -48,6 +48,8 @@ int main() {
         std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
     }
 
+    paal::lp::GLP::freeEnv();
+
     return 0;
 }
 

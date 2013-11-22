@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
                 costs, times, Tf, jobsToMachines,
                 paal::ir::GeneralAssignmentIRComponents<>());
 
-            BOOST_CHECK(probType == OPTIMAL);
+            BOOST_CHECK(probType == lp::OPTIMAL);
 
             int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);

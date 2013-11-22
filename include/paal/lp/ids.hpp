@@ -10,7 +10,7 @@
 #define IDS_HPP 
 
 namespace paal {
-namespace ir {
+namespace lp {
 
     class Id {
     protected:
@@ -50,24 +50,24 @@ namespace ir {
         return RowId(row);
     }
 
-} // ir
+} // lp
 } // paal
 
 namespace std {
 
     template <>
-    struct hash<paal::ir::Id> {
-        size_t operator()(const paal::ir::Id & x) const
+    struct hash<paal::lp::Id> {
+        size_t operator()(const paal::lp::Id & x) const
         {
             return hash<int>()(x.get());
         }
     };
 
     template <>
-    struct hash<paal::ir::RowId> : public hash<paal::ir::Id> {};
+    struct hash<paal::lp::RowId> : public hash<paal::lp::Id> {};
 
     template <>
-    struct hash<paal::ir::ColId> : public hash<paal::ir::Id> {};
+    struct hash<paal::lp::ColId> : public hash<paal::lp::Id> {};
 
 } //std
 

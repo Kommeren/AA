@@ -89,7 +89,7 @@ namespace paal {
             ///Round a coordinate up if it is at least half in the
             ///current solution.
             template <typename Problem, typename LP>
-            boost::optional<double> operator()(Problem & problem, LP & lp, ColId col) {
+            boost::optional<double> operator()(Problem & problem, LP & lp, lp::ColId col) {
                 ///Round a coordinate up if it is at least half.
                 auto res = m_roundHalf(problem, lp, col);
                 //Save some auxiliary info
@@ -115,7 +115,7 @@ namespace paal {
             ///rounding. So returning always false should be
             ///fine, too.
             template <typename Problem, typename LP>
-            bool operator()(Problem & problem, const LP & lp, RowId row) {
+            bool operator()(Problem & problem, const LP & lp, lp::RowId row) {
                 for (auto e : problem.getCoveredBy(problem.rowToEdge(row))) {
                     if (problem.isInSolution(e))
                         return true;
@@ -148,7 +148,7 @@ namespace paal {
 
                 for(auto e : boost::make_iterator_range(edges(problem.getLinksGraph()))) {
                     std::string colName = getEdgeName(eIdx);
-                    ColId colIdx = lp.addColumn(problem.getCost(e), LO, 0, -1, colName);
+                    lp::ColId colIdx = lp.addColumn(problem.getCost(e), lp::LO, 0, -1, colName);
                     problem.bindEdgeWithCol(e, colIdx);
                     ++eIdx;
                 }
@@ -162,7 +162,7 @@ namespace paal {
                 auto const & tree = problem.getTreeGraph();
                 BGL_FORALL_EDGES_T(e, tree, puretype(tree)){
                     std::string rowName = getRowName(dbIndex);
-                    RowId rowIdx = lp.addRow(LO, 1, -1, rowName);
+                    lp::RowId rowIdx = lp.addRow(lp::LO, 1, -1, rowName);
                     problem.bindEdgeWithRow(e, rowIdx);
 
                     for (auto pe : problem.getCoveredBy(e)){
@@ -228,8 +228,8 @@ namespace paal {
             typedef std::map<Edge, EdgeList> CoverMap;
 
             //cross reference between links and column names
-            typedef boost::bimap<Edge, ColId> EdgeToColId;
-            typedef std::map<RowId, Edge> RowIdToEdge; 
+            typedef boost::bimap<Edge, lp::ColId> EdgeToColId;
+            typedef std::map<lp::RowId, Edge> RowIdToEdge; 
 
             typedef boost::optional<std::string> ErrorMessage;
 
@@ -298,18 +298,18 @@ namespace paal {
                 return get(m_costMap, e);
             }
 
-            void addToSolution(ColId col) {
+            void addToSolution(lp::ColId col) {
                 auto tmp = m_Solution.insert(m_edgeToColId.right.at(col));
                 assert(tmp.second);
                 m_solCost += m_costMap[m_edgeToColId.right.at(col)];
             }
                     
-            void bindEdgeWithCol(Edge e, ColId col) {
+            void bindEdgeWithCol(Edge e, lp::ColId col) {
                 auto tmp = m_edgeToColId.insert(typename EdgeToColId::value_type(e, col));
                 assert(tmp.second);
             }
             
-            void bindEdgeWithRow(Edge e, RowId row) {
+            void bindEdgeWithRow(Edge e, lp::RowId row) {
                 auto tmp = m_rowIdToEdge.insert(typename RowIdToEdge::value_type(row, e));
                 assert(tmp.second);
             }
@@ -348,11 +348,11 @@ namespace paal {
                 }
             }
 
-            Edge rowToEdge(RowId row) const {
+            Edge rowToEdge(lp::RowId row) const {
                 return m_rowIdToEdge.at(row);
             }
 
-            ColId edgeToCol(Edge e) const {
+            lp::ColId edgeToCol(Edge e) const {
                 return m_edgeToColId.left.at(e);
             }
 
@@ -403,7 +403,7 @@ namespace paal {
         template <typename Graph, typename TreeMap, 
                   typename CostMap, typename EdgeSet, 
                   typename IRComponents, typename Visitor = TrivialVisitor>
-        ProblemType tree_augmentation_iterative_rounding(
+        lp::ProblemType tree_augmentation_iterative_rounding(
                 const Graph & g,
                 const TreeMap & treeMap,
                 const CostMap & costMap,

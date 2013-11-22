@@ -20,12 +20,12 @@ using namespace  paal::ir;
 struct LogVisitor : public TrivialVisitor {
 
     template <typename Problem, typename LP>
-    void roundCol(const Problem &, LP & lp, ColId col, double val) {
+    void roundCol(const Problem &, LP & lp, lp::ColId col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename Problem, typename LP>
-    void relaxRow(const Problem &, LP & lp, RowId row) {
+    void relaxRow(const Problem &, LP & lp, lp::RowId row) {
         LOGLN("Relax row " << row.get());
     }
 };
@@ -116,6 +116,6 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_infeasible_test) {
         costf, timef, Tf, jobsToMachines,
         paal::ir::GeneralAssignmentIRComponents<>());
 
-    BOOST_CHECK(probType == INFEASIBLE);
+    BOOST_CHECK(probType == lp::INFEASIBLE);
 }
 

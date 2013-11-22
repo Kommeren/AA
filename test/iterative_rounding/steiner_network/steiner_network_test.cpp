@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
 
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(lp::make_RowGenerationSolveLP(oracle));
     steiner_network_iterative_rounding(g, restrictions, cost, resultNetwork, std::move(comps));
 
     // printing result
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
 
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(lp::make_RowGenerationSolveLP(oracle));
     auto steinerNetwork(make_SteinerNetwork(g, restrictions, cost, resultNetwork));
     auto invalid = steinerNetwork.checkInputValidity();
 

@@ -64,7 +64,7 @@ public:
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
-        lp.addRow(UP, 0, m_violatingSetSize - 1);
+        lp.addRow(lp::UP, 0, m_violatingSetSize - 1);
         
         for (auto const & e : problem.getEdgeMap().right) {
             const Vertex & u = source(e.second, m_g);
@@ -168,7 +168,7 @@ private:
         m_vToTrg.resize(num_vertices(m_g));
 
         for (auto const & e : problem.getEdgeMap().right) {
-            ColId colIdx = e.first;
+            lp::ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx) / 2;
             
             if (!problem.getCompare().e(colVal, 0)) {

@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
     std::cout<<"The total cost of the solution is "<<totalCost<<std::endl;
     //TODO handle
 //    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+    paal::lp::GLP::freeEnv();
 
     return 0;
 }

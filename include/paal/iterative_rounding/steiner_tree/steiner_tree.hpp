@@ -83,17 +83,17 @@ public:
     }
 
     /**
-     * Adds map entry from component id to LP ColId.
+     * Adds map entry from component id to LP lp::ColId.
      */
-    void addColumnLP(int id, ColId col) {
+    void addColumnLP(int id, lp::ColId col) {
         bool b = m_elementsMap.insert(std::make_pair(id, col)).second;
         assert(b);
     }
 
     /**
-     * Finds LP ColId based on component id.
+     * Finds LP lp::ColId based on component id.
      */
-    ColId findColumnLP(int id) const {
+    lp::ColId findColumnLP(int id) const {
         return m_elementsMap.at(id);
     }
 
@@ -147,7 +147,7 @@ private:
     Result m_resultIterator; // list of selected Steiner Vertices
     Compare m_compare; // comparison method
 
-    std::unordered_map<int, ColId> m_elementsMap; // maps componentId -> ColId in LP
+    std::unordered_map<int, lp::ColId> m_elementsMap; // maps componentId -> ColId in LP
 };
 
 
@@ -172,7 +172,7 @@ private:
     template <typename Problem, typename LP>
     void addVariables(Problem& problem, LP & lp) {
         for (int i = 0; i < problem.getComponents().size(); ++i) {
-            ColId col = lp.addColumn(problem.getComponents().find(i).getCost(), DB, 0, 1);
+            lp::ColId col = lp.addColumn(problem.getComponents().find(i).getCost(), lp::DB, 0, 1);
             problem.addColumnLP(i, col);
         }
     }
@@ -193,7 +193,7 @@ public:
         std::vector<double> weights;
         weights.reserve(problem.getComponents().size());
         for (int i = 0; i < problem.getComponents().size(); ++i) {
-            ColId cId = problem.findColumnLP(i);
+            lp::ColId cId = problem.findColumnLP(i);
             weights.push_back(lp.getColPrim(cId));
         }
         int selected = paal::utils::randomSelect(weights.begin(), weights.end()) - weights.begin();
@@ -228,7 +228,7 @@ template <
          typename Vertex,
          typename Dist,
          typename Components,
-         typename SolveLPToExtremePoint = RowGenerationSolveLP<SteinerTreeOracle<Vertex, Dist, Components> >,
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<SteinerTreeOracle<Vertex, Dist, Components> >,
          typename RoundCondition = SteinerTreeRoundCondition,
          typename RelaxCondition = utils::ReturnFalseFunctor,
          typename StopCondition = SteinerTreeStopCondition,
@@ -255,7 +255,7 @@ void solve_steiner_tree(const OrigMetric& metric, const Terminals& terminals, co
     typedef typename MT::VertexType Vertex;
     typedef typename MT::DistanceType Dist;
     paal::ir::SteinerTreeOracle<Vertex, Dist, Terminals> oracle;
-    paal::ir::SteinerTreeIRComponents<Vertex, Dist, Terminals> comps(make_RowGenerationSolveLP(oracle));
+    paal::ir::SteinerTreeIRComponents<Vertex, Dist, Terminals> comps(lp::make_RowGenerationSolveLP(oracle));
     steiner_tree_iterative_rounding(metric, terminals, steinerVertices, result, strategy, comps);
 }
 

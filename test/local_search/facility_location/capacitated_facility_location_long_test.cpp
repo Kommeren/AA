@@ -90,8 +90,8 @@ void runTests(const std::string & fname, Solve solve) {
         auto cost = paal::utils::make_ArrayToFunctor(facCost);
         auto verticesDemands = paal::utils::make_ArrayToFunctor(demands, -firstClient);
         auto facCapacities = paal::utils::make_ArrayToFunctor(facCap);
-        std::cout << std::accumulate(clients.begin(), clients.end(), 
-                                    0, [&](int d, int v){return d + verticesDemands(v);}) << std::endl;
+        LOGLN( "demands sum" << std::accumulate(clients.begin(), clients.end(), 
+                                    0, [&](int d, int v){return d + verticesDemands(v);}));
     
         typedef paal::data_structures::CapacitatedVoronoi<decltype(metric), decltype(facCapacities), decltype(verticesDemands)> VorType;
 

@@ -53,14 +53,14 @@ public:
      */
     template <typename Solution, typename LP>
     void addViolatedConstraint(Solution & sol, LP & lp) {
-        lp.addRow(LO, 1);
+        lp.addRow(lp::LO, 1);
         for (int i = 0; i < m_components->size(); ++i) {
             Vertex u = m_artifVertices[i];
             int ver = m_components->findVersion(i);
             Vertex v = m_components->find(i).getSink(ver);
             if (m_violatingSet.find(u) != m_violatingSet.end()
                    && m_violatingSet.find(v) == m_violatingSet.end()) {
-                ColId colIdx = sol.findColumnLP(i);
+                lp::ColId colIdx = sol.findColumnLP(i);
                 lp.addNewRowCoef(colIdx);
             }
         }
@@ -110,7 +110,7 @@ private:
                     double INF = std::numeric_limits<double>::max();
                     addEdge(w, newV, INF);
                 } else {
-                    ColId x = sol.findColumnLP(i);
+                    lp::ColId x = sol.findColumnLP(i);
                     double colVal = lp.getColPrim(x);
                     addEdge(newV, sink, colVal);
                 }
@@ -127,7 +127,7 @@ private:
             AuxVertex componentV = m_artifVertices[i];
             int ver = m_components->findVersion(i);
             Vertex sink = m_components->find(i).getSink(ver);
-            ColId x = sol.findColumnLP(i);
+            lp::ColId x = sol.findColumnLP(i);
             double colVal = lp.getColPrim(x);
             addEdge(componentV, sink, colVal);
         }

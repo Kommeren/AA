@@ -9,7 +9,7 @@
 #define PROBLEM_TYPE_HPP
 
 namespace paal {
-namespace ir {
+namespace lp {
 enum ProblemType {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
 }
 }

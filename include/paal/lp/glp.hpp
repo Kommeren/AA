@@ -19,7 +19,7 @@
 #include "paal/lp/problem_type.hpp"
 
 namespace paal {
-namespace ir {
+namespace lp {
 
    
 /**
@@ -47,6 +47,10 @@ public:
     
     ~GLPBase() {
         glp_delete_prob(m_lp);
+    }
+    
+    static void freeEnv() {
+        glp_free_env();
     }
      
     void setLPName(const std::string & s){
@@ -480,8 +484,7 @@ private:
     mutable Vals m_valTmp;
 };
 
-
-} //ir
+} //lp
 } //paal
 
 #endif /* LPBASE_HPP */

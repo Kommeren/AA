@@ -96,7 +96,7 @@ public:
     
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
-        lp.addRow(LO, m_violatedRestriction);
+        lp.addRow(lp::LO, m_violatedRestriction);
         
         for (auto const & e : problem.getEdgeMap()) {
             const Vertex & u = source(e.second, m_g);
@@ -173,7 +173,7 @@ private:
         m_rev = get(boost::edge_reverse, m_auxGraph);
 
         for (auto const & e : problem.getEdgeMap()) {
-            ColId colIdx = e.first;
+            lp::ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx);
 
             if (problem.getCompare().g(colVal, 0)) {

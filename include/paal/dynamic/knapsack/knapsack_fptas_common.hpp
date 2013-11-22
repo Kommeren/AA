@@ -77,8 +77,6 @@ knapsack_general_on_size_fptas(double epsilon, ObjectsIter oBegin,
         return knapsack_check_integrality(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, retrieveSolution);
     }
 
-    std::cout << "multiplier " << *multiplier << std::endl;
-    
     auto newSize = utils::make_ScaleFunctor<double, SizeType>(size, *multiplier);
     auto ret = knapsack_check_integrality(oBegin, oEnd, SizeType(capacity * *multiplier), out, 
                 newSize, value, is_0_1_Tag, retrieveSolution);

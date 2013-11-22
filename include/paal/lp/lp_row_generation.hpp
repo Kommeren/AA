@@ -11,7 +11,7 @@
 #include "paal/lp/problem_type.hpp"
 
 namespace paal {
-namespace ir {
+namespace lp {
 
 template <typename Oracle>
 class RowGenerationSolveLP {
@@ -39,7 +39,7 @@ make_RowGenerationSolveLP(Oracle & o) {
     return RowGenerationSolveLP<Oracle>(o);
 }
 
+} //lp
 } //paal
-} //ir
 
 #endif /* LP_ROW_GENERATION_HPP */

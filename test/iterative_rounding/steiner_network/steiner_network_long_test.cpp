@@ -42,17 +42,18 @@ int restrictions(int i, int j) {
 template <typename FindViolated = paal::ir::FindRandViolated, typename Restrictions>
 void runTest(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
     namespace ir = paal::ir;
+    namespace lp = paal::lp;
 
     typedef std::set<Edge> ResultNetwork;
     typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
     typedef ir::SteinerNetworkOracle<Graph, Restrictions, ResultNetwork,
         OracleComponents> Oracle;
     typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, ResultNetwork,
-        ir::RowGenerationSolveLP<Oracle>> Components;
+        lp::RowGenerationSolveLP<Oracle>> Components;
 
     ResultNetwork resultNetwork;
     Oracle oracle(g, restrictions, resultNetwork);
-    Components components(make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle));
     auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions, costs,
                                                     resultNetwork));
     auto invalid = steinerNetwork.checkInputValidity();
@@ -60,7 +61,7 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
 
     auto probType = ir::solve_iterative_rounding(steinerNetwork,
                         std::move(components));
-    BOOST_CHECK(probType == ir::OPTIMAL);
+    BOOST_CHECK(probType == lp::OPTIMAL);
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {

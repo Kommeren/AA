@@ -23,12 +23,12 @@ struct LogVisitor : public TrivialVisitor {
     }
 
     template <typename Problem, typename LP>
-    void roundCol(const Problem &, LP & lp, ColId col, double val) {
+    void roundCol(const Problem &, LP & lp, lp::ColId col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
     
     template <typename Problem, typename LP>
-    void relaxRow(const Problem &, LP & lp, RowId row) {
+    void relaxRow(const Problem &, LP & lp, lp::RowId row) {
         LOGLN("Relax row " << row.get());
     }
 };
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle));
     bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(components), LogVisitor());
     
     ON_LOG(for (auto const & e : resultTree) {
@@ -130,7 +130,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
 
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle));
     auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
     auto invalid = bdmst.checkInputValidity();
 
@@ -173,7 +173,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle));
     auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
     auto invalid = bdmst.checkInputValidity();
 
@@ -181,6 +181,6 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     auto probType = solve_iterative_rounding(bdmst, std::move(components));
 
-    BOOST_CHECK(probType == INFEASIBLE);
+    BOOST_CHECK(probType == lp::INFEASIBLE);
 }
 

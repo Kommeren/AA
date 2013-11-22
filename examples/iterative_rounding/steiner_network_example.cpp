@@ -48,7 +48,7 @@ int main() {
 
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(make_RowGenerationSolveLP(oracle));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(lp::make_RowGenerationSolveLP(oracle));
     steiner_network_iterative_rounding(g, restrictions, cost, resultNetwork, std::move(comps));
 
     // printing result
@@ -56,5 +56,6 @@ int main() {
     for(auto const  & e : resultNetwork) {
         std::cout << "Edge " << e << std::endl;
     }
+    paal::lp::GLP::freeEnv();
 }
 

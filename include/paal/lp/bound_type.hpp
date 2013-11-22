@@ -9,7 +9,7 @@
 #define BOUND_TYPE_HPP
 
 namespace paal {
-namespace ir {
+namespace lp {
 // free, only lower bound, only upper bound, both bounds, fix  
 enum BoundType {FR, LO, UP, DB, FX};
 }

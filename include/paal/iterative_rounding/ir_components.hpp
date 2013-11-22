@@ -30,7 +30,7 @@ public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
+    boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         double x = lp.getColPrim(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
@@ -56,7 +56,7 @@ public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
     
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
+    boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 
@@ -93,7 +93,7 @@ public:
         m_cond(c), m_f(f) {}
 
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem &, const LP & lp, ColId col) {
+    boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         double x = lp.getColPrim(col);
         if(m_cond(x)) {
             return m_f(x);
@@ -132,29 +132,29 @@ struct RoundConditionGreaterThanHalf  :
 
 struct DefaultSolveLPToExtremePoint {
     template <typename Problem, typename LP>
-    ProblemType operator()(Problem &, LP & lp) {
+    lp::ProblemType operator()(Problem &, LP & lp) {
         return lp.solveToExtremePoint();
     };
 };
 
 struct DeleteRow {
     template <typename LP>
-    void operator()(LP & lp, RowId row) {
+    void operator()(LP & lp, lp::RowId row) {
         lp.deleteRow(row);
     };
 };
 
 struct DeleteCol {
     template <typename LP>
-    void operator()(LP & lp, ColId col, double value) {
+    void operator()(LP & lp, lp::ColId col, double value) {
         auto column = lp.getRowsInColumn(col);
-        RowId row;
+        lp::RowId row;
         double coef;
         for(auto const & c : boost::make_iterator_range(column)) {
             boost::tie(row, coef) = c;
             double currUb = lp.getRowUb(row);
             double currLb = lp.getRowLb(row);
-            BoundType currType = lp.getRowBoundType(row);
+            lp::BoundType currType = lp.getRowBoundType(row);
             double diff = coef * value;
             lp.setRowBounds(row, currType, currLb - diff, currUb - diff);
         }
@@ -165,15 +165,15 @@ struct DeleteCol {
 /* not supported now
 struct TrivializeRow {
     template <typename LP>
-    void operator()(LP & lp, RowId row) {
+    void operator()(LP & lp, lp::RowId row) {
         lp.setRowBounds(row, FR, 0, 0);
     };
 };
 
 struct FixCol {
     template <typename LP>
-    void operator()(LP & lp, ColId col, double value) {
-        lp.setColBounds(col, FX, value, value);
+    void operator()(LP & lp, lp::ColId col, double value) {
+        lp.setColBounds(col, lp::FX, value, value);
     };
 };*/
 

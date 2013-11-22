@@ -87,15 +87,16 @@ void checkResult(const Graph & g, const ResultTree & tree,
 template <typename FindViolated = paal::ir::FindRandViolated>
 void runTest(const Graph & g, const Cost & costs, const Bound & degBounds, const int verticesNum, const double bestCost) {
     namespace ir = paal::ir;
+    namespace lp = paal::lp;
 
     typedef ir::BoundedDegreeMSTOracleComponents<FindViolated> OracleComponents;
     typedef ir::BoundedDegreeMSTOracle<Graph, OracleComponents> Oracle;
-    typedef ir::BDMSTIRComponents<Graph, ir::RowGenerationSolveLP<Oracle> > Components;
+    typedef ir::BDMSTIRComponents<Graph, lp::RowGenerationSolveLP<Oracle> > Components;
     ResultTree tree;
     Oracle oracle(g);
-    Components components(ir::make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle));
     auto probType = ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
-    BOOST_CHECK(probType == ir::OPTIMAL);
+    BOOST_CHECK(probType == lp::OPTIMAL);
 
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
 }

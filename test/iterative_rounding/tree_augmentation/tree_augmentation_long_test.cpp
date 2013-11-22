@@ -93,10 +93,10 @@ template <typename TA>
 //the copy is intended
 double getLowerBound(TA ta) {
     paal::ir::TAComponents<> comps;
-    GLPBase lp;
+    lp::GLPBase lp;
     comps.call<Init>(ta, lp);
     auto probType = comps.call<SolveLPToExtremePoint>(ta, lp);
-    BOOST_CHECK(probType == OPTIMAL);
+    BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
     return lp.getObjValue();
 }
 
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
     
         double lplowerbd = getLowerBound(treeaug);
         auto probType = paal::ir::solve_iterative_rounding(treeaug, comps);
-        BOOST_CHECK(probType == OPTIMAL);
+        BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
 
         double solval = treeaug.getSolutionValue();
         LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);
