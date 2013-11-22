@@ -6,8 +6,6 @@
  * @date 2013-06-10
  */
 
-#define BOOST_TEST_MODULE bounded_degree_mst_long_test
-
 #include <iterator>
 #include <iostream>
 #include <fstream>

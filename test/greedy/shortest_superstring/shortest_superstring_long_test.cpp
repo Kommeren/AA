@@ -6,8 +6,6 @@
  * @date 2013-08-20
  */
 
-#define BOOST_TEST_MODULE shortest_superstring_long_test
-
 #include <iterator>
 #include <iostream>
 #include <fstream>

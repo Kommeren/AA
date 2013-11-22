@@ -5,8 +5,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#define BOOST_TEST_MODULE bimap_perf_long
-
 #include <vector>
 #include <algorithm>
 #include <numeric>

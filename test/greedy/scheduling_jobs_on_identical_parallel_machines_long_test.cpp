@@ -5,7 +5,6 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#define BOOST_TEST_MODULE scheduling_jobs_on_identical_parallel_machines_long
 
 #include <vector>
 #include <boost/test/unit_test.hpp>

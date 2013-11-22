@@ -6,8 +6,6 @@
  * @date 2013-02-15
  */
 
-#define BOOST_TEST_MODULE facility_location_local_search_long
-
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -18,6 +16,7 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/floating.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
 #include "utils/logger.hpp"
@@ -25,11 +24,6 @@
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
-
-bool le(double x, double y) {
-    static const double epsilon = 0.01;
-    return x * (1 - epsilon) <= y;
-}
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
     std::string testDir = "test/data/FL_ORLIB/";
@@ -74,7 +68,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
 
         double c = simple_algo::getFLCost(metric, cost, sol);
         LOGLN(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(le(opt, c));
+        BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
     }
     

@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE ir_steiner_tree_long_test
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

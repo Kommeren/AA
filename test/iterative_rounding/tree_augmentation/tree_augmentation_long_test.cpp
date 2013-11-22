@@ -6,8 +6,6 @@
  * @date 2013-07-08
  */
 
-#define BOOST_TEST_MODULE tree_augmentation_long_test
-
 
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -145,7 +143,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
 
         auto invalid = treeaug.checkInputValidity();
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());
-        std::cerr << "Input validation " << filename << " ends." << std::endl;
+        LOGLN( "Input validation " << filename << " ends.");
 
         paal::ir::TAComponents<> comps;
     

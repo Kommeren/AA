@@ -6,8 +6,6 @@
  * @date 2013-09-20
  */
 
-#define BOOST_TEST_MODULE knapsack_long_test
-
 #include <fstream>
 
 #include <boost/test/unit_test.hpp>
@@ -22,7 +20,7 @@
 using namespace paal;
 using namespace paal::utils;
 
-BOOST_AUTO_TEST_CASE(KnapSackLong) {
+BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
     std::string testDir = "test/data/KNAPSACK/";
     std::ifstream is_test_cases(testDir + "cases.txt");
 

@@ -34,7 +34,7 @@ Edge addEdge(Graph & g, Cost & cost, int u, int v, double c) {
     return e;
 }
   
-void readBDMST(std::istream & is, int verticesNum, int edgesNum,
+inline void readBDMST(std::istream & is, int verticesNum, int edgesNum,
                Graph & g, Cost & costs, Bound & degBounds, Index & indices,
                double & bestCost) {
     std::string s;

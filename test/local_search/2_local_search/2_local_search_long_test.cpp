@@ -1,5 +1,3 @@
-#define BOOST_TEST_MODULE two_local_search_long
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -57,7 +55,12 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
     }
 }
 
-using paal::local_search::SearchComponents;
+//currently this is too long !
+//hope that in the future stronger algorithms'll handle these cases
+//
+//
+
+/*using paal::local_search::SearchComponents;
 
 BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     const string indexFName = "index.long";
@@ -104,5 +107,5 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         LOGLN("Normal search at the end");
         two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
     }
-}
+}*/
 

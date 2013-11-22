@@ -29,7 +29,7 @@ struct SteinerTreeTest {
     GraphMT metric;
 };
 
-std::istream & goTo(std::istream & is, const std::string & s){
+inline std::istream & goTo(std::istream & is, const std::string & s){
     static const int MAX_LINE_SIZE = 1024;
     char line[MAX_LINE_SIZE];
     memset(line, 0, MAX_LINE_SIZE);
@@ -39,11 +39,11 @@ std::istream & goTo(std::istream & is, const std::string & s){
     return is;
 }
 
-std::istream & goToSection(std::istream & is, const std::string & s){
+inline std::istream & goToSection(std::istream & is, const std::string & s){
     return goTo(is, "SECTION " + s);
 }
 
-int readInt(std::istream & is, const std::string & token){
+ inline int readInt(std::istream & is, const std::string & token){
     std::string s;
     int i;
     is >> s >> i;
@@ -51,7 +51,7 @@ int readInt(std::istream & is, const std::string & token){
     return i;
 }
 
-Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::vector<int> & steinerPoints) {
+inline Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::vector<int> & steinerPoints) {
     typedef std::pair<int, int> Edge;
 
     goToSection(is, "Graph");
@@ -83,14 +83,14 @@ Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::vector<
     return g;
 }
 
-void readLine(std::istream & is, std::string & fname, int & OPT) {
+inline void readLine(std::istream & is, std::string & fname, int & OPT) {
     int dummy;
     std::string dummys;
     is >> fname >> dummy >> dummy >> dummy >> dummys >> OPT;
     fname += ".stp";
 }
 
-void readSTEINLIBtests(std::vector<SteinerTreeTest>& data) {
+inline void readSTEINLIBtests(std::vector<SteinerTreeTest>& data) {
     std::string testDir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(testDir + "/index");
     assert(is_test_cases.good());

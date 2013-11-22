@@ -6,8 +6,6 @@
  * @date 2013-07-10
  */
 
-#define BOOST_TEST_MODULE steiner_network_test
-
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -64,7 +62,7 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
     BOOST_CHECK(probType == lp::OPTIMAL);
 }
 
-BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
+BOOST_AUTO_TEST_CASE(steiner_network_long) {
     std::string testDir = "test/data/BOUNDED_DEGREE_MST/";
     std::ifstream is_test_cases("test/data/STEINER_NETWORK/cases.txt");
 

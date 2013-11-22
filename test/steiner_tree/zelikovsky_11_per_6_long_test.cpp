@@ -6,8 +6,6 @@
  * @date 2013-02-04
  */
 
-#define BOOST_TEST_MODULE steiner_tree_long
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

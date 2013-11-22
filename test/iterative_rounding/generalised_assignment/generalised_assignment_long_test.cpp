@@ -6,8 +6,6 @@
  * @date 2013-02-15
  */
 
-#define BOOST_TEST_MODULE generalised_assignemnt_long
-
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -24,12 +22,8 @@
 using namespace paal::ir;
 using namespace paal;
 
-bool le(double x, double y) {
-    static const double epsilon = 0.01;
-    return x * (1 - epsilon) <= y;
-}
 
-BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
+BOOST_AUTO_TEST_CASE(GeneralizedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
     std::ifstream is_test_cases(testDir + "gapopt.txt");
 
@@ -98,7 +92,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
             }
 
             LOGLN("cost " << c);
-            BOOST_CHECK(le(c, opt));
+            BOOST_CHECK(utils::Compare<double>(0.01).le(c, opt));
             LOGLN( std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
         is_test_cases.getline(buf, MAX_LINE);

@@ -6,8 +6,6 @@
  * @date 2013-08-04
  */
 
-#define BOOST_TEST_MODULE dreyfus_wagner_long
-
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
