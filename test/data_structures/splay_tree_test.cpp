@@ -51,6 +51,8 @@ template<typename I> void fill_range(I begin, I end) {
   }
 }
 
+BOOST_AUTO_TEST_SUITE(SplayTreeTest)
+
 BOOST_AUTO_TEST_CASE(SplayTreeCreateEmpty) {
   SplayTree<int> t;
   BOOST_CHECK_EQUAL(size_t(0), t.size());
@@ -169,18 +171,18 @@ class SplayTreePerformance {
     boost::random::mt19937 gen;
     boost::random::uniform_int_distribution<int> dist;
     int input[kN];
-    SplayTree<int, splay_impl> *tree;
+    SplayTree<int, splay_impl> tree;
 
     SplayTreePerformance() :  
-      dist(boost::random::uniform_int_distribution<int>(0, kN - 1)), tree(NULL){
+      dist(boost::random::uniform_int_distribution<int>(0, kN - 1)){
     }
 
     void test() {
         SetUp();
         for (int i = 0; i < kM; i++) {
-        auto p = rand_reverse();
-        tree->reverse(p.first, p.second);
-      }
+            auto p = rand_reverse();
+            tree.reverse(p.first, p.second);
+        }
     }
 
   protected:
@@ -189,11 +191,12 @@ class SplayTreePerformance {
       int b = (a < kN) ? dist(gen) % (kN - a) : 0;
       return std::make_pair(a, a + b);
     }
+
     virtual void SetUp() {
       gen.seed(seed);
       auto end = input + kN;
       fill_range(input, end);
-      tree = new SplayTree<int, splay_impl>(input, end);
+      tree = SplayTree<int, splay_impl>(input, end);
     }
 };
 
@@ -209,3 +212,5 @@ const uint32_t SplayTreePerformance::seed;
 BOOST_AUTO_TEST_CASE(SplayTreePerformance_ReverseSplay) {
     SplayTreePerformance().test();
 }
+
+BOOST_AUTO_TEST_SUITE_END()

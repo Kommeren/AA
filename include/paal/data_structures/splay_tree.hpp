@@ -229,7 +229,7 @@ namespace splay_tree {
 
     private:
       static const bool kDefLeft = 0;
-      node_type *left_, *right_;
+      node_type *left_ = NULL, *right_ = NULL;
       node_type *parent_;
       bool reversed_;
       size_t size_;
@@ -354,22 +354,37 @@ namespace splay_tree {
       typedef Iterator<value_type, SplayImpl, false> reverse_iterator;
       typedef const Iterator<value_type, SplayImpl, false> const_reverse_iterator;
 
-      SplayTree() : rotation_cnt_(0) {}
+      SplayTree() = default;
 
       /**
        * @brief constructs tree from elements between two iterators
        * @param b iterator to first element
        * @param e iterator to element after last
        **/
-      template<typename I> SplayTree(const I b, const I e) : rotation_cnt_(0) {
+      template<typename I> SplayTree(const I b, const I e) {
         root_ = build_tree(b, e);
       }
       
-      SplayTree(SplayTree && splay) : root_(splay.root_), tTonode_(std::move(splay.tTonode_)), rotation_cnt_(0) {
-          splay.root_ = NULL;
+      SplayTree(SplayTree && splay)  {
+          *this = std::move(splay);
+      }
+
+      SplayTree& operator=(SplayTree && splay) {
+        rotation_cnt_ = splay.rotation_cnt_;
+        root_         = splay.root_;
+        tTonode_      = std::move(splay.tTonode_);
+        splay.root_   = NULL;
+        splay.rotation_cnt_ = 0;
+        return *this;
+      }
+
+      SplayTree& operator=(SplayTree & splay) {
+          SplayTree sp(splay);
+          *this = std::move(sp);
+          return *this;
       }
       
-      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)), rotation_cnt_(0) {
+      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
@@ -381,8 +396,8 @@ namespace splay_tree {
        * @brief creates tree from elements in std::vector
        * @param array vector container
        **/
-      template<typename A> explicit SplayTree(const A &array) : rotation_cnt_(0) {
-        root_ = build_tree(array, 0, array.size());
+      template<typename A> explicit SplayTree(const A &array) {
+        root_ = build_tree(std::begin(array), std::end(array));
       }
 
       ~SplayTree() {
@@ -545,8 +560,7 @@ namespace splay_tree {
 
     private:
       /** @brief creates tree with given node as a root */
-      explicit SplayTree(node_type *root) : root_(root) {
-      }
+      explicit SplayTree(node_type *root) : root_(root) {}
 
       /**
        * @brief splays given node to tree root
@@ -707,29 +721,10 @@ namespace splay_tree {
         }
         ssize_t m = (e - b) / 2;
         node_type *node = new node_type(*(b + m));
-        tTonode_.insert(std::make_pair(*(b + m), node));
+        bool ret = tTonode_.insert(std::make_pair(*(b + m), node)).second;
+        assert(ret);
         node->set_left(build_tree(b, b + m));
         node->set_right(build_tree(b + m + 1, e));
-        return node;
-      }
-
-      /**
-       * @brief recursively creates balanced tree from a structure with random
-       *        access operator []
-       * @param array structure holding data to be copied into tree
-       * @param b index of first element in structure to be placed in tree
-       * @param e index of element after last to be placed in tree
-       **/
-      template<typename A> node_type *build_tree(const A &array,
-          const size_t b, const size_t e) {
-        if (b >= e) {
-          return NULL;
-        }
-        ssize_t m = (e + b) / 2;
-        node_type *node = new node_type(array[m]);
-        tTonode_.insert(std::make_pair(array[m], node));
-        node->set_left(build_tree(array, b, m));
-        node->set_right(build_tree(array, m + 1, e));
         return node;
       }
 
@@ -782,9 +777,9 @@ namespace splay_tree {
       }*/
 
       /** root node of a tree */
+      size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
       mutable node_type *root_ = NULL;
       std::map<T, node_type *> tTonode_;
-      size_t rotation_cnt_;
   };
 }
 }

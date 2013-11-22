@@ -46,7 +46,7 @@ class IterativeRounding  {
 
 public:
     IterativeRounding(Problem & problem, IRComponents e, Visitor vis = Visitor()) 
-        : m_irComponents(std::move(e)), m_visitor(vis), m_problem(problem) {
+        : m_irComponents(std::move(e)), m_visitor(std::move(vis)), m_problem(problem) {
         call<Init>(m_problem, m_lpBase);
     }
     
@@ -58,7 +58,7 @@ public:
     }
 
     bool integerSolution() {
-        for(ColId col :boost::make_iterator_range(m_lpBase.getColumns())) {
+        for(ColId col : boost::make_iterator_range(m_lpBase.getColumns())) {
             double colVal = m_lpBase.getColPrim(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;
