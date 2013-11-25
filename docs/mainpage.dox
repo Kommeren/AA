@@ -62,11 +62,14 @@
             <ul>
             <li>\ref stein_dreyfus
             </ul>
+        <li>\ref linear_programming
+            <ul>
+            <li>\ref multiway_cut
+            </ul>
         <li> Miscellaneous
             <ul>
             <li>\ref stein_zel
             </ul>
-        <li>\ref linear_programming
         </ul>
     <li> Concepts
         <ul>

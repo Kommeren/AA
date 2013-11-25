@@ -10,19 +10,22 @@
 
 #include<vector>
 #include<algorithm>
+#include <utility>
+#include <type_traits>
+
+#include <boost/range/adaptors.hpp>
+#include "boost/range/irange.hpp"
+
 #include "paal/suffix_array/lcp.hpp"
 #include "paal/suffix_array/suffix_array.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/shortest_superstring/prefix_tree.hpp"
-#include "boost/range/irange.hpp"
 #include "paal/data_structures/bimap.hpp"
 
-#include <utility>
 
-#include <type_traits>
 namespace paal{
 namespace greedy{
-namespace shortest_superstring{
+namespace detail{
 
 
 /**
@@ -43,9 +46,12 @@ public:
     typedef typename utils::CollectionToElem<Word>::type Letter;
     
 
-    ShortestSuperstring(Words& words):m_length(countSumLenght(words)),m_prefixTree(m_length,m_suffixArray,m_sumWords,m_lcp,m_lengthSuffixWord){
+    ShortestSuperstring(const Words& words):
+          m_length(countSumLenght(words)),
+          m_prefixTree(m_length,m_suffixArray,m_sumWords,m_lcp,m_lengthSuffixWord) {
+        
         initialize(words);
-    
+        
         suffix_arrays::suffixArray<Letter>(m_sumWords, m_suffixArray);
         
         data_structures::rank(m_suffixArray,m_rank);
@@ -89,9 +95,9 @@ public:
     }
 
 private:
-    int countSumLenght(Words& words){
+    int countSumLenght(const Words& words){
         int length=1;
-        for(auto word : words){
+        for(auto const & word : words){
             length+=word.size()+1;
         }
         return length;
@@ -115,8 +121,8 @@ private:
         
         m_length=1;
         int wordsId = 0;
-        for(auto word : words){
-            auto wordSize = std::distance(std::begin(word), std::end(word));
+        for(auto const & word : words){
+            auto wordSize = boost::distance(word);
             m_lengthWords.push_back(wordSize);
             m_lengthToPos[wordSize].push_back(m_length);
             int noLetterInWord = 0;
@@ -142,17 +148,24 @@ private:
     
 
     void joinAllWords(){
+        auto ovelapSizeRange = boost::irange(0, m_length) | boost::adaptors::reversed;
+        for(auto overlapSize:ovelapSizeRange){
+            for(auto word : m_lengthToPos[overlapSize]){
+                if(m_lcp[m_rank[word]]>=overlapSize){//check if word is substring
+                    eraseWordFormPrefixTree(word);
+                }
+            }
+            
+        }
+        
         //in each iteration we join all pair of words who have overlap size equal overlapSize
-        for(int overlapSize=m_length-1;overlapSize>0;--overlapSize){
+        for(auto overlapSize:ovelapSizeRange){       
             for(auto word : m_longWords){
                 joinWord(word,overlapSize);
             }
             for(auto word : m_lengthToPos[overlapSize]){
                 if(m_lcp[m_rank[word]]<overlapSize){//check if word is not substring
                     m_longWords.push_back(word);
-                }
-                else{
-                    eraseWordFormPrefixTree(word);
                 }
             }
         }
@@ -197,6 +210,8 @@ private:
     const static int NOT_PREFIX=-1;
 
 };
+}//!detail
+
 /**
  * @param Words words
  * @brief return word contains all words as subwords,
@@ -208,15 +223,12 @@ private:
  * @tparam Words
  */
 template<typename Words>
-auto  shortestSuperstring(Words words) ->
-decltype(std::declval<ShortestSuperstring<Words>>().getSolution()){
-    ShortestSuperstring<Words> solver(words);
+auto  shortestSuperstring(const Words & words) ->
+decltype(std::declval<detail::ShortestSuperstring<Words>>().getSolution()){
+    detail::ShortestSuperstring<Words> solver(words);
     return solver.getSolution();
 };
 
-
-
-}//!shortest_superstring
 }//!greedy
 }//!paal
 #endif /*SHORTEST_SUPERSTRING_HPP*/

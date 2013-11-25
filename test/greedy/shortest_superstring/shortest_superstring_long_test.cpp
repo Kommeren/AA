@@ -20,9 +20,7 @@
 #include "utils/read_ss.hpp"
 #include "utils/parse_file.hpp"
 
-using namespace paal::greedy::shortest_superstring;
 using namespace paal;
-
 
 BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
     std::string testDir = "test/data/SS/";
@@ -34,12 +32,18 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
 
         std::ifstream ifs(testDir + "/cases/" + fname+".in");
         auto words= read_SS(ifs);
-        std::string res=shortestSuperstring(words);
+        for(int i=0;i<words.size();i++){
+            for(int j=0;j<words[i].size();j++)
+                assert(words[i][j]>0);
+                
+        }
+        std::string res=paal::greedy::shortestSuperstring(words);
         double s = res.size();
-
-        LOGLN(res);
         LOGLN(std::setprecision(20) <<  "GREEDY " << s);
+        if(opt!=0){
+        LOGLN(res);
         BOOST_CHECK(utils::Compare<double>(0.001).le(opt,s));
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
+        }     
     });
 }

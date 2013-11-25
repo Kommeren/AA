@@ -1,0 +1,40 @@
+/*! \page multiway_cut Multiway Cut
+
+\section def Problem definition.
+In Multiway Cut problem we have graph G and sets of k terminals.
+The goal is to find minimum cost set of edges whose removal disconnects each pair of terminals.
+
+\section Solution
+
+We put terminals in k dimensional space, with Manhattan metric,
+i-th terminal in point 0, 0, 0, ... 0, 0, 1(i-th position), 0, 0, ... 0, 0.
+All others vertices have sum of coordinates equal 1.
+We minimise sum for each edge: edge cost multiply by edge length in Manhattan metric 
+We solve lp to find the location of the others vertices.
+
+Then we several times randomly chose radius from each terminal,
+and we put each vertex in components, correspond to the first terminal, whose ball contains that vertex.
+We select cheapest solution, from all randomly chosen.
+
+  example: 
+\snippet multiway_cut_example.cpp Multiway Cut Example
+ 
+  complete example is multiway_cut_example.cpp
+
+\subsection app_multiway_cut 
+Expected Approximation Ratio equals 2, what is the reason to choose rays many times
+
+\subsection com_multiway_cut The complexity
+
+Complexity of the algorithm is \f$O(|LP|+|R|*(|E|+|V|*|K|))\f$ where \a R is number of repeats \a K is number of terminals,  \a V is number of vertices \a E is number of edges
+and \a LP is cost of solve LP by simplex
+\subsection mem_multiway_cut The memory
+Memory complexity of the algorithm is \f$O(|LP|+|K|*(|V|+|E|))\f$ where \a K is number of terminals  \a V is number of vertices, \a E is number of edges and \a LP is memory cost of solve LP by simplex
+
+
+\subsection References
+
+The algorithm analysis is described in \cite Williamson:2011:DAA:1971947
+
+
+*/

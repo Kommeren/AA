@@ -11,16 +11,14 @@
 #include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
 
 
-using namespace paal::greedy::shortest_superstring;
-using namespace std;
 /**
  * @brief show how to use shortest_superstring
  */
 int main() {
 //! [Shortest Superstring Example]
-    vector<string> words({"ba","ab","aa","bb"});
+    std::vector<std::string> words({"ba","ab","aa","bb"});
     
     
-    cout<<shortestSuperstring(words)<<endl;
+    std::cout<<paal::greedy::shortestSuperstring(words)<<std::endl;
 //! [Shortest Superstring Example]
 }

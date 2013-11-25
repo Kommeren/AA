@@ -1,5 +1,9 @@
+# first column name of in file
+# second column if not 0 length of optimal solution
 ss1    9
 ss2    44
 ss3    33
 ss4    33
 ss5    5
+ss6    0
+

@@ -11,7 +11,7 @@
 #include <vector>
 namespace paal{
 namespace greedy{
-namespace shortest_superstring{
+namespace detail{
     
 template<typename Letter>
 class PrefixTree {
@@ -57,6 +57,7 @@ public:
             auto letterIdx = wordBegin + letterOfWord;
             auto whichSon = m_whichSonAmI[letterIdx];
             auto & nodePrefixes = m_prefixToTree[letterIdx]->prefixes;
+            assert(whichSon<nodePrefixes.size());
             int lastPrefix = nodePrefixes.back();
             nodePrefixes[whichSon] = lastPrefix;
             m_whichSonAmI[lastPrefix + letterOfWord] = whichSon;
@@ -137,7 +138,6 @@ private:
         //and add to Node.prefixes coresponding prefixes
         while(m_sumWords[letter]!=DELIMITER){
             node=node->son;
-            
             m_prefixToTree[letter]=node;
             m_whichSonAmI[letter]=node->prefixes.size();
             node->prefixes.push_back(word);
@@ -167,7 +167,7 @@ public:
     const static Letter DELIMITER=0;
     
 };
-}//!shortest_superstring
+}//!detail
 }//!greedy
 }//!paal
 #endif /*PREFIX_TREE_HPP*/
