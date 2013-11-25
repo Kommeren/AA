@@ -16,7 +16,7 @@ int main() {
     std::vector<int> sizes{1,2,3,1,2,4,1,10};
     int capacity = 6;
     std::vector<int> values{3,2,65,1,2,3,1,23};
-    auto objects = boost::irange(size_t(0), sizes.size());
+    auto objects = boost::irange(std::size_t(0), sizes.size());
 
     //Knapsack 0/1
     std::vector<int> result;

@@ -19,16 +19,16 @@ struct T {
 
 class CheckSize {
 public:
-    CheckSize(SimpleCycle<string> cm, size_t size) : m_cm(cm), m_size(size) {}
+    CheckSize(SimpleCycle<string> cm, std::size_t size) : m_cm(cm), m_size(size) {}
     void operator()(const string & s) {
         auto re = m_cm.getEdgeRange(s);    
         auto rv = m_cm.getVerticesRange(s);    
-        BOOST_CHECK_EQUAL(m_size, size_t(std::distance(re.first, re.second)));        
-        BOOST_CHECK_EQUAL(m_size, size_t(std::distance(rv.first, rv.second)));        
+        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(re.first, re.second)));        
+        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(rv.first, rv.second)));        
     }
 private:
     SimpleCycle<string> m_cm;
-    size_t m_size;
+    std::size_t m_size;
 
 };
 

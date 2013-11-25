@@ -37,7 +37,7 @@ public:
             return;
         }
         
-        size_t size = std::distance(begin, end);
+        std::size_t size = std::distance(begin, end);
 
         m_predecessorMap.reserve(size);
         m_successorMap.reserve(size);
@@ -73,7 +73,7 @@ public:
         link(e1, e2);
     }
 
-    size_t size() const {
+    std::size_t size() const {
         return  m_predecessorMap.size(); 
     }
     

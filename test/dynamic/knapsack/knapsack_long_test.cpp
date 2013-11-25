@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOGLN("Opt size " << optSize << " opt " << opt_0_1);
         LOGLN("");
 
-        auto objects = boost::irange(size_t(0), values.size());
+        auto objects = boost::irange(std::size_t(0), values.size());
 
         //KNAPSACK
         auto opt = detail_knapsack<pd::IntegralValueAndSizeTag, pd::NoZeroOneTag>(objects, capacity, sizesFunct, valuesFunct).first;

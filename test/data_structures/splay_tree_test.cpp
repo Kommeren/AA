@@ -29,9 +29,9 @@ template<typename T, typename I> bool check_content(T &t, I begin, I end) {
 }
 
 template<typename T, typename I> bool check_random_splay(T &t, I begin,
-    I end, const size_t kM) {
-  const size_t kN = end - begin;
-  for (size_t i = 0; i < kM; i++) {
+    I end, const std::size_t kM) {
+  const std::size_t kN = end - begin;
+  for (std::size_t i = 0; i < kM; i++) {
     int el = rand() % kN; // NOLINT
     if (*(begin + el) != t.splay(el)->val_) {
       return false;
@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_SUITE(SplayTreeTest)
 
 BOOST_AUTO_TEST_CASE(SplayTreeCreateEmpty) {
   SplayTree<int> t;
-  BOOST_CHECK_EQUAL(size_t(0), t.size());
+  BOOST_CHECK_EQUAL(std::size_t(0), t.size());
   BOOST_CHECK(t.empty());
   int *input = NULL;
   BOOST_CHECK(check_content(t, input, input));

@@ -66,7 +66,7 @@ struct FacilityHash {
      * @return hash
      */
     template <typename T>
-    size_t operator()(Facility<T> f) const {
+    std::size_t operator()(Facility<T> f) const {
         return std::hash<T>()(f.getElem());
     }
 };

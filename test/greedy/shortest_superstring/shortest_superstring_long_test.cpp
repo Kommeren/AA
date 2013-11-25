@@ -32,10 +32,10 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
 
         std::ifstream ifs(testDir + "/cases/" + fname+".in");
         auto words= read_SS(ifs);
-        for(int i=0;i<words.size();i++){
-            for(int j=0;j<words[i].size();j++)
-                assert(words[i][j]>0);
-                
+
+        for(auto word:words){
+            for(auto letter:word)
+                assert(letter>0);
         }
         std::string res=paal::greedy::shortestSuperstring(words);
         double s = res.size();

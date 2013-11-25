@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     std::set<Edge> steinerEdges;
 
     paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()));
-    BOOST_CHECK(size_t(3) <= steinerEdges.size() && steinerEdges.size()<= size_t(4));
+    BOOST_CHECK(std::size_t(3) <= steinerEdges.size() && steinerEdges.size()<= std::size_t(4));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
     for(auto e: steinerEdges) {
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
 
     paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
             boost::vertex_color_map(&color[0]));
-    BOOST_CHECK(size_t(3) <= steinerEdges.size() && steinerEdges.size()<= size_t(4));
+    BOOST_CHECK(std::size_t(3) <= steinerEdges.size() && steinerEdges.size()<= std::size_t(4));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
     for(auto e: steinerEdges) {

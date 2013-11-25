@@ -18,9 +18,9 @@ BOOST_AUTO_TEST_CASE(KCut) {
     std::vector<int> costs{2,3,3,2,2,4,2,2,2,3,1,3};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::no_property,
-                    boost::property<boost::edge_index_t,size_t>
+                    boost::property<boost::edge_index_t,std::size_t>
                     >graph(8);
-    for(int i=0;i<edgesP.size();i++){
+    for(std::size_t i=0;i<edgesP.size();i++){
         add_edge(edgesP[i].first,edgesP[i].second,i,graph);
     }   
     

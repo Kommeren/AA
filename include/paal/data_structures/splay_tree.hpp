@@ -22,7 +22,7 @@ namespace splay_tree {
    * @param node root of a subtree
    * @returns size of subtree
    **/
-  template<typename N> inline size_t node_size(N node) {
+  template<typename N> inline std::size_t node_size(N node) {
     return (node == NULL) ? 0 : node->size();
   }
   
@@ -193,7 +193,7 @@ namespace splay_tree {
       }
 
       /** @returns size of subtree */
-      size_t size() {
+      std::size_t size() {
         return size_;
       }
 
@@ -232,7 +232,7 @@ namespace splay_tree {
       node_type *left_ = NULL, *right_ = NULL;
       node_type *parent_;
       bool reversed_;
-      size_t size_;
+      std::size_t size_;
   };
   
   /** @brief splay policy */
@@ -332,7 +332,7 @@ namespace splay_tree {
 
       /** pointed node */
       node_type* current_;
-      size_t rotation_cnt_;
+      std::size_t rotation_cnt_;
       const ST * splay_;
   };
 
@@ -426,7 +426,7 @@ namespace splay_tree {
       }
 
       /** @returns number of elements in tree */
-      size_t size() const {
+      std::size_t size() const {
         return (root_ == NULL) ? 0 : root_->size();
       }
 
@@ -436,19 +436,19 @@ namespace splay_tree {
       }
 
       /** @param i index of referenced element */
-      value_type& operator[](size_t i) const {
+      value_type& operator[](std::size_t i) const {
         return find(i)->val_;
       }
       
       /** @param t referenced element */
-      size_t getIdx(const T & t) const {
+      std::size_t getIdx(const T & t) const {
         node_type *node = tTonode_.at(t);
         if(node == NULL) {
             return -1;
         }
         node->normalize_root_path();
         
-        size_t i = node_size(node->left());
+        std::size_t i = node_size(node->left());
         while(node != root_) {
             if(node->parent()->left() == node) {
                 node = node->parent();
@@ -460,7 +460,7 @@ namespace splay_tree {
         return i;
       }
 
-      size_t getRotationCnt() const {
+      std::size_t getRotationCnt() const {
           return rotation_cnt_;
       }
 
@@ -468,7 +468,7 @@ namespace splay_tree {
        * @brief splays tree according to splay policy
        * @param i index of element to become root
        **/
-      node_type *splay(size_t i) const {
+      node_type *splay(std::size_t i) const {
         switch (SplayImpl) {
           case kTopDownUnbalanced:
           case kTopDown:
@@ -485,7 +485,7 @@ namespace splay_tree {
        * @param i index of last element of this after modification
        * @returns tree containing elements {i+1, ...}
        **/
-      SplayTree<value_type, SplayImpl> split_higher(size_t i) {
+      SplayTree<value_type, SplayImpl> split_higher(std::size_t i) {
         splay(i);
         node_type *new_root = root_->right();
         if (new_root != NULL) {
@@ -500,7 +500,7 @@ namespace splay_tree {
        * @param i index of first element of this after modification
        * @returns tree containing elements {0, ..., i-1}
        **/
-      SplayTree<value_type, SplayImpl> split_lower(size_t i) {
+      SplayTree<value_type, SplayImpl> split_lower(std::size_t i) {
         splay(i);
         node_type *new_root = root_->left();
         if (new_root != NULL) {
@@ -545,7 +545,7 @@ namespace splay_tree {
        * @param i index of first element of subsequence
        * @param j index of last element of subsequence
        **/
-      void reverse(size_t i, size_t j) {
+      void reverse(std::size_t i, std::size_t j) {
         assert(i <= j);
         // split lower
         SplayTree<value_type, SplayImpl> ltree = split_lower(i);
@@ -599,13 +599,13 @@ namespace splay_tree {
        * @brief splays node with given index to tree root
        * @param i index of a node to become root
        **/
-      node_type *splay_down(size_t i) const {
+      node_type *splay_down(std::size_t i) const {
         node_type *parent = root_;
         node_type second_tree(T{});
         node_type *l = &second_tree, *r = &second_tree;
 
         for (;;) {
-          size_t left_size = node_size(parent->left());
+          std::size_t left_size = node_size(parent->left());
           if (left_size == i) {
             break;
           } else if (left_size > i) {
@@ -719,7 +719,7 @@ namespace splay_tree {
         if (b >= e) {
           return NULL;
         }
-        ssize_t m = (e - b) / 2;
+        std::size_t m = (e - b) / 2;
         node_type *node = new node_type(*(b + m));
         bool ret = tTonode_.insert(std::make_pair(*(b + m), node)).second;
         assert(ret);
@@ -746,14 +746,14 @@ namespace splay_tree {
        * @param i number of elements smaller than element to be returned
        * @returns pointer to found node or NULL if doesn't exist
        **/
-      node_type *find(size_t i) const {
+      node_type *find(std::size_t i) const {
         node_type *node = root_;
         for (;;) {
           if (node == NULL) {
             return NULL;
           }
           node_type *left = node->left();
-          size_t left_size = (left == NULL) ? 0 : left->size();
+          std::size_t left_size = (left == NULL) ? 0 : left->size();
           if (left_size == i) {
             return node;
           } else if (left_size > i) {
@@ -777,7 +777,7 @@ namespace splay_tree {
       }*/
 
       /** root node of a tree */
-      size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
+      std::size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
       mutable node_type *root_ = NULL;
       std::unordered_map<T, node_type *> tTonode_;
   };

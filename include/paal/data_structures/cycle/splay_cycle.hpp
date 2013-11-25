@@ -33,8 +33,8 @@ public:
     }
 
     VIter vbegin(const T& t) const {
-        size_t i = m_splayTree.getIdx(t);
-        assert(i != size_t(-1));
+        std::size_t i = m_splayTree.getIdx(t);
+        assert(i != std::size_t(-1));
         return VIter(SIter(m_splayTree.splay(i), &m_splayTree), m_splayTree.begin(), m_splayTree.end());
     }
 
@@ -47,10 +47,10 @@ public:
         if(begin == end) {
             return;
         }
-        size_t b = m_splayTree.getIdx(begin);
-        assert(b != size_t(-1));
-        size_t e = m_splayTree.getIdx(end);
-        assert(e != size_t(-1));
+        std::size_t b = m_splayTree.getIdx(begin);
+        assert(b != std::size_t(-1));
+        std::size_t e = m_splayTree.getIdx(end);
+        assert(e != std::size_t(-1));
         if(b < e) {
             m_splayTree.reverse(b, e);
         } else {
@@ -61,7 +61,7 @@ public:
 
 private:
     SplayTree m_splayTree; 
-    const size_t m_size;
+    const std::size_t m_size;
 };
 
 } //data_structures

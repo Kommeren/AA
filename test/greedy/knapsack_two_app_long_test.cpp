@@ -41,7 +41,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         LOGLN("\nvalues ");
         LOG_COPY_RANGE_DEL(values, " ");
         LOGLN("");
-        auto objects = boost::irange(size_t(0), values.size());
+        auto objects = boost::irange(std::size_t(0), values.size());
         //KNAPSACK 0/1
         {
             std::vector<int> result;

@@ -32,7 +32,7 @@ struct LogVisitor : public TrivialVisitor {
 // create a typedef for the Graph type
 typedef adjacency_list<vecS, vecS, undirectedS,
             property < vertex_index_t, int >,
-            property < edge_index_t, size_t,
+            property < edge_index_t, std::size_t,
                 property < edge_weight_t, double,
                     property < edge_color_t, bool> > > > Graph;
 

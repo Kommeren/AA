@@ -43,7 +43,7 @@ public:
     GetMoves() : neighb{.01, -.01, .001, -.001}, neighbCut(neighb.size()) {}
 
     std::pair<Iter, Iter> operator()(const Solution & s, SolutionElement i) {
-        for(int j : boost::irange(size_t(0), neighb.size())) {
+        for(int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCut[j] = std::max(neighb[j] + i, LOWER_BOUND);
             neighbCut[j] = std::min(neighbCut[j], UPPER_BOUND);
         }

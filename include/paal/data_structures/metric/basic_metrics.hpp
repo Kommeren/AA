@@ -59,7 +59,7 @@ class AssymetricArrayMetric {
 
         AssymetricArrayMetric & operator=(const AssymetricArrayMetric & am) {
             auto shape = am.m_matrix.shape();
-            std::vector<size_t> dim(shape, shape + DIM_NR);
+            std::vector<std::size_t> dim(shape, shape + DIM_NR);
             m_matrix.resize(dim);
             m_matrix = am.m_matrix;
             return *this; 

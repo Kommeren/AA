@@ -79,7 +79,7 @@ namespace std {
         /**
          * Returns the hash of a given Id object.
          */
-        size_t operator()(const paal::lp::Id & x) const
+        std::size_t operator()(const paal::lp::Id & x) const
         {
             return hash<int>()(x.get());
         }

@@ -35,7 +35,7 @@ public:
     BiMapMIC() {}
 
     template <typename Iter> BiMapMIC(Iter b, Iter e) {
-        size_t s = std::distance(b, e);
+        std::size_t s = std::distance(b, e);
         m_index.reserve(s);
         for(const T & t : boost::make_iterator_range(b,e)) {
             add(t);
@@ -61,7 +61,7 @@ public:
 #endif
     }
     
-    size_t size() const {
+    std::size_t size() const {
         return m_index.size();
     }
 
@@ -97,7 +97,7 @@ public:
     BiMap() {}
 
     template <typename Iter> BiMap(Iter b, Iter e) {
-        size_t s = std::distance(b, e);
+        std::size_t s = std::distance(b, e);
         m_idToT.reserve(s);
         m_tToID.reserve(s);
         for(const T & t : boost::make_iterator_range(b,e)) {
@@ -125,7 +125,7 @@ public:
 #endif
     }
     
-    size_t size() const {
+    std::size_t size() const {
         return  m_idToT.size(); 
     }
 
@@ -179,7 +179,7 @@ public:
         if(b == e)
             return;
         
-        size_t size = std::distance(b, e);
+        std::size_t size = std::distance(b, e);
         m_idToT.resize(size);
         std::copy(b, e, m_idToT.begin());
         
@@ -196,7 +196,7 @@ public:
         return m_idToT[i];
     }
     
-    size_t size() const {
+    std::size_t size() const {
         return  m_idToT.size(); 
     }
 

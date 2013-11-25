@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     };
    
     auto getMoves =[&] (const Solution & s, SolutionElement i) {
-        for(int j : boost::irange(size_t(0), neighb.size())) {
+        for(int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCut[j] = std::max(neighb[j] + i, LOWER_BOUND);
             neighbCut[j] = std::min(neighbCut[j], UPPER_BOUND);
         }
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
 
     auto getMovesG =[&] (const double g) {
-        for(int j : boost::irange(size_t(0), neighb.size())) {
+        for(int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCutG[j] = neighb[j] + g;
         }
         return std::make_pair(neighbCutG.begin(), neighbCutG.end());

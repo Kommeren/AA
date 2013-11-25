@@ -33,7 +33,8 @@ int main(){
                     boost::property < boost::vertex_color_t, int>,
                     boost::property < boost::edge_weight_t, int> 
                     > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nuVertices);
-    for(int i=1;i<=terminals.size();i++)
+
+    for(std::size_t i=1;i<=terminals.size();i++)
         put (boost::vertex_color,graph,terminals[i-1],i);
     
     //solve

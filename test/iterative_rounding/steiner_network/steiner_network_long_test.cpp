@@ -127,7 +127,7 @@ void fillGraph(Graph & g, const Edges & edges, int & verticesNum) {
         // add regular edge
         paal::addEdge(g, cost, e.first.first, e.first.second, randCost());
         // add new vertices on multi-edges, so that we get a graph not a multigraph
-        for (int i : boost::irange(1, e.second)) {
+        for (int i = 1;i<e.second;++i) {
             paal::addEdge(g, cost, e.first.first, verticesNum, randCost());
             paal::addEdge(g, cost, e.first.second, verticesNum, randCost());
             ++verticesNum;
@@ -252,7 +252,7 @@ void runTestCase(const std::vector<int> & verticesNum, const std::vector<int> & 
         LOGLN("max restriction: " << maxRes[i]);
 
         auto restrictions = [&](int i, int j){
-                if (size_t(i) < res.size() && size_t(j) < res.size())
+                if (std::size_t(i) < res.size() && std::size_t(j) < res.size())
                     return res[i][j];
                 else
                     return 1;
