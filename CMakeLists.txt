@@ -24,7 +24,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe")
 
 # Boost
-find_package(Boost 1.52 COMPONENTS unit_test_framework REQUIRED)
+find_package(Boost 1.55 COMPONENTS unit_test_framework REQUIRED)
 MESSAGE("Boost information:")
 MESSAGE("  Boost_INCLUDE_DIRS: ${Boost_INCLUDE_DIRS}")
 MESSAGE("  Boost_LIBRARIES: ${Boost_LIBRARIES}")

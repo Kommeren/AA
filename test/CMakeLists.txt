@@ -3,12 +3,12 @@ file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
 #we have to link against unit_test lib
 link_directories(${Boost_LIBRARY_DIRS})
 
-ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
+ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK) 
 include_directories (${TEST_DIR})
 #adding tests
-foreach(t ${test_bins})
-    set(TEST_LIBS ${LIBS} ${Boost_LIBRARIES})
+set(TEST_LIBS ${LIBS} ${Boost_LIBRARIES})
 
+foreach(t ${test_bins})
     get_filename_component(n ${t} NAME_WE)
     message("adding test " : ${n})
     if(${n} MATCHES ".*test.*")
@@ -27,8 +27,10 @@ foreach(t ${test_bins})
     endif()
 endforeach()
 
+set(TEST_LIBS ${TEST_LIBS} glpk)
+
 add_executable(all_small_tests ${short_tests})
-target_link_libraries(all_small_tests ${TEST_LIBS} glpk)
+target_link_libraries(all_small_tests ${TEST_LIBS})
 
 add_executable(all_long_tests ${long_tests})
-target_link_libraries(all_long_tests ${TEST_LIBS} glpk)
+target_link_libraries(all_long_tests ${TEST_LIBS})
