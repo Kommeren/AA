@@ -141,7 +141,6 @@ namespace paal {
             }
         private:
             //adding variables
-            //returns the number of variables
             template <typename Problem, typename LP>
             void addVariables(Problem & problem, LP & lp) {
                 int eIdx{0};
@@ -155,7 +154,6 @@ namespace paal {
             }
 
             //adding the cut constraints
-            //returns the number of rows added
             template <typename Problem, typename LP>
             void addCutConstraints(Problem & problem, LP & lp) {
                 int dbIndex = 0;

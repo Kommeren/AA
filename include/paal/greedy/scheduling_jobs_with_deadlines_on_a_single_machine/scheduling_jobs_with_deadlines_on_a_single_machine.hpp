@@ -29,36 +29,36 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine{
  *  \snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
- * @param ImputIterator first - jobs begin
- * @param ImputIterator last - jobs end
+ * @param InputIterator first - jobs begin
+ * @param InputIterator last - jobs end
  * @param GetTime getTime
  * @param GetRelaseDate getRelaseDate
  * @param GetDueDate getDueDate
  * @param OutputIterator result
  * @tparam Time
- * @tparam ImputIterator
+ * @tparam InputIterator
  * @tparam OutputIterator
  * @tparam GetTime
  * @tparam GetDueDate
  * @tparam GetRelaseDate
  */
-template<class ImputIterator, class OutputIterator, class GetTime,class GetDueDate,class GetRelaseDate>
+template<class InputIterator, class OutputIterator, class GetTime,class GetDueDate,class GetRelaseDate>
 auto schedulingJobsWithDeadlinesOnASingleMachine(
-        const ImputIterator first,const ImputIterator last
+        const InputIterator first,const InputIterator last
         ,GetTime getTime,GetRelaseDate getRelaseDate,GetDueDate getDueDate
         ,OutputIterator result)-> puretype (getTime(*first)){
     typedef puretype( getTime(*first)) Time;
-    std::vector<ImputIterator> jobs;
+    std::vector<InputIterator> jobs;
     std::copy(boost::make_counting_iterator(first),
           boost::make_counting_iterator(last),
           std::back_inserter(jobs));
     
-    auto getDueDateFromIterator=[=](ImputIterator iter){return getDueDate(*iter);};
+    auto getDueDateFromIterator=[=](InputIterator iter){return getDueDate(*iter);};
     auto dueDateCompatator=utils::make_FunctorToComparator(getDueDateFromIterator,utils::Greater());
-    typedef std::priority_queue<ImputIterator,std::vector<ImputIterator>,decltype (dueDateCompatator)> QueueType; 
+    typedef std::priority_queue<InputIterator,std::vector<InputIterator>,decltype (dueDateCompatator)> QueueType; 
     QueueType activeJobsIters(dueDateCompatator);
     
-    auto getRelaseDateFromIterator=[=](ImputIterator iter){return getRelaseDate(*iter);};
+    auto getRelaseDateFromIterator=[=](InputIterator iter){return getRelaseDate(*iter);};
     std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getRelaseDateFromIterator));
     Time startIdle=Time();
     Time longestDelay=Time();

@@ -68,8 +68,7 @@ public:
     void fillSuffixToTree(){
         for(int suffix=m_length-1,lastWord=0,commonPrefix=0;suffix>0;suffix--){
             auto beginOfSuffix = m_suffixArray[suffix];
-
-            if(m_sumWords[beginOfSuffix - 1] == DELIMITER){
+            if(beginOfSuffix == 0 || m_sumWords[beginOfSuffix - 1] == DELIMITER) {
                 lastWord = beginOfSuffix;
                 commonPrefix = m_lcp[suffix];
             }

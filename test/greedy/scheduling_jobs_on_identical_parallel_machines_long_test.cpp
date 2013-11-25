@@ -41,18 +41,18 @@ BOOST_AUTO_TEST_CASE(test_1) {
                 minJobsOnMachine<minJobsOnMachineEnd;
                 minJobsOnMachine+=minJobsOnMachineStep){
             LOGLN("machines: "<<numberOfMachines);
-            
-            std::vector< std::pair<int, Time> > result;
-            
+        
             std::vector<Time> jobs=ingen(numberOfMachines,minJobsOnMachine);
-            
+        
+            std::vector< std::pair<int, decltype(jobs)::iterator> > result;
+        
             LOGLN("jobs: "<<jobs.size());
             paal::greedy::scheduling_jobs_on_identical_parallel_machines::
                     schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result),paal::utils::IdentityFunctor());
             std::vector<Time> sumOfMachine;
             sumOfMachine.resize(numberOfMachines);
             for(auto jobMachinePair:result){
-                sumOfMachine[jobMachinePair.first]+=jobMachinePair.second;
+                sumOfMachine[jobMachinePair.first]+=*(jobMachinePair.second);
             }
             
             Time maximumLoad=*std::max_element(sumOfMachine.begin(),sumOfMachine.end());

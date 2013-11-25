@@ -195,15 +195,15 @@ protected:
     static int boundTypeToGLP(BoundType b) {
         switch(b) {
             case FR:
-                return GLP_FR;
+                return GLP_FR;//free
             case LO:
-                return GLP_LO;
+                return GLP_LO;//lower bound
             case UP:
-                return GLP_UP;
+                return GLP_UP;//upper bound
             case DB: 
-                return GLP_DB;
+                return GLP_DB;//lower and upper bound
             case FX:
-                return GLP_FX;
+                return GLP_FX;//exact value
             default:
                 assert(false);
                 return GLP_FR;

@@ -14,6 +14,7 @@
 #include <utility>
 #include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/iterator/counting_iterator.hpp>
 #include <paal/utils/functors.hpp>
 #include <paal/utils/type_functions.hpp>
 
@@ -35,20 +36,28 @@ namespace scheduling_jobs_on_identical_parallel_machines{
  * @param OutputIterator result
  * @tparam _RandomAccessIter
  */
-template<class _RandomAccessIter, class OutputIterator,class GetTime>
-void schedulingJobsOnIdenticalParallelMachines(int n_machines,const _RandomAccessIter first,const _RandomAccessIter last, OutputIterator result,GetTime getTime){
-    typedef typename std::iterator_traits<_RandomAccessIter>::reference JobReference;
+template<class InputIterator, class OutputIterator,class GetTime>
+void schedulingJobsOnIdenticalParallelMachines(int n_machines,const InputIterator first,const InputIterator last, OutputIterator result,GetTime getTime){
+    typedef typename std::iterator_traits<InputIterator>::reference JobReference;
     typedef typename utils::PureResultOf<GetTime(JobReference)>::type Time;
-    std::sort(first,last,utils::Greater());
+    
+    std::vector<InputIterator> jobs;
+    std::copy(boost::make_counting_iterator(first),
+          boost::make_counting_iterator(last),
+          std::back_inserter(jobs));
+    auto getTimeFromIterator=[=](InputIterator iter){return getTime(*iter);};
+    std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getTimeFromIterator,utils::Greater()));
+    
+    //std::sort(first,last,utils::Greater());
     std::priority_queue<std::pair<Time,int> > machines;
     for(auto machineId : boost::irange(0, n_machines)){
         machines.push(std::make_pair(0,machineId));
     }
-    for(JobReference job: boost::make_iterator_range(first,last)){
+    for(auto jobIter: jobs){
         auto leastLoadedMachine=machines.top();
         machines.pop();
-        machines.push(std::make_pair(leastLoadedMachine.first-getTime(job),leastLoadedMachine.second));
-        *result = std::make_pair(leastLoadedMachine.second,job);
+        machines.push(std::make_pair(leastLoadedMachine.first-getTime(*jobIter),leastLoadedMachine.second));
+        *result = std::make_pair(leastLoadedMachine.second,jobIter);
         ++result;
     }
 }

@@ -24,7 +24,7 @@ int main() {
     // sample data
     int numberOfMachines = 3;
     vector<Job> jobs={{2.1,'a'},{3.1,'b'},{4.1,'c'},{5.1,'d'},{6.1,'e'},{7.1,'f'},{8.1,'g'}};
-    vector<pair<int,Job> > result;
+    vector<pair<int,decltype(jobs)::iterator> > result;
     
     schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result), returnJobTimeFunctor);
     
@@ -33,8 +33,8 @@ int main() {
     for(auto machineJobPair:result){
         auto machine=machineJobPair.first;
         auto job=machineJobPair.second;
-        sumOfMachine[machine]+=job.first;
-        cout<<"On machine: "<<machine<<" do job: "<<job.second<<endl;
+        sumOfMachine[machine]+=job->first;
+        cout<<"On machine: "<<machine<<" do job: "<<job->second<<endl;
     }
     Time maximumLoad=*std::max_element(sumOfMachine.begin(),sumOfMachine.end());
     
