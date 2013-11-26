@@ -32,7 +32,7 @@ template <typename Graph> struct GraphMetricTraits {
 namespace metric_fillers {
 
     //generic
-    template <typename GraphTypeTag> class GraphMetricFillerImpl {};
+    template <typename GraphTypeTag> class GraphMetricFillerImpl;
     
     template <> class GraphMetricFillerImpl<graph_type::Sparse> {
         public:

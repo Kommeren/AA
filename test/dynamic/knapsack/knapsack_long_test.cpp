@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
         LOGLN("");
         auto opt_0_1 = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
-        auto optSize = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + sizes[i];});
+        ON_LOG(auto optSize = )std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + sizes[i];});
         LOGLN("Opt size " << optSize << " opt " << opt_0_1);
         LOGLN("");
 

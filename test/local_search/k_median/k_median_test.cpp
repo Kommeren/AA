@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(kmedian_test) {
     paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
 
     //print result
-    auto const & ch = sol.getChosenFacilities();
+    ON_LOG(auto const & ch = )sol.getChosenFacilities();
     LOGLN("Solution:");
     LOG_COPY_DEL(ch.begin(), ch.end(), ",");
 }

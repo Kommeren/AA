@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         {
             std::vector<int> result;
             LOGLN("Knapsack");
-            auto maxValue = knapsack_two_app(std::begin(objects), std::end(objects), 
+            ON_LOG(auto maxValue = )knapsack_two_app(std::begin(objects), std::end(objects), 
                    capacity,
                    std::back_inserter(result), 
                    make_ArrayToFunctor(values),
