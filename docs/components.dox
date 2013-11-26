@@ -2,15 +2,16 @@
 
 \section mot Motivation. 
 
-The main motivation for \a Components class is handling default arguments, this implementation is designed (unlike boost.parameter) to supports different sets default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around. Another advantage of this design is that we can keep many different configurations of default arguments. From now on, each of the argument is called component. Components group together in one class are called just  \a Components. 
+The main motivation for the \a Components class is handling default arguments. This implementation is designed (unlike boost.parameter) to support several sets of default arguments. It often happens that a function takes many arguments, but only some of them are really needed, the rest having default values. The other motivation is that sometimes one would like to keep all the arguments grouped together. 
+This way arguments can be easily moved around. Another advantage of this design is that we can keep many different configurations of default arguments. An instance of the \a Components class represents one configuration of default arguments. 
 
 \subsection mot_exmpl Motivating example
-Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
+Assume that we'd like to write a function which takes three functors: Init, Start and Stop. We are going to introduce the interface using the \a Components class.
 
 
 <b> Very basic usage: </b>
 
-As library developer (or function provider) we introduce a interface
+As a library developer (or a function provider) we introduce the following interface
 
 <pre>
     template \<typename DoStuffComponents\>
@@ -25,7 +26,7 @@ we introduce the names of the needed components
     struct Stop;
 </pre>
 
-and define appropriate components class
+and specify the  appropriate \a Components class
 
 <pre>
     template <typename... Args>
@@ -33,12 +34,12 @@ and define appropriate components class
 </pre>
 
 
-Later on user can run the function
+Later on a user can run the function as follows
 <pre>
     DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
     do_stuff(doStuffComponents);
 </pre>
-Here we assume that all the implementations have the default constructor, this is not mandatory. There are different ways of initializing components(see section:\ref const_comp for more details).
+Here we assume that all the implementations have default constructors, however this is not mandatory. There are different ways of initializing components(see section:\ref const_comp for more details).
     
 How to get the parameters back from DoStuffComponents:
 <pre>
@@ -47,19 +48,19 @@ How to get the parameters back from DoStuffComponents:
     MyInitImpl anotherImplementation(42);
     doStuffComponents.set<Init>(anotherImplementation); //setting Init component
 
-    doStuffComponents.call<Start>("hello world"); // you can directly call component if it is a functor
+    doStuffComponents.call<Start>("hello world"); // you can directly call a component if it is a functor
 </pre>
 
 
-<b> How to provide default parameter: </b>
+<b> How to provide default parameters: </b>
 
-You can define DoStuffComponents as follows
+You can define \a DoStuffComponents as follows
 <pre>
     template <typename... Args>
     using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\>;
 </pre>
 
-Later on user can construct the DoStuffComponents as follows
+Later on a user can construct the \a DoStuffComponents as follows
 <pre>
     DoStuffComponents<MyInitImpl> doStuffComponents1;
     DoStuffComponents<MyInitImpl, MyStartImpl> doStuffComponents2;
@@ -80,7 +81,7 @@ One can define components using template aliasing (preferred)
     DoStuffComponents<MyInitImpl, MyStartImpl, MyStopImpl> doStuffComponents;
 
 </pre>
-This can be done without template aliasing
+This can also be done without template aliasing
 <pre>
     //inside library:
     typedef Components<Init, Start, Stop> DoStuffComponents;
@@ -92,7 +93,7 @@ This can be done without template aliasing
 \section const_comp Constructing Components
 There are several ways of contructing components:
 <ul>
-<li> One can provide any number of arguments. The kth argument has to be convertible kth component.
+<li> One can provide any number of arguments. The kth argument has to be convertible to the kth component.
 <pre>
     //inside library:
     template <typename... Args>
@@ -106,7 +107,7 @@ There are several ways of contructing components:
     int a;
     MyDoStuffComponents doStuffComponents(a);
 </pre>
-<li> One can provide any object and a CopyTag. This tag indicates, that passed object has  get<Name> member functions for some Names.
+<li> One can provide any object and a CopyTag. This tag indicates, that the passed object has  get<Name> member functions for some Names.
 <pre>
     template <typename... Args>
     using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
