@@ -2,7 +2,7 @@
 
 \section mot Motivation. 
 
-The main motivation for \a Components class is handling default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around. Another advantage of this design is that we can keep many different configurations of default arguments. From now on each of the argument is called component. Components group together in one class are called just  \a Components.
+The main motivation for \a Components class is handling default arguments, this implementation is designed (unlike boost.parameter) to supports different sets default arguments. It often happens that function takes many arguments, but very often only some of them are really needed, the rest has default values. The other motivation is that sometimes we'd  like to keep all the arguments grouped together. This way arguments can be easily moved around. Another advantage of this design is that we can keep many different configurations of default arguments. From now on, each of the argument is called component. Components group together in one class are called just  \a Components. 
 
 \subsection mot_exmpl Motivating example
 Assume that we'd like to write a function which takes three functors Init, Start and Stop. We are going to introduce the interface using the components class.
@@ -56,7 +56,7 @@ How to get the parameters back from DoStuffComponents:
 You can define DoStuffComponents as follows
 <pre>
     template <typename... Args>
-    using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>\:\:type\<Args...\>;
+    using DoStuffComponents = Components\<Init, NameWithDefault\<Start, DefaultStart\>, NameWithDefault\<Stop, DefaultStop\>\>::type\<Args...\>;
 </pre>
 
 Later on user can construct the DoStuffComponents as follows
@@ -158,6 +158,32 @@ There is a way to replace component for given components.
     double d(5);
     Replaced replaced = replace<Start>(d, comps); //replacing component
 </pre> 
+
+\section comp_to_other_libs Comparison to other libraries
+<ul>
+    <li> Boost.Parameter
+
+        There are two main differences between boost.parameter and \a Components class
+        <ul>
+        <li> The \a Components, supports different sets of default arguments
+        <li> The \a Components is written in pure C++ (no macros).
+        </ul>
+        The \a Components is not designed to replacing boost.parameter but in many cases (e.g. when given arguments are functors or when given arguments can depend on each other) 
+        it might be more natural design.
+
+    <li> Boost.Fusion
+
+        Although the idea of  \a Components is very similar to boost fusion, the \a Components gives some functionalities that are not offered by Boost.Fusion.
+        The example is different initialization methods (see section:\ref const_comp for more details).
+
+</ul>
+
+\section supp_com Supported Compilers
+<ul>
+<li> clang 3.2
+<li> g++ 4.7.2
+</ul>
+Msvc is not supported, because of lack of the template aliasing. 
 
 \section iterot Iterating Over Components class (TODO)
 
