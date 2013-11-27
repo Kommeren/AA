@@ -20,14 +20,20 @@
 namespace paal {
 namespace utils {
 
-//Functor does nothing
+/**
+ * @brief Functor does nothing
+ */
 struct SkipFunctor {
     template <typename ... Args > 
         void  operator()(Args&&... args) const {}
 };
 
-//Functor returns always the same number. 
-//The number has to be known at compile time
+/**
+ * @brief Functor returns always the same number. The number has to be known at compile time
+ *
+ * @tparam T type of returned value
+ * @tparam t return value
+ */
 template <typename T, T t>
     struct ReturnSomethingFunctor {
         template <typename ... Args > 
@@ -36,8 +42,11 @@ template <typename T, T t>
             } 
     };
 
-//Functor returns always the same number (dynamic version). 
-//The number has to be known at compile time
+/**
+ * @brief Functor returns always the same number (dynamic version). 
+ *
+ * @tparam T type of returned value
+ */
 template <typename T>
     struct DynamicReturnSomethingFunctor {
         DynamicReturnSomethingFunctor(T t) : m_t(t) {}
@@ -49,13 +58,26 @@ template <typename T>
         T m_t;
     };
 
+
+
+/**
+ * @brief make function for DynamicReturnSomethingFunctor
+ *
+ * @tparam T
+ * @param t
+ *
+ * @return 
+ */
 template <typename T>
 DynamicReturnSomethingFunctor<T>
 make_DynamicReturnSomethingFunctor(T t) {
     return DynamicReturnSomethingFunctor<T>(t);
 }
 
-//functor returns its argument
+
+/**
+ * @brief functor returns its argument
+ */
 struct IdentityFunctor {
     template <typename Arg> 
         auto  operator()(Arg&& arg) const ->
@@ -65,19 +87,31 @@ struct IdentityFunctor {
         }
 };
 
-//functor return false
+
+/**
+ * @brief functor return false
+ */
 struct ReturnFalseFunctor : 
     public ReturnSomethingFunctor<bool, false> {};
 
-//functor return true
+
+/**
+ * @brief functor return true
+ */
 struct ReturnTrueFunctor : 
     public ReturnSomethingFunctor<bool, true> {};
 
-//functor returns 0
+
+/**
+ * @brief functor returns 0
+ */
 struct ReturnZeroFunctor :
     public ReturnSomethingFunctor<int, 0> {};
 
-//functors calls assert(false). 
+
+/**
+ * @brief functors calls assert(false). 
+ */
 struct AssertFunctor {
     template <typename ... Args > 
         void  operator()(Args&&... args) const {
@@ -85,8 +119,9 @@ struct AssertFunctor {
         } 
 };
 
-
-//removes reference
+/**
+ * @brief removes reference
+ */
 struct RemoveReference {
     template <typename T>
     T operator()(const T & t) const {
@@ -95,7 +130,12 @@ struct RemoveReference {
 };
 
 
-// Adapts array as function, providing operator()().     
+
+/**
+ * @brief Adapts array as function, providing operator()().     
+ *
+ * @tparam Array
+ */
 template <typename Array> 
     class ArrayToFunctor{
         public:
@@ -113,14 +153,28 @@ template <typename Array>
             int m_offset;
     };
 
+/**
+ * @brief make function for ArrayToFunctor
+ *
+ * @tparam Array
+ * @param a
+ * @param offset
+ *
+ * @return 
+ */
 template <typename Array>
     ArrayToFunctor<Array> make_ArrayToFunctor(const Array &a, int offset = 0) {
         return ArrayToFunctor<Array>(a, offset);
     }
 
-// Wrapper around a functor which adds assigmnent operator as well as default constructor.
-// Note, this struct might be dangerous. Using this struct correctly requires the underlying
-// functor to live at least as long as this wrapper.
+
+/**
+ * @brief  Wrapper around a functor which adds assigmnent operator as well as default constructor.
+ * Note, this struct might be dangerous. Using this struct correctly requires the underlying
+ * functor to live at least as long as this wrapper.
+ *
+ * @tparam Functor
+ */
 template <typename Functor>
 struct AssignableFunctor {
    
@@ -143,12 +197,26 @@ struct AssignableFunctor {
       const Functor* m_f;
 };
 
+/**
+ * @brief make function for AssignableFunctor
+ *
+ * @tparam Functor
+ * @param f
+ *
+ * @return 
+ */
 template <typename Functor>
 AssignableFunctor<Functor>
 make_AssignableFunctor(Functor& f) {
    return AssignableFunctor<Functor>(f);
 }
 
+/**
+ * @brief For given functor f, LiftIteratorFunctor provides operator()(Iterator iterator)
+ * which returns f(*iter).
+ *
+ * @tparam Functor
+ */
 template <typename Functor>
 struct LiftIteratorFunctor {
    LiftIteratorFunctor(Functor f) : m_f(std::move(f)) {}
@@ -161,6 +229,14 @@ struct LiftIteratorFunctor {
       Functor m_f;
 };
 
+/**
+ * @brief make function for LiftIteratorFunctor
+ *
+ * @tparam Functor
+ * @param f
+ *
+ * @return 
+ */
 template <typename Functor>
 LiftIteratorFunctor<Functor>
 make_LiftIteratorFunctor(Functor f) {
@@ -170,6 +246,9 @@ make_LiftIteratorFunctor(Functor f) {
 //************ The set of comparison functors *******************
 //functors are equivalent to corresponding std functors (e.g. std::less) but are not templated
 
+/**
+ * @brief Greater functor
+ */
 struct Greater {
     template<class T>
         auto operator() (const T& x, const T& y) const ->
@@ -178,6 +257,9 @@ struct Greater {
         };
 };
 
+/**
+ * @brief Less functor
+ */
 struct Less {
     template<class T>
         auto operator() (const T& x, const T& y) const ->
@@ -186,6 +268,9 @@ struct Less {
         };
 };
 
+/**
+ * @brief GreaterEqual functor
+ */
 struct GreaterEqual {
     template<class T>
         auto operator() (const T& x, const T& y) const ->
@@ -194,6 +279,9 @@ struct GreaterEqual {
         };
 };
 
+/**
+ * @brief LessEqual functor
+ */
 struct LessEqual {
     template<class T>
         auto operator() (const T& x, const T& y) const ->
@@ -202,6 +290,9 @@ struct LessEqual {
         };
 };
 
+/**
+ * @brief EqualTo functor
+ */
 struct EqualTo {
     template<class T>
         auto operator() (const T& x, const T& y) const ->
@@ -210,6 +301,9 @@ struct EqualTo {
         };
 };
 
+/**
+ * @brief NotEqualTo functor
+ */
 struct NotEqualTo {
     template<class T>
         auto operator() (const T& x, const T& y) const -> 

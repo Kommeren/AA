@@ -37,9 +37,9 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         read(testDir + "cases/", testId, capacity, sizes, values, optimal);
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
-        LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
+        LOG_COPY_RANGE_DEL(sizes, " ");
         LOGLN("\nvalues ");
-        LOG_COPY_DEL(values.begin(), values.end(), " ");
+        LOG_COPY_RANGE_DEL(values, " ");
         LOGLN("");
         auto objects = boost::irange(size_t(0), values.size());
         //KNAPSACK 0/1
@@ -53,12 +53,12 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
                    make_ArrayToFunctor(sizes));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
-            LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
             LOGLN("APPROXIMATION RATIO " << double(opt) /  double(maxValue.first));
             LOGLN("OPT");
-            LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
+            LOG_COPY_RANGE_DEL(optimal, " ");
             LOGLN("");
             BOOST_CHECK(opt <= 2 * maxValue.first);
         }
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
                    make_ArrayToFunctor(sizes));
 
             LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
-            LOG_COPY_DEL(result.begin(), result.end(), " ");
+            LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
         }
     });

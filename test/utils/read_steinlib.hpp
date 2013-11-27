@@ -8,13 +8,14 @@
 #ifndef READ_ORLIB_FC_HPP
 #define READ_ORLIB_FC_HPP
 
+#include <fstream>
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "utils/logger.hpp"
 
 namespace paal {
 
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS,
-            boost::no_property, boost::property < boost::edge_weight_t, int > > Graph;
+          boost::property<boost::vertex_color_t, int>, boost::property < boost::edge_weight_t, int > > Graph;
 typedef paal::data_structures::GraphMetric<Graph, int> GraphMT;
 
 struct SteinerTreeTest {
@@ -43,7 +44,7 @@ inline std::istream & goToSection(std::istream & is, const std::string & s){
     return goTo(is, "SECTION " + s);
 }
 
- inline int readInt(std::istream & is, const std::string & token){
+inline int readInt(std::istream & is, const std::string & token){
     std::string s;
     int i;
     is >> s >> i;
@@ -77,8 +78,10 @@ inline Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::
     goToSection(is, "Terminals");
     T = readInt(is, "Terminals");
     terminals.resize(T);
+    auto color = get(boost::vertex_color, g);
     for(int i : boost::irange(0,T)) {
         terminals[i] = readInt(is, "T");
+        put(color, terminals[i], 1);
     }
     return g;
 }

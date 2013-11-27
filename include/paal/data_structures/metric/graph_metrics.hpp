@@ -32,18 +32,16 @@ template <typename Graph> struct GraphMetricTraits {
 namespace metric_fillers {
 
     //generic
-    template <typename GraphTypeTag> class GraphMetricFillerImpl;
+    template <typename GraphTypeTag> struct GraphMetricFillerImpl;
     
-    template <> class GraphMetricFillerImpl<graph_type::Sparse> {
-        public:
+    template <> struct GraphMetricFillerImpl<graph_type::Sparse> {
         template <typename Graph, typename ResultMatrix> 
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
             boost::johnson_all_pairs_shortest_paths(g, rm); 
         }
     };
     
-    template <> class GraphMetricFillerImpl<graph_type::Dense> {
-        public:
+    template <> struct GraphMetricFillerImpl<graph_type::Dense> {
         template <typename Graph, typename ResultMatrix> 
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
             boost::floyd_warshall_all_pairs_shortest_paths(g, rm);

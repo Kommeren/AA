@@ -39,7 +39,7 @@ void test() {
 
     //create random solution 
     std::random_shuffle(v.begin(), v.end());
-    LOG_COPY_DEL(v.begin(), v.end(), ",");
+    LOG_COPY_RANGE_DEL(v, ",");
     Cycle cycle(v.begin(), v.end());
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
 

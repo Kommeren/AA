@@ -36,7 +36,7 @@ FLLogger(const Metric & m, const Cost & c) :
 template <typename Sol>
 void operator()(Sol & sol) {
            ON_LOG(auto const & ch =  sol.get().getChosenFacilities());
-           LOG_COPY_DEL(ch.begin(), ch.end(), ",");
+           LOG_COPY_RANGE_DEL(ch, ",");
            ON_LOG(auto c = sol.get().getVoronoi().getCost());
            LOGLN("current cost " << simple_algo::getCFLCost(m_metric, m_cost, sol.get()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
         };

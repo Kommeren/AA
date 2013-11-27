@@ -1,0 +1,7 @@
+/*! \page stein_def Steiner Tree Definition
+
+In the Steiner tree problem  we are given the set of nonterminals, 
+the set of terminals and the metric \a m. 
+Our goal is to find minimum spanning tree consisting all terminals (and possibly some nonterminals).
+
+*/

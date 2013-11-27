@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         double c = simple_algo::getKMCost(metric, sol);
         LOGLN("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
         VSet chosen=sol.getChosenFacilities();
-        LOG_COPY_DEL(chosen.begin(),chosen.end()," ");
+        LOG_COPY_RANGE_DEL(chosen," ");
         
         LOGLN(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));

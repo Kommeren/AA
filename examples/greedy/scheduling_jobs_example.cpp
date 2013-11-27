@@ -1,5 +1,5 @@
 /**
- * @file scheduling_jobs.cpp
+ * @file scheduling_jobs_example.cpp
  * @brief
  * @author Robert Rosolek
  * @version 1.0

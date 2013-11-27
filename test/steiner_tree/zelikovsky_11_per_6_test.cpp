@@ -10,9 +10,9 @@
 
 #include <iosfwd>
 
-#include "utils/logger.hpp"
-
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
+
+#include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/euclidean_metric.hpp"
 

@@ -86,7 +86,7 @@ int i;
 auto logger = [&](const Solution & s) {
     //printing
     LOGLN("f(");
-    LOG_COPY_DEL(s.begin(), s.end(), ","); 
+    LOG_COPY_RANGE_DEL(s, ","); 
     LOGLN(") \t" << f(s) << " after " << i++ );
 };
 } //anonymous namespace
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
 
     //printing
     LOGLN("f(");
-    LOG_COPY_DEL(sol.begin(), sol.end(), ","); 
+    LOG_COPY_RANGE_DEL(sol, ","); 
     LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
 
     //printing 
     LOGLN("f(");
-    LOG_COPY_DEL(sol.begin(), sol.end(), ","); 
+    LOG_COPY_RANGE_DEL(sol, ","); 
     LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 

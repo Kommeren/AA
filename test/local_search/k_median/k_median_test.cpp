@@ -34,5 +34,5 @@ BOOST_AUTO_TEST_CASE(kmedian_test) {
     //print result
     ON_LOG(auto const & ch = )sol.getChosenFacilities();
     LOGLN("Solution:");
-    LOG_COPY_DEL(ch.begin(), ch.end(), ",");
+    LOG_COPY_RANGE_DEL(ch, ",");
 }

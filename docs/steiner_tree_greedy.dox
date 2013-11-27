@@ -1,0 +1,23 @@
+/*! \page steiner_tree_greedy Steiner Tree 
+
+\section def Problem definition.
+\copydoc stein_def 
+
+\section sol_steiner_tree_greedy Solution
+This is the implementation of standard greedy approach. 
+We consider graph composed of the terminals and 
+distances between terminals equal to the distance of the shortest path between these terminals in the original graph.
+We compute the minimum spanning tree and lift the result tree to the original graph.
+
+Example:
+ \snippet steiner_tree_greedy_example.cpp steiner tree greedy Example
+
+\subsection apps_steiner_tree_greedy Approximation Ratio equals 2
+ 
+\subsection sa_steiner_tree_greedy See also:
+
+
+\subsection ref References
+The algorithm is described in the \cite Vazirani:2001:AA:500776.
+
+*/

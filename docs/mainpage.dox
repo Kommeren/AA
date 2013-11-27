@@ -50,6 +50,7 @@
             <li> \ref scheduling_jobs
             <li> \ref sjoipm
             <li> \ref sjwdoasm
+            <li> \ref steiner_tree_greedy
             </ul>
         <li> Dynamic
             <ul>

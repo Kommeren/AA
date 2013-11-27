@@ -1,11 +1,7 @@
 /*! \page knapsack_greedy Knapsack Greedy
 
 \section def Problem definition.
-
-<!--
-TODO this is not consistant
--->
-\verbinclude knapsack_definition.dox
+\copydoc knapsack_def
 
 \section Solution 
 This solution implements standard greedy algorithm. 

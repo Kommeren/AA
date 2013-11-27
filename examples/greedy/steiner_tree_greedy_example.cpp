@@ -1,0 +1,41 @@
+/**
+ * @file steiner_tree_greedy_example.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-09-20
+ */
+
+#include <iostream>
+
+#include "paal/greedy/steiner_tree_greedy.hpp"
+
+#include "test/utils/sample_graph.hpp"
+
+int main() {
+//! [steiner tree greedy Example]
+    typedef  SampleGraphsMetrics SGM;
+    auto g = SGM::getGraphSteiner();
+    typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
+    std::set<Edge> steinerEdges;
+    std::vector<int> color(num_vertices(g));
+    {
+        auto c = &color[0];
+        put(c, SGM::A, paal::Terminals::TERMINAL);
+        put(c, SGM::B, paal::Terminals::TERMINAL);
+        put(c, SGM::C, paal::Terminals::TERMINAL);
+        put(c, SGM::D, paal::Terminals::TERMINAL);
+        put(c, SGM::E, paal::Terminals::NONTERMINAL);
+    }
+
+    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()), 
+            boost::vertex_color_map(&color[0])); 
+    auto weight = get(boost::edge_weight, g);
+    auto sum = 0;
+    for(auto e: steinerEdges) {
+        sum += get(weight, e);
+    }
+    std::cout << "result " << sum << std::endl;
+//! [steiner tree greedy Example]
+}
+

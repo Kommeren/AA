@@ -42,13 +42,13 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
 
-        LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
+        LOG_COPY_RANGE_DEL(sizes, " ");
         LOGLN("");
         LOGLN("values ");
-        LOG_COPY_DEL(values.begin(), values.end(), " ");
+        LOG_COPY_RANGE_DEL(values, " ");
         LOGLN("");
         LOGLN("Optimal 0/1");
-        LOG_COPY_DEL(optimal.begin(), optimal.end(), " ");
+        LOG_COPY_RANGE_DEL(optimal, " ");
         LOGLN("");
         auto opt_0_1 = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
         ON_LOG(auto optSize = )std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + sizes[i];});

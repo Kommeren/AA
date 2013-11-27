@@ -52,7 +52,7 @@ void printResult(MaxValue maxValue, const std::vector<int> & result, pd::NoRetri
 
 template <typename MaxValue> 
 void printResult(MaxValue maxValue, const std::vector<int> & result, pd::RetrieveSolutionTag) {
-    LOG_COPY_DEL(result.begin(), result.end(), " ");
+    LOG_COPY_RANGE_DEL(result, " ");
     LOGLN("");
     printMaxValue(maxValue);
 }

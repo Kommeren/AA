@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     
     ON_LOG(auto const & ch = sol.getChosenFacilities());
     LOGLN("Solution after the first search");
-    LOG_COPY_DEL(ch.begin(), ch.end(), ",");
+    LOG_COPY_RANGE_DEL(ch, ",");
     LOGLN("");
     BOOST_CHECK(!facility_location_local_search_simple(sol, rem, add ,swap)); 
 }

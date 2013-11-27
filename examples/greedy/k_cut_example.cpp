@@ -33,5 +33,5 @@ int main(){
     }
     std::cout<<std::endl;
     
-//! [K Cut Example]}
+//! [K Cut Example]
 }
