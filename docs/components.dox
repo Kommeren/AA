@@ -123,7 +123,7 @@ There are several ways of contructing components:
     Small small2(big, CopyTag());
 </pre>
 
-<li> One can make object providing some arguments by name.
+<li> One can make an object providing some arguments by name.
 
 <pre>
     template <typename... Args>
@@ -140,13 +140,13 @@ There are several ways of contructing components:
     int a;
     auto myComps = DoStuffComponents::make_components(1, a, std::ref(a));
 </pre>
-If the deduced type should be reference, the std::ref wraper should be used.
+If the deduced type should be a reference, the std::ref wraper should be used.
 
 </ul>
-The important thing is that components do not have to be default constructible unless it is acctually default constructed.
+The important thing is that the components do not have to be default constructible unless it is acctually default constructed.
 
 \section repl_comps Replacing Components
-There is a way to replace component for given components.  
+There is a way to replace any component of a given \a Components instance.  
 
 <pre>
     template <typename... Args>
@@ -164,17 +164,17 @@ There is a way to replace component for given components.
 <ul>
     <li> Boost.Parameter
 
-        There are two main differences between boost.parameter and \a Components class
+        There are two main differences between Boost.Parameter and \a Components classes
         <ul>
-        <li> The \a Components, supports different sets of default arguments
-        <li> The \a Components is written in pure C++ (no macros).
+        <li> The \a Components class supports different sets of default arguments
+        <li> The \a Components class is written in pure C++ (no macros).
         </ul>
-        The \a Components is not designed to replacing boost.parameter but in many cases (e.g. when given arguments are functors or when given arguments can depend on each other) 
-        it might be more natural design.
+        The \a Components class is not designed to replacing Boost.Parameter but in many cases (e.g. when the given arguments are functors or when the given arguments can depend on each other) 
+        it might be a more natural design.
 
     <li> Boost.Fusion
 
-        Although the idea of  \a Components is very similar to boost fusion, the \a Components gives some functionalities that are not offered by Boost.Fusion.
+        Although the idea of the \a Components is very similar to Boost.Fusion, the \a Components gives some functionalities that are not offered by Boost.Fusion.
         The example is different initialization methods (see section:\ref const_comp for more details).
 
 </ul>
@@ -184,7 +184,7 @@ There is a way to replace component for given components.
 <li> clang 3.2
 <li> g++ 4.7.2
 </ul>
-Msvc is not supported, because of lack of the template aliasing. 
+Msvc is not supported due to lack of template aliasing. 
 
 \section iterot Iterating Over Components class (TODO)
 
