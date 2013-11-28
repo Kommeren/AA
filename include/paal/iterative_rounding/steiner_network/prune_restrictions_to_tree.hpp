@@ -31,6 +31,16 @@ template <typename G>
     };
 
 
+/**
+ * @brief Returns a list of restrictions, made of the edges of a maximum spanning tree
+ * in a clique with edge weights equal to restriction values between the edges.
+ *
+ * @tparam Restrictions
+ * @param res restrictions
+ * @param N number of vertices
+ *
+ * @return A minimum set of restrictions needed to be checked by the oracle.
+ */
 template <typename Restrictions>
     RestrictionsVector pruneRestrictionsToTree(Restrictions res, int N) {
         typedef decltype(std::declval<Restrictions>()(0,0)) Dist;

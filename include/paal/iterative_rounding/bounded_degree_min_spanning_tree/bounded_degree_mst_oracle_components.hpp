@@ -13,6 +13,10 @@
 namespace paal {
 namespace ir {
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the most violated constraint.
+ */
 struct FindMostViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int verticesNum) {
@@ -20,6 +24,10 @@ struct FindMostViolated {
     };
 };
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the any violated constraint.
+ */
 struct FindAnyViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int verticesNum) {
@@ -27,6 +35,10 @@ struct FindAnyViolated {
     };
 };
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the any violated constraint, starting from a random vertex.
+ */
 struct FindRandViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int verticesNum) {
@@ -34,7 +46,11 @@ struct FindRandViolated {
     };
 };
 
-// TODO implement min cut test
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Runs the initial min-cut test, which may quickly find a violated constraint
+ * (but it cannot prove that no constraint is violated).
+ */
 struct MinCutTest {
     template <typename Oracle>
     bool operator()(Oracle & oracle) {
@@ -44,7 +60,7 @@ struct MinCutTest {
   
 /**
  * @class BoundedDegreeMSTOracleComponents
- * @brief components of the separation oracle for the bounded degree minimum spanning tree problem.
+ * @brief Components of the separation oracle for the bounded degree minimum spanning tree problem.
  *
  * @tparam FindViolated 
  * @tparam InitialTest 

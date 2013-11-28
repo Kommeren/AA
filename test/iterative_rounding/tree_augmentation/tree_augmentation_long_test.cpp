@@ -7,6 +7,7 @@
  */
 
 
+#include <fstream>
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 

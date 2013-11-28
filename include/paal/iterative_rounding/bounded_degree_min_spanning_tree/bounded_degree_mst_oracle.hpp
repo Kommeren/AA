@@ -21,9 +21,10 @@ namespace ir {
 
 /**
  * @class BoundedDegreeMSTOracle
- * @brief this is a separation oracle for the row generation in the bounded degree minimum spanning tree problem.
+ * @brief Separation oracle for the row generation in the bounded degree minimum spanning tree problem.
  *
  * @tparam Graph input graph, has to be a model of boost::Graph
+ * @tparam OracleComponents
  */
 template <typename Graph, typename OracleComponents = BoundedDegreeMSTOracleComponents<> >
 class BoundedDegreeMSTOracle {
@@ -34,14 +35,8 @@ public:
     BoundedDegreeMSTOracle(const Graph & g) : m_g(g)
     { }
 
-
     /**
-     * @brief checks if the current LP solution is feasible
-     * @param lp LP object
-     * @param problem Problem object
-     * @return true iff the current LP solution is feasible
-     *
-     * @tparam LP
+     * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
     bool feasibleSolution(const Problem &problem, const LP & lp) {
@@ -56,11 +51,7 @@ public:
     }
     
     /**
-     * @brief adds a violated constraint to the LP
-     * @param lp LP object
-     * @param problem Problem object
-     *
-     * @tparam LP
+     * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
@@ -80,10 +71,11 @@ public:
     
     
     /**
-     * @brief finds any violated constraint
-     * @param srcVertexIndex index of the source vertex
+     * Finds any violated constraint and saves it or decides that no constraint is violated.
+     *
      * @param problem Problem object
-     * @return true iff a violated consrtaint was found
+     * @param srcVertexIndex index of the vertex from which we begin the search
+     * @return true iff a violated constraint was found
      */
     template <typename Problem>
     bool findAnyViolatedConstraint(Problem & problem, int srcVertexIndex = 0) {
@@ -110,8 +102,10 @@ public:
     }
     
     /**
-     * @brief finds the most violated constraint
-     * @return true iff a violated consrtaint was found
+     * Finds the most violated constraint and saves it or decides that no constraint is violated.
+     *
+     * @param problem Problem object
+     * @return true iff a violated constraint was found
      */
     template <typename Problem>
     bool findMostViolatedConstraint(Problem & problem) {
@@ -153,10 +147,7 @@ private:
     typedef std::unordered_map < AuxVertex, bool > ViolatingSet;
     
     /**
-     * @brief creates the auxiliary directed graph used for feasibility testing
-     * @param lp LP object
-     *
-     * @tparam LP
+     * Creates the auxiliary directed graph used for feasibility testing.
      */
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
@@ -188,7 +179,7 @@ private:
     }
     
     /**
-     * @brief adds an edge to the auxiliary graph
+     * Adds an edge to the auxiliary graph.
      * @param vSrc source vertex of for the added edge
      * @param vTrg target vertex of for the added edge
      * @param cap capacity of the added edge
@@ -224,13 +215,7 @@ private:
    
 
     /**
-     * @brief calculates the sum of the variables for edges incident with a given vertex
-     * @param v vertex
-     * @param lp LP object
-     * @return sum of variables for edges incident with given vertex
-     *
-     * @tparam SrcVertex
-     * @tparam TrgVertex
+     * Calculates the sum of the variables for edges incident with a given vertex.
      */
     template <typename Problem, typename LP>
     double degreeOf(Problem & problem, const Vertex & v, const LP & lp) {
@@ -247,7 +232,8 @@ private:
     }
     
     /**
-     * @brief finds the most violated set of vertices containing \c src and avoiding \c trg and saves it if the violation is greater than \c minViolation
+     * Finds the most violated set of vertices containing \c src and not containing
+     * \c trg and saves it if the violation is greater than \c minViolation
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @param minViolation minimum violation that a set should have to be saved
@@ -313,6 +299,15 @@ private:
 };
 
 
+/**
+ * @brief Creates a BoundedDegreeMSTOracle object.
+ *
+ * @tparam OracleComponents 
+ * @tparam Graph
+ * @param g
+ *
+ * @return BoundedDegreeMSTOracle object
+ */
 template <typename OracleComponents = BoundedDegreeMSTOracleComponents<>, typename Graph>
 BoundedDegreeMSTOracle<Graph, OracleComponents>
 make_BoundedDegreeMSTOracle(const Graph & g) {

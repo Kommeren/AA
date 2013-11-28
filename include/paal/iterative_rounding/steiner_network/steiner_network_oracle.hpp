@@ -21,6 +21,10 @@
 namespace paal {
 namespace ir {
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the most violated constraint.
+ */
 struct FindMostViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
@@ -28,6 +32,10 @@ struct FindMostViolated {
     };
 };
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the any violated constraint.
+ */
 struct FindAnyViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
@@ -35,6 +43,10 @@ struct FindAnyViolated {
     };
 };
 
+/**
+ * Component of the Bounded Degree MST Separation Oracle.
+ * Finds the any violated constraint, starting from a random restriction.
+ */
 struct FindRandViolated {
     template <typename Problem, typename Oracle>
     bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
@@ -42,6 +54,12 @@ struct FindRandViolated {
     };
 };
 
+/**
+ * @class SteinerNetworkOracleComponents
+ * @brief Components of the separation oracle for the steiner network problem.
+ *
+ * @tparam FindViolated 
+ */
 template <typename FindViolated = FindRandViolated>
 class SteinerNetworkOracleComponents {
 public:
@@ -54,6 +72,15 @@ private:
     FindViolated m_findViolated;
 };
 
+/**
+ * @class SteinerNetworkOracle
+ * @brief Separation oracle for the row generation in the steiner network problem.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkSet
+ * @tparam OracleComponents
+ */
 template <typename Graph, typename Restrictions, typename ResultNetworkSet,
             typename OracleComponents = SteinerNetworkOracleComponents<>>
 class SteinerNetworkOracle {
@@ -74,6 +101,9 @@ public:
                m_resultNetwork(res)
                {}
 
+    /**
+     * Checks if any solution to the problem exists.
+     */
     template <typename Problem>
     bool checkIfSolutionExists(Problem & problem) {
         remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
@@ -87,17 +117,23 @@ public:
         }
         return !findAnyViolatedConstraint(problem);
     }
-                           
+
+    /**
+     * Checks if the current LP solution is a feasible solution of the problem.
+     */
     template <typename Problem, typename LP>
     bool feasibleSolution(Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
         return !m_oracleComponents.findViolated(problem, *this, m_restrictionsVec.size());
     }
-    
+
+    /**
+     * Adds a violated constraint to the LP.
+     */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
         lp.addRow(lp::LO, m_violatedRestriction);
-        
+
         for (auto const & e : problem.getEdgeMap()) {
             const Vertex & u = source(e.second, m_g);
             const Vertex & v = target(e.second, m_g);
@@ -107,10 +143,17 @@ public:
                     lp.addNewRowCoef(e.first);
             }
         }
-        
+
         lp.loadNewRow();
     }
 
+    /**
+     * Finds any violated constraint and saves it or decides that no constraint is violated.
+     *
+     * @param problem Problem object
+     * @param startIndex index of the restriction from which we begin the search
+     * @return true iff a violated constraint was found
+     */
     template <typename Problem>
     bool findAnyViolatedConstraint(Problem & problem, int startIndex = 0) {
         auto startIter = m_restrictionsVec.begin();
@@ -133,6 +176,12 @@ public:
         return false;
     }
 
+    /**
+     * Finds the most violated constraint and saves it or decides that no constraint is violated.
+     *
+     * @param problem Problem object
+     * @return true iff a violated constraint was found
+     */
     template <typename Problem>
     bool findMostViolatedConstraint(Problem & problem) {
         double max = 0;
@@ -166,6 +215,9 @@ private:
                                   > AuxGraph;
     typedef std::unordered_set < AuxVertex > ViolatingSet;
                                   
+    /**
+     * Creates the auxiliary directed graph used for feasibility testing.
+     */
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
         remove_edge_if(utils::ReturnTrueFunctor(), m_auxGraph);
@@ -190,6 +242,16 @@ private:
         }
     }
 
+    /**
+     * Adds an edge to the auxiliary graph.
+     * @param vSrc source vertex of for the added edge
+     * @param vTrg target vertex of for the added edge
+     * @param cap capacity of the added edge
+     * @return created edge of the auxiliary graph
+     *
+     * @tparam SrcVertex
+     * @tparam TrgVertex
+     */
     template <typename SrcVertex, typename TrgVertex>
     AuxEdge addEdge(const SrcVertex & vSrc, const TrgVertex & vTrg, double cap) {
         bool b, bRev;
@@ -209,6 +271,14 @@ private:
         return e;
     }
 
+    /**
+     * Finds the most violated set of vertices containing \c src and not containing
+     * \c trg and saves it if the violation is greater than \c minViolation
+     * @param src vertex to be contained in the violating set
+     * @param trg vertex not to be contained in the violating set
+     * @param minViolation minimum violation that a set should have to be saved
+     * @return violation of the found set
+     */
     template <typename Problem>
     double checkViolationBiggerThan(Problem & problem, Vertex src, Vertex trg,
                 double minViolation = 0.) {
@@ -240,17 +310,30 @@ private:
     const Restrictions & m_restrictions;
     RestrictionsVector m_restrictionsVec;
     
-    AuxGraph    m_auxGraph;
+    AuxGraph m_auxGraph;
 
-    ViolatingSet        m_violatingSet;
-    Dist                m_violatedRestriction;
+    ViolatingSet m_violatingSet;
+    Dist         m_violatedRestriction;
     
-    const ResultNetworkSet &  m_resultNetwork;
+    const ResultNetworkSet & m_resultNetwork;
     
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
 };
 
+/**
+ * @brief Creates a SteinerNetworkOracle object.
+ *
+ * @tparam OracleComponents
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkSet
+ * @param g
+ * @param restrictions
+ * @param res
+ *
+ * @return SteinerNetworkOracle object
+ */
 template <typename OracleComponents = SteinerNetworkOracleComponents<>,
             typename Graph, typename Restrictions, typename ResultNetworkSet>
 SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet, OracleComponents>

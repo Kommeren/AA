@@ -25,10 +25,16 @@
 namespace paal {
 namespace ir {
 
+/**
+ * @brief Default column rounding condition component.
+ */
 class DefaultRoundCondition {
 public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
   
+    /**
+     * @brief Rounds the column if its value is integral.
+     */
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         double x = lp.getColPrim(col);
@@ -44,6 +50,10 @@ protected:
 };
 
 
+/**
+ * @brief Column rounding component.
+ *        Rounds a column if its value is equal to one of the template parameter values.
+ */
 template <int...> 
 class RoundConditionEquals {
     RoundConditionEquals() = delete;
@@ -130,6 +140,9 @@ struct RoundConditionGreaterThanHalf  :
 };
 
 
+/**
+ * @brief Finds an extreme point solution to the LP.
+ */
 struct DefaultSolveLPToExtremePoint {
     template <typename Problem, typename LP>
     lp::ProblemType operator()(Problem &, LP & lp) {
@@ -137,6 +150,9 @@ struct DefaultSolveLPToExtremePoint {
     };
 };
 
+/**
+ * @brief Deletes a row from the LP.
+ */
 struct DeleteRow {
     template <typename LP>
     void operator()(LP & lp, lp::RowId row) {
@@ -144,6 +160,9 @@ struct DeleteRow {
     };
 };
 
+/**
+ * @brief Deletes a column from the LP and adjusts the row bounds.
+ */
 struct DeleteCol {
     template <typename LP>
     void operator()(LP & lp, lp::ColId col, double value) {
@@ -196,6 +215,9 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
         data_structures::NameWithDefault<DeleteColStrategy, DeleteCol> > Components;
         
+/**
+ * @brief Iterative rounding components.
+ */
 template <typename... Args>
     using IRComponents = typename Components::type<Args...> ;
 

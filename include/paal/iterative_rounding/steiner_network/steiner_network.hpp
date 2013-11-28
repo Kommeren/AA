@@ -28,6 +28,15 @@ const double SteinerNetworkCompareTraits::EPSILON = 1e-10;
 }
 
 
+/**
+ * @class SteinerNetwork
+ * @brief The class for solving the Steiner Network problem using Iterative Rounding.
+ *
+ * @tparam Graph input graph
+ * @tparam Restrictions connectivity restrictions for vertex pairs
+ * @tparam CostMap map of edge costs
+ * @tparam ResultNetworkSet
+ */
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet>
 class SteinerNetwork {
 public:
@@ -58,6 +67,9 @@ public:
 
     typedef boost::optional<std::string> ErrorMessage;
 
+    /**
+     * Checks if the connectivity restrictions can be fulfilled.
+     */
     ErrorMessage checkInputValidity() {
         auto oracle = make_SteinerNetworkSeparationOracle(m_g, m_restrictions, m_resultNetwork);
         if (!oracle.checkIfSolutionExists(*this)) {
@@ -81,15 +93,24 @@ public:
         return m_costMap[e];
     }
 
+    /**
+     * Binds a graph edge to a LP column.
+     */
     void bindEdgeToCol(Edge e, lp::ColId col) {
         m_edgeMap.insert(typename EdgeMap::value_type(col, e));
     }
 
+    /**
+     * Removes an LP column and the graph edge corresponding to it.
+     */
     void removeColumn(lp::ColId colId) {        
         auto ret = m_edgeMap.erase(colId);
         assert(ret == 1);
     }
-    
+
+    /**
+     * Adds an edge corresponding to the given column to the result set.
+     */
     void addColumnToSolution(lp::ColId colId) {
         m_resultNetwork.insert(colToEdge(colId));
     }
@@ -116,6 +137,20 @@ private:
     Compare m_compare;
 };
 
+/**
+ * @brief Creates a SteinerNetwork object.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam CostMap
+ * @tparam ResultNetworkSet
+ * @param g
+ * @param restrictions
+ * @param costMap
+ * @param resultNetwork
+ *
+ * @return SteinerNetwork object
+ */
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet>
 SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkSet>
 make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
@@ -124,8 +159,14 @@ make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
                                                 g, restrictions, costMap, resultNetwork);
 }
 
+/**
+ * Initialization of the IR Steiner Network algorithm.
+ */
 class SteinerNetworkInit {
 public:
+    /**
+     * Initializes the LP: variables for edges.
+     */
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
         lp.setLPName("steiner network");
@@ -146,10 +187,20 @@ private:
 };
 
 
+/**
+ * Round Condition of the IR Steiner Network algorithm.
+ */
 struct SteinerNetworkRoundCondition {
     SteinerNetworkRoundCondition(double epsilon = SteinerNetworkCompareTraits::EPSILON) :
         m_roundHalf(epsilon), m_roundZero(epsilon) {}
 
+    /**
+     * Checks if a given column of the LP can be rounded to 0 or if it is greater
+     * then 1/2.
+     * If the column is rounded to 0, the corresponding edge is removed from the graph.
+     * If the column is greater than 1/2, it is rounded to 1 and the corresponding edge
+     * is added to the solution.
+     */
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem & problem, const LP & lp, lp::ColId colId) {
         auto ret = m_roundZero(problem, lp, colId);
@@ -182,12 +233,30 @@ template <
              using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
+/**
+ * @brief Solves the Steiner Network problem using Iterative Rounding.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam CostMap
+ * @tparam ResultNetworkSet
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @param g
+ * @param restrictions
+ * @param cost
+ * @param result
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkSet,
           typename IRComponents, typename Visitor = TrivialVisitor>
 lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
-        const CostMap & cost, ResultNetworkSet & result, IRComponents comps, Visitor vis = Visitor()) {
+        const CostMap & cost, ResultNetworkSet & result, IRComponents components, Visitor visitor = Visitor()) {
     auto steiner = paal::ir::make_SteinerNetwork(g, restrictions, cost, result);
-    return paal::ir::solve_iterative_rounding(steiner, std::move(comps), std::move(vis));
+    return paal::ir::solve_iterative_rounding(steiner, std::move(components), std::move(visitor));
 }
 
 
