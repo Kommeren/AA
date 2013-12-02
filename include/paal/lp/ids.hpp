@@ -1,17 +1,20 @@
 /**
  * @file ids.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-24
  */
 
 #ifndef IDS_HPP
-#define IDS_HPP 
+#define IDS_HPP
 
 namespace paal {
 namespace lp {
 
+    /**
+     * Base identifier class.
+     */
     class Id {
     protected:
         Id() {}
@@ -24,7 +27,7 @@ namespace lp {
         bool operator<(Id id) const {
             return m_id < id.m_id;
         }
-        
+
         bool operator==(Id id) const {
             return m_id == id.m_id;
         }
@@ -32,20 +35,26 @@ namespace lp {
         int m_id;
     };
 
+    /**
+     * LP column identifier class.
+     */
     struct ColId : Id {
         ColId() {}
-        explicit ColId(int id) : Id(id) {} 
+        explicit ColId(int id) : Id(id) {}
     };
-    
+
     inline ColId make_ColId(int col) {
         return ColId(col);
     }
 
+    /**
+     * LP row identifier class.
+     */
     struct RowId : Id {
         RowId() {}
-        explicit RowId(int id) : Id(id) {} 
+        explicit RowId(int id) : Id(id) {}
     };
-    
+
     inline RowId make_RowId(int row) {
         return RowId(row);
     }

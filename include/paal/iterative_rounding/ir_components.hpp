@@ -1,12 +1,12 @@
 /**
  * @file ir_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-05-10
  */
 #ifndef IR_COMPONENTS_HPP
-#define IR_COMPONENTS_HPP 
+#define IR_COMPONENTS_HPP
 
 #include <cmath>
 
@@ -31,7 +31,7 @@ namespace ir {
 class DefaultRoundCondition {
 public:
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
-  
+
     /**
      * @brief Rounds the column if its value is integral.
      */
@@ -44,7 +44,7 @@ public:
         }
         return boost::optional<double>();
     };
-    
+
 protected:
     const utils::Compare<double> m_compare;
 };
@@ -54,17 +54,17 @@ protected:
  * @brief Column rounding component.
  *        Rounds a column if its value is equal to one of the template parameter values.
  */
-template <int...> 
+template <int...>
 class RoundConditionEquals {
     RoundConditionEquals() = delete;
 };
 
-template <int arg, int... args> 
-class RoundConditionEquals<arg, args...>  : 
+template <int arg, int... args>
+class RoundConditionEquals<arg, args...>  :
         public RoundConditionEquals<args...> {
 public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
-    
+
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         return get(lp, lp.getColPrim(col));
@@ -81,25 +81,25 @@ protected:
     }
 };
 
-template <> 
+template <>
 class RoundConditionEquals<> {
 public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
-    
+
 protected:
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
         return boost::optional<double>();
     }
-    
+
     const utils::Compare<double> m_compare;
 };
-        
 
-template <typename Cond, typename F> 
+
+template <typename Cond, typename F>
 class RoundConditionToFun {
 public:
-    RoundConditionToFun(Cond c = Cond(), F f = F()) : 
+    RoundConditionToFun(Cond c = Cond(), F f = F()) :
         m_cond(c), m_f(f) {}
 
     template <typename Problem, typename LP>
@@ -119,8 +119,8 @@ private:
 
 class CondBiggerEqualThan {
 public:
-    CondBiggerEqualThan(double b, double epsilon = utils::Compare<double>::defaultEpsilon()) 
-        : m_bound(b), m_compare(epsilon) {}    
+    CondBiggerEqualThan(double b, double epsilon = utils::Compare<double>::defaultEpsilon())
+        : m_bound(b), m_compare(epsilon) {}
 
     bool operator()(double x) {
         return m_compare.ge(x, m_bound);
@@ -133,9 +133,9 @@ private:
 
 
 ///A variable is rounded up to 1, if it has value at least half in the solution
-struct RoundConditionGreaterThanHalf  : 
+struct RoundConditionGreaterThanHalf  :
     public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnSomethingFunctor<int, 1> > {
-        RoundConditionGreaterThanHalf(double epsilon = utils::Compare<double>::defaultEpsilon()) : 
+        RoundConditionGreaterThanHalf(double epsilon = utils::Compare<double>::defaultEpsilon()) :
             RoundConditionToFun(CondBiggerEqualThan(0.5, epsilon)) {}
 };
 
@@ -146,7 +146,7 @@ struct RoundConditionGreaterThanHalf  :
 struct DefaultSolveLPToExtremePoint {
     template <typename Problem, typename LP>
     lp::ProblemType operator()(Problem &, LP & lp) {
-        return lp.solveToExtremePoint();
+        return lp.solveToExtremePointPrimal();
     };
 };
 
@@ -205,7 +205,7 @@ class StopCondition;
 class DeleteRowStrategy;
 class DeleteColStrategy;
 
-typedef data_structures::Components<   
+typedef data_structures::Components<
         data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
         data_structures::NameWithDefault<RoundCondition, DefaultRoundCondition>,
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
@@ -214,7 +214,7 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
         data_structures::NameWithDefault<DeleteColStrategy, DeleteCol> > Components;
-        
+
 /**
  * @brief Iterative rounding components.
  */

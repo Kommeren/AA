@@ -1,6 +1,6 @@
 /**
  * @file bounded_degree_mst_oracle.hpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-06-05
@@ -31,7 +31,7 @@ class BoundedDegreeMSTOracle {
 public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    
+
     BoundedDegreeMSTOracle(const Graph & g) : m_g(g)
     { }
 
@@ -41,7 +41,7 @@ public:
     template <typename Problem, typename LP>
     bool feasibleSolution(const Problem &problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
-        
+
         if (m_oracleComponents.initialTest(*this)) {
             return true;
         }
@@ -49,27 +49,27 @@ public:
             return !m_oracleComponents.findViolated(problem, *this, num_vertices(m_g));
         }
     }
-    
+
     /**
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
         lp.addRow(lp::UP, 0, m_violatingSetSize - 1);
-        
+
         for (auto const & e : problem.getEdgeMap().right) {
             const Vertex & u = source(e.second, m_g);
             const Vertex & v = target(e.second, m_g);
-            
+
             if (m_violatingSet[u] && m_violatingSet[v]) {
                 lp.addNewRowCoef(e.first);
             }
         }
-        
+
         lp.loadNewRow();
     }
-    
-    
+
+
     /**
      * Finds any violated constraint and saves it or decides that no constraint is violated.
      *
@@ -97,10 +97,10 @@ public:
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     /**
      * Finds the most violated constraint and saves it or decides that no constraint is violated.
      *
@@ -112,9 +112,9 @@ public:
         auto graphVertices = vertices(m_auxGraph);
         auto src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
-        
+
         double maximumViolation = 0;
-        
+
         for (const Vertex & trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 maximumViolation = std::max(maximumViolation,
@@ -145,7 +145,7 @@ private:
                                   > AuxGraph;
     typedef std::vector < AuxEdge > AuxEdgeList;
     typedef std::unordered_map < AuxVertex, bool > ViolatingSet;
-    
+
     /**
      * Creates the auxiliary directed graph used for feasibility testing.
      */
@@ -161,23 +161,23 @@ private:
         for (auto const & e : problem.getEdgeMap().right) {
             lp::ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx) / 2;
-            
+
             if (!problem.getCompare().e(colVal, 0)) {
                 Vertex u = source(e.second, m_g);
                 Vertex v = target(e.second, m_g);
                 addEdge(u, v, colVal);
             }
         }
-        
+
         m_src = add_vertex(m_auxGraph);
         m_trg = add_vertex(m_auxGraph);
-        
+
         for (const Vertex & v : problem.getVertices()) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
     }
-    
+
     /**
      * Adds an edge to the auxiliary graph.
      * @param vSrc source vertex of for the added edge
@@ -193,12 +193,12 @@ private:
     AuxEdge addEdge(const SrcVertex & vSrc, const TrgVertex & vTrg, double cap, bool noRev = false) {
         bool b, bRev;
         AuxEdge e, eRev;
-        
+
         std::tie(e, b) = add_edge(vSrc, vTrg, m_auxGraph);
         std::tie(eRev, bRev) = add_edge(vTrg, vSrc, m_auxGraph);
-        
+
         assert(b && bRev);
-        
+
         put(m_cap, e, cap);
         if (noRev) {
             put(m_cap, eRev, 0);
@@ -206,13 +206,13 @@ private:
         else {
             put(m_cap, eRev, cap);
         }
-        
+
         put(m_rev, e, eRev);
         put(m_rev, eRev, e);
-        
+
         return e;
     }
-   
+
 
     /**
      * Calculates the sum of the variables for edges incident with a given vertex.
@@ -221,7 +221,7 @@ private:
     double degreeOf(Problem & problem, const Vertex & v, const LP & lp) {
         double res = 0;
         auto adjEdges = out_edges(v, m_g);
-            
+
         for (Edge e : boost::make_iterator_range(adjEdges)) {
             auto colId = problem.edgeToCol(e);
             if (colId) {
@@ -230,7 +230,7 @@ private:
         }
         return res;
     }
-    
+
     /**
      * Finds the most violated set of vertices containing \c src and not containing
      * \c trg and saves it if the violation is greater than \c minViolation
@@ -249,14 +249,14 @@ private:
         // capacity of srcToV[trg] does not change
         put(m_cap, m_vToTrg[src], 0);
         put(m_cap, m_vToTrg[trg], numVertices);
-        
+
         // TODO better flow algorithm
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
         double violation = numVertices - 1 - minCut;
-        
+
         if (problem.getCompare().g(violation, minViolation)) {
             m_violatingSetSize = 0;
-            
+
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, m_src);
             for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
@@ -269,31 +269,31 @@ private:
                 }
             }
         }
-        
+
         // reset the original values for the capacities
         put(m_cap, m_srcToV[src], origVal);
         // capacity of srcToV[trg] does not change
         put(m_cap, m_vToTrg[src], 1);
         put(m_cap, m_vToTrg[trg], 1);
-        
+
         return violation;
     }
-    
-    
+
+
     OracleComponents m_oracleComponents;
-    
+
     const Graph & m_g;
-    
+
     AuxGraph m_auxGraph;
     Vertex   m_src;
     Vertex   m_trg;
-    
+
     AuxEdgeList  m_srcToV;
     AuxEdgeList  m_vToTrg;
-    
+
     ViolatingSet m_violatingSet;
     int          m_violatingSetSize;
-    
+
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
 };
@@ -302,7 +302,7 @@ private:
 /**
  * @brief Creates a BoundedDegreeMSTOracle object.
  *
- * @tparam OracleComponents 
+ * @tparam OracleComponents
  * @tparam Graph
  * @param g
  *

@@ -1,12 +1,12 @@
 /**
  * @file generalised_assignment.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-05-06
  */
 #ifndef GENERALISED_ASSIGNMENT_HPP
-#define GENERALISED_ASSIGNMENT_HPP 
+#define GENERALISED_ASSIGNMENT_HPP
 
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
@@ -24,7 +24,7 @@ struct GARelaxCondition {
     template <typename Problem, typename LP>
     bool operator()(Problem & problem, const LP & lp, lp::RowId row) {
         auto & machineRows = problem.getMachineRows();
-        return machineRows.find(row) != machineRows.end() && 
+        return machineRows.find(row) != machineRows.end() &&
             (
              lp.getRowDegree(row) <= 1 ||
              (
@@ -49,9 +49,9 @@ struct GASetSolution {
         auto & colIdx = problem.getColIdx();
         auto & jobToMachine = problem.getJobToMachines();
 
-        for(int idx : boost::irange(0, int(colIdx.size()))) { 
+        for(int idx : boost::irange(0, int(colIdx.size()))) {
             if(problem.getCompare().e(solution(colIdx[idx]), 1)) {
-                jobToMachine.insert(std::make_pair(*(jbegin + problem.getJIdx(idx)), 
+                jobToMachine.insert(std::make_pair(*(jbegin + problem.getJIdx(idx)),
                                                      *(mbegin + problem.getMIdx(idx))));
             }
         }
@@ -69,7 +69,7 @@ class GAInit {
         template <typename Problem, typename LP>
         void operator()(Problem & problem, LP & lp) {
             lp.setLPName("generalized assignment problem");
-            lp.setMinObjFun(); 
+            lp.setMinObjFun();
 
             addVariables(problem, lp);
             addConstraintsForJobs(problem, lp);
@@ -133,9 +133,9 @@ class GAInit {
         }
 };
 
-template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint, 
-         typename RoundCondition = DefaultRoundCondition, 
-         typename RelaxContition = GARelaxCondition, 
+template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
+         typename RoundCondition = DefaultRoundCondition,
+         typename RelaxContition = GARelaxCondition,
          typename Init = GAInit,
          typename SetSolution = GASetSolution>
              using  GeneralAssignmentIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
@@ -164,9 +164,9 @@ class GeneralAssignment {
         typedef std::set<lp::RowId> MachineRows;
         typedef std::vector<lp::ColId> ColIdx;
 
-        GeneralAssignment(MachineIter mbegin, MachineIter mend, 
+        GeneralAssignment(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
-                const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, JobsToMachines & jobToMachines) : 
+                const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, JobsToMachines & jobToMachines) :
             m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
             m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
             m_c(c), m_t(t), m_T(T), m_jobToMachine(jobToMachines) {}
@@ -204,7 +204,7 @@ class GeneralAssignment {
         MachineRows & getMachineRows() {
             return m_machineRows;
         }
-        
+
         Compare getCompare() {
             return m_compare;
         }
@@ -212,7 +212,7 @@ class GeneralAssignment {
         int getMachinesCnt() const {
             return m_mCnt;
         }
-        
+
         int getJobsCnt() const {
             return m_jCnt;
         }
@@ -236,7 +236,7 @@ class GeneralAssignment {
         const ProceedingTime & getProceedingTime() {
             return m_t;
         }
-        
+
         const MachineAvailableTime & getMachineAvailableTime() {
             return m_T;
         }
@@ -253,9 +253,9 @@ class GeneralAssignment {
         JobIter m_jend;
         MachineIter m_mbegin;
         MachineIter m_mend;
-        const Cost & m_c; 
-        const ProceedingTime & m_t; 
-        const MachineAvailableTime & m_T; 
+        const Cost & m_c;
+        const ProceedingTime & m_t;
+        const MachineAvailableTime & m_T;
         JobsToMachines & m_jobToMachine;
         const Compare m_compare;
         ColIdx m_colIdx;
@@ -284,7 +284,7 @@ class GeneralAssignment {
  */
 template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime, typename JobsToMachines>
 GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime, JobsToMachines>
-make_GeneralAssignment(MachineIter mbegin, MachineIter mend, 
+make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
         JobIter jbegin, JobIter jend,
         const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T, JobsToMachines & jobsToMachines) {
     return  GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime, JobsToMachines>(
@@ -315,15 +315,15 @@ make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
  *
  * @return solution status
  */
-template <typename MachineIter, typename JobIter, typename Cost, 
-          typename ProceedingTime, typename MachineAvailableTime, 
+template <typename MachineIter, typename JobIter, typename Cost,
+          typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachines, typename Components, typename Visitor = TrivialVisitor>
-lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend, 
+lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                     JobIter jbegin, JobIter jend,
-                    const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, 
+                    const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
                     JobsToMachines & jobToMachines, Components components, Visitor visitor = Visitor()) {
     auto gaSolution = make_GeneralAssignment(
-            mbegin, mend, jbegin, jend, 
+            mbegin, mend, jbegin, jend,
             c, t, T, jobToMachines);
     return solve_iterative_rounding(gaSolution, std::move(components), std::move(visitor));
 }

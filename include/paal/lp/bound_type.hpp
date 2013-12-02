@@ -1,6 +1,6 @@
 /**
  * @file bound_type.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-05-06
@@ -10,7 +10,7 @@
 
 namespace paal {
 namespace lp {
-// free, only lower bound, only upper bound, both bounds, fix  
+// free, only lower bound, only upper bound, both bounds, fix
 enum BoundType {FR, LO, UP, DB, FX};
 }
 }

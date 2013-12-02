@@ -1,12 +1,12 @@
 /**
  * @file iterative_rounding.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-05-06
  */
 #ifndef ITERATIVE_ROUNDING_HPP
-#define ITERATIVE_ROUNDING_HPP 
+#define ITERATIVE_ROUNDING_HPP
 
 #include <cstdlib>
 #include <unordered_map>
@@ -28,7 +28,7 @@ struct TrivialVisitor {
 
     template <typename Problem, typename LP>
     void roundCol(Problem & problem, LP & lp, lp::ColId col, double val) {}
-    
+
     template <typename Problem, typename LP>
     void relaxRow(Problem & problem, LP & lp, lp::RowId row) {}
 };
@@ -56,11 +56,11 @@ class IterativeRounding  {
     }
 
 public:
-    IterativeRounding(Problem & problem, IRComponents e, Visitor vis = Visitor()) 
+    IterativeRounding(Problem & problem, IRComponents e, Visitor vis = Visitor())
         : m_irComponents(std::move(e)), m_visitor(std::move(vis)), m_problem(problem) {
         call<Init>(m_problem, m_lpBase);
     }
-    
+
     /**
      * @brief Finds an extreme point solution to the LP.
      *
@@ -83,10 +83,10 @@ public:
                 return false;
             }
         }
-        
+
         return true;
     }
-    
+
     /**
      * @brief Rounds the LP columns (independently) using the RoundCondition component.
      *
@@ -113,10 +113,10 @@ public:
                 }
             }
         }
-        
+
         return deleted > 0;
     }
-    
+
     /**
      * @brief Relaxes the LP rows using the RelaxCondition component.
      *
@@ -142,7 +142,7 @@ public:
                 }
             }
         }
-        
+
         return deleted > 0;
     }
 
@@ -152,7 +152,7 @@ public:
     LPBase & getLP() {
         return m_lpBase;
     }
-    
+
     /**
      * @brief Returns the IR components.
      */
@@ -185,13 +185,13 @@ public:
         return call<StopCondition>(m_problem);
     }
 
-private:   
-    template <typename Action, typename... Args> 
-    auto call(Args&&... args) -> 
+private:
+    template <typename Action, typename... Args>
+    auto call(Args&&... args) ->
     decltype(std::declval<IRComponents>().template call<Action>(args...)){
         return m_irComponents.template call<Action>(args...);
     }
-    
+
     LPBase m_lpBase;
     IRComponents m_irComponents;
     Visitor m_visitor;
@@ -260,4 +260,4 @@ lp::ProblemType solve_dependent_iterative_rounding(Problem & problem, IRComponen
 } //paal
 
 
-#endif //ITERATIVE_ROUNDING_HPP 
+#endif //ITERATIVE_ROUNDING_HPP

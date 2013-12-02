@@ -1,6 +1,6 @@
 /**
  * @file bounded_degree_mst.hpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-06-03
@@ -18,8 +18,8 @@
 
 namespace paal {
 namespace ir {
-    
-    
+
+
 
 namespace {
 struct BoundedDegreeMSTCompareTraits {
@@ -40,7 +40,7 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
  * @tparam ResultSpanningTree
  */
 template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree>
-class BoundedDegreeMST { 
+class BoundedDegreeMST {
 public:
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap,
                      ResultSpanningTree & resultSpanningTree) :
@@ -48,7 +48,7 @@ public:
               m_resultSpanningTree(resultSpanningTree),
               m_compare(BoundedDegreeMSTCompareTraits::EPSILON)
     {}
-              
+
     BoundedDegreeMST(BoundedDegreeMST && o) :
               m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
               m_resultSpanningTree(o.m_resultSpanningTree),
@@ -56,14 +56,14 @@ public:
               m_vertexMap(std::move(o.m_vertexMap)), m_vertexList(std::move(o.m_vertexList)),
               m_compare(std::move(o.m_compare))
     {}
-                           
+
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    
+
     typedef boost::bimap<Edge, lp::ColId> EdgeMap;
     typedef std::unordered_map<lp::RowId, Vertex> VertexMap;
     typedef std::vector<Vertex> VertexList;
-    
+
     typedef std::vector<std::pair<lp::ColId, Edge>> EdgeMapOriginal;
 
     typedef boost::optional<std::string> ErrorMessage;
@@ -163,7 +163,7 @@ public:
         m_resultSpanningTree.insert(e);
     }
 
-    utils::Compare<double> getCompare() const { 
+    utils::Compare<double> getCompare() const {
         return m_compare;
     }
 
@@ -196,7 +196,7 @@ public:
         }
     }
 
-private: 
+private:
     Edge colToEdge(lp::ColId col) {
         auto i = m_edgeMap.right.find(col);
         assert(i != m_edgeMap.right.end());
@@ -207,12 +207,12 @@ private:
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
     ResultSpanningTree &  m_resultSpanningTree;
-    
+
     EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
     VertexMap       m_vertexMap;
     VertexList      m_vertexList;
-    
+
     const utils::Compare<double>   m_compare;
 };
 
@@ -261,10 +261,10 @@ template <typename Graph, typename CostMap, typename DegreeBoundMap,
           typename ResultSpanningTree, typename IRComponents,
           typename Visitor = TrivialVisitor>
 lp::ProblemType bounded_degree_mst_iterative_rounding(
-        const Graph & g, 
-        const CostMap & costMap, 
-        const DegreeBoundMap & degBoundMap, 
-        ResultSpanningTree & resultSpanningTree, 
+        const Graph & g,
+        const CostMap & costMap,
+        const DegreeBoundMap & degBoundMap,
+        ResultSpanningTree & resultSpanningTree,
         IRComponents components,
         Visitor visitor = Visitor()) {
 
@@ -277,7 +277,7 @@ lp::ProblemType bounded_degree_mst_iterative_rounding(
  */
 struct BDMSTRoundCondition {
     BDMSTRoundCondition(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) : m_roundZero(epsilon) {}
-    
+
     /**
      * Checks if a given column of the LP can be rounded to 0.
      * If the column is rounded, the corresponding edge is removed from the graph.
@@ -330,12 +330,12 @@ struct BDMSTInit {
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
         lp.setLPName("bounded degree minimum spanning tree");
-        lp.setMinObjFun(); 
-        
+        lp.setMinObjFun();
+
         addVariables(problem, lp);
         addDegreeBoundConstraints(problem, lp);
         addAllSetEquality(problem, lp);
-        
+
         lp.loadMatrix();
     }
 
@@ -343,7 +343,7 @@ private:
     std::string getEdgeName(int eIdx) const {
         return std::to_string(eIdx);
     }
-    
+
     std::string getDegreeBoundName(int vIdx) const {
         return "degBound" + std::to_string(vIdx);
     }
@@ -359,7 +359,7 @@ private:
             problem.bindEdgeToCol(e, col);
         }
     }
-    
+
     /**
      * Adds a degree bound constraint to the LP for each vertex in the input graph
      * and binds vertices to rows.
@@ -367,13 +367,13 @@ private:
     template <typename Problem, typename LP>
     void addDegreeBoundConstraints(Problem & problem, LP & lp) {
         auto const & g = problem.getGraph();
-        
+
         for(auto v : boost::make_iterator_range(vertices(g))) {
             auto vIdx = problem.addVertex(v);
             lp::RowId rowIdx = lp.addRow(lp::UP, 0, problem.getDegreeBound(v), getDegreeBoundName(vIdx));
             problem.bindVertexToRow(v, rowIdx);
             auto adjEdges = out_edges(v, g);
-            
+
             for(auto e : boost::make_iterator_range(adjEdges)) {
                 auto colId = problem.edgeToCol(e);
                 assert(colId);
@@ -381,7 +381,7 @@ private:
             }
         }
     }
-    
+
     /**
      * Adds an equality constraint to the LP for the set of all edges in the input graph.
      */
@@ -390,19 +390,19 @@ private:
         auto const & g = problem.getGraph();
         int vCnt = num_vertices(g);
         lp::RowId rowIdx = lp.addRow(lp::FX, vCnt-1, vCnt-1);
-        
+
         for (lp::ColId colIdx : boost::make_iterator_range(lp.getColumns())) {
             lp.addConstraintCoef(rowIdx, colIdx);
         }
     }
 };
- 
+
 
 /**
  * Set Solution component of the IR Bounded Degree MST algorithm.
  */
 struct BDMSTSetSolution {
-    BDMSTSetSolution(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) 
+    BDMSTSetSolution(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON)
         : m_compare(epsilon) {}
 
     /**
@@ -423,9 +423,9 @@ private:
 
 template <
          typename Graph,
-         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >, 
-         typename RoundCondition = BDMSTRoundCondition, 
-         typename RelaxContition = BDMSTRelaxCondition, 
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >,
+         typename RoundCondition = BDMSTRoundCondition,
+         typename RelaxContition = BDMSTRelaxCondition,
          typename Init = BDMSTInit,
          typename SetSolution = BDMSTSetSolution>
              using  BDMSTIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;

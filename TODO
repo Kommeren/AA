@@ -1,15 +1,15 @@
 * knapsack (not 0/1) fptas is not realy fptas
-* doxygen does not see some of the references 
-    (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. ) 
+* doxygen does not see some of the references
+    (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. )
 * set up jenkins (run automatic tests, tests different builds and compilers)
 * alternative kanpsack algorithm (n*(1/epsilon)^2)
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** lp documentation
-** framework documentation
 ** return collections via output iterator
 ** passing graph parameters in Boost style
+** lp documentation
+** framework documentation
 ** BDMST & steiner network components should use components style (+ common code)
 ** better tests for steiner netwok
 ** there is some common code in the steiner network and DBMST
@@ -32,5 +32,5 @@
 ** k-center
 ** the multiway cut
 ** the k multi way cut
-** steiner forest (conjecture) 
+** steiner forest (conjecture)
 
