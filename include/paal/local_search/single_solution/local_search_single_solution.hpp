@@ -194,6 +194,16 @@ public:
 };
 
 
+/**
+ * @brief local search simple solution 
+ *
+ * @param solution the initial solution which going to be possibly improved by local_search
+ * @param psa post search action
+ * @param gsc global stop condition
+ * @param components
+ *
+ * @return true if the solution is improved 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
           typename GlobalStopCondition,
@@ -208,6 +218,14 @@ bool local_search(
     return search(lss, psa, gsc);
 }
 
+/**
+ * @brief 
+ *
+ * @param solution the initial solution which going to be possibly improved by local_search
+ * @param components
+ *
+ * @return true if the solution is improved 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
           typename Solution, 
           typename... Components>

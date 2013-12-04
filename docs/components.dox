@@ -2,10 +2,10 @@
 
 \section mot Motivation. 
 
-The \a Components class is boost.fusion.map-like class with constant set of keys (names) and support for default values for given key arguments. 
+The \a Components class is boost.fusion.map-like class with constant set of keys (names) and support for default values for given key. 
 This class meets requirements for specific design of template function. The underlined function instead of taking several arguments takes one \a Components class which represents these arguments. 
 
-This way, argument can be easily replaced. One can implement many versions for each of the arguments and later on these versions can be combined into one \a Components object. On the other hand when the arguments depends on each other they can  be composed into one \a Components class which binds them together in one structure.  
+This way, argument can be easily replaced. One can implement many versions for each of the arguments and later on these versions can be combined into one \a Components object. On the other hand when the arguments depends on each other they can  be composed into one \a Components class which binds them together into one structure.  
 In this implementation one can support several sets of default arguments and permits the function user to easily create new set of defaults arguments. It often happens that a function takes many arguments, but only some of them are really needed, the rest having default values. The other motivation is that sometimes one would like to keep all the arguments grouped together. 
 This way arguments can be easily moved around. Another advantage of this design is that we can keep many different configurations of default arguments. An instance of the \a Components class represents one configuration of default arguments. 
 

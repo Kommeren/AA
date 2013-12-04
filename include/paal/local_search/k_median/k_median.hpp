@@ -36,7 +36,7 @@ struct DefaultKMedianComponents {
 
 /**
  * @class KMedianLocalSearchStep
- * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.<br>
+ * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search_page.<br>
  * KMedian implementation is based on facility location solution. <br>
  * The Move is facility_location::Move. <br>
  * The Solution is adapted KMedianSolution. <br>

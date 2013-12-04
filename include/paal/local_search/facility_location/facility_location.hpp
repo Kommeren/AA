@@ -50,7 +50,7 @@ struct DefaultSwapFLComponents {
 
 /**
  * @class FacilityLocationLocalSearchStep
- * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search.<br>
+ * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search_page.<br>
  * The Move is facility_location::Move. <br>
  * The Solution is adapted data_structures::FacilityLocationSolution. <br>
  * The SolutionElement is facility_location::Facility  <br>

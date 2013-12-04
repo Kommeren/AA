@@ -28,7 +28,7 @@
     <ul> 
     <li> Algorithms
         <ul>
-        <li>\ref local_search
+        <li>\ref local_search_page
             <ul>
             <li>\ref twoopt 
             <li>\ref fl 

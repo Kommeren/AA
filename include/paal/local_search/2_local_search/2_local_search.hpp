@@ -24,7 +24,7 @@ namespace two_local_search {
 
 /**
  @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Move type is pair of vertices.
- See \ref local_search. There are three ways to provide search components
+ See \ref local_search_page. There are three ways to provide search components
  <ul>
        <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
        <li> use TwoLocalComponents to provide your own search Components

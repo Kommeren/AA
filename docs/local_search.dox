@@ -1,4 +1,4 @@
-/*! \page local_search Local Search
+/*! \page local_search_page Local Search
 Index:
 <ul>
     <li> \ref Preliminaries - containing preliminaries to Local Search and our interpretation of it.
@@ -18,7 +18,7 @@ max f(x) over x in X. <br><br>
 
 A well known heuristic for solving problem formulated in such a way is the local search(LS). <br>
 Assume that we have feasible solution x' in X. <br>
-The LS algorithm searches the neighborhood N(x') of x' and tries to localize the better solution x'' with f(x'') > f(x'). <br>
+The LS algorithm searches the neighborhood N(x') (the set of posible moves) of x' and tries to localize the better solution x'' with f(x'') > f(x'). <br>
 If the better solution is found we set x' equal x'' and rerun previous step. <br>
 If better solution couldn't be found we finish the search with resulting local optimum x*. <br><br>
 
@@ -72,19 +72,10 @@ We will refer to this schema as LocalSearchMultiSolution. <br>
 Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 \section local_search_interface  LOCAL SEARCH INTERFACE
-Our local search is based on the LocalSearchStep concept. LocalSearchStep is a class which is responsible for one step of the local search. By the one step of the local search we understand one lookup of the neighborhood. The lookup is finished by one move if the better solution is found.
-So the LocalSearchStep archetype is of the form:
-<pre>
-   class LocalSearchStepArchetype {
-       //perform one step of local search
-       bool search();
+Our local search is divided into steps. One step of the local search consists on checking possible moves and finding move with positive gain (or the move with the biggest gain in the SteepestSlope strategy). 
+In other words, by the one step of the local search we understand one lookup of the neighborhood. 
 
-       //get solution
-       Solution & getSolution();
-   }
-</pre>
-
-The LocalSearchStep is actually the core of the design. In the simplest variant, if we've  got the LocalSearchStep, all we have to do is to run search as long as it's  returning true.
+ In the default variant, we prolong search as long as the last step is producing the move with positive gain.
 In the more general case one can check some additional stop condition and perform some operations between the local search steps. In order to make it possible we introduce two additional concepts:
 <pre>
     class PostSearchActionArchetype {
@@ -99,15 +90,14 @@ The PostSearchAction functor is invoked after each successful search step.
 </pre>
 The GlobalStopCondition is checked after each successful search step.
 
-Now we introduce the search function interface:
-<pre>
-template <typename LocalSearchStep, 
-          typename PostSearchAction = utils::DoNothingFunctor,
-          typename GlobalStopCondition = utils::ReturnFalseFunctor>
-bool search(LocalSearchStep & lss, 
-            PostSearchAction psa = utils::DoNothingFunctor(),
-            GlobalStopCondition gsc = utils::ReturnFalseFunctor());
-</pre>
+As mentioned before there are two possible strategies in step excecution.
+<ul>
+
+<li> We can iterate through  moves until we find the move with positive gain. This strategy is called ChooseFirstBetter and this is this is the default strategy.
+<li> We can iterate through all moves and chose one with the largest gain. This strategy is called SteepestSlope.
+</ul>
+
+The \ref local_search_single and  \ref local_search_multi section introduce complete interface of the local search.
 
 \subsection local_search_single LOCAL SEARCH SINGLE SOLUTION
 
@@ -150,7 +140,31 @@ Concepts:
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStep interface. Note that you can pass arbitrary number of SearchComponents to one local search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
+Now we can introduce the paal::local_search::local_search interface. Note that you can pass arbitrary number of SearchComponents to one local search. If your problem have many different Move types it might be useful to provide SearchComponents for each type of Move.
+
+The simple version of local search:
+<pre>
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename Solution, 
+          typename... Components>
+bool local_search_simple(Solution & solution, Components... components);
+</pre>
+
+
+The more sophisticated version of local search:
+<pre>
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename Solution,
+          typename... Components>
+bool local_search(
+            Solution & solution,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components);
+</pre>
+
 
 \subsubsection Example
 complete example: local_search_example.cpp
@@ -184,11 +198,9 @@ Concepts:
 <ol>
     <li> <i>MultiSolution</i>  is a concept class representing the  solution  
     <pre>
-    MultiSolutionArchetype  begin();
+    MultiSolutionArchetype {
+        SolutionElementIterator begin();
         SolutionElementIterator end();
-        InnerSolution get(); // OPTIONAL, very often solution concept is just adapter containing real solution, 
-                             // The inner solution type is InnerSolution
-                             // If this member function is provided, the LocalSearchStep getSolution() returns InnerSolution.
     }
     </pre>
     <li> <i>MultiGetMoves</i>  is a concept class responsible for getting the neighborhood of the current solution  
@@ -221,7 +233,31 @@ Concepts:
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::LocalSearchStepMultiSolution interface. Note that you can pass arbitrary number of SearchComponents to one locacl search. If your problem have many different Move types it might be usefull to provide SearchComponents for each type of Move.
+Now we can introduce the paal::local_search::multi_local_search interface. Note that you can pass arbitrary number of MultiSearchComponents to one local search. If your problem have many different Move types it might be useful to provide SearchComponents for each type of Move.
+
+Simple version:
+<pre>
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
+          typename Solution, 
+          typename... Components>
+bool local_search_multi_solution_simple(Solution & solution, Components... components);
+</pre>
+
+More sophisticated version:
+
+<pre>
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename PostSearchAction,
+          typename GlobalStopCondition,
+          typename Solution,
+          typename... Components>
+bool local_search_multi_solution(
+            Solution & solution,
+            PostSearchAction psa,
+            GlobalStopCondition gsc,
+            Components... components);
+</pre>
+
 
 \subsubsection Example
 complete example: local_search_multi_solution_example.cpp
