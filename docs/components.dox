@@ -2,7 +2,7 @@
 
 \section mot Motivation. 
 
-The \a Components class is boost fusion map like class with constant set of keys (names) and support for default values for given key arguments. 
+The \a Components class is boost.fusion.map-like class with constant set of keys (names) and support for default values for given key arguments. 
 This class meets requirements for specific design of template function. The underlined function instead of taking several arguments takes one \a Components class which represents these arguments. 
 
 This way, argument can be easily replaced. One can implement many versions for each of the arguments and later on these versions can be combined into one \a Components object. On the other hand when the arguments depends on each other they can  be composed into one \a Components class which binds them together in one structure.  
@@ -170,18 +170,18 @@ There is a way to replace any component of a given \a Components instance.
 <ul>
     <li> Boost.Parameter
 
-        There are two main differences between Boost.Parameter and \a Components classes
+        Main differences between boost.parameter and \a Components classes:
         <ul>
         <li> The \a Components class supports different sets of default arguments. This can be done very easily also by function user. 
         <li> The \a Components class is written in pure C++ (no macros).
-        <li> The \a Components supports default arguments only when they can be default constructed(boost.parameter is much more flexible here). 
+        <li> The \a Components supports default arguments only when they can be default constructed (boost.parameter is much more flexible here). 
         </ul>
-        The \a Components class is not designed to replacing Boost.Parameter but in many cases (e.g. when the given arguments are functors or when the given arguments can depend on each other) 
+        The \a Components class is not designed to replace boost.parameter but in many cases (e.g. when the given arguments are functors or when the given arguments can depend on each other) 
         it might be a more natural design.
 
     <li> Boost.Fusion
 
-        Although the idea of the \a Components is very similar to Boost.Fusion map, the \a Components gives some functionalities that are not offered by Boost.Fusion map.
+        Although the idea of the \a Components is very similar to boost.fusion.map, the \a Components gives some functionalities that are not offered by boost.fusion.map.
         The example is different initialization methods (see section:\ref const_comp for more details).
 
 </ul>
