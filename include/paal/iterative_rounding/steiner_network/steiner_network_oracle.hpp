@@ -1,6 +1,6 @@
 /**
  * @file steiner_network_oracle.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-06-24
@@ -58,7 +58,7 @@ struct FindRandViolated {
  * @class SteinerNetworkOracleComponents
  * @brief Components of the separation oracle for the steiner network problem.
  *
- * @tparam FindViolated 
+ * @tparam FindViolated
  */
 template <typename FindViolated = FindRandViolated>
 class SteinerNetworkOracleComponents {
@@ -78,27 +78,24 @@ private:
  *
  * @tparam Graph
  * @tparam Restrictions
- * @tparam ResultNetworkSet
  * @tparam OracleComponents
  */
-template <typename Graph, typename Restrictions, typename ResultNetworkSet,
+template <typename Graph, typename Restrictions,
             typename OracleComponents = SteinerNetworkOracleComponents<>>
 class SteinerNetworkOracle {
     typedef utils::Compare<double> Compare;
 public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    
-    
+
+
     SteinerNetworkOracle(
-            const Graph & g, 
-            const Restrictions & restrictions, 
-            const ResultNetworkSet & res)
-             : m_g(g), 
-               m_restrictions(restrictions), 
+            const Graph & g,
+            const Restrictions & restrictions)
+             : m_g(g),
+               m_restrictions(restrictions),
                m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, num_vertices(m_g))),
-               m_auxGraph(num_vertices(g)),
-               m_resultNetwork(res)
+               m_auxGraph(num_vertices(g))
                {}
 
     /**
@@ -214,7 +211,7 @@ private:
                                                     >
                                   > AuxGraph;
     typedef std::unordered_set < AuxVertex > ViolatingSet;
-                                  
+
     /**
      * Creates the auxiliary directed graph used for feasibility testing.
      */
@@ -235,7 +232,7 @@ private:
             }
         }
 
-        for (auto const & e : m_resultNetwork) {
+        for (auto const & e : problem.getEdgesInSolution()) {
             Vertex u = source(e, m_g);
             Vertex v = target(e, m_g);
             addEdge(u, v, 1);
@@ -289,7 +286,7 @@ private:
         if (problem.getCompare().g(violation, minViolation)) {
             m_violatedRestriction = restriction;
             m_violatingSet.clear();
-            
+
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, src);
             assert(srcColor != get(colors, trg));
@@ -306,17 +303,15 @@ private:
     OracleComponents m_oracleComponents;
 
     const Graph & m_g;
-    
+
     const Restrictions & m_restrictions;
     RestrictionsVector m_restrictionsVec;
-    
+
     AuxGraph m_auxGraph;
 
     ViolatingSet m_violatingSet;
     Dist         m_violatedRestriction;
-    
-    const ResultNetworkSet & m_resultNetwork;
-    
+
     boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
     boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
 };
@@ -327,18 +322,16 @@ private:
  * @tparam OracleComponents
  * @tparam Graph
  * @tparam Restrictions
- * @tparam ResultNetworkSet
  * @param g
  * @param restrictions
- * @param res
  *
  * @return SteinerNetworkOracle object
  */
 template <typename OracleComponents = SteinerNetworkOracleComponents<>,
-            typename Graph, typename Restrictions, typename ResultNetworkSet>
-SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet, OracleComponents>
-make_SteinerNetworkSeparationOracle(const Graph & g, const Restrictions & restrictions, const ResultNetworkSet & res) {
-    return SteinerNetworkOracle<Graph, Restrictions, ResultNetworkSet, OracleComponents>(g, restrictions, res);
+            typename Graph, typename Restrictions>
+SteinerNetworkOracle<Graph, Restrictions, OracleComponents>
+make_SteinerNetworkSeparationOracle(const Graph & g, const Restrictions & restrictions) {
+    return SteinerNetworkOracle<Graph, Restrictions, OracleComponents>(g, restrictions);
 }
 
 

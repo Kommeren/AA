@@ -1,6 +1,6 @@
 /**
  * @file steiner_network_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-06-24
@@ -34,26 +34,28 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     LOGLN("Sample problem:");
     Graph g(3);
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef std::set<Edge> ResultNetwork;
+    typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
     bool b;
-    b = boost::add_edge(0 , 1, EdgeProp(1), g).second;
+    b = boost::add_edge(0, 1, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(0 , 1, EdgeProp(1), g).second;
+    b = boost::add_edge(0, 1, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(1 , 2, EdgeProp(1), g).second;
+    b = boost::add_edge(1, 2, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(1 , 2, EdgeProp(1), g).second;
+    b = boost::add_edge(1, 2, EdgeProp(1), g).second;
     assert(b);
-    b = boost::add_edge(2 , 0, EdgeProp(7), g).second;
+    b = boost::add_edge(2, 0, EdgeProp(7), g).second;
     assert(b);
 
     auto cost = get(boost::edge_weight, g);
 
     //solve it
-    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(lp::make_RowGenerationSolveLP(oracle));
-    steiner_network_iterative_rounding(g, restrictions, cost, resultNetwork, std::move(comps));
+    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork>
+                comps(lp::make_RowGenerationSolveLP(oracle));
+    steiner_network_iterative_rounding(g, restrictions, cost,
+                std::back_inserter(resultNetwork), std::move(comps));
 
     // printing result
     LOGLN("Edges in steiner network");
@@ -67,7 +69,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     LOGLN("Invalid problem (restrictions cannot be satisfied):");
     Graph g(3);
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef std::set<Edge> ResultNetwork;
+    typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
     bool b;
     b = boost::add_edge(0, 1, EdgeProp(1), g).second;
@@ -78,9 +80,11 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     auto cost = get(boost::edge_weight, g);
 
     //solve it
-    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
-    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork> comps(lp::make_RowGenerationSolveLP(oracle));
-    auto steinerNetwork(make_SteinerNetwork(g, restrictions, cost, resultNetwork));
+    auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
+    SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork>
+                comps(lp::make_RowGenerationSolveLP(oracle));
+    auto steinerNetwork(make_SteinerNetwork(g, restrictions, cost,
+                                    std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();
 
     BOOST_CHECK(invalid);

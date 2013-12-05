@@ -47,12 +47,13 @@ struct GASetSolution {
         auto jbegin = problem.getJobs().first;
         auto mbegin = problem.getMachines().first;
         auto & colIdx = problem.getColIdx();
-        auto & jobToMachine = problem.getJobToMachines();
+        auto jobToMachine = problem.getJobToMachines();
 
         for(int idx : boost::irange(0, int(colIdx.size()))) {
             if(problem.getCompare().e(solution(colIdx[idx]), 1)) {
-                jobToMachine.insert(std::make_pair(*(jbegin + problem.getJIdx(idx)),
-                                                     *(mbegin + problem.getMIdx(idx))));
+                *jobToMachine = std::make_pair(*(jbegin + problem.getJIdx(idx)),
+                                                  *(mbegin + problem.getMIdx(idx)));
+                ++jobToMachine;
             }
         }
     }
@@ -150,9 +151,11 @@ template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
  * @tparam Cost
  * @tparam ProceedingTime
  * @tparam MachineAvailableTime
- * @tparam JobsToMachines
+ * @tparam JobsToMachinesOutputIterator
  */
-template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime, typename JobsToMachines>
+template <typename MachineIter, typename JobIter, typename Cost,
+          typename ProceedingTime, typename MachineAvailableTime,
+          typename JobsToMachinesOutputIterator>
 class GeneralAssignment {
     public:
         typedef typename std::iterator_traits<JobIter>::value_type Job;
@@ -166,7 +169,8 @@ class GeneralAssignment {
 
         GeneralAssignment(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
-                const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T, JobsToMachines & jobToMachines) :
+                const Cost & c, const ProceedingTime & t, const MachineAvailableTime & T,
+                JobsToMachinesOutputIterator jobToMachines) :
             m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
             m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
             m_c(c), m_t(t), m_T(T), m_jobToMachine(jobToMachines) {}
@@ -229,7 +233,7 @@ class GeneralAssignment {
             return m_colIdx;
         }
 
-        JobsToMachines & getJobToMachines() {
+        JobsToMachinesOutputIterator getJobToMachines() {
             return m_jobToMachine;
         }
 
@@ -256,7 +260,7 @@ class GeneralAssignment {
         const Cost & m_c;
         const ProceedingTime & m_t;
         const MachineAvailableTime & m_T;
-        JobsToMachines & m_jobToMachine;
+        JobsToMachinesOutputIterator m_jobToMachine;
         const Compare m_compare;
         ColIdx m_colIdx;
         std::set<lp::RowId> m_machineRows;
@@ -270,7 +274,7 @@ class GeneralAssignment {
  * @tparam Cost
  * @tparam ProceedingTime
  * @tparam MachineAvailableTime
- * @tparam JobsToMachines
+ * @tparam JobsToMachinesOutputIterator
  * @param mbegin begin machines iterator
  * @param mend end machines iterator
  * @param jbegin begin jobs iterator
@@ -282,12 +286,17 @@ class GeneralAssignment {
  *
  * @return GeneralisedAssignment object
  */
-template <typename MachineIter, typename JobIter, typename Cost, typename ProceedingTime, typename MachineAvailableTime, typename JobsToMachines>
-GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime, JobsToMachines>
+template <typename MachineIter, typename JobIter, typename Cost,
+          typename ProceedingTime, typename MachineAvailableTime,
+          typename JobsToMachinesOutputIterator>
+GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+                  MachineAvailableTime, JobsToMachinesOutputIterator>
 make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
-        JobIter jbegin, JobIter jend,
-        const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T, JobsToMachines & jobsToMachines) {
-    return  GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime, MachineAvailableTime, JobsToMachines>(
+            JobIter jbegin, JobIter jend,
+            const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T,
+            JobsToMachinesOutputIterator jobsToMachines) {
+    return GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+                        MachineAvailableTime, JobsToMachinesOutputIterator>(
             mbegin, mend, jbegin, jend, c, t, T, jobsToMachines);
 }
 
@@ -299,7 +308,7 @@ make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
  * @tparam Cost
  * @tparam ProceedingTime
  * @tparam MachineAvailableTime
- * @tparam JobsToMachines
+ * @tparam JobsToMachinesOutputIterator
  * @tparam Components
  * @tparam Visitor
  * @param mbegin begin machines iterator
@@ -317,11 +326,12 @@ make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
  */
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
-          typename JobsToMachines, typename Components, typename Visitor = TrivialVisitor>
+          typename JobsToMachinesOutputIterator, typename Components, typename Visitor = TrivialVisitor>
 lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                     JobIter jbegin, JobIter jend,
                     const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
-                    JobsToMachines & jobToMachines, Components components, Visitor visitor = Visitor()) {
+                    JobsToMachinesOutputIterator jobToMachines, Components components,
+                    Visitor visitor = Visitor()) {
     auto gaSolution = make_GeneralAssignment(
             mbegin, mend, jbegin, jend,
             c, t, T, jobToMachines);

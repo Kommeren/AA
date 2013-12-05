@@ -1,6 +1,6 @@
 /**
  * @file tree_augmentation_long_test.cpp
- * @brief 
+ * @brief
  * @author Attila Bernath
  * @version 1.0
  * @date 2013-07-08
@@ -136,18 +136,17 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         TreeMap treeMap = get(edge_color, g);
 
         readTreeAugFromStream(ifs, g, cost, treeMap);
-        typedef std::set<Edge> SetEdge;
+        typedef std::vector<Edge> SetEdge;
         SetEdge solution;
 
-
-        paal::ir::TreeAug<Graph, TreeMap, Cost, SetEdge> treeaug(g, treeMap, cost, solution);
+        auto treeaug(paal::ir::make_TreeAug(g, treeMap, cost, std::back_inserter(solution)));
 
         auto invalid = treeaug.checkInputValidity();
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());
-        LOGLN( "Input validation " << filename << " ends.");
+        LOGLN("Input validation " << filename << " ends.");
 
         paal::ir::TAComponents<> comps;
-    
+
         double lplowerbd = getLowerBound(treeaug);
         auto probType = paal::ir::solve_iterative_rounding(treeaug, comps);
         BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);

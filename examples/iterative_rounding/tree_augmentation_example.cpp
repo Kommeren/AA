@@ -1,12 +1,12 @@
 /**
  * @file tree_augmentation_example.cpp
- * @brief 
+ * @brief
  * @author Attila Bernath, Piotr Godlewski
  * @version 1.0
  * @date 2013-10-17
  */
 #include <iostream>
-#include <set>
+#include <vector>
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
@@ -34,13 +34,14 @@ int main() {
     b &= add_edge(4, 5, EdgeProp(1, 0), g).second;
     assert(b);
 
-    typedef std::set<Edge> EdgeSet;
+    typedef std::vector<Edge> EdgeSet;
     EdgeSet solution;
     auto cost = get(boost::edge_weight, g);
     auto treeMap = get(boost::edge_color, g);
 
     // optional input validity checking
-    auto treeAug = paal::ir::make_TreeAug(g, treeMap, cost, solution);
+    auto treeAug = paal::ir::make_TreeAug(g, treeMap, cost,
+                        std::back_inserter(solution));
     auto error = treeAug.checkInputValidity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -49,8 +50,8 @@ int main() {
     }
 
     // solve it
-    paal::ir::tree_augmentation_iterative_rounding(g, treeMap, cost, solution,
-                                    paal::ir::TAComponents<>());
+    paal::ir::tree_augmentation_iterative_rounding(g, treeMap, cost,
+                std::back_inserter(solution), paal::ir::TAComponents<>());
 
     std::cout << "The solution contains the following nontree edges:" << std::endl;
 

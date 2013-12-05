@@ -1,6 +1,6 @@
 /**
  * @file steiner_network_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-10
@@ -42,18 +42,17 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
     namespace ir = paal::ir;
     namespace lp = paal::lp;
 
-    typedef std::set<Edge> ResultNetwork;
+    typedef std::vector<Edge> ResultNetwork;
     typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
-    typedef ir::SteinerNetworkOracle<Graph, Restrictions, ResultNetwork,
-        OracleComponents> Oracle;
+    typedef ir::SteinerNetworkOracle<Graph, Restrictions, OracleComponents> Oracle;
     typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, ResultNetwork,
         lp::RowGenerationSolveLP<Oracle>> Components;
 
     ResultNetwork resultNetwork;
-    Oracle oracle(g, restrictions, resultNetwork);
+    Oracle oracle(g, restrictions);
     Components components(lp::make_RowGenerationSolveLP(oracle));
     auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions, costs,
-                                                    resultNetwork));
+                                        std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
 
@@ -77,22 +76,22 @@ BOOST_AUTO_TEST_CASE(steiner_network_long) {
         if(buf[0] == 0) {
             return;
         }
-        
+
         if(buf[0] == '#')
             continue;
         std::stringstream ss;
         ss << buf;
-        
+
         ss >> fname >> verticesNum >> edgesNum;
 
         LOGLN(fname);
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
-        
+
         Graph g(verticesNum);
         Cost costs      = get(boost::edge_weight, g);
         Bound degBounds = get(boost::vertex_degree, g);
         Index indices   = get(boost::vertex_index, g);
-        
+
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics

@@ -6,7 +6,6 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** return collections via output iterator
 ** passing graph parameters in Boost style
 ** lp documentation
 ** framework documentation

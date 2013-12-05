@@ -1,6 +1,6 @@
 /**
  * @file generalised_assignment_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -21,28 +21,29 @@ int main() {
     cost[0][1] = 3;
     cost[1][0] = 1;
     cost[1][1] = 3;
-    auto  costf = [&](int i, int j){return cost[i][j];}; 
+    auto costf = [&](int i, int j){return cost[i][j];};
 
     std::vector<std::vector<int>> time(2, std::vector<int>(2));
     time[0][0] = 2;
     time[0][1] = 2;
     time[1][0] = 1;
     time[1][1] = 1;
-    auto  timef = [&](int i, int j){return time[i][j];}; 
+    auto timef = [&](int i, int j){return time[i][j];};
 
     std::vector<int> T = {2, 2};
-    auto  Tf = [&](int i){return T[i];}; 
+    auto Tf = [&](int i){return T[i];};
 
-    std::map<int, int> jobsToMachines;
+    std::vector<std::pair<int, int>> jobsToMachines;
 
     // solve it
     auto resultType = paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-            costf, timef, Tf, jobsToMachines, paal::ir::GeneralAssignmentIRComponents<>());
+            costf, timef, Tf, std::back_inserter(jobsToMachines),
+            paal::ir::GeneralAssignmentIRComponents<>());
 
     // print result
     if (resultType == paal::lp::OPTIMAL) {
-        for (const std::pair<int, int> & jm : jobsToMachines) {
+        for (auto const & jm : jobsToMachines) {
             std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
         }
     }

@@ -1,12 +1,12 @@
 /**
  * @file steiner_network_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-06-24
  */
 
-#include <set>
+#include <vector>
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -35,12 +35,13 @@ int main() {
     b &= add_edge(2, 0, EdgeProp(7), g).second;
     assert(b);
 
-    typedef std::set<Edge> ResultNetwork;
+    typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
     auto cost = get(boost::edge_weight, g);
 
     // optional input validity checking
-    auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions, cost, resultNetwork);
+    auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions, cost,
+                                std::back_inserter(resultNetwork));
     auto error = steinerNetwork.checkInputValidity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -49,11 +50,11 @@ int main() {
     }
 
     // solve it
-    auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions, resultNetwork));
+    auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions));
     paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork>
             components(paal::lp::make_RowGenerationSolveLP(oracle));
     paal::ir::steiner_network_iterative_rounding(g, restrictions, cost,
-            resultNetwork, std::move(components));
+                        std::back_inserter(resultNetwork), std::move(components));
 
     // print result
     std::cout << "Edges in steiner network" << std::endl;

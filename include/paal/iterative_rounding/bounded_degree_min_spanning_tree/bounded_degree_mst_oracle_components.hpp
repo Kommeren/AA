@@ -1,6 +1,6 @@
 /**
  * @file bounded_degree_mst_oracle_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-06-18
@@ -57,13 +57,13 @@ struct MinCutTest {
         return false;
     };
 };
-  
+
 /**
  * @class BoundedDegreeMSTOracleComponents
  * @brief Components of the separation oracle for the bounded degree minimum spanning tree problem.
  *
- * @tparam FindViolated 
- * @tparam InitialTest 
+ * @tparam FindViolated
+ * @tparam InitialTest
  */
 template <typename FindViolated = FindRandViolated,
           typename InitialTest = utils::ReturnFalseFunctor>
@@ -73,13 +73,13 @@ public:
     bool findViolated(Problem & problem, Oracle & oracle, int verticesNum) {
         return m_findViolated(problem, oracle, verticesNum);
     };
-    
+
     template <typename Oracle>
     bool initialTest(Oracle & oracle) {
         return m_initialTest(oracle);
     };
-    
-private:  
+
+private:
     FindViolated m_findViolated;
     InitialTest m_initialTest;
 };

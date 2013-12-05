@@ -1,6 +1,6 @@
 /**
  * @file tree_augmentation_test.cpp
- * @brief 
+ * @brief
  * @author Attila Bernath, Piotr Godlewski
  * @version 1.0
  * @date 2013-07-10
@@ -22,7 +22,7 @@ struct LogVisitor : public TrivialVisitor {
     void roundCol(LP & lp, int col, double val) {
         LOGLN("Column "<< col << " rounded to " << val);
     }
-    
+
     template <typename LP>
     void relaxRow(LP & lp, int row) {
         LOGLN("Relax row " << row);
@@ -31,7 +31,6 @@ struct LogVisitor : public TrivialVisitor {
 
 // create a typedef for the Graph type
 typedef adjacency_list<vecS, vecS, undirectedS,
-            //property < vertex_index_t, int >,
             no_property,
             property < edge_weight_t, double,
             property < edge_color_t, bool> > > Graph;
@@ -40,8 +39,8 @@ typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
 typedef graph_traits < Graph >::edge_descriptor Edge;
 
 template <typename Graph, typename TreeMap, typename Cost>
-Edge addEdge(Graph & g,  int u, int v, 
-        TreeMap tree, bool inT, 
+Edge addEdge(Graph & g,  int u, int v,
+        TreeMap tree, bool inT,
         Cost & cost, double c) {
     bool b;
     Traits::edge_descriptor e;
@@ -74,10 +73,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     addEdge(g, 2, 5, treeMap, false, cost, 1);
     addEdge(g, 4, 5, treeMap, false, cost, 1);
 
-    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    typedef std::set<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    paal::ir::TreeAug<Graph, TreeMap, Cost, SolutionTree> treeaug(g, treeMap, cost, solutionTree);
+    auto treeaug(make_TreeAug(g, treeMap, cost, std::inserter(solutionTree, solutionTree.begin())));
     paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
     BOOST_CHECK(!solutionTree.empty());
 }
@@ -95,10 +94,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     addEdge(g, 3, 4, treeMap, false, cost, 0);
     addEdge(g, 3, 5, treeMap, false, cost, 0);
 
-    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);
@@ -121,10 +120,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     addEdge(g, 5, 4, treeMap, true, cost, 0);
     addEdge(g, 2, 3, treeMap, false, cost, 0);
 
-    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);
@@ -147,10 +146,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     addEdge(g, 5, 4, treeMap, false, cost, 0);
     addEdge(g, 2, 3, treeMap, false, cost, 0);
 
-    typedef std::set<graph_traits<Graph>::edge_descriptor> SolutionTree;
+    typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, solutionTree));
+    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);

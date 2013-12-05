@@ -1,12 +1,12 @@
 /**
  * @file bounded_degree_mst_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-11-21
  */
 
-#include <set>
+#include <vector>
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -43,13 +43,14 @@ int main() {
     b &= add_edge(3, 4, EdgeProp(5), g).second;
     assert(b);
 
-    typedef std::set<Edge> ResultTree;
+    typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
     auto cost = get(boost::edge_weight, g);
     auto degreeBound = get(boost::vertex_degree, g);
 
     // optional input validity checking
-    auto bdmst = paal::ir::make_BoundedDegreeMST(g, cost, degreeBound, resultTree);
+    auto bdmst = paal::ir::make_BoundedDegreeMST(g, cost, degreeBound,
+                                            std::back_inserter(resultTree));
     auto error = bdmst.checkInputValidity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -61,7 +62,7 @@ int main() {
     auto oracle(paal::ir::make_BoundedDegreeMSTOracle(g));
     paal::ir::BDMSTIRComponents<Graph> components(paal::lp::make_RowGenerationSolveLP(oracle));
     auto resultType = paal::ir::bounded_degree_mst_iterative_rounding(g, cost, degreeBound,
-                resultTree, std::move(components));
+                            std::back_inserter(resultTree), std::move(components));
 
     // print result
     if (resultType == paal::lp::OPTIMAL) {

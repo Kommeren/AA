@@ -1,6 +1,6 @@
 /**
  * @file bounded_degree_mst_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-06-10
@@ -39,45 +39,45 @@ void checkResult(const Graph & g, const ResultTree & tree,
                  const Cost & costs, const Bound & degBounds,
                  int verticesNum, double bestCost) {
     int treeEdges(tree.size());
-    double treeCost = std::accumulate(tree.begin(), tree.end(), 0., 
+    double treeCost = std::accumulate(tree.begin(), tree.end(), 0.,
                         [&](double cost, Edge e){return cost + costs[e];});
 
     LOGLN("tree edges: " << treeEdges);
     BOOST_CHECK(treeEdges == verticesNum - 1);
     BOOST_CHECK(treeCost <= bestCost);
-    
+
     auto verts = vertices(g);
     int numOfViolations(0);
-    
+
     for (const Vertex & v : boost::make_iterator_range(verts.first, verts.second)) {
         int treeDeg(0);
         auto adjVertices = adjacent_vertices(v, g);
-        
+
         for(const Vertex & u : boost::make_iterator_range(adjVertices.first, adjVertices.second)) {
             bool b; Edge e;
             std::tie(e, b) = boost::edge(v, u, g);
             assert(b);
-            
+
             if (tree.count(e)) {
                 ++treeDeg;
             }
         }
-        
+
         BOOST_CHECK(treeDeg <= degBounds[v] + 1);
         if (treeDeg > degBounds[v]) {
             ++numOfViolations;
         }
     }
-        
+
     LOGLN("Found cost = " << treeCost << ", cost upper bound = " << bestCost);
     LOGLN("Number of violated constraints = " << numOfViolations);
-        
+
     Graph treeG(verticesNum);
-        
+
     for (auto const & e : tree) {
         add_edge(source(e, g), target(e, g), treeG);
     }
-        
+
     std::vector<int> component(verticesNum);
     BOOST_CHECK(connected_components(treeG, &component[0]) == 1);
 }
@@ -93,7 +93,8 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds, const
     ResultTree tree;
     Oracle oracle(g);
     Components components(lp::make_RowGenerationSolveLP(oracle));
-    auto probType = ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds, tree, std::move(components));
+    auto probType = ir::bounded_degree_mst_iterative_rounding(g, costs, degBounds,
+                            std::inserter(tree, tree.end()), std::move(components));
     BOOST_CHECK(probType == lp::OPTIMAL);
 
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
@@ -114,22 +115,22 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         if(buf[0] == 0) {
             return;
         }
-        
+
         if(buf[0] == '#')
             continue;
         std::stringstream ss;
         ss << buf;
-        
+
         ss >> fname >> verticesNum >> edgesNum;
 
         LOGLN(fname);
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
-        
+
         Graph g(verticesNum);
         Cost costs      = get(boost::edge_weight, g);
         Bound degBounds = get(boost::vertex_degree, g);
         Index indices   = get(boost::vertex_index, g);
-        
+
         paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
 
         // default heuristics

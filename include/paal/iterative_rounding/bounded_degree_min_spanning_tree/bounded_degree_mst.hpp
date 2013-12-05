@@ -37,13 +37,13 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
  * @tparam Graph input graph
  * @tparam CostMap map from Graph edges to costs
  * @tparam DegreeBoundMap map from Graph vertices to degree bounds
- * @tparam ResultSpanningTree
+ * @tparam SpanningTreeOutputIterator
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree>
+template <typename Graph, typename CostMap, typename DegreeBoundMap, typename SpanningTreeOutputIterator>
 class BoundedDegreeMST {
 public:
     BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap,
-                     ResultSpanningTree & resultSpanningTree) :
+                     SpanningTreeOutputIterator resultSpanningTree) :
               m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
               m_resultSpanningTree(resultSpanningTree),
               m_compare(BoundedDegreeMSTCompareTraits::EPSILON)
@@ -160,7 +160,8 @@ public:
      * Adds an edge to the result spanning tree.
      */
     void addToResultSpanningTree(Edge e) {
-        m_resultSpanningTree.insert(e);
+        *m_resultSpanningTree = e;
+        ++m_resultSpanningTree;
     }
 
     utils::Compare<double> getCompare() const {
@@ -206,7 +207,7 @@ private:
     const Graph & m_g;
     const CostMap & m_costMap;
     const DegreeBoundMap & m_degBoundMap;
-    ResultSpanningTree &  m_resultSpanningTree;
+    SpanningTreeOutputIterator m_resultSpanningTree;
 
     EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
@@ -224,7 +225,7 @@ private:
  * @tparam Graph
  * @tparam CostMap
  * @tparam DegreeBoundMap
- * @tparam ResultSpanningTree
+ * @tparam SpanningTreeOutputIterator
  * @param g
  * @param costMap
  * @param degBoundMap
@@ -232,11 +233,11 @@ private:
  *
  * @return BoundedDegreeMST object
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap, typename ResultSpanningTree>
-BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, ResultSpanningTree>
+template <typename Graph, typename CostMap, typename DegreeBoundMap, typename SpanningTreeOutputIterator>
+BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, SpanningTreeOutputIterator>
 make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
-                      const DegreeBoundMap & degBoundMap, ResultSpanningTree & resultSpanningTree) {
-    return BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, ResultSpanningTree>(g, costMap, degBoundMap, resultSpanningTree);
+                      const DegreeBoundMap & degBoundMap, SpanningTreeOutputIterator resultSpanningTree) {
+    return BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, SpanningTreeOutputIterator>(g, costMap, degBoundMap, resultSpanningTree);
 }
 
 /**
@@ -245,7 +246,7 @@ make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
  * @tparam Graph
  * @tparam CostMap
  * @tparam DegreeBoundMap
- * @tparam ResultSpanningTree
+ * @tparam SpanningTreeOutputIterator
  * @tparam IRComponents
  * @tparam Visitor
  * @param g
@@ -258,13 +259,13 @@ make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
  * @return solution status
  */
 template <typename Graph, typename CostMap, typename DegreeBoundMap,
-          typename ResultSpanningTree, typename IRComponents,
+          typename SpanningTreeOutputIterator, typename IRComponents,
           typename Visitor = TrivialVisitor>
 lp::ProblemType bounded_degree_mst_iterative_rounding(
         const Graph & g,
         const CostMap & costMap,
         const DegreeBoundMap & degBoundMap,
-        ResultSpanningTree & resultSpanningTree,
+        SpanningTreeOutputIterator resultSpanningTree,
         IRComponents components,
         Visitor visitor = Visitor()) {
 

@@ -1,6 +1,6 @@
 /**
  * @file iterative_rounding_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -23,7 +23,7 @@ struct LogVisitor : public TrivialVisitor {
     void roundCol(const Problem &, LP & lp, lp::ColId col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
-    
+
     template <typename Problem, typename LP>
     void relaxRow(const Problem &, LP & lp, lp::RowId row) {
         LOGLN("Relax row " << row.get());
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     cost[0][1] = 3;
     cost[1][0] = 1;
     cost[1][1] = 3;
-    auto  costf = [&](int i, int j){return cost[i][j];}; 
+    auto  costf = [&](int i, int j){return cost[i][j];};
 
 
     std::vector<std::vector<int>> time(2, std::vector<int>(2));
@@ -50,17 +50,17 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     time[0][1] = 2;
     time[1][0] = 1;
     time[1][1] = 1;
-    auto  timef = [&](int i, int j){return time[i][j];}; 
+    auto  timef = [&](int i, int j){return time[i][j];};
 
     std::vector<int> T = {2, 2};
-    auto  Tf = [&](int i){return T[i];}; 
-    
+    auto  Tf = [&](int i){return T[i];};
+
     std::map<int, int> jobsToMachines;
 
     paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
-        jobs.begin(), jobs.end(), 
-        costf, timef, Tf, jobsToMachines, 
+        jobs.begin(), jobs.end(),
+        costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
         paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
 
     ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
@@ -72,14 +72,14 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
 
    auto j1 = jobsToMachines.find(1);
    BOOST_CHECK(j1 != jobsToMachines.end() && j1->second == 0);
-   
+
    //compile with trivial visitor
    {
         std::map<int, int> jobsToMachines2;
         paal::ir::generalised_assignment_iterative_rounding(
            machines.begin(), machines.end(),
-           jobs.begin(), jobs.end(), 
-           costf, timef, Tf, jobsToMachines2, 
+           jobs.begin(), jobs.end(),
+           costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()),
            paal::ir::GeneralAssignmentIRComponents<>());
    }
 
@@ -108,12 +108,12 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_infeasible_test) {
     std::vector<int> T = {2, 2};
     auto  Tf = [&](int i){return T[i];};
 
-    std::map<int, int> jobsToMachines;
+    std::vector<std::pair<int, int>> jobsToMachines;
 
     auto probType = paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
-        costf, timef, Tf, jobsToMachines,
+        costf, timef, Tf, std::back_inserter(jobsToMachines),
         paal::ir::GeneralAssignmentIRComponents<>());
 
     BOOST_CHECK(probType == lp::INFEASIBLE);

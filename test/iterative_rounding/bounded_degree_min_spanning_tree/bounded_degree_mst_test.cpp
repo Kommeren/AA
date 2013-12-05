@@ -1,6 +1,6 @@
 /**
  * @file bounded_degree_mst.cpp
- * @brief 
+ * @brief
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2013-06-04
@@ -26,7 +26,7 @@ struct LogVisitor : public TrivialVisitor {
     void roundCol(const Problem &, LP & lp, lp::ColId col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
-    
+
     template <typename Problem, typename LP>
     void relaxRow(const Problem &, LP & lp, lp::RowId row) {
         LOGLN("Relax row " << row.get());
@@ -61,13 +61,13 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     LOGLN("Sample problem:");
     Graph g;
     Cost costs = get(boost::edge_weight, g);
-    
+
     std::set<Edge> correctBdmst;
-    
+
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef std::set<Edge> ResultTree;
     ResultTree resultTree;
-   
+
     correctBdmst.insert(addEdge(g, costs, 1, 0, 173));
     correctBdmst.insert(addEdge(g, costs, 4, 2, 176));
                         addEdge(g, costs, 2, 3, 176);
@@ -78,22 +78,24 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     correctBdmst.insert(addEdge(g, costs, 2, 1, 84));
                         addEdge(g, costs, 5, 4, 243);
                         addEdge(g, costs, 4, 0, 259);
-    
+
     Bound degBounds = get(boost::vertex_degree, g);
     ON_LOG(Index indices = get(boost::vertex_index, g));
-    
+
     degBounds[0] = 1;
     degBounds[1] = 3;
     degBounds[2] = 2;
     degBounds[3] = 2;
     degBounds[4] = 1;
     degBounds[5] = 1;
-    
+
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
     Components components(lp::make_RowGenerationSolveLP(oracle));
-    bounded_degree_mst_iterative_rounding(g, costs, degBounds, resultTree, std::move(components), LogVisitor());
-    
+    bounded_degree_mst_iterative_rounding(g, costs, degBounds,
+                    std::inserter(resultTree, resultTree.begin()),
+                    std::move(components), LogVisitor());
+
     ON_LOG(for (auto const & e : resultTree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
               << ") " << "in tree");
@@ -110,7 +112,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
     Cost costs = get(boost::edge_weight, g);
 
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef std::set<Edge> ResultTree;
+    typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
 
     addEdge(g, costs, 0, 1, 1);
@@ -131,7 +133,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
     Components components(lp::make_RowGenerationSolveLP(oracle));
-    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
+    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 
     BOOST_CHECK(invalid);
@@ -145,7 +147,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     Cost costs = get(boost::edge_weight, g);
 
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef std::set<Edge> ResultTree;
+    typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
 
     addEdge(g, costs, 0, 3, 5);
@@ -174,7 +176,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
     Components components(lp::make_RowGenerationSolveLP(oracle));
-    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, resultTree));
+    auto bdmst(make_BoundedDegreeMST(g, costs, degBounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 
     BOOST_CHECK(!invalid);
