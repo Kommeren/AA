@@ -10,34 +10,26 @@
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
-typedef boost::property<boost::edge_weight_t, double,
-                     boost::property<boost::edge_color_t, bool>> EdgeProp;
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                            boost::no_property, EdgeProp> Graph;
-
 int main() {
 //! [Tree Augmentation Example]
-    // sample problem
-    Graph g(6);
+    typedef boost::property<boost::edge_weight_t, double,
+                boost::property<boost::edge_color_t, bool>> EdgeProp;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                boost::no_property, EdgeProp> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    bool b;
-    b =  add_edge(0, 1, EdgeProp(0, 1), g).second;
-    b &= add_edge(1, 2, EdgeProp(0, 1), g).second;
-    b &= add_edge(1, 3, EdgeProp(0, 1), g).second;
-    b &= add_edge(3, 4, EdgeProp(0, 1), g).second;
-    b &= add_edge(3, 5, EdgeProp(0, 1), g).second;
-    b &= add_edge(0, 3, EdgeProp(1, 0), g).second;
-    b &= add_edge(0, 2, EdgeProp(1, 0), g).second;
-    b &= add_edge(2, 4, EdgeProp(1, 0), g).second;
-    b &= add_edge(2, 5, EdgeProp(1, 0), g).second;
-    b &= add_edge(4, 5, EdgeProp(1, 0), g).second;
-    assert(b);
+
+    // sample problem
+    std::vector<std::pair<int, int>> edges {{0,1},{1,2},{1,3},{3,4},{3,5},{0,3},{0,3},{2,4},{2,5},{4,5}};
+    std::vector<EdgeProp> edgeProperties {EdgeProp(0,1), EdgeProp(0,1),
+        EdgeProp(0,1), EdgeProp(0,1), EdgeProp(0,1), EdgeProp(1,0),
+        EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0)};
+
+    Graph g(edges.begin(), edges.end(), edgeProperties.begin(), 6);
+    auto cost = get(boost::edge_weight, g);
+    auto treeMap = get(boost::edge_color, g);
 
     typedef std::vector<Edge> EdgeSet;
     EdgeSet solution;
-    auto cost = get(boost::edge_weight, g);
-    auto treeMap = get(boost::edge_color, g);
 
     // optional input validity checking
     auto treeAug = paal::ir::make_TreeAug(g, treeMap, cost,

@@ -13,40 +13,27 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
-typedef boost::property<boost::vertex_degree_t, int> VertexProp;
-typedef boost::property<boost::edge_weight_t, int> EdgeProp;
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                            VertexProp, EdgeProp> Graph;
-
 int main() {
 //! [Bounded-Degree Minimum Spanning Tree Example]
-    Graph g;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::property<boost::vertex_degree_t, int>,
+        boost::property<boost::edge_weight_t, int>> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 
-    // sample data
-    add_vertex(VertexProp(3), g);
-    add_vertex(VertexProp(2), g);
-    add_vertex(VertexProp(2), g);
-    add_vertex(VertexProp(2), g);
-    add_vertex(VertexProp(2), g);
-    add_vertex(VertexProp(2), g);
+    // sample problem
+    std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},{1,5},{5,0},{3,4}};
+    std::vector<int> costs {1,2,1,2,1,1,1,5};
+    std::vector<int> bounds {3,2,2,2,2,2};
 
-    bool b;
-    b =  add_edge(0, 1, EdgeProp(1), g).second;
-    b &= add_edge(0, 2, EdgeProp(2), g).second;
-    b &= add_edge(1, 2, EdgeProp(1), g).second;
-    b &= add_edge(1, 3, EdgeProp(2), g).second;
-    b &= add_edge(1, 4, EdgeProp(1), g).second;
-    b &= add_edge(1, 5, EdgeProp(1), g).second;
-    b &= add_edge(5, 0, EdgeProp(1), g).second;
-    b &= add_edge(3, 4, EdgeProp(5), g).second;
-    assert(b);
+    Graph g(edges.begin(), edges.end(), costs.begin(), 6);
+    auto cost = get(boost::edge_weight, g);
+    auto degreeBound = get(boost::vertex_degree, g);
+    for (int i : boost::irange(0, 6)) {
+        degreeBound[i] = bounds[i];
+    }
 
     typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
-    auto cost = get(boost::edge_weight, g);
-    auto degreeBound = get(boost::vertex_degree, g);
 
     // optional input validity checking
     auto bdmst = paal::ir::make_BoundedDegreeMST(g, cost, degreeBound,

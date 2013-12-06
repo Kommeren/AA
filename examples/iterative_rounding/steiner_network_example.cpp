@@ -13,10 +13,6 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
-typedef boost::property<boost::edge_weight_t, int> EdgeProp;
-
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                            boost::no_property, EdgeProp> Graph;
 
 //! [Steiner Network Example]
 int restrictions(int i, int j) {
@@ -24,20 +20,19 @@ int restrictions(int i, int j) {
 }
 
 int main() {
-    // sample problem
-    Graph g(3);
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    bool b;
-    b =  add_edge(0, 1, EdgeProp(1), g).second;
-    b &= add_edge(0, 1, EdgeProp(1), g).second;
-    b &= add_edge(1, 2, EdgeProp(1), g).second;
-    b &= add_edge(1, 2, EdgeProp(1), g).second;
-    b &= add_edge(2, 0, EdgeProp(7), g).second;
-    assert(b);
+
+    // sample problem
+    std::vector<std::pair<int, int>> edges {{0,1},{0,1},{1,2},{1,2},{2,0}};
+    std::vector<int> costs {1,1,1,1,7};
+
+    Graph g(edges.begin(), edges.end(), costs.begin(), 3);
+    auto cost = get(boost::edge_weight, g);
 
     typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
-    auto cost = get(boost::edge_weight, g);
 
     // optional input validity checking
     auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions, cost,
