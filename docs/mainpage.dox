@@ -4,15 +4,15 @@
 
 <!-- Not very nice solution...-->
   \n   \n   \n   \n   \n
- 
+
   \section Introduction
-    The PAAl is a header-only, generic library consisting of approximation algorithms, 
+    The PAAl is a header-only, generic library consisting of approximation algorithms,
     data structures and several complete solution for the various optimization problems.
     The PAAl is implemented taking advantage of the new features of C++ introduced in the c++0x standard,
     which in many cases simplify greatly creation of generic code.
- 
+
   \section Installation
-   There is no need to install anything because the PAAl is header only. 
+   There is no need to install anything because the PAAl is header only.
    All you have to do is to download the library and include appropriate headers.
    Only, if you use linear programming you must link your executable against glpk.
 
@@ -20,18 +20,18 @@
 
   \section get_repo Download
     In order to download repository please run the following command:
-    
+
     <B>    git clone http://siekiera.mimuw.edu.pl:8082/paal </B>
 
   \section Contents
     The library consists of several sublibraries
-    <ul> 
+    <ul>
     <li> Algorithms
         <ul>
         <li>\ref local_search_page
             <ul>
-            <li>\ref twoopt 
-            <li>\ref fl 
+            <li>\ref twoopt
+            <li>\ref fl
             <li>\ref kmedian
             <li>\ref cfl
             </ul>
@@ -50,7 +50,6 @@
             <li> \ref scheduling_jobs
             <li> \ref sjoipm
             <li> \ref sjwdoasm
-            
             </ul>
         <li> Dynamic
             <ul>
@@ -61,6 +60,7 @@
             <ul>
             <li>\ref stein
             </ul>
+        <li>\ref linear_programming
         </ul>
     <li> Concepts
         <ul>
@@ -85,50 +85,50 @@
         </ul>
     </ul>
 
-  \section general_design General Design  
-   
+  \section general_design General Design
+
   The algorithms are written as functions:
   <pre>
       algorithm(ProblemDescription)
   </pre>
-  Very often algorithms can be customized or extended, as they support many different arguments. These arguments are 
-  usually wrapped using Components class (see \ref comps), which allows to specify named arguments. In such 
+  Very often algorithms can be customized or extended, as they support many different arguments. These arguments are
+  usually wrapped using Components class (see \ref comps), which allows to specify named arguments. In such
   a case the algorithms is called as follows:
   <pre>
       algorithm(ProblemDescription, Components)
   </pre>
 
-  Generally the library is divided into the following three layers: 
+  Generally the library is divided into the following three layers:
   <pre>
    ___________________________________________________________________________________________________
-  
-      ALGORITHMS  - e. g., LocalSearch. The algorithms are written in very generic way by 
+
+      ALGORITHMS  - e. g., LocalSearch. The algorithms are written in very generic way by
       delegating the specific tasks to the algorithm helpers.
   ___________________________________________________________________________________________________
-  
+
       ALGORITHMS COMPONENTS - e. g., GetNeighborhood or Commit in local search.
       This are the bricks that directly manipulate the specific data-structure concepts.
   ___________________________________________________________________________________________________
-  
-      DATA_STRUCTURES - The data-structures used by algorithm helpers. 
+
+      DATA_STRUCTURES - The data-structures used by algorithm helpers.
       Our data-structures introduce useful and interesting higher level concepts, e.g., Metric or Cycle.
   ___________________________________________________________________________________________________
-  
+
   </pre>
   <br>
   For each solution concept our library is delivering default implementations of components from each layer. <br>
   The strength of this design is that the user is allowed to change components from each layer freely. <br><br>
-  
+
   For example the user can easily swap the implementation of the GetNeighborhood to provide his own way of searching the neighborhood
   in local search. <br>
   Also note that the same algorithm helpers that are used by local search can be used to produced the simulated annealing algorithm. <br>
   Similarly, if the user wants to swap the metric implementation to use specific properties of his topology, this is not a problem at all! <br>
-  
+
  \section Platforms
- Currently the library compiles on the gcc 4.7.3. and clang 3.2. Unfortunately, the library does not 
+ Currently the library compiles on the gcc 4.7.3. and clang 3.2. Unfortunately, the library does not
  compile on the newest Microsoft Visual Studio 2013 due to its poor support of c++0x.
 
- \section Contact 
+ \section Contact
  In case of any questions / suggestions / pull requests / contribution please contact Piotr Wygocki (wygos at mimuw.edu.pl).
- 
+
 */

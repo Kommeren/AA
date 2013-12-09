@@ -7,7 +7,6 @@
 
 * ITERATIVE ROUNDING
 ** passing graph parameters in Boost style
-** lp documentation
 ** framework documentation
 ** BDMST & steiner network components should use components style (+ common code)
 ** better tests for steiner netwok

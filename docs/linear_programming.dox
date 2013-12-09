@@ -1,0 +1,51 @@
+/*! \page linear_programming Linear Programming
+
+\section def Problem definition.
+
+Linear programming (LP) is not itself an approximation problem, as it can
+be solved exactly in polynomial time. The method however is used in many
+approximation algorithms (especially in all Iterative Rounding algorithms).
+
+Linear programs can be expressed in canonical form:
+\f{eqnarray*}
+\mbox{maximize:} & \mathbf{c}^{T} \mathbf{x} \\
+\mbox{subject to:} & A\mathbf{x} \leq \mathbf{b} \\
+\mbox{and:} & \mathbf{x} \geq \mathbf{0} \\
+\f}
+where \f$\mathbf{x}\f$ represents the vector of variables to be determined,
+\f$\mathbf{b}\f$ and \f$\mathbf{c}\f$ are vectors of given coefficients
+and \f$A\f$ is a given matrix of coefficients.
+
+\section Solution
+
+We provide an interface for creating, modifying and (re)solving
+LP instances using the primal and dual simplex methods. As the underlying
+implementation we use the GLPK (GNU Linear Programming Kit) library.
+Although the simplex method is not guaranteed to work in polynomial time,
+it usually works equally fast or faster then polynomial algorithms.
+
+example:
+   \snippet glp_example.cpp GLP Example
+
+complete usage example can be found in file glp_example.cpp
+
+\section rowgen  Row generation
+
+Some of the LP formulations used in different algorithms have got an
+exponential number of rows. To solve such instances we use a technique
+called row generation, which uses the concept of a "separation oracle".
+The separation oracle is an algorithm, which given the values of LP variables
+checks if they form a feasible solution to the LP instance and if not,
+it returns some violated LP row.
+
+Using a separation oracle we can create a simple method of solving LPs
+with exponential number of rows:
+- start with a subset (maybe empty) of rows and solve the LP,
+- while the obtained solution is infeasible add a violated row to the LP
+and resolve it.
+
+\subsection References
+
+http://www.gnu.org/software/glpk/ - GLPK library
+
+*/
