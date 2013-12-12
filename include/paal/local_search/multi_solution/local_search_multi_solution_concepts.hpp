@@ -15,11 +15,18 @@ namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
-//avoid unused variable warning
-template <typename T>
-int use(const T & t);
 
-//TODO checking if the method get const object dosn't work in this framework!
+    /**
+     * @brief avoid unused variable warning
+     *
+     * @tparam T
+     * @param t
+     *
+     */
+template <typename T>
+void use(const T & t);
+
+//TODO checking if the method get const object doesn't work in this framework!
 //we have to find some workaround
 template <typename X>
 class MultiSolution  {

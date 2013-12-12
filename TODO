@@ -1,7 +1,7 @@
+* disable typedefs warning in doxygen
 * knapsack (not 0/1) fptas is not realy fptas
 * doxygen does not see some of the references
-    (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi. )
-* set up jenkins (run automatic tests, tests different builds and compilers)
+    (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi.)
 * alternative kanpsack algorithm (n*(1/epsilon)^2)
 * make better traits, maybe it supposed to look like std::iterator traits
 

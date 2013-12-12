@@ -188,8 +188,8 @@ public:
 private:
     template <typename Action, typename... Args>
     auto call(Args&&... args) ->
-    decltype(std::declval<IRComponents>().template call<Action>(args...)){
-        return m_irComponents.template call<Action>(args...);
+    decltype(std::declval<IRComponents>().template call<Action>(std::forward<Args>(args)...)){
+        return m_irComponents.template call<Action>(std::forward<Args>(args)...);
     }
 
     LPBase m_lpBase;

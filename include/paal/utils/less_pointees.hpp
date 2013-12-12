@@ -10,7 +10,11 @@
 namespace paal {
 
 //TODO add to boost
-//compare pointee using comparator
+/**
+ * @brief compare pointee using comparator
+ *
+ * @tparam Comparator
+ */
 template<class Comparator>
 struct less_pointees_t {
     less_pointees_t(Comparator compare) : m_compare(compare) {}
@@ -23,6 +27,14 @@ private:
     Comparator m_compare;
 };
 
+/**
+ * @brief  make function for less_pointees_t
+ *
+ * @tparam Comparator
+ * @param compare
+ *
+ * @return 
+ */
 template<class Comparator>
 less_pointees_t<Comparator>
 make_less_pointees_t(Comparator compare) {
@@ -30,5 +42,5 @@ make_less_pointees_t(Comparator compare) {
 }
 
 
-}
+} //paal
 #endif /* LESS_POINTEES_HPP */

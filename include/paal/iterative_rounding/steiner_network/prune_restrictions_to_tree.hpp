@@ -11,25 +11,11 @@
 #include <boost/range/irange.hpp>
 #include <boost/function_output_iterator.hpp>
 
+#include "paal/utils/functors.hpp"
+
 namespace paal {
 
 typedef std::vector<std::pair<unsigned, unsigned>> RestrictionsVector;
-
-template <typename G>
-    struct EdgeToVertexPairsIterator {
-        typedef typename boost::graph_traits<G>::edge_descriptor Edge;
-
-        EdgeToVertexPairsIterator(const G & g, RestrictionsVector & resVec) :
-            m_restrictionsVec(&resVec), m_g(&g) {}
-
-        void operator()(Edge e) {
-            m_restrictionsVec->push_back(std::make_pair(source(e, *m_g), target(e, *m_g)));
-        }
-
-        RestrictionsVector * m_restrictionsVec;
-        const G * m_g;
-    };
-
 
 /**
  * @brief Returns a list of restrictions, made of the edges of a maximum spanning tree
@@ -47,6 +33,7 @@ template <typename Restrictions>
         typedef boost::property < boost::edge_weight_t, Dist> EdgeProp;
         typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
                 boost::no_property, EdgeProp> TGraph;
+        typedef typename boost::graph_traits<TGraph>::edge_descriptor Edge;
 
         RestrictionsVector resVec;
         TGraph g(N);
@@ -56,11 +43,10 @@ template <typename Restrictions>
                         EdgeProp(-std::max(res(i, j), res(j, i))),  g);
             }
         }
-        
-        EdgeToVertexPairsIterator<TGraph> addEdge(g, resVec);
 
+        auto addEdge = [&](Edge e){resVec.push_back(std::make_pair(source(e, g), target(e,g)));};
         boost::kruskal_minimum_spanning_tree(g, 
-                boost::make_function_output_iterator(addEdge));
+                boost::make_function_output_iterator(utils::make_AssignableFunctor(addEdge)));
         return resVec;
     }
 
