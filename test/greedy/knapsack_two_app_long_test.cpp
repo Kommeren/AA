@@ -14,24 +14,19 @@
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_two_app.hpp"
 #include "paal/utils/floating.hpp"
+
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
+#include "utils/parse_file.hpp"
 
 using namespace paal;
 using namespace paal::utils;
 
 BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
     std::string testDir = "test/data/KNAPSACK/";
-    std::ifstream is_test_cases(testDir + "cases.txt");
 
-    int testId;
-    assert(is_test_cases.good());
-    while(is_test_cases.good()) {
-        std::string line;
-        is_test_cases >> line;
-        if(line == "")
-            return;
-        testId = std::stoi(line);
+    parse(testDir + "cases.txt", [&](const std::string & line, std::istream &){
+        int testId = std::stoi(line);
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
         
         int capacity;
@@ -39,7 +34,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         std::vector<int> values;
         std::vector<int> optimal;
        
-        read(testDir + "cases/",testId, capacity, sizes, values, optimal);
+        read(testDir + "cases/", testId, capacity, sizes, values, optimal);
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
         LOG_COPY_DEL(sizes.begin(), sizes.end(), " ");
@@ -82,5 +77,5 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
             LOG_COPY_DEL(result.begin(), result.end(), " ");
             LOGLN("");
         }
-    }
+    });
 }

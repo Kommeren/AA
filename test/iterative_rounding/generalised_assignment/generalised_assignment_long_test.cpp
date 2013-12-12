@@ -16,8 +16,10 @@
 
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
+
 #include "utils/logger.hpp"
 #include "utils/read_gen_ass.hpp"
+#include "utils/parse_file.hpp"
 
 using namespace paal::ir;
 using namespace paal;
@@ -25,27 +27,11 @@ using namespace paal;
 
 BOOST_AUTO_TEST_CASE(GeneralizedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
-    std::ifstream is_test_cases(testDir + "gapopt.txt");
-
-    assert(is_test_cases.good());
-    while(is_test_cases.good()) {
-        std::string fname;
+    parse(testDir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         double opt;
         int numberOfCases;
-        int MAX_LINE = 256;
-        char buf[MAX_LINE];
-        is_test_cases.getline(buf, MAX_LINE);
-        if(buf[0] == 0) {
-            return;
-        }
-
-        if(buf[0] == '#')
-            continue;
-        std::stringstream ss;
-        ss << buf;
-
-        ss >> fname;
-        ss >> numberOfCases;
+        
+        is_test_cases >> numberOfCases;
 
         LOGLN(fname << " " << numberOfCases);
         std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
@@ -95,7 +81,9 @@ BOOST_AUTO_TEST_CASE(GeneralizedAssignmentLong) {
             BOOST_CHECK(utils::Compare<double>(0.01).le(c, opt));
             LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
+        int MAX_LINE = 256;
+        char buf[MAX_LINE];
         is_test_cases.getline(buf, MAX_LINE);
-    }
+    });
 
 }

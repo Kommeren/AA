@@ -19,6 +19,7 @@
 
 #include "utils/logger.hpp"
 #include "utils/read_bounded_deg_mst.hpp"
+#include "utils/parse_file.hpp"
 
 typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
                         boost::property < boost::vertex_degree_t, int,
@@ -63,26 +64,11 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
 
 BOOST_AUTO_TEST_CASE(steiner_network_long) {
     std::string testDir = "test/data/BOUNDED_DEGREE_MST/";
-    std::ifstream is_test_cases("test/data/STEINER_NETWORK/cases.txt");
-
-    assert(is_test_cases.good());
-    while(is_test_cases.good()) {
-        std::string fname;
-        int MAX_LINE = 256;
-        char buf[MAX_LINE];
+    paal::parse("test/data/STEINER_NETWORK/cases.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         int verticesNum, edgesNum;
         double bestCost;
-        is_test_cases.getline(buf, MAX_LINE);
-        if(buf[0] == 0) {
-            return;
-        }
 
-        if(buf[0] == '#')
-            continue;
-        std::stringstream ss;
-        ss << buf;
-
-        ss >> fname >> verticesNum >> edgesNum;
+        is_test_cases >> verticesNum >> edgesNum;
 
         LOGLN(fname);
         std::ifstream ifs(testDir + "/cases/" + fname + ".lgf");
@@ -112,5 +98,5 @@ BOOST_AUTO_TEST_CASE(steiner_network_long) {
             LOGLN("any violated");
             runTest<paal::ir::FindAnyViolated>(g, costs, restrictions);
         }
-    }
+    });
 }

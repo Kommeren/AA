@@ -18,6 +18,7 @@
 #include "paal/utils/floating.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_ss.hpp"
+#include "utils/parse_file.hpp"
 
 using namespace paal::greedy::shortest_superstring;
 using namespace paal;
@@ -25,15 +26,9 @@ using namespace paal;
 
 BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
     std::string testDir = "test/data/SS/";
-    std::ifstream is_test_cases(testDir + "capopt.txt");
-
-    assert(is_test_cases.good());
-    while(is_test_cases.good()) {
-        std::string fname;
+    parse(testDir + "capopt.txt", [&](const std::string  & fname, std::istream & is_test_cases) {
         double opt;
-        is_test_cases >> fname >> opt;
-        if(fname == "")
-            return;
+        is_test_cases >> opt;
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
@@ -46,6 +41,5 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
         LOGLN(std::setprecision(20) <<  "GREEDY " << s);
         BOOST_CHECK(utils::Compare<double>(0.001).le(opt,s));
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
-
-    }
+    });
 }

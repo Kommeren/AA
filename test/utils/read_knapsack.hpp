@@ -8,71 +8,52 @@
 #ifndef READ_KNAPSACK_HPP
 #define READ_KNAPSACK_HPP 
 
-namespace {
-void read(const std::string & testDir, 
+#include "utils/parse_file.hpp"
+
+inline void read(const std::string & testDir, 
           int testId, 
           int & capacity, 
           std::vector<int> & weights, 
           std::vector<int> & values, 
           std::vector<int> & optimal) {
     auto filePrefix = "p0" + std::to_string(testId);
+    std::string fname = filePrefix + "_c.txt";
 
     //read capacity
-    std::string fname = filePrefix + "_c.txt";
-    std::ifstream ifs(testDir + fname);
-    assert(ifs.good());
-    ifs >> capacity;
-    ifs.close();
+    {
+        std::ifstream ifs(testDir + fname);
+        assert(ifs.good());
+        ifs >> capacity;
+        ifs.close();
+    }
     
     //read weights
     fname = filePrefix + "_w.txt";
-    ifs.open(testDir + fname);
-    assert(ifs.good());
-    while(ifs.good()) {
-        std::string s;
-        ifs >> s;
-        if(s == "")
-            break;
+    paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int weight = std::stoi(s);
         assert(weight);
         weights.push_back(weight);
-    }
-    ifs.close();
+    });
     
     //read profits
     fname = filePrefix + "_p.txt";
-    ifs.open(testDir + fname);
-    assert(ifs.good());
-    while(ifs.good()) {
-        std::string s;
-        ifs >> s;
-        if(s == "")
-            break;
+    paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int val = std::stoi(s);
         assert(val);
         values.push_back(val);
-    }
+    });
     assert(values.size() == weights.size());
-    ifs.close();
     
     //read profits
     fname = filePrefix + "_s.txt";
-    ifs.open(testDir + fname);
-    assert(ifs.good());
     int idx(0);
-    while(ifs.good()) {
-        std::string s;
-        ifs >> s;
-        if(s == "")
-            break;
+    paal::parse(testDir + fname,  [&](const std::string & s, std::istream &) {
         bool chosen = std::stoi(s);
         if(chosen) {
             optimal.push_back(idx);
         }
         ++idx;
-    }
-    ifs.close();
+    });
 }
 
-}
 #endif /* READ_KNAPSACK_HPP */

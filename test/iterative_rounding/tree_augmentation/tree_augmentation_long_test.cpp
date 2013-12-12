@@ -11,8 +11,10 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "utils/logger.hpp"
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
+
+#include "utils/parse_file.hpp"
+#include "utils/logger.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -102,26 +104,7 @@ double getLowerBound(TA ta) {
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
     std::string testDir = "test/data/TREEAUG/";
-    std::ifstream is_test_cases(testDir + "tree_aug.txt");
-
-    assert(is_test_cases.good());
-    while (is_test_cases.good()) {
-        std::string fname;
-        int MAX_LINE = 256;
-        char buf[MAX_LINE];
-
-        is_test_cases.getline(buf, MAX_LINE);
-        if (buf[0] == 0) {
-            return;
-        }
-
-        if (buf[0] == '#')
-            continue;
-        std::stringstream ss;
-        ss << buf;
-
-        ss >> fname;
-
+    parse(testDir + "tree_aug.txt", [&](const std::string & fname, std::istream &) {
         LOGLN(fname);
         std::string filename = testDir + "cases/" + fname + ".lgf";
         std::ifstream ifs(filename);
@@ -154,5 +137,5 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         double solval = treeaug.getSolutionValue();
         LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);
         BOOST_CHECK(solval <= 2 * lplowerbd);
-    }
+    });
 }

@@ -5,13 +5,15 @@
  * @version 1.0
  * @date 2013-11-19
  */
+#include <boost/test/unit_test.hpp>
+
 #include <vector>
 #include <utility>
 
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
+
 #include "utils/scheduling.hpp"
 #include "utils/logger.hpp"
-#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
    typedef long long Time;
