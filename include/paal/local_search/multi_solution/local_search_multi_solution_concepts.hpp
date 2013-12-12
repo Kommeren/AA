@@ -15,19 +15,11 @@ namespace paal {
 namespace local_search {
 namespace local_search_concepts {
 
+namespace detail {
+    template <typename T>
+    void use(const T & t);
+}//detail
 
-    /**
-     * @brief avoid unused variable warning
-     *
-     * @tparam T
-     * @param t
-     *
-     */
-template <typename T>
-void use(const T & t);
-
-//TODO checking if the method get const object doesn't work in this framework!
-//we have to find some workaround
 template <typename X>
 class MultiSolution  {
     private:
@@ -36,8 +28,7 @@ class MultiSolution  {
         typedef decltype(std::declval<const X>().begin()) IterType;
         typedef typename std::decay<decltype(*std::declval<IterType>())>::type Element;
         static_assert(std::is_same<IterType, IterTypeEnd>::value, "begin type != end type");
-        //TODO problem with boost_join
-//        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
+        BOOST_CONCEPT_ASSERT((boost::ForwardIterator<IterType>));
         BOOST_CONCEPT_USAGE(MultiSolution) {
             x.begin();
             x.end();
@@ -48,6 +39,7 @@ class MultiSolution  {
         X x;
 };
 
+namespace detail {
 template <typename X, typename Solution, typename SearchComponents> 
 class MultiConceptsBase {
     typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
@@ -58,32 +50,33 @@ protected:
     SolutionElement e;
     Move u;
 };
+}//detail
 
 template <typename X, typename Solution, typename SearchComponents> 
-class  MultiGetMoves : public MultiConceptsBase<X, Solution, SearchComponents> {
+class  MultiGetMoves : public detail::MultiConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(MultiGetMoves) {
             auto i = this->x(this->s, this->e);
             auto b = i.first;
             auto e = i.second;
             for(auto x = b; x != e; ++x) {
-                const typename MultiConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
-                use(u);
+                const typename detail::MultiConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
+                detail::use(u);
             }
         }
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiGain : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiGain : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiGain) {
-            use((this->x)(this->s, this->e, this->u) > 0);
+            detail::use((this->x)(this->s, this->e, this->u) > 0);
         }
 };
 
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiCommit : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiCommit : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiCommit) {
             this->x(this->s,this-> e, this->u);
@@ -91,11 +84,11 @@ class MultiCommit : public MultiConceptsBase<X, Solution, SearchComponents>{
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiStopCondition : public MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiStopCondition : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiStopCondition) {
             bool b = this->x(this->s,this-> e, this->u);
-            use(b);
+            detail::use(b);
         }
 };
 
