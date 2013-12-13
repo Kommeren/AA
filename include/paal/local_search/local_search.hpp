@@ -15,6 +15,19 @@
 namespace paal {
 namespace local_search {
 
+/**
+ * @brief local search schema, common for 
+ * both single_solution and multi_solution versions 
+ *
+ * @tparam LocalSearchStep
+ * @tparam PostSearchAction
+ * @tparam GlobalStopCondition
+ * @param lss
+ * @param psa
+ * @param gsc
+ *
+ * @return true if the search was succesfull
+ */
 template <typename LocalSearchStep, 
           typename PostSearchAction = utils::SkipFunctor,
           typename GlobalStopCondition = utils::ReturnFalseFunctor>

@@ -15,6 +15,11 @@
 namespace paal {
 namespace local_search {
 
+/**
+ * @brief Traits class for SearchComponents
+ *
+ * @tparam SearchComponents
+ */
 template <typename SearchComponents> 
 struct SearchComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT; 
@@ -23,6 +28,12 @@ struct SearchComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StopCondition>::type StopConditionT; 
 };
 
+/**
+ * @brief metafunction returns move type in single_solution case
+ *
+ * @tparam SearchComponents
+ * @tparam Solution
+ */
 template <typename SearchComponents, typename Solution> 
 class Move {
     typedef typename SearchComponentsTraits<
@@ -31,9 +42,14 @@ class Move {
     typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
-
 };
 
+/**
+ * @brief metafunction returns move type in multi_solution case
+ *
+ * @tparam SearchComponents
+ * @tparam Solution
+ */
 template <typename SearchComponents, typename Solution> 
 class MultiMove {
     typedef typename SearchComponentsTraits<
@@ -43,9 +59,14 @@ class MultiMove {
     typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
-
 };
 
+/**
+ * @brief metafunction returns Fitness type in single_solution case
+ *
+ * @tparam SearchComponents
+ * @tparam Solution
+ */
 template <typename SearchComponents, typename Solution> 
 class Fitness {
     typedef typename SearchComponentsTraits<
@@ -56,6 +77,12 @@ public:
 };
 
 
+/**
+ * @brief metafunction returns Fitness type in multi_solution case
+ *
+ * @tparam SearchComponents
+ * @tparam Solution
+ */
 template <typename SearchComponents, typename Solution> 
 class MultiFitness {
     typedef typename SearchComponentsTraits<

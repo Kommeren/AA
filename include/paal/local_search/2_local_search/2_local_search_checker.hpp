@@ -9,10 +9,32 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-template <typename Metric> class GainTwoOpt {
+/**
+ * @brief gain for two opt moves 
+ *
+ * @tparam Metric
+ */
+template <typename Metric> 
+    class GainTwoOpt {
     public:
+        /**
+         * @brief 
+         *
+         * @param m fulfills \ref metric concept. 
+        */
         GainTwoOpt(const Metric & m) : m_metric(m) {}
 
+        /**
+         * @brief returns gain for given adjustment
+         *
+         * @tparam Solution
+         * @tparam SolutionElement
+         * @param s
+         * @param sel
+         * @param adjustEl
+         *
+         * @return 
+         */
         template <typename Solution, typename SolutionElement> 
         int operator()(const Solution & s, const SolutionElement & sel, const SolutionElement &adjustEl) {
            return m_metric(sel.first, sel.second) + m_metric(adjustEl.first, adjustEl.second) - 

@@ -14,11 +14,27 @@
 namespace paal {
 namespace local_search {
 
+/**
+ * @brief Name for GetMoves component 
+ */
 struct GetMoves;
+/**
+ * @brief Name for ObjFunction component 
+ */
 struct ObjFunction;
+/**
+ * @brief Name for Commit component 
+ */
 struct Commit;
+/**
+ * @brief Name for StopCondition component 
+ */
 struct StopCondition;
         
+/**
+ * @brief Components for objective function local search.
+ *        This usually this class is not used. See SearchComponentsObjFun class.
+ */
 typedef data_structures::Components<
             GetMoves, 
             ObjFunction, 
@@ -26,9 +42,22 @@ typedef data_structures::Components<
             data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>
                 > ComponentsObjFun;
 
+/**
+ * @brief SearchComponentsObjFun alias to components.
+ *
+ * @tparam Args
+ */
 template <typename... Args>
     using SearchComponentsObjFun = typename ComponentsObjFun::type<Args...> ;
 
+/**
+ * @brief make function for SearchComponentsObjFun
+ *
+ * @tparam Args
+ * @param ComponentsObjFun::make_components(std::forward(args
+ *
+ * @return 
+ */
 template <typename... Args>
 auto make_SearchComponentsObjFun(Args&&... args) -> decltype(ComponentsObjFun::make_components(std::forward<Args>(args)...)) {
       return ComponentsObjFun::make_components(std::forward<Args>(args)...);

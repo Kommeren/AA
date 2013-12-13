@@ -22,10 +22,17 @@ namespace paal {
 namespace local_search {
 
 namespace search_strategies {
+    /**
+     * @brief In this strategy, we iterate through moves until we find the move with positive gain.
+     */
     class ChooseFirstBetter;
+    /**
+     * @brief In this strategy, we iterate through all moves and chose one with the largest gain. 
+     */
     class SteepestSlope;
 }
 
+namespace detail {
 
 template <typename Solution> 
 class LocalSearchStepBase {
@@ -192,7 +199,7 @@ public:
         
     }
 };
-
+} // ! detail
 
 /**
  * @brief local search simple solution 
@@ -214,7 +221,7 @@ bool local_search(
             PostSearchAction psa,
             GlobalStopCondition gsc,
             Components... components) {
-    LocalSearchStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
+    detail::LocalSearchStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
     return search(lss, psa, gsc);
 }
 

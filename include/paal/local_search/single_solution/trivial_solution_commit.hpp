@@ -10,10 +10,18 @@
 
 
 /**
- * @brief We assume that operator() is a new solution
+ * @brief Used in case when update is actually the new solution
  */
 struct TrivialCommit {
-    template <typename Solution> void operator()(Solution & s, const Solution & u) const {
+    /**
+     * @brief We assume that operator() receives a new solution
+     *
+     * @tparam Solution
+     * @param s
+     * @param u
+     */
+    template <typename Solution> 
+    void operator()(Solution & s, const Solution & u) const {
         s = u;
     }
 };

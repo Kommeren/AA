@@ -15,6 +15,11 @@
 namespace paal {
 namespace local_search {
 
+/**
+ * @brief traits class for SearchComponentsObjFun 
+ *
+ * @tparam SearchComponentsObjFun
+ */
 template <typename SearchComponentsObjFun> 
 struct SearchObjFunctionComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT; 
@@ -24,40 +29,39 @@ struct SearchObjFunctionComponentsTraits {
 };
 
 namespace detail {
-    template <typename F, typename Solution, typename Commit> class FunToCheck {
-            typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
-        public:
-            FunToCheck(F f, const Commit & su) : m_f(std::move(f)), m_commitFunctor(su) {}
-
-            template <typename Move> Dist operator()(const Solution &s , const Move &u) {
-                Solution newS(s);
-                m_commitFunctor(newS, u);
-                return m_f(newS) - m_f(s);
-            }
-
-        private:
-
-            F m_f;
-            const Commit & m_commitFunctor;
-    };
-
-    template <typename SearchObjFunctionComponents, typename Solution>
-    class SearchObjFunctionComponentsToSearchComponents {
-    private:
-        typedef SearchObjFunctionComponentsTraits<
-                    SearchObjFunctionComponents> traits; 
+template <typename F, typename Solution, typename Commit> class FunToCheck {
+        typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
     public:
-        typedef detail::FunToCheck< 
-                        typename traits::ObjFunctionT, 
-                        Solution, 
-                        typename traits::CommitT> GainType;
-        typedef SearchComponents<
-                    typename traits::GetMovesT, 
-                             GainType,
-                    typename traits::CommitT, 
-                    typename traits::StopConditionT>  type;
-    };
-}
+        FunToCheck(F f, const Commit & su) : m_f(std::move(f)), m_commitFunctor(su) {}
+
+        template <typename Move> Dist operator()(const Solution &s , const Move &u) {
+            Solution newS(s);
+            m_commitFunctor(newS, u);
+            return m_f(newS) - m_f(s);
+        }
+
+    private:
+
+        F m_f;
+        const Commit & m_commitFunctor;
+};
+
+template <typename SearchObjFunctionComponents, typename Solution>
+class SearchObjFunctionComponentsToSearchComponents {
+private:
+    typedef SearchObjFunctionComponentsTraits<
+                SearchObjFunctionComponents> traits; 
+public:
+    typedef detail::FunToCheck< 
+                    typename traits::ObjFunctionT, 
+                    Solution, 
+                    typename traits::CommitT> GainType;
+    typedef SearchComponents<
+                typename traits::GetMovesT, 
+                         GainType,
+                typename traits::CommitT, 
+                typename traits::StopConditionT>  type;
+};
 
 
 //TODO concepts !!!
@@ -94,7 +98,23 @@ class LocalSearchFunctionStep :
                    )
             ) {} 
 };
+} // !detail
 
+/**
+ * @brief local search function for objective function case.
+ *
+ * @tparam SearchStrategy
+ * @tparam PostSearchAction
+ * @tparam GlobalStopCondition
+ * @tparam Solution
+ * @tparam Components
+ * @param solution
+ * @param psa
+ * @param gsc
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
           typename GlobalStopCondition,
@@ -105,10 +125,21 @@ bool local_search_obj_fun(
             PostSearchAction psa,
             GlobalStopCondition gsc,
             Components... components) {
-    LocalSearchFunctionStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
+    detail::LocalSearchFunctionStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
     return search(lss, psa, gsc);
 }
 
+/**
+ * @brief simple version of local_search_obj_fun
+ *
+ * @tparam SearchStrategy
+ * @tparam Solution
+ * @tparam Components
+ * @param solution
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
           typename Solution, 
           typename... Components>

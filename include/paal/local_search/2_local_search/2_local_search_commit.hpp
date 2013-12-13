@@ -12,14 +12,23 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
-class TwoLocalSearchCommit  {
-    public:
-        TwoLocalSearchCommit() {}
-
-            template <typename SolutionElement, typename Solution> 
-        void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
-            s.getWrap().flip(se.second, ae.first);
-        }
+/**
+ * @brief Commit class for local_search 
+ */
+struct TwoLocalSearchCommit  {
+    /**
+     * @brief flips appropriate segment in the solution
+     *
+     * @tparam SolutionElement
+     * @tparam Solution
+     * @param s
+     * @param se
+     * @param ae
+     */
+    template <typename SolutionElement, typename Solution> 
+    void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
+        s.getWrap().flip(se.second, ae.first);
+    }
 };
 
 } //two_local_search

@@ -9,7 +9,7 @@
 #ifndef TWO_LOCAL_SEARCH_HPP
 #define TWO_LOCAL_SEARCH_HPP
 
-#include "paal/local_search/multi_solution/trivial_neighbor.hpp"
+#include "paal/local_search/multi_solution/get_all_moves_from_solution.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
 #include "paal/local_search/2_local_search/2_local_search_commit.hpp"
@@ -39,18 +39,15 @@ namespace two_local_search {
 * @tparam Cycle input cycle, hast to be model of the  \ref cycle concept
 * @tparam SearchComponents this is model MultiSearchComponents
 */
-
-
-
 typedef data_structures::Components<
             Gain, 
-            data_structures::NameWithDefault<GetMoves, TrivialNeighborGetter>,
+            data_structures::NameWithDefault<GetMoves, GetAllMovesFromSolution>,
             data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
             data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
                 > TwoLocalSearchComponentsCreator;
 
 template <typename Gain, 
-          typename GetMoves = TrivialNeighborGetter, 
+          typename GetMoves = GetAllMovesFromSolution, 
           typename StopCondition = utils::ReturnFalseFunctor> 
 using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetMoves, StopCondition>;
 
@@ -66,13 +63,13 @@ using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, 
  * @return 
  */
 template <typename Gain, 
-          typename GetMoves = TrivialNeighborGetter,
+          typename GetMoves = GetAllMovesFromSolution,
           typename StopCondition = utils::ReturnFalseFunctor>
 TwoLocalComponents<Gain, GetMoves, StopCondition>  
 
     make_TwoLocalSearchComponents(Gain ch, 
-            GetMoves ng = TrivialNeighborGetter(),
-            StopCondition sc = utils::ReturnFalseFunctor()) {
+            GetMoves ng = GetMoves(),
+            StopCondition sc = StopCondition()) {
 
     return TwoLocalComponents<Gain, GetMoves, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }
@@ -90,6 +87,21 @@ getDefaultTwoLocalComponents(const Metric & m) {
     return make_TwoLocalSearchComponents(GainTwoOpt<Metric>(m));
 }
 
+/**
+ * @brief local search for two - opt in tsp adapts tsp to local_search_multi_solution
+ *
+ * @tparam SearchStrategy
+ * @tparam PostSearchAction
+ * @tparam GlobalStopCondition
+ * @tparam Cycle
+ * @tparam Components
+ * @param cycle
+ * @param psa
+ * @param gsc
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
           typename GlobalStopCondition,
@@ -106,6 +118,17 @@ bool two_local_search(
     return local_search_multi_solution(cycleAdapted, std::move(psa), std::move(gsc), std::move(components)...);
 }
 
+/**
+ * @brief simple version of two_local_search
+ *
+ * @tparam SearchStrategy
+ * @tparam Cycle
+ * @tparam Components
+ * @param cycle
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
           typename Cycle, 
           typename... Components>

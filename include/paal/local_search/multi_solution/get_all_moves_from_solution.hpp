@@ -1,5 +1,5 @@
 /**
- * @file trivial_neighbor.hpp
+ * @file get_all_moves_from_solution.hpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -17,7 +17,21 @@ namespace paal {
 namespace local_search{
 
 
-struct TrivialNeighborGetter {
+/**
+ * @brief this class assumes that upddates are just solution elements
+*/
+struct GetAllMovesFromSolution {
+
+    /**
+     * @brief returns all solution elements despite current one.
+     *
+     * @tparam SolutionElement
+     * @tparam Solution
+     * @param sol
+     * @param e
+     *
+     * @return 
+     */
     template <typename SolutionElement, typename Solution> 
                           std::pair<utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type>, 
                                     utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type> > 

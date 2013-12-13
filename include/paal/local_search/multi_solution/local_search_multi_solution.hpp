@@ -21,9 +21,17 @@ namespace paal {
 namespace local_search {
 
 namespace search_strategies {
+    /**
+     * @brief In this strategy, we iterate through moves until we find the move with positive gain.
+     */
     class ChooseFirstBetter;
+    /**
+     * @brief In this strategy, we iterate through all moves and chose one with the largest gain. 
+     */
     class SteepestSlope;
 }
+
+namespace detail {
 
 template <typename Solution>
 class LocalSearchStepMultiSolutionBase {
@@ -105,12 +113,6 @@ private:
     decltype(std::declval<MultiSearchComponents>().template call<Action>(std::forward<Args>(args)...)){
         return m_searchComponents.template call<Action>(std::forward<Args>(args)...);
     }
-    
-/*    template <typename Action, typename... Args> 
-    auto call(Args&&... args) const -> 
-    decltype(std::declval<const MultiSearchComponents>().template call<Action>(args...)){
-        return m_searchComponents.template call<Action>(args...);
-    }*/
     
     MultiSearchComponents m_searchComponents;
 };
@@ -249,7 +251,24 @@ public:
     }
 };
 
+}//! detail
 
+
+/**
+ * @brief local_search_multi_solution function 
+ *
+ * @tparam SearchStrategy
+ * @tparam PostSearchAction
+ * @tparam GlobalStopCondition
+ * @tparam Solution
+ * @tparam Components
+ * @param solution
+ * @param psa
+ * @param gsc
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
           typename GlobalStopCondition,
@@ -260,10 +279,21 @@ bool local_search_multi_solution(
             PostSearchAction psa,
             GlobalStopCondition gsc,
             Components... components) {
-    LocalSearchStepMultiSolution<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
+    detail::LocalSearchStepMultiSolution<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
     return search(lss, psa, gsc);
 }
 
+/**
+ * @brief simple version of the local_search_multi_solution
+ *
+ * @tparam SearchStrategy
+ * @tparam Solution
+ * @tparam Components
+ * @param solution
+ * @param components
+ *
+ * @return 
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
           typename Solution, 
           typename... Components>
