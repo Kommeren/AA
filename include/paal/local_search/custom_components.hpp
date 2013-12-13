@@ -13,6 +13,12 @@
 namespace paal {
 namespace local_search {
 
+/**
+ * @brief This is the gain adapter which accepts gains improving the current solution by more than epsilon
+ *
+ * @tparam Gain
+ * @tparam ValueType
+ */
 template <typename Gain, typename ValueType>
 class GainCutSmallImproves {
 public:    
@@ -47,6 +53,9 @@ private:
 };
 
 
+/**
+ * @brief This is custom StopCondition, it returns true after given count limit
+ */
 class StopConditionCountLimit {
 public:
     StopConditionCountLimit(unsigned limit) : m_cnt(0), m_limit(limit) {}
@@ -61,7 +70,11 @@ private:
 
 };
 
-template <typename duration = std::chrono::duration<int, std::chrono::seconds> ,typename clock = std::chrono::system_clock>
+/**
+ * @brief This is custom StopCondition, it returns true after given time limit
+ */
+template <typename duration = std::chrono::duration<int, std::chrono::seconds>, 
+          typename clock    = std::chrono::system_clock>
 class StopConditionTimeLimit {
 public:
     StopConditionTimeLimit(duration d) :  m_duration(d), m_start(clock::now()) {}
@@ -80,6 +93,14 @@ private:
 };
 
 
+/**
+ * @brief This wrapper counts sum of the improvements. 
+ * It makes sense to use it only when ChooseFirstBetter strategy is applied.
+ *          
+ *
+ * @tparam Gain
+ * @tparam ValueType
+ */
 template <typename Gain, typename ValueType>
 class ComputeGainWrapper {
 public:
@@ -90,6 +111,10 @@ public:
         auto diff = m_gain(std::forward<Args>(args)...);
         m_val += diff;
         return diff;
+    }
+
+    ValueType getVal() const {
+        return m_val;
     }
 
 private:

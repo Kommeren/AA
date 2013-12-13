@@ -30,6 +30,9 @@ namespace ir {
  */
 class DefaultRoundCondition {
 public:
+    /**
+     * @brief constructor.
+     */
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
 
     /**
@@ -63,6 +66,9 @@ template <int arg, int... args>
 class RoundConditionEquals<arg, args...>  :
         public RoundConditionEquals<args...> {
 public:
+    /**
+     * @brief constructor takes epsilon used in double comparison.
+     */
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
 
     template <typename Problem, typename LP>
@@ -84,6 +90,9 @@ protected:
 template <>
 class RoundConditionEquals<> {
 public:
+    /**
+     * @brief constructor takes epsilon used in double comparison.
+     */
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
 
 protected:
@@ -99,6 +108,9 @@ protected:
 template <typename Cond, typename F>
 class RoundConditionToFun {
 public:
+    /**
+     * @brief constructor takes epsilon used in double comparison.
+     */
     RoundConditionToFun(Cond c = Cond(), F f = F()) :
         m_cond(c), m_f(f) {}
 
@@ -119,6 +131,9 @@ private:
 
 class CondBiggerEqualThan {
 public:
+    /**
+     * @brief constructor takes epsilon used in double comparison.
+     */
     CondBiggerEqualThan(double b, double epsilon = utils::Compare<double>::defaultEpsilon())
         : m_bound(b), m_compare(epsilon) {}
 

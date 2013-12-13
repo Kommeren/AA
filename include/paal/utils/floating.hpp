@@ -60,6 +60,11 @@ public:
         return m_epsilon;
     }
     
+    /**
+     * @brief returns default epsilon equals the smallest possible difference on doubles
+     *
+     * @return 
+     */
     static T defaultEpsilon() {
         return std::numeric_limits<T>::epsilon();
     }
