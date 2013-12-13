@@ -24,7 +24,8 @@ int main() {
     VoronoiT voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D}, VSet{SGM::E}, gm);
 
     //run algorithm
-    auto steinerPoints = paal::steiner_tree::getSteinerVertices(gm, voronoi);
+    std::vector<int> steinerPoints; 
+    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(gm, voronoi, std::back_inserter(steinerPoints));
 
     //print result
     std::cout << "Steiner points:" << std::endl;

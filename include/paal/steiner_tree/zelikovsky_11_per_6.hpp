@@ -16,6 +16,7 @@
 #include <boost/graph/subgraph.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
@@ -32,6 +33,8 @@
 namespace paal {
 namespace steiner_tree {
 
+
+namespace detail {
 /**
  * class SteinerTree
  * @brief This is Alexander Zelikovsky 11/6 approximation algorithm for steiner tree.
@@ -68,11 +71,12 @@ public:
             m_save(N)  {}
 
 
-    ResultSteinerVertices getResultSteinerVertices() {
+    template <typename OutputIterator>
+    void getResultSteinerVertices(OutputIterator out) {
         ResultSteinerVertices res;
 
         if(m_voronoi.getVertices().empty()) {
-            return res;
+            return ;
         }
 
         auto ti = boost::irange<int>(0, N);
@@ -110,7 +114,7 @@ public:
                 sc);
 
         uniqueRes(res);
-        return res; 
+        boost::copy(res, out);
     }
 
 private:
@@ -309,13 +313,12 @@ private:
     data_structures::ArrayMetric<Dist> m_save;
     data_structures::BiMap<VertexType> m_tIdx;
 };
+} // !detail
 
-
-template <typename Metric, typename Voronoi>
-typename SteinerTree<Metric, Voronoi>::ResultSteinerVertices
-getSteinerVertices(const Metric & m, const Voronoi & v ) {
-    SteinerTree<Metric, Voronoi> st(m, v);
-    return st.getResultSteinerVertices();
+template <typename Metric, typename Voronoi, typename OutputIterator>
+void steinerTreeZelikovsky11per6approximation(const Metric & m, const Voronoi & v, OutputIterator out) {
+    detail::SteinerTree<Metric, Voronoi> st(m, v);
+    st.getResultSteinerVertices(out);
 }
 
 

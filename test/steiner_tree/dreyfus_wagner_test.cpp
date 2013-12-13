@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_CASE(testBasic) {
     auto dw = make_DreyfusWagner(gm, terminals, nonterminals);
     dw.solve();
     BOOST_CHECK_EQUAL(dw.getCost(), 4);
-    BOOST_CHECK_EQUAL(dw.getSteinerVertices().size(), 1);
+    BOOST_CHECK_EQUAL(dw.steinerTreeZelikovsky11per6approximation().size(), 1);
     BOOST_CHECK_EQUAL(dw.getEdges().size(), 4);
 }
 
@@ -33,6 +33,6 @@ BOOST_AUTO_TEST_CASE(testMedium) {
     auto dw = make_DreyfusWagner(gm, terminals, nonterminals);
     dw.solve();
     BOOST_CHECK_EQUAL(dw.getCost(), 15);
-    BOOST_CHECK_EQUAL(dw.getSteinerVertices().size(), 0);
+    BOOST_CHECK_EQUAL(dw.steinerTreeZelikovsky11per6approximation().size(), 0);
     BOOST_CHECK_EQUAL(dw.getEdges().size(), 5);
 }

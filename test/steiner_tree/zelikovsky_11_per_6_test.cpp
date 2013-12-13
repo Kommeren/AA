@@ -32,7 +32,9 @@ BOOST_AUTO_TEST_CASE(zelikowsky_test) {
     typedef typename VoronoiT::GeneratorsSet FSet;
     VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);
 
-    auto steiner = paal::steiner_tree::getSteinerVertices(gm, voronoi); 
+    std::vector<int> steiner; 
+
+    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(gm, voronoi, std::back_inserter(steiner)); 
     BOOST_CHECK_EQUAL(steiner.size(), size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), SGM::E);
 }
@@ -43,8 +45,9 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
     typedef paal::data_structures::Voronoi<paal::EuclideanMetric> VoronoiT;
     typedef typename VoronoiT::GeneratorsSet FSet;
     VoronoiT voronoi(FSet{{0,0}, {0,2}, {2, 0}, {2, 2}}, FSet{{1,1}}, em);
+    std::vector<std::pair<int, int>> steiner; 
 
-    auto steiner = paal::steiner_tree::getSteinerVertices(em, voronoi); 
+    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(em, voronoi, std::back_inserter(steiner)); 
     BOOST_CHECK_EQUAL(steiner.size(), size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), make_pair(1,1));
 }

@@ -78,7 +78,7 @@ public:
     /**
      * Gets selected Steiner vertices.
      */
-    const std::set<Vertex> & getSteinerVertices() {
+    const std::set<Vertex> & steinerTreeZelikovsky11per6approximation() {
         return m_steinerElements;
     }
 

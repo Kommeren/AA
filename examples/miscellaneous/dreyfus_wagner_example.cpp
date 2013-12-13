@@ -26,7 +26,7 @@ int main() {
     // print result
     std::cout << "Cost = " << dw.getCost() << std::endl;
     std::cout << "Steiner points:" << std::endl;
-    std::set<int> steinerPoints = dw.getSteinerVertices();
+    std::set<int> steinerPoints = dw.steinerTreeZelikovsky11per6approximation();
     std::copy(steinerPoints.begin(), steinerPoints.end(), std::ostream_iterator<int>(std::cout, "\n"));
     std::cout << "Edges:" << std::endl;
     for (auto edge: dw.getEdges()) {

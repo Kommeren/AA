@@ -30,7 +30,8 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
         typedef typename VoronoiT::GeneratorsSet FSet;
         VoronoiT voronoi(FSet(test.terminals.begin(), test.terminals.end()),
                          FSet(test.steinerPoints.begin(), test.steinerPoints.end()), test.metric);
-        std::vector<int> selectedSteinerPoints = paal::steiner_tree::getSteinerVertices(test.metric, voronoi);
+        std::vector<int> selectedSteinerPoints; 
+        paal::steiner_tree::steinerTreeZelikovsky11per6approximation(test.metric, voronoi, std::back_inserter(selectedSteinerPoints));
 
         auto resRange = boost::join(test.terminals, selectedSteinerPoints);
         LOG_COPY_RANGE_DEL(resRange, ",");

@@ -35,7 +35,7 @@ public:
         auto dw = paal::steiner_tree::make_DreyfusWagner(costMap, m_elements, steinerVertices);
         dw.solve();
         m_cost = dw.getCost();
-        auto & steiner = dw.getSteinerVertices();
+        auto & steiner = dw.steinerTreeZelikovsky11per6approximation();
         m_steinerElements.insert(m_steinerElements.begin(), steiner.begin(), steiner.end());
         m_edges = std::move(dw.getEdges());
     }
