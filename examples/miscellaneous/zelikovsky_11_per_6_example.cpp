@@ -1,6 +1,6 @@
 /**
  * @file zelikovsky_11_per_6_example.cpp
- * @brief 
+ * @brief This is example for zelikovsky 11/6 approximation for steiner tree problem.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04

@@ -41,6 +41,7 @@
             <li>\ref gen_ass
             <li>\ref steiner_network
             <li>\ref tree_aug
+            <li>\ref stein_1_39
             </ul>
         <li> Greedy
             <ul>
@@ -50,16 +51,20 @@
             <li> \ref scheduling_jobs
             <li> \ref sjoipm
             <li> \ref sjwdoasm
-            <li> \ref steiner_tree_greedy
+            <li> \ref stein_tree_greedy
             </ul>
         <li> Dynamic
             <ul>
             <li> \ref knapsack_dynamic
             <li> \ref knapsack_fptas
             </ul>
+        <li> Exact
+            <ul>
+            <li>\ref stein_dreyfus
+            </ul>
         <li> Miscellaneous
             <ul>
-            <li>\ref stein
+            <li>\ref stein_zel
             </ul>
         <li>\ref linear_programming
         </ul>

@@ -1,6 +1,6 @@
 /**
  * @file steiner_tree_greedy_example.cpp
- * @brief 
+ * @brief This is example for greedy solution for steiner tree problem.
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20

@@ -1,0 +1,32 @@
+/*! \page stein_1_39 Steiner Tree 1.39 Approximation
+
+\section def Problem definition.
+\copydoc stein_def 
+
+\section sol_1_39 Solution
+This solution implements LP-based approximation algorithm.
+It is currently the best known approximation algorithm for solving general Steiner Tree problem.
+
+We consider an LP relaxation of the problem, which is based on the notion of directed components. 
+We sample one component with probability proportional to the value of the associated variable 
+in a fractional solution: the sampled component is contracted and the LP is updated consequently. 
+We iterate this process until all terminals are connected.
+
+Example:
+ \snippet ir_steiner_tree_example.cpp IR Steiner Tree Example
+  
+  complete example is steiner_tree_example.cpp
+
+\subsection apps_st2 Approximation Ratio equals 1.39
+ 
+\subsection ref References
+The algorithm is described in the \cite Byrka2013.
+
+\subsection sa_1_39 See Also
+
+<ul>
+<li> \ref stein_zel
+<li> \ref stein_dreyfus
+<li> \ref stein_tree_greedy
+</ul>
+*/

@@ -1,4 +1,4 @@
-/*! \page steiner_tree_greedy Steiner Tree 
+/*! \page stein_tree_greedy Steiner Tree Greedy 
 
 \section def Problem definition.
 \copydoc stein_def 
@@ -11,13 +11,19 @@ We compute the minimum spanning tree and lift the result tree to the original gr
 
 Example:
  \snippet steiner_tree_greedy_example.cpp steiner tree greedy Example
+  
+  complete example is steiner_tree_greedy_example.cpp
 
 \subsection apps_steiner_tree_greedy Approximation Ratio equals 2
- 
-\subsection sa_steiner_tree_greedy See also:
-
 
 \subsection ref References
 The algorithm is described in the \cite Vazirani:2001:AA:500776.
 
+\subsection sa_steiner_tree_greedy See also:
+
+<ul>
+<li> \ref stein_1_39
+<li> \ref stein_zel
+<li> \ref stein_dreyfus
+</ul>
 */
