@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(GeneralizedAssignmentLong) {
             boost::integer_range<int> jobs(0,0);
             paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
             auto  Tf = [&](int i){return machinesBounds[i];};
-            std::map<int, int> jobsToMachines;
+            std::unordered_map<int, int> jobsToMachines;
             times(0, 0);
             auto probType = paal::ir::generalised_assignment_iterative_rounding(
                 machines.begin(), machines.end(),

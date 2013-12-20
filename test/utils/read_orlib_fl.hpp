@@ -15,9 +15,9 @@
 
 namespace paal {
 
+static const double MULTIPL = 1000000;
 
 inline long long cast(double d) {
-    static const double MULTIPL = 1000000;
     return (long long)(d * MULTIPL) + 1;
 }
 

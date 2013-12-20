@@ -8,7 +8,7 @@
 #ifndef SCHEDULING_UTILS
 #define SCHEDULING_UTILS
 
-#include <map>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
@@ -17,6 +17,7 @@
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/test/unit_test.hpp>
+#include <boost/functional/hash.hpp>
 
 template <class Machines, class Time, class GetSpeed>
 std::vector<long long> generateJobLoads(Machines machines,
@@ -48,7 +49,7 @@ template <class Result, class GetSpeed>
 double getMaxTime(const Result& result, GetSpeed getSpeed) {
    typedef typename paal::utils::CollectionToElem<Result>::type::first_type MachineIter;
    typedef typename std::iterator_traits<MachineIter>::value_type Machine; 
-   std::map<Machine, double> machineTime;
+   std::unordered_map<Machine, double, boost::hash<Machine>> machineTime;
    for (const auto& machineJobPair: result) {
       Machine machine = *machineJobPair.first;
       auto load = *machineJobPair.second;

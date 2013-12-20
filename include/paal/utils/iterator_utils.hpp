@@ -10,6 +10,7 @@
 #include <boost/iterator/filter_iterator.hpp>
 
 #include "type_functions.hpp"
+#include "functors.hpp"
 
 #ifndef ITERATOR_HELPERS_HPP
 #define ITERATOR_HELPERS_HPP
@@ -17,13 +18,18 @@
 namespace paal {
 namespace utils {
 
-template <typename Iterator> class IteratorWithExcludedElement : 
-    public boost::filter_iterator<std::function<bool(const typename std::iterator_traits<Iterator>::value_type &)>, Iterator> {
-public:
+template <typename Iterator> 
+struct IteratorWithExcludedElement : 
+    public boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(), 
+                                           std::declval<typename std::iterator_traits<Iterator>::value_type>() , 
+                                           std::placeholders::_1)), Iterator> {
+
     typedef typename std::iterator_traits<Iterator>::value_type Element;
     IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e) 
-        : boost::filter_iterator<std::function<bool(const Element &)>, Iterator >
-          (std::bind(std::not_equal_to<Element>(), e, std::placeholders::_1), i, end )  {}
+        : boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(), 
+                                                    std::declval<Element>(), 
+                                                    std::placeholders::_1)), Iterator >
+          (std::bind(utils::NotEqualTo(), e, std::placeholders::_1), i, end )  {}
     
     IteratorWithExcludedElement() {} 
 };

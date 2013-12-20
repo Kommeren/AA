@@ -12,7 +12,7 @@
 #include <boost/iterator.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <algorithm>
-#include <map>
+#include <unordered_map>
 
 namespace paal {
 namespace data_structures {
@@ -779,7 +779,7 @@ namespace splay_tree {
       /** root node of a tree */
       size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
       mutable node_type *root_ = NULL;
-      std::map<T, node_type *> tTonode_;
+      std::unordered_map<T, node_type *> tTonode_;
   };
 }
 }

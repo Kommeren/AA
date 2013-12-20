@@ -55,6 +55,8 @@ typedef property_map < Graph, vertex_index_t >::type Index;
 typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
+BOOST_AUTO_TEST_SUITE(tree_augmentation) 
+
 BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     // sample problem
     LOGLN("Sample problem:");
@@ -155,3 +157,5 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     BOOST_CHECK(invalid);
     LOGLN(*invalid);
 }
+
+BOOST_AUTO_TEST_SUITE_END() 

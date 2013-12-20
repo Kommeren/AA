@@ -1,8 +1,18 @@
+/**
+ * @file metric_to_bgl.hpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-02-01
+ */
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/graph/adjacency_matrix.hpp>
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/metric_on_idx.hpp"
+#include "paal/utils/functors.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -52,7 +62,8 @@ metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
     typedef typename MT::VertexType VertexType;
     idx = data_structures::BiMap<VertexType>(vbegin, vend); 
     auto  idxMetric = data_structures::make_metricOnIdx(m, idx);
-    std::function<int(VertexType)> trans = [&](VertexType v) {return idx.getIdx(v);};
+    auto transLambda = [&](VertexType v) {return idx.getIdx(v);};
+    auto trans = utils::make_AssignableFunctor(transLambda);
     return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans), 
                                   boost::make_transform_iterator(vend, trans));
 }

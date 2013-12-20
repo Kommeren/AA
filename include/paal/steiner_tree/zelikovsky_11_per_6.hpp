@@ -5,10 +5,14 @@
  * @version 1.0
  * @date 2013-07-24
  */
-#include <map>
+#include <unordered_map>
 #include <stack>
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
+
+//hack for clang compilation (hash for boost tuple, boost::1_55)
+#include <boost/config.hpp>
+#undef BOOST_NO_CXX11_HDR_TUPLE
 
 #include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
@@ -19,9 +23,9 @@
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/iterator/zip_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "paal/utils/contract_bgl_adjacency_matrix.hpp"
-
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
 #include "paal/data_structures/metric/metric_traits.hpp"
@@ -133,7 +137,7 @@ private:
    
     //other types
     typedef std::vector<Dist> ThreeSubsetsDists;
-    typedef std::map<ThreeTuple, VertexType> NearstByThreeSubsets;
+    typedef std::unordered_map<ThreeTuple, VertexType, boost::hash<ThreeTuple>> NearstByThreeSubsets;
 
         template <typename Iter> std::pair<data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>, 
                                            data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>>        

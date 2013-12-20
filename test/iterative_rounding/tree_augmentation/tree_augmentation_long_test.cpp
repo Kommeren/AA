@@ -59,7 +59,7 @@ typedef property_map < Graph, edge_color_t >::type TreeMap;
 void readTreeAugFromStream(std::ifstream & is,
         Graph & g, Cost & cost, TreeMap & treeMap) {
     std::string s;
-    std::map<std::string, Vertex> nodes;
+    std::unordered_map<std::string, Vertex> nodes;
     int verticesNum, edgesNum;
     is >> s; is >> verticesNum; is >> s;
 

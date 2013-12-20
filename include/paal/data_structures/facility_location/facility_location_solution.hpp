@@ -9,7 +9,9 @@
 #ifndef FACILITY_LOCATION_SOLUTION_HPP
 #define FACILITY_LOCATION_SOLUTION_HPP
 
-#include <set>
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
+#include <unordered_set>
 #include <cassert>
 #include <type_traits>
 
@@ -35,7 +37,7 @@ class FacilityLocationSolution {
         typedef typename VT::VertexType VertexType;
         typedef typename VT::DistanceType Dist;
         typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
-        typedef std::set<VertexType> UnchosenFacilitiesSet;
+        typedef std::unordered_set<VertexType, boost::hash<VertexType>> UnchosenFacilitiesSet;
 
         FacilityLocationSolution(VoronoiType  voronoi,
                                  UnchosenFacilitiesSet uf,

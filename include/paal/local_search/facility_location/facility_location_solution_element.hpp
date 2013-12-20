@@ -15,6 +15,11 @@ namespace facility_location {
 
 enum is_chosen { CHOSEN, UNCHOSEN};
 
+/**
+ * @brief class representing facility consists of vertex type and  is_chosen enum value.
+ *
+ * @tparam T
+ */
 template <typename T> class Facility {
 public:
     Facility(is_chosen ic, T e) : m_isChosen(ic), m_elem(e) {}
@@ -48,12 +53,37 @@ private:
     T m_elem;    
 };
 
+/**
+ * @brief Hash for facility
+ */
 struct FacilityHash {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param f
+     *
+     * @return hash
+     */
     template <typename T>
     size_t operator()(Facility<T> f) const {
         return std::hash<T>()(f.getElem());
     }
 };
+
+/**
+ * @brief operator< for facility
+ *
+ * @tparam T
+ * @param left
+ * @param right
+ *
+ * @return 
+ */
+template <typename T>
+bool operator<(const Facility<T> & left, const Facility<T> & right) {
+    return left.getElem() < right.getElem();
+}
 
 
 }

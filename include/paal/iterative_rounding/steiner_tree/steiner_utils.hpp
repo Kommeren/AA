@@ -8,6 +8,8 @@
 #ifndef STEINER_UTILS_HPP
 #define STEINER_UTILS_HPP
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/join.hpp>
 

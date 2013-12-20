@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
     std::vector<int> T = {2, 2};
     auto  Tf = [&](int i){return T[i];};
 
-    std::map<int, int> jobsToMachines;
+    std::unordered_map<int, int> jobsToMachines;
 
     paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
 
    //compile with trivial visitor
    {
-        std::map<int, int> jobsToMachines2;
+        std::unordered_map<int, int> jobsToMachines2;
         paal::ir::generalised_assignment_iterative_rounding(
            machines.begin(), machines.end(),
            jobs.begin(), jobs.end(),

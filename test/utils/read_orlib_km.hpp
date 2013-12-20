@@ -13,10 +13,10 @@
 #define READ_ORLIB_KM_HPP
 
 #include <type_traits>
+#include <unordered_map>
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "utils/logger.hpp"
-#include <map>
 namespace paal {
 
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, boost::property < boost::edge_weight_t, int > > graph_t;
@@ -38,7 +38,7 @@ GraphMT readORLIB_KM(std::istream & ist,
     int l;
     std::vector<Edge> edges;
     std::vector<int> weight;
-    std::map<std::pair<int,int> ,int> edges_position;
+    std::unordered_map<std::pair<int,int> ,int, boost::hash<std::pair<int, int>>> edges_position;
     int j=1;
     while(nE--){
         ist >> a>>b>>l;

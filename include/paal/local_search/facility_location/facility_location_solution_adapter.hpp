@@ -9,14 +9,17 @@
 #ifndef FACILITY_LOCATION_SOLUTION_ADAPTER_HPP
 #define FACILITY_LOCATION_SOLUTION_ADAPTER_HPP
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
 
 #include <unordered_map>
 #include <unordered_set>
 
-#include <boost/iterator/transform_iterator.hpp>
-#include <boost/range/join.hpp>
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/range/distance.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/functors.hpp"
 #include "paal/data_structures/collection_starts_from_last_change.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_element.hpp"
@@ -40,20 +43,7 @@ public:
     typedef decltype(std::declval<FLS>().getUnchosenFacilities()) Unchosen;
     typedef typename data_structures::FacilityLocationSolutionTraits<FLS>::Dist Dist;
     typedef std::unordered_set<VertexType> UnchosenCopy;
-private:
-    typedef std::function<Fac(VertexType)> TransFunct;
-    template <typename Col> 
-    struct Traits {
-        typedef typename utils::CollectionToIter<Col>::type ColIter;
-        typedef boost::transform_iterator<TransFunct, ColIter> ColTIter;
-        typedef std::pair<ColTIter, ColTIter> ColTIterRange;
-    };
-    typedef typename Traits<Chosen>::ColTIter ChosenTIter;
-    typedef typename Traits<Unchosen>::ColTIter UnchosenTIter;
 public:
-    typedef boost::joined_range<typename Traits<Chosen>::ColTIterRange, 
-                                typename Traits<Unchosen>::ColTIterRange> Range;
-    typedef typename boost::range_iterator<Range>::type SolutionIterator;
 
     FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) : 
             m_sol(sol), 
@@ -61,26 +51,20 @@ public:
                          m_sol.getUnchosenFacilities().end()) {
         auto const &  ch = m_sol.getChosenFacilities();
         auto const &  uch = m_sol.getUnchosenFacilities();
-        auto chb = ch.begin();
-        auto che = ch.end();
-        auto uchb = uch.begin();
-        auto uche = uch.end();
 
-        TransFunct transformChosen = [](VertexType f){ return Fac(CHOSEN ,f);};
-        TransFunct transformUnchosen = [](VertexType f){ return Fac(UNCHOSEN, f);};
+        auto transformChosen = [](VertexType f){ return Fac(CHOSEN ,f);};
+        auto transformUnchosen = [](VertexType f){ return Fac(UNCHOSEN, f);};
+        auto transformChosenAssignable = utils::make_AssignableFunctor(transformChosen);
+        auto transformUnchosenAssignable = utils::make_AssignableFunctor(transformUnchosen);
         
-        ChosenTIter chBegin(chb, transformChosen);
-        ChosenTIter chEnd(che, transformChosen);
+        auto transformedChosen = boost::adaptors::transform(ch, transformChosenAssignable);
+        auto transformedUnchosen = boost::adaptors::transform(uch, transformUnchosenAssignable);
 
-        UnchosenTIter uchBegin(uchb, transformUnchosen);
-        UnchosenTIter uchEnd(uche, transformUnchosen);
-
-        typename Traits<Chosen>::ColTIterRange   rch(chBegin, chEnd);
-        typename Traits<Unchosen>::ColTIterRange ruch(uchBegin, uchEnd);
-
-        auto join = boost::join(rch, ruch);
-        m_facilities.resize(std::distance(boost::begin(join), boost::end(join)));
-        std::copy(join.begin(), join.end(), m_facilities.begin());
+        auto chosenSize = boost::distance(ch);
+        m_facilities.resize(chosenSize + boost::distance(uch));
+        boost::copy(transformedChosen, m_facilities.begin());
+        boost::copy(transformedUnchosen, m_facilities.begin() + chosenSize);
+        
         for(auto & f : m_facilities) {
             m_vertexToFac.insert(std::make_pair(f.getElem(), &f));
         }

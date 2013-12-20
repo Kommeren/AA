@@ -10,7 +10,6 @@
 #define SIMPLE_CYCLE_HPP 
 
 #include <cassert>
-#include <map>
 #include <vector>
 #include <iterator>
 

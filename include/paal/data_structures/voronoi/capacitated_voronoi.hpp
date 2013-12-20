@@ -8,6 +8,8 @@
 #ifndef CAPACITATED_VORONOI_HPP
 #define CAPACITATED_VORONOI_HPP 
 
+#include <unordered_map>
+
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/iterator/transform_iterator.hpp>
@@ -117,7 +119,7 @@ private:
     typedef typename GTraits::in_edge_iterator IEI;
     typedef typename GTraits::vertex_descriptor VD;
     typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
-    typedef typename std::map<VertexType, VD> VertexToGraphVertex;
+    typedef typename std::unordered_map<VertexType, VD, boost::hash<VertexType>> VertexToGraphVertex;
     
     struct Trans {
         std::pair<VertexType, DistI> operator()(const ED &e) const {

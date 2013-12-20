@@ -8,6 +8,8 @@
 #ifndef COLLECTION_STARTS_FROM_LAST_CHANGE_HPP
 #define COLLECTION_STARTS_FROM_LAST_CHANGE_HPP 
 
+#include <boost/range/join.hpp>
+
 namespace paal {
 namespace data_structures {
 

@@ -8,7 +8,6 @@
 #ifndef BIMAP_HPP
 #define BIMAP_HPP 
 
-#include <map>
 #include <unordered_map>
 
 #include <boost/multi_index_container.hpp>

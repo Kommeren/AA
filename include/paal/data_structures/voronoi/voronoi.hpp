@@ -9,15 +9,18 @@
 #define VORONOI_HPP
 
 
-#include <set>
+#include <unordered_set>
+#include <unordered_map>
 #include <map>
 #include <cassert>
 #include <climits>
 
 
 #include <boost/range/adaptor/map.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/utils/functors.hpp"
 #include "voronoi_traits.hpp"
 
 namespace paal {
@@ -35,7 +38,7 @@ class Voronoi {
     public:
         typedef typename MetricTraits<Metric>::VertexType VertexType;    
         typedef std::multimap<VertexType, VertexType> GeneratorsToVertices;
-        typedef std::set<VertexType> GeneratorsSet;
+        typedef std::unordered_set<VertexType, boost::hash<VertexType>> GeneratorsSet;
         typedef typename MetricTraits<Metric>::DistanceType Dist;
         //TODO change to vector
         typedef GeneratorsSet Vertices;
@@ -124,13 +127,13 @@ class Voronoi {
                 m_verticesToGenerators.clear();
                 m_generatorsToVertices.clear();
             } else {
-                auto op = std::bind(std::not_equal_to<VertexType>(), f, std::placeholders::_1);
+                auto op = std::bind(utils::NotEqualTo(), f, std::placeholders::_1);
                 auto begin = m_generatorsToVertices.lower_bound(f);
                 auto end = m_generatorsToVertices.upper_bound(f);
                 for(;begin != end; ) {
                     auto v = begin->second;
                     //using the fact that generators is a map 
-                    //(with other containers you have to be carefull cause of iter invalidation)
+                    //(with other containers you have to be careful cause of iter invalidation)
                     ++begin;
                     cost -= dist(v);
                     cost += adjustVertex(v, op);
@@ -150,11 +153,7 @@ class Voronoi {
 
             decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values) 
         getVerticesForGenerator(VertexType g) const {
-           
-            auto l = m_generatorsToVertices.lower_bound(g);
-            auto u = m_generatorsToVertices.upper_bound(g);
-
-            return std::make_pair(l, u) | boost::adaptors::map_values;
+            return m_generatorsToVertices.equal_range(g) | boost::adaptors::map_values;
         }
 
     private:
@@ -162,8 +161,9 @@ class Voronoi {
         Dist dist(VertexType v) {
             return m_metric(v, vertexToGenerators(v));
         }
-        
-        Dist adjustVertex(VertexType v, std::function<bool(VertexType)> filter = [](VertexType v){return true;}) {
+       
+        template <typename Filter = utils::ReturnTrueFunctor>
+        Dist adjustVertex(VertexType v, Filter filter = Filter()) {
             bool init = true;
             Dist d = Dist();
             VertexType f_best = VertexType();
@@ -196,8 +196,8 @@ class Voronoi {
                 m_generatorsToVertices.insert(std::make_pair(f, v));
         }
 
-        typedef std::map<VertexType, 
-                typename GeneratorsToVertices::iterator> VerticesToGenerators;
+        typedef std::unordered_map<VertexType, 
+                typename GeneratorsToVertices::iterator, boost::hash<VertexType>> VerticesToGenerators;
         
         VerticesToGenerators m_verticesToGenerators;
         GeneratorsToVertices m_generatorsToVertices;

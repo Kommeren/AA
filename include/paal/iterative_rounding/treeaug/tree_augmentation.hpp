@@ -23,6 +23,7 @@
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
+#include "paal/utils/bgl_edge_hash.hpp"
 
 namespace paal {
 namespace ir {
@@ -238,7 +239,7 @@ public:
     typedef boost::filtered_graph<Graph, BoolMapToNonTreeFilter<TreeMap> > NonTreeGraph;
 
     typedef std::vector<Edge> EdgeList;
-    typedef std::map<Edge, EdgeList> CoverMap;
+    typedef std::unordered_map<Edge, EdgeList, EdgeHash<Graph>> CoverMap;
 
     //cross reference between links and columns
     typedef boost::bimap<Edge, lp::ColId> EdgeToColId;

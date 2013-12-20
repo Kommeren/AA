@@ -8,6 +8,8 @@
 #ifndef STEINER_TREE_HPP
 #define STEINER_TREE_HPP
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <boost/range/join.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"

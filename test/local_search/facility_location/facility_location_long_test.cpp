@@ -15,7 +15,6 @@
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
-#include "paal/utils/floating.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
 #include "utils/logger.hpp"
@@ -28,9 +27,9 @@ using namespace paal;
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
     std::string testDir = "test/data/FL_ORLIB/";
     parse(testDir + "uncapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
-        double opt;
-        is_test_cases >> opt;
-        opt = cast(opt);
+        double optTemp;
+        is_test_cases >> optTemp;
+        long long opt = cast(optTemp);
 
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) <<  "OPT " << opt);
@@ -60,10 +59,10 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
 
         facility_location_local_search(sol, nop, nop, rem, add, swap);
 
-        double c = simple_algo::getFLCost(metric, cost, sol);
+        long long c = simple_algo::getFLCost(metric, cost, sol);
         LOGLN(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));
-        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        BOOST_CHECK(opt <= c + MULTIPL);
+        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << double(c) / double(opt));
     });
     
 }
