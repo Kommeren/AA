@@ -129,7 +129,7 @@ Concepts:
     </pre>
     
     </li>
-    <li> <i>StopCondition</i> is a concept class responsible for stop condition.
+    <li> <i>StepStopCondition</i> is a concept class responsible for stop condition in each step.
     <pre>
     StopConditionArchetype {
         bool operator()(const Solution & s, const Move & move);
@@ -178,7 +178,7 @@ We start with defining search components, that is:
 <li> Gain functor </li>
 <li> Commit functor </li>
 </ol>
-Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
+Note that we don't define StepStopCondition i.e. we're using default StopCondition.
 
 \snippet local_search_example.cpp Local Search Components Example
 
@@ -222,14 +222,14 @@ Concepts:
     }
     </pre>
     
-    <li> <i>MultiStopCondition</i> is a concept class responsible for stop condition.
+    <li> <i>MultiStepStopCondition</i> is a concept class responsible for stop condition.
     <pre>
-    StopCondition {
+    MultiStepStopCondition {
         bool operator()(const Solution & s, const SolutionElement & se, const Move & move);
     }
     </pre>
     
-    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
+    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StepStopCondition.
     </li>
 </ol>
 
@@ -270,7 +270,7 @@ We start with defining search components, that is:
 <li> Gain functor
 <li> Commit functor
 </ol>
-Note that we don't define StopCondition i.e. we're using default TrivialStopCondition.
+Note that we don't define StepStopCondition i.e. we're using default StopCondition.
 
 \snippet local_search_multi_solution_example.cpp Local Search Components Example
 

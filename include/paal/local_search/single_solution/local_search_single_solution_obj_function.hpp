@@ -25,7 +25,7 @@ struct SearchObjFunctionComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT; 
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT; 
     typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<Commit>::type CommitT; 
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<StopCondition>::type StopConditionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<StepStopCondition>::type StepStopConditionT; 
 };
 
 namespace detail {
@@ -60,7 +60,7 @@ public:
                 typename traits::GetMovesT, 
                          GainType,
                 typename traits::CommitT, 
-                typename traits::StopConditionT>  type;
+                typename traits::StepStopConditionT>  type;
 };
 
 
@@ -94,7 +94,7 @@ class LocalSearchFunctionStep :
                     std::move(s.template get<GetMoves>()),
                     Gain(std::move(s.template get<ObjFunction>()), base::m_searchComponents.template get<Commit>()),
                     std::move(s.template get<Commit>()),
-                    std::move(s.template get<StopCondition>())
+                    std::move(s.template get<StepStopCondition>())
                    )
             ) {} 
 };

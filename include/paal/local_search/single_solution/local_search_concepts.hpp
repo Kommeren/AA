@@ -60,9 +60,9 @@ class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class StopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
+class StepStopCondition : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(StopCondition) {
+        BOOST_CONCEPT_USAGE(StepStopCondition) {
             bool b = this->x(this->s, this->u);
             use(b);
         }
@@ -74,12 +74,12 @@ class SearchComponents {
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
-    typedef typename Traits::StopConditionT SC;
+    typedef typename Traits::StepStopConditionT SC;
 public:
     BOOST_CONCEPT_ASSERT((GetMoves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((Gain<IC, Solution, X>));
     BOOST_CONCEPT_ASSERT((Commit<SU, Solution, X>));
-    BOOST_CONCEPT_ASSERT((StopCondition<SC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((StepStopCondition<SC, Solution, X>));
 };
 
 } // concepts

@@ -84,9 +84,9 @@ class MultiCommit : public detail::MultiConceptsBase<X, Solution, SearchComponen
 };
 
 template <typename X, typename Solution, typename SearchComponents> 
-class MultiStopCondition : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
+class MultiStepStopCondition : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
-        BOOST_CONCEPT_USAGE(MultiStopCondition) {
+        BOOST_CONCEPT_USAGE(MultiStepStopCondition) {
             bool b = this->x(this->s,this-> e, this->u);
             detail::use(b);
         }
@@ -98,12 +98,12 @@ class MultiSearchComponents {
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
-    typedef typename Traits::StopConditionT SC;
+    typedef typename Traits::StepStopConditionT SC;
 public:
     BOOST_CONCEPT_ASSERT((MultiGetMoves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiGain<IC, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiCommit<SU, Solution, X>));
-    BOOST_CONCEPT_ASSERT((MultiStopCondition<SC, Solution, X>));
+    BOOST_CONCEPT_ASSERT((MultiStepStopCondition<SC, Solution, X>));
 };
 
 } // local_search_concepts

@@ -62,7 +62,7 @@ template <typename Solution,
 class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponents, MultiSearchComponentsRest...> : 
         public LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> {
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
-    typedef typename MultiMove<MultiSearchComponents, Solution>::type Move;
+    typedef typename MultiMove<MultiSearchComponents, Solution>::reference MoveRef;
     
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> base;
     typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
@@ -94,11 +94,11 @@ public:
 
         for(SolElementRef r : m_solution) {
             auto adjustmentSet = call<GetMoves>(m_solution, r);
-            for(const Move & move : boost::make_iterator_range(adjustmentSet)) {
+            for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
                 if(call<Gain>(m_solution, r, move) > 0) {
                     call<Commit>(m_solution, r, move);
                     return true;
-                } else if(call<StopCondition>(m_solution, r, move)) {
+                } else if(call<StepStopCondition>(m_solution, r, move)) {
                     return false;
                 }
             }
@@ -148,6 +148,7 @@ class LocalSearchStepMultiSolution<
       public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> { 
 
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
+    typedef typename MultiMove<MultiSearchComponents, Solution>::reference MoveRef;
     typedef typename MultiMove<MultiSearchComponents, Solution>::type Move;
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> base;
 public:
@@ -211,7 +212,7 @@ private:
                     bestMove = *currMove;
                     max = gain;
                 } 
-                stop = call<StopCondition>(m_solution, *currSE, *currMove);
+                stop = call<StepStopCondition>(m_solution, *currSE, *currMove);
             }
         }
           

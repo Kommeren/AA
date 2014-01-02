@@ -39,17 +39,14 @@ namespace two_local_search {
 * @tparam Cycle input cycle, hast to be model of the  \ref cycle concept
 * @tparam SearchComponents this is model MultiSearchComponents
 */
-typedef data_structures::Components<
+
+template <typename... Args>
+using TwoLocalComponents = data_structures::Components<
             Gain, 
             data_structures::NameWithDefault<GetMoves, GetAllMovesFromSolution>,
-            data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
+            data_structures::NameWithDefault<StepStopCondition, utils::ReturnFalseFunctor>,
             data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
-                > TwoLocalSearchComponentsCreator;
-
-template <typename Gain, 
-          typename GetMoves = GetAllMovesFromSolution, 
-          typename StopCondition = utils::ReturnFalseFunctor> 
-using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, GetMoves, StopCondition>;
+                >::type<Args...>;
 
 /**
  * @brief make template function for TwoLocalComponents, just to avoid providing type names in template.
@@ -64,14 +61,14 @@ using TwoLocalComponents = typename TwoLocalSearchComponentsCreator::type<Gain, 
  */
 template <typename Gain, 
           typename GetMoves = GetAllMovesFromSolution,
-          typename StopCondition = utils::ReturnFalseFunctor>
-TwoLocalComponents<Gain, GetMoves, StopCondition>  
+          typename StepStopCondition = utils::ReturnFalseFunctor>
+TwoLocalComponents<Gain, GetMoves, StepStopCondition>  
 
     make_TwoLocalSearchComponents(Gain ch, 
             GetMoves ng = GetMoves(),
-            StopCondition sc = StopCondition()) {
+            StepStopCondition sc = StepStopCondition()) {
 
-    return TwoLocalComponents<Gain, GetMoves, StopCondition>(std::move(ch), std::move(ng), std::move(sc));
+    return TwoLocalComponents<Gain, GetMoves, StepStopCondition>(std::move(ch), std::move(ng), std::move(sc));
 }
 
 

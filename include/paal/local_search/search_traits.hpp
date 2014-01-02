@@ -25,7 +25,7 @@ struct SearchComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT; 
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StopCondition>::type StopConditionT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StepStopCondition>::type StepStopConditionT; 
 };
 
 /**
@@ -42,6 +42,7 @@ class Move {
     typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
+   typedef typename std::iterator_traits<MoveIterator>::reference reference;
 };
 
 /**
@@ -59,6 +60,7 @@ class MultiMove {
     typedef decltype(std::declval<MovesRange>().first) MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
+   typedef typename std::iterator_traits<MoveIterator>::reference reference;
 };
 
 /**

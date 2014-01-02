@@ -28,9 +28,9 @@ namespace local_search {
      */
     struct Commit;
     /**
-     * @brief name for the StopCondition component
+     * @brief name for the StepStopCondition component
      */
-    struct StopCondition;
+    struct StepStopCondition;
 
     /**
      * @brief Definition for the Components class for local search
@@ -40,7 +40,7 @@ namespace local_search {
                 GetMoves, 
                 Gain, 
                 Commit, 
-                data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>
+                data_structures::NameWithDefault<StepStopCondition, utils::ReturnFalseFunctor>
                     > Components;
 
     /**

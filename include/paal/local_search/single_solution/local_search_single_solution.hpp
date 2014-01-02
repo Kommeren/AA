@@ -70,7 +70,8 @@ private:
     
     typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
     using base::m_solution;
-    typedef typename  Move<SearchComponents, Solution>::type Move;
+    typedef typename Move<SearchComponents, Solution>::reference MoveRef;
+    typedef typename Move<SearchComponents, Solution>::type Move;
 
 public:
     LocalSearchStep(Solution & solution) :
@@ -83,12 +84,12 @@ public:
     bool search() {
         auto adjustmentSet = call<GetMoves>(m_solution);
 
-        for(const Move & move : boost::make_iterator_range(adjustmentSet)) {
+        for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
             if(call<Gain>(m_solution, move) > 0) {
                 call<Commit>(m_solution, move);
                 return true;
             } else {
-                if(call<StopCondition>(m_solution, move)) {
+                if(call<StepStopCondition>(m_solution, move)) {
                     break;
                 }
             }
@@ -155,7 +156,7 @@ private:
                 max = gain;
                 init = true;
             } 
-            if(call<StopCondition>(m_solution, *currMove)) {
+            if(call<StepStopCondition>(m_solution, *currMove)) {
                 break;
             }
         }
