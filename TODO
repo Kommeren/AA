@@ -6,13 +6,13 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** passing graph parameters in Boost style
 ** framework documentation
 ** BDMST & steiner network components should use components style (+ common code)
 ** better tests for steiner netwok
 ** there is some common code in the steiner network and DBMST
 ** columns iterator is invalidated when we remove column (see relaxing code)
 ** LP formulation in separate dir
+** doxygen warnings
 ** limited number of relaxation per iteration (at least in BDMST, maybe in the rest also)?
 ** restriction(v, v) case in steiner network
 ** resolve and stop_condition components in IR

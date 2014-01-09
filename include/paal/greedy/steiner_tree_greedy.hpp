@@ -1,12 +1,12 @@
 /**
  * @file steiner_tree_greedy.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-11-27
  */
 #ifndef STEINER_TREE_GREEDY_HPP
-#define STEINER_TREE_GREEDY_HPP 
+#define STEINER_TREE_GREEDY_HPP
 
 #include <algorithm>
 
@@ -36,7 +36,7 @@ enum Terminals {
 };
 
 /**
- * @brief non-named version of  steiner_tree_greedy 
+ * @brief non-named version of  steiner_tree_greedy
  *
  * @tparam Graph
  * @tparam OutputIterator
@@ -50,7 +50,7 @@ enum Terminals {
 template <typename Graph, typename OutputIterator, typename EdgeWeightMap, typename ColorMap>
 void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edgeWeight, ColorMap colorMap) {
     typedef typename boost::property_traits<EdgeWeightMap>::value_type value;
-    typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property, 
+    typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property,
                 boost::property<boost::edge_weight_t, value>> TerminalGraph;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor vertex;
     typedef typename boost::graph_traits<Graph>::edge_descriptor edge;
@@ -58,10 +58,10 @@ void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edge
 
     //distance array used in the dijkstra runs
     std::vector<int> distance(N);
-    
+
     //computing terminals
     std::vector<int> terminals;
-    auto terminalsNr = boost::accumulate(vertices(g), 0, 
+    auto terminalsNr = boost::accumulate(vertices(g), 0,
             [=](int sum, vertex v){return sum + get(colorMap, v);});
     terminals.reserve(terminalsNr);
     for(auto v: boost::make_iterator_range(vertices(g))) {
@@ -73,7 +73,7 @@ void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edge
     if(terminals.empty()) {
         return;
     }
-    
+
     //computing distances between terminals
     //creating terminalGraph
     TerminalGraph terminalGraph(N);
@@ -86,10 +86,10 @@ void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edge
 
     //computing spanning tree on terminalGraph
     std::vector<int> terminalsPredecessors(N);
-    boost::prim_minimum_spanning_tree(terminalGraph, 
-            &terminalsPredecessors[0], 
+    boost::prim_minimum_spanning_tree(terminalGraph,
+            &terminalsPredecessors[0],
             boost::root_vertex(terminals.front()));
-    
+
     //computing result
     std::vector<edge> treeEdges;
     treeEdges.reserve(terminalsNr);
@@ -105,18 +105,18 @@ void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edge
             auto localPred = vpred[v];
             while(localPred != edge()) {
                 treeEdges.push_back(localPred);
-                v = source(localPred, g);               
-                localPred = vpred[v];                
+                v = source(localPred, g);
+                localPred = vpred[v];
             }
             assert(localPred == edge());
         }
-    }      
+    }
     boost::sort(treeEdges);
     boost::copy(boost::unique(treeEdges), out);
 }
 
 /**
- * @brief named version of  steiner_tree_greedy 
+ * @brief named version of  steiner_tree_greedy
  *
  * @tparam Graph
  * @tparam OutputIterator
@@ -127,7 +127,7 @@ void steiner_tree_greedy(const Graph & g, OutputIterator out, EdgeWeightMap edge
  * @param out - edge output iterator
  * @param params
  */
-template <typename Graph, typename OutputIterator, typename  P, typename T, typename R>
+template <typename Graph, typename OutputIterator, typename P, typename T, typename R>
 void steiner_tree_greedy(const Graph &g, OutputIterator out,
         const boost::bgl_named_params<P, T, R>& params) {
     steiner_tree_greedy(g, out,
@@ -145,8 +145,7 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
  */
 template <typename Graph, typename OutputIterator>
 void steiner_tree_greedy(const Graph &g, OutputIterator out) {
-    boost::bgl_named_params<int, boost::buffer_param_t> params(0);
-    steiner_tree_greedy(g, out, params);
+    steiner_tree_greedy(g, out, boost::no_named_parameters());
 }
 
 

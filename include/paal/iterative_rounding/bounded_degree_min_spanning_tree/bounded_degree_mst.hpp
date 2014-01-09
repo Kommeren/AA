@@ -35,26 +35,21 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
  * @brief The class for solving the Bounded Degree MST problem using Iterative Rounding.
  *
  * @tparam Graph input graph
+ * @tparam DegreeBounds map from Graph vertices to degree bounds
  * @tparam CostMap map from Graph edges to costs
- * @tparam DegreeBoundMap map from Graph vertices to degree bounds
  * @tparam SpanningTreeOutputIterator
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap, typename SpanningTreeOutputIterator>
+template <typename Graph, typename DegreeBounds, typename CostMap, typename SpanningTreeOutputIterator>
 class BoundedDegreeMST {
 public:
-    BoundedDegreeMST(const Graph & g, const CostMap & costMap, const DegreeBoundMap & degBoundMap,
+    /**
+     * Constructor.
+     */
+    BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds, CostMap costMap,
                      SpanningTreeOutputIterator resultSpanningTree) :
-              m_g(g), m_costMap(costMap), m_degBoundMap(degBoundMap),
+              m_g(g), m_costMap(costMap), m_degBounds(degBounds),
               m_resultSpanningTree(resultSpanningTree),
               m_compare(BoundedDegreeMSTCompareTraits::EPSILON)
-    {}
-
-    BoundedDegreeMST(BoundedDegreeMST && o) :
-              m_g(o.m_g), m_costMap(o.m_costMap), m_degBoundMap(o.m_degBoundMap),
-              m_resultSpanningTree(o.m_resultSpanningTree),
-              m_edgeMap(std::move(o.m_edgeMap)),
-              m_vertexMap(std::move(o.m_vertexMap)), m_vertexList(std::move(o.m_vertexList)),
-              m_compare(std::move(o.m_compare))
     {}
 
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -126,9 +121,9 @@ public:
     /**
      * Returns the degree bound of a vertex.
      */
-    decltype(get(std::declval<DegreeBoundMap>(), std::declval<Vertex>()))
+    decltype(std::declval<DegreeBounds>()(std::declval<Vertex>()))
     getDegreeBound(Vertex v) {
-        return get(m_degBoundMap, v);
+        return m_degBounds(v);
     }
 
     /**
@@ -205,8 +200,8 @@ private:
     }
 
     const Graph & m_g;
-    const CostMap & m_costMap;
-    const DegreeBoundMap & m_degBoundMap;
+    CostMap m_costMap;
+    const DegreeBounds & m_degBounds;
     SpanningTreeOutputIterator m_resultSpanningTree;
 
     EdgeMapOriginal m_edgeMapOriginal;
@@ -219,58 +214,186 @@ private:
 
 
 
+namespace detail {
 /**
- * @brief Creates a BoundedDegreeMST object.
+ * @brief Creates a BoundedDegreeMST object. Non-named version.
  *
  * @tparam Graph
+ * @tparam DegreeBounds
  * @tparam CostMap
- * @tparam DegreeBoundMap
  * @tparam SpanningTreeOutputIterator
  * @param g
- * @param costMap
  * @param degBoundMap
+ * @param costMap
  * @param resultSpanningTree
  *
  * @return BoundedDegreeMST object
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap, typename SpanningTreeOutputIterator>
-BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, SpanningTreeOutputIterator>
-make_BoundedDegreeMST(const Graph & g, const CostMap & costMap,
-                      const DegreeBoundMap & degBoundMap, SpanningTreeOutputIterator resultSpanningTree) {
-    return BoundedDegreeMST<Graph, CostMap, DegreeBoundMap, SpanningTreeOutputIterator>(g, costMap, degBoundMap, resultSpanningTree);
+template <typename Graph, typename DegreeBounds, typename CostMap, typename SpanningTreeOutputIterator>
+BoundedDegreeMST<Graph, DegreeBounds, CostMap, SpanningTreeOutputIterator>
+make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
+                      CostMap costMap, SpanningTreeOutputIterator resultSpanningTree) {
+    return BoundedDegreeMST<Graph, DegreeBounds, CostMap, SpanningTreeOutputIterator>(g, degBounds, costMap, resultSpanningTree);
 }
 
 /**
- * @brief Solves the Bounded Degree MST problem using Iterative Rounding.
+ * @brief Solves the Bounded Degree MST problem using Iterative Rounding. Non-named version.
  *
  * @tparam Graph
+ * @tparam DegreeBounds
  * @tparam CostMap
- * @tparam DegreeBoundMap
  * @tparam SpanningTreeOutputIterator
  * @tparam IRComponents
  * @tparam Visitor
  * @param g
- * @param costMap
  * @param degBoundMap
+ * @param costMap
  * @param resultSpanningTree
  * @param components
  * @param visitor
  *
  * @return solution status
  */
-template <typename Graph, typename CostMap, typename DegreeBoundMap,
+template <typename Graph, typename DegreeBounds, typename CostMap,
           typename SpanningTreeOutputIterator, typename IRComponents,
           typename Visitor = TrivialVisitor>
 lp::ProblemType bounded_degree_mst_iterative_rounding(
-        const Graph & g,
-        const CostMap & costMap,
-        const DegreeBoundMap & degBoundMap,
-        SpanningTreeOutputIterator resultSpanningTree,
-        IRComponents components,
-        Visitor visitor = Visitor()) {
+            const Graph & g,
+            const DegreeBounds & degBounds,
+            CostMap costMap,
+            SpanningTreeOutputIterator resultSpanningTree,
+            IRComponents components,
+            Visitor visitor = Visitor()) {
 
-        auto bdmst = make_BoundedDegreeMST(g, costMap, degBoundMap, resultSpanningTree);
+        auto bdmst = make_BoundedDegreeMST(g, degBounds, costMap, resultSpanningTree);
         return solve_iterative_rounding(bdmst, std::move(components), std::move(visitor));
+}
+} // detail
+
+/**
+ * Creates a BoundedDegreeMST object. Named version.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam DegreeBounds
+ * @tparam SpanningTreeOutputIterator
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param degBounds
+ * @param params
+ * @param resultSpanningTree
+ *
+ * @return BoundedDegreeMST object
+ */
+template <typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator,
+            typename P, typename T, typename R>
+auto
+make_BoundedDegreeMST(const Graph & g,
+                      const DegreeBounds & degBounds,
+                      const boost::bgl_named_params<P, T, R> & params,
+                      SpanningTreeOutputIterator resultSpanningTree)
+        -> BoundedDegreeMST<Graph, DegreeBounds,
+                decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
+                SpanningTreeOutputIterator> {
+
+    return detail::make_BoundedDegreeMST(g, degBounds,
+                choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                resultSpanningTree);
+}
+
+/**
+ * Creates a BoundedDegreeMST object. All default parameters.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam DegreeBounds
+ * @tparam SpanningTreeOutputIterator
+ * @param g
+ * @param degBounds
+ * @param resultSpanningTree
+ *
+ * @return BoundedDegreeMST object
+ */
+template <typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator>
+auto
+make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
+                      SpanningTreeOutputIterator resultSpanningTree) ->
+        decltype(make_BoundedDegreeMST(g, degBounds, boost::no_named_parameters(), resultSpanningTree)) {
+    return make_BoundedDegreeMST(g, degBounds, boost::no_named_parameters(), resultSpanningTree);
+}
+
+/**
+ * @brief Solves the Bounded Degree MST problem using Iterative Rounding. Named version.
+ *
+ * @tparam Graph
+ * @tparam DegreeBounds
+ * @tparam SpanningTreeOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param degBounds
+ * @param resultSpanningTree
+ * @param params
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename DegreeBounds,
+          typename SpanningTreeOutputIterator,
+          typename IRComponents,
+          typename Visitor = TrivialVisitor,
+          typename P, typename T, typename R>
+lp::ProblemType bounded_degree_mst_iterative_rounding(
+            const Graph & g,
+            const DegreeBounds & degBounds,
+            const boost::bgl_named_params<P, T, R> & params,
+            SpanningTreeOutputIterator resultSpanningTree,
+            IRComponents components,
+            Visitor visitor = Visitor()) {
+
+        return detail::bounded_degree_mst_iterative_rounding(g, degBounds,
+                    choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                    std::move(resultSpanningTree), std::move(components), std::move(visitor));
+}
+
+/**
+ * @brief Solves the Bounded Degree MST problem using Iterative Rounding. All default parameters.
+ *
+ * @tparam Graph
+ * @tparam DegreeBounds
+ * @tparam SpanningTreeOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @param g
+ * @param degBounds
+ * @param resultSpanningTree
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename DegreeBounds,
+          typename SpanningTreeOutputIterator,
+          typename IRComponents,
+          typename Visitor = TrivialVisitor>
+lp::ProblemType bounded_degree_mst_iterative_rounding(
+            const Graph & g,
+            const DegreeBounds & degBounds,
+            SpanningTreeOutputIterator resultSpanningTree,
+            IRComponents components,
+            Visitor visitor = Visitor()) {
+
+        return bounded_degree_mst_iterative_rounding(g, degBounds,
+                    boost::no_named_parameters(), std::move(resultSpanningTree),
+                    std::move(components), std::move(visitor));
 }
 
 /**

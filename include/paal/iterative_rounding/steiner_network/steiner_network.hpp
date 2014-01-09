@@ -9,6 +9,7 @@
 #define STEINER_NETWORK_HPP
 
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/named_function_params.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -41,21 +42,14 @@ template <typename Graph, typename Restrictions, typename CostMap, typename Resu
 class SteinerNetwork {
 public:
 
+    /**
+     * Constructor.
+     */
     SteinerNetwork(const Graph & g, const Restrictions & restrictions,
-                   const CostMap & costMap, ResultNetworkOutputIterator resultNetwork) :
+                   CostMap costMap, ResultNetworkOutputIterator resultNetwork) :
             m_g(g), m_restrictions(restrictions),
             m_costMap(costMap), m_resultNetwork(resultNetwork),
             m_compare(SteinerNetworkCompareTraits::EPSILON) {}
-
-    SteinerNetwork(SteinerNetwork && other) :
-            m_g(other.m_g), m_restrictions(other.m_restrictions),
-            m_costMap(other.m_costMap), m_resultNetwork(other.m_resultNetwork),
-            m_compare(std::move(other.m_compare)) {}
-
-    SteinerNetwork(const SteinerNetwork & other) :
-            m_g(other.m_g), m_restrictions(other.m_restrictions),
-            m_costMap(other.m_costMap), m_resultNetwork(other.m_resultNetwork),
-            m_compare(other.m_compare) {}
 
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
@@ -140,7 +134,7 @@ private:
 
     const Graph & m_g;
     const Restrictions & m_restrictions;
-    const CostMap & m_costMap;
+    CostMap m_costMap;
     ResultNetworkOutputIterator m_resultNetwork;
 
     EdgeMap m_edgeMap;
@@ -149,8 +143,9 @@ private:
     Compare m_compare;
 };
 
+namespace detail {
 /**
- * @brief Creates a SteinerNetwork object.
+ * @brief Creates a SteinerNetwork object. Non-named version.
  *
  * @tparam Graph
  * @tparam Restrictions
@@ -166,9 +161,64 @@ private:
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkOutputIterator>
 SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkOutputIterator>
 make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
-                    const CostMap & costMap, ResultNetworkOutputIterator resultNetwork) {
+                    CostMap costMap, ResultNetworkOutputIterator resultNetwork) {
     return SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkOutputIterator>(
-                                                g, restrictions, costMap, resultNetwork);
+                                    g, restrictions, costMap, resultNetwork);
+}
+} // detail
+
+/**
+ * Creates a SteinerNetwork object. Named version.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkOutputIterator
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param restrictions
+ * @param params
+ * @param resultNetwork
+ *
+ * @return SteinerNetwork object
+ */
+template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
+            typename P, typename T, typename R>
+auto
+make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+                    const boost::bgl_named_params<P, T, R>& params,
+                    ResultNetworkOutputIterator resultNetwork) ->
+       SteinerNetwork<Graph, Restrictions,
+            decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
+            ResultNetworkOutputIterator> {
+    return detail::make_SteinerNetwork(g, restrictions,
+                choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                resultNetwork);
+}
+
+/**
+ * Creates a SteinerNetwork object. All default parameters.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkOutputIterator
+ * @param g
+ * @param restrictions
+ * @param resultNetwork
+ *
+ * @return SteinerNetwork object
+ */
+template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator>
+auto
+make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+                    ResultNetworkOutputIterator resultNetwork) ->
+        decltype(make_SteinerNetwork(g, restrictions, boost::no_named_parameters(), resultNetwork)) {
+    return make_SteinerNetwork(g, restrictions, boost::no_named_parameters(), resultNetwork);
 }
 
 /**
@@ -245,8 +295,9 @@ template <
              using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
+namespace detail {
 /**
- * @brief Solves the Steiner Network problem using Iterative Rounding.
+ * @brief Solves the Steiner Network problem using Iterative Rounding. Non-named version.
  *
  * @tparam Graph
  * @tparam Restrictions
@@ -266,11 +317,66 @@ template <
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor>
 lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
-        const CostMap & cost, ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
-    auto steiner = paal::ir::make_SteinerNetwork(g, restrictions, cost, result);
-    return paal::ir::solve_iterative_rounding(steiner, std::move(components), std::move(visitor));
+        CostMap cost, ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
+    auto steiner = make_SteinerNetwork(g, restrictions, cost, result);
+    return solve_iterative_rounding(steiner, std::move(components), std::move(visitor));
+}
+} // detail
+
+/**
+ * @brief Solves the Steiner Network problem using Iterative Rounding. Named version.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param restrictions
+ * @param params
+ * @param result
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
+          typename IRComponents, typename Visitor = TrivialVisitor,
+          typename P, typename T, typename R>
+lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+        const boost::bgl_named_params<P, T, R> & params,
+        ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
+    return detail::steiner_network_iterative_rounding(g, restrictions,
+                choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                std::move(result), std::move(components), std::move(visitor));
 }
 
+/**
+ * @brief Solves the Steiner Network problem using Iterative Rounding. All default parameters.
+ *
+ * @tparam Graph
+ * @tparam Restrictions
+ * @tparam ResultNetworkOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @param g
+ * @param restrictions
+ * @param result
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
+          typename IRComponents, typename Visitor = TrivialVisitor>
+lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+        ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
+    return steiner_network_iterative_rounding(g, restrictions, boost::no_named_parameters(),
+                std::move(result), std::move(components), std::move(visitor));
+}
 
 
 } //ir

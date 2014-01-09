@@ -31,9 +31,10 @@ struct LogVisitor : public TrivialVisitor {
 
 // create a typedef for the Graph type
 typedef adjacency_list<vecS, vecS, undirectedS,
-            no_property,
-            property < edge_weight_t, double,
-            property < edge_color_t, bool> > > Graph;
+            property < vertex_index_t, int >,
+            property < edge_index_t, size_t,
+                property < edge_weight_t, double,
+                    property < edge_color_t, bool> > > > Graph;
 
 typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
 typedef graph_traits < Graph >::edge_descriptor Edge;
@@ -51,11 +52,10 @@ Edge addEdge(Graph & g,  int u, int v,
     return e;
 }
 
-typedef property_map < Graph, vertex_index_t >::type Index;
 typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
 
-BOOST_AUTO_TEST_SUITE(tree_augmentation) 
+BOOST_AUTO_TEST_SUITE(tree_augmentation)
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     // sample problem
@@ -78,9 +78,48 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     typedef std::set<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, std::inserter(solutionTree, solutionTree.begin())));
+    auto treeaug(make_TreeAug(g, std::inserter(solutionTree, solutionTree.begin())));
     paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
     BOOST_CHECK(!solutionTree.empty());
+}
+
+BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
+    // sample problem
+    LOGLN("Sample problem:");
+    Graph g(6);
+    TreeMap treeMap = get(edge_color, g);
+
+    treeMap[add_edge(0, 1, 0, g).first] = true;
+    treeMap[add_edge(1, 2, 1, g).first] = true;
+    treeMap[add_edge(1, 3, 2, g).first] = true;
+    treeMap[add_edge(3, 4, 3, g).first] = true;
+    treeMap[add_edge(3, 5, 4, g).first] = true;
+    treeMap[add_edge(0, 3, 5, g).first] = false;
+    treeMap[add_edge(0, 2, 6, g).first] = false;
+    treeMap[add_edge(2, 4, 7, g).first] = false;
+    treeMap[add_edge(2, 5, 8, g).first] = false;
+    treeMap[add_edge(4, 5, 9, g).first] = false;
+
+    auto edgeId = get(boost::edge_index, g);
+    std::vector<double> costs = {0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
+    auto cost = boost::make_iterator_property_map(&costs[0], edgeId);
+
+    typedef std::set<Edge> SolutionTree;
+    {
+        SolutionTree solutionTree;
+        auto treeaug(make_TreeAug(g, boost::edge_color_map(treeMap).weight_map(cost),
+                std::inserter(solutionTree, solutionTree.begin())));
+        paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
+        BOOST_CHECK(!solutionTree.empty());
+    }
+    {
+        SolutionTree solutionTree;
+        paal::ir::tree_augmentation_iterative_rounding(g,
+                boost::weight_map(cost),
+                std::inserter(solutionTree, solutionTree.begin()),
+                paal::ir::TAComponents<>());
+        BOOST_CHECK(!solutionTree.empty());
+    }
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
@@ -99,7 +138,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
+    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);
@@ -125,7 +164,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
+    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);
@@ -151,11 +190,11 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     typedef std::vector<Edge> SolutionTree;
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, treeMap, cost, std::back_inserter(solutionTree)));
+    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
     auto invalid = treeaug.checkInputValidity();
 
     BOOST_CHECK(invalid);
     LOGLN(*invalid);
 }
 
-BOOST_AUTO_TEST_SUITE_END() 
+BOOST_AUTO_TEST_SUITE_END()

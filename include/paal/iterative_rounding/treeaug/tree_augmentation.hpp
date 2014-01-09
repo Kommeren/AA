@@ -17,6 +17,7 @@
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/connected_components.hpp>
+#include <boost/graph/named_function_params.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/range/distance.hpp>
@@ -255,13 +256,13 @@ public:
      * @param costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
      * @param solution result set of edges output iterator
      */
-    TreeAug(const Graph & g, const TreeMap & treeMap, const CostMap & costMap, EdgeSetOutputIterator solution) :
+    TreeAug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIterator solution) :
         m_g(g), m_treeMap(treeMap), m_costMap(costMap),
         m_solution(solution),
         m_tree(m_g, BoolMapToTreeFilter<TreeMap>(m_treeMap)),
         m_ntree(m_g, BoolMapToNonTreeFilter<TreeMap>(m_treeMap)),
         m_solCost(0)
-    { }
+    {}
 
     /// Checks validity of the input
     ErrorMessage checkInputValidity() {
@@ -404,8 +405,8 @@ private:
 
     /// The input
     const Graph & m_g;
-    const TreeMap & m_treeMap;
-    const CostMap & m_costMap;
+    TreeMap m_treeMap;
+    CostMap m_costMap;
 
     /// Which links are chosen in the solution
     EdgeSetOutputIterator m_solution;
@@ -425,8 +426,9 @@ private:
     RowIdToEdge m_rowIdToEdge;
 };
 
+namespace detail {
 /**
- * @brief Creates a TreeAug object.
+ * @brief Creates a TreeAug object. Non-named parameters.
  *
  * @tparam Graph
  * @tparam TreeMap
@@ -441,12 +443,12 @@ private:
  */
 template <typename Graph, typename TreeMap, typename CostMap, typename EdgeSetOutputIterator>
 TreeAug<Graph, TreeMap, CostMap, EdgeSetOutputIterator>
-make_TreeAug(const Graph & g, const TreeMap & treeMap, const CostMap & costMap, EdgeSetOutputIterator solution) {
-    return TreeAug<Graph, TreeMap, CostMap, EdgeSetOutputIterator>(g, treeMap, costMap, solution);
+make_TreeAug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIterator solution) {
+    return paal::ir::TreeAug<Graph, TreeMap, CostMap, EdgeSetOutputIterator>(g, treeMap, costMap, solution);
 }
 
 /**
- * @brief Solves the Tree Augmentation problem using Iterative Rounding.
+ * @brief Solves the Tree Augmentation problem using Iterative Rounding. Non-named parameters.
  *
  * @tparam Graph
  * @tparam TreeMap
@@ -468,13 +470,120 @@ template <typename Graph, typename TreeMap,
           typename IRComponents, typename Visitor = TrivialVisitor>
 lp::ProblemType tree_augmentation_iterative_rounding(
         const Graph & g,
-        const TreeMap & treeMap,
-        const CostMap & costMap,
+        TreeMap treeMap,
+        CostMap costMap,
         EdgeSetOutputIterator solution,
         IRComponents components,
         Visitor visitor = Visitor()) {
-    paal::ir::TreeAug<Graph, TreeMap, CostMap, EdgeSetOutputIterator> treeaug(g, treeMap, costMap, solution);
+    auto treeaug = make_TreeAug(g, treeMap, costMap, solution);
     return solve_iterative_rounding(treeaug, std::move(components), std::move(visitor));
+}
+} // detail
+
+/**
+ * Creates a TreeAug object. Named parameters.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam EdgeSetOutputIterator
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param params
+ * @param solution
+ *
+ * @return TreeAug object
+ */
+template <typename Graph, typename EdgeSetOutputIterator, typename P, typename T, typename R>
+auto
+make_TreeAug(const Graph & g, const boost::bgl_named_params<P, T, R> & params, EdgeSetOutputIterator solution) ->
+        TreeAug<Graph,
+                decltype(choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color)),
+                decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
+                EdgeSetOutputIterator> {
+    return detail::make_TreeAug(g,
+            choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color),
+            choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+            solution);
+}
+
+/**
+ * Creates a TreeAug object. All default parameters.
+ * The returned object can be used to check input validity or to get a lower bound on the
+ * optimal solution cost.
+ *
+ * @tparam Graph
+ * @tparam EdgeSetOutputIterator
+ * @param g
+ * @param solution
+ *
+ * @return TreeAug object
+ */
+template <typename Graph, typename EdgeSetOutputIterator>
+auto
+make_TreeAug(const Graph & g, EdgeSetOutputIterator solution) ->
+        decltype(make_TreeAug(g, boost::no_named_parameters(), solution)) {
+    return make_TreeAug(g, boost::no_named_parameters(), solution);
+}
+
+/**
+ * @brief Solves the Tree Augmentation problem using Iterative Rounding. Named parameters.
+ *
+ * @tparam Graph
+ * @tparam EdgeSetOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @tparam P
+ * @tparam T
+ * @tparam R
+ * @param g
+ * @param params
+ * @param solution
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename EdgeSetOutputIterator,
+          typename IRComponents, typename Visitor = TrivialVisitor,
+          typename P, typename T, typename R>
+lp::ProblemType tree_augmentation_iterative_rounding(
+        const Graph & g,
+        const boost::bgl_named_params<P, T, R> & params,
+        EdgeSetOutputIterator solution,
+        IRComponents components,
+        Visitor visitor = Visitor()) {
+    return detail::tree_augmentation_iterative_rounding(g,
+            choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color),
+            choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+            std::move(solution), std::move(components), std::move(visitor));
+}
+
+/**
+ * @brief Solves the Tree Augmentation problem using Iterative Rounding. All default parameters.
+ *
+ * @tparam Graph
+ * @tparam EdgeSetOutputIterator
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @param g
+ * @param solution
+ * @param components
+ * @param visitor
+ *
+ * @return solution status
+ */
+template <typename Graph, typename EdgeSetOutputIterator,
+          typename IRComponents, typename Visitor = TrivialVisitor>
+lp::ProblemType tree_augmentation_iterative_rounding(
+        const Graph & g,
+        EdgeSetOutputIterator solution,
+        IRComponents components,
+        Visitor visitor = Visitor()) {
+    return tree_augmentation_iterative_rounding(g, boost::no_named_parameters(),
+            std::move(solution), std::move(components), std::move(visitor));
 }
 
 } //ir

@@ -10,14 +10,14 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
+#include "paal/utils/functors.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
 int main() {
 //! [Bounded-Degree Minimum Spanning Tree Example]
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::property<boost::vertex_degree_t, int>,
-        boost::property<boost::edge_weight_t, int>> Graph;
+        boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 
     // sample problem
@@ -26,17 +26,13 @@ int main() {
     std::vector<int> bounds {3,2,2,2,2,2};
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 6);
-    auto cost = get(boost::edge_weight, g);
-    auto degreeBound = get(boost::vertex_degree, g);
-    for (int i : boost::irange(0, 6)) {
-        degreeBound[i] = bounds[i];
-    }
+    auto degreeBounds = paal::utils::make_ArrayToFunctor(bounds);
 
     typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
 
     // optional input validity checking
-    auto bdmst = paal::ir::make_BoundedDegreeMST(g, cost, degreeBound,
+    auto bdmst = paal::ir::make_BoundedDegreeMST(g, degreeBounds,
                                             std::back_inserter(resultTree));
     auto error = bdmst.checkInputValidity();
     if (error) {
@@ -48,7 +44,7 @@ int main() {
     // solve it
     auto oracle(paal::ir::make_BoundedDegreeMSTOracle(g));
     paal::ir::BDMSTIRComponents<Graph> components(paal::lp::make_RowGenerationSolveLP(oracle));
-    auto resultType = paal::ir::bounded_degree_mst_iterative_rounding(g, cost, degreeBound,
+    auto resultType = paal::ir::bounded_degree_mst_iterative_rounding(g, degreeBounds,
                             std::back_inserter(resultTree), std::move(components));
 
     // print result

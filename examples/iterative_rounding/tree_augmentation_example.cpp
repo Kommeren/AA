@@ -25,15 +25,12 @@ int main() {
         EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0)};
 
     Graph g(edges.begin(), edges.end(), edgeProperties.begin(), 6);
-    auto cost = get(boost::edge_weight, g);
-    auto treeMap = get(boost::edge_color, g);
 
     typedef std::vector<Edge> EdgeSet;
     EdgeSet solution;
 
     // optional input validity checking
-    auto treeAug = paal::ir::make_TreeAug(g, treeMap, cost,
-                        std::back_inserter(solution));
+    auto treeAug = paal::ir::make_TreeAug(g, std::back_inserter(solution));
     auto error = treeAug.checkInputValidity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -42,7 +39,7 @@ int main() {
     }
 
     // solve it
-    paal::ir::tree_augmentation_iterative_rounding(g, treeMap, cost,
+    paal::ir::tree_augmentation_iterative_rounding(g,
                 std::back_inserter(solution), paal::ir::TAComponents<>());
 
     std::cout << "The solution contains the following nontree edges:" << std::endl;

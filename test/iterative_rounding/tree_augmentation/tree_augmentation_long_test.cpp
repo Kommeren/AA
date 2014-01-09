@@ -122,7 +122,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         typedef std::vector<Edge> SetEdge;
         SetEdge solution;
 
-        auto treeaug(paal::ir::make_TreeAug(g, treeMap, cost, std::back_inserter(solution)));
+        auto treeaug(paal::ir::make_TreeAug(g, std::back_inserter(solution)));
 
         auto invalid = treeaug.checkInputValidity();
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());

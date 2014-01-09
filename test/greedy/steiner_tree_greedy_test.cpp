@@ -1,6 +1,6 @@
 /**
  * @file steiner_tree_greedy_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -14,7 +14,7 @@
 #include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
 
-BOOST_AUTO_TEST_SUITE(SteinerTreeGreedy) 
+BOOST_AUTO_TEST_SUITE(SteinerTreeGreedy)
 
 BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     typedef  SampleGraphsMetrics SGM;
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::set<Edge> steinerEdges;
 
-    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin())); 
+    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()));
     BOOST_CHECK(size_t(3) <= steinerEdges.size() && steinerEdges.size()<= size_t(4));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
@@ -48,8 +48,8 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
         put(c, SGM::E, paal::Terminals::NONTERMINAL);
     }
 
-    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()), 
-            boost::vertex_color_map(&color[0])); 
+    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
+            boost::vertex_color_map(&color[0]));
     BOOST_CHECK(size_t(3) <= steinerEdges.size() && steinerEdges.size()<= size_t(4));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
@@ -59,4 +59,4 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
     BOOST_CHECK(sum <= 2 * 4);
 }
 
-BOOST_AUTO_TEST_SUITE_END() 
+BOOST_AUTO_TEST_SUITE_END()

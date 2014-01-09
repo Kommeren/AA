@@ -27,13 +27,12 @@ int main() {
     std::vector<int> costs {1,1,1,1,7};
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 3);
-    auto cost = get(boost::edge_weight, g);
 
     typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
 
     // optional input validity checking
-    auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions, cost,
+    auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions,
                                 std::back_inserter(resultNetwork));
     auto error = steinerNetwork.checkInputValidity();
     if (error) {
@@ -46,7 +45,7 @@ int main() {
     auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions));
     paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions), ResultNetwork>
             components(paal::lp::make_RowGenerationSolveLP(oracle));
-    paal::ir::steiner_network_iterative_rounding(g, restrictions, cost,
+    paal::ir::steiner_network_iterative_rounding(g, restrictions,
                         std::back_inserter(resultNetwork), std::move(components));
 
     // print result

@@ -1,16 +1,16 @@
 //=======================================================================
 // Copyright 2013 University of Warsaw.
-// Authors: Piotr Wygocki 
+// Authors: Piotr Wygocki
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 //
-//This file contains set of simple useful functors or functor adapters. 
+//This file contains set of simple useful functors or functor adapters.
 
 #ifndef BOOST_FUNCTORS_HPP
-#define BOOST_FUNCTORS_HPP 
+#define BOOST_FUNCTORS_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -30,7 +30,7 @@ struct SkipFunctor {
      * @tparam Args
      * @param args
      */
-    template <typename ... Args > 
+    template <typename ... Args >
         void  operator()(Args&&... args) const {}
 };
 
@@ -48,16 +48,16 @@ template <typename T, T t>
          * @tparam Args
          * @param args
          *
-         * @return 
+         * @return
          */
-        template <typename ... Args > 
+        template <typename ... Args >
             T  operator()(Args&&... args) const {
                 return t;
-            } 
+            }
     };
 
 /**
- * @brief Functor returns always the same number (dynamic version). 
+ * @brief Functor returns always the same number (dynamic version).
  *
  * @tparam T type of returned value
  */
@@ -76,9 +76,9 @@ template <typename T>
          * @tparam Args
          * @param args
          *
-         * @return 
+         * @return
          */
-        template <typename ... Args > 
+        template <typename ... Args >
             T  operator()(Args&&... args) const {
                 return m_t;
             }
@@ -94,7 +94,7 @@ template <typename T>
  * @tparam T
  * @param t
  *
- * @return 
+ * @return
  */
 template <typename T>
 DynamicReturnSomethingFunctor<T>
@@ -107,10 +107,10 @@ make_DynamicReturnSomethingFunctor(T t) {
  * @brief functor returns its argument
  */
 struct IdentityFunctor {
-    template <typename Arg> 
+    template <typename Arg>
         auto  operator()(Arg&& arg) const ->
         Arg
-        { 
+        {
             return std::forward<Arg>(arg);
         }
 };
@@ -119,14 +119,14 @@ struct IdentityFunctor {
 /**
  * @brief functor return false
  */
-struct ReturnFalseFunctor : 
+struct ReturnFalseFunctor :
     public ReturnSomethingFunctor<bool, false> {};
 
 
 /**
  * @brief functor return true
  */
-struct ReturnTrueFunctor : 
+struct ReturnTrueFunctor :
     public ReturnSomethingFunctor<bool, true> {};
 
 
@@ -144,13 +144,13 @@ struct ReturnOneFunctor :
     public ReturnSomethingFunctor<int, 1> {};
 
 /**
- * @brief functors calls assert(false). 
+ * @brief functors calls assert(false).
  */
 struct AssertFunctor {
-    template <typename ... Args > 
+    template <typename ... Args >
         void  operator()(Args&&... args) const {
             assert(false);
-        } 
+        }
 };
 
 /**
@@ -166,11 +166,11 @@ struct RemoveReference {
 
 
 /**
- * @brief Adapts array as function, providing operator()().     
+ * @brief Adapts array as function, providing operator()().
  *
  * @tparam Array
  */
-template <typename Array> 
+template <typename Array>
     class ArrayToFunctor{
         public:
             /**
@@ -179,7 +179,7 @@ template <typename Array>
              * @param array
              * @param offset
              */
-            ArrayToFunctor(const Array & array, int offset = 0) : 
+            ArrayToFunctor(const Array & array, int offset = 0) :
                 m_array(&array), m_offset(offset) {}
 
             typedef decltype(std::declval<const Array>()[0]) Value;
@@ -207,7 +207,7 @@ template <typename Array>
  * @param a
  * @param offset
  *
- * @return 
+ * @return
  */
 template <typename Array>
     ArrayToFunctor<Array> make_ArrayToFunctor(const Array &a, int offset = 0) {
@@ -237,7 +237,7 @@ struct AssignableFunctor {
     *
     * @param f
     *
-    * @return 
+    * @return
     */
    AssignableFunctor& operator=(Functor& f) { m_f = f; }
 
@@ -264,7 +264,7 @@ struct AssignableFunctor {
  * @tparam Functor
  * @param f
  *
- * @return 
+ * @return
  */
 template <typename Functor>
 AssignableFunctor<Functor>
@@ -296,7 +296,7 @@ struct LiftIteratorFunctor {
  * @tparam Functor
  * @param f
  *
- * @return 
+ * @return
  */
 template <typename Functor>
 LiftIteratorFunctor<Functor>
@@ -367,7 +367,7 @@ struct EqualTo {
  */
 struct NotEqualTo {
     template<class T>
-        auto operator() (const T& x, const T& y) const -> 
+        auto operator() (const T& x, const T& y) const ->
             decltype(x != y){
             return x != y;
         };
@@ -406,7 +406,7 @@ template <typename Functor,typename Compare = Less>
 template <typename Functor, typename ScaleType, typename ReturnType = ScaleType>
 struct ScaleFunctor {
 
-    ScaleFunctor(Functor f, ScaleType s) : 
+    ScaleFunctor(Functor f, ScaleType s) :
         m_f(std::move(f)), m_s(s) {}
 
     template <typename Arg>
@@ -414,7 +414,7 @@ struct ScaleFunctor {
         return m_s * m_f(std::forward<Arg>(arg));
     }
 
-private: 
+private:
     Functor m_f;
     ScaleType m_s;
 };
@@ -426,7 +426,7 @@ make_ScaleFunctor(Functor f, ScaleType s) {
 }
 
 //****************************** This is set of functors representing standard boolean operation
-//that is !, &&, ||. These are equivalent to standard std:: structs but are not templated 
+//that is !, &&, ||. These are equivalent to standard std:: structs but are not templated
 //(only operator() is templated)
 struct Not {
     template <typename T>
@@ -445,7 +445,7 @@ struct Or {
 
 struct And {
     template <typename T>
-    auto operator()(const T & left, const T & right) const -> 
+    auto operator()(const T & left, const T & right) const ->
         decltype(left && right){
         return left && right;
     }
@@ -459,16 +459,16 @@ template <typename FunctorLeft, typename FunctorRight, typename Operator>
         LiftBinaryOperatorFunctor(FunctorLeft left = FunctorLeft(),
                                   FunctorRight right = FunctorRight(),
                                   Operator op = Operator()) :
-            m_left(std::move(left)), m_right(std::move(right)), 
+            m_left(std::move(left)), m_right(std::move(right)),
             m_operator(std::move(op)) {}
 
-        template <typename ... Args> 
+        template <typename ... Args>
             auto  operator()(Args&&... args) const ->
                 decltype(std::declval<Operator>()(
                             std::declval<FunctorLeft>()(std::forward<Args>(args)...),
                             std::declval<FunctorRight>()(std::forward<Args>(args)...)
                             )){
-                return m_operator(m_left(std::forward<Args>(args)...), 
+                return m_operator(m_left(std::forward<Args>(args)...),
                                   m_right(std::forward<Args>(args)...));
             }
 
@@ -488,7 +488,7 @@ template <typename FunctorLeft, typename FunctorRight, typename Operator>
     }
 
 
-//******************** this is set of functors 
+//******************** this is set of functors
 //allowing two compose functors  using
 //standard logical operators
 
@@ -499,7 +499,7 @@ template <typename Functor>
         NotFunctor(Functor functor= Functor()) :
             m_functor(functor) {}
 
-        template <typename ... Args> 
+        template <typename ... Args>
             auto operator()(Args&&... args) const ->
                 decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
                 return !m_functor(std::forward<Args>(args)...);
@@ -519,12 +519,12 @@ template <typename Functor>
 
 //Or
 template <typename FunctorLeft, typename FunctorRight>
-    class OrFunctor : 
+    class OrFunctor :
             public LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, Or> {
         typedef LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, Or> base;
 
     public:
-        OrFunctor(FunctorLeft left = FunctorLeft(), 
+        OrFunctor(FunctorLeft left = FunctorLeft(),
                   FunctorRight right = FunctorRight()) :
             base(std::move(left), std::move(right)) {}
     };

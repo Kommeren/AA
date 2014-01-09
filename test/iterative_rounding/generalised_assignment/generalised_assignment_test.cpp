@@ -30,8 +30,8 @@ struct LogVisitor : public TrivialVisitor {
     }
 };
 
-
-BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
+BOOST_AUTO_TEST_SUITE(generalised_assignment)
+BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
     //sample problem
     LOGLN("sample problem:");
     auto machines = boost::irange(0,2);
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_test) {
 
 }
 
-BOOST_AUTO_TEST_CASE(generalized_assignemnt_infeasible_test) {
+BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
     // infeasible problem
     LOGLN("infeasible problem:");
     auto machines = boost::irange(0,2);
@@ -118,4 +118,5 @@ BOOST_AUTO_TEST_CASE(generalized_assignemnt_infeasible_test) {
 
     BOOST_CHECK(probType == lp::INFEASIBLE);
 }
+BOOST_AUTO_TEST_SUITE_END()
 

@@ -22,16 +22,12 @@
 #include "utils/parse_file.hpp"
 
 typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                        boost::property < boost::vertex_degree_t, int,
-                            boost::property < boost::vertex_index_t, int >
-                                 >,
+                        boost::property < boost::vertex_index_t, int >,
                         boost::property < boost::edge_weight_t, double > > Graph;
 typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::undirectedS > Traits;
 typedef boost::graph_traits < Graph >::edge_descriptor Edge;
 typedef boost::graph_traits < Graph >::vertex_descriptor Vertex;
 
-typedef boost::property_map < Graph, boost::vertex_degree_t >::type Bound;
-typedef boost::property_map < Graph, boost::vertex_index_t >::type Index;
 typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
 
 int restrictions(int i, int j) {
@@ -52,8 +48,8 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
     ResultNetwork resultNetwork;
     Oracle oracle(g, restrictions);
     Components components(lp::make_RowGenerationSolveLP(oracle));
-    auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions, costs,
-                                        std::back_inserter(resultNetwork)));
+    auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions,
+                                    std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
 
@@ -75,10 +71,9 @@ BOOST_AUTO_TEST_CASE(steiner_network_long) {
 
         Graph g(verticesNum);
         Cost costs      = get(boost::edge_weight, g);
-        Bound degBounds = get(boost::vertex_degree, g);
-        Index indices   = get(boost::vertex_index, g);
+        std::vector<int> degBounds(verticesNum);
 
-        paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, indices, bestCost);
+        paal::readBDMST(ifs, verticesNum, edgesNum, g, costs, degBounds, bestCost);
 
         // default heuristics
         for (int i : boost::irange(0, 5)) {

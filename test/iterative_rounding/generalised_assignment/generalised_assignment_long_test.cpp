@@ -25,12 +25,12 @@ using namespace paal::ir;
 using namespace paal;
 
 
-BOOST_AUTO_TEST_CASE(GeneralizedAssignmentLong) {
+BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
     parse(testDir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         double opt;
         int numberOfCases;
-        
+
         is_test_cases >> numberOfCases;
 
         LOGLN(fname << " " << numberOfCases);
