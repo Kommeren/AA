@@ -10,8 +10,65 @@
 
 #include <chrono>
 
+#include "paal/utils/functors.hpp"
+
 namespace paal {
 namespace local_search {
+
+    /**
+     * @brief if the  condition is not fulfilled this gain adaptor returns 0
+     *
+     * @tparam Gain
+     * @tparam Condition
+     */
+template <typename Gain = utils::ReturnOneFunctor, typename Condition = utils::ReturnTrueFunctor>
+struct ConditionalGainAdaptor {
+
+    /**
+     * @brief constructor
+     *
+     * @param gain
+     * @param cond
+     */
+    ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) :
+        m_gain(std::move(gain)), m_condition(std::move(cond))
+    { }
+    
+    /**
+     * @brief 
+     *
+     * @tparam Args to be forwarded
+     *
+     * @return 
+     */
+    template <typename... Args> 
+    auto operator()(Args&&... args) -> decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
+        if(!m_condition(std::forward<Args>(args)...)) {
+            return 0;
+        }
+        return m_gain(std::forward<Args>(args)...);
+    }
+
+private:
+    Gain m_gain;
+    Condition m_condition;
+};
+
+/**
+ * @brief make for ConditionalGainAdaptor
+ *
+ * @tparam Gain
+ * @tparam Condition
+ * @param gain
+ * @param cond
+ *
+ * @return 
+ */
+template <typename Gain = utils::ReturnOneFunctor, typename Condition = utils::ReturnTrueFunctor>
+ConditionalGainAdaptor<Gain, Condition>
+make_ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) {
+    return ConditionalGainAdaptor<Gain, Condition>(std::move(gain), std::move(cond));
+}
 
 /**
  * @brief This is the gain adapter which accepts gains improving the current solution by more than epsilon.
@@ -23,12 +80,6 @@ namespace local_search {
 template <typename Gain, typename ValueType>
 class GainCutSmallImproves {
 public:    
-    GainCutSmallImproves() = default; 
-    GainCutSmallImproves(GainCutSmallImproves && ) = default; 
-    GainCutSmallImproves(const GainCutSmallImproves & ) = default; 
-    GainCutSmallImproves & operator=(GainCutSmallImproves && ) = default; 
-    GainCutSmallImproves & operator=(const GainCutSmallImproves & ) = default; 
-
     /**
      * @brief Constructor, 
      *
@@ -102,11 +153,11 @@ public:
      * @return 
      */
     template <typename... Args> 
-    bool operator()(Args&&... ) {
+    bool operator()(Args&&... ) const {
         return m_cnt++ >= m_limit;
     }
 private:
-    unsigned m_cnt;
+    mutable unsigned m_cnt;
     const unsigned m_limit;
 
 };
@@ -159,8 +210,7 @@ private:
  * @tparam ValueType
  */
 template <typename Gain, typename ValueType>
-class ComputeGainWrapper {
-public:
+struct ComputeGainWrapper {
     /**
      * @brief Constructor
      *
@@ -198,6 +248,156 @@ private:
     ValueType & m_val;
 };
 
+/**
+ * @brief Adapts gain to implement tabu search
+ *
+ * @tparam TabuList
+ * @tparam Gain
+ * @tparam AspirationCriteria
+ */
+template <typename TabuList, 
+          typename Gain = utils::ReturnOneFunctor, 
+          typename AspirationCriteria = utils::ReturnTrueFunctor>
+struct TabuGainAdaptor {
+
+    /**
+     * @brief constructor
+     *
+     * @param tabuList
+     * @param gain
+     * @param aspirationCriteria 
+     */
+    TabuGainAdaptor(TabuList tabuList = TabuList(), Gain gain = Gain(), 
+                    AspirationCriteria aspirationCriteria 
+                        = AspirationCriteria()) :
+       m_tabuList(std::move(tabuList)), m_aspirationCriteriaGain(std::move(gain), std::move(aspirationCriteria))
+    { }
+
+    /**
+     * @brief operator()
+     *
+     * @tparam Args args to be forwarded
+     *
+     * @return 
+     */
+    template <typename... Args> 
+    auto operator()(Args&&... args) -> decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
+        if(!m_tabuList.isTabu(std::forward<Args>(args)...)) {
+            auto diff = m_aspirationCriteriaGain(std::forward<Args>(args)...);
+            if(diff > 0) {
+                m_tabuList.accept(std::forward<Args>(args)...);
+            }
+            return diff;
+        }
+        return 0;
+    }
+
+private:
+    TabuList m_tabuList;
+    ConditionalGainAdaptor<Gain, AspirationCriteria> m_aspirationCriteriaGain;
+};
+
+/**
+ * @brief make function for TabuGainAdaptor
+ *
+ * @tparam TabuList
+ * @tparam Gain
+ * @tparam AspirationCriteria
+ * @param tabuList
+ * @param gain
+ * @param aspirationCriteria
+ *
+ * @return 
+ */
+template <typename TabuList, 
+          typename Gain = utils::ReturnTrueFunctor, 
+          typename AspirationCriteria = utils::ReturnTrueFunctor>
+TabuGainAdaptor<TabuList, Gain, AspirationCriteria>
+make_TabuGainAdaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria aspirationCriteria = AspirationCriteria()) {
+    return TabuGainAdaptor<TabuList, Gain, AspirationCriteria>(std::move(tabuList), std::move(gain), std::move(aspirationCriteria));
+}
+
+/**
+ * @brief This is adaptor on Commit which allows to record solution basing on condition
+ *        It is particularly useful in tabu search  and simulated annealing 
+ *        in which we'd like to store the best found solution
+ *
+ * @tparam Commit
+ * @tparam Solution
+ * @tparam Condition
+ */
+template <typename Commit, typename Solution, typename Condition>
+struct RecordSolutionCommitAdapter {
+
+    /**
+     * @brief constructor
+     *
+     * @param solution
+     * @param commit
+     * @param cond
+     */
+    RecordSolutionCommitAdapter(Solution & solution, 
+                                Commit commit = Commit(), 
+                                Condition cond = Condition()) : 
+        m_solution(&solution), m_commit(std::move(commit)), 
+        m_condition(std::move(cond)) { }
+
+    /**
+     * @brief operator
+     *
+     * @tparam Move
+     * @param sol
+     * @param move
+     */
+    template <typename Move>
+    void operator()(Solution & sol, const Move & move) {
+        m_commit(sol, move);
+        if(m_condition(sol, *m_solution)) {
+            *m_solution = sol;
+        }
+    }
+    
+    /**
+     * @brief Access to the stored solution (const version)
+     *
+     * @return 
+     */
+    const Solution & getSolution() const {
+        return *m_solution;
+    }
+    
+    /**
+     * @brief Access to the stored solution (non-const version)
+     *
+     * @return 
+     */
+    Solution & getSolution() {
+        return *m_solution;
+    }
+
+private:
+    Solution * m_solution;
+    Commit m_commit;
+    Condition m_condition;
+};
+
+/**
+ * @brief make function for RecordSolutionCommitAdapter
+ *
+ * @tparam Commit
+ * @tparam Solution
+ * @tparam Condition
+ * @param s
+ * @param commit
+ * @param c
+ *
+ * @return 
+ */
+template <typename Commit, typename Solution, typename Condition>
+RecordSolutionCommitAdapter<Commit, Solution, Condition> 
+make_RecordSolutionCommitAdapter(Solution & s, Commit commit, Condition c) {
+    return RecordSolutionCommitAdapter<Commit, Solution, Condition>(s, std::move(commit), std::move(c));
+}
 
 
 } // local_search

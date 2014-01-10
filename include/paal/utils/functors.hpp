@@ -24,6 +24,12 @@ namespace utils {
  * @brief Functor does nothing
  */
 struct SkipFunctor {
+    /**
+     * @brief operator
+     *
+     * @tparam Args
+     * @param args
+     */
     template <typename ... Args > 
         void  operator()(Args&&... args) const {}
 };
@@ -36,6 +42,14 @@ struct SkipFunctor {
  */
 template <typename T, T t>
     struct ReturnSomethingFunctor {
+        /**
+         * @brief operator
+         *
+         * @tparam Args
+         * @param args
+         *
+         * @return 
+         */
         template <typename ... Args > 
             T  operator()(Args&&... args) const {
                 return t;
@@ -49,7 +63,21 @@ template <typename T, T t>
  */
 template <typename T>
     struct DynamicReturnSomethingFunctor {
+        /**
+         * @brief constructor
+         *
+         * @param t
+         */
         DynamicReturnSomethingFunctor(T t) : m_t(t) {}
+
+        /**
+         * @brief operator
+         *
+         * @tparam Args
+         * @param args
+         *
+         * @return 
+         */
         template <typename ... Args > 
             T  operator()(Args&&... args) const {
                 return m_t;
@@ -110,6 +138,12 @@ struct ReturnZeroFunctor :
 
 
 /**
+ * @brief functor returns 1
+ */
+struct ReturnOneFunctor :
+    public ReturnSomethingFunctor<int, 1> {};
+
+/**
  * @brief functors calls assert(false). 
  */
 struct AssertFunctor {
@@ -139,11 +173,24 @@ struct RemoveReference {
 template <typename Array> 
     class ArrayToFunctor{
         public:
+            /**
+             * @brief constructor
+             *
+             * @param array
+             * @param offset
+             */
             ArrayToFunctor(const Array & array, int offset = 0) : 
                 m_array(&array), m_offset(offset) {}
 
             typedef decltype(std::declval<const Array>()[0]) Value;
 
+            /**
+             * @brief operator
+             *
+             * @param a
+             *
+             * @return 
+             */
             Value operator()(int a) const {
                 return (*m_array)[a + m_offset];
             }
@@ -177,16 +224,30 @@ template <typename Array>
  */
 template <typename Functor>
 struct AssignableFunctor {
-   
-   AssignableFunctor() = default;
-   AssignableFunctor(const AssignableFunctor& af)  = default;
-   AssignableFunctor(AssignableFunctor&&) = default;
+    /**
+     * @brief constructor
+     *
+     * @param f
+     */
    AssignableFunctor(Functor& f) : m_f(&f) {}
+   AssignableFunctor() = default;
  
-   AssignableFunctor& operator=(AssignableFunctor&&) = default;
-   AssignableFunctor& operator=(const AssignableFunctor& af) = default;
+   /**
+    * @brief assign operator
+    *
+    * @param f
+    *
+    * @return 
+    */
    AssignableFunctor& operator=(Functor& f) { m_f = f; }
 
+   /**
+    * @brief operator()
+    *
+    * @tparam Args
+    *
+    * @return 
+    */
    template<typename ... Args>
    auto operator()(Args&& ... args) const ->
       decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {

@@ -10,43 +10,13 @@
 
 #include <vector>
 
-#include "paal/local_search/local_search.hpp"
 #include "utils/logger.hpp"
+#include "utils/simple_single_local_search_components.hpp"
 
 namespace ls = paal::local_search;
 using namespace  paal;
 
 namespace {
-int f(int x) {
-    return -x*x + 12 * x -27;
-}
-
-struct GetMoves {
-    typedef typename std::vector<int>::const_iterator Iter;
-    const std::vector<int> neighb;
-public:
-
-    GetMoves() : neighb{10, -10, 1, -1} {}
-
-    std::pair<Iter, Iter> operator()(int x) {
-        return std::make_pair(neighb.begin(), neighb.end());
-    }
-};
-
-struct Gain {
-    int operator()(int s, int u) const {
-        return f(s + u) - f(s);
-    }
-};
-
-struct Commit {
-    void operator()(int & s, int u) {
-        s = s + u;
-    }
-};
-
-typedef  ls::SearchComponents<GetMoves, Gain, Commit> SearchComp;
- 
 ON_LOG(  
     int i = 0;
 )

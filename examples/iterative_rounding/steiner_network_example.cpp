@@ -15,14 +15,12 @@
 
 
 //! [Steiner Network Example]
-int restrictions(int i, int j) {
-    return 2;
-}
 
 int main() {
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    auto restrictions = [](int i, int j) {return 2;};
 
     // sample problem
     std::vector<std::pair<int, int>> edges {{0,1},{0,1},{1,2},{1,2},{2,0}};

@@ -157,11 +157,11 @@ private:
     const std::vector<int> & m_lcp;
     const std::vector<int> & m_lengthSuffixWord;
     
-    const static int ROOT=0;
-    const static int NOT_PREFIX=-1;
-    const static int ANY_PREFIX=0; 
-    const static int ANY_OTHER_PREFIX=1; 
-    const static int NO_SUFFIX_IN_TREE=0;
+    const static int ROOT = 0;
+    const static int NOT_PREFIX = -1;
+    const static int ANY_PREFIX = 0; 
+    const static int ANY_OTHER_PREFIX = 1; 
+    const static std::nullptr_t NO_SUFFIX_IN_TREE;
     const static std::nullptr_t CHILDLESS;
 public:
     const static Letter DELIMITER=0;
