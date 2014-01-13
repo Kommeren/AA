@@ -43,10 +43,10 @@ public:
     auto get_violation_candidates(const Problem & problem, const LP & lp)
             -> decltype(problem.get_terminals()) {
 
-        int graphSize = problem.get_terminals().size();
-        if (graphSize != m_current_graph_size) {
+        int graph_size = problem.get_terminals().size();
+        if (graph_size != m_current_graph_size) {
             // Graph has changed, construct new oracle
-            m_current_graph_size = graphSize;
+            m_current_graph_size = graph_size;
             m_root = select_root(problem.get_terminals());
             create_auxiliary_digraph(problem, lp);
         } else {
@@ -65,7 +65,7 @@ public:
             return Violation{};
         }
 
-        double violation = check_min_cut(candidate);
+        double violation = find_violation(candidate);
         if (problem.get_compare().g(violation, 0)) {
             return violation;
         }
@@ -80,9 +80,9 @@ public:
      * but its sink vertex is not reachable.
      */
     template <typename Problem, typename LP>
-    void add_violated_constraint(Candidate violatingTerminal, const Problem & problem, LP & lp) {
-        if (std::make_pair(violatingTerminal, m_root) != m_min_cut.get_last_cut()) {
-            check_min_cut(violatingTerminal);
+    void add_violated_constraint(Candidate violating_terminal, const Problem & problem, LP & lp) {
+        if (std::make_pair(violating_terminal, m_root) != m_min_cut.get_last_cut()) {
+            find_violation(violating_terminal);
         }
 
         const auto & components = problem.get_components();
@@ -90,7 +90,7 @@ public:
         for (int i = 0; i < components.size(); ++i) {
             auto u = m_artif_vertices[i];
             int ver = components.find_version(i);
-            auto v = components.find(i).get_sink(ver);
+            auto v = m_terminals_to_aux[components.find(i).get_sink(ver)];
             if (m_min_cut.is_in_source_set(u) && !m_min_cut.is_in_source_set(v)) {
                 expr += problem.find_column_lp(i);
             }
@@ -109,23 +109,27 @@ private:
      */
     template <typename Problem, typename LP>
     void create_auxiliary_digraph(Problem &problem, const LP & lp) {
-        m_min_cut.init(problem.get_terminals().size());
+        m_min_cut.init(0);
         m_artif_vertices.clear();
+        m_terminals_to_aux.clear();
+        for (auto term : problem.get_terminals()) {
+            m_terminals_to_aux[term] = m_min_cut.add_vertex_to_graph();
+        }
         const auto & components = problem.get_components();
 
         for (int i = 0; i < components.size(); ++i) {
-            AuxVertex newV = m_min_cut.add_vertex_to_graph();
-            m_artif_vertices[i] = newV;
+            AuxVertex new_v = m_min_cut.add_vertex_to_graph();
+            m_artif_vertices[i] = new_v;
             int ver = components.find_version(i);
             auto sink = components.find(i).get_sink(ver);
             for (auto w : boost::make_iterator_range(components.find(i).get_elements())) {
                 if (w != sink) {
                     double INF = std::numeric_limits<double>::max();
-                    m_min_cut.add_edge_to_graph(w, newV, INF);
+                    m_min_cut.add_edge_to_graph(m_terminals_to_aux[w], new_v, INF);
                 } else {
                     lp::col_id x = problem.find_column_lp(i);
-                    double colVal = lp.get_col_value(x);
-                    m_min_cut.add_edge_to_graph(newV, sink, colVal);
+                    double col_val = lp.get_col_value(x);
+                    m_min_cut.add_edge_to_graph(new_v, m_terminals_to_aux[sink], col_val);
                 }
             }
         }
@@ -138,12 +142,12 @@ private:
     void update_auxiliary_digraph(Problem &problem, const LP & lp) {
         const auto & components = problem.get_components();
         for (int i = 0; i < components.size(); ++i) {
-            AuxVertex componentV = m_artif_vertices[i];
+            AuxVertex component_v = m_artif_vertices[i];
             int ver = components.find_version(i);
             auto sink = components.find(i).get_sink(ver);
             lp::col_id x = problem.find_column_lp(i);
-            double colVal = lp.get_col_value(x);
-            m_min_cut.add_edge_to_graph(componentV, sink, colVal);
+            double col_val = lp.get_col_value(x);
+            m_min_cut.add_edge_to_graph(component_v, m_terminals_to_aux[sink], col_val);
         }
     }
 
@@ -158,17 +162,18 @@ private:
     }
 
     /**
-     * Runs a maxflow algorithm between given source and root.
+     * Finds the most violated cut containing \c src and returns its violation value.
      */
-    double check_min_cut(AuxVertex src) {
-        double minCut = m_min_cut.find_min_cut(src, m_root);
-        return 1 - minCut;
+    double find_violation(AuxVertex src) {
+        double min_cut_weight = m_min_cut.find_min_cut(m_terminals_to_aux[src], m_terminals_to_aux[m_root]);
+        return 1 - min_cut_weight;
     }
 
     AuxVertex m_root; // root vertex, sink of all max-flows
     int m_current_graph_size; // size of current graph
 
     std::unordered_map<int, AuxVertex> m_artif_vertices; // maps componentId to auxGraph vertex
+    std::unordered_map<AuxVertex, AuxVertex> m_terminals_to_aux; // maps teminals to auxGraph vertices
 
     min_cut_finder m_min_cut;
 };

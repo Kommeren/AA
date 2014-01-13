@@ -110,7 +110,7 @@ public:
     /**
      * Returns the bigger of the two restrictions for a given vertex pair.
      */
-    auto getMaxRestriction(Vertex u, Vertex v) const
+    auto get_max_restriction(Vertex u, Vertex v) const
             -> decltype(std::declval<Restrictions>()(0,0)) {
         return std::max(m_restrictions(u, v), m_restrictions(v, u));
     }

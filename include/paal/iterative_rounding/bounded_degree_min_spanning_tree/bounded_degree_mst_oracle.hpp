@@ -50,7 +50,7 @@ public:
      */
     template <typename Problem>
     Violation check_violation(Candidate candidate, const Problem & problem) {
-        double violation = check_min_cut(candidate.first, candidate.second);
+        double violation = find_violation(candidate.first, candidate.second);
         if (problem.get_compare().g(violation, 0)) {
             return violation;
         }
@@ -63,9 +63,9 @@ public:
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void add_violated_constraint(Candidate violatingPair, const Problem & problem, LP & lp) {
-        if (violatingPair != m_min_cut.get_last_cut()) {
-            check_min_cut(violatingPair.first, violatingPair.second);
+    void add_violated_constraint(Candidate violating_pair, const Problem & problem, LP & lp) {
+        if (violating_pair != m_min_cut.get_last_cut()) {
+            find_violation(violating_pair.first, violating_pair.second);
         }
 
         const auto & g = problem.get_graph();
@@ -95,13 +95,13 @@ private:
         m_v_to_trg.resize(m_vertices_num);
 
         for (auto const & e : problem.get_edge_map().right) {
-            lp::col_id colIdx = e.first;
-            double colVal = lp.get_col_value(colIdx) / 2;
+            lp::col_id col_idx = e.first;
+            double col_val = lp.get_col_value(col_idx) / 2;
 
-            if (!problem.get_compare().e(colVal, 0)) {
+            if (!problem.get_compare().e(col_val, 0)) {
                 auto u = source(e.second, g);
                 auto v = target(e.second, g);
-                m_min_cut.add_edge_to_graph(u, v, colVal, colVal);
+                m_min_cut.add_edge_to_graph(u, v, col_val, col_val);
             }
         }
 
@@ -136,36 +136,36 @@ private:
     template <typename Problem, typename LP, typename Vertex>
     double degree_of(const Problem & problem, const Vertex & v, const LP & lp) {
         double res = 0;
-        auto adjEdges = out_edges(v, problem.get_graph());
+        auto adj_edges = out_edges(v, problem.get_graph());
 
-        for (auto e : boost::make_iterator_range(adjEdges)) {
-            auto colId = problem.edge_to_col(e);
-            if (colId) {
-                res += lp.get_col_value(*colId);
+        for (auto e : boost::make_iterator_range(adj_edges)) {
+            auto col_id = problem.edge_to_col(e);
+            if (col_id) {
+                res += lp.get_col_value(*col_id);
             }
         }
         return res;
     }
 
     /**
-     * Finds the most violated set of vertices containing \c src and not containing \c trg.
+     * Finds the most violated set of vertices containing \c src and not containing \c trg and returns its violation value.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @return violation of the found set
      */
-    double check_min_cut(AuxVertex src, AuxVertex trg) {
-        double origCap = m_min_cut.get_capacity(m_src_to_v[src]);
+    double find_violation(AuxVertex src, AuxVertex trg) {
+        double orig_cap = m_min_cut.get_capacity(m_src_to_v[src]);
 
         m_min_cut.set_capacity(m_src_to_v[src], m_vertices_num);
         // capacity of srcToV[trg] does not change
         m_min_cut.set_capacity(m_v_to_trg[src], 0);
         m_min_cut.set_capacity(m_v_to_trg[trg], m_vertices_num);
 
-        double minCut = m_min_cut.find_min_cut(m_src, m_trg);
-        double violation = m_vertices_num - 1 - minCut;
+        double min_cut_weight = m_min_cut.find_min_cut(m_src, m_trg);
+        double violation = m_vertices_num - 1 - min_cut_weight;
 
         // reset the original values for the capacities
-        m_min_cut.set_capacity(m_src_to_v[src], origCap);
+        m_min_cut.set_capacity(m_src_to_v[src], orig_cap);
         // capacity of srcToV[trg] does not change
         m_min_cut.set_capacity(m_v_to_trg[src], 1);
         m_min_cut.set_capacity(m_v_to_trg[trg], 1);

@@ -69,7 +69,7 @@ public:
      */
     template <typename Problem>
     Violation check_violation(Candidate candidate, const Problem & problem) {
-        double violation = check_min_cut(candidate.first, candidate.second, problem);
+        double violation = find_violation(candidate.first, candidate.second, problem);
         if (problem.get_compare().g(violation, 0)) {
             return violation;
         }
@@ -84,11 +84,11 @@ public:
     template <typename Problem, typename LP>
     void add_violated_constraint(Candidate violation, const Problem & problem, LP & lp) {
         if (violation != m_min_cut.get_last_cut()) {
-            check_min_cut(violation.first, violation.second, problem);
+            find_violation(violation.first, violation.second, problem);
         }
 
         const auto & g = problem.get_graph();
-        auto restriction = problem.getMaxRestriction(violation.first, violation.second);
+        auto restriction = problem.get_max_restriction(violation.first, violation.second);
 
         for (auto const & e : problem.get_edges_in_solution()) {
             if (is_edge_in_violating_cut(e, g)) {
@@ -127,13 +127,13 @@ private:
         m_min_cut.init(num_vertices(g));
 
         for (auto const & e : problem.get_edge_map()) {
-            lp::col_id colIdx = e.first;
-            double colVal = lp.get_col_value(colIdx);
+            lp::col_id col_idx = e.first;
+            double col_val = lp.get_col_value(col_idx);
 
-            if (problem.get_compare().g(colVal, 0)) {
+            if (problem.get_compare().g(col_val, 0)) {
                 auto u = source(e.second, g);
                 auto v = target(e.second, g);
-                m_min_cut.add_edge_to_graph(u, v, colVal, colVal);
+                m_min_cut.add_edge_to_graph(u, v, col_val, col_val);
             }
         }
 
@@ -145,17 +145,17 @@ private:
     }
 
     /**
-     * Finds the most violated set of vertices containing \c src and not containing \c trg.
+     * Finds the most violated set of vertices containing \c src and not containing \c trg and returns its violation value.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @param problem problem object
      * @return violation of the found set
      */
     template <typename Problem>
-    double check_min_cut(AuxVertex src, AuxVertex trg, const Problem & problem) {
-        double minCut = m_min_cut.find_min_cut(src, trg);
-        double restriction = problem.getMaxRestriction(src, trg);
-        return restriction - minCut;
+    double find_violation(AuxVertex src, AuxVertex trg, const Problem & problem) {
+        double min_cut_weight = m_min_cut.find_min_cut(src, trg);
+        double restriction = problem.get_max_restriction(src, trg);
+        return restriction - min_cut_weight;
     }
 
     min_cut_finder m_min_cut;
