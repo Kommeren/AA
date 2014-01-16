@@ -102,7 +102,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
 
     auto edgeId = get(boost::edge_index, g);
     std::vector<double> costs = {0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
-    auto cost = boost::make_iterator_property_map(&costs[0], edgeId);
+    auto cost = boost::make_iterator_property_map(costs.begin(), edgeId);
 
     typedef std::set<Edge> SolutionTree;
     {

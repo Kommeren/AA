@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
     correctBdmst.insert(add_edge(0, 2, 2, g).first);
 
     std::vector<double> costs = {173, 176, 37};
-    auto cost = boost::make_iterator_property_map(&costs[0], get(boost::edge_index, g));
+    auto cost = boost::make_iterator_property_map(costs.begin(), get(boost::edge_index, g));
 
     ON_LOG(Index indices = get(boost::vertex_index, g));
 

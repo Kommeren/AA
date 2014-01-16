@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
 
     auto edgeId = get(boost::edge_index, g);
     std::vector<double> costs = {1, 1, 1, 1, 7};
-    auto cost = boost::make_iterator_property_map(&costs[0], edgeId);
+    auto cost = boost::make_iterator_property_map(costs.begin(), edgeId);
 
     //solve it
     {

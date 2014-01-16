@@ -15,15 +15,27 @@ int main(){
 //! [K Cut Example]
     // sample data
     std::vector<std::pair<int,int> > edgesP{{1,2},{1,5},{2,3},{2,5},{2,6},{3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
-    std::vector<int> cost{2,3,3,2,2,4,2,2,2,3,1,3};
+    std::vector<int> costs{2,3,3,2,2,4,2,2,2,3,1,3};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::no_property,
-                    boost::property < boost::edge_weight_t, int> 
-                    > graph(edgesP.begin(),edgesP.end(),cost.begin(),8);
+                    boost::property<boost::edge_index_t,size_t>
+                    > graph(8);
+    for(int i=0;i<edgesP.size();i++){
+        add_edge(edgesP[i].first,edgesP[i].second,i,graph);
+    }   
     int parts=3;
+    
+    auto edgeId = get(boost::edge_index, graph);
+    auto weight=make_iterator_property_map(costs.begin(), edgeId);
+    
     //solve
+    int costCut;
     std::vector<std::pair<int,int> > verticesParts;
-    int costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts));
+    costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts),boost::weight_map(weight));
+    
+    //alternative form
+    //int costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts));
+    //this works if graph have edge weight property
     
     //print result
     std::cout<<"cost cut:"<<costCut<<std::endl;
@@ -32,6 +44,7 @@ int main(){
         std::cout<<i.first<<"("<<i.second<<"), ";
     }
     std::cout<<std::endl;
+    
     
 //! [K Cut Example]
 }

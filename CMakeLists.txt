@@ -11,7 +11,7 @@ SET(CMAKE_COLOR_MAKEFILE ON)
 if(${USE_CLANG}) 
     SET (CMAKE_CXX_COMPILER  "clang++")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-tautological-constant-out-of-range-compare")
-    
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
     #    ADD_DEFINITIONS("-stdlib=libc++")
     #    set(LIBS c++)
 else()

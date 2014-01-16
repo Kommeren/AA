@@ -15,18 +15,24 @@
 
 BOOST_AUTO_TEST_CASE(KCut) {
     std::vector<std::pair<int,int> > edgesP{{1,2},{1,5},{2,3},{2,5},{2,6},{3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
-    std::vector<int> cost{2,3,3,2,2,4,2,2,2,3,1,3};
+    std::vector<int> costs{2,3,3,2,2,4,2,2,2,3,1,3};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::no_property,
-                    boost::property < boost::edge_weight_t, int> 
-                    > graph(edgesP.begin(),edgesP.end(),cost.begin(),8);
-    std::vector<int> optimal={4,9,13,16,21,25,29};
-
-    auto weight= boost::get(boost::edge_weight, graph); 
+                    boost::property<boost::edge_index_t,size_t>
+                    >graph(8);
+    for(int i=0;i<edgesP.size();i++){
+        add_edge(edgesP[i].first,edgesP[i].second,i,graph);
+    }   
     
+    auto edgeId = get(boost::edge_index, graph);
+    
+    std::vector<int> optimal={4,9,13,16,21,25,29};
+    
+    auto weight=make_iterator_property_map(costs.begin(), edgeId);
+   
     for(auto i:boost::irange(2,9)){
         std::vector<std::pair<int,int> > verticesParts;
-        int costCut=paal::greedy::kCut(graph,i,back_inserter(verticesParts));
+        int costCut=paal::greedy::kCut(graph,i,back_inserter(verticesParts),boost::weight_map(weight));
         LOGLN("cost cut: "<<costCut);
         std::vector<int> verticesToParts;
         verticesToParts.resize(verticesParts.size());
@@ -37,10 +43,9 @@ BOOST_AUTO_TEST_CASE(KCut) {
         LOGLN("");
         
         int costCutVerification=0;
-        auto allEdges=edges(graph);
-        for(auto i=allEdges.first;i!=allEdges.second;i++){
-            if(verticesToParts[source(*i,graph)]!=verticesToParts[target(*i,graph)])
-                costCutVerification+=weight(*i);
+        for(auto i:boost::make_iterator_range(edges(graph))){
+            if(verticesToParts[source(i,graph)]!=verticesToParts[target(i,graph)])
+                costCutVerification+=weight[i];
         }
         LOGLN("cost cut: "<<costCutVerification <<" optimal: "<<optimal[i-2]);
         LOGLN("Aproximation Ratio: "<<double(costCutVerification)/optimal[i-2]);
