@@ -38,8 +38,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
 
             std::vector< std::pair<int, decltype(jobs)::iterator> > result;
 
-            paal::greedy::scheduling_jobs_on_identical_parallel_machines::
-                    schedulingJobsOnIdenticalParallelMachines(numberOfMachines,
+            paal::greedy::schedulingJobsOnIdenticalParallelMachines(numberOfMachines,
                      jobs.begin(),jobs.end(),back_inserter(result),
                      paal::utils::IdentityFunctor());
             checkJobs(result, jobs);

@@ -16,6 +16,13 @@ And we assign longest not assigned job to machine which has smallest load, until
  
   complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
 
+\subsection parameters_sjoipm Parameters
+IN: int n_machines
+IN: InputIterator first iterator to collection of jobs is not const because we sort given collection
+IN: InputIterator last
+OUT: OutputIterator result pair of machine id and job iterator
+IN: GetTime getTime
+  
 \subsection app_sjoipm Approximation Ratio equals 4/3.
 
 \subsection com_sjoipm The complexity

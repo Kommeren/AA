@@ -9,7 +9,7 @@
 #include <utility>
 #include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 //! [Scheduling Jobs Example]
-using namespace paal::greedy::scheduling_jobs_on_identical_parallel_machines;
+using namespace paal::greedy;
 using namespace std;
 
 
