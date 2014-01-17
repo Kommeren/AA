@@ -102,7 +102,7 @@ namespace local_search {
          *
          * @return 
          */
-        int objFun() {
+        int objFun() const {
             auto attacingNr = [](int sum, int n) {
                 return sum + n * (n-1) / 2;
             };
