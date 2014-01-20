@@ -274,6 +274,7 @@ struct SteinerNetworkRoundCondition {
             ret = m_roundHalf(problem, lp, colId);
             if(ret) {
                 problem.addColumnToSolution(colId);
+                problem.removeColumn(colId);
             }
             return ret;
         }

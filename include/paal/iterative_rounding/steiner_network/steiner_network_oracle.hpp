@@ -8,6 +8,8 @@
 #ifndef STEINER_NETWORK_ORACLE_HPP
 #define STEINER_NETWORK_ORACLE_HPP
 
+#include <boost/range/iterator_range.hpp>
+#include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 #include <boost/bimap.hpp>
@@ -129,15 +131,17 @@ public:
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
+        for (auto const & e : problem.getEdgesInSolution()) {
+            if (isEdgeInViolatingCut(e)) {
+                --m_violatedRestriction;
+            }
+        }
+
         lp.addRow(lp::LO, m_violatedRestriction);
 
         for (auto const & e : problem.getEdgeMap()) {
-            const Vertex & u = source(e.second, m_g);
-            const Vertex & v = target(e.second, m_g);
-
-            if ((m_violatingSet.find(u) != m_violatingSet.end()) !=
-                (m_violatingSet.find(v) != m_violatingSet.end())) {
-                    lp.addNewRowCoef(e.first);
+            if (isEdgeInViolatingCut(e.second)) {
+                lp.addNewRowCoef(e.first);
             }
         }
 
@@ -156,14 +160,8 @@ public:
         auto startIter = m_restrictionsVec.begin();
         std::advance(startIter, startIndex);
 
-        for (auto const & src_trg : boost::make_iterator_range(startIter, m_restrictionsVec.end())) {
-            assert(src_trg.first != src_trg.second);
-            if (problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
-                return true;
-            }
-        }
-
-        for (auto const & src_trg : boost::make_iterator_range(m_restrictionsVec.begin(), startIter)) {
+        for (auto const & src_trg : boost::join(boost::make_iterator_range(startIter, m_restrictionsVec.end()),
+                                        boost::make_iterator_range(m_restrictionsVec.begin(), startIter))) {
             assert(src_trg.first != src_trg.second);
             if (problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
                 return true;
@@ -211,6 +209,17 @@ private:
                                                     >
                                   > AuxGraph;
     typedef std::unordered_set < AuxVertex > ViolatingSet;
+
+    /**
+     * Checks if a given edge belongs to the cut given by the current violating set.
+     */
+    bool isEdgeInViolatingCut(Edge edge) {
+        Vertex u = source(edge, m_g);
+        Vertex v = target(edge, m_g);
+
+        return (m_violatingSet.find(u) != m_violatingSet.end()) !=
+                    (m_violatingSet.find(v) != m_violatingSet.end());
+    }
 
     /**
      * Creates the auxiliary directed graph used for feasibility testing.
@@ -290,7 +299,7 @@ private:
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, src);
             assert(srcColor != get(colors, trg));
-            for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
+            for (Vertex v : boost::make_iterator_range(vertices(m_auxGraph))) {
                 if (v != trg && get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }
