@@ -43,7 +43,7 @@ struct sched_traits {
     typedef typename utils::pure_result_of<GetSpeed(machine_reference)>::type
         speed_t;
     typedef typename utils::pure_result_of<GetLoad(job_reference)>::type load_t;
-    typedef data_structures::Fraction<load_t, speed_t> frac_t;
+    typedef data_structures::fraction<load_t, speed_t> frac_t;
 };
 
 template <class MachineIterator, class JobIterator, class GetSpeed,
@@ -125,13 +125,13 @@ void schedule(MachineIterator mfirst, MachineIterator mlast, JobIterator jfirst,
                 std::back_inserter(machines));
     auto get_speed_from_iterator = utils::make_lift_iterator_functor(get_speed);
     boost::sort(machines, utils::make_functor_to_comparator(
-                              get_speed_from_iterator, utils::Greater{}));
+                              get_speed_from_iterator, utils::greater{}));
 
     std::vector<JobIterator> jobs;
     boost::copy(boost::counting_range(jfirst, jlast), std::back_inserter(jobs));
     auto get_load_from_iterator = utils::make_lift_iterator_functor(get_load);
     boost::sort(jobs, utils::make_functor_to_comparator(get_load_from_iterator,
-                                                        utils::Greater{}));
+                                                        utils::greater{}));
 
     auto bound = detail::calculate_bound(
         machines.begin(), machines.end(), jobs.begin(), jobs.end(),
@@ -175,12 +175,15 @@ void schedule(MachineIterator mfirst, MachineIterator mlast, JobIterator jfirst,
 }
 } //!detail
 
-/**
- * @brief this is deterministic solve scheduling jobs on machines with different
- * speeds problem and return schedule example:
+/*
+ * @brief This is deterministic solve scheduling jobs on machines with different
+ * speeds problem and return schedule
+ *
+ * Example:
  *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
- * complete example is scheduling_jobs_example.cpp
+ * Complete example is scheduling_jobs_example.cpp
+ *
  * @param mfirst
  * @param mlast
  * @param jfirst
@@ -205,12 +208,15 @@ void schedule_deterministic(const MachineIterator mfirst,
                      utils::always_true{});
 }
 
-/**
- * @brief this is randomized solve scheduling jobs on machines with different
- * speeds problem and return schedule example:
+/*
+ * @brief This is randomized solve scheduling jobs on machines with different
+ * speeds problem and return schedule.
+ *
+ * Example:
  *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
- * complete example is scheduling_jobs_example.cpp
+ * Complete example is scheduling_jobs_example.cpp
+ *
  * @param mfirst
  * @param mlast
  * @param jfirst

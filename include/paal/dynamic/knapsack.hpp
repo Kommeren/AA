@@ -133,7 +133,7 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
         oBegin, oEnd, maxSize, out, value, size,
         get_max_element_on_value_indexed_collection<TableElementType, SizeType>(
             TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
-        utils::Greater{});
+        utils::greater{});
     return std::make_pair(ret.second, ret.first);
 }
 
@@ -161,7 +161,7 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
     return knapsack_dynamic(
         oBegin, oEnd, capacity, out, size, value,
         detail::get_max_element_on_capacity_indexed_collection<ValueType>(),
-        utils::Less{});
+        utils::less{});
 }
 
 } // detail

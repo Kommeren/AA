@@ -1,14 +1,14 @@
 /*! \page iterative_rounding Iterative Rounding
 Index:
 <ul>
-    <li> \ref Preliminaries - containing preliminaries to Iterative Rounding and our interpretation of it.
+    <li> \ref preliminaries - containing preliminaries to Iterative Rounding and our interpretation of it.
     <li> \ref iterative_rounding_interface - containing C++ interfaces of Iterative Rounding classes.
     <li> \ref ir_framework_example - example usage of the Iterative Rounding framework.
     <li> \ref ir_custom_components
 </ul>
 
 
-\section Preliminaries
+\section preliminaries Preliminaries
 In the iterative rounding method we consider a linear programming relaxation of the given problem.<br>
 After solving the linear programming relaxation the fractional solution is being rounded (some variables are fixed to integer values)
 and/or relaxed (some constraints are removed from the problem) according to some rounding and relaxing rules (specfic to the problem).<br>

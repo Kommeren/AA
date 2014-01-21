@@ -203,7 +203,7 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
         ValueType;
 
     Knapsack_0_1<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor,
-                 utils::Less> knapsack(size, value);
+                 utils::less> knapsack(size, value);
     auto maxValueAndSize = knapsack.solve(
         oBegin, oEnd, capacity,
         get_max_element_on_capacity_indexed_collection<ValueType>());
@@ -230,7 +230,7 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
 
     Knapsack_0_1<ObjectsIter, ObjectValueFunctor, ObjectSizeFunctor,
-                 utils::Greater> knapsack(value, size);
+                 utils::greater> knapsack(value, size);
     auto maxValue = get_value_upper_bound(oBegin, oEnd, capacity, value, size,
                                           zero_one_tag());
     auto maxValueAndSize = knapsack.solve(

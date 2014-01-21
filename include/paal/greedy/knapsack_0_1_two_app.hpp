@@ -42,10 +42,10 @@ get_greedy_fill(
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
-    auto starValue = utils::make_lift_iterator_functor(value);
-    auto starSize = utils::make_lift_iterator_functor(size);
-    auto density = make_Density(starValue, starSize);
-    auto compare = utils::make_functor_to_comparator(density, utils::Greater());
+                    auto starValue = utils::make_lift_iterator_functor(value);
+                    auto starSize = utils::make_lift_iterator_functor(size);
+                    auto density = make_Density(starValue, starSize);
+                    auto compare = utils::make_functor_to_comparator(density, utils::greater());
 
     // finding the biggest set elements with the greatest density
     std::sort(oBegin, oEnd, compare);

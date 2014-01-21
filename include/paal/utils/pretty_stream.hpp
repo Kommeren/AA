@@ -8,7 +8,9 @@
 #ifndef PRITTY_STREAM_HPP
 #define PRITTY_STREAM_HPP
 
+#include <cmath>
 #include <iostream>
+#include <string>
 
 namespace paal {
 

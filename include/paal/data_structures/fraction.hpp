@@ -1,13 +1,16 @@
 /**
  * @file fraction.hpp
- * @brief
+ * @brief Implementation of fractions, which are used only for comparison purposes,
+ * and thus they can be used with floating point types as well.
  * @author Robert Rosolek
  * @version 1.0
- * @date
+ * @date 2013-06-06
  */
 
 #ifndef FRACTION_HPP
 #define FRACTION_HPP
+
+#include "paal/utils/floating.hpp"
 
 namespace paal {
 namespace data_structures {
@@ -18,13 +21,13 @@ namespace data_structures {
  * @tparam A
  * @tparam B
  */
-template <class A, class B> struct Fraction {
+template <class A, class B> struct fraction {
     /// numerator
     A num;
     /// denominator
     B den;
     /// constructor
-    Fraction(A num, B den) : num(num), den(den) {}
+    fraction(A num, B den) : num(num), den(den) {}
 };
 
 /**
@@ -38,7 +41,8 @@ template <class A, class B> struct Fraction {
  * @return
  */
 template <class A, class B>
-bool operator<(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
+bool operator<(const fraction<A, B> &f1, const fraction<A, B> &f2)
+{
     return f1.num * f2.den < f2.num * f1.den;
 }
 
@@ -53,7 +57,8 @@ bool operator<(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
  * @return
  */
 template <class A, class B>
-bool operator>(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
+bool operator>(const fraction<A, B> &f1, const fraction<A, B> &f2)
+{
     return f2 < f1;
 }
 
@@ -68,7 +73,8 @@ bool operator>(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
  * @return
  */
 template <class A, class B>
-bool operator<=(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
+bool operator<=(const fraction<A, B> &f1, const fraction<A, B> &f2)
+{
     return !(f2 < f1);
 }
 
@@ -83,8 +89,64 @@ bool operator<=(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
  * @return
  */
 template <class A, class B>
-bool operator>=(const Fraction<A, B> &f1, const Fraction<A, B> &f2) {
+bool operator>=(const fraction<A, B> &f1, const fraction<A, B> &f2)
+{
     return !(f1 < f2);
+}
+
+/**
+ * @brief operator==
+ *
+ * @tparam A
+ * @tparam B
+ * @tparam C
+ * @tparam D
+ * @tparam EPS
+ * @param f1
+ * @param f2
+ * @param eps
+ *
+ * @return
+ */
+template<class A, class B, class C, class D, class EPS = A>
+bool are_fractions_equal(const fraction<A, B>& f1, const fraction<C, D>& f2, EPS eps = A{})
+{
+    auto x = f1.num * f2.den - f2.num * f1.den;
+    utils::compare<decltype(x)> cmp(eps);
+    return cmp.e(x, 0);
+}
+
+/**
+ * @brief make function for fraction
+ *
+ * @tparam A
+ * @tparam B
+ * @param a
+ * @param b
+ *
+ * @return
+ */
+template <class A, class B>
+fraction<A, B> make_fraction(A a, B b)
+{
+    return fraction<A, B>(a, b);
+}
+
+/**
+ * @brief operator*
+ *
+ * @tparam A
+ * @tparam B
+ * @tparam C
+ * @param c
+ * @param f
+ *
+ * @return
+ */
+template<class A, class B, class C>
+auto operator*(C c, const fraction<A, B>& f) -> fraction<decltype(c * f.num), B>
+{
+    return make_fraction(c * f.num, f.den);
 }
 
 } //!data_structures

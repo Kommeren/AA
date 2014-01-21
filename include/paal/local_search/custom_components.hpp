@@ -326,7 +326,7 @@ make_tabu_gain_adaptor(TabuList tabuList, Gain gain = Gain(),
  * @tparam Solution
  * @tparam Comparator
  */
-template <typename Commit, typename Solution, typename Comparator = utils::Less>
+template <typename Commit, typename Solution, typename Comparator = utils::less>
 struct record_solution_commit_adapter {
 
     /**

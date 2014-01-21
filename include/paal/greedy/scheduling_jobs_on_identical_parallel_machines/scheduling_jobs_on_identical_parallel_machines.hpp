@@ -8,14 +8,16 @@
 #ifndef SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
 #define SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
 
+#include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
+
 #include <boost/range/irange.hpp>
 
 #include <queue>
 #include <vector>
 #include <algorithm>
 #include <utility>
-#include <paal/utils/functors.hpp>
-#include <paal/utils/type_functions.hpp>
+
 
 namespace paal {
 namespace greedy {
@@ -56,7 +58,7 @@ void scheduling_jobs_on_identical_parallel_machines(int n_machines,
         typename std::iterator_traits<InputIterator>::reference;
     using Time = typename utils::pure_result_of<GetTime(JobReference)>::type;
 
-    std::sort(first, last, utils::Greater());
+    std::sort(first, last, utils::greater());
     std::vector<int> load(n_machines);
 
     std::priority_queue<int, std::vector<int>, detail::compare> machines(load);

@@ -55,7 +55,7 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
     <li> Never use \<TAB\>, only spaces are legal!
     <li> Don't write macros.
     <li> Code is header only
-    <li> Use desing patterns: traits, tag dispatching, visitors.
+    <li> Use design patterns: traits, tag dispatching, visitors.
     <li> Strong preference of static polymorphism.
     </ul>
 \section Workflow

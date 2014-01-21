@@ -1,0 +1,194 @@
+/*! \page combinatorial_auctions Combinatorial Auctions
+Index:
+<ul>
+    <li> \ref preliminaries
+    <li> \ref query_model
+    <li> \ref bidding_languages
+</ul>
+
+
+\section preliminaries Preliminaries
+We have a set \f$U\f$ of \f$|U| = m\f$ indivisible items that are concurrently being auctioned among
+a set \f$K\f$ of \f$|K| = k\f$ bidders. Every bidder \f$i \in K\f$ has a <b><i>valuation</i></b> function
+\f$v_i : 2^U \to \mathbb{R} \f$, \f$v_i(S)\f$ is the value that bidder \f$i\f$ obtains if
+she receives bundle of items \f$S\f$. A valuation must be monotone: for \f$S \subseteq T\f$ we have that
+\f$ v_i(S) \leq v_i(T)\f$ and it must be normalized: \f$v_i(\emptyset) = 0\f$. There are \f$b_j\geq1\f$ copies of
+each item \f$j\f$. If all \f$b_j\f$ are equal to 1 then our auction is a Single-Unit Combinatorial Auction,
+otherwise we call it Multi-Unit Combinatorial Auction.
+An allocation of items \f$S_1, \cdots, S_k\f$ is valid if every item \f$j\f$ is allocated to at most \f$b_j\f$
+bidders. The <b><i> social welfare </i></b> obtained by an allocation is \f$\sum_i v_i(S_i)\f$.
+Apart from receiving a bundle of items \f$S_i\f$, bidder \f$i\f$ might also be charged a price \f$p_i\f$.
+In such case her <b><i>utility</i></b> is equal to \f$v_i(S_i) - p_i\f$.
+
+In <b><i> winner determination </i></b> problem the goal is to find a socially efficient allocation, that is one
+that maximizes social welfare among all allocations.
+
+Let \f$V = V_1 \times \cdots \times V_k\f$ denote the space of all bidders' valid valuations,
+and let \f$A\f$ be the set of all items allocations.
+A <b><i>mechanism</i></b> \f$(f, p)\f$ for an auction is composed of an allocation mechanism
+\f$f: V \to A\f$ and pricing scheme \f$p_i : V \to \mathbb{R}\f$ for each bidder \f$i\f$.
+A mechanism could be randomized, in which case \f$f(v), p_i(v)\f$ and thus bidders' utilities
+are all random variables.
+
+Here we use \f$v_{-i}\f$ to denote the tuple
+\f$(v_1, \cdots, v_{i-1}, v_{i+1}, \cdots, v_k)\f$ and \f$V_{-i} = \prod_{j \neq i}V_j\f$.
+
+In the usual setting valuations of the bidders are private knowledge.
+In such case bidder \f$i\f$ might decide to "strategize", i.e., report valuation \f$v_i\f$ that is
+different from her real valuation \f$\bar{v}_i\f$ (throughout, we will be using this notation to
+denote real valuation), hoping that this will improve her utility.
+A desirable property for a mechanism is therefore to satisfy truthfulness, wherein
+each player maximizes her utility by reporting her true valuation. Formally:
+
+A deterministic mechanism \f$(f, p)\f$ is <b><i>truthful</i></b> if for any bidder \f$i\f$, any
+\f$v_{-i} \in V_{-i}\f$, and any \f$\bar{v}_i, v'_i \in V_i\f$ we have
+\f$\bar{v}_i(f(\bar{v}_i, v_{-i})) - p_i(\bar{v}_i, v_{-i}) \geq
+\bar{v}_i(f(v'_i, v_{-i})) - p_i(v'_i, v_{-i})\f$
+
+A randomized mechanism \f$(f, p)\f$ is <b><i>truthful in expectation</i></b> if for any bidder,
+any \f$v_{-i} \in V_{-i}\f$, and any \f$\bar{v}_i, v'_i \in V_i\f$ we have
+\f$E(\bar{v}_i(f(\bar{v}_i, v_{-i})) - p_i(\bar{v}_i, v_{-i})) \geq
+E(\bar{v}_i(f(v'_i, v_{-i})) - p_i(v'_i, v_{-i}))\f$
+
+You can read more about combinatorial auctions in \cite BriestKV11.
+
+\section query_model Query Model Interface
+Specifying a valuation in a combinatorial auction requires provididing a value for each of the possible
+\f$2^m - 1\f$ nonempty subsets. A naive representation would thus require \f$2^m - 1\f$ real numbers to represent
+a valuation, which is clearly impractical for more than about three dozen items. To overcome this problem, we
+use the interface for representing valuations, in which bidders are represented as oracles. There are different
+kinds of oracles, answering different types of queries:
+<ul>
+   <li> <i><b>Value Query</b>: The auctioneer presents a bundle \f$S\f$, the bidder reports her value
+         \f$v(S)\f$ for this bundle.</i><br><br>
+         In our library auctions with value query oracles are represented as class
+         paal::auctions::value_query_auction_components
+         (created using \ref comps class), with the following components:
+         <ol>
+            <li>\anchor bidders <i>bidders</i> range of bidders
+            <li> \anchor items <i>items</i> range of items
+            <li> \anchor get_copies_num <i>get_copies_num</i> functor that returns the number of
+               copies of the given item.
+            <pre>
+            get_copies_num_archetype {
+               CopiesNum operator()(Item);
+            }
+            </pre>
+            Default component: <i>paal::utils::return_one_functor</i> (Single-Unit Combinatorial Auction)
+            <li> <i>value_query</i> functor representing a value query oracle.
+            <pre>
+            value_query_archetype {
+               template &lt;class ItemSet&gt;
+               Value operator()(Bidder, const ItemSet&);
+            }
+            </pre>
+            ItemSet is a
+            <a href=http://www.boost.org/doc/libs/1_32_0/libs/range/doc/range.html#forward_range>
+            Forward Range</a> of Item elements that has an adequate <i>size_type count(Item)</i> method.
+         </ol>
+         <b>Example:</b><br>
+         Complete example: value_query_example.cpp <br>
+
+         We start with defining the auction components:
+         \snippet value_query_example.cpp Value Query Auction Components Example
+         Then we create the auction:
+         \snippet value_query_example.cpp Value Query Auction Create Example
+         We can use it as follows:
+         \snippet value_query_example.cpp Value Query Auction Use Example
+         <br>
+
+   <li> <i><b>Demand Query</b>: The auctioneer presents item prices
+         \f$p_j\f$ for each \f$j \in U\f$; the bidder reports a demand bundle under these prices,
+         i.e., some set \f$S\f$ that maximizes \f$v(S) - \sum_{i \in S} p_i\f$.</i><br>
+
+         Being able to answer demand queries appears to be a natural requirement from a bidder,
+         as without this ability, if the bidder comes to a market in which the items have prices,
+         she herself would not know what she prefers to buy.
+
+         \todo write about demand queries in our library once they are introduced
+         <br>
+
+   <li> \anchor gamma_oracle <i><b>\f$\gamma\f$-Oracle Query</b>: The auctioneer presents \f$\gamma \geq 1\f$,
+         item prices \f$p_j\f$ for each \f$j \in U\f$, and a bidding threshold \f$z \geq 0\f$;
+         the bidder either reports that \f$v(S) \leq z\f$ for all sets \f$S\f$
+         (i.e., she cannot buy anything) or otherwise she outputs some set \f$S^*\f$ with \f$v(S^*) > z\f$
+         such that <br>
+         \f$ \frac{\sum_{j \in S^*}p_j}{v(S^*) - z} \leq
+         \gamma \cdot \frac{\sum_{j \in S}p_j}{v(S) - z}\f$ for all \f$S \subseteq U\f$
+         with \f$v(S) > z\f$.</i><br>
+
+         \f$\gamma\f$-oracle queries are not as natural as previously mentioned types of queries.
+         However, for many natural bidding languages one can write a simple, polynomial time
+         implementation of such oracle. Our library provides interfaces for creating
+         \f$\gamma\f$-oracle auctions for a number of such bidding languages, see \ref bidding_languages.<br><br>
+         In our library auctions with \f$\gamma\f$-oracle valuations are represented as class
+         paal::auctions::gamma_oracle_auction_components (created using \ref comps class), with
+         the following components:
+         <ol>
+            <li> <i>bidders</i> \ref bidders "as above"
+            <li> <i>items</i> \ref items "as above"
+            <li> <i>get_copies_num</i> \ref get_copies_num "as above"
+            <li> <i>gamma</i> value of \f$\gamma\f$
+            <li> <i>gamma_oracle</i> functor representing a \f$\gamma\f$-oracle.
+            <pre>
+            gamma_oracle_archetype {
+               template<class GetPrice, class Threshold, class OutputIterator>
+               boost::optional<paal::data_structures::fraction<Value, Value>>
+               operator()(Bidder, GetPrice, Threshold, OutputIterator);
+            }
+            </pre>
+            GetPrice is a functor that for any item returns its price.
+            Threshold is a parameter \f$z\f$ from \f$\gamma\f$-oracle definition.
+            If \f$v(S) \leq z\f$ for all sets \f$S\f$ then oracle should return <i>boost::none</i>.
+            Otherwise it should copy the result bundle \f$S^*\f$ to the OutputIterator and return
+            its corresponding fraction \f$\frac{\sum_{j \in S^*}p_j}{v(S^*) - z}\f$ as
+            <i>paal::data_structures::fraction</i>.
+         </ol>
+         <b>Example:</b><br>
+         Complete example: gamma_oracle_example.cpp <br>
+         We start with defining the auction components:
+         \snippet gamma_oracle_example.cpp Gamma Oracle Auction Components Example
+         Then we create the auction:
+         \snippet gamma_oracle_example.cpp Gamma Oracle Auction Create Example
+         We can use it as follows:
+         \snippet gamma_oracle_example.cpp Gamma Oracle Auction Use Example
+         <br>
+</ul>
+\section bidding_languages Bidding Languages Interface
+Alternative approach for succinctly representing bidders' valuations is to use so called
+<b><i>bidding languages</i></b>. Such language allows to encode "common" types of valuations in a
+simpler way than by using oracles. Still, algorithms in our library expect auctions created via \ref query_model.
+Therefore, in order to solve an auction with a valuation encoded by some bidding language we need to first
+transform this valuation into a proper oracle. For the convenience of the user, we provide adequate adapter
+functions for a number of well-established bidding languages:
+<ul>
+   <li> <i><b>Single-Minded Bids</b>: A single-minded bid is a pair \f$(S^*, v^*)\f$, where \f$S^*\f$ is a subset
+         of items and \f$v^*\f$ is a value. It corresponds to a
+         valuation such that \f$v(S) = v^*\f$ for all \f$S \supseteq S^*\f$,
+         and \f$v(S) = 0\f$ for all other \f$S\f$.</i><br><br>
+         Adapter functions:
+         <ol>
+         <li> paal::auctions::make_single_minded_to_value_query_auction
+         <li> paal::auctions::make_single_minded_to_gamma_oracle_auction
+         </ol>
+         <br>
+         <b>Example:</b><br>
+         Complete example: single_minded_example.cpp<br>
+         \snippet single_minded_example.cpp Single Minded Auctions Example
+         <br>
+
+   <li> <i><b>Xor Bids</b>: A xor bid is a collection of pairs \f$(S_1, v_1), \cdots (S_t, v_t)\f$, where each
+         \f$S_i\f$ is a subset of items and each \f$v_i\f$ is a value. It corresponds to a valuation such that
+         \f$v(S) = \max_{i | S_i \subseteq S} v_i\f$.</i><br><br>
+         Adapter functions:
+         <ol>
+         <li> paal::auctions::make_xor_bids_to_value_query_auction
+         <li> paal::auctions::make_xor_bids_to_gamma_oracle_auction
+         </ol>
+         <br>
+         <b>Example:</b><br>
+         Complete example: xor_bids_example.cpp<br>
+         \snippet xor_bids_example.cpp Xor Bids Auctions Example
+         <br>
+</ul>
+*/

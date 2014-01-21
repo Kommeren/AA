@@ -10,6 +10,7 @@
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/range/iterator_range.hpp>
 
 namespace paal {
 namespace utils {
@@ -23,7 +24,7 @@ class singleton_iterator : public boost::iterator_facade<
     singleton_iterator<Elem>, typename std::decay<Elem>::type,
     boost::forward_traversal_tag, Elem> {
     template <typename E>
-    friend singleton_iterator<E> make_singleton_iterator_begin(E);
+    friend singleton_iterator<E> make_singleton_iterator_begin(E&&);
     template <typename E>
     friend singleton_iterator<E> make_singleton_iterator_end();
 
@@ -65,8 +66,8 @@ class singleton_iterator : public boost::iterator_facade<
  * @return
  */
 template <typename Elem>
-singleton_iterator<Elem> make_singleton_iterator_begin(Elem elem) {
-    return singleton_iterator<Elem>(elem);
+singleton_iterator<Elem> make_singleton_iterator_begin(Elem&& elem) {
+    return singleton_iterator<Elem>(std::forward<Elem>(elem));
 }
 
 /**
@@ -79,6 +80,26 @@ singleton_iterator<Elem> make_singleton_iterator_begin(Elem elem) {
 template <typename Elem>
 singleton_iterator<Elem> make_singleton_iterator_end() {
     return singleton_iterator<Elem>();
+}
+
+/**
+ * @brief function to create a singleton range
+ *
+ * @tparam Elem
+ * @param elem
+ *
+ * @return
+ */
+template <typename Elem>
+auto make_singleton_range(Elem&& elem)
+-> decltype(boost::make_iterator_range(
+    make_singleton_iterator_begin(std::forward<Elem>(elem)),
+    make_singleton_iterator_end<Elem>()
+)) {
+    return boost::make_iterator_range(
+        make_singleton_iterator_begin(std::forward<Elem>(elem)),
+        make_singleton_iterator_end<Elem>()
+    );
 }
 
 } //!utils

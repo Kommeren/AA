@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
             LOGLN("OPT");
             LOG_COPY_RANGE_DEL(optimal, " ");
             LOGLN("");
-            check_result(maxValue.first, opt, 0.5, paal::utils::GreaterEqual());
+            check_result(maxValue.first,opt,0.5,paal::utils::greater_equal());
         }
 
         // KNAPSACK

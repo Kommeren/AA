@@ -8,8 +8,6 @@
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
-//#define LOGGER_ON
-
 #ifdef LOGGER_ON
 #include <iostream>
 #include "paal/utils/type_functions.hpp"

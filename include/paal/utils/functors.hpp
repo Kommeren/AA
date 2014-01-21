@@ -1,21 +1,10 @@
 /**
  * @file functors.hpp
- * @brief
+ * @brief This file contains set of simple useful functors or functor adapters.
  * @author Piotr Wygocki
  * @version 1.0
- * @date
+ * @date 2013-02-01
  */
-
-//=======================================================================
-// Copyright 2013 University of Warsaw.
-// Authors: Piotr Wygocki
-//
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//=======================================================================
-//
-// This file contains set of simple useful functors or functor adapters.
 
 #ifndef BOOST_FUNCTORS_HPP
 #define BOOST_FUNCTORS_HPP
@@ -23,12 +12,31 @@
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
 #include <algorithm>
-
 #include <cassert>
 #include <utility>
 
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/range/iterator_range.hpp>
+#include <boost/range/numeric.hpp>
+
+#include "paal/utils/type_functions.hpp"
+
 namespace paal {
 namespace utils {
+
+// TODO this will not be needed once C++14 auto lambda parameters become available.
+/**
+ *  @brief Type that can be constructed from anything and has no other functionality
+ */
+struct ignore_param {
+    /**
+     * @brief constructor
+     *
+     * @tparam Args
+     */
+    template <class... Args>
+        ignore_param(Args&&...) {}
+};
 
 /**
  * @brief Functor does nothing
@@ -174,7 +182,7 @@ struct remove_reference {
 };
 
 /**
- * @brief Counts numner of calls
+ * @brief Counts number of calls
  *
  * @tparam Functor
  * @tparam CounterType
@@ -192,7 +200,7 @@ class counting_functor_adaptor {
         : m_cnt(&cnt), m_functor(std::move(f)) {}
 
     /**
-     * @brief increment the counter and checks if the given limit is reached.
+     * @brief increments the counter and checks if the given limit is reached.
      *
      * @tparam Args
      *
@@ -381,9 +389,9 @@ lift_iterator_functor<Functor> make_lift_iterator_functor(Functor f) {
 // are not templated
 
 /**
- * @brief Greater functor
+ * @brief greater functor
  */
-struct Greater {
+struct greater {
     /**
      * @brief operator()
      *
@@ -400,9 +408,9 @@ struct Greater {
 };
 
 /**
- * @brief Less functor
+ * @brief less functor
  */
-struct Less {
+struct less {
     /**
      * @brief operator()
      *
@@ -419,20 +427,21 @@ struct Less {
 };
 
 /**
- * @brief GreaterEqual functor
+ * @brief greater_equal functor
  */
-struct GreaterEqual {
+struct greater_equal {
     /**
      * @brief operator()
      *
-     * @tparam T
+     * @tparam T1
+     * @tparam T2
      * @param x
      * @param y
      *
      * @return
      */
-    template <class T>
-    auto operator()(const T &x, const T &y) const->decltype(x >= y) {
+    template <class T1, class T2>
+    auto operator()(const T1 &x, const T2 &y) const->decltype(x >= y) {
         return x >= y;
     }
 };
@@ -444,14 +453,15 @@ struct less_equal {
     /**
      * @brief operator()
      *
-     * @tparam T
+     * @tparam T1
+     * @tparam T2
      * @param x
      * @param y
      *
      * @return
      */
-    template <class T>
-    auto operator()(const T &x, const T &y) const->decltype(x <= y) {
+    template <class T1, class T2>
+    auto operator()(const T1 &x, const T2 &y) const->decltype(x <= y) {
         return x <= y;
     }
 };
@@ -496,8 +506,8 @@ struct not_equal_to {
 
 /// This comparator  takes functor "f" and comparator "c"
 /// and for elements(x,y) returns c(f(x), f(y))
-/// c is Less by default
-template <typename Functor, typename Compare = Less>
+/// c is less by default
+template <typename Functor, typename Compare = less>
 struct functor_to_comparator {
     /**
      * @brief constructor
@@ -538,7 +548,7 @@ struct functor_to_comparator {
  *
  * @return
  */
-template <typename Functor, typename Compare = Less>
+template <typename Functor, typename Compare = less>
 functor_to_comparator<Functor, Compare>
 make_functor_to_comparator(Functor functor, Compare compare = Compare()) {
     return functor_to_comparator<Functor, Compare>(std::move(functor),
@@ -547,7 +557,7 @@ make_functor_to_comparator(Functor functor, Compare compare = Compare()) {
 
 /// Functor that scales another functor
 template <typename Functor, typename ScaleType,
-          typename return_type = ScaleType>
+          typename ReturnType = ScaleType>
 struct scale_functor {
 
     /**
@@ -566,7 +576,7 @@ struct scale_functor {
      *
      * @return
      */
-    template <typename Arg> return_type operator()(Arg &&arg) const {
+    template <typename Arg> ReturnType operator()(Arg &&arg) const {
         return m_s * m_f(std::forward<Arg>(arg));
     }
 
@@ -579,18 +589,18 @@ struct scale_functor {
  * @brief make for scale_functor
  *
  * @tparam ScaleType
- * @tparam return_type
+ * @tparam ReturnType
  * @tparam Functor
  * @param f
  * @param s
  *
  * @return
  */
-template <typename ScaleType, typename return_type = ScaleType,
+template <typename ScaleType, typename ReturnType = ScaleType,
           typename Functor>
-scale_functor<Functor, ScaleType, return_type> make_scale_functor(Functor f,
+scale_functor<Functor, ScaleType, ReturnType> make_scale_functor(Functor f,
                                                                   ScaleType s) {
-    return scale_functor<Functor, ScaleType, return_type>(f, s);
+    return scale_functor<Functor, ScaleType, ReturnType>(f, s);
 }
 
 //****************************** This is a set of functors representing standard
@@ -645,8 +655,8 @@ struct max {
     }
 };
 
-//****************************** This is set of functors representing standard
-// boolean operation
+//****************************** This is a set of functors representing standard
+// boolean operations
 // that is !, &&, ||. These are equivalent to standard std:: structs but are not
 // templated
 //(only operator() is templated)
@@ -760,7 +770,7 @@ make_lift_binary_operator_functor(FunctorLeft left, FunctorRight right,
 }
 
 //******************** this is set of functors
-// allowing two compose functors  using
+// allowing to compose functors using
 // standard logical operators
 
 /// not_functor
@@ -873,6 +883,18 @@ xor_functor<FunctorLeft, FunctorRight> make_xor_functor(FunctorLeft left,
                                                         FunctorRight right) {
     return xor_functor<FunctorLeft, FunctorRight>(std::move(left),
                                                   std::move(right));
+}
+
+/// combination of boost::accumulate and boost::adaptors::transformed
+template <typename Range, typename T, typename Functor, typename BinaryOperation = plus>
+T accumulate_functor(const Range& rng, T init, Functor f, BinaryOperation bin_op = BinaryOperation{}) {
+   return boost::accumulate(
+      rng | boost::adaptors::transformed(make_assignable_functor(f)),
+      init,
+      [&](T t1, T t2) {
+         return bin_op(t1, t2);
+      }
+   );
 }
 
 } //! utils

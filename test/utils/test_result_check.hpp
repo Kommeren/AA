@@ -1,12 +1,13 @@
 /**
  * @file test_result_check.hpp
  * @brief
- * @author Piotr Smulewicz
+ * @author Piotr Smulewicz, Robert Rosolek
  * @version 1.0
  * @date 2014-01-29
  */
 #ifndef TEST_RESULT_CHECK_HPP
 #define TEST_RESULT_CHECK_HPP
+
 #include <boost/test/unit_test.hpp>
 
 #include "utils/logger.hpp"
@@ -15,41 +16,54 @@
 
 #include <iomanip>
 
-template <typename T, typename T2,
-          typename Comparator = paal::utils::less_equal>
-void check_result(T result, T optimal, T2 aproximation_ratio,
-                  Comparator comp = Comparator(), T eps = 0,
-                  std::string opt = "optimal: ",
-                  std::string apr_ratio = "aproximation ratio: ") {
-    LOGLN("result: " << std::setprecision(20) << result);
-    LOGLN(opt << optimal);
-    LOGLN(apr_ratio << double(result) / optimal);
-    // +eps is for comp =Less() , -eps if for comp =Greater().
-    BOOST_CHECK(comp(optimal, result + eps) || comp(optimal, result - eps));
-    BOOST_CHECK(
-        comp(double(result) + eps, double(optimal) * aproximation_ratio) ||
-        comp(double(result) - eps, double(optimal) * aproximation_ratio));
-}
-;
+template <typename T> auto to_double(T t) -> puretype(t + 0.0) { return t; }
 
-template <typename T, typename T2,
-          typename Comaparator = paal::utils::less_equal>
+template<
+   typename Result,
+   typename Bound,
+   typename Ratio,
+   typename Comparator=paal::utils::less_equal,
+   typename Eps = double
+>
 void check_result_compare_to_bound(
-    T result, T upper_bound_for_optimal, T2 aproximation_ratio,
-    Comaparator comp = paal::utils::less_equal(), T eps = 0,
-    std::string ub = "Solution is not better than: ",
-    std::string apr_ratio = "Aproxmimation ratio is not worst than: ") {
-    LOGLN(std::setprecision(20) << "result: " << result);
-    if (upper_bound_for_optimal != 0) {
-        LOGLN(ub << upper_bound_for_optimal);
-        // +eps is for comp =Less() , -eps if for comp =Greater().
-        LOGLN(apr_ratio << double(result) / upper_bound_for_optimal);
-        BOOST_CHECK(comp(double(result) + eps, double(upper_bound_for_optimal) *
-                                                   aproximation_ratio) ||
-                    comp(double(result) - eps,
-                         double(upper_bound_for_optimal) * aproximation_ratio));
-    }
-}
-;
+   Result result,
+   Bound bound_for_optimal,
+   Ratio approximation_ratio,
+   Comparator comp = Comparator{},
+   Eps eps = 0,
+   std::string bound = "Solution is not worse than: ",
+   std::string got_ratio = "Approximation ratio is not better than: ",
+   std::string want_ratio = "Want approximation: "
+) {
+   LOGLN("result: " << std::setprecision(20) << result);
+   LOGLN(bound << bound_for_optimal);
+   LOGLN(got_ratio << to_double(result) / bound_for_optimal);
+   LOGLN(want_ratio << approximation_ratio);
+   // +eps is for comp = less_equal() , -eps if for comp = greater_equal().
+   BOOST_CHECK(comp(to_double(result) + eps, to_double(bound_for_optimal) * approximation_ratio) ||
+         comp(to_double(result) - eps, to_double(bound_for_optimal) * approximation_ratio));
+};
+
+template<
+   typename Result,
+   typename Optimal,
+   typename Ratio,
+   typename Comparator=paal::utils::less_equal,
+   typename Eps = double
+>
+void check_result(
+   Result result,
+   Optimal optimal,
+   Ratio approximation_ratio,
+   Comparator comp = Comparator{},
+   Eps eps = 0,
+   std::string opt = "Optimal: ",
+   std::string got_ratio = "Got approximation ratio: ",
+   std::string want_ratio = "Want approximation: "
+) {
+    check_result_compare_to_bound(result, optimal, approximation_ratio, comp, eps, opt, got_ratio, want_ratio);
+    // +eps is for comp = less_equal() , -eps if for comp = greater_equal().
+    BOOST_CHECK(comp(optimal, result + eps) || comp(optimal, result - eps));
+};
 
 #endif /* TEST_RESULT_CHECK_HPP */

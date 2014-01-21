@@ -7,16 +7,16 @@
 
   \section Introduction
     The PAAl is a header-only, generic library consisting of approximation algorithms,
-    data structures and several complete solution for the various optimization problems.
+    data structures and several complete solutions for the various optimization problems.
     The PAAl is implemented taking advantage of the new features of C++ introduced in the C++0x standard,
     which in many cases simplify greatly creation of generic code.
 
   \section Installation
    There is no need to install anything because the PAAl is header only.
-   All you have to do is to download the library and include appropriate headers.
+   All you have to do is download the library and include appropriate headers.
    Only, if you use linear programming you must link your executable against glpk.
 
-   If you'd like to alter the library, we encourage you to compile the unit test.
+   If you'd like to alter the library, we encourage you to compile the unit tests.
 
   \section get_repo Download
     In order to download repository please run the following command:
@@ -67,6 +67,10 @@
             <ul>
             <li>\ref multiway_cut
             </ul>
+        <li>\ref combinatorial_auctions
+            <ul>
+            <li> \ref winner_determination_in_multi_unit_CAs
+            </ul>
         <li> Miscellaneous
             <ul>
             <li>\ref stein_zel
@@ -103,7 +107,7 @@
   </pre>
   Very often algorithms can be customized or extended, as they support many different arguments. These arguments are
   usually wrapped using Components class (see \ref comps), which allows to specify named arguments. In such
-  a case the algorithms is called as follows:
+  case the algorithm is called as follows:
   <pre>
       algorithm(ProblemDescription, Components)
   </pre>
@@ -117,7 +121,7 @@
   ___________________________________________________________________________________________________
 
       ALGORITHMS COMPONENTS - e. g., GetNeighborhood or Commit in local search.
-      This are the bricks that directly manipulate the specific data-structure concepts.
+      These are the bricks that directly manipulate the specific data-structure concepts.
   ___________________________________________________________________________________________________
 
       DATA_STRUCTURES - The data-structures used by algorithm helpers.

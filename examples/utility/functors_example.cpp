@@ -48,9 +48,9 @@ void functors_example() {
 }
 
 void compare_functors() {
-    Greater g;
-    GreaterEqual ge;
-    Less l;
+    greater g;
+    greater_equal ge;
+    less l;
     less_equal le;
     equal_to e;
     not_equal_to ne;
@@ -86,7 +86,7 @@ void comparator_functor() {
 
     assert(!compareFirst(std::make_pair(1, 2), std::make_pair(0, 1)));
 
-    auto compareFirstDesc = make_functor_to_comparator(getFirst, Greater());
+    auto compareFirstDesc = make_functor_to_comparator(getFirst, greater());
 
     assert(compareFirstDesc(std::make_pair(1, 2), std::make_pair(0, 1)));
 }

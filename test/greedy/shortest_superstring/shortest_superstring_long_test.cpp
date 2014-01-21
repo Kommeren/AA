@@ -36,16 +36,19 @@ BOOST_AUTO_TEST_CASE(shortest_superstringLong) {
         std::ifstream ifs(testDir + "/cases/" + fname + ".in");
         auto words = read_SS(ifs);
 
-        for (auto word : words) {
-            for (auto letter : word) assert(letter > 0);
+        for (auto word: words) {
+            for (auto letter: word) assert(letter > 0);
         }
         std::string res = paal::greedy::shortestSuperstring(words);
         int s = res.size();
+        // check feasibility
+        if (s < 100) {
+            for (auto word: words)
+               BOOST_CHECK(res.find(word) != std::string::npos);
+        }
         if (opt != 0) {
             LOGLN(res);
             check_result(s, opt, 3.5);
-        } else {
-            check_result_compare_to_bound(s, opt, 3.5);
         }
     });
 }

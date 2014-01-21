@@ -65,9 +65,10 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
     // cuts contain pair(x,y)
     // x is the cost of the cut
     // y and y+1 are index parts of graph after make a cut
-    std::priority_queue<std::pair<cost_t, int>,
-                        std::vector<std::pair<cost_t, int>>, utils::Greater>
-        cuts;
+    std::priority_queue<
+            std::pair<cost_t,int>,
+            std::vector<std::pair<cost_t,int> >
+            ,utils::greater> cuts;
 
     int id_part = 0;
 

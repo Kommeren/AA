@@ -1,0 +1,9 @@
+<number of bidders>
+<number of items>
+<number of bids>
+<bidder of bid 1> <number of items in bid 1> <value of bid 1> <first item in bid 1> ... <last item in bid 1>
+...
+<bidder of bid n> <number of items in bid n> <value of bid n> <first item in bid n> ... <last item in bid n>
+<quantity of item 1>
+...
+<quantity of item m>

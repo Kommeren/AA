@@ -57,6 +57,12 @@ template <class F> struct pure_result_of {
     typedef typename std::decay<typename std::result_of<F>::type>::type type;
 };
 
+/// return type after promotion with double
+template <typename T>
+struct promote_with_double {
+   using type = puretype(std::declval<T>() + 0.0);
+};
+
 } //!utils
 } //!paal
 

@@ -133,3 +133,6 @@
 [submodule "boost/io"]
 	path = boost/io
 	url = https://github.com/boostorg/io.git
+[submodule "boost/algorithm"]
+	path = boost/algorithm
+	url = https://github.com/boostorg/algorithm.git
