@@ -29,7 +29,7 @@ namespace greedy{
  * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
- * complete example is k_cut.cpp
+ * complete example is k_cut_example.cpp
  * @param Graph graph
  * @param int numberOfParts
  * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
@@ -147,7 +147,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
  * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
- * complete example is k_cut.cpp
+ * complete example is k_cut_example.cpp
  * @param Graph graph
  * @param int numberOfParts
  * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
@@ -157,7 +157,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
  * @tparam OutputIterator
  * @tparam T
  * @tparam P
- * @tparam P
+ * @tparam R
  */
 template<typename inGraph
         ,class OutputIterator
@@ -180,7 +180,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
  * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
- * complete example is k_cut.cpp
+ * complete example is k_cut_example.cpp
  * @param Graph graph
  * @param int numberOfParts
  * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part

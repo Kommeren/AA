@@ -42,4 +42,5 @@ void check_result_compare_to_bound(T result,T upper_bound_for_optimal,T2 aproxim
                     comp(double(result)-eps,double(upper_bound_for_optimal)*aproximation_ratio));
     }
 };
+
 #endif /* TEST_RESULT_CHECK_HPP */

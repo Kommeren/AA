@@ -45,6 +45,7 @@
             </ul>
         <li> Greedy
             <ul>
+            <li> \ref kcenter
             <li> \ref kcut
             <li> \ref knapsack_greedy
             <li> \ref shortestsuperstring

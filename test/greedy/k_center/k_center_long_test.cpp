@@ -1,0 +1,38 @@
+/**
+ * @file k_center_long_test.cpp
+ * @brief
+ * @author Piotr Smulewicz
+ * @version 1.0
+ * @date 2013-01-29
+ */
+
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+#include "paal/data_structures/metric/basic_metrics.hpp"
+#include "paal/greedy/k_center/k_center.hpp"
+#include "utils/test_result_check.hpp"
+#include "greedy/k_center/in_balls.hpp"
+
+BOOST_AUTO_TEST_CASE(KCenter) {
+    //performance test
+    const int NUM_CENTERS=1000;
+    const int NUM_ITEMS=1000*1000;
+    const int P1=15469313;
+    const int P2=10554857;
+    const int P3=4241099;
+    const double APPROXIMATION_RATIO=2;
+    auto metric=[=](int a,int b){
+        if(a>b)
+            std::swap(a,b);
+        if(a==b)
+            return 0;
+        return ((a*a*P3+b*P2)%P1+P1*(1+100*(((b-a)%NUM_CENTERS)!=0)));
+    };
+    auto items=boost::irange(0,NUM_ITEMS);
+    std::vector<int> centers;
+    //solution
+    int radious=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
+    BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
+    check_result(radious,P1,APPROXIMATION_RATIO,paal::utils::LessEqual(),0,"lower bound ","upper bound for approximation ratio ");
+    paal::inBalls(items,centers,metric,radious);
+}
