@@ -15,7 +15,10 @@
 #include <boost/bimap.hpp>
 #include <unordered_set>
 
+#include "paal/data_structures/components/components.hpp"
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
+#include "paal/lp/lp_row_generation.hpp"
+#include "paal/lp/separation_oracle_components.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -23,56 +26,16 @@
 namespace paal {
 namespace ir {
 
-/**
- * Component of the Bounded Degree MST Separation Oracle.
- * Finds the most violated constraint.
- */
-struct FindMostViolated {
-    template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
-        return oracle.findMostViolatedConstraint(problem);
-    };
-};
+class FindViolated;
 
 /**
- * Component of the Bounded Degree MST Separation Oracle.
- * Finds the any violated constraint.
- */
-struct FindAnyViolated {
-    template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
-        return oracle.findAnyViolatedConstraint(problem);
-    };
-};
-
-/**
- * Component of the Bounded Degree MST Separation Oracle.
- * Finds the any violated constraint, starting from a random restriction.
- */
-struct FindRandViolated {
-    template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int restrictionsNum) {
-        return oracle.findAnyViolatedConstraint(problem, rand() % restrictionsNum);
-    };
-};
-
-/**
- * @class SteinerNetworkOracleComponents
  * @brief Components of the separation oracle for the steiner network problem.
- *
- * @tparam FindViolated
  */
-template <typename FindViolated = FindRandViolated>
-class SteinerNetworkOracleComponents {
-public:
-    template <typename Problem, typename Oracle>
-    bool findViolated(Problem & problem, Oracle & oracle, int restrictionsNum) {
-        return m_findViolated(problem, oracle, restrictionsNum);
-    };
+template <typename... Args>
+    using SteinerNetworkOracleComponents =
+        data_structures::Components<
+        data_structures::NameWithDefault<FindViolated, lp::FindRandViolated> >::type<Args...>;
 
-private:
-    FindViolated m_findViolated;
-};
 
 /**
  * @class SteinerNetworkOracle
@@ -123,7 +86,8 @@ public:
     template <typename Problem, typename LP>
     bool feasibleSolution(Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
-        return !m_oracleComponents.findViolated(problem, *this, m_restrictionsVec.size());
+        return !m_oracleComponents.template call<FindViolated>(
+                            problem, *this, m_restrictionsVec.size());
     }
 
     /**
@@ -193,22 +157,20 @@ private:
     //TODO make it signed type
     typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
 
-    typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::directedS > Traits;
+    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
     typedef Traits::edge_descriptor AuxEdge;
     typedef Traits::vertex_descriptor AuxVertex;
-    typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::directedS,
-                                    boost::property < boost::vertex_color_t, boost::default_color_type,
-                                        boost::property < boost::vertex_distance_t, long,
-                                            boost::property < boost::vertex_predecessor_t, AuxEdge >
-                                                        >
-                                                    >,
-                                    boost::property < boost::edge_capacity_t, double,
-                                        boost::property < boost::edge_residual_capacity_t, double,
-                                            boost::property < boost::edge_reverse_t, AuxEdge >
-                                                        >
-                                                    >
-                                  > AuxGraph;
-    typedef std::unordered_set < AuxVertex > ViolatingSet;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
+                                  boost::property<boost::vertex_color_t, boost::default_color_type,
+                                      boost::property<boost::vertex_distance_t, long,
+                                          boost::property<boost::vertex_predecessor_t, AuxEdge>>>,
+                                  boost::property<boost::edge_capacity_t, double,
+                                      boost::property<boost::edge_residual_capacity_t, double,
+                                          boost::property<boost::edge_reverse_t, AuxEdge>>>
+                                 > AuxGraph;
+    typedef boost::property_map<AuxGraph, boost::edge_capacity_t>::type AuxEdgeCapacity;
+    typedef boost::property_map<AuxGraph, boost::edge_reverse_t>::type  AuxEdgeReverse;
+    typedef std::unordered_set<AuxVertex> ViolatingSet;
 
     /**
      * Checks if a given edge belongs to the cut given by the current violating set.
@@ -321,8 +283,8 @@ private:
     ViolatingSet m_violatingSet;
     Dist         m_violatedRestriction;
 
-    boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
-    boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
+    AuxEdgeCapacity m_cap;
+    AuxEdgeReverse  m_rev;
 };
 
 /**

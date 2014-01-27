@@ -23,14 +23,14 @@
 #include "utils/read_bounded_deg_mst.hpp"
 #include "utils/parse_file.hpp"
 
-typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                        boost::property < boost::vertex_index_t, int >,
-                        boost::property < boost::edge_weight_t, double > > Graph;
-typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::undirectedS > Traits;
-typedef boost::graph_traits < Graph >::edge_descriptor Edge;
-typedef boost::graph_traits < Graph >::vertex_descriptor Vertex;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                        boost::property<boost::vertex_index_t, int>,
+                        boost::property<boost::edge_weight_t, double>> Graph;
+typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::undirectedS> Traits;
+typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
-typedef boost::property_map < Graph, boost::edge_weight_t >::type Cost;
+typedef boost::property_map<Graph, boost::edge_weight_t>::type Cost;
 typedef std::set<Edge> ResultTree;
 
 template <typename Bound>
@@ -81,7 +81,7 @@ void checkResult(const Graph & g, const ResultTree & tree,
     BOOST_CHECK(connected_components(treeG, &component[0]) == 1);
 }
 
-template <typename FindViolated = paal::ir::FindRandViolated, typename Bound>
+template <typename FindViolated = paal::lp::FindRandViolated, typename Bound>
 void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
              const int verticesNum, const double bestCost) {
     namespace ir = paal::ir;
@@ -128,13 +128,13 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // non-default heuristics
         if (verticesNum <= 80) {
             LOGLN("most violated");
-            runTest<paal::ir::FindMostViolated>(g, costs, bounds, verticesNum, bestCost);
+            runTest<paal::lp::FindMostViolated>(g, costs, bounds, verticesNum, bestCost);
         }
 
         // non-default heuristics (slow, only for smaller instances)
         if (verticesNum <= 60) {
             LOGLN("any violated");
-            runTest<paal::ir::FindAnyViolated>(g, costs, bounds, verticesNum, bestCost);
+            runTest<paal::lp::FindAnyViolated>(g, costs, bounds, verticesNum, bestCost);
         }
     });
 }

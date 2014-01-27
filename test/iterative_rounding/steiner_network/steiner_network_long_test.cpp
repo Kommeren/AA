@@ -189,7 +189,7 @@ int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
     return verticesNum;
 }
 
-template <typename FindViolated = paal::ir::FindRandViolated, typename Restrictions>
+template <typename FindViolated = paal::lp::FindRandViolated, typename Restrictions>
 void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
     namespace ir = paal::ir;
     namespace lp = paal::lp;
@@ -197,7 +197,7 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     typedef std::vector<Edge> ResultNetwork;
     typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
     typedef ir::SteinerNetworkOracle<Graph, Restrictions, OracleComponents> Oracle;
-    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, ResultNetwork,
+    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions,
         lp::RowGenerationSolveLP<Oracle>> Components;
 
     ResultNetwork resultNetwork;
@@ -226,13 +226,13 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
     // non-default heuristics
     if (verticesNum <= 80) {
         LOGLN("most violated");
-        runSingleTest<paal::ir::FindMostViolated>(g, costs, restrictions);
+        runSingleTest<paal::lp::FindMostViolated>(g, costs, restrictions);
     }
 
     // non-default heuristics (slow, only for smaller instances)
     if (verticesNum <= 50) {
         LOGLN("any violated");
-        runSingleTest<paal::ir::FindAnyViolated>(g, costs, restrictions);
+        runSingleTest<paal::lp::FindAnyViolated>(g, costs, restrictions);
     }
 }
 

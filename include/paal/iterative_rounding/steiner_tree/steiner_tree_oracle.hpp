@@ -94,7 +94,6 @@ private:
         m_artifVertices.clear();
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
-        m_resCap = get(boost::edge_residual_capacity, m_auxGraph);
 
         for (int i = 0; i < (int)m_terminals->size(); ++i) {
             add_vertex(m_auxGraph);
@@ -243,7 +242,6 @@ private:
 
     boost::property_map<AuxGraph, boost::edge_capacity_t>::type m_cap; // capacity
     boost::property_map<AuxGraph, boost::edge_reverse_t>::type m_rev; // reverse edge
-    boost::property_map<AuxGraph, boost::edge_residual_capacity_t>::type m_resCap; // residual capacity
 };
 
 } //ir

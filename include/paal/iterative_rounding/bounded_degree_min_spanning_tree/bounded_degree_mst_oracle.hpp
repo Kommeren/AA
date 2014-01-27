@@ -11,13 +11,30 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 #include <boost/bimap.hpp>
+#include <unordered_set>
 
+#include "paal/data_structures/components/components.hpp"
+#include "paal/lp/lp_row_generation.hpp"
+#include "paal/lp/separation_oracle_components.hpp"
 #include "paal/utils/floating.hpp"
-#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle_components.hpp"
+#include "paal/utils/functors.hpp"
 
 
 namespace paal {
 namespace ir {
+
+class InitialTest;
+class FindViolated;
+
+/**
+ * @brief Components of the separation oracle for the bounded degree minimum spanning tree problem.
+ */
+template <typename... Args>
+    using BoundedDegreeMSTOracleComponents =
+        data_structures::Components<
+        data_structures::NameWithDefault<FindViolated, lp::FindRandViolated>,
+        data_structures::NameWithDefault<InitialTest, utils::ReturnFalseFunctor> >::type<Args...>;
+
 
 /**
  * @class BoundedDegreeMSTOracle
@@ -39,14 +56,15 @@ public:
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
-    bool feasibleSolution(const Problem &problem, const LP & lp) {
+    bool feasibleSolution(const Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
 
-        if (m_oracleComponents.initialTest(*this)) {
+        if (m_oracleComponents.template call<InitialTest>(*this)) {
             return true;
         }
         else {
-            return !m_oracleComponents.findViolated(problem, *this, num_vertices(m_g));
+            return !m_oracleComponents.template call<FindViolated>(
+                        problem, *this, num_vertices(m_g));
         }
     }
 
@@ -55,13 +73,14 @@ public:
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
-        lp.addRow(lp::UP, 0, m_violatingSetSize - 1);
+        lp.addRow(lp::UP, 0, m_violatingSet.size() - 1);
 
         for (auto const & e : problem.getEdgeMap().right) {
-            const Vertex & u = source(e.second, m_g);
-            const Vertex & v = target(e.second, m_g);
+            Vertex u = source(e.second, m_g);
+            Vertex v = target(e.second, m_g);
 
-            if (m_violatingSet[u] && m_violatingSet[v]) {
+            if ((m_violatingSet.find(u) != m_violatingSet.end())
+                && (m_violatingSet.find(v) != m_violatingSet.end())) {
                 lp.addNewRowCoef(e.first);
             }
         }
@@ -84,7 +103,7 @@ public:
         auto src = *(vert.first);
         assert(src != m_src && src != m_trg);
 
-        for (const Vertex & trg : boost::make_iterator_range(vertices(m_auxGraph))) {
+        for (Vertex trg : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 if (problem.getCompare().g(
                         checkViolationGreaterThan(problem, src, trg), 0)) {
@@ -115,7 +134,7 @@ public:
 
         double maximumViolation = 0;
 
-        for (const Vertex & trg : boost::make_iterator_range(graphVertices)) {
+        for (Vertex trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 maximumViolation = std::max(maximumViolation,
                     checkViolationGreaterThan(problem, src, trg, maximumViolation));
@@ -128,23 +147,21 @@ public:
     }
 
 private:
-    typedef boost::adjacency_list_traits < boost::vecS, boost::vecS, boost::directedS > Traits;
+    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
     typedef Traits::edge_descriptor AuxEdge;
     typedef Traits::vertex_descriptor AuxVertex;
-    typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::directedS,
-                                    boost::property < boost::vertex_color_t, boost::default_color_type,
-                                        boost::property < boost::vertex_distance_t, long,
-                                            boost::property < boost::vertex_predecessor_t, AuxEdge >
-                                                        >
-                                                    >,
-                                    boost::property < boost::edge_capacity_t, double,
-                                        boost::property < boost::edge_residual_capacity_t, double,
-                                            boost::property < boost::edge_reverse_t, AuxEdge >
-                                                        >
-                                                    >
-                                  > AuxGraph;
-    typedef std::vector < AuxEdge > AuxEdgeList;
-    typedef std::unordered_map < AuxVertex, bool > ViolatingSet;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
+                                  boost::property<boost::vertex_color_t, boost::default_color_type,
+                                      boost::property<boost::vertex_distance_t, long,
+                                          boost::property<boost::vertex_predecessor_t, AuxEdge>>>,
+                                  boost::property<boost::edge_capacity_t, double,
+                                      boost::property<boost::edge_residual_capacity_t, double,
+                                          boost::property<boost::edge_reverse_t, AuxEdge>>>
+                                 > AuxGraph;
+    typedef boost::property_map<AuxGraph, boost::edge_capacity_t>::type AuxEdgeCapacity;
+    typedef boost::property_map<AuxGraph, boost::edge_reverse_t>::type  AuxEdgeReverse;
+    typedef std::vector<AuxEdge> AuxEdgeList;
+    typedef std::unordered_set<AuxVertex> ViolatingSet;
 
     /**
      * Creates the auxiliary directed graph used for feasibility testing.
@@ -172,7 +189,7 @@ private:
         m_src = add_vertex(m_auxGraph);
         m_trg = add_vertex(m_auxGraph);
 
-        for (const Vertex & v : problem.getVertices()) {
+        for (Vertex v : problem.getVertices()) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
@@ -255,17 +272,14 @@ private:
         double violation = numVertices - 1 - minCut;
 
         if (problem.getCompare().g(violation, minViolation)) {
-            m_violatingSetSize = 0;
+            m_violatingSet.clear();
 
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, m_src);
-            for (const Vertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
+            assert(srcColor != get(colors, m_trg));
+            for (Vertex v : boost::make_iterator_range(vertices(m_auxGraph))) {
                 if (v != m_src && v != m_trg && get(colors, v) == srcColor) {
-                    m_violatingSet[v] = true;
-                    ++m_violatingSetSize;
-                }
-                else {
-                    m_violatingSet[v] = false;
+                    m_violatingSet.insert(v);
                 }
             }
         }
@@ -292,10 +306,9 @@ private:
     AuxEdgeList  m_vToTrg;
 
     ViolatingSet m_violatingSet;
-    int          m_violatingSetSize;
 
-    boost::property_map < AuxGraph, boost::edge_capacity_t >::type m_cap;
-    boost::property_map < AuxGraph, boost::edge_reverse_t >::type  m_rev;
+    AuxEdgeCapacity m_cap;
+    AuxEdgeReverse  m_rev;
 };
 
 

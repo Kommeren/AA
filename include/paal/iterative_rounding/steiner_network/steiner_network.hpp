@@ -287,7 +287,6 @@ private:
 template <
          typename Graph,
          typename Restrictions,
-         typename ResultNetworkOutputIterator,
          typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<SteinerNetworkOracle<Graph, Restrictions>>,
          typename RoundCondition = SteinerNetworkRoundCondition,
          typename RelaxContition = utils::ReturnFalseFunctor,
