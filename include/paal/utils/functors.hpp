@@ -163,6 +163,57 @@ struct RemoveReference {
     }
 };
 
+/**
+ * @brief Counts numner of calls
+ *
+ * @tparam Functor
+ * @tparam CounterType
+ */
+template <typename Functor, typename CounterType = int>
+class CountingFunctorAdaptor {
+public:
+    /**
+     * @brief Constructor
+     *
+     * @param cnt count reference
+     * @param f functor
+     */
+    CountingFunctorAdaptor(Functor f, CounterType & cnt) : m_cnt(&cnt), m_functor(std::move(f)) {}
+
+    /**
+     * @brief increment the counter and checks if the given limit is reached. 
+     *
+     * @tparam Args
+     *
+     * @return 
+     */
+    template <typename... Args> 
+    auto operator()(Args&&... args) -> decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
+        ++(*m_cnt);
+        return m_functor(std::forward<Args>(args)...);
+    }
+
+private:
+    CounterType * m_cnt;
+    Functor m_functor;
+};
+
+/**
+ * @brief make function for CountingFunctorAdaptor
+ *
+ * @tparam CounterType
+ * @tparam Functor
+ * @param f
+ * @param cnt
+ *
+ * @return 
+ */
+template <typename CounterType = int, typename Functor>
+CountingFunctorAdaptor<Functor, CounterType>
+make_CountingFunctorAdaptor(Functor f, CounterType & cnt) {
+    return CountingFunctorAdaptor<Functor, CounterType>(std::move(f), cnt);
+}
+
 
 
 /**
