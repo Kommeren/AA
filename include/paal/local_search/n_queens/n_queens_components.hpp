@@ -43,9 +43,9 @@ struct NQueensGetMoves {
      * @return 
      */
     template <typename Solution, typename Idx>
-    auto operator()(const Solution & solution, Idx) const -> 
+    auto operator()(const Solution & solution, Idx idx) const -> 
             std::pair<decltype(solution.begin()), decltype(solution.end())> {
-        return std::make_pair(solution.begin(), solution.end());
+        return std::make_pair(solution.begin() + idx + 1, solution.end());
     }
 };
 
