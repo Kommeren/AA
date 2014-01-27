@@ -28,7 +28,7 @@ int main(int argc, char ** argv) {
     boost::iota(queens, 0);
 
     ls::NQueensLocalSearchComponents<> comps;
-    int nr_of_iterations;
+    int nr_of_iterations(0);
     auto countingGain = paal::utils::make_CountingFunctorAdaptor(comps.get<ls::Gain>(), nr_of_iterations);
     auto countingComps = paal::data_structures::replace<ls::Gain>(countingGain, comps);
 
