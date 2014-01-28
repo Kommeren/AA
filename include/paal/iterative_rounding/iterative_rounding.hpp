@@ -22,13 +22,25 @@
 namespace paal {
 namespace ir {
 
+/**
+ * @brief Default Iterative Rounding visitor.
+ */
 struct TrivialVisitor {
+    /**
+     * @brief Method called after (re)solving the LP.
+     */
     template <typename Problem, typename LP>
     void solveLPToExtremePoint(Problem & problem, LP & lp) {}
 
+    /**
+     * @brief Method called after rounding a column of the LP.
+     */
     template <typename Problem, typename LP>
     void roundCol(Problem & problem, LP & lp, lp::ColId col, double val) {}
 
+    /**
+     * @brief Method called after relaxing a row of the LP.
+     */
     template <typename Problem, typename LP>
     void relaxRow(Problem & problem, LP & lp, lp::RowId row) {}
 };
@@ -56,6 +68,9 @@ class IterativeRounding  {
     }
 
 public:
+    /**
+     * @brief Constructor.
+     */
     IterativeRounding(Problem & problem, IRComponents e, Visitor vis = Visitor())
         : m_irComponents(std::move(e)), m_visitor(std::move(vis)), m_problem(problem) {
         call<Init>(m_problem, m_lpBase);

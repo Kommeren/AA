@@ -78,12 +78,11 @@ public:
         return ErrorMessage();
     }
 
+    /**
+     * Returns the input graph.
+     */
     const Graph & getGraph() {
         return m_g;
-    }
-
-    double getEpsilon() const {
-        return m_compare.getEpsilon();
     }
 
     /**
@@ -139,14 +138,23 @@ public:
         }
     }
 
+    /**
+     * Returns a bimap between edges and LP column IDs.
+     */
     const EdgeMap & getEdgeMap() const {
         return m_edgeMap;
     }
 
+    /**
+     * Returns a bimap between edges and LP column IDs.
+     */
     const EdgeMapOriginal & getOriginalEdgesMap() const {
         return m_edgeMapOriginal;
     }
 
+    /**
+     * Returns a mapping between LP column IDs and edges in the original graph.
+     */
     const VertexList & getVertices() const {
         return m_vertexList;
     }
@@ -159,6 +167,9 @@ public:
         ++m_resultSpanningTree;
     }
 
+    /**
+     * Returns the double comparison object.
+     */
     utils::Compare<double> getCompare() const {
         return m_compare;
     }
@@ -400,6 +411,9 @@ lp::ProblemType bounded_degree_mst_iterative_rounding(
  * Round Condition of the IR Bounded Degree MST algorithm.
  */
 struct BDMSTRoundCondition {
+    /**
+     * Constructor. Takes epsilon used in double comparison.
+     */
     BDMSTRoundCondition(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON) : m_roundZero(epsilon) {}
 
     /**
@@ -526,6 +540,9 @@ private:
  * Set Solution component of the IR Bounded Degree MST algorithm.
  */
 struct BDMSTSetSolution {
+    /**
+     * Constructor. Takes epsilon used in double comparison.
+     */
     BDMSTSetSolution(double epsilon = BoundedDegreeMSTCompareTraits::EPSILON)
         : m_compare(epsilon) {}
 

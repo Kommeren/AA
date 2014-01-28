@@ -53,7 +53,9 @@ public:
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
-
+    /**
+     * Constructor.
+     */
     SteinerNetworkOracle(
             const Graph & g,
             const Restrictions & restrictions)

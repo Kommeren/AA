@@ -156,7 +156,7 @@ template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator>
-class GeneralAssignment {
+class GeneralisedAssignment {
     public:
         typedef typename std::iterator_traits<JobIter>::value_type Job;
         typedef typename std::iterator_traits<MachineIter>::value_type Machine;
@@ -167,7 +167,10 @@ class GeneralAssignment {
         typedef std::set<lp::RowId> MachineRows;
         typedef std::vector<lp::ColId> ColIdx;
 
-        GeneralAssignment(MachineIter mbegin, MachineIter mend,
+        /**
+         * Constructor.
+         */
+        GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const MachineAvailableTime & T,
                 JobsToMachinesOutputIterator jobToMachines) :
@@ -177,74 +180,110 @@ class GeneralAssignment {
 
         typedef boost::optional<std::string> ErrorMessage;
 
+        /**
+         * Checks if input is valid.
+         */
         ErrorMessage checkInputValidity() {
             return ErrorMessage();
         }
 
         /**
-         * @brief Returns the index of the edge between a given job and a given machine.
+         * Returns the index of the edge between a given job and a given machine.
          */
         int idx(int jIdx, int mIdx) {
             return jIdx * m_mCnt + mIdx;
         }
 
         /**
-         * @brief Returns the index of a job given the index of the edge between the job and a machine.
+         * Returns the index of a job given the index of the edge between the job and a machine.
          */
         int getJIdx(int idx) {
             return idx / m_mCnt;
         }
 
         /**
-         * @brief Returns the index of a machine given the index of the edge between a job and the machine.
+         * Returns the index of a machine given the index of the edge between a job and the machine.
          */
         int getMIdx(int idx) {
             return idx % m_mCnt;
         }
 
         /**
-         * @brief Returns the LP rows corresponding to the machines.
+         * Returns the LP rows corresponding to the machines.
          */
         MachineRows & getMachineRows() {
             return m_machineRows;
         }
 
+        /**
+         * Returns the double comparison object.
+         */
         Compare getCompare() {
             return m_compare;
         }
 
+        /**
+         * Returns the number of machines in the problem.
+         */
         int getMachinesCnt() const {
             return m_mCnt;
         }
 
+        /**
+         * Returns the number of jobs in the problem.
+         */
         int getJobsCnt() const {
             return m_jCnt;
         }
 
+        /**
+         * Returns the machines iterator range.
+         */
         std::pair<MachineIter, MachineIter> getMachines() {
             return std::make_pair(m_mbegin, m_mend);
         }
 
+        /**
+         * Returns the jobs iterator range.
+         */
         std::pair<JobIter, JobIter> getJobs() {
             return std::make_pair(m_jbegin, m_jend);
         }
 
+        /**
+         * Returns the vector of LP column IDs.
+         */
         ColIdx & getColIdx() {
             return m_colIdx;
         }
 
+        /**
+         * Returns the result output iterator.
+         */
         JobsToMachinesOutputIterator getJobToMachines() {
             return m_jobToMachine;
         }
 
+        /**
+         * Returns the proceeding time function (function from (job, machine)
+         * pairs into the proceeding time of the job on the machine).
+         */
         const ProceedingTime & getProceedingTime() {
             return m_t;
         }
 
+        /**
+         * Returns the machine available time function (function returning
+         * the time available on a given machine).
+         */
         const MachineAvailableTime & getMachineAvailableTime() {
             return m_T;
         }
 
+        /**
+         * Returns the cost function (function from (job, machine)
+         * pairs into the cost of executing the job on the machine).
+         */
         const Cost & getCost() const {
             return m_c;
         }
@@ -289,13 +328,13 @@ class GeneralAssignment {
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator>
-GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+GeneralisedAssignment<MachineIter, JobIter, Cost, ProceedingTime,
                   MachineAvailableTime, JobsToMachinesOutputIterator>
-make_GeneralAssignment(MachineIter mbegin, MachineIter mend,
+make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
             JobIter jbegin, JobIter jend,
             const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T,
             JobsToMachinesOutputIterator jobsToMachines) {
-    return GeneralAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+    return GeneralisedAssignment<MachineIter, JobIter, Cost, ProceedingTime,
                         MachineAvailableTime, JobsToMachinesOutputIterator>(
             mbegin, mend, jbegin, jend, c, t, T, jobsToMachines);
 }
@@ -332,7 +371,7 @@ lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, Ma
                     const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
                     JobsToMachinesOutputIterator jobToMachines, Components components,
                     Visitor visitor = Visitor()) {
-    auto gaSolution = make_GeneralAssignment(
+    auto gaSolution = make_GeneralisedAssignment(
             mbegin, mend, jbegin, jend,
             c, t, T, jobToMachines);
     return solve_iterative_rounding(gaSolution, std::move(components), std::move(visitor));

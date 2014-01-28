@@ -335,6 +335,9 @@ protected:
     typedef std::vector<int> Ids;
     typedef std::vector<double> Vals;
 
+    /**
+     * Initializes a given vector.
+     */
     template <typename Vec>
     static void initVec(Vec & v, int numberOfNonZerosInMatrix = 0) {
         v.reserve(++numberOfNonZerosInMatrix);
@@ -383,8 +386,11 @@ protected:
         }
     }
 
+    /// GLPK problem object
     glp_prob * m_lp;
+    /// mapping between GLPK column numbers and column IDs
     data_structures::EraseableBiMap<int> m_colIdx;
+    /// mapping between GLPK row numbers and column IDs
     data_structures::EraseableBiMap<int> m_rowIdx;
 
 private:

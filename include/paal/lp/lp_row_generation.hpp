@@ -21,6 +21,7 @@ namespace lp {
 template <typename Oracle>
 class RowGenerationSolveLP {
 public:
+    /// Constructor.
     RowGenerationSolveLP(Oracle & oracle) : m_oracle(oracle) {}
 
     /**

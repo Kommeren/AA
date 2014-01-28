@@ -29,6 +29,8 @@
 namespace paal {
 namespace ir {
 
+namespace detail {
+
 /// This function returns the number of edges in a graph. The
 /// reason this function was written is that BGL's num_edges()
 /// function does not work properly for filtered_graph.  See
@@ -38,7 +40,6 @@ int filtered_num_edges(const EdgeListGraph & G)
 {
     return boost::distance(edges(G));
 }
-
 
 /// A class that translates bool map on the edges to a filter, which can be used with
 /// boost::filtered_graph. That is, we translate operator[] to
@@ -86,6 +87,7 @@ public:
     reference operator[](KeyType e) const { return num; }
 };
 
+} // namespace detail
 
 /**
  * Round Condition of the IR Tree Augmentation algorithm.
@@ -236,8 +238,8 @@ public:
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
     typedef double CostValue;
 
-    typedef boost::filtered_graph<Graph, BoolMapToTreeFilter<TreeMap> > TreeGraph;
-    typedef boost::filtered_graph<Graph, BoolMapToNonTreeFilter<TreeMap> > NonTreeGraph;
+    typedef boost::filtered_graph<Graph, detail::BoolMapToTreeFilter<TreeMap>> TreeGraph;
+    typedef boost::filtered_graph<Graph, detail::BoolMapToNonTreeFilter<TreeMap>> NonTreeGraph;
 
     typedef std::vector<Edge> EdgeList;
     typedef std::unordered_map<Edge, EdgeList, EdgeHash<Graph>> CoverMap;
@@ -259,8 +261,8 @@ public:
     TreeAug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIterator solution) :
         m_g(g), m_treeMap(treeMap), m_costMap(costMap),
         m_solution(solution),
-        m_tree(m_g, BoolMapToTreeFilter<TreeMap>(m_treeMap)),
-        m_ntree(m_g, BoolMapToNonTreeFilter<TreeMap>(m_treeMap)),
+        m_tree(m_g, detail::BoolMapToTreeFilter<TreeMap>(m_treeMap)),
+        m_ntree(m_g, detail::BoolMapToNonTreeFilter<TreeMap>(m_treeMap)),
         m_solCost(0)
     {}
 
@@ -289,7 +291,7 @@ public:
         }
 
         // Is the graph 2-edge-connected?
-        ConstIntMap<Edge, 1> const1EdgeMap;
+        detail::ConstIntMap<Edge, 1> const1EdgeMap;
         // TODO This stoer-wagner algorithm is unnecessarily slow for some reason
         int minCut = boost::stoer_wagner_min_cut(m_g, const1EdgeMap);
         if (minCut < 2) {
@@ -301,16 +303,24 @@ public:
         return ErrorMessage();
     }
 
+    /**
+     * Returns the non-tree graph (set of links).
+     */
     const NonTreeGraph & getLinksGraph() const {
         return m_ntree;
     }
 
+    /**
+     * Returns the spanning tree.
+     */
     const TreeGraph & getTreeGraph() const {
         return m_tree;
     }
 
-    decltype(get(std::declval<CostMap>(), std::declval<Edge>()))
-    getCost(Edge e) {
+    /**
+     * Returns the cost of an edge.
+     */
+    auto getCost(Edge e) -> decltype(get(std::declval<CostMap>(), e)) {
         return get(m_costMap, e);
     }
 
@@ -390,6 +400,9 @@ public:
         return m_coveredBy[e];
     }
 
+    /**
+     * Checks if an edge belongs to the solution.
+     */
     bool isInSolution(Edge e) const {
         return m_edgeToColId.left.find(e) == m_edgeToColId.left.end();
     }
@@ -403,9 +416,11 @@ public:
 
 private:
 
-    /// The input
+    /// Input graph
     const Graph & m_g;
+    /// Input thee edges map
     TreeMap m_treeMap;
+    /// Input edge cost map
     CostMap m_costMap;
 
     /// Which links are chosen in the solution

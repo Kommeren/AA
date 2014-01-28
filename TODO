@@ -12,7 +12,6 @@
 ** there is some common code in the steiner network and DBMST (and steiner tree) oracles
 ** LP formulation in separate dir
 ** framework documentation
-** doxygen warnings
 ** restriction(v, v) case in steiner network
 ** resolve and stop_condition components in IR
 ** BDMST oracle initial test
@@ -22,6 +21,7 @@
 ** removing rows/cols strategy
 ** resolving solution by moving a point ?
 ** cplex support ???
+** steiner tree doxygen warnings
 
 * GREEDY
 ** set cover (AA)

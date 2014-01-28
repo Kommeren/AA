@@ -17,17 +17,22 @@ namespace lp {
      */
     class Id {
     protected:
+        /// Constructor.
         Id() {}
+        /// Constructor.
         explicit Id(int id) : m_id(id) {}
     public:
+        /// Returns the id number.
         int get() const {
             return m_id;
         }
 
+        /// Less operator.
         bool operator<(Id id) const {
             return m_id < id.m_id;
         }
 
+        /// Equality operator.
         bool operator==(Id id) const {
             return m_id == id.m_id;
         }
@@ -40,6 +45,7 @@ namespace lp {
      */
     struct ColId : Id {
         ColId() {}
+        /// Constructor.
         explicit ColId(int id) : Id(id) {}
     };
 
@@ -52,6 +58,7 @@ namespace lp {
      */
     struct RowId : Id {
         RowId() {}
+        /// Constructor.
         explicit RowId(int id) : Id(id) {}
     };
 
@@ -64,8 +71,14 @@ namespace lp {
 
 namespace std {
 
+    /**
+     * Hash function for Id class.
+     */
     template <>
     struct hash<paal::lp::Id> {
+        /**
+         * Returns the hash of a given Id object.
+         */
         size_t operator()(const paal::lp::Id & x) const
         {
             return hash<int>()(x.get());

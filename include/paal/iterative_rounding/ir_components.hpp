@@ -31,7 +31,7 @@ namespace ir {
 class DefaultRoundCondition {
 public:
     /**
-     * @brief constructor.
+     * @brief constructor takes epsilon used in double comparison.
      */
     DefaultRoundCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
 
@@ -49,6 +49,7 @@ public:
     };
 
 protected:
+    /// Double comparison object.
     const utils::Compare<double> m_compare;
 };
 
@@ -62,6 +63,10 @@ class RoundConditionEquals {
     RoundConditionEquals() = delete;
 };
 
+/**
+ * @brief Column rounding component.
+ *        Rounds a column if its value is equal to one of the template parameter values.
+ */
 template <int arg, int... args>
 class RoundConditionEquals<arg, args...>  :
         public RoundConditionEquals<args...> {
@@ -71,12 +76,14 @@ public:
      */
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): RoundConditionEquals<args...>(epsilon) { }
 
+    /// Rounds a column if its value is equal to one of the template parameter values.
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         return get(lp, lp.getColPrim(col));
     }
 
 protected:
+    /// Checks if the value can be rounded to the first template parameter.
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
         if(this->m_compare.e(x, arg)) {
@@ -87,6 +94,11 @@ protected:
     }
 };
 
+/**
+ * @brief Column rounding component.
+ *        Rounds a column if its value is equal to one of the template parameter values.
+ *        Edge case (no template parameter values).
+ */
 template <>
 class RoundConditionEquals<> {
 public:
@@ -96,24 +108,32 @@ public:
     RoundConditionEquals(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
 
 protected:
+    /// Edge case: return false.
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
         return boost::optional<double>();
     }
 
+    /// Double comparison object.
     const utils::Compare<double> m_compare;
 };
 
 
+/**
+ * @brief Column rounding component.
+ *        Rounds a column if its value satisfies a fixed condition.
+ *        The column is rounded to a value defined by a fixed function.
+ */
 template <typename Cond, typename F>
 class RoundConditionToFun {
 public:
     /**
-     * @brief constructor takes epsilon used in double comparison.
+     * @brief Constructor. Takes the rounding condition and the rounding function.
      */
     RoundConditionToFun(Cond c = Cond(), F f = F()) :
         m_cond(c), m_f(f) {}
 
+    /// Rounds a column if its value satisfies a fixed condition.
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::ColId col) {
         double x = lp.getColPrim(col);
@@ -129,6 +149,9 @@ private:
 };
 
 
+/**
+ * @brief Checks if a variable is greater or equal than a fixed bound.
+ */
 class CondBiggerEqualThan {
 public:
     /**
@@ -137,6 +160,7 @@ public:
     CondBiggerEqualThan(double b, double epsilon = utils::Compare<double>::defaultEpsilon())
         : m_bound(b), m_compare(epsilon) {}
 
+    /// Checks if a variable is greater or equal than a fixed bound.
     bool operator()(double x) {
         return m_compare.ge(x, m_bound);
     }
@@ -147,9 +171,12 @@ private:
 };
 
 
-///A variable is rounded up to 1, if it has value at least half in the solution
+/**
+ * @brief Column rounding component.
+ *        A variable is rounded up to 1, if it has value at least half in the solution.
+ */
 struct RoundConditionGreaterThanHalf  :
-    public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnSomethingFunctor<int, 1> > {
+    public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnOneFunctor> {
         RoundConditionGreaterThanHalf(double epsilon = utils::Compare<double>::defaultEpsilon()) :
             RoundConditionToFun(CondBiggerEqualThan(0.5, epsilon)) {}
 };
@@ -159,6 +186,7 @@ struct RoundConditionGreaterThanHalf  :
  * @brief Finds an extreme point solution to the LP.
  */
 struct DefaultSolveLPToExtremePoint {
+    /// Finds an extreme point solution to the LP.
     template <typename Problem, typename LP>
     lp::ProblemType operator()(Problem &, LP & lp) {
         return lp.solveToExtremePointPrimal();
@@ -169,6 +197,7 @@ struct DefaultSolveLPToExtremePoint {
  * @brief Deletes a row from the LP.
  */
 struct DeleteRow {
+    /// Deletes a row from the LP.
     template <typename LP>
     void operator()(LP & lp, lp::RowId row) {
         lp.deleteRow(row);
@@ -179,6 +208,7 @@ struct DeleteRow {
  * @brief Deletes a column from the LP and adjusts the row bounds.
  */
 struct DeleteCol {
+    /// Deletes a column from the LP and adjusts the row bounds.
     template <typename LP>
     void operator()(LP & lp, lp::ColId col, double value) {
         auto column = lp.getRowsInColumn(col);
@@ -236,6 +266,9 @@ typedef data_structures::Components<
 template <typename... Args>
     using IRComponents = typename Components::type<Args...> ;
 
+/**
+ * @brief Returns iterative rounding components.
+ */
 template <typename... Args>
 auto make_IRComponents(Args&&... args) -> decltype(Components::make_components(std::forward<Args>(args)...)) {
       return Components::make_components(std::forward<Args>(args)...);

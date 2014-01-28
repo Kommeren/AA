@@ -75,17 +75,25 @@ public:
         }
     }
 
+    /**
+     * Returns the map from LP column IDs to edges.
+     */
     const EdgeMap & getEdgeMap() const  {
         return m_edgeMap;
     }
 
+    /**
+     * Returns the input graph.
+     */
     const Graph & getGraph() {
         return m_g;
     }
 
-    decltype(std::declval<CostMap>()[std::declval<Edge>()])
-    getCost(Edge e) {
-        return m_costMap[e];
+    /**
+     * Returns the cost of an edge.
+     */
+    auto getCost(Edge e) -> decltype(get(std::declval<CostMap>(), e)) {
+        return get(m_costMap, e);
     }
 
     /**
@@ -120,6 +128,9 @@ public:
         return m_resultList;
     }
 
+    /**
+     * Returns the double comparison object.
+     */
     Compare getCompare() const {
         return m_compare;
     }
@@ -253,6 +264,9 @@ private:
  * Round Condition of the IR Steiner Network algorithm.
  */
 struct SteinerNetworkRoundCondition {
+    /**
+     * Constructor. Takes epsilon used in double comparison.
+     */
     SteinerNetworkRoundCondition(double epsilon = SteinerNetworkCompareTraits::EPSILON) :
         m_roundHalf(epsilon), m_roundZero(epsilon) {}
 
