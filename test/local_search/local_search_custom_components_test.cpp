@@ -1,5 +1,5 @@
 /**
- * @file local_search_test.cpp
+ * @file local_search_custom_components_test.cpp
  * @brief 
  * @author Piotr Wygocki
  * @version 1.0
@@ -46,11 +46,12 @@ using namespace paal;
                         best, 
                         Commit(), 
                         paal::utils::make_FunctorToComparator(f, utils::Greater()));
-        
+       
         ls::local_search_simple(currentSolution, ls::make_SearchComponents(GetMoves(), condGain, recordSolutionCommit));
 
         BOOST_CHECK_EQUAL(best, 3);
         LOGLN("solution " << best);
     }
+    
 
 BOOST_AUTO_TEST_SUITE_END()

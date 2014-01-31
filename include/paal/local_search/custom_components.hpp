@@ -9,7 +9,7 @@
 #define CUSTOM_COMPONENTS_HPP 
 
 #include <chrono>
-
+#include <random>
 #include "paal/utils/functors.hpp"
 
 namespace paal {
@@ -166,7 +166,7 @@ private:
 /**
  * @brief This is custom StopCondition, it returns true after given time limit
  */
-template <typename duration = std::chrono::duration<int, std::chrono::seconds>, 
+template <typename duration = std::chrono::seconds, 
           typename clock    = std::chrono::system_clock>
 class StopConditionTimeLimit {
 public:
@@ -229,7 +229,7 @@ struct ComputeGainWrapper {
      * @return 
      */
     template <typename... Args> 
-    bool operator()(Args&&... args) {
+    ValueType operator()(Args&&... args) {
         auto diff = m_gain(std::forward<Args>(args)...);
         m_val += diff;
         return diff;
@@ -248,6 +248,7 @@ private:
     Gain m_gain;
     ValueType & m_val;
 };
+
 
 /**
  * @brief Adapts gain to implement tabu search
