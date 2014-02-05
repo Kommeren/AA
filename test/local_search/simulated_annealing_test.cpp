@@ -25,7 +25,7 @@ using namespace paal;
         int currentSolution(0);
         int best(0);
         auto saGain = ls::make_SimulatedAnnealingGainAdaptor(Gain(), 
-                            ls::ExponentialCoolingSchema<>(std::chrono::seconds(1), 10, 0.1));
+                            ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(1), 10, 0.1));
 
         auto recordSolutionCommit = 
                 ls::make_RecordSolutionCommitAdapter(

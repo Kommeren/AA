@@ -25,7 +25,7 @@ namespace local_search {
      */
 template <typename Duration = std::chrono::seconds, 
           typename Clock    = std::chrono::system_clock>
-struct ExponentialCoolingSchema {
+struct ExponentialCoolingSchemaDependantOnTime {
 
     /**
      * @brief Constructor 
@@ -34,7 +34,7 @@ struct ExponentialCoolingSchema {
      * @param startTemperature
      * @param endTemperature
      */
-    ExponentialCoolingSchema(Duration duration, double startTemperature, double endTemperature) :  
+    ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) :  
         m_duration(duration), m_start(Clock::now()), 
         m_multiplier(startTemperature), 
         m_base(std::pow(endTemperature/startTemperature, 1. / duration.count())) {}
@@ -65,7 +65,7 @@ private:
 };
 
 /**
- * @brief make function for ExponentialCoolingSchema
+ * @brief make function for ExponentialCoolingSchemaDependantOnTime
  *
  * @tparam Clock 
  * @tparam Duration
@@ -77,12 +77,51 @@ private:
  */
 template <typename Clock    = std::chrono::system_clock,
           typename Duration>
-ExponentialCoolingSchema<Duration, Clock>
-make_ExponentialCoolingSchema(Duration duration, double startTemperature, double endTemperature) {
-    return ExponentialCoolingSchema<Duration, Clock>(duration, startTemperature, endTemperature);
+ExponentialCoolingSchemaDependantOnTime<Duration, Clock>
+make_ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) {
+    return ExponentialCoolingSchemaDependantOnTime<Duration, Clock>(duration, startTemperature, endTemperature);
 }
 
 
+    /**
+     * @brief This functors returns potential (temperature) using the following
+     * schema. The start potential equals given startTemperature, once per numberOFRoundsWithSameTemperature
+     * the temperature is multiplied by given multiplier 
+     */
+struct ExponentialCoolingSchemaDependantOnIteration {
+
+    /**
+     * @brief Constructor 
+     *
+     * @param startTemperature
+     * @param multiplier
+     * @param numberOFRoundsWithSameTemperature
+     */
+    ExponentialCoolingSchemaDependantOnIteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) : 
+        m_temperature(startTemperature),
+        m_multiplier(multiplier),
+        m_numberOFRoundsWithSameTemperature(numberOFRoundsWithSameTemperature) {}
+    
+
+    /**
+     * @brief operator(), return Temperature at given time point point
+     *
+     * @return 
+     */
+    double operator()() {
+        if(++m_cntFromLastMultiply == m_numberOFRoundsWithSameTemperature) {
+            m_temperature *= m_multiplier;
+            m_cntFromLastMultiply = 0;
+        }
+        return m_temperature; 
+    }
+
+private:
+    double m_temperature;
+    double m_multiplier;
+    int    m_numberOFRoundsWithSameTemperature;
+    int    m_cntFromLastMultiply = 0;
+};
 
 
 /**

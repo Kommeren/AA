@@ -6,15 +6,36 @@
  * @date 2014-01-04
  */
 
+#define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include <iostream>
 
 #include <boost/range/algorithm_ext/iota.hpp>
+#include <boost/iterator/function_input_iterator.hpp>
+
 #include "paal/local_search/n_queens/n_queens_local_search.hpp"
 #include "paal/local_search/simulated_annealing.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "utils/logger.hpp"
 
+struct Move {
+    int m_from;
+    int m_to;
+};
+
+    //This is needed because of boost bug in function_input_iterator!!!
+    template <typename F>
+    struct RandomMoves {
+        RandomMoves(F _f) : f(_f) {}
+        typedef Move result_type;
+
+        Move operator()() const {
+            return f();
+        }
+
+        mutable F f;
+    };
 
 int main(int argc, char ** argv) {
     if(argc != 2) {
@@ -29,14 +50,38 @@ int main(int argc, char ** argv) {
     std::vector<int> queens(number_of_queens);
     boost::iota(queens, 0);
 
-    ls::NQueensLocalSearchComponents<> comps;
-    int nr_of_iterations(0);
-    auto countingGain = paal::utils::make_CountingFunctorAdaptor(comps.get<ls::Gain>(), nr_of_iterations);
-    auto saGain = ls::make_SimulatedAnnealingGainAdaptor(countingGain,
-                    ls::make_ExponentialCoolingSchema(std::chrono::seconds(5),10,0.1));
-    auto countingComps = paal::data_structures::replace<ls::Gain>(saGain, comps);
+    std::default_random_engine rand;
+    std::uniform_int_distribution<int> distribution(0,number_of_queens);
 
-    ls::nQueensSolutionLocalSearchSimple(queens, countingComps);
+    //TODO add multisolution -> single solution
+    auto gain = [](Adapter & sol, Move m){return ls::NQueensGain()(sol, m.m_from, m.m_to);};
+    auto commit = [](Adapter & sol, Move m){return ls::NQueensCommit()(sol, m.m_from, m.m_to);};
+    auto randomMove = [=]() mutable {
+                            Move m; 
+                            m.m_from = distribution(rand);
+                            m.m_to = distribution(rand);
+                            return m;
+    };
+
+    RandomMoves<decltype(randomMove)> r(randomMove);
+
+    auto movesBegin = boost::make_function_input_iterator(r, 0);
+    auto movesEnd = boost::make_function_input_iterator(r, 100);
+
+    auto getMoves = [=](Adapter & sol) 
+        {return std::make_pair(movesBegin, movesEnd);};
+
+    int nr_of_iterations(0);
+    auto countingGain = paal::utils::make_CountingFunctorAdaptor(gain, nr_of_iterations);
+
+    //alternative cooling strategy
+    ///auto coolingStrategy =  ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(10), 100, 0.1);
+    auto coolingStrategy = ls::ExponentialCoolingSchemaDependantOnIteration(10, 0.9999, 1000);
+    auto saGain = ls::make_SimulatedAnnealingGainAdaptor(countingGain, coolingStrategy);
+    auto comps = ls::make_SearchComponents(getMoves, saGain, commit);
+
+    Adapter adaptor(queens);
+    ls::local_search_simple(adaptor, comps);
     std::cout <<  Adapter(queens).objFun() << " " << nr_of_iterations << std::endl;
 
     return 0;
