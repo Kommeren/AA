@@ -80,7 +80,7 @@ public:
     /**
      * Returns the input graph.
      */
-    const Graph & getGraph() {
+    const Graph & getGraph() const {
         return m_g;
     }
 
@@ -546,16 +546,10 @@ private:
     const utils::Compare<double>   m_compare;
 };
 
-template <typename Graph>
-using BDMSTSolveLP = lp::RowGenerationSolveLP<BoundedDegreeMSTOracle<Graph>>;
-
-template <typename Graph>
-using BDMSTResolveLP = lp::RowGenerationResolveLP<BoundedDegreeMSTOracle<Graph>>;
-
 template <
          typename Graph,
-         typename SolveLPToExtremePoint = BDMSTSolveLP<Graph>,
-         typename ResolveLPToExtremePoint = BDMSTResolveLP<Graph>,
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<BoundedDegreeMSTOracle<>>,
+         typename ResolveLPToExtremePoint = lp::RowGenerationResolveLP<BoundedDegreeMSTOracle<>>,
          typename RoundCondition = BDMSTRoundCondition,
          typename RelaxContition = BDMSTRelaxCondition,
          typename Init = BDMSTInit,

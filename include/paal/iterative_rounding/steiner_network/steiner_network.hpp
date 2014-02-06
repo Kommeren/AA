@@ -14,6 +14,7 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/lp_row_generation.hpp"
+#include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network_oracle.hpp"
 
 
@@ -49,6 +50,7 @@ public:
                    CostMap costMap, ResultNetworkOutputIterator resultNetwork) :
             m_g(g), m_restrictions(restrictions),
             m_costMap(costMap), m_resultNetwork(resultNetwork),
+            m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, num_vertices(m_g))),
             m_compare(SteinerNetworkCompareTraits::EPSILON) {}
 
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -66,7 +68,7 @@ public:
      * Checks if the connectivity restrictions can be fulfilled.
      */
     ErrorMessage checkInputValidity() {
-        auto oracle = make_SteinerNetworkSeparationOracle(m_g, m_restrictions);
+        SteinerNetworkOracle<> oracle;
         if (!oracle.checkIfSolutionExists(*this)) {
             return ErrorMessage("A Steiner network satisfying the restrictions does not exist.");
         }
@@ -85,8 +87,23 @@ public:
     /**
      * Returns the input graph.
      */
-    const Graph & getGraph() {
+    const Graph & getGraph() const {
         return m_g;
+    }
+
+    /**
+     * Returns the bigger of the two restrictions for a given vertex pair.
+     */
+    auto getMaxRestriction(Vertex u, Vertex v) const
+            -> decltype(std::declval<Restrictions>()(0,0)) {
+        return std::max(m_restrictions(u, v), m_restrictions(v, u));
+    }
+
+    /**
+     * Returns the restrictions vector.
+     */
+    const RestrictionsVector & getRestrictionsVec() const {
+        return m_restrictionsVec;
     }
 
     /**
@@ -147,6 +164,8 @@ private:
     const Restrictions & m_restrictions;
     CostMap m_costMap;
     ResultNetworkOutputIterator m_resultNetwork;
+
+    RestrictionsVector m_restrictionsVec;
 
     EdgeMap m_edgeMap;
     EdgeList m_resultList;
@@ -298,17 +317,11 @@ private:
     RoundConditionEquals<0>       m_roundZero;
 };
 
-template <typename Graph, typename Restrictions>
-using SteinerNetworkSolveLP = lp::RowGenerationSolveLP<SteinerNetworkOracle<Graph, Restrictions>>;
-
-template <typename Graph, typename Restrictions>
-using SteinerNetworkResolveLP = lp::RowGenerationResolveLP<SteinerNetworkOracle<Graph, Restrictions>>;
-
 template <
          typename Graph,
          typename Restrictions,
-         typename SolveLPToExtremePoint = SteinerNetworkSolveLP<Graph, Restrictions>,
-         typename ResolveLPToExtremePoint = SteinerNetworkResolveLP<Graph, Restrictions>,
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<SteinerNetworkOracle<>>,
+         typename ResolveLPToExtremePoint = lp::RowGenerationResolveLP<SteinerNetworkOracle<>>,
          typename RoundCondition = SteinerNetworkRoundCondition,
          typename RelaxContition = utils::ReturnFalseFunctor,
          typename Init = SteinerNetworkInit,

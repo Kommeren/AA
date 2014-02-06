@@ -89,12 +89,12 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
     namespace lp = paal::lp;
 
     typedef ir::BoundedDegreeMSTOracleComponents<FindViolated> OracleComponents;
-    typedef ir::BoundedDegreeMSTOracle<Graph, OracleComponents> Oracle;
+    typedef ir::BoundedDegreeMSTOracle<OracleComponents> Oracle;
     typedef lp::RowGenerationSolveLP<Oracle> SolveLP;
     typedef lp::RowGenerationResolveLP<Oracle> ResolveLP;
     typedef ir::BDMSTIRComponents<Graph, SolveLP, ResolveLP> Components;
     ResultTree tree;
-    Oracle oracle(g);
+    Oracle oracle;
     Components components(lp::make_RowGenerationSolveLP(oracle),
                           lp::make_RowGenerationResolveLP(oracle));
     auto result = ir::bounded_degree_mst_iterative_rounding(g, degBounds,

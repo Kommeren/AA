@@ -23,7 +23,6 @@
 namespace paal {
 namespace ir {
 
-class InitialTest;
 class FindViolated;
 
 /**
@@ -32,29 +31,18 @@ class FindViolated;
 template <typename... Args>
     using BoundedDegreeMSTOracleComponents =
         data_structures::Components<
-        data_structures::NameWithDefault<FindViolated, lp::FindRandViolated>,
-        data_structures::NameWithDefault<InitialTest, utils::ReturnFalseFunctor> >::type<Args...>;
+        data_structures::NameWithDefault<FindViolated, lp::FindRandViolated>>::type<Args...>;
 
 
 /**
  * @class BoundedDegreeMSTOracle
  * @brief Separation oracle for the row generation in the bounded degree minimum spanning tree problem.
  *
- * @tparam Graph input graph, has to be a model of boost::Graph
  * @tparam OracleComponents
  */
-template <typename Graph, typename OracleComponents = BoundedDegreeMSTOracleComponents<> >
+template <typename OracleComponents = BoundedDegreeMSTOracleComponents<> >
 class BoundedDegreeMSTOracle {
 public:
-    typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-
-    /**
-     * Constructor.
-     */
-    BoundedDegreeMSTOracle(const Graph & g) : m_g(g)
-    { }
-
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
      */
@@ -62,13 +50,8 @@ public:
     bool feasibleSolution(const Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
 
-        if (m_oracleComponents.template call<InitialTest>(*this)) {
-            return true;
-        }
-        else {
-            return !m_oracleComponents.template call<FindViolated>(
-                        problem, *this, num_vertices(m_g));
-        }
+        return !m_oracleComponents.template call<FindViolated>(
+                    problem, *this, num_vertices(problem.getGraph()));
     }
 
     /**
@@ -76,11 +59,12 @@ public:
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Problem & problem, LP & lp) {
+        const auto & g = problem.getGraph();
         lp.addRow(lp::UP, 0, m_violatingSet.size() - 1);
 
         for (auto const & e : problem.getEdgeMap().right) {
-            Vertex u = source(e.second, m_g);
-            Vertex v = target(e.second, m_g);
+            auto u = source(e.second, g);
+            auto v = target(e.second, g);
 
             if ((m_violatingSet.find(u) != m_violatingSet.end())
                 && (m_violatingSet.find(v) != m_violatingSet.end())) {
@@ -106,7 +90,7 @@ public:
         auto src = *(vert.first);
         assert(src != m_src && src != m_trg);
 
-        for (Vertex trg : boost::make_iterator_range(vertices(m_auxGraph))) {
+        for (auto trg : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 if (problem.getCompare().g(
                         checkViolationGreaterThan(problem, src, trg), 0)) {
@@ -137,7 +121,7 @@ public:
 
         double maximumViolation = 0;
 
-        for (Vertex trg : boost::make_iterator_range(graphVertices)) {
+        for (auto trg : boost::make_iterator_range(graphVertices)) {
             if (src != trg && trg != m_src && trg != m_trg) {
                 maximumViolation = std::max(maximumViolation,
                     checkViolationGreaterThan(problem, src, trg, maximumViolation));
@@ -171,20 +155,21 @@ private:
      */
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
-        m_auxGraph = AuxGraph(num_vertices(m_g));
+        const auto & g = problem.getGraph();
+        m_auxGraph = AuxGraph(num_vertices(g));
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
 
-        m_srcToV.resize(num_vertices(m_g));
-        m_vToTrg.resize(num_vertices(m_g));
+        m_srcToV.resize(num_vertices(g));
+        m_vToTrg.resize(num_vertices(g));
 
         for (auto const & e : problem.getEdgeMap().right) {
             lp::ColId colIdx = e.first;
             double colVal = lp.getColPrim(colIdx) / 2;
 
             if (!problem.getCompare().e(colVal, 0)) {
-                Vertex u = source(e.second, m_g);
-                Vertex v = target(e.second, m_g);
+                auto u = source(e.second, g);
+                auto v = target(e.second, g);
                 addEdge(u, v, colVal);
             }
         }
@@ -192,7 +177,7 @@ private:
         m_src = add_vertex(m_auxGraph);
         m_trg = add_vertex(m_auxGraph);
 
-        for (Vertex v : boost::make_iterator_range(vertices(m_g))) {
+        for (auto v : boost::make_iterator_range(vertices(g))) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
@@ -237,12 +222,12 @@ private:
     /**
      * Calculates the sum of the variables for edges incident with a given vertex.
      */
-    template <typename Problem, typename LP>
+    template <typename Problem, typename LP, typename Vertex>
     double degreeOf(Problem & problem, const Vertex & v, const LP & lp) {
         double res = 0;
-        auto adjEdges = out_edges(v, m_g);
+        auto adjEdges = out_edges(v, problem.getGraph());
 
-        for (Edge e : boost::make_iterator_range(adjEdges)) {
+        for (auto e : boost::make_iterator_range(adjEdges)) {
             auto colId = problem.edgeToCol(e);
             if (colId) {
                 res += lp.getColPrim(*colId);
@@ -260,9 +245,9 @@ private:
      * @return violation of the found set
      */
     template <typename Problem>
-    double checkViolationGreaterThan(Problem & problem, Vertex src, Vertex trg,
+    double checkViolationGreaterThan(Problem & problem, AuxVertex src, AuxVertex trg,
                 double minViolation = 0.) {
-        int numVertices(num_vertices(m_g));
+        int numVertices(num_vertices(problem.getGraph()));
         double origVal = get(m_cap, m_srcToV[src]);
 
         put(m_cap, m_srcToV[src], numVertices);
@@ -280,7 +265,7 @@ private:
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, m_src);
             assert(srcColor != get(colors, m_trg));
-            for (Vertex v : boost::make_iterator_range(vertices(m_auxGraph))) {
+            for (auto v : boost::make_iterator_range(vertices(m_auxGraph))) {
                 if (v != m_src && v != m_trg && get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }
@@ -299,11 +284,9 @@ private:
 
     OracleComponents m_oracleComponents;
 
-    const Graph & m_g;
-
     AuxGraph m_auxGraph;
-    Vertex   m_src;
-    Vertex   m_trg;
+    AuxVertex   m_src;
+    AuxVertex   m_trg;
 
     AuxEdgeList  m_srcToV;
     AuxEdgeList  m_vToTrg;
@@ -314,21 +297,6 @@ private:
     AuxEdgeReverse  m_rev;
 };
 
-
-/**
- * @brief Creates a BoundedDegreeMSTOracle object.
- *
- * @tparam OracleComponents
- * @tparam Graph
- * @param g
- *
- * @return BoundedDegreeMSTOracle object
- */
-template <typename OracleComponents = BoundedDegreeMSTOracleComponents<>, typename Graph>
-BoundedDegreeMSTOracle<Graph, OracleComponents>
-make_BoundedDegreeMSTOracle(const Graph & g) {
-    return  BoundedDegreeMSTOracle<Graph, OracleComponents>(g);
-}
 
 } //ir
 } //paal

@@ -42,7 +42,7 @@ int main() {
     }
 
     // solve it
-    auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions));
+    paal::ir::SteinerNetworkOracle<> oracle;
     paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions)>
             components(paal::lp::make_RowGenerationSolveLP(oracle),
                        paal::lp::make_RowGenerationResolveLP(oracle));

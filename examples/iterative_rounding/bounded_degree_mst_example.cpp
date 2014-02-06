@@ -42,7 +42,7 @@ int main() {
     }
 
     // solve it
-    auto oracle(paal::ir::make_BoundedDegreeMSTOracle(g));
+    paal::ir::BoundedDegreeMSTOracle<> oracle;
     paal::ir::BDMSTIRComponents<Graph> components(
             paal::lp::make_RowGenerationSolveLP(oracle),
             paal::lp::make_RowGenerationResolveLP(oracle));
