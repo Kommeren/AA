@@ -88,10 +88,6 @@ public:
             if(call<Gain>(m_solution, move) > 0) {
                 call<Commit>(m_solution, move);
                 return true;
-            } else {
-                if(call<StepStopCondition>(m_solution, move)) {
-                    break;
-                }
             }
         }
         return base::search();
@@ -156,9 +152,6 @@ private:
                 max = gain;
                 init = true;
             } 
-            if(call<StepStopCondition>(m_solution, *currMove)) {
-                break;
-            }
         }
 
         return BestDesc(max, m_searchComponents, bestMove);

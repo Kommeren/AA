@@ -98,8 +98,6 @@ public:
                 if(call<Gain>(m_solution, r, move) > 0) {
                     call<Commit>(m_solution, r, move);
                     return true;
-                } else if(call<StepStopCondition>(m_solution, r, move)) {
-                    return false;
                 }
             }
         }
@@ -195,15 +193,14 @@ private:
     BestDesc best() {
         Fitness max = Fitness();
         bool init = false;
-        bool stop = false;
         auto currSE = m_solution.begin();
         auto endSE =  m_solution.end();
         auto bestSE = currSE;
         Move bestMove = Move();
-        for(;currSE != endSE && !stop; ++currSE) {
+        for(;currSE != endSE; ++currSE) {
             auto adjustmentSet = call<GetMoves>(m_solution, *currSE);
             auto currMove = adjustmentSet.first;
-            for(;currMove !=  adjustmentSet.second && !stop; ++currMove) {
+            for(;currMove !=  adjustmentSet.second; ++currMove) {
                 Fitness gain = call<Gain>(m_solution, *currSE, *currMove); 
                 
                 if(!init || gain > max) {
@@ -212,7 +209,6 @@ private:
                     bestMove = *currMove;
                     max = gain;
                 } 
-                stop = call<StepStopCondition>(m_solution, *currSE, *currMove);
             }
         }
           

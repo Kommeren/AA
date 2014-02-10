@@ -25,7 +25,6 @@ struct SearchComponentsTraits {
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT; 
     typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT; 
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<StepStopCondition>::type StepStopConditionT; 
 };
 
 /**

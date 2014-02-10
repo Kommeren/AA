@@ -129,13 +129,6 @@ Concepts:
     </pre>
     
     </li>
-    <li> <i>StepStopCondition</i> is a concept class responsible for stop condition in each step.
-    <pre>
-    StopConditionArchetype {
-        bool operator()(const Solution & s, const Move & move);
-    }
-    </pre>
-    </li>
     <li> <i>SearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
     </li>
 </ol>
@@ -178,7 +171,6 @@ We start with defining search components, that is:
 <li> Gain functor </li>
 <li> Commit functor </li>
 </ol>
-Note that we don't define StepStopCondition i.e. we're using default StopCondition.
 
 \snippet local_search_example.cpp Local Search Components Example
 
@@ -222,14 +214,8 @@ Concepts:
     }
     </pre>
     
-    <li> <i>MultiStepStopCondition</i> is a concept class responsible for stop condition.
-    <pre>
-    MultiStepStopCondition {
-        bool operator()(const Solution & s, const SolutionElement & se, const Move & move);
-    }
-    </pre>
     
-    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StepStopCondition.
+    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with three components: GetMoves, Gain, Commit.
     </li>
 </ol>
 
@@ -270,7 +256,6 @@ We start with defining search components, that is:
 <li> Gain functor
 <li> Commit functor
 </ol>
-Note that we don't define StepStopCondition i.e. we're using default StopCondition.
 
 \snippet local_search_multi_solution_example.cpp Local Search Components Example
 
@@ -286,6 +271,14 @@ The library provides a number of custom components which might be very helpful.
 <li> paal::local_search::StopConditionTimeLimit
 <li> paal::local_search::StopConditionCountLimit
 <li> paal::local_search::ComputeGainWrapper
+</ol>
+
+Since library employs the iterators, the following utilities might be helpful 
+<ol>
+<li> boost::trasform_iterator
+<li> boost::filter_iterator
+<li> boost::function_input_iterator
+<li> paal::IteratorWithStopCondition
 </ol>
 */
 

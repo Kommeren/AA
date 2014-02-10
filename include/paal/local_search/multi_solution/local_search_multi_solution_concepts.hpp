@@ -98,12 +98,10 @@ class MultiSearchComponents {
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
-    typedef typename Traits::StepStopConditionT SC;
 public:
     BOOST_CONCEPT_ASSERT((MultiGetMoves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiGain<IC, Solution, X>));
     BOOST_CONCEPT_ASSERT((MultiCommit<SU, Solution, X>));
-    BOOST_CONCEPT_ASSERT((MultiStepStopCondition<SC, Solution, X>));
 };
 
 } // local_search_concepts

@@ -26,8 +26,7 @@ namespace local_search {
     using NQueensLocalSearchComponents =  data_structures::Components<
             data_structures::NameWithDefault<GetMoves, NQueensGetMoves>,
             data_structures::NameWithDefault<Gain, NQueensGain>, 
-            data_structures::NameWithDefault<Commit, NQueensCommit>,
-            data_structures::NameWithDefault<StepStopCondition, utils::ReturnFalseFunctor>
+            data_structures::NameWithDefault<Commit, NQueensCommit>
                 >::type<Args...>;
 
     /**

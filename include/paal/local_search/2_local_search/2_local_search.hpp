@@ -44,7 +44,6 @@ template <typename... Args>
 using TwoLocalComponents = data_structures::Components<
             Gain, 
             data_structures::NameWithDefault<GetMoves, GetAllMovesFromSolution>,
-            data_structures::NameWithDefault<StepStopCondition, utils::ReturnFalseFunctor>,
             data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
                 >::type<Args...>;
 
@@ -60,15 +59,13 @@ using TwoLocalComponents = data_structures::Components<
  * @return 
  */
 template <typename Gain, 
-          typename GetMoves = GetAllMovesFromSolution,
-          typename StepStopCondition = utils::ReturnFalseFunctor>
-TwoLocalComponents<Gain, GetMoves, StepStopCondition>  
+          typename GetMoves = GetAllMovesFromSolution>
+TwoLocalComponents<Gain, GetMoves>  
 
     make_TwoLocalSearchComponents(Gain ch, 
-            GetMoves ng = GetMoves(),
-            StepStopCondition sc = StepStopCondition()) {
+            GetMoves ng = GetMoves()) {
 
-    return TwoLocalComponents<Gain, GetMoves, StepStopCondition>(std::move(ch), std::move(ng), std::move(sc));
+    return TwoLocalComponents<Gain, GetMoves>(std::move(ch), std::move(ng));
 }
 
 

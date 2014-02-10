@@ -135,7 +135,7 @@ private:
 
 
 /**
- * @brief This is custom StopCondition (it can be used in GlobalStopCondition and StepStopCondition) , it returns true after given count limit
+ * @brief This is custom StopCondition , it returns true after given count limit
  */
 class StopConditionCountLimit {
 public:

@@ -26,10 +26,6 @@ struct ObjFunction;
  * @brief Name for Commit component 
  */
 struct Commit;
-/**
- * @brief Name for StepStopCondition component 
- */
-struct StepStopCondition;
         
 /**
  * @brief Components for objective function local search.
@@ -38,8 +34,7 @@ struct StepStopCondition;
 typedef data_structures::Components<
             GetMoves, 
             ObjFunction, 
-            Commit, 
-            data_structures::NameWithDefault<StepStopCondition, utils::ReturnFalseFunctor>
+            Commit 
                 > ComponentsObjFun;
 
 /**
