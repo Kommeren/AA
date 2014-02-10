@@ -7,6 +7,7 @@
 
 using namespace paal::local_search::facility_location;
 
+
 BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     
     typedef SampleGraphsMetrics SGM;
@@ -24,12 +25,20 @@ BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     DefaultAddFLComponents<int>::type    add;
     DefaultSwapFLComponents<int>::type   swap;
     paal::utils::SkipFunctor nop;
-    paal::local_search::StopConditionCountLimit oneRoundSearch(1);
+    //this search can and in one or 2 rounds depending on
+    //implementation of unordered_set in FacilityLocationSolution
+    //if the first facility to add is A, then the search will be finished 
+    //in  one round. The 2 round are needed otherwise
+    paal::local_search::StopConditionCountLimit oneRoundSearch(2);
+    
+    ON_LOG(auto const & ch = sol.getChosenFacilities());
+    LOGLN("Solution before the first search");
+    LOG_COPY_RANGE_DEL(ch, ",");
+    LOGLN("");
 
     BOOST_CHECK(facility_location_local_search(
                     sol, nop, oneRoundSearch, rem, add, swap));
     
-    ON_LOG(auto const & ch = sol.getChosenFacilities());
     LOGLN("Solution after the first search");
     LOG_COPY_RANGE_DEL(ch, ",");
     LOGLN("");

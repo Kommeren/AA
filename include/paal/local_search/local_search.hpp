@@ -26,7 +26,7 @@ namespace local_search {
  * @param psa
  * @param gsc
  *
- * @return true if the search was succesfull
+ * @return true if the search was successful
  */
 template <typename LocalSearchStep, 
           typename PostSearchAction = utils::SkipFunctor,
@@ -34,12 +34,17 @@ template <typename LocalSearchStep,
 bool search(LocalSearchStep & lss, 
             PostSearchAction psa = utils::SkipFunctor(),
             GlobalStopCondition gsc = utils::ReturnFalseFunctor()) {
-    bool ret = false;  
-    while(lss.search() && !gsc(lss.getSolution())) {
-        ret = true;
-        psa(lss.getSolution());
+    if(!lss.search()) {
+        return false;
     }
-    return ret;
+
+    if(!gsc(lss.getSolution())) {
+        psa(lss.getSolution());
+        while(lss.search() && !gsc(lss.getSolution())) {
+            psa(lss.getSolution());
+        }
+    }
+    return true;
 }
 
 

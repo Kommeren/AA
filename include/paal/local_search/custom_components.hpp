@@ -155,7 +155,7 @@ public:
      */
     template <typename... Args> 
     bool operator()(Args&&... ) const {
-        return m_cnt++ >= m_limit;
+        return ++m_cnt >= m_limit;
     }
 private:
     mutable unsigned m_cnt;

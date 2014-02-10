@@ -1,3 +1,11 @@
+/**
+ * @file facility_location_solution_test.cpp
+ * @brief 
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date 2013-06-20
+ */
+
 #include <boost/test/unit_test.hpp>
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"
