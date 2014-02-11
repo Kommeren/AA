@@ -13,12 +13,11 @@
 ** LP formulation in separate dir
 ** framework documentation
 ** restriction(v, v) case in steiner network
-** resolve and stop_condition components in IR
-** BDMST oracle initial test
 ** improve row generation
 ** cost function
 ** complexities
 ** removing rows/cols strategy
+** big copy-paste's in tests
 ** resolving solution by moving a point ?
 ** cplex support ???
 ** steiner tree doxygen warnings

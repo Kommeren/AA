@@ -208,8 +208,8 @@ public:
 
 class SteinerTreeStopCondition {
 public:
-    template<typename Problem>
-    bool operator()(Problem& problem) {
+    template<typename Problem, typename LP>
+    bool operator()(Problem& problem, LP &) {
         return problem.getTerminals().size() < 2;
     }
 };
@@ -226,18 +226,26 @@ SteinerTree<OrigMetric, Terminals, Result, Strategy> make_SteinerTree(
             terminals, steinerVertices, result, strategy);
 }
 
+template <typename Vertex, typename Dist, typename Components>
+using SteinerTreeSolveLP = lp::RowGenerationSolveLP<SteinerTreeOracle<Vertex, Dist, Components>>;
+
+template <typename Vertex, typename Dist, typename Components>
+using SteinerTreeResolveLP = lp::RowGenerationResolveLP<SteinerTreeOracle<Vertex, Dist, Components>>;
+
 template <
          typename Vertex,
          typename Dist,
          typename Components,
-         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<SteinerTreeOracle<Vertex, Dist, Components> >,
+         typename SolveLPToExtremePoint = SteinerTreeSolveLP<Vertex, Dist, Components>,
+         typename ResolveLPToExtremePoint = SteinerTreeResolveLP<Vertex, Dist, Components>,
          typename RoundCondition = SteinerTreeRoundCondition,
          typename RelaxCondition = utils::ReturnFalseFunctor,
          typename StopCondition = SteinerTreeStopCondition,
          typename Init = SteinerTreeInit,
          typename SetSolution = utils::SkipFunctor>
-             using  SteinerTreeIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition,
-                         RelaxCondition, Init, SetSolution, StopCondition>;
+             using  SteinerTreeIRComponents = IRComponents<SolveLPToExtremePoint,
+                        ResolveLPToExtremePoint, RoundCondition,
+                        RelaxCondition, Init, SetSolution, StopCondition>;
 
 
 template <typename OrigMetric, typename Terminals, typename Result,
@@ -257,7 +265,9 @@ void solve_steiner_tree(const OrigMetric& metric, const Terminals& terminals, co
     typedef typename MT::VertexType Vertex;
     typedef typename MT::DistanceType Dist;
     paal::ir::SteinerTreeOracle<Vertex, Dist, Terminals> oracle;
-    paal::ir::SteinerTreeIRComponents<Vertex, Dist, Terminals> comps(lp::make_RowGenerationSolveLP(oracle));
+    auto solveLP(lp::make_RowGenerationSolveLP(oracle));
+    auto resolveLP(lp::make_RowGenerationResolveLP(oracle));
+    paal::ir::SteinerTreeIRComponents<Vertex, Dist, Terminals> comps(solveLP, resolveLP);
     steiner_tree_iterative_rounding(metric, terminals, steinerVertices, result, strategy, comps);
 }
 

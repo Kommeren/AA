@@ -43,7 +43,9 @@ int main() {
 
     // solve it
     auto oracle(paal::ir::make_BoundedDegreeMSTOracle(g));
-    paal::ir::BDMSTIRComponents<Graph> components(paal::lp::make_RowGenerationSolveLP(oracle));
+    paal::ir::BDMSTIRComponents<Graph> components(
+            paal::lp::make_RowGenerationSolveLP(oracle),
+            paal::lp::make_RowGenerationResolveLP(oracle));
     auto resultType = paal::ir::bounded_degree_mst_iterative_rounding(g, degreeBounds,
                             std::back_inserter(resultTree), std::move(components));
 

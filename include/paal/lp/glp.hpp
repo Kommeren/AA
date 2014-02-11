@@ -96,7 +96,6 @@ public:
      */
     ProblemType solveToExtremePointPrimal() {
         m_glpkControl.meth = GLP_PRIMAL;
-        glp_adv_basis(m_lp, 0);
         return runSimplex();
     }
 
@@ -105,7 +104,6 @@ public:
      */
     ProblemType solveToExtremePointDual() {
         m_glpkControl.meth = GLP_DUAL;
-        glp_adv_basis(m_lp, 0);
         return runSimplex();
     }
 
@@ -115,7 +113,7 @@ public:
      */
     ProblemType resolveToExtremePointPrimal() {
         m_glpkControl.meth = GLP_PRIMAL;
-        return runSimplex();
+        return runSimplex(true);
     }
 
     /**
@@ -124,7 +122,7 @@ public:
      */
     ProblemType resolveToExtremePointDual() {
         m_glpkControl.meth = GLP_DUAL;
-        return runSimplex();
+        return runSimplex(true);
     }
 
     /**
@@ -269,8 +267,16 @@ protected:
      *
      * @return solution status
      */
-    ProblemType runSimplex() {
+    ProblemType runSimplex(bool resolve = false) {
+        if (!resolve) {
+            glp_adv_basis(m_lp, 0);
+        }
         int ret = glp_simplex(m_lp, &m_glpkControl);
+        if (resolve && ret != 0) {
+            // if basis is not valid, create basis and try again
+            glp_adv_basis(m_lp, 0);
+            ret = glp_simplex(m_lp, &m_glpkControl);
+        }
         assert(ret == 0);
         return getPrimalType();
     }

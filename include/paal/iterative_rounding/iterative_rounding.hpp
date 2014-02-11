@@ -89,17 +89,15 @@ public:
     }
 
     /**
-     * @brief Checks if the current LP solution has got only integer values.
+     * @brief Finds an extreme point solution to the LP.
+     *
+     * @return LP solution status
      */
-    bool integerSolution() {
-        for(lp::ColId col : boost::make_iterator_range(m_lpBase.getColumns())) {
-            double colVal = m_lpBase.getColPrim(col);
-            if (!m_compare.e(colVal, std::round(colVal))) {
-                return false;
-            }
-        }
-
-        return true;
+    lp::ProblemType resolveLPToExtremePoint() {
+        auto probType = call<ResolveLPToExtremePoint>(m_problem, m_lpBase);
+        assert(probType != lp::UNDEFINED);
+        m_visitor.solveLPToExtremePoint(m_problem, m_lpBase);
+        return probType;
     }
 
     /**
@@ -197,7 +195,7 @@ public:
      * @return true iff the problem has been solved
      */
     bool stopCondition() {
-        return call<StopCondition>(m_problem);
+        return call<StopCondition>(m_problem, m_lpBase);
     }
 
 private:
@@ -229,17 +227,23 @@ private:
 template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = lp::GLP>
 lp::ProblemType solve_iterative_rounding(Problem & problem, IRComponents components, Visitor visitor = Visitor()) {
     IterativeRounding<Problem, IRComponents, Visitor, LPBase> ir(problem, std::move(components), std::move(visitor));
-    bool irSolved = false;
+
+    auto probType = ir.solveLPToExtremePoint();
+    if (probType != lp::OPTIMAL) {
+        return probType;
+    }
+
     do {
-        auto probType = ir.solveLPToExtremePoint();
+        bool rounded{ir.round()};
+        bool relaxed{ir.relax()};
+        if (ir.stopCondition()) break;
+        assert(rounded || relaxed);
+
+        probType = ir.resolveLPToExtremePoint();
         if (probType != lp::OPTIMAL) {
             return probType;
         }
-        bool rounded{ir.round()};
-        bool relaxed{ir.relax()};
-        irSolved = ir.integerSolution();
-        assert(irSolved || rounded || relaxed);
-    } while (!irSolved);
+    } while(true);
     ir.setSolution();
     return lp::OPTIMAL;
 }
@@ -258,14 +262,21 @@ lp::ProblemType solve_iterative_rounding(Problem & problem, IRComponents compone
 template <typename Problem, typename IRComponents, typename Visitor = TrivialVisitor, typename LPBase = lp::GLP>
 lp::ProblemType solve_dependent_iterative_rounding(Problem & problem, IRComponents components, Visitor vis = Visitor()) {
     IterativeRounding<Problem, IRComponents, Visitor, LPBase> ir(problem, std::move(components), std::move(vis));
+
+    auto probType = ir.solveLPToExtremePoint();
+    if (probType != lp::OPTIMAL) {
+        return probType;
+    }
+
     do {
-        auto probType = ir.solveLPToExtremePoint();
-        if (probType != lp::OPTIMAL) {
-            return probType;
-        }
         ir.dependentRound();
         ir.relax();
         if (ir.stopCondition()) break;
+
+        probType = ir.resolveLPToExtremePoint();
+        if (probType != lp::OPTIMAL) {
+            return probType;
+        }
     } while (true);
     ir.setSolution();
     return lp::OPTIMAL;

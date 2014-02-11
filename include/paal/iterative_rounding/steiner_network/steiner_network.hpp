@@ -298,15 +298,23 @@ private:
     RoundConditionEquals<0>       m_roundZero;
 };
 
+template <typename Graph, typename Restrictions>
+using SteinerNetworkSolveLP = lp::RowGenerationSolveLP<SteinerNetworkOracle<Graph, Restrictions>>;
+
+template <typename Graph, typename Restrictions>
+using SteinerNetworkResolveLP = lp::RowGenerationResolveLP<SteinerNetworkOracle<Graph, Restrictions>>;
+
 template <
          typename Graph,
          typename Restrictions,
-         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP<SteinerNetworkOracle<Graph, Restrictions>>,
+         typename SolveLPToExtremePoint = SteinerNetworkSolveLP<Graph, Restrictions>,
+         typename ResolveLPToExtremePoint = SteinerNetworkResolveLP<Graph, Restrictions>,
          typename RoundCondition = SteinerNetworkRoundCondition,
          typename RelaxContition = utils::ReturnFalseFunctor,
          typename Init = SteinerNetworkInit,
          typename SetSolution = utils::SkipFunctor>
-             using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+             using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint,
+                        ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
 namespace detail {

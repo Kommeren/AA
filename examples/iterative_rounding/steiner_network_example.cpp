@@ -44,7 +44,8 @@ int main() {
     // solve it
     auto oracle(paal::ir::make_SteinerNetworkSeparationOracle(g, restrictions));
     paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-            components(paal::lp::make_RowGenerationSolveLP(oracle));
+            components(paal::lp::make_RowGenerationSolveLP(oracle),
+                       paal::lp::make_RowGenerationResolveLP(oracle));
     paal::ir::steiner_network_iterative_rounding(g, restrictions,
                         std::back_inserter(resultNetwork), std::move(components));
 

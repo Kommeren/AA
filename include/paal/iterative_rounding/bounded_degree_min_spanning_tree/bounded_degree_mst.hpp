@@ -57,7 +57,6 @@ public:
 
     typedef boost::bimap<Edge, lp::ColId> EdgeMap;
     typedef std::unordered_map<lp::RowId, Vertex> VertexMap;
-    typedef std::vector<Vertex> VertexList;
 
     typedef std::vector<std::pair<lp::ColId, Edge>> EdgeMapOriginal;
 
@@ -102,14 +101,6 @@ public:
     }
 
     /**
-     * Adds a vertex to the vertex list.
-     */
-    int addVertex(Vertex v) {
-        m_vertexList.push_back(v);
-        return m_vertexList.size() - 1;
-    }
-
-    /**
      * Returns the cost of a given edge.
      */
     decltype(get(std::declval<CostMap>(), std::declval<Edge>()))
@@ -146,17 +137,10 @@ public:
     }
 
     /**
-     * Returns a bimap between edges and LP column IDs.
+     * Returns a mapping between LP column IDs and edges in the original graph.
      */
     const EdgeMapOriginal & getOriginalEdgesMap() const {
         return m_edgeMapOriginal;
-    }
-
-    /**
-     * Returns a mapping between LP column IDs and edges in the original graph.
-     */
-    const VertexList & getVertices() const {
-        return m_vertexList;
     }
 
     /**
@@ -218,7 +202,6 @@ private:
     EdgeMapOriginal m_edgeMapOriginal;
     EdgeMap         m_edgeMap;
     VertexMap       m_vertexMap;
-    VertexList      m_vertexList;
 
     const utils::Compare<double>   m_compare;
 };
@@ -505,9 +488,9 @@ private:
     template <typename Problem, typename LP>
     void addDegreeBoundConstraints(Problem & problem, LP & lp) {
         auto const & g = problem.getGraph();
+        int vIdx(0);
 
         for(auto v : boost::make_iterator_range(vertices(g))) {
-            auto vIdx = problem.addVertex(v);
             lp::RowId rowIdx = lp.addRow(lp::UP, 0, problem.getDegreeBound(v), getDegreeBoundName(vIdx));
             problem.bindVertexToRow(v, rowIdx);
             auto adjEdges = out_edges(v, g);
@@ -517,6 +500,7 @@ private:
                 assert(colId);
                 lp.addConstraintCoef(rowIdx, *colId);
             }
+            ++vIdx;
         }
     }
 
@@ -562,14 +546,22 @@ private:
     const utils::Compare<double>   m_compare;
 };
 
+template <typename Graph>
+using BDMSTSolveLP = lp::RowGenerationSolveLP<BoundedDegreeMSTOracle<Graph>>;
+
+template <typename Graph>
+using BDMSTResolveLP = lp::RowGenerationResolveLP<BoundedDegreeMSTOracle<Graph>>;
+
 template <
          typename Graph,
-         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP < BoundedDegreeMSTOracle < Graph, BoundedDegreeMSTOracleComponents<>> >,
+         typename SolveLPToExtremePoint = BDMSTSolveLP<Graph>,
+         typename ResolveLPToExtremePoint = BDMSTResolveLP<Graph>,
          typename RoundCondition = BDMSTRoundCondition,
          typename RelaxContition = BDMSTRelaxCondition,
          typename Init = BDMSTInit,
          typename SetSolution = BDMSTSetSolution>
-             using  BDMSTIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+             using  BDMSTIRComponents = IRComponents<SolveLPToExtremePoint, ResolveLPToExtremePoint,
+                                RoundCondition, RelaxContition, Init, SetSolution>;
 
 } //ir
 } //paal

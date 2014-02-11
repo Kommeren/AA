@@ -194,6 +194,17 @@ struct DefaultSolveLPToExtremePoint {
 };
 
 /**
+ * @brief Finds an extreme point solution to the LP.
+ */
+struct DefaultResolveLPToExtremePoint {
+    /// Finds an extreme point solution to the LP.
+    template <typename Problem, typename LP>
+    lp::ProblemType operator()(Problem &, LP & lp) {
+        return lp.resolveToExtremePointPrimal();
+    };
+};
+
+/**
  * @brief Deletes a row from the LP.
  */
 struct DeleteRow {
@@ -241,22 +252,54 @@ struct FixCol {
     };
 };*/
 
+/**
+ * @brief Default stop condition component.
+ */
+class DefaultStopCondition {
+public:
+    /**
+     * @brief Constructor. Takes epsilon used in double comparison.
+     */
+    DefaultStopCondition(double epsilon = utils::Compare<double>::defaultEpsilon()): m_compare(epsilon) { }
+
+    /**
+     * @brief Checks if the current LP solution has got only integer values.
+     */
+    template <typename Problem, typename LP>
+    bool operator()(Problem &, const LP & lp) {
+        for(lp::ColId col : boost::make_iterator_range(lp.getColumns())) {
+            double colVal = lp.getColPrim(col);
+            if (!m_compare.e(colVal, std::round(colVal))) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+protected:
+    /// Double comparison object.
+    const utils::Compare<double> m_compare;
+};
+
 class SolveLPToExtremePoint;
 class RoundCondition;
 class RelaxCondition;
 class Init;
 class SetSolution;
 class StopCondition;
+class ResolveLPToExtremePoint;
 class DeleteRowStrategy;
 class DeleteColStrategy;
 
 typedef data_structures::Components<
         data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
+        data_structures::NameWithDefault<ResolveLPToExtremePoint, DefaultResolveLPToExtremePoint>,
         data_structures::NameWithDefault<RoundCondition, DefaultRoundCondition>,
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<Init, utils::SkipFunctor>,
         data_structures::NameWithDefault<SetSolution, utils::SkipFunctor>,
-        data_structures::NameWithDefault<StopCondition, utils::ReturnFalseFunctor>,
+        data_structures::NameWithDefault<StopCondition, DefaultStopCondition>,
         data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
         data_structures::NameWithDefault<DeleteColStrategy, DeleteCol> > Components;
 

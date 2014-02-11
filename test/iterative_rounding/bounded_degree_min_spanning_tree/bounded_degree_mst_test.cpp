@@ -84,7 +84,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(lp::make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle),
+                          lp::make_RowGenerationResolveLP(oracle));
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(resultTree, resultTree.begin()),
                     std::move(components), LogVisitor());
@@ -120,7 +121,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
     {
         ResultTree resultTree;
         auto oracle(make_BoundedDegreeMSTOracle(g));
-        Components components(lp::make_RowGenerationSolveLP(oracle));
+        Components components(lp::make_RowGenerationSolveLP(oracle),
+                              lp::make_RowGenerationResolveLP(oracle));
 
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin()),
@@ -132,7 +134,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
     {
         ResultTree resultTree;
         auto oracle(make_BoundedDegreeMSTOracle(g));
-        Components components(lp::make_RowGenerationSolveLP(oracle));
+        Components components(lp::make_RowGenerationSolveLP(oracle),
+                              lp::make_RowGenerationResolveLP(oracle));
 
         auto bdmst(make_BoundedDegreeMST(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin())));
@@ -164,7 +167,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
 
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(lp::make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle),
+                          lp::make_RowGenerationResolveLP(oracle));
+
     auto bdmst(make_BoundedDegreeMST(g, bounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 
@@ -195,7 +200,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     typedef BDMSTIRComponents<Graph> Components;
     auto oracle(make_BoundedDegreeMSTOracle(g));
-    Components components(lp::make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle),
+                          lp::make_RowGenerationResolveLP(oracle));
+
     auto bdmst(make_BoundedDegreeMST(g, bounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 

@@ -135,11 +135,13 @@ class GAInit {
 };
 
 template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
+         typename ResolveLPToExtremePoint = DefaultResolveLPToExtremePoint,
          typename RoundCondition = DefaultRoundCondition,
          typename RelaxContition = GARelaxCondition,
          typename Init = GAInit,
          typename SetSolution = GASetSolution>
-             using  GeneralAssignmentIRComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+             using  GeneralAssignmentIRComponents = IRComponents<SolveLPToExtremePoint,
+                ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
 /**

@@ -197,12 +197,15 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     typedef std::vector<Edge> ResultNetwork;
     typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
     typedef ir::SteinerNetworkOracle<Graph, Restrictions, OracleComponents> Oracle;
-    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions,
-        lp::RowGenerationSolveLP<Oracle>> Components;
+    typedef lp::RowGenerationSolveLP<Oracle> SolveLP;
+    typedef lp::RowGenerationResolveLP<Oracle> ResolveLP;
+    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, SolveLP,
+        ResolveLP> Components;
 
     ResultNetwork resultNetwork;
     Oracle oracle(g, restrictions);
-    Components components(lp::make_RowGenerationSolveLP(oracle));
+    Components components(lp::make_RowGenerationSolveLP(oracle),
+                          lp::make_RowGenerationResolveLP(oracle));
     auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions,
                                     std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();

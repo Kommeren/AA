@@ -207,11 +207,13 @@ private:
 
 template <
     typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
+    typename ResolveLPToExtremePoint = DefaultResolveLPToExtremePoint,
     typename RoundCondition = TARoundCondition,
     typename RelaxContition = TARelaxCondition,
     typename Init = TAInit,
     typename SetSolution = utils::SkipFunctor>
-        using  TAComponents = IRComponents<SolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+        using  TAComponents = IRComponents<SolveLPToExtremePoint, ResolveLPToExtremePoint,
+                    RoundCondition, RelaxContition, Init, SetSolution>;
 
 /**
  * @brief This is Jain's iterative rounding

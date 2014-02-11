@@ -50,7 +50,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
     SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                comps(lp::make_RowGenerationSolveLP(oracle));
+            comps(lp::make_RowGenerationSolveLP(oracle),
+                  lp::make_RowGenerationResolveLP(oracle));
     steiner_network_iterative_rounding(g, restrictions,
                 std::back_inserter(resultNetwork), std::move(comps));
 
@@ -83,7 +84,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
         ResultNetwork resultNetwork;
         auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
         SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                    comps(lp::make_RowGenerationSolveLP(oracle));
+                comps(lp::make_RowGenerationSolveLP(oracle),
+                      lp::make_RowGenerationResolveLP(oracle));
         steiner_network_iterative_rounding(g, restrictions, boost::weight_map(cost),
                     std::back_inserter(resultNetwork), std::move(comps));
 
@@ -97,7 +99,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
         ResultNetwork resultNetwork;
         auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
         SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                    comps(lp::make_RowGenerationSolveLP(oracle));
+                comps(lp::make_RowGenerationSolveLP(oracle),
+                      lp::make_RowGenerationResolveLP(oracle));
         auto steinerNetwork(make_SteinerNetwork(g, restrictions,
                     boost::weight_map(cost),
                     std::back_inserter(resultNetwork)));
@@ -126,7 +129,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     //solve it
     auto oracle(make_SteinerNetworkSeparationOracle(g, restrictions));
     SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                comps(lp::make_RowGenerationSolveLP(oracle));
+            comps(lp::make_RowGenerationSolveLP(oracle),
+                  lp::make_RowGenerationResolveLP(oracle));
     auto steinerNetwork(make_SteinerNetwork(g, restrictions,
                                     std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();

@@ -192,7 +192,7 @@ private:
         m_src = add_vertex(m_auxGraph);
         m_trg = add_vertex(m_auxGraph);
 
-        for (Vertex v : problem.getVertices()) {
+        for (Vertex v : boost::make_iterator_range(vertices(m_g))) {
             m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
             m_vToTrg[v] = addEdge(v, m_trg, 1, true);
         }
