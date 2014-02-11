@@ -1,6 +1,6 @@
 /**
  * @file k_cut_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-30
@@ -22,21 +22,21 @@ int main(){
                     > graph(8);
     for(std::size_t i=0;i<edgesP.size();i++){
         add_edge(edgesP[i].first,edgesP[i].second,i,graph);
-    }   
+    }
     int parts=3;
-    
+
     auto edgeId = get(boost::edge_index, graph);
     auto weight=make_iterator_property_map(costs.begin(), edgeId);
-    
+
     //solve
     int costCut;
     std::vector<std::pair<int,int> > verticesParts;
     costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts),boost::weight_map(weight));
-    
+
     //alternative form
     //int costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts));
     //this works if graph have edge weight property
-    
+
     //print result
     std::cout<<"cost cut:"<<costCut<<std::endl;
     std::vector<int> verticesToParts;
@@ -44,7 +44,7 @@ int main(){
         std::cout<<i.first<<"("<<i.second<<"), ";
     }
     std::cout<<std::endl;
-    
-    
+
+
 //! [K Cut Example]
 }

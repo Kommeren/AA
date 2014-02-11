@@ -368,7 +368,7 @@ make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator, typename Components, typename Visitor = TrivialVisitor>
-lp::ProblemType generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
+IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                     JobIter jbegin, JobIter jend,
                     const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
                     JobsToMachinesOutputIterator jobToMachines, Components components,

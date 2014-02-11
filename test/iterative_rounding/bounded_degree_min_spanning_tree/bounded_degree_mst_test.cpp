@@ -208,9 +208,9 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     BOOST_CHECK(!invalid);
 
-    auto probType = solve_iterative_rounding(bdmst, std::move(components));
+    auto result = solve_iterative_rounding(bdmst, std::move(components));
 
-    BOOST_CHECK(probType == lp::INFEASIBLE);
+    BOOST_CHECK(result.first == lp::INFEASIBLE);
 }
 BOOST_AUTO_TEST_SUITE_END()
 

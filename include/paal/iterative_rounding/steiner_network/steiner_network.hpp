@@ -338,7 +338,7 @@ namespace detail {
  */
 template <typename Graph, typename Restrictions, typename CostMap, typename ResultNetworkOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor>
-lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+IRResult steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
         CostMap cost, ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
     auto steiner = make_SteinerNetwork(g, restrictions, cost, result);
     return solve_iterative_rounding(steiner, std::move(components), std::move(visitor));
@@ -368,7 +368,7 @@ lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restri
 template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor,
           typename P, typename T, typename R>
-lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+IRResult steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
         const boost::bgl_named_params<P, T, R> & params,
         ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
     return detail::steiner_network_iterative_rounding(g, restrictions,
@@ -394,7 +394,7 @@ lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restri
  */
 template <typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor>
-lp::ProblemType steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
+IRResult steiner_network_iterative_rounding(const Graph & g, const Restrictions & restrictions,
         ResultNetworkOutputIterator result, IRComponents components, Visitor visitor = Visitor()) {
     return steiner_network_iterative_rounding(g, restrictions, boost::no_named_parameters(),
                 std::move(result), std::move(components), std::move(visitor));

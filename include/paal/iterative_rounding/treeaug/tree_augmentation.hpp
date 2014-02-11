@@ -412,7 +412,7 @@ public:
     /**
      * Returns cost of the found solution.
      */
-    CostValue getSolutionValue() const {
+    CostValue getSolutionCost() const {
         return m_solCost;
     }
 
@@ -485,7 +485,7 @@ make_TreeAug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIte
 template <typename Graph, typename TreeMap,
           typename CostMap, typename EdgeSetOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor>
-lp::ProblemType tree_augmentation_iterative_rounding(
+IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         TreeMap treeMap,
         CostMap costMap,
@@ -566,7 +566,7 @@ make_TreeAug(const Graph & g, EdgeSetOutputIterator solution) ->
 template <typename Graph, typename EdgeSetOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor,
           typename P, typename T, typename R>
-lp::ProblemType tree_augmentation_iterative_rounding(
+IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         const boost::bgl_named_params<P, T, R> & params,
         EdgeSetOutputIterator solution,
@@ -594,7 +594,7 @@ lp::ProblemType tree_augmentation_iterative_rounding(
  */
 template <typename Graph, typename EdgeSetOutputIterator,
           typename IRComponents, typename Visitor = TrivialVisitor>
-lp::ProblemType tree_augmentation_iterative_rounding(
+IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         EdgeSetOutputIterator solution,
         IRComponents components,

@@ -36,10 +36,11 @@ typedef std::set<Edge> ResultTree;
 template <typename Bound>
 void checkResult(const Graph & g, const ResultTree & tree,
                  const Cost & costs, const Bound & degBounds,
-                 int verticesNum, double bestCost) {
+                 int verticesNum, double bestCost, double treeCost) {
     int treeEdges(tree.size());
-    double treeCost = std::accumulate(tree.begin(), tree.end(), 0.,
+    double resultCost = std::accumulate(tree.begin(), tree.end(), 0.,
                         [&](double cost, Edge e){return cost + costs[e];});
+    BOOST_CHECK_EQUAL(resultCost, treeCost);
 
     LOGLN("tree edges: " << treeEdges);
     BOOST_CHECK(treeEdges == verticesNum - 1);
@@ -96,11 +97,11 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
     Oracle oracle(g);
     Components components(lp::make_RowGenerationSolveLP(oracle),
                           lp::make_RowGenerationResolveLP(oracle));
-    auto probType = ir::bounded_degree_mst_iterative_rounding(g, degBounds,
+    auto result = ir::bounded_degree_mst_iterative_rounding(g, degBounds,
                             std::inserter(tree, tree.end()), std::move(components));
-    BOOST_CHECK(probType == lp::OPTIMAL);
+    BOOST_CHECK(result.first == lp::OPTIMAL);
 
-    checkResult(g, tree, costs, degBounds, verticesNum, bestCost);
+    checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {

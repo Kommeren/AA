@@ -1,6 +1,6 @@
 /**
  * @file prefix_tree.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-10
@@ -12,10 +12,10 @@
 namespace paal{
 namespace greedy{
 namespace detail{
-    
+
 template<typename Letter>
 class PrefixTree {
-    
+
     struct Node{
         Letter letter = DELIMITER;
         Node* son = CHILDLESS;
@@ -30,7 +30,7 @@ public:
                std::vector<int> const& suffixArray,
                std::vector<Letter> const& sumWords,
                std::vector<int> const& lcp,
-               std::vector<int> const& lengthSuffixWord) : 
+               std::vector<int> const& lengthSuffixWord) :
                  m_length(length),
                  m_prefixTree(m_length),
                  m_whichSonAmI(m_length),
@@ -41,7 +41,7 @@ public:
                  m_lcp(lcp),
                  m_lengthSuffixWord(lengthSuffixWord)
     {}
-    
+
     void buildPrefixTree(){
         m_prefixTree.push_back(Node()); //root
         for(auto suffix : m_suffixArray){
@@ -51,20 +51,20 @@ public:
             }
         }
     }
-    
+
     void eraseWordFormPrefixTree(int wordBegin){
         for(int letterOfWord=0;m_sumWords[letterOfWord+wordBegin]!=DELIMITER;++letterOfWord) {
             auto letterIdx = wordBegin + letterOfWord;
             auto whichSon = m_whichSonAmI[letterIdx];
             auto & nodePrefixes = m_prefixToTree[letterIdx]->prefixes;
-            assert(whichSon<nodePrefixes.size());
+            assert(std::size_t(whichSon)<nodePrefixes.size());
             int lastPrefix = nodePrefixes.back();
             nodePrefixes[whichSon] = lastPrefix;
             m_whichSonAmI[lastPrefix + letterOfWord] = whichSon;
             nodePrefixes.pop_back();
         }
     }
-    
+
     //for all suffix of word: if suffix is equal to any prefix of word we remember position in prefix tree coresponding to suffix
     void fillSuffixToTree(){
         for(int suffix=m_length-1,lastWord=0,commonPrefix=0;suffix>0;suffix--){
@@ -83,14 +83,14 @@ public:
             }
         }
     }
-    
+
     int getPrefixEqualToSuffix(int suffix,int firstWordInBlock){
         Node* nodeCorrespondingToSuffix = m_suffixToTree[suffix];
         if(nodeCorrespondingToSuffix == NO_SUFFIX_IN_TREE){
             return NOT_PREFIX;
         }
         auto const & overlapPrefixes = nodeCorrespondingToSuffix->prefixes;
-        
+
         if(overlapPrefixes.size()){
             int whichPrefix = ANY_PREFIX;//which prefix of prefixes equal to suffix, will be joined
             //check if first prefix belong to same block as prefix (avoid loops)
@@ -115,15 +115,15 @@ private:
         int letter=word;
         //we go by patch until Letter on patch all equal to letter in words
         //we only check last son because we add words in lexographic order
-        while(node->son!=CHILDLESS && 
-                node->son->letter==m_sumWords[letter] && 
+        while(node->son!=CHILDLESS &&
+                node->son->letter==m_sumWords[letter] &&
                 m_sumWords[letter]!=DELIMITER){
             node=node->son;
             ++letter;
         }
         //we add new Node
         while(m_sumWords[letter]) {
-            //if this asserts, you have very strange implementation of stl 
+            //if this asserts, you have very strange implementation of stl
             assert(m_prefixTree.capacity()>m_prefixTree.size());
             m_prefixTree.push_back(Node(m_sumWords[letter]));
             node->son= &m_prefixTree.back();
@@ -133,7 +133,7 @@ private:
         node= &m_prefixTree[ROOT];
         letter=word;
         //we fill:
-        //    m_prefixToTree 
+        //    m_prefixToTree
         //    m_whichSonAmI
         //and add to Node.prefixes coresponding prefixes
         while(m_sumWords[letter]!=DELIMITER){
@@ -145,27 +145,27 @@ private:
         }
     }
     int m_length;
-    
+
     std::vector<Node> m_prefixTree;
     std::vector<int> m_whichSonAmI;
-    
+
     std::vector<Node*> m_prefixToTree;
     std::vector<Node*> m_suffixToTree;
-    
+
     const std::vector<int> & m_suffixArray;
     const std::vector<Letter> & m_sumWords;
     const std::vector<int> & m_lcp;
     const std::vector<int> & m_lengthSuffixWord;
-    
+
     const static int ROOT = 0;
     const static int NOT_PREFIX = -1;
-    const static int ANY_PREFIX = 0; 
-    const static int ANY_OTHER_PREFIX = 1; 
+    const static int ANY_PREFIX = 0;
+    const static int ANY_OTHER_PREFIX = 1;
     const static std::nullptr_t NO_SUFFIX_IN_TREE;
     const static std::nullptr_t CHILDLESS;
 public:
     const static Letter DELIMITER=0;
-    
+
 };
 }//!detail
 }//!greedy

@@ -131,10 +131,11 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         paal::ir::TAComponents<> comps;
 
         double lplowerbd = getLowerBound(treeaug);
-        auto probType = paal::ir::solve_iterative_rounding(treeaug, comps);
-        BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
+        auto result = paal::ir::solve_iterative_rounding(treeaug, comps);
+        BOOST_CHECK_EQUAL(result.first, lp::OPTIMAL);
 
-        double solval = treeaug.getSolutionValue();
+        double solval = treeaug.getSolutionCost();
+        BOOST_CHECK_EQUAL(solval, *(result.second));
         LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);
         BOOST_CHECK(solval <= 2 * lplowerbd);
     });

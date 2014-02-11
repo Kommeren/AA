@@ -1,6 +1,6 @@
 /**
  * @file multiway_cut.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-12-19
@@ -12,7 +12,7 @@
 #include <tuple>
 
 #include <utility>                   // for std::pair
-#include <vector>   
+#include <vector>
 
 #include <boost/bimap.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -24,8 +24,6 @@
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/graph/named_function_params.hpp>
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/glp.hpp"
 
 
@@ -34,7 +32,7 @@ namespace detail{
     inline int vertices_column_index(const int vertex,const int dimentions,const int column){
         return vertex*dimentions+column;
     }
-    
+
     template<class Graph> using CostType =
             typename boost::property_traits<
                     puretype(get(boost::edge_weight,std::declval<Graph>()))
@@ -43,16 +41,16 @@ namespace detail{
         public:
             ///Initialize the cut LP.
             template <typename Graph, typename LP>
-            void init(Graph & graph, LP & lp,int k) {    
-                
+            void init(Graph & graph, LP & lp,int k) {
+
                 lp.setLPName("Multiway Cut");
-                lp.setMinObjFun(); 
-               
+                lp.setMinObjFun();
+
                 addVariables(graph, lp, k);
 
                 addConstraints(graph, lp, k);
-                
-                lp.loadMatrix(); 
+
+                lp.loadMatrix();
             }
         private:
             //adding variables
@@ -66,17 +64,17 @@ namespace detail{
                         edges_column.push_back(colIdx);
                     }
                 }
-                for(int vertex=0;vertex<=num_vertices(graph);vertex++){
+                for(unsigned vertex=0;vertex<=num_vertices(graph);vertex++){
                     for(int i=0;i<k;++i){
                         auto colIdx = lp.addColumn(0);
                         vertices_column.push_back(colIdx);
                     }
                 }
-            }    
-            
+            }
+
         template <typename Graph, typename LP>
             void addConstraints(Graph & graph, LP & lp,int k) {
-                
+
                 int dbIndex = 0;
                 for(auto edge: boost::make_iterator_range(edges(graph))){
                     auto sour=source(edge,graph);
@@ -86,8 +84,8 @@ namespace detail{
                             auto rowIdx = lp.addRow(lp::LO, 0);
                             lp.addConstraintCoef(rowIdx,edges_column[vertices_column_index(dbIndex,k,i)]);
                             lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(sour,k,i)],j*2-1);
-                            lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(targ,k,i)],1-2*j); 
-                            
+                            lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(targ,k,i)],1-2*j);
+
                         }
                     }
                     ++dbIndex;
@@ -110,9 +108,9 @@ namespace detail{
         std::vector<lp::ColId> edges_column;
         std::vector<lp::ColId> vertices_column;
     };
-    
 
-    
+
+
 template <typename Graph,typename LP>
 class MultiwayCut{
 public:
@@ -120,9 +118,9 @@ public:
     MultiwayCut(const Graph & g,LP & lp,int k) :
                 m_g(g),m_k(k){
                     multiwayCutLP.init(g,lp,m_k);
-                    lp.solveToExtremePointDual();   
+                    lp.solveToExtremePointDual();
                 };
-    
+
      private:
             ///The input
             const Graph & m_g;
@@ -166,11 +164,11 @@ template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
          ,typename LP=lp::GLP
          ,typename Graph
-         ,typename OutputIterator 
+         ,typename OutputIterator
          ,typename VertexIndexMap
          ,typename EdgeWeightMap
          ,typename VertexColorMap>
-auto multiway_cut_dispatch(Graph &graph, 
+auto multiway_cut_dispatch(Graph &graph,
                 OutputIterator result,
                 Rand && random_engine,
                 int iterations,
@@ -202,19 +200,19 @@ auto multiway_cut_dispatch(Graph &graph,
                     *result=std::make_pair(i,best_solution[indexMap(i)]);
                     ++result;
                 }
-                return cut_cost;                    
-                    
+                return cut_cost;
+
             }
 
 template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
          ,typename LP=lp::GLP
          ,typename Graph
-         ,typename OutputIterator 
+         ,typename OutputIterator
          ,typename VertexIndexMap
          ,typename EdgeWeightMap
          ,typename VertexColorMap>
-auto multiway_cut_dispatch(Graph &graph, 
+auto multiway_cut_dispatch(Graph &graph,
                 OutputIterator result,
                 Rand && random_engine,
                 boost::param_not_found,
@@ -228,13 +226,13 @@ auto multiway_cut_dispatch(Graph &graph,
                 auto numberOfRepeats = vertices*vertices + MIN_NUMBER_OF_REPEATS; //This variable is not supported by any proof
                 return multiway_cut_dispatch(graph,result,random_engine,numberOfRepeats,indexMap,weightMap,colorMap);
             }
-            
+
 }//!detail
-            
+
 /**
  * @brief this is solve multiway_cut problem
  * and return cut_cost
- * example: 
+ * example:
  *  \snippet multiway_cut_example.cpp  Multiway Cut Example
  * @param Graph graph
  * @param OutputIterator result pairs of vertex descriptor and number form (1,2, ... ,k) id of part
@@ -253,17 +251,17 @@ template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
          ,typename LP=lp::GLP
          ,typename Graph
-         ,typename OutputIterator 
-         ,typename P 
-         ,typename T 
+         ,typename OutputIterator
+         ,typename P
+         ,typename T
          ,typename R>
 auto multiway_cut(const Graph &g, OutputIterator out,
         const boost::bgl_named_params<P, T, R>& params, Rand && random_engine=std::default_random_engine(5426u))->
         typename boost::property_traits<
                 puretype(boost::choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight))
                 >::value_type {
-    return detail::multiway_cut_dispatch(g, out,random_engine,   
-           get_param(params, boost::iterations_t()),        
+    return detail::multiway_cut_dispatch(g, out,random_engine,
+           get_param(params, boost::iterations_t()),
            boost::choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index),
            boost::choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
            boost::choose_const_pmap(get_param(params, boost::vertex_color), g, boost::vertex_color));
@@ -272,7 +270,7 @@ auto multiway_cut(const Graph &g, OutputIterator out,
 /**
  * @brief this is solve multiway_cut problem
  * and return cut_cost
- * example: 
+ * example:
  *  \snippet multiway_cut_example.cpp  Multiway Cut Example
  *
  * complete example is  multiway_cut_example.cpp
@@ -292,8 +290,7 @@ template <typename Rand=std::default_random_engine
          ,class OutputIterator>
 auto multiway_cut(Graph graph, OutputIterator result,Rand random_engine=std::default_random_engine(5426u))->
     detail::CostType<Graph> {
-        boost::bgl_named_params<int, boost::buffer_param_t> params(0);
-        return multiway_cut(graph,result,params,random_engine);
+        return multiway_cut(graph,result,boost::no_named_parameters(),random_engine);
 }
 
 }//!paal

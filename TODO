@@ -14,7 +14,6 @@
 ** framework documentation
 ** restriction(v, v) case in steiner network
 ** improve row generation
-** cost function
 ** complexities
 ** removing rows/cols strategy
 ** big copy-paste's in tests

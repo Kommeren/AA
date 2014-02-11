@@ -251,16 +251,16 @@ make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
 template <typename Graph, typename DegreeBounds, typename CostMap,
           typename SpanningTreeOutputIterator, typename IRComponents,
           typename Visitor = TrivialVisitor>
-lp::ProblemType bounded_degree_mst_iterative_rounding(
-            const Graph & g,
-            const DegreeBounds & degBounds,
-            CostMap costMap,
-            SpanningTreeOutputIterator resultSpanningTree,
-            IRComponents components,
-            Visitor visitor = Visitor()) {
+IRResult bounded_degree_mst_iterative_rounding(
+        const Graph & g,
+        const DegreeBounds & degBounds,
+        CostMap costMap,
+        SpanningTreeOutputIterator resultSpanningTree,
+        IRComponents components,
+        Visitor visitor = Visitor()) {
 
-        auto bdmst = make_BoundedDegreeMST(g, degBounds, costMap, resultSpanningTree);
-        return solve_iterative_rounding(bdmst, std::move(components), std::move(visitor));
+    auto bdmst = make_BoundedDegreeMST(g, degBounds, costMap, resultSpanningTree);
+    return solve_iterative_rounding(bdmst, std::move(components), std::move(visitor));
 }
 } // detail
 
@@ -345,7 +345,7 @@ template <typename Graph, typename DegreeBounds,
           typename IRComponents,
           typename Visitor = TrivialVisitor,
           typename P, typename T, typename R>
-lp::ProblemType bounded_degree_mst_iterative_rounding(
+IRResult bounded_degree_mst_iterative_rounding(
             const Graph & g,
             const DegreeBounds & degBounds,
             const boost::bgl_named_params<P, T, R> & params,
@@ -378,7 +378,7 @@ template <typename Graph, typename DegreeBounds,
           typename SpanningTreeOutputIterator,
           typename IRComponents,
           typename Visitor = TrivialVisitor>
-lp::ProblemType bounded_degree_mst_iterative_rounding(
+IRResult bounded_degree_mst_iterative_rounding(
             const Graph & g,
             const DegreeBounds & degBounds,
             SpanningTreeOutputIterator resultSpanningTree,

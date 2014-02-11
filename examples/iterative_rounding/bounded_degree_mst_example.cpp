@@ -46,15 +46,16 @@ int main() {
     paal::ir::BDMSTIRComponents<Graph> components(
             paal::lp::make_RowGenerationSolveLP(oracle),
             paal::lp::make_RowGenerationResolveLP(oracle));
-    auto resultType = paal::ir::bounded_degree_mst_iterative_rounding(g, degreeBounds,
+    auto result = paal::ir::bounded_degree_mst_iterative_rounding(g, degreeBounds,
                             std::back_inserter(resultTree), std::move(components));
 
     // print result
-    if (resultType == paal::lp::OPTIMAL) {
+    if (result.first == paal::lp::OPTIMAL) {
         std::cout << "Edges in the spanning tree" << std::endl;
         for (auto const & e : resultTree) {
             std::cout << "Edge " << e << std::endl;
         }
+        std::cout << "Cost of the solution: " << *(result.second) << std::endl;
     }
     else {
         std::cout << "The instance is infeasible" << std::endl;

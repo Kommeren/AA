@@ -127,6 +127,8 @@ public:
 
     /**
      * Returns the found objective function value.
+     * Should be called only after the LP has been solved and if it
+     * wasn't modified afterwards.
      */
     double getObjValue() const {
         return glp_get_obj_val(m_lp);
@@ -465,7 +467,7 @@ public:
         o << "Problem name: " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
 
         for(ColId col : boost::make_iterator_range(glp.getColumns())) {
-            o << glp_get_obj_coef(glp.m_lp, glp.getCol(col)) << ", ";
+            o << glp.getColCoef(col) << ", ";
         }
         o << std::endl << "Rows" << std::endl;
 
@@ -619,6 +621,13 @@ public:
             return "";
         }
         return name;
+    }
+
+    /**
+     * Returns the column cost function coefficient.
+     */
+    double getColCoef(ColId col) const {
+        return glp_get_obj_coef(m_lp, getCol(col));
     }
 
     /**

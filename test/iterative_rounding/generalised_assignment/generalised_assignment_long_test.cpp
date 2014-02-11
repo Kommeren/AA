@@ -52,19 +52,17 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             auto  Tf = [&](int i){return machinesBounds[i];};
             std::unordered_map<int, int> jobsToMachines;
             times(0, 0);
-            auto probType = paal::ir::generalised_assignment_iterative_rounding(
+            auto result = paal::ir::generalised_assignment_iterative_rounding(
                 machines.begin(), machines.end(),
                 jobs.begin(), jobs.end(),
                 costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
                 paal::ir::GeneralAssignmentIRComponents<>());
 
-            BOOST_CHECK(probType == lp::OPTIMAL);
+            BOOST_CHECK(result.first == lp::OPTIMAL);
 
-            int c(0);
             std::vector<int> machinesLoad(machines.size(), 0);
             for (const std::pair<int, int> & jm : jobsToMachines) {
                 LOGLN("job " << jm.first << " assigned to machine " << jm.second);
-                c += costs(jm.first, jm.second);
                 machinesLoad[jm.second] += times(jm.first, jm.second);
             }
             double approximationRatio = 1.;
@@ -77,6 +75,7 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
                 BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
             }
 
+            int c(*(result.second));
             LOGLN("cost " << c);
             BOOST_CHECK(utils::Compare<double>(0.01).le(c, opt));
             LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));

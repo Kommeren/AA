@@ -46,13 +46,19 @@ int main() {
     paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions)>
             components(paal::lp::make_RowGenerationSolveLP(oracle),
                        paal::lp::make_RowGenerationResolveLP(oracle));
-    paal::ir::steiner_network_iterative_rounding(g, restrictions,
+    auto result = paal::ir::steiner_network_iterative_rounding(g, restrictions,
                         std::back_inserter(resultNetwork), std::move(components));
 
     // print result
-    std::cout << "Edges in steiner network" << std::endl;
-    for (auto const  & e : resultNetwork) {
-        std::cout << "Edge " << e << std::endl;
+    if (result.first == paal::lp::OPTIMAL) {
+        std::cout << "Edges in steiner network" << std::endl;
+        for (auto const  & e : resultNetwork) {
+            std::cout << "Edge " << e << std::endl;
+        }
+        std::cout << "Cost of the solution: " << *(result.second) << std::endl;
+    }
+    else {
+        std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::GLP::freeEnv();
 

@@ -36,16 +36,17 @@ int main() {
     std::vector<std::pair<int, int>> jobsToMachines;
 
     // solve it
-    auto resultType = paal::ir::generalised_assignment_iterative_rounding(
+    auto result = paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(), jobs.begin(), jobs.end(),
             costf, timef, Tf, std::back_inserter(jobsToMachines),
             paal::ir::GeneralAssignmentIRComponents<>());
 
     // print result
-    if (resultType == paal::lp::OPTIMAL) {
+    if (result.first == paal::lp::OPTIMAL) {
         for (auto const & jm : jobsToMachines) {
             std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
         }
+        std::cout << "Cost of the solution: " << *(result.second) << std::endl;
     }
     else {
         std::cout << "The instance is infeasible" << std::endl;

@@ -127,7 +127,7 @@ void fillGraph(Graph & g, const Edges & edges, int & verticesNum) {
         // add regular edge
         paal::addEdge(g, cost, e.first.first, e.first.second, randCost());
         // add new vertices on multi-edges, so that we get a graph not a multigraph
-        for (int i = 1;i<e.second;++i) {
+        for (int i = 1; i < e.second; ++i) {
             paal::addEdge(g, cost, e.first.first, verticesNum, randCost());
             paal::addEdge(g, cost, e.first.second, verticesNum, randCost());
             ++verticesNum;
@@ -211,9 +211,9 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
 
-    auto probType = ir::solve_iterative_rounding(steinerNetwork,
+    auto result = ir::solve_iterative_rounding(steinerNetwork,
                         std::move(components));
-    BOOST_CHECK(probType == lp::OPTIMAL);
+    BOOST_CHECK(result.first == lp::OPTIMAL);
 }
 
 template <typename Restrictions>

@@ -1,6 +1,6 @@
 /**
  * @file multiway_cut_test_long.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2014-01-17
@@ -14,13 +14,13 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "paal/greedy/k_cut/k_cut.hpp"
-#include "paal//multiway_cut/multiway_cut.hpp"
+#include "paal/multiway_cut/multiway_cut.hpp"
 #include "utils/logger.hpp"
 
 namespace{
 template <typename Graph>
 double test(Graph graph){
-    auto weight= boost::get(boost::edge_weight, graph); 
+    auto weight= boost::get(boost::edge_weight, graph);
     std::vector<std::pair<int,int> > verticesParts;
     LOGLN("multiway_cut: ");
     auto costCut=paal::multiway_cut(graph,back_inserter(verticesParts));
@@ -37,7 +37,7 @@ double test(Graph graph){
         if(verticesToParts[source(*i,graph)]!=verticesToParts[target(*i,graph)])
             costCutVerification+=weight(*i);
     }
-    
+
     LOGLN("Cost Cut:              "<<costCut);
     LOGLN("Cost Cut Verification: "<<costCutVerification );
     LOGLN("");
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
             }while(source==target);
             addEdge(source,target,CONECT_TO_TERMINAL_COST);
         }
-        
+
         //add edges in components
         nuEdgesCopy=NU_COMPONENTS_EDGES;
         while(--nuEdgesCopy){
@@ -96,7 +96,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
             }while(source==target);
             addEdge(source,target,CONECT_IN_COMPONENT_COST);
         }
-        
+
         //add random edges
         nuEdgesCopy=NU_RANDOM_EDGES;
         while(--nuEdgesCopy){
@@ -110,7 +110,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
     std::vector<int> terminals={0,1,2};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::property < boost::vertex_color_t, int>,
-                    boost::property < boost::edge_weight_t, int> 
+                    boost::property < boost::edge_weight_t, int>
                     > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),NU_VERTICES);
 
     for(std::size_t i=1;i<=terminals.size();i++)
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
     //  *-*-*-* *
     //  |/|/|/
     //  *-*-* * *
-    //  |/|/ 
+    //  |/|/
     //  *-* * * *
     //  |/
     //  * * * * *
@@ -136,7 +136,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
     // in the oder words we have triangle
     // and we several times get all triangle add point on each edge and connect them dividing triangle on 4 triangle
     // edges added in each step have ten times smaller cost
-    
+
     static const int SIZ=33;
     static const int OPTIMAL=324992;
     static const int NU_VERTICES=SIZ*SIZ;
@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
         }
         return cost;
     };
-    {   
+    {
         for(auto i:sizeRange)
         for(auto j:sizeRange){
             if(i+j<SIZ-1){
@@ -173,14 +173,14 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
     std::vector<int> terminals={0,SIZ-1,(SIZ-1)*SIZ};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::property < boost::vertex_color_t, int>,
-                    boost::property < boost::edge_weight_t, int> 
+                    boost::property < boost::edge_weight_t, int>
                     > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),NU_VERTICES);
 
     for(std::size_t i=1;i<=terminals.size();i++)
         put (boost::vertex_color,graph,terminals[i-1],i);
-    
+
     double costCut=::test(graph);
-    
+
     LOGLN("Cost Cut Optimal: "<<OPTIMAL );
     BOOST_CHECK(costCut>=OPTIMAL);
     LOGLN("Aproximation Ratio: "<<double(costCut)/OPTIMAL);

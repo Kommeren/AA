@@ -39,18 +39,21 @@ int main() {
     }
 
     // solve it
-    paal::ir::tree_augmentation_iterative_rounding(g,
+    auto result = paal::ir::tree_augmentation_iterative_rounding(g,
                 std::back_inserter(solution), paal::ir::TAComponents<>());
 
-    std::cout << "The solution contains the following nontree edges:" << std::endl;
-
-    for (auto const & e : solution) {
-        std::cout << "Edge " << e << std::endl;
+    if (result.first == paal::lp::OPTIMAL) {
+        std::cout << "The solution contains the following nontree edges:" << std::endl;
+        for (auto const & e : solution) {
+            std::cout << "Edge " << e << std::endl;
+        }
+        std::cout << "Cost of the solution: " << *(result.second) << std::endl;
     }
-//! [Tree Augmentation Example]
-    //TODO change after adding of cost computation to the IR
-//    std::cout<<"The total cost of the solution is "<<treeaug.getSolutionValue()<<std::endl;
+    else {
+        std::cout << "The instance is infeasible" << std::endl;
+    }
     paal::lp::GLP::freeEnv();
+//! [Tree Augmentation Example]
 
     return 0;
 }

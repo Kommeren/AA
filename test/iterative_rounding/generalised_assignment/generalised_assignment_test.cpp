@@ -110,13 +110,14 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
 
     std::vector<std::pair<int, int>> jobsToMachines;
 
-    auto probType = paal::ir::generalised_assignment_iterative_rounding(
+    auto result = paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
         costf, timef, Tf, std::back_inserter(jobsToMachines),
         paal::ir::GeneralAssignmentIRComponents<>());
 
-    BOOST_CHECK(probType == lp::INFEASIBLE);
+    BOOST_CHECK(result.first == lp::INFEASIBLE);
+    BOOST_ASSERT(!result.second);
 }
 BOOST_AUTO_TEST_SUITE_END()
 

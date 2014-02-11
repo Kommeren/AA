@@ -1,6 +1,6 @@
 /**
  * @file shortest_superstring_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-20
@@ -44,6 +44,6 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
         LOGLN(res);
         BOOST_CHECK(utils::Compare<double>(0.001).le(opt,s));
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
-        }     
+        }
     });
 }
