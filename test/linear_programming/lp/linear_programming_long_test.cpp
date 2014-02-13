@@ -12,9 +12,9 @@
  * @version 1.0
  * @date 2014-04-03
  */
-#include "utils/logger.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/read_lp.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/read_lp.hpp"
 
 #include "paal/lp/glp.hpp"
 

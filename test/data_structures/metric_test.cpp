@@ -14,7 +14,7 @@
  * @date 2013-02-04
  */
 
-#include "utils/sample_graph.hpp"
+#include "test_utils/sample_graph.hpp"
 
 #include "paal/utils/irange.hpp"
 #include "paal/utils/floating.hpp"

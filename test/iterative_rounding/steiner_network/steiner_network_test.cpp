@@ -13,7 +13,7 @@
  * @date 2013-06-24
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"

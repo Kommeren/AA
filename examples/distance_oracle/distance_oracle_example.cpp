@@ -15,7 +15,7 @@
 
 //! [Distance Oracle Example]
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include <iostream>
 

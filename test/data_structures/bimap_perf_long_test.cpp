@@ -12,7 +12,7 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/utils/irange.hpp"

@@ -13,7 +13,7 @@
  * @date 2013-06-04
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 #include "iterative_rounding/log_visitor.hpp"
 
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"

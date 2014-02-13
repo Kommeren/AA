@@ -14,8 +14,8 @@
  */
 #define BOOST_TEST_MODULE two_local_search_stdin
 
-#include "utils/read_tsplib.hpp"
-#include "2_local_search_logger.hpp"
+#include "test_utils/read_tsplib.hpp"
+#include "test_utils/2_local_search_logger.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"

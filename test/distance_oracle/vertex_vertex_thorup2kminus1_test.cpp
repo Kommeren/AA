@@ -12,11 +12,12 @@
 * @version 1.0
 * @date 2014-05-11
 */
-#include "utils/sample_graph.hpp"
-#include "utils/test_result_check.hpp"
-
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
+
+#include "test_utils/sample_graph.hpp"
+#include "test_utils/test_result_check.hpp"
+
 #include "paal/utils/irange.hpp"
 #include "paal/utils/indexed_range.hpp"
 

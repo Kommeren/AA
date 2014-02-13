@@ -13,7 +13,7 @@
  * @date 2013-08-01
  */
     //! [Dreyfus Wagner Example]
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
 

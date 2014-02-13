@@ -13,9 +13,9 @@
  * @date 2013-06-10
  */
 
-#include "utils/logger.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/read_bounded_deg_mst.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/read_bounded_deg_mst.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"

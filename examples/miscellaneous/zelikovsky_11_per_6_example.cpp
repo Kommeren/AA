@@ -16,7 +16,7 @@
     //! [Steiner Tree Example]
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include <iostream>
 

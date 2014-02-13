@@ -13,7 +13,7 @@
  * @date 2013-08-04
  */
 
-#include "utils/sample_graph.hpp"
+#include "test_utils/sample_graph.hpp"
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
 

@@ -14,9 +14,9 @@
  */
 
 
-#include "utils/logger.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 

@@ -13,7 +13,7 @@
  * @date 2014-01-04
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/local_search/n_queens/n_queens_local_search.hpp"
 #include "paal/data_structures/components/components_replace.hpp"

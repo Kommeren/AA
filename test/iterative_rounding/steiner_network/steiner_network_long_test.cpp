@@ -13,9 +13,8 @@
  * @date 2013-07-10
  */
 
-#include "utils/logger.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/read_bounded_deg_mst.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_bounded_deg_mst.hpp"
 
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 #include "paal/utils/irange.hpp"

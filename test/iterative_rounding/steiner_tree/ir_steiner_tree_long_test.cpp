@@ -13,9 +13,9 @@
  * @date 2013-02-04
  */
 
-#include "utils/logger.hpp"
-#include "utils/read_steinlib.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_steinlib.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
 

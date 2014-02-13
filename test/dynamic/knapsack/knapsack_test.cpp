@@ -13,8 +13,8 @@
  * @date 2013-09-20
  */
 
-#include "utils/logger.hpp"
-#include "utils/knapsack_tags_utils.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/knapsack_tags_utils.hpp"
 
 #include "paal/dynamic/knapsack_unbounded.hpp"
 #include "paal/dynamic/knapsack_0_1.hpp"

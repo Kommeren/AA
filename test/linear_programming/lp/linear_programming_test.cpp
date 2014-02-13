@@ -13,7 +13,7 @@
  * @date 2014-04-07
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/floating.hpp"

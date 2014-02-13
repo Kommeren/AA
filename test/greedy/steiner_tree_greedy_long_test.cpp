@@ -12,8 +12,9 @@
  * @version 1.0
  * @date 2013-09-20
  */
-#include "utils/read_steinlib.hpp"
-#include "utils/test_result_check.hpp"
+
+#include "test_utils/read_steinlib.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
 #include "paal/utils/functors.hpp"

@@ -13,7 +13,7 @@
  * @date 2013-07-10
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 

@@ -13,7 +13,7 @@
  * @date 2013-02-01
  */
     //! [K Median Search Example]
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include "paal/local_search/k_median/k_median.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"

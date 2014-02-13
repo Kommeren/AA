@@ -5,8 +5,8 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
-#include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
+#include "test_utils/sample_graph.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/local_search/custom_components.hpp"

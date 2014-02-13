@@ -12,8 +12,9 @@
  * @version 1.0
  * @date 2013-11-19
  */
-#include "utils/scheduling.hpp"
-#include "utils/test_result_check.hpp"
+
+#include "test_utils/scheduling.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
 #include "paal/utils/functors.hpp"

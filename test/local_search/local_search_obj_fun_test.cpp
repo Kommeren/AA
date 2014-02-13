@@ -13,7 +13,7 @@
  * @date 2013-02-11
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/local_search/search_obj_func_components.hpp"
 #include "paal/local_search/local_search_obj_function.hpp"

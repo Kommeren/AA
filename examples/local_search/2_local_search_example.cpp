@@ -14,7 +14,7 @@
  */
 
     //! [Two Local Search Example]
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/cycle_algo.hpp"

@@ -13,7 +13,7 @@
  * @date 2013-02-04
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/data_structures/combine_iterator.hpp"
 #include "paal/utils/make_tuple.hpp"

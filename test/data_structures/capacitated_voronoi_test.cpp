@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 
-#include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
+#include "test_utils/sample_graph.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
 #include "paal/data_structures/object_with_copy.hpp"

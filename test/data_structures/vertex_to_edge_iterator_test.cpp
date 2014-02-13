@@ -5,7 +5,7 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/data_structures/vertex_to_edge_iterator.hpp"
 

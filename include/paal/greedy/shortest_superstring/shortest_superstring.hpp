@@ -16,8 +16,8 @@
 #define PAAL_SHORTEST_SUPERSTRING_HPP
 
 
-#include "paal/suffix_array/lcp.hpp"
-#include "paal/suffix_array/suffix_array.hpp"
+#include "paal/utils/algorithms/suffix_array/lcp.hpp"
+#include "paal/utils/algorithms/suffix_array/suffix_array.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/shortest_superstring/prefix_tree.hpp"
 #include "paal/data_structures/bimap.hpp"

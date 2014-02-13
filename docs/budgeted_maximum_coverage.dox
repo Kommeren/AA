@@ -1,0 +1,66 @@
+/*! \page budgeted_maximum_coverage Budgeted Maximum Coverage
+
+\section def Problem definition.
+In budgeted maximum coverage we are given Universe \f$U\f$ and family \anchor S \f$S\f$ of subsets of \f$U\f$.
+Each set s in \f$S\f$ has cost c(s) and each element e in \f$U\f$ has weight w(e).
+We are also given budget \f$B\f$
+
+The goal if to find subfamily \f$C\subseteq S\f$ that has cost not greater than B and
+maximize weight of covered elements.
+
+\section Solution
+
+We use the following procedure:
+
+At each stage we add to \f$C\f$ a set which doesn't exceed the budget and which maximizes (weight of uncovered elements)/(cost of set)
+
+We repeat the step as long as such set exists.
+
+Here we implement the following algorithm:
+
+We start above procedure from every initial_set_size \f$I\f$ of set selected
+
+and return best from (all \f$K!/(K-I)!/I!\f$) found solution
+
+  example:
+\snippet budgeted_maximum_coverage_example.cpp Budgeted Maximum Coverage Example
+
+  complete example is budgeted_maximum_coverage_example.cpp
+
+\subsection parameters_budgeted_maximum_coverage Parameters
+
+IN: <i>SetIterator</i> sets_begin
+
+IN: <i>SetIterator</i> sets_end,
+
+IN: <i>GetCostOfSet</i> set_to_cost
+
+IN: <i>GetElementsOfSet</i> set_to_elements
+
+OUT: <i>OutputIterator</i> result
+
+The Iterators of selected Sets will be output to the output iterator result
+
+The iterator type must be a model of <i>Output Iterator</i>
+
+IN: <i>GetElementIndex</i> get_el_index we need in algorithm map elements to small unique integers
+
+IN: <i>Budget</i> budget
+
+IN: <i>GetWeightOfElement</i> element_to_weight =GetWeightOfElement()
+
+IN: <i>unsigned int</i> initial_set_size =3
+
+\subsection app_WsetCover Approximation Ratio
+equals to \f$ 1-1/e \f$.
+
+\subsection com_WsetCover The complexity
+Complexity of the algorithm is \f$E*log(|\f$<a class="el" href="budgeted_maximum_coverage.html#S">\\\(S\\\)</a>\f$|)*|\f$<a class="el" href="budgeted_maximum_coverage.html#S">\\\(S\\\)</a>\f$|^{|I|}\f$. where \f$E\f$ is number of elements in all sets and \f$I\f$ is initial set size
+
+Memory complexity of the algorithm is \f$E\f$. where \f$E\f$ is number of elements in all sets
+
+\subsection References
+
+The algorithm analysis is described in \cite Cohen:2008:GMC:1401272.1401544
+
+*/

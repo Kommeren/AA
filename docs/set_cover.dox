@@ -1,0 +1,53 @@
+/*! \page w_set_cover Set Cover
+
+\section def Problem definition.
+In weighted set cover problem we are given Universe \f$U\f$ and family \f$S\f$ of subsets of U, a cover is a subfamily \f$C\subseteq S\f$
+of sets whose union is \f$U\f$.
+The goal is to find minimum cost cover.
+
+\section Solution
+
+Here we implement the following algorithm:
+
+At each stage we add to \f$C\f$ a set which maximizes(number of uncovered elements)/(cost of set).
+
+We repeat the step as long as uncovered elements exist. When the algorithm finishes we return selected sets in \f$C\f$.
+
+  example:
+\snippet set_cover_example.cpp Set Cover Example
+
+  complete example is set_cover_example.cpp
+
+\subsection parameters_WsetCover Parameters
+
+IN: <i>SetIterator</i> sets_begin
+
+IN: <i>SetIterator</i> sets_eEnd,
+
+IN: <i>GetCostOfSet</i> set_to_cost
+
+IN: <i>GetElementsOfSet</i> set_to_elements
+
+OUT: <i>OutputIterator</i> result
+
+The Iterators of selected Sets will be output to the output iterator result
+
+The iterator type must be a model of <i>Output Iterator</i>
+
+IN: <i> GetElementIndex</i> get_el_index we need in algorithm map elements to small unique integers
+
+
+\subsection app_WsetCover Approximation Ratio
+equals to \f$H(s')\f$ where \f$s'\f$ is the maximum cardinality set of \f$S\f$ and \f$H(n)\f$ is n-th harmonic number.
+
+\subsection com_WsetCover The complexity
+Complexity of the algorithm is \f$|I|*log(|I|)\f$. where \f$I\f$ is number of elements in all sets
+
+Memory complexity of the algorithm is \f$|I|\f$. where \f$I\f$ is number of elements in all sets
+
+\subsection References
+
+The algorithm analysis is described in \cite Vazirani:2001:AA:500776
+
+
+*/

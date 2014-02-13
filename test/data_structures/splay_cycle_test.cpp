@@ -13,7 +13,7 @@
  * @date 2013-02-04
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 #include "cycle.hpp"
 
 #include "paal/data_structures/cycle/splay_cycle.hpp"

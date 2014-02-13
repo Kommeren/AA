@@ -13,10 +13,10 @@
  * @date 2013-02-15
  */
 
-#include "utils/logger.hpp"
-#include "utils/read_orlib_fl.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_orlib_fl.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"

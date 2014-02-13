@@ -18,9 +18,9 @@
 // this include must be here! //hack for clang
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_steinlib.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_steinlib.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/utils/irange.hpp"
 #include "paal/data_structures/bimap.hpp"

@@ -15,7 +15,7 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 
 #include "paal/local_search/n_queens/n_queens_local_search.hpp"
 #include "paal/local_search/simulated_annealing.hpp"

@@ -13,9 +13,9 @@
  * @date 2013-09-06
  */
 
-#include "utils/logger.hpp"
-#include "utils/scheduling.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/scheduling.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 

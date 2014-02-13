@@ -15,8 +15,8 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/multiway_cut/multiway_cut.hpp"
 #include "paal/utils/irange.hpp"

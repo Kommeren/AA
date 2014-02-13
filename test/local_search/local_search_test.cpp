@@ -13,8 +13,8 @@
  * @date 2013-02-04
  */
 
-#include "utils/logger.hpp"
-#include "utils/simple_single_local_search_components.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/simple_single_local_search_components.hpp"
 
 #include "paal/local_search/custom_components.hpp"
 

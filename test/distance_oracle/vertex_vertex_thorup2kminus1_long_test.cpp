@@ -15,10 +15,10 @@
 
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_dist.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_dist.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/range/adaptor/sliced.hpp>

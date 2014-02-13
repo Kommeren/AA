@@ -14,7 +14,7 @@
  */
 
     //! [steiner tree greedy Example]
-#include "test/utils/sample_graph.hpp"
+#include "test/test_utils/sample_graph.hpp"
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
 

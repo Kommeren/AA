@@ -13,9 +13,9 @@
  * @date 2013-02-15
  */
 
-#include "utils/logger.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/read_gen_ass.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/read_gen_ass.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"

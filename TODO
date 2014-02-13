@@ -1,4 +1,14 @@
+
 * add example to metrics
+
+* euclidean metric shouldn't be parametrized
+
+* doxygen comment in code should start from big letter
+
+* check boost concepts
+
+* separate in/out, type, name, description in doxygen
+
 * disable typedefs warning in doxygen
 * knapsack unbounded fptas is not realy fptas
   there is a problem with number of objects.
@@ -29,10 +39,5 @@
 
 
 * GREEDY
-** set cover (AA)
-** max coverage (AA)
 ** steiner forest (conjecture)
-
-*LOCAL_SEARCH
-** maybe 0 shouldn't be hardcoded
 

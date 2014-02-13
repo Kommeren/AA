@@ -47,6 +47,8 @@
             </ul>
         <li> Greedy
             <ul>
+            <li> \ref budgeted_maximum_coverage
+            <li> \ref maximum_coverage
             <li> \ref kcenter
             <li> \ref kcut
             <li> \ref knapsack_greedy
@@ -55,6 +57,7 @@
             <li> \ref sjoipm
             <li> \ref sjwdoasm
             <li> \ref stein_tree_greedy
+            <li> \ref w_set_cover
             </ul>
         <li> Dynamic
             <ul>
@@ -89,8 +92,10 @@
         <ul>
         <li>\ref comps
         <li>\ref do_vv_2kminus1
+        <li>\ref paal::data_structures::stack
         <li>\ref paal::data_structures::graph_metric
         <li>\ref paal::data_structures::array_metric
+        <li>\ref paal::data_structures::euclidean_metric
         <li>\ref paal::data_structures::simple_cycle
         <li>\ref paal::data_structures::splay_cycle
         <li>\ref paal::data_structures::object_with_copy
@@ -100,6 +105,7 @@
         <li>\ref paal::data_structures::subsets_iterator
         <li>\ref paal::data_structures::vertex_to_edge_iterator
         <li>\ref paal::data_structures::bimap
+
         </ul>
     </ul>
 

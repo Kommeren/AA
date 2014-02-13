@@ -13,7 +13,8 @@
  * @date 2013-02-04
  */
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
+
 #include "iterative_rounding/log_visitor.hpp"
 
 #include "paal/data_structures/metric/basic_metrics.hpp"

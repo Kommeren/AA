@@ -13,9 +13,9 @@
  * @date 2013-09-20
  */
 
-#include "utils/logger.hpp"
-#include "utils/sample_graph.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/sample_graph.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
 

@@ -13,7 +13,7 @@
  * @date 2013-06-20
  */
 
-#include "utils/sample_graph.hpp"
+#include "test_utils/sample_graph.hpp"
 
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"

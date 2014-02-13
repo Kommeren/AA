@@ -5,9 +5,9 @@
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
-#include "utils/read_tsplib.hpp"
-#include "2_local_search_logger.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/read_tsplib.hpp"
+#include "test_utils/2_local_search_logger.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"

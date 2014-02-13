@@ -13,10 +13,10 @@
  * @date 2013-08-20
  */
 
-#include "utils/logger.hpp"
-#include "utils/read_ss.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/read_ss.hpp"
+#include "test_utils/parse_file.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
 #include "paal/utils/floating.hpp"

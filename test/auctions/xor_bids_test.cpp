@@ -13,7 +13,7 @@
  * @date 2014-2-25
  */
 
-#include "utils/auctions.hpp"
+#include "test_utils/auctions.hpp"
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/xor_bids.hpp"

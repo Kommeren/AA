@@ -14,7 +14,7 @@
  */
 
 
-#include "utils/logger.hpp"
+#include "test_utils/logger.hpp"
 #include "cycle.hpp"
 
 using std::string;

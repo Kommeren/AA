@@ -13,8 +13,8 @@
  * @date 2013-08-20
  */
 
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/utils/irange.hpp"

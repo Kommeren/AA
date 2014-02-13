@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
+#include "test_utils/logger.hpp"
+#include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
 #include "paal/utils/irange.hpp"

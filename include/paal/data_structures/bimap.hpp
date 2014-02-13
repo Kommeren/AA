@@ -365,7 +365,7 @@ void rank(std::vector<T> const &m_id_to_t, std::vector<Idx> &m_t_to_id,
           int INVALID_IDX = 0) {
     static_assert(std::is_integral<T>::value, "Type T has to be integral");
     unsigned long size = m_t_to_id.size();
-    for (auto i : boost::irange(0ul, size)) {
+    for (auto i : irange(size)) {
         Idx &idx = m_t_to_id[m_id_to_t[i]];
         assert(m_id_to_t[i] < int(size) && idx == INVALID_IDX);
         idx = i;

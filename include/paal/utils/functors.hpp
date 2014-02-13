@@ -25,6 +25,7 @@
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/numeric.hpp>
 
 #include "paal/utils/type_functions.hpp"
@@ -1013,6 +1014,15 @@ template <typename Range, typename Functor>
 auto sum_functor(const Range& rng, Functor f) {
    using T = pure_result_of_t<Functor(range_to_elem_t<Range>)>;
    return accumulate_functor(rng, T(0), f);
+}
+
+
+/// combination of boost::accumulate and boost::adaptors::transformed
+template <typename Range, typename Functor>
+auto max_element_functor(const Range& rng, Functor f) {
+   return boost::max_element(
+      rng | boost::adaptors::transformed(make_assignable_functor(f))
+   );
 }
 
 } //! utils

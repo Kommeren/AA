@@ -13,7 +13,8 @@
  * @date 2014-01-29
  */
 
-#include "utils/test_result_check.hpp"
+#include "test_utils/test_result_check.hpp"
+
 #include "greedy/k_center/in_balls.hpp"
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
