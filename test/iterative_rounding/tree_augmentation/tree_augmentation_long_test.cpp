@@ -15,6 +15,7 @@
 
 #include "utils/parse_file.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;
@@ -135,7 +136,6 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
 
         double solval = treeaug.getSolutionCost();
         BOOST_CHECK_EQUAL(solval, *(result.second));
-        LOGLN("Cost of solution found: " << solval << ", LP lower bound: " << lplowerbd);
-        BOOST_CHECK(solval <= 2 * lplowerbd);
+        check_result_compare_to_bound(solval,lplowerbd,2);
     });
 }

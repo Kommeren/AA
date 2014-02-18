@@ -11,6 +11,7 @@
 #include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 #include "utils/logger.hpp"
 #include "../utils/scheduling.hpp"
+#include "utils/test_result_check.hpp"
 const long long maxTime=1000000000;
 const long minMachines=10;
 const long maxMachines=1000000;
@@ -51,14 +52,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
             Time maximumLoad=*std::max_element(sumOfMachine.begin(),sumOfMachine.end());
 
             Time sumAllLoads=std::accumulate(sumOfMachine.begin(),sumOfMachine.end(),0.0);
-            auto upperBoundAproxmiationRatio=
-               (maximumLoad*numberOfMachines)/double(sumAllLoads);
             //print result
-            LOGLN("Solution: "<<maximumLoad);
-            LOGLN("Approximation Ratio: "<<upperBoundAproxmiationRatio);
-            LOGLN("");
-            BOOST_CHECK(upperBoundAproxmiationRatio<=4.0/3.0);
-            BOOST_CHECK(upperBoundAproxmiationRatio>=1);
+            check_result(double(maximumLoad),double(sumAllLoads)/numberOfMachines,4.0/3.0);
         }
     }
 }

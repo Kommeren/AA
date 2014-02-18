@@ -16,6 +16,7 @@
 #include "paal/data_structures/bimap.hpp"
 
 #include "utils/read_steinlib.hpp"
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
     std::vector<paal::SteinerTreeTest> data;
@@ -46,11 +47,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
                 res += idxM(i, pm[i]);
             }
         }
-        LOGLN("RES " << res);
-
-        auto appRatio = double(res) / double(test.optimal);
-        BOOST_CHECK(appRatio <= 11./6.);
-        LOGLN("APPROXIMATION_RATIO:" << appRatio);
+        check_result(res,test.optimal,11./6);
     }
 
    //BOOST_CHECK_EQUAL(s, 6);

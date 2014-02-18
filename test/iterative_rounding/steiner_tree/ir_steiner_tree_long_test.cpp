@@ -14,6 +14,7 @@
 #include "utils/logger.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
 #include "utils/read_steinlib.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal;
 using namespace paal::ir;
@@ -35,10 +36,9 @@ BOOST_AUTO_TEST_CASE(steiner_long_test) {
         std::vector<int> result;
         paal::ir::solve_steiner_tree(test.metric, test.terminals, test.steinerPoints,
                 std::back_inserter(result), strategyRand);
-        ON_LOG(int res = )paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
+        int res = paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
 
-        LOG("RES " << res << "\n");
-        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
+        check_result(res,test.optimal,1.39);
 
         // First tests only
         if (++k == 10) break;

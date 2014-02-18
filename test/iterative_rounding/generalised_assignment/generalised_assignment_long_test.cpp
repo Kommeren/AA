@@ -28,7 +28,7 @@ using namespace paal;
 BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
     parse(testDir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
-        double opt;
+        int opt;
         int numberOfCases;
 
         is_test_cases >> numberOfCases;
@@ -73,10 +73,10 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             for (int j : jobs) {
                 BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
             }
-
-            int c(*(result.second));
+            BOOST_CHECK(abs(std::round(*(result.second))-*(result.second)<0.000001));
+            int c=std::round(*(result.second));
             LOGLN("cost " << c);
-            BOOST_CHECK(utils::Compare<double>(0.01).le(c, opt));
+            BOOST_CHECK(c <= opt);
             LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
         int MAX_LINE = 256;

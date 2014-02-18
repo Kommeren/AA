@@ -20,6 +20,7 @@
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
 #include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
@@ -60,9 +61,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         facility_location_local_search(sol, nop, nop, rem, add, swap);
 
         long long c = simple_algo::getFLCost(metric, cost, sol);
-        LOGLN(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(opt <= c + MULTIPL);
-        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << double(c) / double(opt));
+        check_result(c,opt,3.,paal::utils::LessEqual(),MULTIPL);
     });
 
 }

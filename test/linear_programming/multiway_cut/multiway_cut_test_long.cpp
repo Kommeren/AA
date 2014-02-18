@@ -16,6 +16,7 @@
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/multiway_cut/multiway_cut.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 namespace{
 template <typename Graph>
@@ -179,10 +180,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
     for(std::size_t i=1;i<=terminals.size();i++)
         put (boost::vertex_color,graph,terminals[i-1],i);
 
-    double costCut=::test(graph);
-
-    LOGLN("Cost Cut Optimal: "<<OPTIMAL );
-    BOOST_CHECK(costCut>=OPTIMAL);
-    LOGLN("Aproximation Ratio: "<<double(costCut)/OPTIMAL);
+    int costCut=::test(graph);
+    check_result(costCut,OPTIMAL,2);
 }
 BOOST_AUTO_TEST_SUITE_END();

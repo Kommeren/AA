@@ -22,6 +22,7 @@
 #include "utils/logger.hpp"
 #include "utils/read_orlib_km.hpp"
 #include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
@@ -57,9 +58,6 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         LOGLN("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
         VSet chosen=sol.getChosenFacilities();
         LOG_COPY_RANGE_DEL(chosen," ");
-
-        LOGLN(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));
-        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        check_result(c,opt,5.,paal::utils::LessEqual(),0.01);
     });
 }

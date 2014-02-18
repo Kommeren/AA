@@ -10,7 +10,7 @@
 #include <boost/range/irange.hpp>
 #include "utils/logger.hpp"
 #include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
-
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     // sample data
@@ -40,11 +40,6 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
             maxDelay=startTime+time[jobId]-dueDate[jobId];
     }
     //print result
-    LOGLN("Solution:");
-    LOGLN(delay);
-    LOGLN("Aproximation ratio:");
-    LOGLN(delay/bestDelay);
-    BOOST_CHECK(delay>=bestDelay);
-    BOOST_CHECK(delay<=bestDelay*2);
+    check_result(delay,bestDelay,2);
     BOOST_CHECK_EQUAL(delay,maxDelay);
 }

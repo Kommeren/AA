@@ -12,6 +12,7 @@
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
 #include "paal/utils/functors.hpp"
 #include "utils/scheduling.hpp"
+#include "utils/test_result_check.hpp"
 
 using std::pair;
 using std::vector;
@@ -37,9 +38,7 @@ BOOST_AUTO_TEST_CASE(testDeterministicRounding) {
       back_inserter(result), IdentityFunctor(), IdentityFunctor());
    checkJobs(result, jobs);
    Time maxTime = getMaxTime(result, IdentityFunctor());
-   LOGLN("Solution: " << maxTime);
-   LOGLN("Approximation ratio: " << (maxTime / opt));
-   BOOST_CHECK(maxTime <= 2 * opt);
+   check_result(maxTime,opt,2.0);
 }
 
 BOOST_AUTO_TEST_CASE(testRandomizedRounding) {
@@ -50,7 +49,5 @@ BOOST_AUTO_TEST_CASE(testRandomizedRounding) {
       back_inserter(result), IdentityFunctor(), IdentityFunctor());
    checkJobs(result, jobs);
    Time maxTime = getMaxTime(result, IdentityFunctor());
-   LOGLN("Solution: " << maxTime);
-   LOGLN("Approximation ratio: " << (maxTime / opt));
-   BOOST_CHECK(maxTime <= 2 * opt);
+   check_result(maxTime,opt,2.0);
 }

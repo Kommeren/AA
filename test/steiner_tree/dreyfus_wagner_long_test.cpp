@@ -18,6 +18,7 @@
 
 #include "utils/read_steinlib.hpp"
 #include "utils/sample_graph.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal;
 
@@ -28,7 +29,6 @@ BOOST_AUTO_TEST_CASE(steinlib_test) {
     int k = 0;
     for (const SteinerTreeTest& test : data) {
         LOGLN("TEST " << test.testName);
-        LOGLN("OPT " << test.optimal);
         auto dw = paal::steiner_tree::make_DreyfusWagner(test.metric, test.terminals, test.steinerPoints);
         dw.solve();
         int res = dw.getCost();

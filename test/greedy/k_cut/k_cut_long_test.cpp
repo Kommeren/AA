@@ -12,6 +12,7 @@
 
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 const int nuVertices=500;
 const int nuEdges=1000*100;
@@ -66,12 +67,9 @@ BOOST_AUTO_TEST_CASE(KCut) {
         if(verticesToParts[source(edge,graph)]!=verticesToParts[target(edge,graph)])
             costCutVerification+=weight(edge);
     }
-    //estimate aproximation ratio
-    LOGLN("cost cut from algorithm: "<<costCutVerification <<" cut cost on "<<parts<<" components: "<<costCutOnComponents);
-    auto lowerBoundAproxmiationRatio=(costCutVerification)/double(costCutOnComponents);
-    LOGLN("Aproxmimation Ratio is not beter than: "<<lowerBoundAproxmiationRatio);
-    BOOST_CHECK(lowerBoundAproxmiationRatio<=2.0-2.0/double(parts));
-    LOGLN("");
     BOOST_CHECK_EQUAL(costCut,costCutVerification);
-
+	LOGLN("Number of parts: "<<parts);
+    //estimate aproximation ratio
+    check_result_compare_to_bound(costCutVerification,costCutOnComponents,2.0-2.0/double(parts),paal::utils::LessEqual(),
+                  0LL,"cut cost on components: ");
 }

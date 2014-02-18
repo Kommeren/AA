@@ -22,6 +22,7 @@
 
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal::local_search::facility_location;
 using namespace paal;
@@ -103,9 +104,8 @@ void runTests(const std::string & fname, Solve solve) {
         solve.template operator()<VorType>(sol, metric, cost, opt, make_fLLogger(metric, cost));
 
         double c = simple_algo::getCFLCost(metric, cost, sol);
-        LOGLN(std::setprecision(20) <<  "cost " << c);
-        BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));
-        LOGLN(std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);
+        check_result(c,opt,6.,paal::utils::LessEqual(),0.01);
+
     }
 }
 

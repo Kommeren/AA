@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <cmath>
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
@@ -11,6 +12,7 @@
 
 #include "utils/read_tsplib.h"
 #include "2_local_search_logger.hpp"
+#include "utils/test_result_check.hpp"
 
 using std::string;
 using std::vector;
@@ -51,7 +53,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //search
         two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
-        LOGLN(std::setprecision(20) << "APPROXIMATION RATIO: " << float(simple_algo::getLength(mtx, cycle)) / opt);
+        check_result(float(simple_algo::getLength(mtx, cycle)),opt,4*sqrt(size));
     }
 }
 

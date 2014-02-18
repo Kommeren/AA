@@ -13,9 +13,11 @@
 
 #include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_SUITE(SteinerTreeGreedy)
-
+static const int OPTIMAL=4;
+static const int APPROXIMATION_RATIO =2;
 BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     typedef  SampleGraphsMetrics SGM;
     auto g = SGM::getGraphSteiner();
@@ -29,8 +31,7 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     for(auto e: steinerEdges) {
         sum += get(weight, e);
     }
-    BOOST_CHECK(sum <= 2 * 4);
-
+    check_result(sum,OPTIMAL,APPROXIMATION_RATIO);
 }
 
 BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
@@ -58,7 +59,7 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
     for(auto e: steinerEdges) {
         sum += get(weight, e);
     }
-    BOOST_CHECK(sum <= 2 * 4);
+    check_result(sum,OPTIMAL,APPROXIMATION_RATIO);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

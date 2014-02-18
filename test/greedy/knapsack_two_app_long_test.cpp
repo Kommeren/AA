@@ -18,6 +18,7 @@
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
 #include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal;
 using namespace paal::utils;
@@ -56,11 +57,10 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
             LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
             auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
-            LOGLN("APPROXIMATION RATIO " << double(opt) /  double(maxValue.first));
             LOGLN("OPT");
             LOG_COPY_RANGE_DEL(optimal, " ");
             LOGLN("");
-            BOOST_CHECK(opt <= 2 * maxValue.first);
+            check_result(maxValue.first,opt,0.5,paal::utils::GreaterEqual());
         }
 
         //KNAPSACK

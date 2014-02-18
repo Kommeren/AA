@@ -14,6 +14,7 @@
 
 #include "utils/scheduling.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
    typedef long long Time;
@@ -62,10 +63,7 @@ BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
          auto checkAndPrint = [&] (const Result& result) {
             checkJobs(result, jobs);
             double maxTime = getMaxTime(result, getSpeed);
-            LOGLN("Solution: " << maxTime);
-            LOGLN("Approximation ratio: " << (double(maxTime) / optTime));
-            LOGLN("");
-            BOOST_CHECK(maxTime <= 2 * optTime);
+            check_result(maxTime,double(optTime),2);
          };
          checkAndPrint(resultRandomized);
          checkAndPrint(resultDeterministic);

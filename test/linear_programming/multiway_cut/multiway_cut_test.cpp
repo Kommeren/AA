@@ -15,6 +15,7 @@
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/multiway_cut/multiway_cut.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(MultiwayCutS) {
     std::vector<std::pair<int,int> > edgesP{{0,3},{1,3},
@@ -59,13 +60,11 @@ BOOST_AUTO_TEST_CASE(MultiwayCutS) {
         if(verticesToParts[source(*i,graph)]!=verticesToParts[target(*i,graph)])
             costCutVerification+=weight(*i);
     }
-    LOGLN("Cost Cut:              "<<costCut);
+
+
+    check_result(costCut,optimal,2);
     LOGLN("Cost Cut Verification: "<<costCutVerification );
-    LOGLN("Cost Cut Verification: "<<optimal );
-    LOGLN("Aproximation Ratio: "<<double(costCutVerification)/optimal);
-    LOGLN("");
     BOOST_CHECK_EQUAL(costCut,costCutVerification);
-    BOOST_CHECK(costCut>=optimal);
 
 }
 

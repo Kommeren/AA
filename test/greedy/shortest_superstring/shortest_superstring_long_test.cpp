@@ -19,13 +19,14 @@
 #include "utils/logger.hpp"
 #include "utils/read_ss.hpp"
 #include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
     std::string testDir = "test/data/SS/";
     parse(testDir + "capopt.txt", [&](const std::string  & fname, std::istream & is_test_cases) {
-        double opt;
+        int opt;
         is_test_cases >> opt;
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) <<  "OPT " << opt);
@@ -38,12 +39,12 @@ BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
                 assert(letter>0);
         }
         std::string res=paal::greedy::shortestSuperstring(words);
-        double s = res.size();
-        LOGLN(std::setprecision(20) <<  "GREEDY " << s);
+        int s = res.size();
         if(opt!=0){
-        LOGLN(res);
-        BOOST_CHECK(utils::Compare<double>(0.001).le(opt,s));
-        LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << s / opt);
+            LOGLN(res);
+            check_result(s,opt,3.5);
+        }else{
+            check_result_compare_to_bound(s,opt,3.5);
         }
     });
 }

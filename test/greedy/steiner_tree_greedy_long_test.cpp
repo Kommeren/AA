@@ -16,7 +16,7 @@
 #include "paal/greedy/steiner_tree_greedy.hpp"
 #include "paal/utils/functors.hpp"
 #include "utils/read_steinlib.hpp"
-
+#include "utils/test_result_check.hpp"
 
 template <typename Edge>
 struct EdgeFilter{
@@ -71,10 +71,6 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
         for(auto e : eFilter.edges) {
             res += weight(e);
         }
-        BOOST_CHECK(res > 0);
-        LOGLN("RES " << res);
-        auto appRatio = double(res) / double(test.optimal);
-        BOOST_CHECK(appRatio <= 2.);
-        LOGLN("APPROXIMATION_RATIO:" << double(res) / double(test.optimal));
+        check_result(res,test.optimal,2.);
     }
 }

@@ -26,7 +26,7 @@ public:
     template <typename Cycle>
     void operator()(const Cycle & cycle) {
         if(m_cnt++ % m_actionPerLog == 0) {
-            LOGLN("Length after\t" << m_cnt << ": " << simple_algo::getLength(m_mtx, cycle.get()));
+            LOGLN("Length after\t" << m_cnt << ": " << simple_algo::getLength(m_mtx, cycle.getCycle()));
         }
     }
 private:

@@ -12,6 +12,7 @@
 
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(KCut) {
     std::vector<std::pair<int,int> > edgesP{{1,2},{1,5},{2,3},{2,5},{2,6},{3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
@@ -47,11 +48,8 @@ BOOST_AUTO_TEST_CASE(KCut) {
             if(verticesToParts[source(i,graph)]!=verticesToParts[target(i,graph)])
                 costCutVerification+=weight[i];
         }
-        LOGLN("cost cut: "<<costCutVerification <<" optimal: "<<optimal[i-2]);
-        LOGLN("Aproximation Ratio: "<<double(costCutVerification)/optimal[i-2]);
-        LOGLN("");
         BOOST_CHECK_EQUAL(costCut,costCutVerification);
-        BOOST_CHECK(costCut>=optimal[i-2]);
+        check_result(costCutVerification,optimal[i-2],2.0-2.0/double(i));
     }
 
 }
