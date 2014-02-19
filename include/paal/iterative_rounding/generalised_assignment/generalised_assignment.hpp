@@ -367,12 +367,14 @@ make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
  */
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
-          typename JobsToMachinesOutputIterator, typename Components, typename Visitor = TrivialVisitor>
+          typename JobsToMachinesOutputIterator,
+          typename Components = GeneralAssignmentIRComponents<>,
+          typename Visitor = TrivialVisitor>
 IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
-                    JobIter jbegin, JobIter jend,
-                    const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
-                    JobsToMachinesOutputIterator jobToMachines, Components components,
-                    Visitor visitor = Visitor()) {
+                JobIter jbegin, JobIter jend,
+                const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
+                JobsToMachinesOutputIterator jobToMachines,
+                Components components = Components(), Visitor visitor = Visitor()) {
     auto gaSolution = make_GeneralisedAssignment(
             mbegin, mend, jbegin, jend,
             c, t, T, jobToMachines);

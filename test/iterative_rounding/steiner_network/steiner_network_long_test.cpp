@@ -197,22 +197,15 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     typedef std::vector<Edge> ResultNetwork;
     typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
     typedef ir::SteinerNetworkOracle<OracleComponents> Oracle;
-    typedef lp::RowGenerationSolveLP<Oracle> SolveLP;
-    typedef lp::RowGenerationResolveLP<Oracle> ResolveLP;
-    typedef ir::SteinerNetworkIRComponents<Graph, Restrictions, SolveLP,
-        ResolveLP> Components;
+    typedef ir::SteinerNetworkIRComponents<> Components;
 
     ResultNetwork resultNetwork;
-    Oracle oracle;
-    Components components(lp::make_RowGenerationSolveLP(oracle),
-                          lp::make_RowGenerationResolveLP(oracle));
-    auto steinerNetwork(ir::make_SteinerNetwork(g, restrictions,
-                                    std::back_inserter(resultNetwork)));
+    auto steinerNetwork(ir::make_SteinerNetwork<Oracle>(g, restrictions,
+                            std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
 
-    auto result = ir::solve_iterative_rounding(steinerNetwork,
-                        std::move(components));
+    auto result = ir::solve_iterative_rounding(steinerNetwork, Components());
     BOOST_CHECK(result.first == lp::OPTIMAL);
 }
 

@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     SolutionTree solutionTree;
 
     auto treeaug(make_TreeAug(g, std::inserter(solutionTree, solutionTree.begin())));
-    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
+    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TreeAugmentationIRComponents<>());
     BOOST_CHECK(!solutionTree.empty());
 }
 
@@ -109,15 +109,14 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
         SolutionTree solutionTree;
         auto treeaug(make_TreeAug(g, boost::edge_color_map(treeMap).weight_map(cost),
                 std::inserter(solutionTree, solutionTree.begin())));
-        paal::ir::solve_iterative_rounding(treeaug, paal::ir::TAComponents<>());
+        paal::ir::solve_iterative_rounding(treeaug, paal::ir::TreeAugmentationIRComponents<>());
         BOOST_CHECK(!solutionTree.empty());
     }
     {
         SolutionTree solutionTree;
-        paal::ir::tree_augmentation_iterative_rounding(g,
-                boost::weight_map(cost),
-                std::inserter(solutionTree, solutionTree.begin()),
-                paal::ir::TAComponents<>());
+        paal::ir::tree_augmentation_iterative_rounding(
+                g, boost::weight_map(cost),
+                std::inserter(solutionTree, solutionTree.begin()));
         BOOST_CHECK(!solutionTree.empty());
     }
 }

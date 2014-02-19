@@ -42,12 +42,8 @@ int main() {
     }
 
     // solve it
-    paal::ir::SteinerNetworkOracle<> oracle;
-    paal::ir::SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-            components(paal::lp::make_RowGenerationSolveLP(oracle),
-                       paal::lp::make_RowGenerationResolveLP(oracle));
-    auto result = paal::ir::steiner_network_iterative_rounding(g, restrictions,
-                        std::back_inserter(resultNetwork), std::move(components));
+    auto result = paal::ir::steiner_network_iterative_rounding(
+                    g, restrictions, std::back_inserter(resultNetwork));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {

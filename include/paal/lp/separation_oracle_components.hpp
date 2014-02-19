@@ -19,7 +19,7 @@ namespace lp {
 struct FindMostViolated {
     /// Finds the most violated component.
     template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int) {
+    bool operator()(const Problem & problem, Oracle & oracle, int) {
         return oracle.findMostViolatedConstraint(problem);
     };
 };
@@ -31,7 +31,7 @@ struct FindMostViolated {
 struct FindAnyViolated {
     /// Finds any violated component.
     template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int) {
+    bool operator()(const Problem & problem, Oracle & oracle, int) {
         return oracle.findAnyViolatedConstraint(problem);
     };
 };
@@ -43,7 +43,7 @@ struct FindAnyViolated {
 struct FindRandViolated {
     /// Finds any violated component, starting from a random position.
     template <typename Problem, typename Oracle>
-    bool operator()(Problem & problem, Oracle & oracle, int numOfStartingPositions) {
+    bool operator()(const Problem & problem, Oracle & oracle, int numOfStartingPositions) {
         return oracle.findAnyViolatedConstraint(problem, rand() % numOfStartingPositions);
     };
 };

@@ -58,7 +58,7 @@ public:
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void addViolatedConstraint(Problem & problem, LP & lp) {
+    void addViolatedConstraint(const Problem & problem, LP & lp) {
         const auto & g = problem.getGraph();
         lp.addRow(lp::UP, 0, m_violatingSet.size() - 1);
 
@@ -84,7 +84,7 @@ public:
      * @return true iff a violated constraint was found
      */
     template <typename Problem>
-    bool findAnyViolatedConstraint(Problem & problem, int srcVertexIndex = 0) {
+    bool findAnyViolatedConstraint(const Problem & problem, int srcVertexIndex = 0) {
         auto vert = vertices(m_auxGraph);
         std::advance(vert.first, srcVertexIndex);
         auto src = *(vert.first);
@@ -114,7 +114,7 @@ public:
      * @return true iff a violated constraint was found
      */
     template <typename Problem>
-    bool findMostViolatedConstraint(Problem & problem) {
+    bool findMostViolatedConstraint(const Problem & problem) {
         auto graphVertices = vertices(m_auxGraph);
         auto src = *(graphVertices.first);
         assert(src != m_src && src != m_trg);
@@ -154,7 +154,7 @@ private:
      * Creates the auxiliary directed graph used for feasibility testing.
      */
     template <typename Problem, typename LP>
-    void fillAuxiliaryDigraph(Problem & problem, const LP & lp) {
+    void fillAuxiliaryDigraph(const Problem & problem, const LP & lp) {
         const auto & g = problem.getGraph();
         m_auxGraph = AuxGraph(num_vertices(g));
         m_cap = get(boost::edge_capacity, m_auxGraph);
@@ -223,7 +223,7 @@ private:
      * Calculates the sum of the variables for edges incident with a given vertex.
      */
     template <typename Problem, typename LP, typename Vertex>
-    double degreeOf(Problem & problem, const Vertex & v, const LP & lp) {
+    double degreeOf(const Problem & problem, const Vertex & v, const LP & lp) {
         double res = 0;
         auto adjEdges = out_edges(v, problem.getGraph());
 
@@ -245,7 +245,7 @@ private:
      * @return violation of the found set
      */
     template <typename Problem>
-    double checkViolationGreaterThan(Problem & problem, AuxVertex src, AuxVertex trg,
+    double checkViolationGreaterThan(const Problem & problem, AuxVertex src, AuxVertex trg,
                 double minViolation = 0.) {
         int numVertices(num_vertices(problem.getGraph()));
         double origVal = get(m_cap, m_srcToV[src]);

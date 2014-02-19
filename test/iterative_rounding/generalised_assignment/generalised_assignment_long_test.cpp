@@ -55,8 +55,7 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             auto result = paal::ir::generalised_assignment_iterative_rounding(
                 machines.begin(), machines.end(),
                 jobs.begin(), jobs.end(),
-                costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
-                paal::ir::GeneralAssignmentIRComponents<>());
+                costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()));
 
             BOOST_CHECK(result.first == lp::OPTIMAL);
 

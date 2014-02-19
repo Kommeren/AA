@@ -212,8 +212,8 @@ template <
     typename RelaxContition = TARelaxCondition,
     typename Init = TAInit,
     typename SetSolution = utils::SkipFunctor>
-        using  TAComponents = IRComponents<SolveLPToExtremePoint, ResolveLPToExtremePoint,
-                    RoundCondition, RelaxContition, Init, SetSolution>;
+        using  TreeAugmentationIRComponents = IRComponents<SolveLPToExtremePoint,
+                ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 /**
  * @brief This is Jain's iterative rounding
@@ -484,13 +484,14 @@ make_TreeAug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIte
  */
 template <typename Graph, typename TreeMap,
           typename CostMap, typename EdgeSetOutputIterator,
-          typename IRComponents, typename Visitor = TrivialVisitor>
+          typename IRComponents = TreeAugmentationIRComponents<>,
+          typename Visitor = TrivialVisitor>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         TreeMap treeMap,
         CostMap costMap,
         EdgeSetOutputIterator solution,
-        IRComponents components,
+        IRComponents components = IRComponents(),
         Visitor visitor = Visitor()) {
     auto treeaug = make_TreeAug(g, treeMap, costMap, solution);
     return solve_iterative_rounding(treeaug, std::move(components), std::move(visitor));
@@ -564,13 +565,14 @@ make_TreeAug(const Graph & g, EdgeSetOutputIterator solution) ->
  * @return solution status
  */
 template <typename Graph, typename EdgeSetOutputIterator,
-          typename IRComponents, typename Visitor = TrivialVisitor,
+          typename IRComponents = TreeAugmentationIRComponents<>,
+          typename Visitor = TrivialVisitor,
           typename P, typename T, typename R>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         const boost::bgl_named_params<P, T, R> & params,
         EdgeSetOutputIterator solution,
-        IRComponents components,
+        IRComponents components = IRComponents(),
         Visitor visitor = Visitor()) {
     return detail::tree_augmentation_iterative_rounding(g,
             choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color),
@@ -593,11 +595,12 @@ IRResult tree_augmentation_iterative_rounding(
  * @return solution status
  */
 template <typename Graph, typename EdgeSetOutputIterator,
-          typename IRComponents, typename Visitor = TrivialVisitor>
+          typename IRComponents = TreeAugmentationIRComponents<>,
+          typename Visitor = TrivialVisitor>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         EdgeSetOutputIterator solution,
-        IRComponents components,
+        IRComponents components = IRComponents(),
         Visitor visitor = Visitor()) {
     return tree_augmentation_iterative_rounding(g, boost::no_named_parameters(),
             std::move(solution), std::move(components), std::move(visitor));

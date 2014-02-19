@@ -82,13 +82,10 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     std::vector<int> degBounds = {1, 3, 2, 2, 1, 1};
     auto bounds = paal::utils::make_ArrayToFunctor(degBounds);
 
-    typedef BDMSTIRComponents<Graph> Components;
-    BoundedDegreeMSTOracle<> oracle;
-    Components components(lp::make_RowGenerationSolveLP(oracle),
-                          lp::make_RowGenerationResolveLP(oracle));
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(resultTree, resultTree.begin()),
-                    std::move(components), LogVisitor());
+                    BDMSTIRComponents<>(), BoundedDegreeMSTOracle<>(),
+                    LogVisitor());
 
     ON_LOG(for (auto const & e : resultTree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
@@ -116,30 +113,21 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
     ON_LOG(Index indices = get(boost::vertex_index, g));
 
     auto bounds = [&](int){return 2;};
-
-    typedef BDMSTIRComponents<Graph> Components;
     {
         ResultTree resultTree;
-        BoundedDegreeMSTOracle<> oracle;
-        Components components(lp::make_RowGenerationSolveLP(oracle),
-                              lp::make_RowGenerationResolveLP(oracle));
-
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin()),
-                    std::move(components), LogVisitor());
+                    BDMSTIRComponents<>(), BoundedDegreeMSTOracle<>(),
+                    LogVisitor());
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
         BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
     }
     {
         ResultTree resultTree;
-        BoundedDegreeMSTOracle<> oracle;
-        Components components(lp::make_RowGenerationSolveLP(oracle),
-                              lp::make_RowGenerationResolveLP(oracle));
-
         auto bdmst(make_BoundedDegreeMST(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin())));
-        solve_iterative_rounding(bdmst, std::move(components), LogVisitor());
+        solve_iterative_rounding(bdmst, BDMSTIRComponents<>(), LogVisitor());
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
         BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
@@ -165,10 +153,6 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
 
     auto bounds = [&](int){return 6;};
 
-    typedef BDMSTIRComponents<Graph> Components;
-    BoundedDegreeMSTOracle<> oracle;
-    Components components(lp::make_RowGenerationSolveLP(oracle),
-                          lp::make_RowGenerationResolveLP(oracle));
     auto bdmst(make_BoundedDegreeMST(g, bounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 
@@ -197,16 +181,12 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     std::vector<int> degBounds = {1, 2, 1, 2, 1, 3, 1, 1, 1, 3};
     auto bounds = paal::utils::make_ArrayToFunctor(degBounds);
 
-    typedef BDMSTIRComponents<Graph> Components;
-    BoundedDegreeMSTOracle<> oracle;
-    Components components(lp::make_RowGenerationSolveLP(oracle),
-                          lp::make_RowGenerationResolveLP(oracle));
     auto bdmst(make_BoundedDegreeMST(g, bounds, std::back_inserter(resultTree)));
     auto invalid = bdmst.checkInputValidity();
 
     BOOST_CHECK(!invalid);
 
-    auto result = solve_iterative_rounding(bdmst, std::move(components));
+    auto result = solve_iterative_rounding(bdmst, BDMSTIRComponents<>());
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
 }

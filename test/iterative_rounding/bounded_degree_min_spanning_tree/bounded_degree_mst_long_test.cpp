@@ -90,15 +90,10 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
 
     typedef ir::BoundedDegreeMSTOracleComponents<FindViolated> OracleComponents;
     typedef ir::BoundedDegreeMSTOracle<OracleComponents> Oracle;
-    typedef lp::RowGenerationSolveLP<Oracle> SolveLP;
-    typedef lp::RowGenerationResolveLP<Oracle> ResolveLP;
-    typedef ir::BDMSTIRComponents<Graph, SolveLP, ResolveLP> Components;
+
     ResultTree tree;
-    Oracle oracle;
-    Components components(lp::make_RowGenerationSolveLP(oracle),
-                          lp::make_RowGenerationResolveLP(oracle));
-    auto result = ir::bounded_degree_mst_iterative_rounding(g, degBounds,
-                            std::inserter(tree, tree.end()), std::move(components));
+    auto result = ir::bounded_degree_mst_iterative_rounding<Oracle>(
+                        g, degBounds, std::inserter(tree, tree.end()));
     BOOST_CHECK(result.first == lp::OPTIMAL);
 
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));

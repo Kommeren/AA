@@ -33,8 +33,6 @@ int restrictions(int i, int j) {
     return 2;
 }
 
-typedef SteinerNetworkOracle<> Oracle;
-
 BOOST_AUTO_TEST_SUITE(steiner_network)
 BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
@@ -50,12 +48,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     assert(b);
 
     //solve it
-    Oracle oracle;
-    SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-            comps(lp::make_RowGenerationSolveLP(oracle),
-                  lp::make_RowGenerationResolveLP(oracle));
-    steiner_network_iterative_rounding(g, restrictions,
-                std::back_inserter(resultNetwork), std::move(comps));
+    steiner_network_iterative_rounding(
+        g, restrictions, std::back_inserter(resultNetwork));
 
     // printing result
     LOGLN("Edges in steiner network");
@@ -84,12 +78,8 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
     //solve it
     {
         ResultNetwork resultNetwork;
-        Oracle oracle;
-        SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                comps(lp::make_RowGenerationSolveLP(oracle),
-                      lp::make_RowGenerationResolveLP(oracle));
-        steiner_network_iterative_rounding(g, restrictions, boost::weight_map(cost),
-                    std::back_inserter(resultNetwork), std::move(comps));
+        steiner_network_iterative_rounding(g, restrictions,
+            boost::weight_map(cost), std::back_inserter(resultNetwork));
 
         // printing result
         LOGLN("Edges in steiner network");
@@ -99,14 +89,10 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
     }
     {
         ResultNetwork resultNetwork;
-        Oracle oracle;
-        SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-                comps(lp::make_RowGenerationSolveLP(oracle),
-                      lp::make_RowGenerationResolveLP(oracle));
         auto steinerNetwork(make_SteinerNetwork(g, restrictions,
                     boost::weight_map(cost),
                     std::back_inserter(resultNetwork)));
-        solve_iterative_rounding(steinerNetwork, std::move(comps));
+        solve_iterative_rounding(steinerNetwork, SteinerNetworkIRComponents<>());
 
         // printing result
         LOGLN("Edges in steiner network");
@@ -129,10 +115,6 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     assert(b);
 
     //solve it
-    Oracle oracle;
-    SteinerNetworkIRComponents<Graph, decltype(restrictions)>
-            comps(lp::make_RowGenerationSolveLP(oracle),
-                  lp::make_RowGenerationResolveLP(oracle));
     auto steinerNetwork(make_SteinerNetwork(g, restrictions,
                                     std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();

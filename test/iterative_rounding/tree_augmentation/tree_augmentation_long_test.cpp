@@ -93,7 +93,7 @@ void readTreeAugFromStream(std::ifstream & is,
 template <typename TA>
 //the copy is intended
 double getLowerBound(TA ta) {
-    paal::ir::TAComponents<> comps;
+    paal::ir::TreeAugmentationIRComponents<> comps;
     lp::GLPBase lp;
     comps.call<Init>(ta, lp);
     auto probType = comps.call<SolveLPToExtremePoint>(ta, lp);
@@ -128,10 +128,9 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());
         LOGLN("Input validation " << filename << " ends.");
 
-        paal::ir::TAComponents<> comps;
-
         double lplowerbd = getLowerBound(treeaug);
-        auto result = paal::ir::solve_iterative_rounding(treeaug, comps);
+        auto result = paal::ir::solve_iterative_rounding(treeaug,
+                                    paal::ir::TreeAugmentationIRComponents<>());
         BOOST_CHECK_EQUAL(result.first, lp::OPTIMAL);
 
         double solval = treeaug.getSolutionCost();

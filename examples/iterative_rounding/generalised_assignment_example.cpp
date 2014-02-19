@@ -38,8 +38,7 @@ int main() {
     // solve it
     auto result = paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-            costf, timef, Tf, std::back_inserter(jobsToMachines),
-            paal::ir::GeneralAssignmentIRComponents<>());
+            costf, timef, Tf, std::back_inserter(jobsToMachines));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {

@@ -18,12 +18,8 @@ namespace lp {
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-template <typename Oracle>
 class LPRowGeneration {
 public:
-    /// Constructor.
-    LPRowGeneration(Oracle & oracle) : m_oracle(oracle) {}
-
     /**
      * Finds an extreme point solution to the LP using the row genereation technique:
      * solves the initial LP and then ask the separation oracle if the found solution
@@ -32,16 +28,14 @@ public:
      * feasible solution to the full LP is found.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(const Problem & problem, LP & lp, ProblemType probType) {
-        while (probType == OPTIMAL && !m_oracle.feasibleSolution(problem, lp)) {
-            m_oracle.addViolatedConstraint(problem, lp);
+    ProblemType operator()(Problem & problem, LP & lp, ProblemType probType) {
+        auto & oracle = problem.getOracle();
+        while (probType == OPTIMAL && !oracle.feasibleSolution(problem, lp)) {
+            oracle.addViolatedConstraint(problem, lp);
             probType = lp.resolveToExtremePointDual();
         }
         return probType;
     }
-
-private:
-    Oracle & m_oracle;
 };
 
 /**
@@ -49,22 +43,18 @@ private:
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-template <typename Oracle>
 class RowGenerationSolveLP {
 public:
-    /// Constructor.
-    RowGenerationSolveLP(Oracle & oracle) : m_rowGeneration(oracle) {}
-
     /**
      * Finds an extreme point solution to the LP using the row genereation technique.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(const Problem & problem, LP & lp) {
+    ProblemType operator()(Problem & problem, LP & lp) {
         return m_rowGeneration(problem, lp, lp.solveToExtremePointPrimal());
     }
 
 private:
-    LPRowGeneration<Oracle> m_rowGeneration;
+    LPRowGeneration m_rowGeneration;
 };
 
 /**
@@ -72,52 +62,19 @@ private:
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-template <typename Oracle>
 class RowGenerationResolveLP {
 public:
-    /// Constructor.
-    RowGenerationResolveLP(Oracle & oracle) : m_rowGeneration(oracle) {}
-
     /**
      * Finds an extreme point solution to the LP using the row genereation technique.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(const Problem & problem, LP & lp) {
+    ProblemType operator()(Problem & problem, LP & lp) {
         return m_rowGeneration(problem, lp, lp.resolveToExtremePointPrimal());
     }
 
 private:
-    LPRowGeneration<Oracle> m_rowGeneration;
+    LPRowGeneration m_rowGeneration;
 };
-
-
-/**
- * @brief Creates a RowGenerationSolveLP object.
- *
- * @tparam Oracle
- * @param o separation oracle object
- *
- * @return RowGenerationSolveLP object
- */
-template <typename Oracle>
-RowGenerationSolveLP<Oracle>
-make_RowGenerationSolveLP(Oracle & o) {
-    return RowGenerationSolveLP<Oracle>(o);
-}
-
-/**
- * @brief Creates a RowGenerationResolveLP object.
- *
- * @tparam Oracle
- * @param o separation oracle object
- *
- * @return RowGenerationResolveLP object
- */
-template <typename Oracle>
-RowGenerationResolveLP<Oracle>
-make_RowGenerationResolveLP(Oracle & o) {
-    return RowGenerationResolveLP<Oracle>(o);
-}
 
 } //lp
 } //paal

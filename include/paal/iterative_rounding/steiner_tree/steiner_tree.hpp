@@ -33,11 +33,18 @@ struct SteinerTreeCompareTraits {
 const double SteinerTreeCompareTraits::EPSILON = 1e-10;
 }
 
+template<typename OrigMetric, typename Terminals>
+using SteinerTreeSeparationOracle =
+        SteinerTreeOracle<typename data_structures::MetricTraits<OrigMetric>::VertexType,
+                          typename data_structures::MetricTraits<OrigMetric>::DistanceType,
+                          Terminals>;
+
 /**
  * @class SteinerTree
  */
 template<typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy=AllGenerator>
+    typename Strategy=AllGenerator,
+    typename Oracle = SteinerTreeSeparationOracle<OrigMetric, Terminals>>
 class SteinerTree {
 public:
     typedef data_structures::MetricTraits<OrigMetric> MT;
@@ -47,6 +54,9 @@ public:
     typedef utils::Compare<double> Compare;
     typedef data_structures::ArrayMetric<Dist> Metric;
 
+    /**
+     * Constructor.
+     */
     SteinerTree(const OrigMetric& metric, const Terminals& terminals,
             const Terminals& steinerVertices, Result result,
             const Strategy& strategy = Strategy()) :
@@ -61,6 +71,13 @@ public:
      * Move constructor
      */
     SteinerTree(SteinerTree&& other) = default;
+
+    /**
+     * Returns the separation oracle.
+     */
+    Oracle & getOracle() {
+        return m_oracle;
+    }
 
     /**
      * Generates all the components using specified strategy.
@@ -150,6 +167,7 @@ private:
     Compare m_compare; // comparison method
 
     std::unordered_map<int, lp::ColId> m_elementsMap; // maps componentId -> ColId in LP
+    Oracle m_oracle;
 };
 
 
@@ -226,18 +244,9 @@ SteinerTree<OrigMetric, Terminals, Result, Strategy> make_SteinerTree(
             terminals, steinerVertices, result, strategy);
 }
 
-template <typename Vertex, typename Dist, typename Components>
-using SteinerTreeSolveLP = lp::RowGenerationSolveLP<SteinerTreeOracle<Vertex, Dist, Components>>;
-
-template <typename Vertex, typename Dist, typename Components>
-using SteinerTreeResolveLP = lp::RowGenerationResolveLP<SteinerTreeOracle<Vertex, Dist, Components>>;
-
 template <
-         typename Vertex,
-         typename Dist,
-         typename Components,
-         typename SolveLPToExtremePoint = SteinerTreeSolveLP<Vertex, Dist, Components>,
-         typename ResolveLPToExtremePoint = SteinerTreeResolveLP<Vertex, Dist, Components>,
+         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP,
+         typename ResolveLPToExtremePoint = lp::RowGenerationResolveLP,
          typename RoundCondition = SteinerTreeRoundCondition,
          typename RelaxCondition = utils::ReturnFalseFunctor,
          typename StopCondition = SteinerTreeStopCondition,
@@ -249,9 +258,10 @@ template <
 
 
 template <typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy, typename IRComponents, typename Visitor = TrivialVisitor>
+    typename Strategy, typename IRComponents = SteinerTreeIRComponents<>,
+    typename Visitor = TrivialVisitor>
 void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
-        Result result, Strategy strategy, IRComponents comps, Visitor vis = Visitor()) {
+        Result result, Strategy strategy, IRComponents comps = IRComponents(), Visitor vis = Visitor()) {
 
     auto steiner = paal::ir::make_SteinerTree(metric, terminals, steinerVertices, result, strategy);
     paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(vis));
@@ -261,14 +271,7 @@ template <typename OrigMetric, typename Terminals, typename Result,
     typename Strategy = AllGenerator>
 void solve_steiner_tree(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
         Result result, Strategy strategy=Strategy()) {
-    typedef data_structures::MetricTraits<OrigMetric> MT;
-    typedef typename MT::VertexType Vertex;
-    typedef typename MT::DistanceType Dist;
-    paal::ir::SteinerTreeOracle<Vertex, Dist, Terminals> oracle;
-    auto solveLP(lp::make_RowGenerationSolveLP(oracle));
-    auto resolveLP(lp::make_RowGenerationResolveLP(oracle));
-    paal::ir::SteinerTreeIRComponents<Vertex, Dist, Terminals> comps(solveLP, resolveLP);
-    steiner_tree_iterative_rounding(metric, terminals, steinerVertices, result, strategy, comps);
+    steiner_tree_iterative_rounding(metric, terminals, steinerVertices, result, strategy);
 }
 
 } //ir

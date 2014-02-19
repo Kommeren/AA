@@ -177,6 +177,9 @@ private:
  */
 struct RoundConditionGreaterThanHalf  :
     public RoundConditionToFun<CondBiggerEqualThan, utils::ReturnOneFunctor> {
+        /**
+         * @brief constructor takes epsilon used in double comparison.
+         */
         RoundConditionGreaterThanHalf(double epsilon = utils::Compare<double>::defaultEpsilon()) :
             RoundConditionToFun(CondBiggerEqualThan(0.5, epsilon)) {}
 };

@@ -39,8 +39,8 @@ int main() {
     }
 
     // solve it
-    auto result = paal::ir::tree_augmentation_iterative_rounding(g,
-                std::back_inserter(solution), paal::ir::TAComponents<>());
+    auto result = paal::ir::tree_augmentation_iterative_rounding(
+                    g, std::back_inserter(solution));
 
     if (result.first == paal::lp::OPTIMAL) {
         std::cout << "The solution contains the following nontree edges:" << std::endl;

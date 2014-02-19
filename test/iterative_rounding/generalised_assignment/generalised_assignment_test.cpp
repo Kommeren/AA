@@ -79,8 +79,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
         paal::ir::generalised_assignment_iterative_rounding(
            machines.begin(), machines.end(),
            jobs.begin(), jobs.end(),
-           costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()),
-           paal::ir::GeneralAssignmentIRComponents<>());
+           costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
    }
 
 }
@@ -113,8 +112,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
     auto result = paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
-        costf, timef, Tf, std::back_inserter(jobsToMachines),
-        paal::ir::GeneralAssignmentIRComponents<>());
+        costf, timef, Tf, std::back_inserter(jobsToMachines));
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
     BOOST_ASSERT(!result.second);

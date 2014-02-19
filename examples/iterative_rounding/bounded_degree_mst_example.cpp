@@ -32,8 +32,8 @@ int main() {
     ResultTree resultTree;
 
     // optional input validity checking
-    auto bdmst = paal::ir::make_BoundedDegreeMST(g, degreeBounds,
-                                            std::back_inserter(resultTree));
+    auto bdmst = paal::ir::make_BoundedDegreeMST(
+                    g, degreeBounds, std::back_inserter(resultTree));
     auto error = bdmst.checkInputValidity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -42,12 +42,8 @@ int main() {
     }
 
     // solve it
-    paal::ir::BoundedDegreeMSTOracle<> oracle;
-    paal::ir::BDMSTIRComponents<Graph> components(
-            paal::lp::make_RowGenerationSolveLP(oracle),
-            paal::lp::make_RowGenerationResolveLP(oracle));
-    auto result = paal::ir::bounded_degree_mst_iterative_rounding(g, degreeBounds,
-                            std::back_inserter(resultTree), std::move(components));
+    auto result = paal::ir::bounded_degree_mst_iterative_rounding(
+                    g, degreeBounds, std::back_inserter(resultTree));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
