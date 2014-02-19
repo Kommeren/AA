@@ -1,6 +1,6 @@
 /**
  * @file local_search_single_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -27,34 +27,34 @@ namespace search_strategies {
      */
     class ChooseFirstBetter;
     /**
-     * @brief In this strategy, we iterate through all moves and chose one with the largest gain. 
+     * @brief In this strategy, we iterate through all moves and chose one with the largest gain.
      */
     class SteepestSlope;
 }
 
 namespace detail {
 
-template <typename Solution> 
+template <typename Solution>
 class LocalSearchStepBase {
 protected:
     LocalSearchStepBase(Solution & solution) :
         m_solution(solution) {}
-   
+
     Solution & m_solution;
 
 public:
-    
+
     Solution & getSolution() {
         return m_solution;
     }
 };
 
 template <typename Solution,
-          typename SearchStrategy, 
+          typename SearchStrategy,
           typename... SearchComponents>
 
 class LocalSearchStep  {
-    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value || 
+    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value ||
                   std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
     LocalSearchStep() = delete;
 };
@@ -63,11 +63,11 @@ template <typename Solution,
           typename SearchComponents,
           typename... SearchComponentsRest>
 
-class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponents, SearchComponentsRest...> : 
+class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponents, SearchComponentsRest...> :
     public LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> {
 private:
     BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
-    
+
     typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
     using base::m_solution;
     typedef typename Move<SearchComponents, Solution>::reference MoveRef;
@@ -93,8 +93,8 @@ public:
         return base::search();
     }
 protected:
-    template <typename Action, typename... Args> 
-    auto call(Args&&... args) -> 
+    template <typename Action, typename... Args>
+    auto call(Args&&... args) ->
     decltype(std::declval<SearchComponents>().template call<Action>(args...)){
         return m_searchComponents.template call<Action>(args...);
     }
@@ -103,7 +103,7 @@ protected:
 };
 
 template <typename Solution>
-class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter> : 
+class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter> :
     public LocalSearchStepBase<Solution> {
 public:
     typedef LocalSearchStepBase<Solution> base;
@@ -116,8 +116,8 @@ public:
 
 };
 
-template <typename Solution, typename SearchComponents, typename... SearchComponentsRest> 
-class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponents, SearchComponentsRest...> 
+template <typename Solution, typename SearchComponents, typename... SearchComponentsRest>
+class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponents, SearchComponentsRest...>
         : public LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...>  {
     BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
     typedef LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...> base;
@@ -151,13 +151,13 @@ private:
                 bestMove = *currMove;
                 max = gain;
                 init = true;
-            } 
+            }
         }
 
         return BestDesc(max, m_searchComponents, bestMove);
     }
 protected:
-    
+
     template <typename Best>
     bool searchAndPassBest(const Best & b) {
         auto b2 = best();
@@ -167,9 +167,9 @@ protected:
             return base::searchAndPassBest(b2);
         }
     }
-    
-    template <typename Action, typename... Args> 
-    auto call(Args&&... args) -> 
+
+    template <typename Action, typename... Args>
+    auto call(Args&&... args) ->
     decltype(std::declval<SearchComponents>().template call<Action>(args...)){
         return m_searchComponents.template call<Action>(args...);
     }
@@ -177,33 +177,33 @@ protected:
     SearchComponents m_searchComponents;
 };
 
-template <typename Solution> 
-class LocalSearchStep<Solution, search_strategies::SteepestSlope> 
+template <typename Solution>
+class LocalSearchStep<Solution, search_strategies::SteepestSlope>
         : public LocalSearchStepBase<Solution>  {
 public:
     typedef LocalSearchStepBase<Solution> base;
     LocalSearchStep(Solution & sol) : base(sol) {}
-    
+
     template <typename Best>
     bool searchAndPassBest(const Best &b) {
         if(std::get<0>(b) > 0) {
             std::get<1>(b).template call<Commit>(this->m_solution, std::get<2>(b));
         }
         return std::get<0>(b) > 0;
-        
+
     }
 };
 } // ! detail
 
 /**
- * @brief local search simple solution 
+ * @brief local search simple solution
  *
  * @param solution the initial solution which going to be possibly improved by local_search
  * @param psa post search action
  * @param gsc global stop condition
  * @param components
  *
- * @return true if the solution is improved 
+ * @return true if the solution is improved
  */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
@@ -220,15 +220,15 @@ bool local_search(
 }
 
 /**
- * @brief 
+ * @brief
  *
  * @param solution the initial solution which going to be possibly improved by local_search
  * @param components
  *
- * @return true if the solution is improved 
+ * @return true if the solution is improved
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename Solution, 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename Solution,
           typename... Components>
 bool local_search_simple(Solution & solution, Components... components) {
     return local_search<SearchStrategy>(solution, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);

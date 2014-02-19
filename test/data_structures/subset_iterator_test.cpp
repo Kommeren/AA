@@ -1,6 +1,6 @@
 /**
  * @file subset_iterator_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -16,8 +16,8 @@
 using std::vector;
 
 template <typename T> void printTuple3(T t) {
-    LOGLN(std::get<0>(t) << "," << 
-        std::get<1>(t) << "," << 
+    LOGLN(std::get<0>(t) << "," <<
+        std::get<1>(t) << "," <<
         std::get<2>(t));
 }
 

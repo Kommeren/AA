@@ -1,6 +1,6 @@
 /**
  * @file simple_cycle_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -21,10 +21,10 @@ class CheckSize {
 public:
     CheckSize(SimpleCycle<string> cm, std::size_t size) : m_cm(cm), m_size(size) {}
     void operator()(const string & s) {
-        auto re = m_cm.getEdgeRange(s);    
-        auto rv = m_cm.getVerticesRange(s);    
-        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(re.first, re.second)));        
-        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(rv.first, rv.second)));        
+        auto re = m_cm.getEdgeRange(s);
+        auto rv = m_cm.getVerticesRange(s);
+        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(re.first, re.second)));
+        BOOST_CHECK_EQUAL(m_size, std::size_t(std::distance(rv.first, rv.second)));
     }
 private:
     SimpleCycle<string> m_cm;
@@ -54,7 +54,7 @@ template  <typename I> void  pe(I b, I e) {
 }
 
 
-template <typename El, typename Sol> 
+template <typename El, typename Sol>
 void checkSwapEdge(T::iter b, T::iter e, const El & p1, const  El & p2, const El & start, const Sol & sol) {
     SimpleCycle<string> cm(b, e);
     cm.flip(p1, p2);
@@ -63,11 +63,11 @@ void checkSwapEdge(T::iter b, T::iter e, const El & p1, const  El & p2, const El
 }
 
 BOOST_AUTO_TEST_SUITE(simple_cycle)
-    
+
 BOOST_AUTO_TEST_CASE(iterator_size) {
-    T::iter i = v.begin(); 
-    T::iter end = v.end(); 
-    
+    T::iter i = v.begin();
+    T::iter end = v.end();
+
     CheckAllSizes c(v.begin());
     for(; i!= end; ++i ) {
         c(i);

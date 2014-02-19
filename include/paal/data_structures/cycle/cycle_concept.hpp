@@ -1,6 +1,6 @@
 /**
  * @file cycle_concept.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-28
@@ -16,7 +16,7 @@ namespace paal {
 namespace data_structures {
 namespace concepts {
 
-template <typename X> 
+template <typename X>
 class  Cycle {
 public:
     BOOST_CONCEPT_USAGE(Cycle) {

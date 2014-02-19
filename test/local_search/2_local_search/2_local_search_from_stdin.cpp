@@ -1,6 +1,6 @@
 /**
  * @file 2_local_search_from_stdin.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -37,13 +37,13 @@ void test() {
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution 
+    //create random solution
     std::random_shuffle(v.begin(), v.end());
     LOG_COPY_RANGE_DEL(v, ",");
     Cycle cycle(v.begin(), v.end());
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
 
-    //printing 
+    //printing
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
     LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
@@ -51,7 +51,7 @@ void test() {
     auto logger = utils::make_twoLSLogger(mtx);
 
     //search
-    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));  
+    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution 
+    //create random solution
     typedef data_structures::SimpleCycle<int> Cycle;
     std::random_shuffle(v.begin(), v.end());
     Cycle cycle(v.begin(), v.end());
@@ -87,11 +87,11 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     double epsilon = 0.001;
     CIC  cut(lsc.get<paal::local_search::Gain>(), startLen, epsilon);
     auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
-    
+
     //setting logger
     auto logger = utils::make_twoLSLogger(mtx);
 
-    //printing 
+    //printing
     LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
     //search

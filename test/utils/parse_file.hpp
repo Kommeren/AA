@@ -1,12 +1,12 @@
 /**
  * @file parse_file.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-12-12
  */
 #ifndef PARSE_FILE_HPP
-#define PARSE_FILE_HPP 
+#define PARSE_FILE_HPP
 
 #include <fstream>
 

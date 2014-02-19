@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     VorType voronoi(FSet{SGM::A}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E} , gm);
     typedef FacilityLocationSolution<decltype(cost), VorType> Sol;
     Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
-    FacilityLocationSolutionAdapter<Sol> sa(sol); 
+    FacilityLocationSolutionAdapter<Sol> sa(sol);
     Facility<int> facChosen(CHOSEN, SGM::A);
     Facility<int> facUnchosen(UNCHOSEN, SGM::B);
 

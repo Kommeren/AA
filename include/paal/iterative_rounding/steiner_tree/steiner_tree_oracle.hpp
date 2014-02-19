@@ -1,6 +1,6 @@
 /**
  * @file steiner_tree_oracle.hpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-08-01

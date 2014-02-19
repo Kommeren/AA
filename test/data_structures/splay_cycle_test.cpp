@@ -1,6 +1,6 @@
 /**
  * @file splay_cycle.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04

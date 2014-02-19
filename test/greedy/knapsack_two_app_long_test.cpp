@@ -1,6 +1,6 @@
 /**
  * @file knapsack_two_app_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -28,12 +28,12 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
     parse(testDir + "cases.txt", [&](const std::string & line, std::istream &){
         int testId = std::stoi(line);
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
-        
+
         int capacity;
         std::vector<int> sizes;
         std::vector<int> values;
         std::vector<int> optimal;
-       
+
         read(testDir + "cases/", testId, capacity, sizes, values, optimal);
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
@@ -46,9 +46,9 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         {
             std::vector<int> result;
             LOGLN("Knapsack 0/1");
-            auto maxValue = knapsack_0_1_two_app(std::begin(objects), std::end(objects), 
+            auto maxValue = knapsack_0_1_two_app(std::begin(objects), std::end(objects),
                    capacity,
-                   std::back_inserter(result), 
+                   std::back_inserter(result),
                    make_ArrayToFunctor(values),
                    make_ArrayToFunctor(sizes));
 
@@ -62,14 +62,14 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
             LOGLN("");
             BOOST_CHECK(opt <= 2 * maxValue.first);
         }
-        
-        //KNAPSACK 
+
+        //KNAPSACK
         {
             std::vector<int> result;
             LOGLN("Knapsack");
-            ON_LOG(auto maxValue = )knapsack_two_app(std::begin(objects), std::end(objects), 
+            ON_LOG(auto maxValue = )knapsack_two_app(std::begin(objects), std::end(objects),
                    capacity,
-                   std::back_inserter(result), 
+                   std::back_inserter(result),
                    make_ArrayToFunctor(values),
                    make_ArrayToFunctor(sizes));
 

@@ -1,12 +1,12 @@
 /**
  * @file custom_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-26
  */
 #ifndef CUSTOM_COMPONENTS_HPP
-#define CUSTOM_COMPONENTS_HPP 
+#define CUSTOM_COMPONENTS_HPP
 
 #include <chrono>
 #include <random>
@@ -33,15 +33,15 @@ struct ConditionalGainAdaptor {
     ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) :
         m_gain(std::move(gain)), m_condition(std::move(cond))
     { }
-    
+
     /**
-     * @brief 
+     * @brief
      *
      * @tparam Args to be forwarded
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> 
+    template <typename... Args>
     auto operator()(Args&&... args) -> decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
         if(!m_condition(std::forward<Args>(args)...)) {
             return 0;
@@ -62,7 +62,7 @@ private:
  * @param gain
  * @param cond
  *
- * @return 
+ * @return
  */
 template <typename Gain = utils::ReturnOneFunctor, typename Condition = utils::ReturnTrueFunctor>
 ConditionalGainAdaptor<Gain, Condition>
@@ -79,9 +79,9 @@ make_ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) {
  */
 template <typename Gain, typename ValueType>
 class GainCutSmallImproves {
-public:    
+public:
     /**
-     * @brief Constructor, 
+     * @brief Constructor,
      *
      * @param gain - original gain functor
      * @param currOpt - current optimum
@@ -91,15 +91,15 @@ public:
                 m_gain(std::move(gain)), m_currOpt(currOpt), m_epsilon(epsilon)  {}
 
     /**
-     * @brief transfers arguments to original gain, if the value is to small it is changed to 0. 
+     * @brief transfers arguments to original gain, if the value is to small it is changed to 0.
      *
      * @tparam Args
      * @param args
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> ValueType 
-        operator()(Args&&... args) { 
+    template <typename... Args> ValueType
+        operator()(Args&&... args) {
         ValueType dist = m_gain(std::forward<Args>(args)...);
         if(dist > m_epsilon * m_currOpt) {
             m_currOpt -= dist;
@@ -116,7 +116,7 @@ public:
     void setEpsilon(double e) {
         m_epsilon = e;
     }
-    
+
     /**
      * @brief sets current Opt
      *
@@ -128,8 +128,8 @@ public:
 
 private:
     Gain m_gain;
-    ValueType m_currOpt;    
-    double m_epsilon;    
+    ValueType m_currOpt;
+    double m_epsilon;
 };
 
 
@@ -147,13 +147,13 @@ public:
     StopConditionCountLimit(unsigned limit) : m_cnt(0), m_limit(limit) {}
 
     /**
-     * @brief increment the counter and checks if the given limit is reached. 
+     * @brief increment the counter and checks if the given limit is reached.
      *
      * @tparam Args
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> 
+    template <typename... Args>
     bool operator()(Args&&... ) const {
         return ++m_cnt >= m_limit;
     }
@@ -166,7 +166,7 @@ private:
 /**
  * @brief This is custom StopCondition, it returns true after given time limit
  */
-template <typename duration = std::chrono::seconds, 
+template <typename duration = std::chrono::seconds,
           typename clock    = std::chrono::system_clock>
 class StopConditionTimeLimit {
 public:
@@ -178,14 +178,14 @@ public:
     StopConditionTimeLimit(duration d) :  m_duration(d), m_start(clock::now()) {}
 
     /**
-     * @brief Checks if the time is up 
+     * @brief Checks if the time is up
      *
      * @tparam Args
      * @param ...
      *
      * @return true if the time is up
      */
-    template <typename... Args> 
+    template <typename... Args>
     bool operator()(Args&&... ) {
         return m_start + m_duration < clock::now() ;
     }
@@ -203,9 +203,9 @@ private:
 
 
 /**
- * @brief This wrapper counts sum of the improvements. 
+ * @brief This wrapper counts sum of the improvements.
  * It makes sense to use it only when ChooseFirstBetter strategy is applied.
- *          
+ *
  *
  * @tparam Gain
  * @tparam ValueType
@@ -226,9 +226,9 @@ struct ComputeGainWrapper {
      * @tparam Args
      * @param args
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> 
+    template <typename... Args>
     ValueType operator()(Args&&... args) {
         auto diff = m_gain(std::forward<Args>(args)...);
         m_val += diff;
@@ -238,7 +238,7 @@ struct ComputeGainWrapper {
     /**
      * @brief Returns sum of the improvements
      *
-     * @return 
+     * @return
      */
     ValueType getVal() const {
         return m_val;
@@ -257,8 +257,8 @@ private:
  * @tparam Gain
  * @tparam AspirationCriteria
  */
-template <typename TabuList, 
-          typename Gain = utils::ReturnOneFunctor, 
+template <typename TabuList,
+          typename Gain = utils::ReturnOneFunctor,
           typename AspirationCriteria = utils::ReturnTrueFunctor>
 struct TabuGainAdaptor {
 
@@ -267,10 +267,10 @@ struct TabuGainAdaptor {
      *
      * @param tabuList
      * @param gain
-     * @param aspirationCriteria 
+     * @param aspirationCriteria
      */
-    TabuGainAdaptor(TabuList tabuList = TabuList(), Gain gain = Gain(), 
-                    AspirationCriteria aspirationCriteria 
+    TabuGainAdaptor(TabuList tabuList = TabuList(), Gain gain = Gain(),
+                    AspirationCriteria aspirationCriteria
                         = AspirationCriteria()) :
        m_tabuList(std::move(tabuList)), m_aspirationCriteriaGain(std::move(gain), std::move(aspirationCriteria))
     { }
@@ -280,9 +280,9 @@ struct TabuGainAdaptor {
      *
      * @tparam Args args to be forwarded
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> 
+    template <typename... Args>
     auto operator()(Args&&... args) -> decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
         if(!m_tabuList.isTabu(std::forward<Args>(args)...)) {
             auto diff = m_aspirationCriteriaGain(std::forward<Args>(args)...);
@@ -309,10 +309,10 @@ private:
  * @param gain
  * @param aspirationCriteria
  *
- * @return 
+ * @return
  */
-template <typename TabuList, 
-          typename Gain = utils::ReturnTrueFunctor, 
+template <typename TabuList,
+          typename Gain = utils::ReturnTrueFunctor,
           typename AspirationCriteria = utils::ReturnTrueFunctor>
 TabuGainAdaptor<TabuList, Gain, AspirationCriteria>
 make_TabuGainAdaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria aspirationCriteria = AspirationCriteria()) {
@@ -321,7 +321,7 @@ make_TabuGainAdaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria a
 
 /**
  * @brief This is adaptor on Commit which allows to record solution basing on condition
- *        It is particularly useful in tabu search  and simulated annealing 
+ *        It is particularly useful in tabu search  and simulated annealing
  *        in which we'd like to store the best found solution
  *
  * @tparam Commit
@@ -338,10 +338,10 @@ struct RecordSolutionCommitAdapter {
      * @param commit
      * @param cond
      */
-    RecordSolutionCommitAdapter(Solution & solution, 
-                                Commit commit = Commit(), 
-                                Condition cond = Condition()) : 
-        m_solution(&solution), m_commit(std::move(commit)), 
+    RecordSolutionCommitAdapter(Solution & solution,
+                                Commit commit = Commit(),
+                                Condition cond = Condition()) :
+        m_solution(&solution), m_commit(std::move(commit)),
         m_condition(std::move(cond)) { }
 
     /**
@@ -358,20 +358,20 @@ struct RecordSolutionCommitAdapter {
             *m_solution = sol;
         }
     }
-    
+
     /**
      * @brief Access to the stored solution (const version)
      *
-     * @return 
+     * @return
      */
     const Solution & getSolution() const {
         return *m_solution;
     }
-    
+
     /**
      * @brief Access to the stored solution (non-const version)
      *
-     * @return 
+     * @return
      */
     Solution & getSolution() {
         return *m_solution;
@@ -393,10 +393,10 @@ private:
  * @param commit
  * @param c
  *
- * @return 
+ * @return
  */
 template <typename Commit, typename Solution, typename Condition>
-RecordSolutionCommitAdapter<Commit, Solution, Condition> 
+RecordSolutionCommitAdapter<Commit, Solution, Condition>
 make_RecordSolutionCommitAdapter(Solution & s, Commit commit, Condition c) {
     return RecordSolutionCommitAdapter<Commit, Solution, Condition>(s, std::move(commit), std::move(c));
 }

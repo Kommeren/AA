@@ -1,12 +1,12 @@
 /**
  * @file bgl_edge_hash.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-12-19
  */
 #ifndef BGL_EDGE_HASH_HPP
-#define BGL_EDGE_HASH_HPP 
+#define BGL_EDGE_HASH_HPP
 
 #include <boost/functional/hash.hpp>
 
@@ -26,7 +26,7 @@ struct EdgeHash {
      *
      * @param e
      *
-     * @return 
+     * @return
      */
     std::size_t operator()(const Edge& e) const {
         std::size_t hash = 0;
@@ -51,7 +51,7 @@ struct EdgeHash<Graph, typename std::enable_if<std::is_same<typename boost::grap
      *
      * @param e
      *
-     * @return 
+     * @return
      */
     std::size_t operator()(const Edge& e) const {
         std::size_t hash = 0;

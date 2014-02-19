@@ -1,6 +1,6 @@
 /**
  * @file facility_location_solution_element.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -28,7 +28,7 @@ public:
     is_chosen getIsChosen() const {
         return m_isChosen;
     }
-    
+
     void setIsChosen(is_chosen ic) {
         m_isChosen = ic;
     }
@@ -50,7 +50,7 @@ public:
 
 private:
     is_chosen m_isChosen;
-    T m_elem;    
+    T m_elem;
 };
 
 /**
@@ -78,7 +78,7 @@ struct FacilityHash {
  * @param left
  * @param right
  *
- * @return 
+ * @return
  */
 template <typename T>
 bool operator<(const Facility<T> & left, const Facility<T> & right) {

@@ -1,12 +1,12 @@
 /**
  * @file simulated_annealing.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-31
  */
 #ifndef SIMULATED_ANNEALING_HPP
-#define SIMULATED_ANNEALING_HPP 
+#define SIMULATED_ANNEALING_HPP
 
 #include <chrono>
 
@@ -15,30 +15,30 @@ namespace local_search {
 
     /**
      * @brief This functors returns potential (temperature) using the following
-     * schema. The start potential equals given startTemperature, the end temperature (after given duration) equals 
-     * given endTemperature. In the beetween potential decreases (increase when startTemperature < endTemperature, 
+     * schema. The start potential equals given startTemperature, the end temperature (after given duration) equals
+     * given endTemperature. In the beetween potential decreases (increase when startTemperature < endTemperature,
      * which is not typical use case)
      * in exponential manner
      *
      * @tparam Duration
-     * @tparam Clock 
+     * @tparam Clock
      */
-template <typename Duration = std::chrono::seconds, 
+template <typename Duration = std::chrono::seconds,
           typename Clock    = std::chrono::system_clock>
 struct ExponentialCoolingSchemaDependantOnTime {
 
     /**
-     * @brief Constructor 
+     * @brief Constructor
      *
-     * @param duration 
+     * @param duration
      * @param startTemperature
      * @param endTemperature
      */
-    ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) :  
-        m_duration(duration), m_start(Clock::now()), 
-        m_multiplier(startTemperature), 
+    ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) :
+        m_duration(duration), m_start(Clock::now()),
+        m_multiplier(startTemperature),
         m_base(std::pow(endTemperature/startTemperature, 1. / duration.count())) {}
-    
+
     /**
      * @brief resets the start point
      */
@@ -49,12 +49,12 @@ struct ExponentialCoolingSchemaDependantOnTime {
     /**
      * @brief operator(), return Temperature at given time point point
      *
-     * @return 
+     * @return
      */
     double operator()() const {
-        return m_multiplier * std::pow(m_base, 
+        return m_multiplier * std::pow(m_base,
                 std::chrono::duration_cast<Duration>(
-                    Clock::now() - m_start).count()); 
+                    Clock::now() - m_start).count());
     }
 
 private:
@@ -67,13 +67,13 @@ private:
 /**
  * @brief make function for ExponentialCoolingSchemaDependantOnTime
  *
- * @tparam Clock 
+ * @tparam Clock
  * @tparam Duration
  * @param duration
  * @param startTemperature
  * @param endTemperature
  *
- * @return 
+ * @return
  */
 template <typename Clock    = std::chrono::system_clock,
           typename Duration>
@@ -86,34 +86,34 @@ make_ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemp
     /**
      * @brief This functors returns potential (temperature) using the following
      * schema. The start potential equals given startTemperature, once per numberOFRoundsWithSameTemperature
-     * the temperature is multiplied by given multiplier 
+     * the temperature is multiplied by given multiplier
      */
 struct ExponentialCoolingSchemaDependantOnIteration {
 
     /**
-     * @brief Constructor 
+     * @brief Constructor
      *
      * @param startTemperature
      * @param multiplier
      * @param numberOFRoundsWithSameTemperature
      */
-    ExponentialCoolingSchemaDependantOnIteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) : 
+    ExponentialCoolingSchemaDependantOnIteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) :
         m_temperature(startTemperature),
         m_multiplier(multiplier),
         m_numberOFRoundsWithSameTemperature(numberOFRoundsWithSameTemperature) {}
-    
+
 
     /**
      * @brief operator(), return Temperature at given time point point
      *
-     * @return 
+     * @return
      */
     double operator()() {
         if(++m_cntFromLastMultiply == m_numberOFRoundsWithSameTemperature) {
             m_temperature *= m_multiplier;
             m_cntFromLastMultiply = 0;
         }
-        return m_temperature; 
+        return m_temperature;
     }
 
 private:
@@ -142,10 +142,10 @@ struct SimulatedAnnealingGainAdaptor {
      * @param getTemperature
      * @param rand
      */
-    SimulatedAnnealingGainAdaptor(Gain gain, 
-            GetTemperature getTemperature, 
-            RandomGenerator rand = RandomGenerator()) : 
-        m_gain(gain), m_getTemperature(getTemperature), 
+    SimulatedAnnealingGainAdaptor(Gain gain,
+            GetTemperature getTemperature,
+            RandomGenerator rand = RandomGenerator()) :
+        m_gain(gain), m_getTemperature(getTemperature),
         m_rand(rand), m_distribution(0.0, 1.0) {}
 
     /**
@@ -160,31 +160,31 @@ struct SimulatedAnnealingGainAdaptor {
          *
          * @param d
          *
-         * @return 
+         * @return
          */
         static IsChosen makeChosen(Delta d) {
             return IsChosen(true, d);
         }
-        
+
         /**
          * @brief creates IsChosen fo Move which is not chosen
          *
          * @param d
          *
-         * @return 
+         * @return
          */
         static IsChosen makeUnchosen(Delta d) {
             return IsChosen(false, d);
         }
-        
+
         /**
          * @brief constructor (from 0) represents the largest possible value of unchosen element
          *        If some element is bigger than zero, then this element is chosen.
          *
          * @param i given int must be 0
          */
-        IsChosen(int i) : 
-            m_isChosen(false), 
+        IsChosen(int i) :
+            m_isChosen(false),
             m_delta(std::numeric_limits<Delta>::max()) {assert(i == 0);}
 
         /**
@@ -192,7 +192,7 @@ struct SimulatedAnnealingGainAdaptor {
          *
          * @param other
          *
-         * @return 
+         * @return
          */
         bool operator<(IsChosen other) const {
             if(m_isChosen != other.m_isChosen) {
@@ -205,7 +205,7 @@ struct SimulatedAnnealingGainAdaptor {
         /**
          * @brief conversion to delta operator
          *
-         * @return 
+         * @return
          */
         operator Delta() {
             return m_delta;
@@ -225,16 +225,16 @@ struct SimulatedAnnealingGainAdaptor {
     };
 
     /**
-     * @brief operator(), returns original gain with information 
+     * @brief operator(), returns original gain with information
      *                    indicating if the move is chosen
      *
      * @tparam Args
      * @param args
      *
-     * @return 
+     * @return
      */
     template <typename... Args>
-    auto operator()(Args&&... args) -> 
+    auto operator()(Args&&... args) ->
         IsChosen<typename std::result_of<Gain(Args...)>::type> {
             auto delta =  m_gain(std::forward<Args>(args)...);
             using Delta = decltype(delta);
@@ -248,7 +248,7 @@ struct SimulatedAnnealingGainAdaptor {
                 }
             }
     }
-    
+
 
 private:
     Gain m_gain;
@@ -268,12 +268,12 @@ private:
  * @param getTemperature
  * @param rand
  *
- * @return 
+ * @return
  */
 template <typename Gain, typename GetTemperature, typename RandomGenerator = std::default_random_engine>
 SimulatedAnnealingGainAdaptor<Gain, GetTemperature, RandomGenerator>
-make_SimulatedAnnealingGainAdaptor( 
-         Gain gain, GetTemperature getTemperature, 
+make_SimulatedAnnealingGainAdaptor(
+         Gain gain, GetTemperature getTemperature,
          RandomGenerator rand = RandomGenerator()) {
      return SimulatedAnnealingGainAdaptor
                 <Gain, GetTemperature, RandomGenerator>(

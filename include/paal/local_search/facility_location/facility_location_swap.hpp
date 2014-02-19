@@ -1,12 +1,12 @@
 /**
  * @file facility_location_swap.hpp
-* @brief 
+* @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-08
  */
 #ifndef FACILITY_LOCATION_SWAP_HPP
-#define FACILITY_LOCATION_SWAP_HPP 
+#define FACILITY_LOCATION_SWAP_HPP
 #include <cassert>
 #include <vector>
 #include <numeric>
@@ -35,7 +35,7 @@ public:
     T getTo() const {
         return m_to;
     }
-    
+
     void setFrom(T from) {
         m_from = from;
     }
@@ -52,17 +52,17 @@ private:
 template <typename VertexType> class VertexToSwapMove {
 public:
     VertexToSwapMove(VertexType v) : m_from(v) {}
-    
+
     VertexToSwapMove() = default;
     VertexToSwapMove(const VertexToSwapMove & u) = default;
-    
-    VertexToSwapMove & operator=(const VertexToSwapMove & u)  { 
+
+    VertexToSwapMove & operator=(const VertexToSwapMove & u)  {
         m_from = u.m_from;
         return *this;
     }
 
     const Swap<VertexType> & operator()(VertexType v) const {
-        m_sw.setFrom(m_from); 
+        m_sw.setFrom(m_from);
         m_sw.setTo(v);
         return m_sw;
     }
@@ -72,16 +72,16 @@ private:
     VertexType m_from;
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCheckerSwap {
 public:
-        template <class Solution> 
-    auto operator()(Solution & sol, 
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+        template <class Solution>
+    auto operator()(Solution & sol,
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
         typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
-        
+
         ret   = sol.addFacilityTentative(s.getTo());
         ret  += sol.removeFacilityTentative(s.getFrom());
         back  = sol.addFacilityTentative(s.getFrom());
@@ -92,30 +92,30 @@ public:
 };
 
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCommitSwap {
 public:
-    template <typename Solution> 
-    void operator()(Solution & sol, 
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+    template <typename Solution>
+    void operator()(Solution & sol,
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) {
         sol.addFacility(sol.getFacility(s.getTo()));
         sol.removeFacility(sol.getFacility(s.getFrom()));
     }
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationGetMovesSwap {
     template <typename Solution>
     struct IterType {
-        typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen; 
-        typedef typename utils::CollectionToIter<const Unchosen>::type UchIter; 
-        typedef boost::transform_iterator<VertexToSwapMove<VertexType>, 
+        typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen;
+        typedef typename utils::CollectionToIter<const Unchosen>::type UchIter;
+        typedef boost::transform_iterator<VertexToSwapMove<VertexType>,
                  UchIter, const Swap<VertexType> &> TransIter;
         typedef std::pair<TransIter, TransIter> TransRange;
     };
 
-public: 
+public:
     typedef Facility<VertexType> Fac;
 
     //Due to the memory optimization at one moment only one Move is valid
@@ -129,10 +129,10 @@ public:
             //the move of CHOSEN could be swap with some unchosen
             auto const & uch = s.getUnchosenCopy();
             VertexToSwapMove<VertexType> uchToUE(e);
-            return std::make_pair(TransIter(uch.begin(), uchToUE), 
-                                  TransIter(uch.end()  , uchToUE)); 
+            return std::make_pair(TransIter(uch.begin(), uchToUE),
+                                  TransIter(uch.end()  , uchToUE));
         }
-        return std::make_pair(TransIter(), TransIter()); 
+        return std::make_pair(TransIter(), TransIter());
     }
 };
 

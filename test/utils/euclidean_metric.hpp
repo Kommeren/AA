@@ -1,12 +1,12 @@
 /**
  * @file euclidean_metric.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-10-28
  */
 #ifndef EUCLIDEAN_METRIC_HPP
-#define EUCLIDEAN_METRIC_HPP 
+#define EUCLIDEAN_METRIC_HPP
 
 #include <cmath>
 
@@ -18,7 +18,7 @@ struct EuclideanMetric {
     }
 };
 
-namespace data_structures { 
+namespace data_structures {
 
     template <>
     struct MetricTraits<EuclideanMetric> {

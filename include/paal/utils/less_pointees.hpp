@@ -1,12 +1,12 @@
 /**
  * @file less_pointees.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-29
  */
 #ifndef LESS_POINTEES_HPP
-#define LESS_POINTEES_HPP 
+#define LESS_POINTEES_HPP
 namespace paal {
 
 //TODO add to boost
@@ -19,8 +19,8 @@ template<class Comparator>
 struct less_pointees_t {
     less_pointees_t(Comparator compare) : m_compare(compare) {}
 
-    template <typename OptionalPointee> 
-    bool operator() ( OptionalPointee const& x, OptionalPointee const& y ) const { 
+    template <typename OptionalPointee>
+    bool operator() ( OptionalPointee const& x, OptionalPointee const& y ) const {
        return !y ? false : ( !x ? true : m_compare(*x, *y) ) ;
     }
 private:
@@ -33,7 +33,7 @@ private:
  * @tparam Comparator
  * @param compare
  *
- * @return 
+ * @return
  */
 template<class Comparator>
 less_pointees_t<Comparator>

@@ -1,12 +1,12 @@
 /**
  * @file tabu_list.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-09
  */
 #ifndef TABU_LIST_HPP
-#define TABU_LIST_HPP 
+#define TABU_LIST_HPP
 
 #include <unordered_set>
 #include <queue>
@@ -29,7 +29,7 @@ struct TabuListRememberMove {
      *
      * @param size
      */
-    TabuListRememberMove(unsigned size) : 
+    TabuListRememberMove(unsigned size) :
         m_size(size), m_forbidenMovesSet(size) {
         }
 
@@ -39,7 +39,7 @@ struct TabuListRememberMove {
      * @tparam Solution
      * @param move
      *
-     * @return 
+     * @return
      */
     template <typename Solution>
     bool isTabu(const Solution &, Move move) const {
@@ -55,7 +55,7 @@ struct TabuListRememberMove {
     template <typename Solution>
     void accept(const Solution &, Move move) {
         assert(!isTabu(move));
-        m_forbidenMovesSet.insert(move);        
+        m_forbidenMovesSet.insert(move);
         if(m_forbidenMovesFIFO.size() == m_size) {
             m_forbidenMovesFIFO.pop_front();
         }
@@ -68,7 +68,7 @@ private:
      *
      * @param move
      *
-     * @return 
+     * @return
      */
     bool isTabu(const Move & move) const {
         return m_forbidenMovesSet.find(move) != m_forbidenMovesSet.end();
@@ -103,7 +103,7 @@ public:
      * @param s
      * @param move
      *
-     * @return 
+     * @return
      */
     bool isTabu(Solution s, Move move) const {
         return base::isTabu(nullptr, std::make_pair(std::move(s), std::move(move)));
@@ -123,5 +123,5 @@ public:
 } //!data_structures
 } //!paal
 
- 
+
 #endif /* TABU_LIST_HPP */

@@ -1,6 +1,6 @@
 /**
  * @file 2_local_search_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -32,7 +32,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution 
+    //create random solution
     std::random_shuffle(v.begin(), v.end());
     typedef data_structures::SimpleCycle<int> Cycle;
     Cycle cycle(v.begin(), v.end());
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
 
     //printing
     LOGLN("Length \t" << simple_algo::getLength(gm, cycle));
-    
+
     //setting logger
     auto logger = utils::make_twoLSLogger(gm, 100);
 

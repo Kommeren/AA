@@ -1,12 +1,12 @@
 /**
  * @file knapsack_two_app.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-10-07
  */
 #ifndef KNAPSACK_TWO_APP_HPP
-#define KNAPSACK_TWO_APP_HPP 
+#define KNAPSACK_TWO_APP_HPP
 
 #include <type_traits>
 #include <utility>
@@ -24,23 +24,23 @@ namespace paal {
 
 namespace detail {
         template <
-          typename ObjectsIterIter, 
-          typename ObjectSizeFunctor, 
+          typename ObjectsIterIter,
+          typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
               std::tuple<
-                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                    FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
-                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                    FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
                     std::pair<ObjectsIterIter, unsigned>>
               getGreedyFill (
-                        ObjectsIterIter oBegin, 
-                        ObjectsIterIter oEnd, 
-                        FunctorOnIteratorPValue<ObjectSizeFunctor, 
+                        ObjectsIterIter oBegin,
+                        ObjectsIterIter oEnd,
+                        FunctorOnIteratorPValue<ObjectSizeFunctor,
                             typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
-                        ObjectValueFunctor value, 
+                        ObjectValueFunctor value,
                         ObjectSizeFunctor size,
-                        NoZeroOneTag) 
+                        NoZeroOneTag)
               {
                     typedef typename std::iterator_traits<ObjectsIterIter>::value_type ObjectsIter;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
@@ -57,12 +57,12 @@ namespace detail {
                     SizeType sizeSum = SizeType(nr) * size(**mostDenseIter);
                     return std::make_tuple(valueSum, sizeSum, std::make_pair(mostDenseIter, nr));
               }
-          
+
         template <
-          typename ObjectsIterAndNr, 
-          typename OutputIter> 
+          typename ObjectsIterAndNr,
+          typename OutputIter>
               void greedyToOutput (
-                        ObjectsIterAndNr mostDenseIterAndNr, 
+                        ObjectsIterAndNr mostDenseIterAndNr,
                         OutputIter out,
                         NoZeroOneTag)
               {
@@ -76,19 +76,19 @@ namespace detail {
 
 } // detail
 
-template <typename OutputIterator, 
-          typename ObjectsIter, 
-          typename ObjectSizeFunctor, 
+template <typename OutputIterator,
+          typename ObjectsIter,
+          typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
 std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
           detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
-knapsack_two_app(ObjectsIter oBegin, 
-        ObjectsIter oEnd, 
+knapsack_two_app(ObjectsIter oBegin,
+        ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-        OutputIterator out, 
-        ObjectValueFunctor value, 
+        OutputIterator out,
+        ObjectValueFunctor value,
         ObjectSizeFunctor size) {
-    return detail::knapsack_general_two_app(oBegin, oEnd, capacity, 
+    return detail::knapsack_general_two_app(oBegin, oEnd, capacity,
                     out, value, size, detail::NoZeroOneTag());
 }
 

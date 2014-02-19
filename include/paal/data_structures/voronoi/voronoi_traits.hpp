@@ -1,6 +1,6 @@
 /**
  * @file voronoi_traits.hpp
- * @brief voronoi traits 
+ * @brief voronoi traits
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-06
@@ -20,7 +20,7 @@ struct _VoronoiTraits {
                 DistanceType;
     typedef puretype(std::declval<V>().getGenerators())
                 GeneratorsSet;
-    
+
     typedef puretype(std::declval<V>().getVertices())
                 VerticesSet;
 };

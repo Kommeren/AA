@@ -1,6 +1,6 @@
 /**
  * @file dreyfus_wagner_long_test.cpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-08-04

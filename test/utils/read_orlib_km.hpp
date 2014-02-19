@@ -1,6 +1,6 @@
 /**
  * @file read_orlib_km.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-01
@@ -33,7 +33,7 @@ GraphMT readORLIB_KM(std::istream & ist,
     clients = boost::irange(K, V);
 
     data_structures::ArrayMetric<long long> m(V);
-    
+
     int a,b;
     int l;
     std::vector<Edge> edges;

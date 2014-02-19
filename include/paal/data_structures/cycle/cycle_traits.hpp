@@ -1,12 +1,12 @@
 /**
  * @file cycle_traits.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-26
  */
 #ifndef CYCLE_TRAITS_HPP
-#define CYCLE_TRAITS_HPP 
+#define CYCLE_TRAITS_HPP
 
 #include "paal/utils/type_functions.hpp"
 

@@ -1,6 +1,6 @@
 /**
  * @file local_search_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -17,7 +17,7 @@ namespace ls = paal::local_search;
 using namespace  paal;
 
 namespace {
-ON_LOG(  
+ON_LOG(
     int i = 0;
 )
 
@@ -41,12 +41,12 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
 
 
 BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
-   //printing 
+   //printing
    int s(0);
    LOGLN("f("<< s <<") \t" << f(s));
    ON_LOG(i = 0);
    utils::ReturnFalseFunctor nop;
-   
+
    //search
    BOOST_CHECK(ls::local_search<ls::search_strategies::SteepestSlope>(s, logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(s, 6);

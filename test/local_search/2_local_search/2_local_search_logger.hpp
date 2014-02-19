@@ -1,12 +1,12 @@
 /**
  * @file 2_local_search_logger.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-15
  */
 #ifndef TWO_LOCAL_SEARCH_LOGLNGER_HPP
-#define TWO_LOCAL_SEARCH_LOGLNGER_HPP 
+#define TWO_LOCAL_SEARCH_LOGLNGER_HPP
 
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "utils/logger.hpp"
@@ -17,11 +17,11 @@ namespace utils {
 template <typename Matrix>
 class TwoLSLogger {
 public:
-    TwoLSLogger(const Matrix & mtx, unsigned int actionsPerLog = 1) : 
+    TwoLSLogger(const Matrix & mtx, unsigned int actionsPerLog = 1) :
         m_mtx(mtx), m_actionPerLog(actionsPerLog), m_cnt(0) {}
-    
-    TwoLSLogger(TwoLSLogger &&) = default; 
-    TwoLSLogger(const TwoLSLogger &) = default; 
+
+    TwoLSLogger(TwoLSLogger &&) = default;
+    TwoLSLogger(const TwoLSLogger &) = default;
 
     template <typename Cycle>
     void operator()(const Cycle & cycle) {

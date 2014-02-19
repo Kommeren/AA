@@ -1,6 +1,6 @@
 /**
  * @file local_search_lambda_example.cpp
- * @brief local search example 
+ * @brief local search example
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-02-04
@@ -31,7 +31,7 @@ int main() {
     auto gain = [=](int sol, int move) {
         return f(sol + move) - f(sol);
     };
-    
+
     auto commit = [](int & sol, int move) {
         sol = sol + move;
     };
@@ -42,6 +42,6 @@ int main() {
     //print
     std::cout << "Local search solution: " <<  solution << std::endl;
     //! [Local Search Example]
-    return 0; 
+    return 0;
 }
 

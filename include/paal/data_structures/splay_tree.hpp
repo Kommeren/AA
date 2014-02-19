@@ -1,6 +1,6 @@
 /**
  * @file splay_tree.hpp
- * @brief 
+ * @brief
  * @author unknown
  * @version 1.0
  * @date 2013-07-24
@@ -25,7 +25,7 @@ namespace splay_tree {
   template<typename N> inline std::size_t node_size(N node) {
     return (node == NULL) ? 0 : node->size();
   }
-  
+
   template<typename N> inline N * copy_node(N * node) {
     return (node == NULL) ? NULL : new N(*node);
   }
@@ -44,12 +44,12 @@ namespace splay_tree {
       typedef Node<value_type> node_type;
 
       /** @param val stored value */
-      explicit Node(const value_type &val) : val_(val), left_(NULL), 
+      explicit Node(const value_type &val) : val_(val), left_(NULL),
         right_(NULL), parent_(NULL), reversed_(false), size_(1) {
       }
-      
-      Node(const Node & n) : val_(n.val_), left_(copy_node(n.left_)), 
-        right_(copy_node(n.right_)), parent_(NULL), reversed_(n.reversed_), 
+
+      Node(const Node & n) : val_(n.val_), left_(copy_node(n.left_)),
+        right_(copy_node(n.right_)), parent_(NULL), reversed_(n.reversed_),
         size_(n.size_) {
             if(right_) {
                 right_->parent_ = this;
@@ -129,7 +129,7 @@ namespace splay_tree {
                 + ((right_ != NULL) ? right_->size_ : 0);
       }
 
-      /** @returns next in same tree according to infix order 
+      /** @returns next in same tree according to infix order
        * WARNING, we assume that path from root to the this node is normalized*/
       node_type *next() {
         node_type *node = right();
@@ -234,7 +234,7 @@ namespace splay_tree {
       bool reversed_;
       std::size_t size_;
   };
-  
+
   /** @brief splay policy */
   enum SplayImplEnum {
     /** splaying goes from root, resulting tree is less balanced */
@@ -364,7 +364,7 @@ namespace splay_tree {
       template<typename I> SplayTree(const I b, const I e) {
         root_ = build_tree(b, e);
       }
-      
+
       SplayTree(SplayTree && splay)  {
           *this = std::move(splay);
       }
@@ -383,7 +383,7 @@ namespace splay_tree {
           *this = std::move(sp);
           return *this;
       }
-      
+
       SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
           auto i = begin();
           auto e = end();
@@ -439,7 +439,7 @@ namespace splay_tree {
       value_type& operator[](std::size_t i) const {
         return find(i)->val_;
       }
-      
+
       /** @param t referenced element */
       std::size_t getIdx(const T & t) const {
         node_type *node = tTonode_.at(t);
@@ -447,7 +447,7 @@ namespace splay_tree {
             return -1;
         }
         node->normalize_root_path();
-        
+
         std::size_t i = node_size(node->left());
         while(node != root_) {
             if(node->parent()->left() == node) {

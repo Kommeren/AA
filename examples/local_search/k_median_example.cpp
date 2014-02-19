@@ -1,6 +1,6 @@
 /**
  * @file k_median_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -16,7 +16,7 @@ int main() {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
-    
+
     //define voronoi and solution
     const int k = 2;
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
@@ -35,7 +35,7 @@ int main() {
     //create facility location local search step
     paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
 
-    //search 
+    //search
     paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
 
     //print result
@@ -48,5 +48,5 @@ int main() {
 //! [K Median Search Example]
 
     return 0;
-    
+
 }

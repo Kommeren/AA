@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_on_identical_parallel_machines.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-06
@@ -19,11 +19,11 @@
 
 namespace paal{
 namespace greedy{
-    
+
 /**
  * @brief this is solve scheduling jobs on identical parallel machines problem
  * and return schedule
- * example: 
+ * example:
  *  \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
@@ -37,7 +37,7 @@ template<class InputIterator, class OutputIterator,class GetTime>
 void schedulingJobsOnIdenticalParallelMachines(int n_machines,InputIterator first,InputIterator last, OutputIterator result,GetTime getTime){
     typedef typename std::iterator_traits<InputIterator>::reference JobReference;
     typedef typename utils::PureResultOf<GetTime(JobReference)>::type Time;
-    
+
     std::sort(first,last,utils::Greater());
     std::priority_queue<std::pair<Time,int> > machines;
     for(auto machineId : boost::irange(0, n_machines)){

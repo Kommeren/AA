@@ -1,12 +1,12 @@
 /**
  * @file bimap.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki, Piotr Smulewicz
  * @version 1.1
  * @date 2013-09-12
  */
 #ifndef BIMAP_HPP
-#define BIMAP_HPP 
+#define BIMAP_HPP
 
 #include <unordered_map>
 
@@ -28,10 +28,10 @@ namespace data_structures {
  * @tparam T
  * @tparam Idx
  */
-template <typename T, typename Idx = int> 
+template <typename T, typename Idx = int>
 class BiMapMIC {
 public:
-    
+
     BiMapMIC() {}
 
     template <typename Iter> BiMapMIC(Iter b, Iter e) {
@@ -41,11 +41,11 @@ public:
             add(t);
         }
     }
-    
-    BiMapMIC(BiMapMIC && bm) = default; 
-    
+
+    BiMapMIC(BiMapMIC && bm) = default;
+
     BiMapMIC(const BiMapMIC & bm) =  default;
-    
+
     BiMapMIC & operator=(BiMapMIC && bm)  = default;
 
     Idx getIdx(const T & t) const {
@@ -60,7 +60,7 @@ public:
         return m_index.at(i);
 #endif
     }
-    
+
     std::size_t size() const {
         return m_index.size();
     }
@@ -70,7 +70,7 @@ public:
         return m_index.size() - 1;
     }
 private:
-    typedef boost::multi_index_container<T, 
+    typedef boost::multi_index_container<T,
                 boost::multi_index::indexed_by<
                     boost::multi_index::random_access<>,
                     boost::multi_index::hashed_unique<boost::multi_index::identity<T>>
@@ -88,12 +88,12 @@ private:
  * @tparam T
  * @tparam Idx
  */
-template <typename T, typename Idx = int> 
+template <typename T, typename Idx = int>
 class BiMap {
     typedef std::unordered_map<T,Idx, boost::hash<T>> TToID;
 public:
     typedef typename TToID::const_iterator Iterator;
-    
+
     BiMap() {}
 
     template <typename Iter> BiMap(Iter b, Iter e) {
@@ -104,11 +104,11 @@ public:
             add(t);
         }
     }
-    
-    BiMap(BiMap && bm) = default; 
-    
+
+    BiMap(BiMap && bm) = default;
+
     BiMap(const BiMap & bm) =  default;
-    
+
     BiMap & operator=(BiMap && bm)  = default;
 
     Idx getIdx(const T & t) const {
@@ -124,9 +124,9 @@ public:
         return m_idToT.at(i);
 #endif
     }
-    
+
     std::size_t size() const {
-        return  m_idToT.size(); 
+        return  m_idToT.size();
     }
 
     Idx add(const T & t) {
@@ -148,7 +148,7 @@ protected:
 };
 
 
-template <typename T, typename Idx = int> 
+template <typename T, typename Idx = int>
 class EraseableBiMap : public BiMap<T, Idx> {
     typedef BiMap<T, Idx> base;
     using base::m_tToID;
@@ -178,14 +178,14 @@ public:
     template <typename Iter> BiMapOfConsecutive(Iter b, Iter e) {
         if(b == e)
             return;
-        
+
         std::size_t size = std::distance(b, e);
         m_idToT.resize(size);
         std::copy(b, e, m_idToT.begin());
-        
+
         m_tToID.resize(size, INVALID_IDX);
         rank(m_idToT,m_tToID,INVALID_IDX);
-        
+
     }
 
     Idx getIdx(const T & t) const {
@@ -195,9 +195,9 @@ public:
     const T & getVal(Idx i) const {
         return m_idToT[i];
     }
-    
+
     std::size_t size() const {
-        return  m_idToT.size(); 
+        return  m_idToT.size();
     }
 
 private:
@@ -234,7 +234,7 @@ void rank(std::vector<T> const& m_idToT,std::vector<Idx> &m_tToID,int INVALID_ID
     static_assert(std::is_integral<T>::value, "Type T has to be integral");
     unsigned long size = m_tToID.size();
     for(auto i : boost::irange(0ul,size)) {
-            Idx & idx = m_tToID[m_idToT[i]]; 
+            Idx & idx = m_tToID[m_idToT[i]];
             assert(m_idToT[i] < int(size) && idx == INVALID_IDX);
             idx = i;
             }

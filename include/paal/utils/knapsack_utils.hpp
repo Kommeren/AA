@@ -1,12 +1,12 @@
 /**
  * @file knapsack_utils.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-10-07
  */
 #ifndef KNAPSACK_UTILS_HPP
-#define KNAPSACK_UTILS_HPP 
+#define KNAPSACK_UTILS_HPP
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/optional.hpp>
@@ -35,11 +35,11 @@ Density<Value, Size>
 make_Density(Value value, Size size) {
     return Density<Value, Size>(value, size);
 }
-    
+
 
 template <typename ObjectSizeFunctor, typename SizeType>
 struct RightSize {
-    RightSize(ObjectSizeFunctor size, SizeType capacity) : 
+    RightSize(ObjectSizeFunctor size, SizeType capacity) :
         m_capacity(capacity), m_size(size) {}
 
     template <typename ObjectsIter>
@@ -61,7 +61,7 @@ make_RightSize(ObjectSizeFunctor size, SizeType capacity) {
 
 namespace detail {
 template <typename Functor, typename Iter>
-    using FunctorOnIteratorPValue = 
+    using FunctorOnIteratorPValue =
       puretype(std::declval<Functor>()(*std::declval<Iter>()));
 
 template <typename FunctorLeft, typename FunctorRight, typename Iter>
@@ -70,17 +70,17 @@ template <typename FunctorLeft, typename FunctorRight, typename Iter>
                       FunctorOnIteratorPValue<FunctorRight, Iter>>;
 
 template <typename ObjectsIter,
-          typename ObjectSizeFunctor> 
-    using FilteredSizesIterator = 
-             boost::filter_iterator<ObjectsIter, 
+          typename ObjectSizeFunctor>
+    using FilteredSizesIterator =
+             boost::filter_iterator<ObjectsIter,
                   RightSize<ObjectSizeFunctor, FunctorOnIteratorPValue<ObjectsIter, ObjectSizeFunctor>>>;
 }
-           
-template <typename ObjectSizeFunctor> 
+
+template <typename ObjectSizeFunctor>
 struct NotZeroSize {
-    NotZeroSize(ObjectSizeFunctor size) : 
+    NotZeroSize(ObjectSizeFunctor size) :
         m_size(std::move(size)) {}
-    template <typename Object> 
+    template <typename Object>
     bool operator()(Object && o) const {
         typedef typename utils::PureResultOf<ObjectSizeFunctor(decltype(o))>::type SizeType;
         return m_size(o) > SizeType();
@@ -91,10 +91,10 @@ private:
 
 
 template <typename ObjectsIter,
-           typename ObjectSizeFunctor, 
+           typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
  detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
- getDensityBasedValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd, 
+ getDensityBasedValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd,
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
   ObjectValueFunctor value, ObjectSizeFunctor size) {
       typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
@@ -109,7 +109,7 @@ template <typename ObjectsIter,
 
       auto b = boost::make_filter_iterator(notZeroSize, oBegin, oEnd);
       auto e = boost::make_filter_iterator(notZeroSize, oEnd, oEnd);
-      
+
       auto nb = boost::make_filter_iterator(zeroSize, oBegin, oEnd);
       auto ne = boost::make_filter_iterator(zeroSize, oEnd, oEnd);
 
@@ -119,11 +119,11 @@ template <typename ObjectsIter,
 }
 
 template <typename ObjectsIter,
-           typename ObjectSizeFunctor, 
+           typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
 std::pair<detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>,
           detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>>
- filterToLarge(ObjectsIter oBegin, ObjectsIter oEnd, 
+ filterToLarge(ObjectsIter oBegin, ObjectsIter oEnd,
   detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
   ObjectValueFunctor value, ObjectSizeFunctor size) {
       auto rightSize = make_RightSize(size, capacity);
@@ -133,20 +133,20 @@ std::pair<detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>,
 }
 
 template <typename ObjectsIter,
-           typename ObjectSizeFunctor, 
+           typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
  detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
- getTrivalValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd, 
+ getTrivalValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd,
   ObjectValueFunctor value, ObjectSizeFunctor size) {
       auto density = make_Density(value, size);
       return *std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(density));
 }
-   
+
 
 namespace detail {
 //definition of basic types
-template <typename ObjectsIter, 
-         typename ObjectSizeFunctor, 
+template <typename ObjectsIter,
+         typename ObjectSizeFunctor,
          typename ObjectValueFunctor>
 struct KnapsackBase {
     typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
@@ -181,7 +181,7 @@ private:
 };
 
 //if the knapsack dynamic table is indexed by sizes,
-//the procedure to find the best element is to find the biggest 
+//the procedure to find the best element is to find the biggest
 //index i in the table that maximizes *i
 template <typename ValueType>
 struct GetMaxElementOnCapacityIndexedCollection {
@@ -207,11 +207,11 @@ struct RetrieveSolutionTag{};
 struct NoRetrieveSolutionTag{};
 
 template <typename SizeType, typename ValueType>
-using GetIntegralTag =  
-        typename boost::mpl::if_c<std::is_integral<SizeType>::value && 
-                       std::is_integral<ValueType>::value, IntegralValueAndSizeTag, 
+using GetIntegralTag =
+        typename boost::mpl::if_c<std::is_integral<SizeType>::value &&
+                       std::is_integral<ValueType>::value, IntegralValueAndSizeTag,
                             typename boost::mpl::if_c<std::is_integral<SizeType>::value, IntegralSizeTag,
-                                typename boost::mpl::if_c<std::is_integral<ValueType>::value, 
+                                typename boost::mpl::if_c<std::is_integral<ValueType>::value,
                                                           IntegralValueTag,
                                                           NonIntegralValueAndSizeTag
                                                          >::type
@@ -220,15 +220,15 @@ using GetIntegralTag =
 
 
 template <typename SizeType>
-using GetArithmeticSizeTag =  
-        typename boost::mpl::if_c<std::is_arithmetic<SizeType>::value, 
+using GetArithmeticSizeTag =
+        typename boost::mpl::if_c<std::is_arithmetic<SizeType>::value,
                                  ArithmeticSizeTag,
                                  NonArithmeticSizeTag>::type;
 
 }//detail
 
 template <typename ObjectsIter, typename Functor>
-boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd, 
+boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
                      double epsilon, double lowerBound, Functor, detail::ZeroOneTag) {
     double n = std::distance(oBegin, oEnd);
     auto ret =  n / (epsilon * lowerBound);
@@ -241,7 +241,7 @@ boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
 
 //TODO this multiplier does not guarantee fptas
 template <typename ObjectsIter, typename Functor>
-boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd, 
+boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
                      double epsilon, double lowerBound, Functor f, detail::NoZeroOneTag) {
     double minF = f(*std::min_element(oBegin, oEnd, utils::make_FunctorToComparator(f)));
     double n = int(double(lowerBound) * (1. + epsilon) / minF + 1.); //maximal number of elements in the found solution

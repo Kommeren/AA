@@ -1,12 +1,12 @@
 /**
  * @file bimap_traits.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-11-04
  */
 #ifndef BIMAP_TRAITS_HPP
-#define BIMAP_TRAITS_HPP 
+#define BIMAP_TRAITS_HPP
 
 namespace paal {
 namespace data_structures {

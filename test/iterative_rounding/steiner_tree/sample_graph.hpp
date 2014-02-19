@@ -1,6 +1,6 @@
 /**
  * @file sample_graph.hpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-08-04

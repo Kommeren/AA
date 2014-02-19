@@ -1,6 +1,6 @@
 /**
  * @file knapsack_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -38,14 +38,14 @@ static const double VALUE_MULTIPLIER = 1. - EPSILON;
 static const double SIZE_MULTIPLIER = 1. + EPSILON;
 static const utils::Compare<double> compare(0.001);
 
-    
-template <typename MaxValue> 
+
+template <typename MaxValue>
 void check(MaxValue maxValue, pd::NoZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
     BOOST_CHECK(compare.ge(maxValue.first, OPT * valMultiplier));
     BOOST_CHECK(compare.ge(OPT_CAP * capMultiplier, maxValue.second));
 }
 
-template <typename MaxValue> 
+template <typename MaxValue>
 void check(MaxValue maxValue, pd::ZeroOneTag, double valMultiplier = 1, double capMultiplier = 1) {
     BOOST_CHECK(compare.ge(maxValue.first, OPT_0_1 * valMultiplier));
     BOOST_CHECK(compare.ge(OPT_CAP * capMultiplier, maxValue.second));
@@ -53,7 +53,7 @@ void check(MaxValue maxValue, pd::ZeroOneTag, double valMultiplier = 1, double c
 
 
 
-template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = pd::RetrieveSolutionTag> 
+template <typename IntegralTag, typename IsZeroOne, typename RetrieveSolution = pd::RetrieveSolutionTag>
 void detail_knapsack_and_check() {
     auto maxValue = detail_knapsack<IntegralTag, IsZeroOne, RetrieveSolution>(objects, capacity, sizesFunctor, valuesFunctor);
     check(maxValue, IsZeroOne());
@@ -72,14 +72,14 @@ BOOST_AUTO_TEST_CASE(KnapsackOverloads) {
     detail_knapsack_and_check<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>();
 }
 
-//Knapsack 
+//Knapsack
 BOOST_AUTO_TEST_CASE(Knapsack) {
     std::vector<int> result;
     LOGLN("Knapsack");
-    auto maxValue = paal::knapsack(std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack(std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::NoZeroOneTag());
@@ -91,10 +91,10 @@ BOOST_AUTO_TEST_CASE(Knapsack) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1");
-    auto maxValue = paal::knapsack_0_1(std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1(std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
     check(maxValue, pd::ZeroOneTag());
     printResult(maxValue, result, pd::RetrieveSolutionTag());
@@ -103,9 +103,9 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 no output");
-    auto maxValue = paal::knapsack_0_1_no_output(std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_no_output(std::begin(objects), std::end(objects),
             capacity,
-            sizesFunctor, 
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::ZeroOneTag());
@@ -116,10 +116,10 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output) {
 BOOST_AUTO_TEST_CASE(Knapsack_fptas_value) {
     std::vector<int> result;
     LOGLN("Knapsack fptas value");
-    auto maxValue = paal::knapsack_on_value_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_on_value_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::NoZeroOneTag(), VALUE_MULTIPLIER);
@@ -131,10 +131,10 @@ BOOST_AUTO_TEST_CASE(Knapsack_fptas_value) {
 BOOST_AUTO_TEST_CASE(Knapsack_fptas_size) {
     std::vector<int> result;
     LOGLN("Knapsack fptas size");
-    auto maxValue = paal::knapsack_on_size_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_on_size_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
 
     printResult(maxValue, result, pd::RetrieveSolutionTag());
@@ -145,9 +145,9 @@ BOOST_AUTO_TEST_CASE(Knapsack_fptas_size) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size_fptas) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 no output size fptas");
-    auto maxValue = paal::knapsack_0_1_no_output_on_size_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_no_output_on_size_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            sizesFunctor, 
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);
@@ -158,9 +158,9 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_size_fptas) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_fptas) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 no output value fptas");
-    auto maxValue = paal::knapsack_0_1_no_output_on_value_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_no_output_on_value_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            sizesFunctor, 
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::ZeroOneTag(), VALUE_MULTIPLIER);
@@ -171,10 +171,10 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_no_output_value_fptas) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_value_fptas) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 on value fptas");
-    auto maxValue = paal::knapsack_0_1_on_value_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_on_value_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::ZeroOneTag(), VALUE_MULTIPLIER);
@@ -185,10 +185,10 @@ BOOST_AUTO_TEST_CASE(Knapsack_0_1_value_fptas) {
 BOOST_AUTO_TEST_CASE(Knapsack_0_1_size_fptas) {
     std::vector<int> result;
     LOGLN("Knapsack 0/1 on size fptas");
-    auto maxValue = paal::knapsack_0_1_on_size_fptas(EPSILON, std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_on_size_fptas(EPSILON, std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
-            sizesFunctor, 
+            std::back_inserter(result),
+            sizesFunctor,
             valuesFunctor);
 
     check(maxValue, pd::ZeroOneTag(), 1, SIZE_MULTIPLIER);

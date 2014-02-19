@@ -1,12 +1,12 @@
 /**
  * @file k_median_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-08
  */
 #ifndef K_MEDIAN_SOLUTION_HPP
-#define K_MEDIAN_SOLUTION_HPP 
+#define K_MEDIAN_SOLUTION_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
@@ -15,20 +15,20 @@ namespace paal {
 namespace data_structures {
 
 template <typename VoronoiType>
-class KMedianSolution : 
+class KMedianSolution :
     public data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> {
     typedef data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> base;
 public:
     KMedianSolution(VoronoiType voronoi,
-                    typename base::UnchosenFacilitiesSet uf, int k) : 
+                    typename base::UnchosenFacilitiesSet uf, int k) :
         base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(int(base::getChosenFacilities().size()) == k);}
-    
+
     KMedianSolution(const KMedianSolution & kmsol) : base(kmsol) {}
-    
+
     KMedianSolution(KMedianSolution && kmsol) : base(std::move(kmsol)) {}
 private:
     utils::ReturnZeroFunctor m_zeroFunc;
-        
+
 };
 
 

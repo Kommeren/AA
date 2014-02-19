@@ -1,6 +1,6 @@
 /**
  * @file facility_location_solution_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-06-20
@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
         < decltype(cost), VorType> Sol;
     typedef typename VorType::GeneratorsSet FSet;
     VorType voronoi( FSet{},   FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
-            
+
     Sol sol(voronoi, FSet{SGM::A, SGM::B}, cost);
 
     sol.addFacility(SGM::A);

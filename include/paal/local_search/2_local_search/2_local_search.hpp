@@ -1,6 +1,6 @@
 /**
  * @file 2_local_search.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -26,7 +26,7 @@ namespace two_local_search {
  @brief represents step of 2 local search in multi solution where Solution is Cycle, SolutionElement is pair of vertices and Move type is pair of vertices.
  See \ref local_search_page. There are three ways to provide search components
  <ul>
-       <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.  
+       <li> use (TODO link does not generate) getDefaultTwoLocalComponents(const Metric &) - this is the easiest way.
        <li> use TwoLocalComponents to provide your own search Components
        <li> write your own implementation of MultiSearchComponents
  </ul>
@@ -42,7 +42,7 @@ namespace two_local_search {
 
 template <typename... Args>
 using TwoLocalComponents = data_structures::Components<
-            Gain, 
+            Gain,
             data_structures::NameWithDefault<GetMoves, GetAllMovesFromSolution>,
             data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
                 >::type<Args...>;
@@ -56,13 +56,13 @@ using TwoLocalComponents = data_structures::Components<
  * @param ich
  * @param ng
  *
- * @return 
+ * @return
  */
-template <typename Gain, 
+template <typename Gain,
           typename GetMoves = GetAllMovesFromSolution>
-TwoLocalComponents<Gain, GetMoves>  
+TwoLocalComponents<Gain, GetMoves>
 
-    make_TwoLocalSearchComponents(Gain ch, 
+    make_TwoLocalSearchComponents(Gain ch,
             GetMoves ng = GetMoves()) {
 
     return TwoLocalComponents<Gain, GetMoves>(std::move(ch), std::move(ng));
@@ -94,7 +94,7 @@ getDefaultTwoLocalComponents(const Metric & m) {
  * @param gsc
  * @param components
  *
- * @return 
+ * @return
  */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
@@ -121,10 +121,10 @@ bool two_local_search(
  * @param cycle
  * @param components
  *
- * @return 
+ * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename Cycle, 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename Cycle,
           typename... Components>
 bool two_local_search_simple(Cycle & cycle, Components... components) {
     return two_local_search(cycle, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);

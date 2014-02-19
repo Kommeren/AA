@@ -1,6 +1,6 @@
 /**
  * @file n_queens_simulated_annealing.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-04
@@ -57,7 +57,7 @@ int main(int argc, char ** argv) {
     auto gain = [](Adapter & sol, Move m){return ls::NQueensGain()(sol, m.m_from, m.m_to);};
     auto commit = [](Adapter & sol, Move m){return ls::NQueensCommit()(sol, m.m_from, m.m_to);};
     auto randomMove = [=]() mutable {
-                            Move m; 
+                            Move m;
                             m.m_from = distribution(rand);
                             m.m_to = distribution(rand);
                             return m;
@@ -68,7 +68,7 @@ int main(int argc, char ** argv) {
     auto movesBegin = boost::make_function_input_iterator(r, 0);
     auto movesEnd = boost::make_function_input_iterator(r, 100);
 
-    auto getMoves = [=](Adapter & sol) 
+    auto getMoves = [=](Adapter & sol)
         {return std::make_pair(movesBegin, movesEnd);};
 
     int nr_of_iterations(0);

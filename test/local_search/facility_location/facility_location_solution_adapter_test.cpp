@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
 
     Sol sol(std::move(voronoi), FSet{SGM::A,SGM::B}, cost);
 
-    FacilityLocationSolutionAdapter<Sol> sa(sol);  
+    FacilityLocationSolutionAdapter<Sol> sa(sol);
     std::vector<Facility<int>> saSorted;
     std::copy(sa.begin(), sa.end(), std::back_inserter(saSorted));
     boost::sort(saSorted);
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     auto B = *b;
     BOOST_CHECK(b != e);
     BOOST_CHECK(++b == e);
-    
+
     sa.addFacility(A);
 
     saSorted.clear();

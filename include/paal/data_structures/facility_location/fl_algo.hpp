@@ -1,12 +1,12 @@
 /**
  * @file fl_algo.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
  */
 #ifndef FL_ALGO_HPP
-#define FL_ALGO_HPP 
+#define FL_ALGO_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/functors.hpp"
@@ -14,7 +14,7 @@
 namespace paal {
 namespace simple_algo {
 
-    template <typename Metric, typename FCosts, typename FLSolution> 
+    template <typename Metric, typename FCosts, typename FLSolution>
        typename data_structures::MetricTraits<Metric>::DistanceType
 getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     auto const & ch      = fls.getChosenFacilities();
@@ -27,14 +27,14 @@ getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
 
     for(VertexType f : ch) {
         for(std::pair<VertexType, Dist> v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
-            d += m(v.first, f) * v.second; 
+            d += m(v.first, f) * v.second;
         }
     }
 
     return d;
 }
-    
-template <typename Metric, typename FCosts, typename FLSolution> 
+
+template <typename Metric, typename FCosts, typename FLSolution>
        typename data_structures::MetricTraits<Metric>::DistanceType
 getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     auto const & ch      = fls.getChosenFacilities();
@@ -47,7 +47,7 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
 
     for(VertexType f : ch) {
         for(VertexType v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
-            d += m(v, f); 
+            d += m(v, f);
         }
     }
 

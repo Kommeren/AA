@@ -1,12 +1,12 @@
 /**
  * @file capacitated_voronoi.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-20
  */
 #ifndef CAPACITATED_VORONOI_HPP
-#define CAPACITATED_VORONOI_HPP 
+#define CAPACITATED_VORONOI_HPP
 
 #include <unordered_map>
 
@@ -37,14 +37,14 @@ public:
     class Dist {
     public:
         typedef typename MetricTraits<Metric>::DistanceType DistI;
-        Dist() {} 
-        Dist(DistI real, DistI distToFullAssign) : 
+        Dist() {}
+        Dist(DistI real, DistI distToFullAssign) :
             m_realDist(real), m_distToFullAssignment(distToFullAssign) {}
         Dist operator-(Dist d) {
-            return Dist(m_realDist - d.m_realDist, 
+            return Dist(m_realDist - d.m_realDist,
                         m_distToFullAssignment - d.m_distToFullAssignment);
         }
-        
+
         DistI getDistToFullAssignment() const {
             return m_distToFullAssignment;
         }
@@ -57,7 +57,7 @@ public:
             return m_realDist ==  d.m_realDist &&
                    m_distToFullAssignment == d.m_distToFullAssignment;
         }
-        
+
         bool operator>(DistI d) {
             if(m_distToFullAssignment > DistI(0)) {
                 return true;
@@ -66,30 +66,30 @@ public:
             }
             return m_realDist > d;
         }
-        
+
         const Dist & operator+=(Dist d) {
             m_realDist += d.m_realDist;
             m_distToFullAssignment += d.m_distToFullAssignment;
             return *this;
         }
-        
+
         Dist operator+(Dist d) {
             Dist ret(d);
             ret += *this;
             return ret;
         }
-        
+
         Dist operator-() {
             return Dist(-m_realDist, -m_distToFullAssignment);
         }
-    
+
         friend  Dist  operator+(DistI di, Dist d) {
-            return Dist(d.m_realDist + di, d.m_distToFullAssignment); 
+            return Dist(d.m_realDist + di, d.m_distToFullAssignment);
         }
 
         template <typename Stream >
         friend Stream & operator<<(Stream & s, Dist d) {
-            return s << d.m_distToFullAssignment << " " <<  d.m_realDist; 
+            return s << d.m_distToFullAssignment << " " <<  d.m_realDist;
         }
 
     private:
@@ -97,7 +97,7 @@ public:
         DistI m_distToFullAssignment;
     };
     typedef typename Dist::DistI DistI;
-    typedef typename MetricTraits<Metric>::VertexType VertexType;    
+    typedef typename MetricTraits<Metric>::VertexType VertexType;
     typedef std::set<VertexType> Generators;
     typedef std::vector<VertexType> Vertices;
 
@@ -106,11 +106,11 @@ private:
         boost::property<boost::vertex_name_t, VertexType >,
             boost::property < boost::edge_capacity_t, DistI,
                 boost::property < boost::edge_residual_capacity_t, DistI,
-                    boost::property < boost::edge_reverse_t, 
-                                        boost::adjacency_list_traits <boost::listS, boost::vecS, boost::bidirectionalS >::edge_descriptor, 
+                    boost::property < boost::edge_reverse_t,
+                                        boost::adjacency_list_traits <boost::listS, boost::vecS, boost::bidirectionalS >::edge_descriptor,
                       boost::property <boost::edge_weight_t, DistI>
-                             > 
-                          > 
+                             >
+                          >
                       > > Graph;
     typedef boost::graph_traits<Graph> GTraits;
     typedef typename GTraits::edge_descriptor ED;
@@ -120,7 +120,7 @@ private:
     typedef typename GTraits::vertex_descriptor VD;
     typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
     typedef typename std::unordered_map<VertexType, VD, boost::hash<VertexType>> VertexToGraphVertex;
-    
+
     struct Trans {
         std::pair<VertexType, DistI> operator()(const ED &e) const {
             return std::make_pair(m_v->getVertexForEdge(e), m_v->getFlowOnEdge(e));
@@ -133,11 +133,11 @@ private:
 public:
 
     CapacitatedVoronoi(const Generators & gen, Vertices ver,
-                       const Metric & m, 
-                       const GeneratorsCapacieties & gc, const VerticesDemands & vd, 
-                       DistI costOfNoGenerator = std::numeric_limits<DistI>::max()) : 
+                       const Metric & m,
+                       const GeneratorsCapacieties & gc, const VerticesDemands & vd,
+                       DistI costOfNoGenerator = std::numeric_limits<DistI>::max()) :
                          m_s(addVertex()), m_t(addVertex()),
-                         m_vertices(std::move(ver)), m_metric(m), 
+                         m_vertices(std::move(ver)), m_metric(m),
                          m_generatorsCap(gc),
                          m_firstGeneratorId(m_vertices.size() + 2),
                          m_costOfNoGenerator(costOfNoGenerator) {
@@ -172,7 +172,7 @@ public:
                 rev[e] = eb.first;
             }
         }
-    
+
     // returns diff between new cost and old cost
     Dist addGenerator(VertexType gen) {
         Dist costStart = getCost();
@@ -185,13 +185,13 @@ public:
 
         addEdge(genGraph, m_t, 0, m_generatorsCap(gen));
 
-        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t,                              
+        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t,
                 predecessor_map(&m_pred[0]).distance_map(&m_dist[0]).distance_map2(&m_dist_prev[0]));
-                                                                    
+
 
         return getCost() - costStart;
     }
-        
+
     // returns diff between new cost and old cost
     Dist remGenerator(VertexType gen) {
         Dist costStart = getCost();
@@ -199,7 +199,7 @@ public:
         auto genGraph = m_gToGraphV.at(gen);
         auto rev = get(boost::edge_reverse, m_g);
         auto residual_capacity = get(boost::edge_residual_capacity, m_g);
-        
+
         //removing flow from the net
         for(const ED & e : boost::make_iterator_range(in_edges(genGraph, m_g))) {
             bool b;
@@ -219,35 +219,35 @@ public:
         assert(!edge(genGraph, m_t, m_g).second);
         remove_vertex(genGraph, m_g);
         restoreIndex();
-        
-        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t, 
+
+        boost::successive_shortest_path_nonnegative_weights(m_g, m_s, m_t,
                 predecessor_map(&m_pred[0]).distance_map(&m_dist[0]).distance_map2(&m_dist_prev[0]));
-                                                                    
+
 
         return getCost() - costStart;
     }
-    
+
     const Generators & getGenerators() const {
         return m_generators;
     }
-    
+
     const Vertices & getVertices() const {
         return m_vertices;
     }
-    
+
     /**
      * @brief member function for getting assignment, for generator.
      *
-     * @return returns range of pairs; the first element of pair is the Vertex 
+     * @return returns range of pairs; the first element of pair is the Vertex
      * and the second element is the flow from this vertex to given generator
      *
      */
-    std::pair<VForGenerator, VForGenerator> 
+    std::pair<VForGenerator, VForGenerator>
     getVerticesForGenerator(VertexType gen) const {
         IEI ei, end;
         VD v = m_gToGraphV.at(gen);
         auto r = in_edges(v, m_g);
-        Trans t; 
+        Trans t;
         t.m_v = this;
         return std::make_pair(VForGenerator(r.first,  t),
                               VForGenerator(r.second, t));
@@ -266,7 +266,7 @@ public:
         return Dist(cost, resCap);
     }
 
-    template <typename OStream> 
+    template <typename OStream>
     friend OStream & operator<<(OStream & s, CapacitatedVoronoi & v) {
         s << num_vertices(v.m_g) << ", ";
         s <<  v.m_s <<", " << v.m_t << "\n";
@@ -304,7 +304,7 @@ public:
         s <<  "\n";
         return s;
     }
-    
+
 private:
 
     void restoreIndex() {
@@ -316,11 +316,11 @@ private:
         }
     }
 
-    
+
     VD addVertex(VertexType v = VertexType()) {
         VD vG = add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
         int N = num_vertices(m_g);
-        
+
         m_dist.resize(N);
         m_dist_prev.resize(N);
         m_pred.resize(N);
@@ -334,9 +334,9 @@ private:
         e = addDirEdge(v, w, weight, capacity);
         f = addDirEdge(w, v, -weight, 0);
         rev[e] = f;
-        rev[f] = e; 
+        rev[f] = e;
     }
-    
+
     ED addDirEdge(VD v, VD w, DistI weight, DistI capacity) {
         bool b;
         ED e;
@@ -350,13 +350,13 @@ private:
         weightMap[e] = weight;
         return e;
     }
-    
+
     DistI getFlowOnEdge(const ED & e) const {
         auto capacityMap = get(boost::edge_capacity, m_g);
         auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         return capacityMap[e] - residual_capacity[e];
     }
-    
+
     VertexType getVertexForEdge(const ED & e) const  {
         auto name = get(boost::vertex_name, m_g);
         return name[source(e, m_g)];

@@ -1,6 +1,6 @@
 /**
  * @file voronoi.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -36,7 +36,7 @@ namespace data_structures {
 template <typename Metric>
 class Voronoi {
     public:
-        typedef typename MetricTraits<Metric>::VertexType VertexType;    
+        typedef typename MetricTraits<Metric>::VertexType VertexType;
         typedef std::multimap<VertexType, VertexType> GeneratorsToVertices;
         typedef std::unordered_set<VertexType, boost::hash<VertexType>> GeneratorsSet;
         typedef typename MetricTraits<Metric>::DistanceType Dist;
@@ -52,7 +52,7 @@ class Voronoi {
          * @param m
          * @param costOfNoGenerator
          */
-        Voronoi(const GeneratorsSet & generators, 
+        Voronoi(const GeneratorsSet & generators,
                Vertices vertices,
                const Metric & m, Dist costOfNoGenerator = std::numeric_limits <Dist>::max()) :
             m_vertices(std::move(vertices)), m_metric(m), m_costOfNoGenerator(costOfNoGenerator) {
@@ -60,14 +60,14 @@ class Voronoi {
                     addGenerator(f);
                 }
             }
-        
+
         /**
          * @brief Copy constructor
          *
          * @param v
          */
-        Voronoi(const Voronoi & v) : m_generatorsToVertices(v.m_generatorsToVertices), 
-                m_vertices(v.m_vertices), m_generators(v.m_generators), 
+        Voronoi(const Voronoi & v) : m_generatorsToVertices(v.m_generatorsToVertices),
+                m_vertices(v.m_vertices), m_generators(v.m_generators),
                 m_metric(v.m_metric), m_costOfNoGenerator(v.m_costOfNoGenerator) {
             auto b = m_generatorsToVertices.begin();
             auto e = m_generatorsToVertices.end();
@@ -75,35 +75,35 @@ class Voronoi {
                 m_verticesToGenerators.insert(std::make_pair(b->second, b));
             }
         }
-        
+
         /**
          * @brief Move constructor
          *
          * @param v
          */
         Voronoi(Voronoi && v) : m_verticesToGenerators(std::move(v.m_verticesToGenerators)),
-                                m_generatorsToVertices(std::move(v.m_generatorsToVertices)), 
-                m_vertices(std::move(v.m_vertices)), m_generators(std::move(v.m_generators)), 
+                                m_generatorsToVertices(std::move(v.m_generatorsToVertices)),
+                m_vertices(std::move(v.m_vertices)), m_generators(std::move(v.m_generators)),
                 m_metric(v.m_metric), m_costOfNoGenerator(v.m_costOfNoGenerator) {
         }
-       
+
         // returns diff between new cost and old cost
         Dist addGenerator(VertexType f) {
             Dist cost = Dist();
             m_generators.insert(f);
-           
+
             //first generatorsility
             if(m_generators.size() == 1) {
                 m_verticesToGenerators.clear();
                 m_generatorsToVertices.clear();
                 for(VertexType v : m_vertices) {
-                    m_verticesToGenerators[v] = 
+                    m_verticesToGenerators[v] =
                         m_generatorsToVertices.insert(std::make_pair(f, v));
-                    cost += m_metric(v,f); 
+                    cost += m_metric(v,f);
                 }
-                
+
                 cost = cost - m_costOfNoGenerator;
-                
+
             } else {
                 for(VertexType v: m_vertices) {
                     Dist d = m_metric(v,f) - dist(v);
@@ -115,7 +115,7 @@ class Voronoi {
             }
             return cost;
         }
-        
+
         // returns diff between new cost and old cost
         Dist remGenerator(VertexType f) {
             Dist cost = Dist();
@@ -132,7 +132,7 @@ class Voronoi {
                 auto end = m_generatorsToVertices.upper_bound(f);
                 for(;begin != end; ) {
                     auto v = begin->second;
-                    //using the fact that generators is a map 
+                    //using the fact that generators is a map
                     //(with other containers you have to be careful cause of iter invalidation)
                     ++begin;
                     cost -= dist(v);
@@ -146,22 +146,22 @@ class Voronoi {
         const GeneratorsSet & getGenerators() const {
             return m_generators;
         }
-        
+
         const Vertices & getVertices() const {
             return m_vertices;
         }
 
-            decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values) 
+            decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values)
         getVerticesForGenerator(VertexType g) const {
             return m_generatorsToVertices.equal_range(g) | boost::adaptors::map_values;
         }
 
     private:
-        
+
         Dist dist(VertexType v) {
             return m_metric(v, vertexToGenerators(v));
         }
-       
+
         template <typename Filter = utils::ReturnTrueFunctor>
         Dist adjustVertex(VertexType v, Filter filter = Filter()) {
             bool init = true;
@@ -179,7 +179,7 @@ class Voronoi {
             }
             assert(!init);
             assign(v,f_best);
-            return d; 
+            return d;
         }
 
         VertexType vertexToGenerators(VertexType v) const {
@@ -192,13 +192,13 @@ class Voronoi {
         void assign(VertexType v, VertexType f) {
             auto prev = m_verticesToGenerators.at(v);
             m_generatorsToVertices.erase(prev);
-            m_verticesToGenerators[v] = 
+            m_verticesToGenerators[v] =
                 m_generatorsToVertices.insert(std::make_pair(f, v));
         }
 
-        typedef std::unordered_map<VertexType, 
+        typedef std::unordered_map<VertexType,
                 typename GeneratorsToVertices::iterator, boost::hash<VertexType>> VerticesToGenerators;
-        
+
         VerticesToGenerators m_verticesToGenerators;
         GeneratorsToVertices m_generatorsToVertices;
         Vertices m_vertices;
@@ -209,7 +209,7 @@ class Voronoi {
 };
 
 template <typename Metric>
-struct VoronoiTraits<Voronoi<Metric>> : 
+struct VoronoiTraits<Voronoi<Metric>> :
     public  _VoronoiTraits<Voronoi<Metric>, typename MetricTraits<Metric>::VertexType> {
 };
 

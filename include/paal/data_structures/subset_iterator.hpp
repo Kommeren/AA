@@ -1,6 +1,6 @@
 /**
  * @file subset_iterator.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -25,16 +25,16 @@ namespace data_structures {
  * @tparam Iterator
  * @tparam k
  */
-template <typename Iterator,int k, 
-          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *, 
-          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &> class SubsetsIterator : 
+template <typename Iterator,int k,
+          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *,
+          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &> class SubsetsIterator :
     private SubsetsIterator<Iterator, k-1>{
-    
+
 public:
     typedef typename std::iterator_traits<Iterator>::value_type Element;
-    typedef typename utils::kTuple<Element, k>::type SubsetType; 
+    typedef typename utils::kTuple<Element, k>::type SubsetType;
     typedef SubsetsIterator<Iterator, k-1> base;
-    typedef std::iterator<std::forward_iterator_tag, 
+    typedef std::iterator<std::forward_iterator_tag,
                          SubsetType,
                          ptrdiff_t,
                          Pointer,
@@ -49,7 +49,7 @@ public:
     using base::m_end;
 
 
-    SubsetsIterator(Iterator begin, Iterator end ) : 
+    SubsetsIterator(Iterator begin, Iterator end ) :
         base(begin, end), m_begin(base::m_begin) {
         if(m_begin != m_end) {
             ++m_begin;
@@ -57,7 +57,7 @@ public:
 
         moveCurr();
     }
-    
+
     SubsetsIterator()  {}
 
     SubsetsIterator & operator++(){
@@ -74,7 +74,7 @@ public:
 
         return *this;
     }
-    
+
     SubsetsIterator operator++(int){
         SubsetsIterator i(*this);
         operator++();
@@ -83,67 +83,67 @@ public:
 
     bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
-    }               
-    
+    }
+
     bool operator==(const SubsetsIterator & ei) const {
         return (m_begin == ei.m_begin && base::operator==(ei)) ||
                (m_begin == m_end && ei.m_begin == m_end);
-    }               
-    
+    }
+
     pointer const operator->() const {
         return &m_return;
-    }               
+    }
 
     void operator=(SubsetsIterator ei) {
         base::operator=(ei);
-        m_begin = ei.m_begin; 
+        m_begin = ei.m_begin;
         m_end = ei.m_end;
         m_return = ei.m_return;
-    }               
+    }
 
     reference operator*() const {
         return m_return;
     }
-    
+
 private:
     void moveCurr() {
         if(m_begin != m_end) {
             m_return = std::tuple_cat(base::operator*(), std::tuple<Element>(*m_begin));
         }
     }
-    
+
     SubsetType m_return;
-protected:    
+protected:
     Iterator m_begin;
 };
 
-template <typename Iterator> class SubsetsIterator<Iterator, 1> : 
-    public std::iterator<std::forward_iterator_tag, 
+template <typename Iterator> class SubsetsIterator<Iterator, 1> :
+    public std::iterator<std::forward_iterator_tag,
                          std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator>,
-                         ptrdiff_t, 
+                         ptrdiff_t,
                          std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator> *,
                          const std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator> &> {
-public:    
+public:
     typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef std::tuple<Element> SubsetType;
 
-    SubsetsIterator(Iterator begin, Iterator end ) : 
+    SubsetsIterator(Iterator begin, Iterator end ) :
         m_begin(begin), m_end(end) {
 
         moveCurr();
     }
-    
+
     SubsetsIterator()  {}
 
     SubsetsIterator & operator++(){
         assert(m_begin != m_end);
         ++m_begin;
-    
+
         moveCurr();
 
         return *this;
     }
-    
+
     SubsetsIterator operator++(int){
         SubsetsIterator i(*this);
         operator++();
@@ -152,26 +152,26 @@ public:
 
     bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
-    }               
-    
+    }
+
     bool operator==(SubsetsIterator ei) const {
         return m_begin == ei.m_begin;
-    }               
-    
+    }
+
     const SubsetType * const operator->() const {
         return &m_return;
-    }               
+    }
 
     void operator=(SubsetsIterator ei) {
-        m_begin = ei.m_begin; 
+        m_begin = ei.m_begin;
         m_end = ei.m_end;
         m_return = ei.m_return;
-    }               
+    }
 
     const SubsetType & operator*() const {
         return m_return;
     }
-    
+
 private:
     void moveCurr() {
         if(m_begin != m_end) {
@@ -179,15 +179,15 @@ private:
         }
     }
     SubsetType m_return;
-protected:    
+protected:
     Iterator m_begin;
     Iterator m_end;
 };
 
 
 template <typename Iterator,int k,
-          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *, 
-          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &> 
+          typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *,
+          typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &>
 std::pair<SubsetsIterator<Iterator, k, Pointer, Reference>, SubsetsIterator<Iterator, k, Pointer, Reference>>
 make_SubsetsIteratorrange(Iterator b, Iterator e)  {
      typedef SubsetsIterator<Iterator, k, Pointer, Reference> SI;

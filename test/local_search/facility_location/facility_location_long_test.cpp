@@ -1,6 +1,6 @@
 /**
  * @file facility_location_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
@@ -41,9 +41,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
-    
+
         auto cost = paal::utils::make_ArrayToFunctor(facCost);
-    
+
         typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
 
         typedef paal::data_structures::FacilityLocationSolution
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         typedef typename VorType::GeneratorsSet FSet;
         VorType voronoi( FSet{},  FSet(clients.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), FSet(fac.begin(), fac.end()), cost);
-    
+
         DefaultRemoveFLComponents<int>::type rem;
         DefaultAddFLComponents<int>::type    add;
         DefaultSwapFLComponents<int>::type   swap;
@@ -64,5 +64,5 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         BOOST_CHECK(opt <= c + MULTIPL);
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << double(c) / double(opt));
     });
-    
+
 }

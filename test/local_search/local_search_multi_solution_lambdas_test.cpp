@@ -1,6 +1,6 @@
 /**
  * @file local_search_multi_solution_test.cpp
- * @brief this is implementation using lagrangian relaxation and c++11 lambdas 
+ * @brief this is implementation using lagrangian relaxation and c++11 lambdas
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -34,11 +34,11 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     double G{1};
 
     //components for vector
-    auto f = [&](Solution & x){ 
+    auto f = [&](Solution & x){
         double & x1(x[0]), & x2(x[1]), & x3(x[2]);
         return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3 + G * (2- (x1 + x2 + x3));
     };
-   
+
     auto getMoves =[&] (const Solution & s, SolutionElement i) {
         for(int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCut[j] = std::max(neighb[j] + i, LOWER_BOUND);
@@ -59,18 +59,18 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     auto commit = [&](Solution &, SolutionElement & se, Move u) {
         se = u;
     };
-        
+
     auto ls = [=](Solution & x) {
-        local_search_multi_solution_simple(x, 
+        local_search_multi_solution_simple(x,
             local_search::make_SearchComponents(getMoves, gain, commit));
     };
 
     //components for G.
     std::vector<double> neighbCutG(4);
     std::vector<double> x(DIM, 0);
-    local_search_multi_solution_simple(x, 
-                local_search::make_SearchComponents(getMoves, gain, commit)); 
-    double best = f(x); 
+    local_search_multi_solution_simple(x,
+                local_search::make_SearchComponents(getMoves, gain, commit));
+    double best = f(x);
 
 
     auto getMovesG =[&] (const double g) {
@@ -79,26 +79,26 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         }
         return std::make_pair(neighbCutG.begin(), neighbCutG.end());
     };
-    
+
     auto gainG = [&](double, double g) {
         std::vector<double> x(DIM, 0);
         auto old = G;
         G = g;
-        ls(x); 
+        ls(x);
         G = old;
         return best - f(x);
     };
-    
+
     auto commitG = [&](double & s, double u) {
         s = u;
     };
-            
+
     local_search_simple(G, local_search::make_SearchComponents(getMovesG, gainG, commitG));
     ls(x);
 
     //printing
     LOGLN("f(");
-    LOG_COPY_DEL(x.begin(), x.end(), ","); 
+    LOG_COPY_DEL(x.begin(), x.end(), ",");
     LOGLN(") = \t" << f(x));
     //TODO, unfinished invesitigate
 //    BOOST_CHECK_EQUAL(f(x), 6.);

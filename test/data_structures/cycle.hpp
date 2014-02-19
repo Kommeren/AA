@@ -1,12 +1,12 @@
 /**
  * @file cycle.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-11
  */
 #ifndef CYCLE_HPP
-#define CYCLE_HPP 
+#define CYCLE_HPP
 
 #include <boost/test/unit_test.hpp>
 #include <vector>
@@ -24,27 +24,27 @@ namespace {
     std::vector<std::string> v = {"1","2","3","4","5","6","7","8","9","10"};
 }
 
-template <typename El, typename Sol, typename Cycle> 
+template <typename El, typename Sol, typename Cycle>
 void checkSwap(Cycle & c, const El & p1, const  El & p2, const El & start, const Sol & sol) {
     c.flip(p1, p2);
     BOOST_CHECK(vecEquals(sol.begin(), sol.end(), c.vbegin(start), c.vend()));
 }
 
-template <template <class> class  Cycle> 
+template <template <class> class  Cycle>
 void swap_edges_3() {
     std::vector<std::string> sol = {"1","2", "3"};
     Cycle<std::string> sc(v.begin(), v.begin() + 3);
     checkSwap(sc, "2", "2", "1", sol);
 }
 
-template <template <class> class  Cycle> 
+template <template <class> class  Cycle>
 void swap_edges_3_1() {
     std::vector<std::string> sol = {"1", "3", "2"};
     Cycle<std::string> sc(v.begin(), v.begin() + 3);
     checkSwap(sc, "3", "1", "1", sol);
 }
 
-template <template <class> class  Cycle> 
+template <template <class> class  Cycle>
 void swap_edges_4() {
     std::vector<std::string> sol = {"1","3", "2", "4"};
 

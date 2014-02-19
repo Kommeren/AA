@@ -1,6 +1,6 @@
 /**
  * @file knapsack_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -29,7 +29,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
     parse(testDir + "cases.txt", [&](const std::string & line, std::istream & is_test_cases) {
         int testId = std::stoi(line);
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
-        
+
         int capacity;
         std::vector<int> sizes;
         std::vector<int> values;
@@ -59,28 +59,28 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
 
         //KNAPSACK
         auto opt = detail_knapsack<pd::IntegralValueAndSizeTag, pd::NoZeroOneTag>(objects, capacity, sizesFunct, valuesFunct).first;
-       
+
         auto maxValue = detail_knapsack<pd::IntegralValueTag, pd::NoZeroOneTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt, maxValue.first);
         maxValue = detail_knapsack<pd::IntegralSizeTag, pd::NoZeroOneTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt, maxValue.first);
 
         //KNAPSACK 0/1
-        
+
         maxValue = detail_knapsack<pd::IntegralValueAndSizeTag, pd::ZeroOneTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::IntegralSizeTag, pd::ZeroOneTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::IntegralValueTag, pd::ZeroOneTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
-        
+
         maxValue = detail_knapsack<pd::IntegralValueAndSizeTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::IntegralSizeTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::IntegralValueTag, pd::ZeroOneTag, pd::NoRetrieveSolutionTag>(objects, capacity, sizesFunct, valuesFunct);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
-        
+
         //FPTAS
         auto epsilons = {
             0.00001, 0.0001, 0.001, 0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             maxValue = detail_knapsack_fptas<pd::NoZeroOneTag, pd::RetrieveSolutionTag>(epsilon, objects, capacity, sizesFunct, valuesFunct, OnValueTag());
             BOOST_CHECK(double(opt) * (1. - epsilon) <= maxValue.first);
             BOOST_CHECK(capacity  >= maxValue.second);
-            
+
             maxValue = detail_knapsack_fptas<pd::NoZeroOneTag, pd::RetrieveSolutionTag>(epsilon, objects, capacity, sizesFunct, valuesFunct, OnSizeTag());
             BOOST_CHECK(opt <= maxValue.first);
             BOOST_CHECK(double(capacity) * (1. + epsilon) >= maxValue.second);
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
             maxValue = detail_knapsack_fptas<pd::ZeroOneTag, pd::RetrieveSolutionTag>(epsilon, objects, capacity, sizesFunct, valuesFunct, OnValueTag());
             BOOST_CHECK(double(opt_0_1) * (1. - epsilon) <= maxValue.first);
             BOOST_CHECK(capacity  >= maxValue.second);
-            
+
             maxValue = detail_knapsack_fptas<pd::ZeroOneTag, pd::RetrieveSolutionTag>(epsilon, objects, capacity, sizesFunct, valuesFunct, OnSizeTag());
             BOOST_CHECK(opt_0_1 <= maxValue.first);
             BOOST_CHECK(double(capacity) * (1. + epsilon) >= maxValue.second);

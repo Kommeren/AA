@@ -28,8 +28,8 @@ int main() {
         put(c, SGM::E, paal::Terminals::NONTERMINAL);
     }
 
-    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()), 
-            boost::vertex_color_map(&color[0])); 
+    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
+            boost::vertex_color_map(&color[0]));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
     for(auto e: steinerEdges) {

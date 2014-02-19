@@ -1,7 +1,7 @@
 /**
  * @file types_vector.hpp
  * @brief This is implementation of type vector taking advantage of variadic template.
- *        This implementation is NOT  c++11 adaptation of mpl. 
+ *        This implementation is NOT  c++11 adaptation of mpl.
  *        It is small set of functon needed for Components class purpose.
  *        It is also less general than mpl. The implementation is create to avoid
  *        some problems with mpl. The c++11 techniques makes it much simpler and clearer.
@@ -11,7 +11,7 @@
  * @date 2013-07-18
  */
 #ifndef TYPES_VECTOR_HPP
-#define TYPES_VECTOR_HPP 
+#define TYPES_VECTOR_HPP
 namespace paal {
 namespace data_structures {
 
@@ -36,8 +36,8 @@ struct fold;
 template <typename StartValue, typename Functor, typename Arg, typename... Args>
 struct fold<TypesVector<Arg, Args...>, StartValue, Functor> {
     typedef typename fold<
-        TypesVector<Args...>, 
-        typename Functor::template apply<StartValue, Arg>::type, 
+        TypesVector<Args...>,
+        typename Functor::template apply<StartValue, Arg>::type,
         Functor
             >::type type;
 };
@@ -103,30 +103,30 @@ struct remove_n_first<0, TypesVector<>>{
 //returns pos of the element in the TypesVector
 template <typename Type, typename TypesVector>
 struct pos;
-    
+
 template <typename Type, typename TypesPrefix, typename... TypesSufix>
 struct pos<Type, TypesVector<TypesPrefix, TypesSufix...>> {
-    enum { value =  pos<Type, TypesVector<TypesSufix...>>::value + 1 }; 
+    enum { value =  pos<Type, TypesVector<TypesSufix...>>::value + 1 };
 };
 
 template <typename Type, typename... TypesSufix>
 struct pos<Type, TypesVector<Type, TypesSufix...>> {
-    enum { value = 0 }; 
+    enum { value = 0 };
 };
 
 //replace element at pos to NewType
 template <int pos, typename NewType, typename TypesVector>
 struct replace_at_pos;
-    
+
 template <int pos, typename NewType, typename TypesPrefix, typename... TypesSufix>
 struct replace_at_pos<pos, NewType, TypesVector<TypesPrefix, TypesSufix...>> {
-    typedef typename join<TypesVector<TypesPrefix>, 
-                typename replace_at_pos<pos - 1, NewType, TypesVector<TypesSufix...>>::type>::type type; 
+    typedef typename join<TypesVector<TypesPrefix>,
+                typename replace_at_pos<pos - 1, NewType, TypesVector<TypesSufix...>>::type>::type type;
 };
 
 template <typename NewType, typename TypesPrefix, typename... TypesSufix>
 struct replace_at_pos<0, NewType, TypesVector<TypesPrefix, TypesSufix...>> {
-    typedef TypesVector<NewType, TypesSufix...> type; 
+    typedef TypesVector<NewType, TypesSufix...> type;
 };
 
 } // data_structures

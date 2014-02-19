@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;
-    while(dir.getGraph(fname ,opt))  {  
+    while(dir.getGraph(fname ,opt))  {
         std::ifstream is(fname);
         read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
@@ -34,18 +34,18 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         std::vector<int> v(size);
         std::iota(v.begin(), v.end(), 0);
 
-        //create random solution 
+        //create random solution
         std::random_shuffle(v.begin(), v.end());
         data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
 
         //creating local search
         auto lsc = getDefaultTwoLocalComponents(mtx);
 
-        //printing 
+        //printing
         LOGLN("Graph:\t" << fname);
         LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 
-        
+
         //setting logger
         auto logger = utils::make_twoLSLogger(mtx, 100);
 
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;
-    while(dir.getGraph(fname ,opt))  {   
+    while(dir.getGraph(fname ,opt))  {
         std::ifstream is(fname);
         read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         std::vector<int> v(size);
         std::iota(v.begin(), v.end(), 0);
 
-        //create random solution 
+        //create random solution
         std::random_shuffle(v.begin(), v.end());
         data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
         int startLen = simple_algo::getLength(mtx, cycle);
@@ -88,11 +88,11 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         double epsilon = 0.001;
         CIC  cut(lsc.get<local_search::Gain>(), startLen, epsilon);
         auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
-        
+
         //setting logger
         auto logger = utils::make_twoLSLogger(mtx, 100);
 
-        //printing 
+        //printing
         LOGLN("Graph:\t" << fname);
         LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
 

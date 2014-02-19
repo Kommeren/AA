@@ -1,6 +1,6 @@
 /**
  * @file steiner_tree_greedy_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
         std::vector<int> colorMap(N);
         boost::connected_components(fg, &components[0], boost::color_map(&colorMap[0]));
         auto treeColor = components[test.terminals.front()];
-        
+
         for(auto v : boost::make_iterator_range(vertices(fg))) {
             if(std::find(test.terminals.begin(), test.terminals.end(), v) != test.terminals.end()) {
                 BOOST_CHECK_EQUAL(components[v], treeColor);

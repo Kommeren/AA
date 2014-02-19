@@ -12,7 +12,7 @@ using namespace paal::local_search::facility_location;
 BOOST_AUTO_TEST_CASE(KMedianSolutionAdapterTest) {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
-   
+
     const int k = 2;
     typedef Voronoi<decltype(gm)> Voronoi;
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
@@ -21,10 +21,10 @@ BOOST_AUTO_TEST_CASE(KMedianSolutionAdapterTest) {
     Voronoi voronoi(GSet{SGM::A, SGM::B}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
 
     typedef paal::data_structures::KMedianSolution< Voronoi> Sol;
-    
+
     Sol sol(std::move(voronoi), GSet{SGM:: C,SGM::D, SGM::E},k);
-    FacilityLocationSolutionAdapter<Sol> sa(sol);  
-    auto & realSol = sa.get(); 
+    FacilityLocationSolutionAdapter<Sol> sa(sol);
+    auto & realSol = sa.get();
 
     realSol.addFacility(SGM::C);
     realSol.remFacility(SGM::A);

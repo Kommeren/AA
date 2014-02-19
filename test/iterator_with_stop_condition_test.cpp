@@ -1,6 +1,6 @@
 /**
  * @file iterator_with_stop_condition_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-06-20
@@ -17,20 +17,20 @@ BOOST_AUTO_TEST_CASE(IteratorWithStopConditionTest) {
 
     auto begin = paal::makeBeginIteratorWithStopCondition(
                     v.begin(), v.end(), stopcondition);
-    
+
     auto end = paal::makeEndIteratorWithStopCondition(
                     v.end(), stopcondition);
 
     BOOST_CHECK(begin != end);
     BOOST_CHECK_EQUAL(*begin, 1);
     ++begin;
-    BOOST_CHECK(begin != end); 
+    BOOST_CHECK(begin != end);
     BOOST_CHECK_EQUAL(*begin, 2);
     begin += 3;
-    BOOST_CHECK(begin != end); 
+    BOOST_CHECK(begin != end);
     BOOST_CHECK_EQUAL(*begin, 5);
     ++begin;
-    BOOST_CHECK(begin == end); 
+    BOOST_CHECK(begin == end);
 }
 
 

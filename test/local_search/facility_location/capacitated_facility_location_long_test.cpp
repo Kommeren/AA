@@ -1,6 +1,6 @@
 /**
  * @file capacitated_facility_location_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
@@ -47,7 +47,7 @@ private:
 };
 
 template <typename Metric, typename Cost>
-FLLogger<Metric, Cost> 
+FLLogger<Metric, Cost>
 make_fLLogger(const Metric & m , const Cost & c)  {
     return FLLogger<Metric, Cost>(m, c);
 };
@@ -80,13 +80,13 @@ void runTests(const std::string & fname, Solve solve) {
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
-    
+
         auto cost = paal::utils::make_ArrayToFunctor(facCost);
         auto verticesDemands = paal::utils::make_ArrayToFunctor(demands, -firstClient);
         auto facCapacities = paal::utils::make_ArrayToFunctor(facCap);
-        LOGLN( "demands sum" << std::accumulate(clients.begin(), clients.end(), 
+        LOGLN( "demands sum" << std::accumulate(clients.begin(), clients.end(),
                                     0, [&](int d, int v){return d + verticesDemands(v);}));
-    
+
         typedef paal::data_structures::CapacitatedVoronoi<decltype(metric), decltype(facCapacities), decltype(verticesDemands)> VorType;
 
         typedef paal::data_structures::FacilityLocationSolution
@@ -118,7 +118,7 @@ struct SolveAddRemove {
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
         facility_location_local_search(sol, a, nop, rem);
         facility_location_local_search(sol, a, nop, rem, add);
-        
+
         ON_LOG(double c = simple_algo::getCFLCost(metric, cost, sol));
         LOGLN(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
     }
@@ -126,14 +126,14 @@ struct SolveAddRemove {
 
 struct SolveAddRemoveSwap : public SolveAddRemove {
     DefaultSwapFLComponents<int>::type   swap;
-    
+
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
         facility_location_local_search(sol, a, nop, rem);
         facility_location_local_search(sol, a, nop, rem, add);
         facility_location_local_search(sol, a, nop, rem, add, swap);
     }
-        
+
 };
 
 

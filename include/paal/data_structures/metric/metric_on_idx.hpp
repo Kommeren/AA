@@ -1,12 +1,12 @@
 /**
  * @file metric_on_idx.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-14
  */
 #ifndef METRIC_ON_IDX_HPP
-#define METRIC_ON_IDX_HPP 
+#define METRIC_ON_IDX_HPP
 
 
 #include "paal/data_structures/bimap_traits.hpp"

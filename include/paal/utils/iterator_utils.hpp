@@ -1,6 +1,6 @@
 /**
  * @file iterator_utils.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -18,20 +18,20 @@
 namespace paal {
 namespace utils {
 
-template <typename Iterator> 
-struct IteratorWithExcludedElement : 
-    public boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(), 
-                                           std::declval<typename std::iterator_traits<Iterator>::value_type>() , 
+template <typename Iterator>
+struct IteratorWithExcludedElement :
+    public boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
+                                           std::declval<typename std::iterator_traits<Iterator>::value_type>() ,
                                            std::placeholders::_1)), Iterator> {
 
     typedef typename std::iterator_traits<Iterator>::value_type Element;
-    IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e) 
-        : boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(), 
-                                                    std::declval<Element>(), 
+    IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e)
+        : boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
+                                                    std::declval<Element>(),
                                                     std::placeholders::_1)), Iterator >
           (std::bind(utils::NotEqualTo(), e, std::placeholders::_1), i, end )  {}
-    
-    IteratorWithExcludedElement() {} 
+
+    IteratorWithExcludedElement() {}
 };
 
 } //utils

@@ -1,6 +1,6 @@
 /**
  * @file read_orlib_fc.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
@@ -28,7 +28,7 @@ namespace cap {
 
 
 template <typename IsCapacitated, typename IStream>
-typename std::enable_if<std::is_same<IsCapacitated, cap::uncapacitated>::value, int>::type  
+typename std::enable_if<std::is_same<IsCapacitated, cap::uncapacitated>::value, int>::type
 readDemand(IStream & i){
     int a;
     i >> a;
@@ -51,24 +51,24 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
                        boost::integer_range<int> & clients ) {
     int N, F;
     ist >> F >> N;
-    
+
     fac =     boost::irange(0, F);
     clients = boost::irange(F, N + F);
-    
+
     data_structures::ArrayMetric<long long> m(N + F);
     demands.resize(N);
     facCosts.resize(F);
     facCap.resize(F);
-    
+
     double l;
     for(int i : boost::irange(0,F)) {
         ist >> facCap[i] >> l;
         facCosts[i] = cast(l);
     }
-    
+
     for(int i : boost::irange(0,N)) {
 
-        demands[i] = readDemand<IsCapacitated>(ist);    
+        demands[i] = readDemand<IsCapacitated>(ist);
         for(int j : boost::irange(0,F)) {
             ist >> l;
             l /= double(demands[i]);
@@ -80,7 +80,7 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
 
 
     //LOG_COPY(facCosts.begin(), facCosts.end());
-    return m;   
+    return m;
 }
 
 }

@@ -1,12 +1,12 @@
 /**
  * @file iterator_with_stop_condition.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-02-10
  */
 #ifndef ITERATOR_WITH_STOP_CONDITION_HPP
-#define ITERATOR_WITH_STOP_CONDITION_HPP 
+#define ITERATOR_WITH_STOP_CONDITION_HPP
 
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -45,13 +45,13 @@ namespace paal {
 
         friend class boost::iterator_core_access;
         template <typename I, typename SC>
-            friend IteratorWithStopCondition<I,SC> 
+            friend IteratorWithStopCondition<I,SC>
                 makeBeginIteratorWithStopCondition(I, I, SC);
-        
+
         template <typename I, typename SC>
-            friend IteratorWithStopCondition<I,SC> 
+            friend IteratorWithStopCondition<I,SC>
                 makeEndIteratorWithStopCondition(I, SC);
-            
+
         /**
          * @brief checked if stopCondition is fullfiled
          *        moves m_begin to m_end if yes.
@@ -65,15 +65,15 @@ namespace paal {
         /**
          * @brief increment
          */
-        void increment() { 
+        void increment() {
             ++m_begin;
             checkStop();
         }
-        
+
         /**
          * @brief decrement
          */
-        void decrement() { 
+        void decrement() {
             --m_begin;
             checkStop();
         }
@@ -83,7 +83,7 @@ namespace paal {
          *
          * @param other
          *
-         * @return 
+         * @return
          */
         bool equal(IteratorWithStopCondition const& other) const
         {
@@ -93,7 +93,7 @@ namespace paal {
         /**
          * @brief dereference
          *
-         * @return 
+         * @return
          */
         reference dereference() const { return *m_begin; }
 
@@ -112,7 +112,7 @@ namespace paal {
          *
          * @param other
          *
-         * @return 
+         * @return
          */
         std::size_t distance_to(IteratorWithStopCondition other) {
             return other.m_begin - m_begin;
@@ -133,7 +133,7 @@ namespace paal {
      * @param end
      * @param stopCondition
      *
-     * @return 
+     * @return
      */
     template <typename Iterator, typename StopCondition>
         IteratorWithStopCondition<Iterator, StopCondition>
@@ -149,7 +149,7 @@ namespace paal {
      * @param end
      * @param stopCondition
      *
-     * @return 
+     * @return
      */
     template <typename Iterator, typename StopCondition>
         IteratorWithStopCondition<Iterator, StopCondition>

@@ -13,7 +13,7 @@ auto fcap = [&](int i){ return fcapv[i];};
 
 std::vector<long long> cdemv{2, 2, 1, 3, 3, 1, 1, 2};
 auto cdem = [&](int i){ return cdemv[i];};
-    
+
 
 BOOST_AUTO_TEST_SUITE( capacitated_voronoi_test_suite )
 
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
 
     /*for(int i = 0; i < 5; ++i)
         LOGLN(gm(SGM::A, i));
-    
+
     for(int i = 0; i < 5; ++i)
         LOGLN(gm(SGM::B, i));*/
 
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B}, 
+    Voronoi voronoi(GSet{SGM::A, SGM::B},
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
     voronoi.addGenerator(SGM::C);
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(test_2) {
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, 
+    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, gm, fcap, cdem);
     for(int i = 0;i  < 8; ++i) {
         remAdd(voronoi, i);
@@ -104,11 +104,11 @@ BOOST_AUTO_TEST_CASE(test_3) {
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A/*, SGM::B*//*, SGM::C, SGM::D, SGM::E*/}, 
+    Voronoi voronoi(GSet{SGM::A/*, SGM::B*//*, SGM::C, SGM::D, SGM::E*/},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E}, gm, fcap, cdem);
 
     Voronoi vCopy(voronoi);
-    
+
     for(int i = 0;i  < 1/*5*/; ++i) {
         remAdd(vCopy, i);
     }
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(test_4) {
     typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, 
+    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, gm, fcap, cdem);
     for(int i = 0;i  < 8; ++i) {
         paal::data_structures::ObjectWithCopy<Voronoi> owc(voronoi);

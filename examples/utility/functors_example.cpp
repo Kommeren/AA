@@ -31,13 +31,13 @@ void functors_example() {
     //assert
     //AssertFunctor assertFun;
     //assertFun(); //aborts
-    
+
 
     //array to functor
     std::vector<int> vec{1,2,3};
     auto vecFun = make_ArrayToFunctor(vec);
     assert(vecFun(1) == 2);
-    
+
     auto vecFunWithOffset = make_ArrayToFunctor(vec, 1);
     assert(vecFunWithOffset(1) == 3);
 };
@@ -53,23 +53,23 @@ void compare_functors() {
     assert(!g(1,2));
     assert(!g(1,1));
     assert( g(2,1));
-    
+
     assert(!ge(1,2));
     assert( ge(1,1));
     assert( ge(2,1));
-    
+
     assert( l(1,2));
     assert(!l(1,1));
     assert(!l(2,1));
-    
+
     assert( le(1,2));
     assert( le(1,1));
     assert(!le(2,1));
-    
+
     assert(!e(1,2));
     assert( e(1,1));
     assert(!e(2,1));
-    
+
     assert( ne(1,2));
     assert(!ne(1,1));
     assert( ne(2,1));
@@ -80,9 +80,9 @@ void comparator_functor() {
     auto compareFirst = make_FunctorToComparator(getFirst);
 
     assert(!compareFirst(std::make_pair(1,2), std::make_pair(0,1)));
-    
+
     auto compareFirstDesc = make_FunctorToComparator(getFirst, Greater());
-    
+
     assert(compareFirstDesc(std::make_pair(1,2), std::make_pair(0,1)));
 }
 
@@ -98,7 +98,7 @@ void boolean_functors() {
     assert( orFun(true , false));
     assert( orFun(false, true));
     assert( orFun(true , true));
-    
+
     assert(!andFun(false, false));
     assert(!andFun(true , false));
     assert(!andFun(false, true));
@@ -123,7 +123,7 @@ void boolean_functors_on_functors() {
         auto trueFunctor = make_NotFunctor(retFalse);
         assert(trueFunctor(1.2, "xada", 3));
     }
-    
+
     {
         auto falseFunctor = make_NotFunctor(retTrue);
         assert(!falseFunctor(1.2, "xada", 3));
@@ -133,12 +133,12 @@ void boolean_functors_on_functors() {
         auto trueFunctor = make_OrFunctor(retTrue, retFalse);
         assert(trueFunctor(1.2, "xada", 3));
     }
-    
+
     {
         auto falseFunctor = make_AndFunctor(retTrue, retFalse);
         assert(!falseFunctor(1.2, "xada", 3));
     }
-    
+
     {
         auto trueFunctor = make_XorFunctor(retTrue, retFalse);
         assert(trueFunctor(1.2, "xada", 3));

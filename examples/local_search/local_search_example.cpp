@@ -1,6 +1,6 @@
 /**
  * @file local_search_example.cpp
- * @brief local search example 
+ * @brief local search example
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -58,6 +58,6 @@ int main() {
    //print
    std::cout << "Local search solution: " <<  solution << std::endl;
 //! [Local Search Example]
-  return 0; 
+  return 0;
 }
 

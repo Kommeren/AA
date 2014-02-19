@@ -1,6 +1,6 @@
 /**
  * @file local_search_multi_solution_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -55,7 +55,7 @@ public:
 
 
 //assigns given solution element with new value computes the objective function
-//and assigns the old value to the solution element 
+//and assigns the old value to the solution element
 //solution remains the same
 struct Gain {
     Fitness operator()(const Solution & s, SolutionElement & se, Move u) {
@@ -68,7 +68,7 @@ struct Gain {
     }
 };
 
-//assigns the solution to the given move 
+//assigns the solution to the given move
 struct Commit {
     void operator()(Solution & s, SolutionElement & se, Move u) {
         se = u;
@@ -82,7 +82,7 @@ typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(SolutionElement & el : s) {
-        el = Fitness(std::rand() % MAX_VAL) / Fitness(MAX_VAL); 
+        el = Fitness(std::rand() % MAX_VAL) / Fitness(MAX_VAL);
     }
 }
 

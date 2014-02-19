@@ -1,12 +1,12 @@
 /**
  * @file splay_cycle.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-08
  */
 #ifndef SPLAY_CYCLE_HPP
-#define SPLAY_CYCLE_HPP 
+#define SPLAY_CYCLE_HPP
 
 #include "paal/data_structures/splay_tree.hpp"
 #include "paal/data_structures/bimap.hpp"
@@ -16,16 +16,16 @@ namespace paal {
 namespace data_structures {
 
 
-template <typename T> 
+template <typename T>
 class SplayCycle {
     typedef splay_tree::template Iterator<T> SIter;
-    typedef splay_tree::SplayTree<T> SplayTree; 
+    typedef splay_tree::SplayTree<T> SplayTree;
 public:
     typedef CycleIterator<SIter> VIter;
     SplayCycle() {}
     template <typename Iter>
-        SplayCycle(Iter begin, Iter end) : 
-            m_splayTree(begin, end), 
+        SplayCycle(Iter begin, Iter end) :
+            m_splayTree(begin, end),
             m_size(m_splayTree.size()) {}
 
     VIter vbegin() const {
@@ -60,7 +60,7 @@ public:
     }
 
 private:
-    SplayTree m_splayTree; 
+    SplayTree m_splayTree;
     const std::size_t m_size;
 };
 

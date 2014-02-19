@@ -1,6 +1,6 @@
 /**
  * @file k_median_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-01
@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
     parse(testDir + "capopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         double opt;
         is_test_cases >> opt;
-        
+
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) <<  "OPT " << opt);
 
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
         auto metric = paal::readORLIB_KM(ifs, fac, clients);
-    
+
         typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
         typedef paal::data_structures::KMedianSolution
             <VorType> Sol;
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         LOGLN("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
         VSet chosen=sol.getChosenFacilities();
         LOG_COPY_RANGE_DEL(chosen," ");
-        
+
         LOGLN(std::setprecision(20) <<  "cost " << c);
         BOOST_CHECK(utils::Compare<double>(0.01).le(opt, c));
         LOGLN( std::setprecision(20) << "APPROXIMATION RATIO: " << c / opt);

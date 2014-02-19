@@ -1,6 +1,6 @@
 /**
  * @file ir_steiner_tree_long_test.cpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-02-04

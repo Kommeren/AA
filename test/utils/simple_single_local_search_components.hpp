@@ -1,12 +1,12 @@
 /**
  * @file simple_single_local_search_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-07
  */
 #ifndef SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
-#define SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP 
+#define SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
 
 #include "paal/local_search/local_search.hpp"
 
@@ -41,5 +41,5 @@ struct Commit {
 
 typedef  paal::local_search::SearchComponents<GetMoves, Gain, Commit> SearchComp;
 } //anonymous namespace
- 
+
 #endif /* SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP */

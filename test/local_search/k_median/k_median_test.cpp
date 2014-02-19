@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE(kmedian_test) {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
-    
+
     //define voronoi and solution
     const int k = 2;
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(kmedian_test) {
     //create facility location local search components
     paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
 
-    //search 
+    //search
     paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
 
     //print result

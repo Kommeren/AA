@@ -1,13 +1,13 @@
 /**
  * @file simple_cycle.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
  */
 
 #ifndef SIMPLE_CYCLE_HPP
-#define SIMPLE_CYCLE_HPP 
+#define SIMPLE_CYCLE_HPP
 
 #include <cassert>
 #include <vector>
@@ -19,7 +19,7 @@ namespace paal {
 namespace data_structures {
 
 
-//TODO THIS IS SIMPLEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION 
+//TODO THIS IS SIMPLEST IMPLEMENTATION, LATER WE NEED EFFICIENT IMPLEMENTATION
 /**
  * @class SimpleCycle
  * @brief This is the simplest implementation of the \ref cycle concept based on the list.
@@ -36,12 +36,12 @@ public:
         if(begin == end) {
             return;
         }
-        
+
         std::size_t size = std::distance(begin, end);
 
         m_predecessorMap.reserve(size);
         m_successorMap.reserve(size);
-        
+
         IdxT prevIdx = add(*(begin++));
         IdxT firstIdx = prevIdx;
         for(;begin != end;++begin) {
@@ -51,12 +51,12 @@ public:
         }
         link(prevIdx, firstIdx);
     }
-    SimpleCycle(SimpleCycle && sc) : 
+    SimpleCycle(SimpleCycle && sc) :
         m_cycleIdx(std::move(sc.m_cycleIdx)),
         m_predecessorMap(std::move(sc.m_predecessorMap)),
         m_successorMap(std::move(sc.m_successorMap))   { }
-   
-    SimpleCycle(const SimpleCycle & sc) : 
+
+    SimpleCycle(const SimpleCycle & sc) :
         m_cycleIdx(sc.m_cycleIdx),
         m_predecessorMap(sc.m_predecessorMap),
         m_successorMap(sc.m_successorMap)   { }
@@ -74,31 +74,31 @@ public:
     }
 
     std::size_t size() const {
-        return  m_predecessorMap.size(); 
+        return  m_predecessorMap.size();
     }
-    
+
     CycleEl next(const CycleEl & ce) const {
         return fromIdx(nextIdx(toIdx(ce)));
     }
-    
+
     class VertexIterator : public std::iterator<std::forward_iterator_tag, CycleEl,
                                 ptrdiff_t, CycleEl *, const CycleEl &> {
         public:
-            VertexIterator(const SimpleCycle & cm, CycleEl ce ) : 
+            VertexIterator(const SimpleCycle & cm, CycleEl ce ) :
                 m_cycle(&cm), m_idx(m_cycle->toIdx(ce)), m_first(m_idx) {}
-            
+
             VertexIterator() : m_cycle(NULL) ,m_idx(-1) {}
 
             VertexIterator & operator++(){
                 m_idx = nextIdx(m_idx);
 
                 if(m_idx == m_first) {
-                    m_idx = -1;    
+                    m_idx = -1;
                 }
 
                 return *this;
             }
-            
+
             VertexIterator operator++(int){
                 VertexIterator i(*this);
                 operator++();
@@ -107,28 +107,28 @@ public:
 
             bool operator!=(VertexIterator ei) const {
                 return !operator==(ei);
-            }               
-            
+            }
+
             bool operator==(VertexIterator ei) const {
                 return m_idx == ei.m_idx;
-            }               
-            
+            }
+
             const CycleEl * const operator->() const {
                return &operator*();
-            }               
+            }
 
             void operator=(VertexIterator ei) {
-                m_idx = ei.m_idx; 
+                m_idx = ei.m_idx;
                 m_first = ei.m_first;
                 m_cycle = ei.m_cycle;
-            }               
+            }
 
             const CycleEl & operator*() const {
                return m_cycle->fromIdx(m_idx);
             }
-            
+
         private:
-            
+
             IdxT nextIdx(IdxT i) const {
                 return m_cycle->nextIdx(i);
             }
@@ -137,38 +137,38 @@ public:
             IdxT m_idx;
             IdxT m_first;
     };
-    
+
     typedef std::pair<VertexIterator, VertexIterator> VertexIteratorRange;
-    
+
     VertexIterator vbegin(const CycleEl & el) const {
         return VertexIterator(*this, el);
     }
-    
+
     VertexIterator vbegin() const {
         return vbegin(fromIdx(0));
     }
-    
+
     VertexIterator vend() const {
         return VertexIterator();
     }
-    
+
     VertexIteratorRange getVerticesRange(const CycleEl & el) const {
         return VertexIteratorRange(vbegin(el), vend());
     }
-    
+
     VertexIteratorRange getVerticesRange() const {
         return getVerticesRange(fromIdx(0));
     }
-    
+
     class EdgeIterator : public std::iterator<std::forward_iterator_tag, CycleElPair,
                                 ptrdiff_t, CycleElPair *, const CycleElPair &> {
         public:
-            EdgeIterator(const SimpleCycle & cm, CycleEl ce ) : 
+            EdgeIterator(const SimpleCycle & cm, CycleEl ce ) :
                 m_cycle(&cm), m_idx(m_cycle->toIdx(ce)), m_first(m_idx) {
 
                 moveCurr();
             }
-            
+
             EdgeIterator() : m_cycle(NULL) ,m_idx(-1) {}
 
             EdgeIterator & operator++(){
@@ -176,12 +176,12 @@ public:
                 moveCurr();
 
                 if(m_idx == m_first) {
-                    m_idx = -1;    
+                    m_idx = -1;
                 }
 
                 return *this;
             }
-            
+
             EdgeIterator operator++(int){
                 EdgeIterator i(*this);
                 operator++();
@@ -190,33 +190,33 @@ public:
 
             bool operator!=(EdgeIterator ei) const {
                 return !operator==(ei);
-            }               
-            
+            }
+
             bool operator==(EdgeIterator ei) const {
                 return m_idx == ei.m_idx;
-            }               
-            
+            }
+
             const CycleElPair * const operator->() const {
                 return &m_curr;
-            }               
+            }
 
             void operator=(EdgeIterator ei) {
-                m_idx = ei.m_idx; 
+                m_idx = ei.m_idx;
                 m_first = ei.m_first;
                 m_curr = ei.m_curr;
                 m_cycle = ei.m_cycle;
-            }               
+            }
 
             const CycleElPair & operator*() const {
                 return m_curr;
             }
-            
+
         private:
             void moveCurr() {
                 m_curr.first = m_cycle->fromIdx(m_idx);
                 m_curr.second = m_cycle->fromIdx(nextIdx(m_idx));
             }
-            
+
             IdxT nextIdx(IdxT i) const {
                 return m_cycle->nextIdx(i);
             }
@@ -226,13 +226,13 @@ public:
             IdxT m_first;
             CycleElPair m_curr;
     };
-    
+
     typedef std::pair<EdgeIterator, EdgeIterator> EdgeIteratorRange;
-    
+
     EdgeIteratorRange getEdgeRange(const CycleEl & el) const {
         return EdgeIteratorRange(EdgeIterator(*this, el), EdgeIterator());
     }
-    
+
     EdgeIteratorRange getEdgeRange() const {
         return getEdgeRange(fromIdx(0));
     }
@@ -263,7 +263,7 @@ protected:
     IdxT nextIdx(IdxT i) const {
         return m_successorMap[i];
     }
-    
+
     IdxT prevIdx(IdxT i) const {
         return m_predecessorMap[i];
     }
@@ -277,7 +277,7 @@ protected:
         m_successorMap.push_back(-1);
         return m_cycleIdx.add(el);
     }
-    
+
     BiMap<CycleEl, IdxT> m_cycleIdx;
 
     typedef std::vector<IdxT> SorsMap;
@@ -286,7 +286,7 @@ protected:
     SorsMap m_successorMap;
 };
 
-template <typename CycleEl, typename IdxT = int> 
+template <typename CycleEl, typename IdxT = int>
 class  SimpleCycleStartFromLastChange : public SimpleCycle<CycleEl, IdxT> {
     typedef SimpleCycle<CycleEl, IdxT> base;
 public:
@@ -299,14 +299,14 @@ public:
         m_lastId = prevIdx(e1);
         base::flip(begin, end);
     }
-    
+
     typename base::VertexIterator vbegin() const {
         return base::vbegin(fromIdx(m_lastId));
     }
 
 private:
     IdxT m_lastId;
-    
+
 };
 
 

@@ -1,7 +1,7 @@
 /**
  *
  * @file n_queens_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-02
@@ -38,7 +38,7 @@ int main() {
     //local search
     ls::NQueensLocalSearchComponents<> comps;
     ls::nQueensSolutionLocalSearchSimple(queens, comps);
-    
+
     //print after
     std::cout << "final configuration" << std::endl;;
     print(queens);

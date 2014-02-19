@@ -1,6 +1,6 @@
 /**
  * @file 2_local_search_solution_adapter.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -23,7 +23,7 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
         Iterator begin() const {
             return data_structures::make_VertexToEdgeIterator(m_cycle.vbegin(), m_cycle.vend());
         }
-        
+
         Iterator end() const {
             auto end =  m_cycle.vend();
             return data_structures::make_VertexToEdgeIterator(end, end);
@@ -32,11 +32,11 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
         decltype(std::declval<Cycle>().getCycle()) get()  {
             return m_cycle.getCycle();
         }
-        
+
         decltype(std::declval<const Cycle>().getCycle()) get() const {
             return m_cycle.getCycle();
         }
-        
+
         Cycle & getWrap() {
             return m_cycle;
         }

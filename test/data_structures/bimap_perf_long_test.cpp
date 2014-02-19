@@ -1,6 +1,6 @@
 /**
  * @file bimap_perf_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -48,7 +48,7 @@ void test() {
     testGetVal(b);
     ON_LOG(t2 = time(NULL));
     LOGLN("getval time " << t2 - t1);
-    
+
     ON_LOG(t1 = t2);
     testGetIdx(b);
     ON_LOG(t2 = time(NULL));
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(bimap) {
 
     std::iota(vec.begin(), vec.end(), 0);
     std::random_shuffle(vec.begin(), vec.end());
-    
+
     for(int & i : ids) {
         i = rand() % s;
     }

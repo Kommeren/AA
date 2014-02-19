@@ -173,7 +173,7 @@ class SplayTreePerformance {
     int input[kN];
     SplayTree<int, splay_impl> tree;
 
-    SplayTreePerformance() :  
+    SplayTreePerformance() :
       dist(boost::random::uniform_int_distribution<int>(0, kN - 1)){
     }
 

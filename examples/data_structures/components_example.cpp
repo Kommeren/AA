@@ -1,6 +1,6 @@
 /**
  * @file components_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -39,7 +39,7 @@ void example_default_constructor_and_basic_usage() {
     //setter
     comps.set<names::A>(7);
     assert(comps.get<names::A>() == 7);
-   
+
     const MyComps & constAlias = comps;
     // const version of get
     constAlias.get<names::B>();
@@ -47,7 +47,7 @@ void example_default_constructor_and_basic_usage() {
 }
 
 void example_constructor_with_all_arguments() {
-    //constructor with parameters 
+    //constructor with parameters
     Comps<int, double, int> comps(5,4,3);
     assert(comps.get<names::A>() == 5);
     assert(comps.get<names::B>() == 4);
@@ -66,20 +66,20 @@ int f(int i) {
     return i;
 }
 void example_calling_function_from_components() {
-    //declaration components with function 
+    //declaration components with function
     typedef Comps<int(*)(int), int(*)(int), int> CompsF;
 
     //definition
     CompsF comps(f, f, 17);
     const CompsF & constAlias = comps;
-    
+
     //call the first argument
     assert(comps.call<names::A>(2) == 2);
 
     //const version
     assert(constAlias.call<names::B>(2) == 2);
 }
-    
+
 void example_replacing() {
     //components with replaceped type
     typedef Comps<int(*)(int), double, int> CompsF;
@@ -91,7 +91,7 @@ void example_replacing() {
     //replace components
     CompsF comps(f, 2, 17);
     Replaced replaced = ds::replace<names::A>(std::make_pair(11, 12), comps);
-    
+
     auto p = replaced.get<names::A>();
     assert(p.first == 11);
     assert(p.second == 12);
@@ -141,12 +141,12 @@ void example_default_parameters() {
     //definition with default 3rd template parameter
     CompsWithDefaults<int, double> compsDef2(1, 2, 3);
     assert(compsDef2.get<names::C>() == X(3));
-    
+
     //This won't compile
     //CompsWithDefaults<int> comps3;
 }
 
-    
+
 //definition of Comps with names names::A, names::B
 template <typename... Args>
 using CompsToReplace = typename  ds::Components<
@@ -161,7 +161,7 @@ void example_replacing_struct_without_default_constructors() {
     //replace, X, Y, Z doesn't have default constructors
     auto s = ds::replace<names::A>(z, compsToReplace);
     assert(s.get<names::A>().z == 3);
-    
+
     auto s2 = ds::replace<names::B>(z, compsToReplace);
     assert(s2.get<names::B>().z == 3);
 }
@@ -172,13 +172,13 @@ void example_create_using_make() {
     SomeComps someComps = SomeComps::make<names::A, names::C>(1,2);
     assert(someComps.get<names::A>() == 1);
     assert(someComps.get<names::C>() == 2);
-    
-    
+
+
     SomeComps someComps2 = SomeComps::make<names::C, names::A>(1,2);
     assert(someComps2.get<names::C>() == 1);
     assert(someComps2.get<names::A>() == 2);
 }
-    
+
 void example_create_using_copy_tag() {
     typedef Comps<int, double, float> SomeComps;
     SomeComps someComps(CompsToReplace<int, int>(1,2), ds::CopyTag());
@@ -198,7 +198,7 @@ void example_references() {
 void example_make_components() {
     //this is the way of constructing components without providing actual types
     typedef ds::Components<names::A, names::B> MComps;
-    
+
     int a;
     auto mComps = MComps::make_components(1,std::ref(a));
     static_assert(std::is_same<std::remove_reference<decltype(mComps)>::type, MComps::type<int, int &>>::value, "Ups...");

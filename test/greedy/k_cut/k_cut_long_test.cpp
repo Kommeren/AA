@@ -1,6 +1,6 @@
 /**
  * @file k_cut_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-20
@@ -44,7 +44,7 @@ BOOST_AUTO_TEST_CASE(KCut) {
     }
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::no_property,
-                    boost::property < boost::edge_weight_t, int> 
+                    boost::property < boost::edge_weight_t, int>
                     > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nuVertices);
     //solve
     std::vector<std::pair<int,int> > verticesParts;
@@ -59,7 +59,7 @@ BOOST_AUTO_TEST_CASE(KCut) {
     }
     LOGLN("");
     //verificate result
-    auto weight= get(boost::edge_weight, graph); 
+    auto weight= get(boost::edge_weight, graph);
     long long costCutVerification=0;
     auto allEdges=edges(graph);
     for(auto edge : boost::make_iterator_range(allEdges)){

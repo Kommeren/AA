@@ -1,6 +1,6 @@
 /**
  * @file facility_location_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -31,7 +31,7 @@ namespace data_structures {
  * @tparam VoronoiType
  */
 template <typename FacilityCost, typename VoronoiType>
-class FacilityLocationSolution { 
+class FacilityLocationSolution {
     public:
         typedef VoronoiTraits<VoronoiType> VT;
         typedef typename VT::VertexType VertexType;
@@ -43,15 +43,15 @@ class FacilityLocationSolution {
                                  UnchosenFacilitiesSet uf,
                                  const FacilityCost & c) :
             m_voronoi(std::move(voronoi)), m_unchosenFacilities(std::move(uf)), m_facCosts(c) {}
-        
+
         FacilityLocationSolution(const FacilityLocationSolution & fls) :
             m_voronoi(fls.m_voronoi), m_unchosenFacilities(fls.m_unchosenFacilities), m_facCosts(fls.m_facCosts) {}
-        
+
         FacilityLocationSolution(FacilityLocationSolution && fls) :
             m_voronoi(std::move(fls.m_voronoi)), m_unchosenFacilities(std::move(fls.m_unchosenFacilities)), m_facCosts(fls.m_facCosts) {}
 
 
-       
+
         // returns diff between new cost and old cost
         Dist addFacility(VertexType f) {
             assert(m_unchosenFacilities.find(f) != m_unchosenFacilities.end());
@@ -59,7 +59,7 @@ class FacilityLocationSolution {
 
             return  m_facCosts(f) + m_voronoi.addGenerator(f);
         }
-        
+
         // returns diff between new cost and old cost
         Dist remFacility(VertexType f) {
             assert(m_unchosenFacilities.find(f) == m_unchosenFacilities.end());
@@ -71,7 +71,7 @@ class FacilityLocationSolution {
         const UnchosenFacilitiesSet & getUnchosenFacilities() const {
             return m_unchosenFacilities;
         }
-        
+
         const ChosenFacilitiesSet & getChosenFacilities() const {
             return m_voronoi.getGenerators();
         }

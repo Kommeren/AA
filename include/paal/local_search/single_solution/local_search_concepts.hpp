@@ -1,6 +1,6 @@
 /**
  * @file local_search_concepts.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -15,7 +15,7 @@ namespace paal {
 namespace local_search {
 namespace concepts {
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class  ConceptsBase {
     protected:
         X x;
@@ -28,7 +28,7 @@ class  ConceptsBase {
 template <typename T>
 int use(const T & t);
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class  GetMoves : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(GetMoves) {
@@ -42,16 +42,16 @@ class  GetMoves : protected ConceptsBase<X, Solution, SearchComponents> {
         }
 };
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(Gain) {
-            use(this->x(this->s, this->u) > 0);          
+            use(this->x(this->s, this->u) > 0);
         }
 };
 
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(Commit) {
@@ -59,9 +59,9 @@ class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
         }
 };
 
-template <typename X, typename Solution> 
+template <typename X, typename Solution>
 class SearchComponents {
-    typedef SearchComponentsTraits<X> Traits; 
+    typedef SearchComponentsTraits<X> Traits;
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
@@ -74,7 +74,7 @@ public:
 } // concepts
 } // local_search
 } //paal
- 
- 
- 
- 
+
+
+
+

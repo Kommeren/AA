@@ -1,6 +1,6 @@
 /**
  * @file floating.hpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-09-01
@@ -38,20 +38,20 @@ template <typename T>
 class Compare {
 public:
     Compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
-    
+
     bool e(T a, T b) const {
         return std::abs(a - b) < m_epsilon;
         //return abs(a -b ) < m_epsilon; //this line breaks generalised_assignment_long_test TODO investigate
     }
-    
+
     bool g(T a, T b) const {
         return a > b + m_epsilon;
     }
-    
+
     bool ge(T a, T b) const {
         return a >= b - m_epsilon;
     }
-    
+
     bool le(T a, T b) const {
         return a <= b + m_epsilon;
     }
@@ -59,11 +59,11 @@ public:
     double getEpsilon() const {
         return m_epsilon;
     }
-    
+
     /**
      * @brief returns default epsilon equals the smallest possible difference on doubles
      *
-     * @return 
+     * @return
      */
     static T defaultEpsilon() {
         return std::numeric_limits<T>::epsilon();

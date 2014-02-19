@@ -1,12 +1,12 @@
 /**
  * @file search_obj_func_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-18
  */
 #ifndef SEARCH_OCJ_FUNC_COMPONENTS_HPP
-#define SEARCH_OCJ_FUNC_COMPONENTS_HPP 
+#define SEARCH_OCJ_FUNC_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/utils/functors.hpp"
@@ -15,26 +15,26 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief Name for GetMoves component 
+ * @brief Name for GetMoves component
  */
 struct GetMoves;
 /**
- * @brief Name for ObjFunction component 
+ * @brief Name for ObjFunction component
  */
 struct ObjFunction;
 /**
- * @brief Name for Commit component 
+ * @brief Name for Commit component
  */
 struct Commit;
-        
+
 /**
  * @brief Components for objective function local search.
  *        This usually this class is not used. See SearchComponentsObjFun class.
  */
 typedef data_structures::Components<
-            GetMoves, 
-            ObjFunction, 
-            Commit 
+            GetMoves,
+            ObjFunction,
+            Commit
                 > ComponentsObjFun;
 
 /**
@@ -51,7 +51,7 @@ template <typename... Args>
  * @tparam Args
  * @param ComponentsObjFun::make_components(std::forward(args
  *
- * @return 
+ * @return
  */
 template <typename... Args>
 auto make_SearchComponentsObjFun(Args&&... args) -> decltype(ComponentsObjFun::make_components(std::forward<Args>(args)...)) {

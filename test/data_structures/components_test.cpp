@@ -1,6 +1,6 @@
 /**
  * @file components_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -42,7 +42,7 @@ template <typename... Args>
 using Comps = typename  ds::Components<
         names::A, names::B, names::C>::type<Args...> ;
 
-    
+
 BOOST_AUTO_TEST_SUITE(components)
 
 BOOST_AUTO_TEST_CASE(ComponentsTest) {
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     comps.get<names::A>();
     comps.set<names::A>(7);
     BOOST_CHECK_EQUAL(comps.get<names::A>(), 7);
-   
+
 
     Comps<int, double, int> comps2(5,4,3);
     static_assert(ds::detail::HasTemplateGet<Comps<int, double,int>, names::A>::value, "HasGet doesn't work");
@@ -63,9 +63,9 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     Comps<int, double, int> comps3(5,4);
     BOOST_CHECK_EQUAL(comps3.get<names::A>(), 5);
     BOOST_CHECK_EQUAL(comps3.get<names::B>(), 4);
-    
+
     typedef Comps<int(*)(int), double, int> CompsF;
-    
+
     CompsF comps4;
     const CompsF & constAlias = comps4;
 
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
    Replaced replace = ds::replace<names::A>(std::make_pair(11, 12), comps5);
-    
+
     auto p = replace.get<names::A>();
     BOOST_CHECK_EQUAL(p.first, 11);
     BOOST_CHECK_EQUAL(p.second, 12);
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
     CompsWithDefaults<int, double, int> comps;
     CompsWithDefaults<int, double> comps2(1, 2, 3);
     BOOST_CHECK_EQUAL(comps2.get<names::C>(), X(3));
-    
+
     //This won't compile
     //CompsWithDefaults<int> comps3;
 }
@@ -154,7 +154,7 @@ BOOST_AUTO_TEST_CASE(ComponentsReplaceNotDefConstructible) {
     BOOST_CHECK_EQUAL(comps.get<names::A>().x, 1);
     auto s = ds::replace<names::A>(z, comps);
     BOOST_CHECK_EQUAL(s.get<names::A>().z, 3);
-    
+
     auto s2 = ds::replace<names::B>(z, comps);
     BOOST_CHECK_EQUAL(s2.get<names::B>().z, 3);
 }
@@ -164,11 +164,11 @@ BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
     SomeComps someComps = SomeComps::make<names::A, names::C>(1,2);
     BOOST_CHECK_EQUAL(someComps.get<names::A>(), 1);
     BOOST_CHECK_EQUAL(someComps.get<names::C>(), 2);
-    
+
     SomeComps someComps2 = SomeComps::make<names::C, names::A>(1,2);
     BOOST_CHECK_EQUAL(someComps2.get<names::C>(), 1);
     BOOST_CHECK_EQUAL(someComps2.get<names::A>(), 2);
-    
+
     SomeComps someComps3 = SomeComps::make<names::C, names::B>(1,2);
     BOOST_CHECK_EQUAL(someComps3.get<names::C>(), 1);
     BOOST_CHECK_EQUAL(someComps3.get<names::B>(), 2);
@@ -176,8 +176,8 @@ BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
     SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
     BOOST_CHECK_EQUAL(someComps4.get<names::A>(), 1);
     BOOST_CHECK_EQUAL(someComps4.get<names::B>(), 2);
-}    
-    
+}
+
 BOOST_AUTO_TEST_CASE(ComponentsReferences) {
     int a(3);
     Comps<int &, const int &, int &> compsWithRefs(a, a, a);
@@ -187,8 +187,8 @@ BOOST_AUTO_TEST_CASE(ComponentsReferences) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-    
-    
+
+
 
 //this shouldn't compile
 //template <typename... Args>

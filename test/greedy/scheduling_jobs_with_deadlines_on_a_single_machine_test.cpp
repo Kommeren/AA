@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_with_deadlines_on_a_single_machine_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-06
@@ -21,9 +21,9 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     double bestDelay=36.7;
 
     auto jobs = boost::irange(0,int(time.size()));
-    
+
     std::vector<std::pair<decltype(jobs)::iterator,Time> > jobsToStartDates;
-    
+
     Time delay=paal::greedy::scheduling_jobs_with_deadlines_on_a_single_machine::schedulingJobsWithDeadlinesOnASingleMachine(
             jobs.begin(),jobs.end(),
             paal::utils::make_ArrayToFunctor(time),

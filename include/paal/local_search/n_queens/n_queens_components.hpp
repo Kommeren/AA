@@ -1,12 +1,12 @@
 /**
  * @file n_queens_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-02
  */
 #ifndef N_QUEENS_COMPONENETS_HPP
-#define N_QUEENS_COMPONENETS_HPP 
+#define N_QUEENS_COMPONENETS_HPP
 
 
 namespace paal {
@@ -20,7 +20,7 @@ struct NQueensCommit {
         /**
          * @brief Operator swaps elements of the solution range
          *
-         * @param sol 
+         * @param sol
          * @param solutionElement
          * @param move
          */
@@ -40,10 +40,10 @@ struct NQueensGetMoves {
      * @tparam Idx
      * @param solution
      *
-     * @return 
+     * @return
      */
     template <typename Solution, typename Idx>
-    auto operator()(const Solution & solution, Idx idx) const -> 
+    auto operator()(const Solution & solution, Idx idx) const ->
             std::pair<decltype(solution.begin()), decltype(solution.end())> {
         return std::make_pair(solution.begin() + idx + 1, solution.end());
     }
@@ -62,7 +62,7 @@ struct NQueensGain {
      * @param solutionElement
      * @param move
      *
-     * @return 
+     * @return
      */
     template <typename Solution, typename Idx>
     int operator()(const Solution & solution, Idx solutionElement, Idx move) const {
@@ -71,14 +71,14 @@ struct NQueensGain {
         int x2 = move;
         int y2 = solution.getY(move);
 
-        return - solution.getNumAttacing(x1, y2)  
-               - solution.getNumAttacing(x2, y1) 
+        return - solution.getNumAttacing(x1, y2)
+               - solution.getNumAttacing(x2, y1)
                + solution.getNumAttacing(x1, y1) - 2
                + solution.getNumAttacing(x2, y2) - 2
-               - 2 * (std::abs(x1 - x2) == std::abs(y1 - y2)); 
+               - 2 * (std::abs(x1 - x2) == std::abs(y1 - y2));
     }
 };
-} //!local_search 
+} //!local_search
 } // !// paal
 
 

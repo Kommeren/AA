@@ -1,6 +1,6 @@
 /**
  * @files zelikovsky_11_per_6_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
         typedef typename VoronoiT::GeneratorsSet FSet;
         VoronoiT voronoi(FSet(test.terminals.begin(), test.terminals.end()),
                          FSet(test.steinerPoints.begin(), test.steinerPoints.end()), test.metric);
-        std::vector<int> selectedSteinerPoints; 
+        std::vector<int> selectedSteinerPoints;
         paal::steiner_tree::steinerTreeZelikovsky11per6approximation(test.metric, voronoi, std::back_inserter(selectedSteinerPoints));
 
         auto resRange = boost::join(test.terminals, selectedSteinerPoints);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
             }
         }
         LOGLN("RES " << res);
-        
+
         auto appRatio = double(res) / double(test.optimal);
         BOOST_CHECK(appRatio <= 11./6.);
         LOGLN("APPROXIMATION_RATIO:" << appRatio);

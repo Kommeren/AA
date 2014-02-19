@@ -1,12 +1,12 @@
 /**
  * @file knapsack_0_1_two_app.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-10-07
  */
 #ifndef KNAPSACK_0_1_TWO_APP_HPP
-#define KNAPSACK_0_1_TWO_APP_HPP 
+#define KNAPSACK_0_1_TWO_APP_HPP
 
 #include <type_traits>
 #include <utility>
@@ -23,23 +23,23 @@ namespace paal {
 
 namespace detail {
         template <
-          typename ObjectsIterIter, 
-          typename ObjectSizeFunctor, 
+          typename ObjectsIterIter,
+          typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
               std::tuple<
-                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                    FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
-                    FunctorOnIteratorPValue<ObjectValueFunctor, 
+                    FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
                     std::pair<ObjectsIterIter, ObjectsIterIter>>
               getGreedyFill (
-                        ObjectsIterIter oBegin, 
-                        ObjectsIterIter oEnd, 
-                        FunctorOnIteratorPValue<ObjectSizeFunctor, 
+                        ObjectsIterIter oBegin,
+                        ObjectsIterIter oEnd,
+                        FunctorOnIteratorPValue<ObjectSizeFunctor,
                             typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
-                        ObjectValueFunctor value, 
+                        ObjectValueFunctor value,
                         ObjectSizeFunctor size,
-                        ZeroOneTag) 
+                        ZeroOneTag)
               {
                     typedef typename std::iterator_traits<ObjectsIterIter>::value_type ObjectsIter;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
@@ -49,30 +49,30 @@ namespace detail {
                     auto starSize = utils::make_LiftIteratorFunctor(size);
                     auto density = make_Density(starValue, starSize);
                     auto compare = utils::make_FunctorToComparator(density, utils::Greater());
-    
+
                     //finding the biggest set elements with the greatest density
                     std::sort(oBegin, oEnd, compare);
 
                     ValueType valueSum = ValueType();
                     SizeType sizeSum = SizeType();
-                    auto end = std::find_if(oBegin, oEnd, 
+                    auto end = std::find_if(oBegin, oEnd,
                         [=, &sizeSum, &valueSum](ObjectsIter objIter){
                             auto newSize = sizeSum + size(*objIter);
                             if(newSize > capacity) {
                                 return true;
-                            } 
+                            }
                             sizeSum = newSize;
                             valueSum += value(*objIter);
-                            return false;   
+                            return false;
                     });
                     return std::make_tuple(valueSum, sizeSum, std::make_pair(oBegin, end));
               }
-          
+
         template <
-          typename ObjectsRange, 
-          typename OutputIter> 
+          typename ObjectsRange,
+          typename OutputIter>
               void greedyToOutput (
-                        ObjectsRange range, 
+                        ObjectsRange range,
                         OutputIter out,
                         ZeroOneTag)
               {
@@ -84,18 +84,18 @@ namespace detail {
 
 } // detail
 
-template <typename OutputIterator, 
-          typename ObjectsIter, 
-          typename ObjectSizeFunctor, 
+template <typename OutputIterator,
+          typename ObjectsIter,
+          typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
 typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
-knapsack_0_1_two_app(ObjectsIter oBegin, 
-        ObjectsIter oEnd, 
+knapsack_0_1_two_app(ObjectsIter oBegin,
+        ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
-        OutputIterator out, 
+        OutputIterator out,
         ObjectValueFunctor value,
         ObjectSizeFunctor size) {
-        return detail::knapsack_general_two_app(oBegin, oEnd, capacity, 
+        return detail::knapsack_general_two_app(oBegin, oEnd, capacity,
                     out, value, size, detail::ZeroOneTag());
     }
 

@@ -1,6 +1,6 @@
 /**
  * @file knapsack_0_1_two_app_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
@@ -21,9 +21,9 @@ int main() {
     //Knapsack 0/1
     std::vector<int> result;
     std::cout << "Knapsack 0 / 1" << std::endl;
-    auto maxValue = paal::knapsack_0_1_two_app(std::begin(objects), std::end(objects), 
+    auto maxValue = paal::knapsack_0_1_two_app(std::begin(objects), std::end(objects),
             capacity,
-            std::back_inserter(result), 
+            std::back_inserter(result),
             paal::utils::make_ArrayToFunctor(values),
             paal::utils::make_ArrayToFunctor(sizes));
 

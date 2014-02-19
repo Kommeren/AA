@@ -1,12 +1,12 @@
 /**
  * @file component_traits.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-22
  */
 #ifndef COMPONENT_TRAITS_HPP
-#define COMPONENT_TRAITS_HPP 
+#define COMPONENT_TRAITS_HPP
 #include "components.hpp"
 namespace paal {
 namespace data_structures {

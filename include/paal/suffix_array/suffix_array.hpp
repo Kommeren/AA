@@ -1,6 +1,6 @@
 /**
  * @file suffix_array.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-29
@@ -11,9 +11,9 @@
 
 /*
  * algorithm from:
- * 
+ *
  * http://www.cs.cmu.edu/~guyb/realworld/papersS04/KaSa03.pdf
- * 
+ *
  */
 
 namespace paal{
@@ -32,7 +32,7 @@ namespace suffix_arrays{
 template<typename Letter>
 inline bool leq(Letter a1, int a2,   Letter b1, int b2) { // lexic. order for pairs
     return(a1 < b1 ||( a1 == b1 && a2 <= b2));
-}   
+}
 /**
  * @param int a1
  * @param Letter a2
@@ -46,11 +46,11 @@ inline bool leq(Letter a1, int a2,   Letter b1, int b2) { // lexic. order for pa
  */
 template<typename Letter>
 inline bool leq(Letter a1, Letter a2, int a3,   Letter b1, Letter b2, int b3) {
-    return(a1 < b1 ||(a1 == b1 && leq(a2,a3, b2,b3))); 
+    return(a1 < b1 ||(a1 == b1 && leq(a2,a3, b2,b3)));
 }
 // stably sort sortFrom[0..n-1] to sortTo[0..n-1] with keys in 0..K from r
 template <typename Iterator>
-static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo, Iterator r, int n, int maxLetter) 
+static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo, Iterator r, int n, int maxLetter)
 { // count occurrences
     std::vector<int> c(maxLetter+1);
     for (auto i : boost::irange(0, n)){
@@ -62,14 +62,14 @@ static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo,
         c[i] = sum;
         sum += t;
     }
-    for (auto i : boost::irange(0, n)){ 
+    for (auto i : boost::irange(0, n)){
         sortTo[c[*(r+sortFrom[i])]++] = sortFrom[i];      // sort
     }
 }
 
 /**
- *  
- * @brief 
+ *
+ * @brief
  * require text[n]=text[n+1]=text[n+2]=0, n>=2
  * fill suffixArray
  * suffixArray[i] contains the starting position of the i-1'th smallest suffix in Word
@@ -82,7 +82,7 @@ static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo,
 template<typename Letter>
 void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLetter=0) {
     int n=text.size()-3;
-    int n0=(n+2)/3, n1=(n+1)/3, n2=n/3, n02=n0+n2; 
+    int n0=(n+2)/3, n1=(n+1)/3, n2=n/3, n02=n0+n2;
     text.resize(text.size()+3);
     std::vector<int> text12;
     std::vector<int> SA12;
@@ -121,8 +121,8 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
         }
         if (SA12[i] % 3 == 1) {
             text12[SA12[i]/3]      = name;// left half
-        } 
-        else{ 
+        }
+        else{
             text12[SA12[i]/3 + n0] = name; // right half
         }
     }
@@ -134,13 +134,13 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
         for (auto i : boost::irange(0,n02)){
             text12[SA12[i]] = i + 1;
         }
-    } 
+    }
     else{ // generate the suffix array of s12 directly
         for (auto i : boost::irange(0,n02)){
             SA12[text12[i] - 1] = i;
         }
     }
-    
+
     // stably sort the mod 0 suffixes from SA12 by their first character
     for (auto i : boost::irange(0,n02)){
         if (SA12[i] < n0) {
@@ -157,11 +157,11 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
     for (auto  k=SA.begin();  k < SA.begin()+n;  k++) {
         int i = GetI(t); // pos of current offset 12 suffix
         int j = (*p); // pos of current offset 0  suffix
-        if (SA12[t] < n0 ? 
+        if (SA12[t] < n0 ?
             leq(text[i],       text12[SA12[t] + n0], text[j],       text12[j/3]) :
             leq(text[i],text[i+1],text12[SA12[t]-n0+1], text[j],text[j+1],text12[j/3+n0]))
         { // suffix from SA12 is smaller
-            (*k) = i;  
+            (*k) = i;
             t++;
             if (t == n02) { // done --- only SA0 suffixes left
                 k++;
@@ -170,9 +170,9 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
                     p=SA0.end();
                 }
             }
-        } else { 
+        } else {
             (*k) = j;
-            p++; 
+            p++;
             if (p == SA0.end())  { // done --- only SA12 suffixes left
                 for (k++;  t < n02;  t++, k++){
                     (*k) = GetI(t);
@@ -183,8 +183,8 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
 };
 
 /**
- *  
- * @brief 
+ *
+ * @brief
  * require text.size()>=2
  * fill suffixArray
  * suffixArray[i] contains the starting position of the i-1'th smallest suffix in Word

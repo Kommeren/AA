@@ -1,6 +1,6 @@
 /**
  * @file dreyfus_wagner_example.cpp
- * @brief 
+ * @brief
  * @author Maciej Andrejczuk
  * @version 1.0
  * @date 2013-08-01
@@ -32,7 +32,7 @@ int main() {
     for (auto edge: dw.getEdges()) {
         std::cout << "(" << edge.first << "," << edge.second << ")" << std::endl;
     }
-    
+
 //! [Dreyfus Wagner Example]
     return 0;
 }

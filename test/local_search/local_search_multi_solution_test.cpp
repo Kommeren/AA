@@ -1,6 +1,6 @@
 /**
  * @file local_search_multi_solution_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-04
@@ -75,18 +75,18 @@ typedef  local_search::MultiSearchComponents<GetMoves, Gain, Commit> SearchComp;
 void fillRand(Solution &s) {
     const int MAX_VAL = 10000;
     for(float & el : s) {
-        el = float(std::rand() % MAX_VAL) / float(MAX_VAL); 
+        el = float(std::rand() % MAX_VAL) / float(MAX_VAL);
     }
 }
-    
+
 ON_LOG(
 int i;
 )
-    
+
 auto logger = [&](const Solution & s) {
     //printing
     LOGLN("f(");
-    LOG_COPY_RANGE_DEL(s, ","); 
+    LOG_COPY_RANGE_DEL(s, ",");
     LOGLN(") \t" << f(s) << " after " << i++ );
 };
 } //anonymous namespace
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
 
     //printing
     LOGLN("f(");
-    LOG_COPY_RANGE_DEL(sol, ","); 
+    LOG_COPY_RANGE_DEL(sol, ",");
     LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 
@@ -113,9 +113,9 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
     Solution sol(DIM, 0);
     fillRand(sol);
 
-    //printing 
+    //printing
     LOGLN("f(");
-    LOG_COPY_RANGE_DEL(sol, ","); 
+    LOG_COPY_RANGE_DEL(sol, ",");
     LOGLN(") \t" << f(sol));
     ON_LOG(i = 0);
 

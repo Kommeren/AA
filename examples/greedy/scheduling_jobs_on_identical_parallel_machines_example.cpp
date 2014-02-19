@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_on_identical_parallel_machines_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-06
@@ -25,9 +25,9 @@ int main() {
     int numberOfMachines = 3;
     vector<Job> jobs={{2.1,'a'},{3.1,'b'},{4.1,'c'},{5.1,'d'},{6.1,'e'},{7.1,'f'},{8.1,'g'}};
     vector<pair<int,decltype(jobs)::iterator> > result;
-    
+
     schedulingJobsOnIdenticalParallelMachines(numberOfMachines,jobs.begin(),jobs.end(),back_inserter(result), returnJobTimeFunctor);
-    
+
     vector<Time> sumOfMachine;
     sumOfMachine.resize(numberOfMachines);
     for(auto machineJobPair:result){
@@ -37,7 +37,7 @@ int main() {
         cout<<"On machine: "<<machine<<" do job: "<<job->second<<endl;
     }
     Time maximumLoad=*std::max_element(sumOfMachine.begin(),sumOfMachine.end());
-    
+
     //print result
     cout<<"Solution:" << maximumLoad << endl;
     return 0;

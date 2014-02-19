@@ -1,6 +1,6 @@
 /**
  * @file n_queens_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-04

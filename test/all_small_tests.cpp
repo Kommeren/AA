@@ -1,6 +1,6 @@
 /**
  * @file all_small_tests.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-11-18

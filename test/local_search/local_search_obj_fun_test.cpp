@@ -1,6 +1,6 @@
 /**
  * @file local_search_obj_fun_test.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-11
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     typedef  ls::SearchComponentsObjFun<NG, F, SU> SearchComp;
     ON_LOG(F f);
 
-    //printing 
+    //printing
     int s(0);
     LOGLN("f("<< s <<") \t" << f(s));
     ON_LOG(int i = 0);
@@ -62,6 +62,6 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
         };
 
     //search
-    ls::local_search_obj_fun(s, logger, utils::ReturnFalseFunctor(), SearchComp()); 
+    ls::local_search_obj_fun(s, logger, utils::ReturnFalseFunctor(), SearchComp());
     BOOST_CHECK_EQUAL(s, 6);
 }

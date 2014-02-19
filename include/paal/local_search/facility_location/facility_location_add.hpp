@@ -1,12 +1,12 @@
 /**
  * @file facility_location_add.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-08
  */
 #ifndef FACILITY_LOCATION_ADD_HPP
-#define FACILITY_LOCATION_ADD_HPP 
+#define FACILITY_LOCATION_ADD_HPP
 
 #include <vector>
 #include <numeric>
@@ -27,30 +27,30 @@ namespace facility_location {
 
 struct Add {};
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCommitAdd {
 public:
-    template <typename Solution> 
+    template <typename Solution>
     void operator()(
-            Solution & s, 
-            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+            Solution & s,
+            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Add) {
 
         s.addFacility(se);
     }
 };
 
-    
-template <typename VertexType> 
+
+template <typename VertexType>
 class FacilityLocationGetMovesAdd {
     typedef std::vector<Add> Moves;
     typedef typename Moves::iterator Iter;
 
-public: 
+public:
     FacilityLocationGetMovesAdd() : m_add(1) {}
     typedef Facility<VertexType> Fac;
 
-    template <typename Solution> 
+    template <typename Solution>
         std::pair<Iter, Iter>
     operator()(const Solution &, Fac & el) {
         if(el.getIsChosen() == UNCHOSEN) {
@@ -64,12 +64,12 @@ private:
 };
 
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCheckerAdd {
 public:
-        template <class Solution> 
-    auto operator()(Solution & s, 
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+        template <class Solution>
+    auto operator()(Solution & s,
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Add ) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
         auto ret = s.addFacilityTentative(se.getElem());

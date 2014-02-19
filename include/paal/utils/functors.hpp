@@ -181,13 +181,13 @@ public:
     CountingFunctorAdaptor(Functor f, CounterType & cnt) : m_cnt(&cnt), m_functor(std::move(f)) {}
 
     /**
-     * @brief increment the counter and checks if the given limit is reached. 
+     * @brief increment the counter and checks if the given limit is reached.
      *
      * @tparam Args
      *
-     * @return 
+     * @return
      */
-    template <typename... Args> 
+    template <typename... Args>
     auto operator()(Args&&... args) -> decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
         ++(*m_cnt);
         return m_functor(std::forward<Args>(args)...);
@@ -206,7 +206,7 @@ private:
  * @param f
  * @param cnt
  *
- * @return 
+ * @return
  */
 template <typename CounterType = int, typename Functor>
 CountingFunctorAdaptor<Functor, CounterType>
@@ -240,7 +240,7 @@ template <typename Array>
              *
              * @param a
              *
-             * @return 
+             * @return
              */
             Value operator()(int a) const {
                 return (*m_array)[a + m_offset];
@@ -282,7 +282,7 @@ struct AssignableFunctor {
      */
    AssignableFunctor(Functor& f) : m_f(&f) {}
    AssignableFunctor() = default;
- 
+
    /**
     * @brief assign operator
     *
@@ -297,7 +297,7 @@ struct AssignableFunctor {
     *
     * @tparam Args
     *
-    * @return 
+    * @return
     */
    template<typename ... Args>
    auto operator()(Args&& ... args) const ->

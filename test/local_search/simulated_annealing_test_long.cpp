@@ -1,6 +1,6 @@
 /**
  * @file simulated_annealing_test_long.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-02-04
@@ -8,7 +8,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <thread> 
+#include <thread>
 
 #include <boost/range/irange.hpp>
 
@@ -20,11 +20,11 @@
 #include "utils/simple_single_local_search_components.hpp"
 #include "utils/logger.hpp"
 
-BOOST_AUTO_TEST_SUITE( simulated_annealing ) 
+BOOST_AUTO_TEST_SUITE( simulated_annealing )
 
 namespace ls = paal::local_search;
 using namespace paal;
-    
+
     BOOST_AUTO_TEST_CASE(CoolingSchemaTest) {
         std::chrono::seconds sec(1);
         auto exponential = ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(10), 1024, 1);

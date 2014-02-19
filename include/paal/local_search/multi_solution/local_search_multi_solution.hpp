@@ -1,6 +1,6 @@
 /**
  * @file local_search_multi_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -26,7 +26,7 @@ namespace search_strategies {
      */
     class ChooseFirstBetter;
     /**
-     * @brief In this strategy, we iterate through all moves and chose one with the largest gain. 
+     * @brief In this strategy, we iterate through all moves and chose one with the largest gain.
      */
     class SteepestSlope;
 }
@@ -35,10 +35,10 @@ namespace detail {
 
 template <typename Solution>
 class LocalSearchStepMultiSolutionBase {
-protected:    
+protected:
     typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 
-    LocalSearchStepMultiSolutionBase(Solution & solution) : 
+    LocalSearchStepMultiSolutionBase(Solution & solution) :
         m_solution(solution) {}
 
 public:
@@ -54,41 +54,41 @@ protected:
 template <typename Solution,
           typename SearchStrategy,
           typename... MultiSearchComponentsRest>
-class LocalSearchStepMultiSolution; 
+class LocalSearchStepMultiSolution;
 
 template <typename Solution,
           typename MultiSearchComponents,
           typename... MultiSearchComponentsRest>
-class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponents, MultiSearchComponentsRest...> : 
+class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponents, MultiSearchComponentsRest...> :
         public LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> {
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
     typedef typename MultiMove<MultiSearchComponents, Solution>::reference MoveRef;
-    
+
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter, MultiSearchComponentsRest...> base;
     typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
 public:
 
     LocalSearchStepMultiSolution(
-            Solution & solution, 
-            MultiSearchComponents sc, 
-            MultiSearchComponentsRest... rest) : 
+            Solution & solution,
+            MultiSearchComponents sc,
+            MultiSearchComponentsRest... rest) :
         base(solution, std::move(rest)...), m_searchComponents(std::move(sc)) {}
-    
+
     LocalSearchStepMultiSolution(
-            Solution & solution) : 
+            Solution & solution) :
         base(solution), m_searchComponents(MultiSearchComponents()) {}
 
     typedef typename base::SolutionElement SolutionElement;
     using base::m_solution;
-    
+
     MultiSearchComponents & getSearchComponents() {
         return m_searchComponents;
     }
 
     /**
-     * @brief tries to improve the solution using local search 
+     * @brief tries to improve the solution using local search
      *
-     * @return true if the solution is improved false otherwise 
+     * @return true if the solution is improved false otherwise
      */
     bool search() {
 
@@ -101,31 +101,31 @@ public:
                 }
             }
         }
-          
+
         return base::search();
     }
-          
+
 private:
-    template <typename Action, typename... Args> 
-    auto call(Args&&... args) -> 
+    template <typename Action, typename... Args>
+    auto call(Args&&... args) ->
     decltype(std::declval<MultiSearchComponents>().template call<Action>(std::forward<Args>(args)...)){
         return m_searchComponents.template call<Action>(std::forward<Args>(args)...);
     }
-    
+
     MultiSearchComponents m_searchComponents;
 };
 
 template <typename Solution>
-class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter> : 
+class LocalSearchStepMultiSolution<Solution, search_strategies::ChooseFirstBetter> :
         public LocalSearchStepMultiSolutionBase<Solution> {
-      
+
     typedef LocalSearchStepMultiSolutionBase<Solution> base;
     typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
 //TODO change after redesign
 protected:
-    LocalSearchStepMultiSolution(Solution & solution) : 
+    LocalSearchStepMultiSolution(Solution & solution) :
         base(solution) {}
 public:
     using base::getSolution;
@@ -135,15 +135,15 @@ public:
 };
 
 
-template <typename Solution, 
-          typename MultiSearchComponents, 
-          typename... MultiSearchComponentsRest> 
+template <typename Solution,
+          typename MultiSearchComponents,
+          typename... MultiSearchComponentsRest>
 class LocalSearchStepMultiSolution<
-        Solution, 
-        search_strategies::SteepestSlope, 
-        MultiSearchComponents, 
-        MultiSearchComponentsRest...> : 
-      public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> { 
+        Solution,
+        search_strategies::SteepestSlope,
+        MultiSearchComponents,
+        MultiSearchComponentsRest...> :
+      public LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> {
 
     BOOST_CONCEPT_ASSERT((local_search_concepts::MultiSearchComponents<MultiSearchComponents, Solution>));
     typedef typename MultiMove<MultiSearchComponents, Solution>::reference MoveRef;
@@ -151,25 +151,25 @@ class LocalSearchStepMultiSolution<
     typedef LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope, MultiSearchComponentsRest...> base;
 public:
 
-    LocalSearchStepMultiSolution(Solution & solution) : 
+    LocalSearchStepMultiSolution(Solution & solution) :
         base(solution) {}
-    
-    LocalSearchStepMultiSolution(Solution & solution, MultiSearchComponents sc,  MultiSearchComponentsRest... rest) : 
+
+    LocalSearchStepMultiSolution(Solution & solution, MultiSearchComponents sc,  MultiSearchComponentsRest... rest) :
         base(solution, rest...), m_searchComponents(std::move(sc)) {}
 
     typedef typename base::SolutionElement SolutionElement;
     typedef typename utils::CollectionToIter<Solution>::type SolutionIterator;
     typedef typename MultiFitness<MultiSearchComponents, Solution>::type Fitness;
     using base::m_solution;
-    
+
     MultiSearchComponents & getSearchComponents() {
         return m_searchComponents;
     }
 
     /**
-     * @brief tries to improve the solution using local search 
+     * @brief tries to improve the solution using local search
      *
-     * @return true if the solution is improved false otherwise 
+     * @return true if the solution is improved false otherwise
      */
 
     bool search() {
@@ -187,7 +187,7 @@ protected:
         }
     }
 private:
-    
+
     typedef std::tuple<Fitness, MultiSearchComponents &, SolutionIterator, Move> BestDesc;
 
     BestDesc best() {
@@ -201,22 +201,22 @@ private:
             auto adjustmentSet = call<GetMoves>(m_solution, *currSE);
             auto currMove = adjustmentSet.first;
             for(;currMove !=  adjustmentSet.second; ++currMove) {
-                Fitness gain = call<Gain>(m_solution, *currSE, *currMove); 
-                
+                Fitness gain = call<Gain>(m_solution, *currSE, *currMove);
+
                 if(!init || gain > max) {
                     init = true;
                     bestSE = currSE;
                     bestMove = *currMove;
                     max = gain;
-                } 
+                }
             }
         }
-          
+
         return BestDesc(max, m_searchComponents, bestSE, bestMove);
     }
-    
-    template <typename Action, typename... Args> 
-    auto call(Args&&... args) -> 
+
+    template <typename Action, typename... Args>
+    auto call(Args&&... args) ->
     decltype(std::declval<MultiSearchComponents>().template call<Action>(args...)){
         return m_searchComponents.template call<Action>(args...);
     }
@@ -225,15 +225,15 @@ private:
 };
 
 template <typename Solution>
-class LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope> : 
+class LocalSearchStepMultiSolution<Solution, search_strategies::SteepestSlope> :
         public LocalSearchStepMultiSolutionBase<Solution> {
-      
+
     typedef LocalSearchStepMultiSolutionBase<Solution> base;
     typedef typename std::iterator_traits<typename utils::CollectionToIter<Solution>::type>::reference SolElementRef;
     template <typename Sol, typename SS, typename... MSC>
     friend class LocalSearchStepMultiSolution;
 
-    LocalSearchStepMultiSolution(Solution & solution) : 
+    LocalSearchStepMultiSolution(Solution & solution) :
         base(solution) {}
 public:
     using base::getSolution;
@@ -252,7 +252,7 @@ public:
 
 
 /**
- * @brief local_search_multi_solution function 
+ * @brief local_search_multi_solution function
  *
  * @tparam SearchStrategy
  * @tparam PostSearchAction
@@ -264,7 +264,7 @@ public:
  * @param gsc
  * @param components
  *
- * @return 
+ * @return
  */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
@@ -289,10 +289,10 @@ bool local_search_multi_solution(
  * @param solution
  * @param components
  *
- * @return 
+ * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename Solution, 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename Solution,
           typename... Components>
 bool local_search_multi_solution_simple(Solution & solution, Components... components) {
     return local_search_multi_solution<SearchStrategy>(solution, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);

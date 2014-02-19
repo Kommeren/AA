@@ -15,7 +15,7 @@ int main() {
     typedef  SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSteiner();
     typedef decltype(gm) Metric;
-    
+
     //sample voronoi
     typedef paal::data_structures::Voronoi<Metric> VoronoiT;
     typedef paal::data_structures::VoronoiTraits<VoronoiT> VT;
@@ -24,7 +24,7 @@ int main() {
     VoronoiT voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D}, VSet{SGM::E}, gm);
 
     //run algorithm
-    std::vector<int> steinerPoints; 
+    std::vector<int> steinerPoints;
     paal::steiner_tree::steinerTreeZelikovsky11per6approximation(gm, voronoi, std::back_inserter(steinerPoints));
 
     //print result

@@ -1,6 +1,6 @@
 /**
  * @file 2_local_search_commit.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -13,7 +13,7 @@ namespace local_search {
 namespace two_local_search {
 
 /**
- * @brief Commit class for local_search 
+ * @brief Commit class for local_search
  */
 struct TwoLocalSearchCommit  {
     /**
@@ -25,7 +25,7 @@ struct TwoLocalSearchCommit  {
      * @param se
      * @param ae
      */
-    template <typename SolutionElement, typename Solution> 
+    template <typename SolutionElement, typename Solution>
     void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
         s.getWrap().flip(se.second, ae.first);
     }

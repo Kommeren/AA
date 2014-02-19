@@ -1,6 +1,6 @@
 /**
  * @file facility_location_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -21,7 +21,7 @@ int main() {
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     std::vector<int> fcosts{7,8};
-    typedef paal::utils::ArrayToFunctor<std::vector<int>> Cost;  
+    typedef paal::utils::ArrayToFunctor<std::vector<int>> Cost;
 
     //define voronoi and solution
     typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
@@ -42,7 +42,7 @@ int main() {
     DefaultAddFLComponents<int>::type    add;
     DefaultSwapFLComponents<int>::type   swap;
 
-    //search 
+    //search
     facility_location_local_search_simple(sol, rem, add, swap);
 
     //print result
@@ -52,5 +52,5 @@ int main() {
 //! [FL Search Example]
 
     return true;
-    
+
 }

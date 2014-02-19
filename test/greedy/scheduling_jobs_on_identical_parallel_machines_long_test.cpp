@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_on_identical_parallel_machines_long_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-06

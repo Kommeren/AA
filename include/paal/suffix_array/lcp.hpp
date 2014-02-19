@@ -1,6 +1,6 @@
 /**
  * @file lcp.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-29
@@ -12,12 +12,12 @@
 namespace paal{
 namespace suffix_arrays{
 /**
- * 
+ *
  * @brief
  * fill array lcp
  * lcp[0] is undefined
  * and
- * lcp[i] stores the largest common prefix of the lexicographically i-1'th smallest suffix 
+ * lcp[i] stores the largest common prefix of the lexicographically i-1'th smallest suffix
  * and its predecessor in the suffix array
  * @tparam Letter
  * @param vector<int> suffixArray

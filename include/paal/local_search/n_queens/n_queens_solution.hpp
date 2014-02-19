@@ -1,12 +1,12 @@
 /**
  * @file n_queens_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-02
  */
 #ifndef N_QUEENS_SOLUTION_HPP
-#define N_QUEENS_SOLUTION_HPP 
+#define N_QUEENS_SOLUTION_HPP
 
 #include <vector>
 
@@ -34,10 +34,10 @@ namespace local_search {
          * @param pos
          */
         NQueensSolutionAdapter(NQueensPositionsVector & pos) :
-            m_queenPosition(pos),  
-            m_numeberAttacingDiagonalNegative(boost::distance(pos), 0),  
+            m_queenPosition(pos),
+            m_numeberAttacingDiagonalNegative(boost::distance(pos), 0),
             m_numeberAttacingDiagonalNonnegative(boost::distance(pos), 0),
-            m_numeberAttacingCounterDiagonal(2 * boost::distance(pos), 0) 
+            m_numeberAttacingCounterDiagonal(2 * boost::distance(pos), 0)
         {
             for(auto q : boost::irange(0, int(boost::distance(pos)))) {
                 increase(q);
@@ -47,7 +47,7 @@ namespace local_search {
         /**
          * @brief begin of the queens positions' collection
          *
-         * @return 
+         * @return
          */
         QueensIterator begin() const {
             return QueensIterator(0);
@@ -56,7 +56,7 @@ namespace local_search {
         /**
          * @brief end of the queens positions' collection
          *
-         * @return 
+         * @return
          */
         QueensIterator end() const {
             return QueensIterator(m_queenPosition.size());
@@ -73,25 +73,25 @@ namespace local_search {
             putQueen(xLeft, m_queenPosition[xRight]);
             putQueen(xRight, leftPosition);
         }
-            
+
         /**
          * @brief get number of queens attacing (x,y) position
          *
          * @param x
          * @param y
          *
-         * @return 
+         * @return
          */
         int getNumAttacing(int x, int y) const {
             return m_numeberAttacingCounterDiagonal[x + y] + getDiagonal(x, y);
         }
 
         /**
-         * @brief return y for xth queen 
+         * @brief return y for xth queen
          *
          * @param x
          *
-         * @return 
+         * @return
          */
         int getY(int x) const {
             return m_queenPosition[x];
@@ -100,7 +100,7 @@ namespace local_search {
         /**
          * @brief computes total number of conflicts on the board
          *
-         * @return 
+         * @return
          */
         int objFun() const {
             auto attacingNr = [](int sum, int n) {
@@ -112,7 +112,7 @@ namespace local_search {
         }
 
     private:
-        
+
         /**
          * @brief puts xth queen on position y
          *
@@ -131,7 +131,7 @@ namespace local_search {
          *
          * @param x
          *
-         * @return 
+         * @return
          */
         int & getDiagonal(int x) {
             return getDiagonal(x, m_queenPosition[x]);
@@ -143,7 +143,7 @@ namespace local_search {
          * @param x
          * @param y
          *
-         * @return 
+         * @return
          */
         int & getDiagonal(int x, int y) {
             if(x >= y) {
@@ -152,14 +152,14 @@ namespace local_search {
                 return m_numeberAttacingDiagonalNonnegative[y - x];
             }
         }
-        
+
         /**
          * @brief const version of getDiagonal(x,y)
          *
          * @param x
          * @param y
          *
-         * @return 
+         * @return
          */
         int getDiagonal(int x, int y) const {
             if(x >= y) {
@@ -178,7 +178,7 @@ namespace local_search {
             --m_numeberAttacingCounterDiagonal[x + m_queenPosition[x]];
             --getDiagonal(x);
         }
-        
+
         /**
          * @brief decrese diagonal counter for the xth queen
          *
@@ -195,7 +195,7 @@ namespace local_search {
         std::vector<int> m_numeberAttacingCounterDiagonal;
     };
 
-} //!local_search 
+} //!local_search
 } //!paal
 
 #endif /* N_QUEENS_SOLUTION_HPP */

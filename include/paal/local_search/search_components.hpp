@@ -1,12 +1,12 @@
 /**
  * @file paal/local_search/search_components.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-18
  */
 #ifndef SEARCH_COMPONENTS_HPP
-#define SEARCH_COMPONENTS_HPP 
+#define SEARCH_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/utils/functors.hpp"
@@ -33,9 +33,9 @@ namespace local_search {
      * usually this class is not directly used, see SearchComponents.
      */
     typedef data_structures::Components<
-                GetMoves, 
-                Gain, 
-                Commit 
+                GetMoves,
+                Gain,
+                Commit
                     > Components;
 
     /**
@@ -59,7 +59,7 @@ namespace local_search {
      *
      * @tparam Args
      *
-     * @return SearchComponents or MultiSearchComponents 
+     * @return SearchComponents or MultiSearchComponents
      */
     template <typename... Args>
     auto make_SearchComponents(Args&&... args) -> decltype(Components::make_components(std::forward<Args>(args)...)) {

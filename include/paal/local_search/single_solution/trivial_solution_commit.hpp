@@ -1,12 +1,12 @@
 /**
  * @file trivial_solution_commit.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-11
  */
 #ifndef TRIVIAL_COMMIT_HPP
-#define TRIVIAL_COMMIT_HPP 
+#define TRIVIAL_COMMIT_HPP
 
 
 /**
@@ -20,7 +20,7 @@ struct TrivialCommit {
      * @param s
      * @param u
      */
-    template <typename Solution> 
+    template <typename Solution>
     void operator()(Solution & s, const Solution & u) const {
         s = u;
     }

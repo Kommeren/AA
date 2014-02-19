@@ -1,12 +1,12 @@
 /**
  * @file n_queens_local_search.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-01-02
  */
 #ifndef N_QUEENS_LOCAL_SEARCH_HPP
-#define N_QUEENS_LOCAL_SEARCH_HPP 
+#define N_QUEENS_LOCAL_SEARCH_HPP
 
 #include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
 #include "paal/local_search/search_components.hpp"
@@ -18,14 +18,14 @@ namespace paal {
 namespace local_search {
 
     /**
-     * @brief NQueen Compoenents 
+     * @brief NQueen Compoenents
      *
      * @tparam Args
      */
     template <typename... Args>
     using NQueensLocalSearchComponents =  data_structures::Components<
             data_structures::NameWithDefault<GetMoves, NQueensGetMoves>,
-            data_structures::NameWithDefault<Gain, NQueensGain>, 
+            data_structures::NameWithDefault<Gain, NQueensGain>,
             data_structures::NameWithDefault<Commit, NQueensCommit>
                 >::type<Args...>;
 
@@ -42,7 +42,7 @@ namespace local_search {
      * @param gsc
      * @param nQueensComponents
      *
-     * @return 
+     * @return
      */
     template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
              typename PostSearchAction,
@@ -55,7 +55,7 @@ namespace local_search {
                          GlobalStopCondition gsc,
                          Components... nQueensComponents) {
                      NQueensSolutionAdapter<NQueensPositionsVector> nqueens(pos);
-                     return local_search_multi_solution(nqueens, std::move(psa), 
+                     return local_search_multi_solution(nqueens, std::move(psa),
                                 std::move(gsc), std::move(nQueensComponents)...);
                  }
 
@@ -69,13 +69,13 @@ namespace local_search {
      */
     template <typename NQueensPositionsVector, typename... Components>
         void nQueensSolutionLocalSearchSimple(NQueensPositionsVector & pos, Components... nQueensComponents) {
-            nQueensSolutionLocalSearch(pos, 
-                                       utils::SkipFunctor(), 
-                                       utils::ReturnFalseFunctor(), 
+            nQueensSolutionLocalSearch(pos,
+                                       utils::SkipFunctor(),
+                                       utils::ReturnFalseFunctor(),
                                        std::move(nQueensComponents)...);
         }
 
-} //!local_search 
+} //!local_search
 } // !paal
 
 #endif /* N_QUEENS_LOCAL_SEARCH_HPP */

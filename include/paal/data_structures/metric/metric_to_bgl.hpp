@@ -1,6 +1,6 @@
 /**
  * @file metric_to_bgl.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -17,15 +17,15 @@
 namespace paal {
 namespace data_structures {
 //TODO it would be nice to adapt Matrix + something to bgl
-    
+
 template <typename Metric>  struct AdjacencyMatrix {
     typedef data_structures::MetricTraits<Metric> MT;
-    typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property, 
+    typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property,
                 boost::property<boost::edge_weight_t, typename MT::DistanceType> > type;
 };
 
 
- template <typename Metric, typename VertexIter>                
+ template <typename Metric, typename VertexIter>
  typename   AdjacencyMatrix<Metric>::type
  /**
   * @brief we assume that (vbegin, vend) is sequence of values  (0, vend - vbegin).
@@ -45,7 +45,7 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     for(VertexType v : r){
         for(VertexType w : r){
             if(v < w) {
-                bool succ = add_edge(v, w, 
+                bool succ = add_edge(v, w,
                         boost::property<boost::edge_weight_t, Dist>(m(v,w)), g).second;
                 assert(succ);
             }
@@ -53,18 +53,18 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     }
     return g;
 }
- 
-template <typename Metric, typename VertexIter>                
+
+template <typename Metric, typename VertexIter>
  typename   AdjacencyMatrix<Metric>::type
 metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
                      BiMap<typename std::iterator_traits<VertexIter>::value_type> & idx) {
     typedef data_structures::MetricTraits<Metric> MT;
     typedef typename MT::VertexType VertexType;
-    idx = data_structures::BiMap<VertexType>(vbegin, vend); 
+    idx = data_structures::BiMap<VertexType>(vbegin, vend);
     auto  idxMetric = data_structures::make_metricOnIdx(m, idx);
     auto transLambda = [&](VertexType v) {return idx.getIdx(v);};
     auto trans = utils::make_AssignableFunctor(transLambda);
-    return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans), 
+    return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans),
                                   boost::make_transform_iterator(vend, trans));
 }
 

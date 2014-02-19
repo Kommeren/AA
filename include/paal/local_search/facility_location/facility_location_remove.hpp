@@ -1,12 +1,12 @@
 /**
  * @file facility_location_remove.hpp
-* @brief 
+* @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-07-08
  */
 #ifndef FACILITY_LOCATION_REMOVE_HPP
-#define FACILITY_LOCATION_REMOVE_HPP 
+#define FACILITY_LOCATION_REMOVE_HPP
 
 #include <cassert>
 #include <vector>
@@ -27,12 +27,12 @@ namespace facility_location {
 
 struct Remove {};
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCheckerRemove {
 public:
-        template <class Solution> 
-    auto operator()(Solution & s, 
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+        template <class Solution>
+    auto operator()(Solution & s,
+            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Remove) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
 
@@ -46,32 +46,32 @@ public:
     }
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationCommitRemove {
 public:
-        template <typename Solution> 
+        template <typename Solution>
     void operator()(
-            Solution & s, 
-            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement 
+            Solution & s,
+            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Remove) {
         s.removeFacility(se);
     }
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 class FacilityLocationGetMovesRemove {
     typedef std::vector<Remove> Moves;
     typedef typename Moves::iterator Iter;
 
-public: 
+public:
 
     FacilityLocationGetMovesRemove() : m_remove(1) {}
 
-    template <typename Solution> 
+    template <typename Solution>
         typename std::pair<Iter, Iter>
-    operator()(const Solution &, 
+    operator()(const Solution &,
             typename utils::CollectionToElem<Solution>::type & el) {
-        if(el.getIsChosen() == CHOSEN) { 
+        if(el.getIsChosen() == CHOSEN) {
             //the move of CHOSEN could be remove
             return std::make_pair(m_remove.begin(), m_remove.end());
         }

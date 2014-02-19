@@ -1,6 +1,6 @@
 /**
  * @file facility_location.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -19,12 +19,12 @@ namespace local_search {
 namespace facility_location {
 
 /**
- * @class DefaultFLComponents 
+ * @class DefaultFLComponents
  * @brief Model of MultiSearchComponents with default multi search components for facility location.
  *
  * @tparam VertexType
  */
-template <typename VertexType> 
+template <typename VertexType>
 struct DefaultRemoveFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesRemove<VertexType>,
@@ -32,7 +32,7 @@ struct DefaultRemoveFLComponents {
                 FacilityLocationCommitRemove        <VertexType>> type;
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 struct DefaultAddFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesAdd<VertexType>,
@@ -40,7 +40,7 @@ struct DefaultAddFLComponents {
                 FacilityLocationCommitAdd        <VertexType>> type;
 };
 
-template <typename VertexType> 
+template <typename VertexType>
 struct DefaultSwapFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesSwap<VertexType>,
@@ -60,7 +60,7 @@ struct DefaultSwapFLComponents {
  * <b> WARNING </b>
  * getSolution of the FacilityLocationLocalSearchStep returns type ObjectWithCopy<FacilityLocationSolution>.
  * If you want to perform search, then change the solution object and continue local search you should perform all the operations on ObjectWithCopy. <br>
- * example: 
+ * example:
     \snippet facility_location_example.cpp FL Search Example
  *
  * complete example is facility_location_example.cpp
@@ -84,8 +84,8 @@ bool facility_location_local_search(
     return local_search_multi_solution(flsa, std::move(psa), std::move(gsc), std::move(components)...);
 }
 
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename FacilityLocationSolution, 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename FacilityLocationSolution,
           typename... Components>
 bool facility_location_local_search_simple(FacilityLocationSolution & fls, Components... components) {
     return facility_location_local_search(fls, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);

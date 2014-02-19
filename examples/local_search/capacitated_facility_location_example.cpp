@@ -1,6 +1,6 @@
 /**
  * @file capacitated_facility_location_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -17,16 +17,16 @@ int main() {
     // sample data
     typedef SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
-   
+
     std::vector<int> fcostsv{7,8};
     auto facilityCost = paal::utils::make_ArrayToFunctor(fcostsv);
 
     std::vector<int> fcapv{2, 2};
     auto facilityCapacity = paal::utils::make_ArrayToFunctor(fcapv);
-    
+
     std::vector<int> cdemv{2, 2, 1, 3, 3};
     auto clientDemand = paal::utils::make_ArrayToFunctor(cdemv);
-    
+
     //define voronoi and solution
     typedef paal::data_structures::CapacitatedVoronoi<
         decltype(gm), decltype(facilityCapacity), decltype(clientDemand)> VorType;
@@ -41,7 +41,7 @@ int main() {
     VorType voronoi(GSet{SGM::A}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, facilityCapacity, clientDemand);
     Sol sol(std::move(voronoi), USet{SGM::B}, facilityCost);
 
-    //search 
+    //search
     facility_location_local_search_simple(sol, DefaultRemoveFLComponents<int>::type(), DefaultAddFLComponents<int>::type(), DefaultSwapFLComponents<int>::type());
 
     //print result
@@ -51,5 +51,5 @@ int main() {
 //! [CFL Search Example]
 
     return 0;
-    
+
 }

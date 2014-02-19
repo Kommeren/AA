@@ -1,6 +1,6 @@
 /**
  * @file contract_bgl_adjacency_matrix.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-22
@@ -17,16 +17,16 @@ namespace utils {
 //template <typename Idx, typename... Args>
 //On gcc 4.6 I get sorry unimplemented ... !!!
 
-template <typename Directed, 
-          typename VertexProperty, 
-          typename EdgeProperty, 
+template <typename Directed,
+          typename VertexProperty,
+          typename EdgeProperty,
           typename GraphProperty,
           typename Allocator,
           typename Idx>
 void contract(
-boost::adjacency_matrix<Directed, 
-                        VertexProperty, 
-                        EdgeProperty, 
+boost::adjacency_matrix<Directed,
+                        VertexProperty,
+                        EdgeProperty,
                         GraphProperty,
                         Allocator > &amatrix, Idx v, Idx w) {
     typedef boost::graph_traits<puretype(amatrix)> mtraits;

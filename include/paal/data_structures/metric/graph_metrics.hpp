@@ -1,6 +1,6 @@
 /**
  * @file graph_metrics.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -23,7 +23,7 @@ namespace graph_type {
     class Large;
 }
 
-template <typename Graph> struct GraphMetricTraits { 
+template <typename Graph> struct GraphMetricTraits {
     typedef graph_type::Sparse GraphTypeTag;
 };
 
@@ -33,16 +33,16 @@ namespace metric_fillers {
 
     //generic
     template <typename GraphTypeTag> struct GraphMetricFillerImpl;
-    
+
     template <> struct GraphMetricFillerImpl<graph_type::Sparse> {
-        template <typename Graph, typename ResultMatrix> 
+        template <typename Graph, typename ResultMatrix>
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
-            boost::johnson_all_pairs_shortest_paths(g, rm); 
+            boost::johnson_all_pairs_shortest_paths(g, rm);
         }
     };
-    
+
     template <> struct GraphMetricFillerImpl<graph_type::Dense> {
-        template <typename Graph, typename ResultMatrix> 
+        template <typename Graph, typename ResultMatrix>
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
             boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
         }
@@ -60,14 +60,14 @@ namespace metric_fillers {
  */
 // GENERIC
 // GraphType could be sparse, dense, large ...
-template <typename Graph, typename DistanceType, 
-          typename GraphType = typename GraphMetricTraits<Graph>::GraphTypeTag > 
-struct  GraphMetric : public ArrayMetric<DistanceType>, 
+template <typename Graph, typename DistanceType,
+          typename GraphType = typename GraphMetricTraits<Graph>::GraphTypeTag >
+struct  GraphMetric : public ArrayMetric<DistanceType>,
             public metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> {
       typedef   ArrayMetric<DistanceType> GMBase;
       typedef metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> GMFBase;
 
-    GraphMetric(const Graph & g)  
+    GraphMetric(const Graph & g)
         : GMBase(num_vertices(g)) {
             GMFBase::fillMatrix(g, GMBase::m_matrix);
     }
@@ -76,40 +76,40 @@ struct  GraphMetric : public ArrayMetric<DistanceType>,
 
 //Specialization for large graphs
 //TODO implement
-template <typename Graph, typename DistanceType> 
+template <typename Graph, typename DistanceType>
 struct  GraphMetric<Graph, DistanceType, graph_type::Large> {
-    GraphMetric(const Graph & g) { assert(false);} 
+    GraphMetric(const Graph & g) { assert(false);}
 };
 
 //Specialization for adjacency_list
-template <typename OutEdgeList, 
-          typename VertexList, 
+template <typename OutEdgeList,
+          typename VertexList,
           typename Directed,
-          typename VertexProperties, 
+          typename VertexProperties,
           typename EdgeProperties,
-          typename GraphProperties, 
+          typename GraphProperties,
           typename EdgeList>
 struct GraphMetricTraits<boost::adjacency_list<
-                             OutEdgeList, 
-                             VertexList, 
+                             OutEdgeList,
+                             VertexList,
                              Directed,
-                             VertexProperties, 
+                             VertexProperties,
                              EdgeProperties,
-                             GraphProperties, 
+                             GraphProperties,
                              EdgeList>> {
                                typedef graph_type::Sparse GraphTypeTag;
 };
 
 //Specialization for adjacency_matrix
-template <typename Directed, 
-          typename VertexProperty, 
-          typename EdgeProperty, 
+template <typename Directed,
+          typename VertexProperty,
+          typename EdgeProperty,
           typename GraphProperty,
           typename Allocator>
 struct GraphMetricTraits<boost::adjacency_matrix<
-                            Directed, 
-                            VertexProperty, 
-                            EdgeProperty, 
+                            Directed,
+                            VertexProperty,
+                            EdgeProperty,
                             GraphProperty,
                             Allocator>> {
                                 typedef graph_type::Dense GraphTypeTag;

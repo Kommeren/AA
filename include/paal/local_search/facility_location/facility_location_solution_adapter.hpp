@@ -1,6 +1,6 @@
 /**
  * @file facility_location_solution_adapter.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -29,7 +29,7 @@ namespace local_search {
 namespace facility_location {
 
 
-template <typename FacilityLocationSolution> 
+template <typename FacilityLocationSolution>
 class FacilityLocationSolutionAdapter {
     typedef FacilityLocationSolution FLS;
 public:
@@ -45,9 +45,9 @@ public:
     typedef std::unordered_set<VertexType> UnchosenCopy;
 public:
 
-    FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) : 
-            m_sol(sol), 
-            m_unchosenCopy(m_sol.getUnchosenFacilities().begin(), 
+    FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) :
+            m_sol(sol),
+            m_unchosenCopy(m_sol.getUnchosenFacilities().begin(),
                          m_sol.getUnchosenFacilities().end()) {
         auto const &  ch = m_sol.getChosenFacilities();
         auto const &  uch = m_sol.getUnchosenFacilities();
@@ -56,7 +56,7 @@ public:
         auto transformUnchosen = [](VertexType f){ return Fac(UNCHOSEN, f);};
         auto transformChosenAssignable = utils::make_AssignableFunctor(transformChosen);
         auto transformUnchosenAssignable = utils::make_AssignableFunctor(transformUnchosen);
-        
+
         auto transformedChosen = boost::adaptors::transform(ch, transformChosenAssignable);
         auto transformedUnchosen = boost::adaptors::transform(uch, transformUnchosenAssignable);
 
@@ -64,7 +64,7 @@ public:
         m_facilities.resize(chosenSize + boost::distance(uch));
         boost::copy(transformedChosen, m_facilities.begin());
         boost::copy(transformedUnchosen, m_facilities.begin() + chosenSize);
-        
+
         for(auto & f : m_facilities) {
             m_vertexToFac.insert(std::make_pair(f.getElem(), &f));
         }
@@ -74,7 +74,7 @@ public:
     Dist addFacilityTentative(VertexType v) {
         return m_sol.addFacility(v);
     }
-    
+
     Dist addFacility(Fac & se) {
         auto ret = addFacilityTentative(se.getElem());
         assert(se.getIsChosen() == UNCHOSEN);
@@ -83,7 +83,7 @@ public:
         m_cycledFacilities.setLastChange(se);
         return ret;
     }
-    
+
     Dist removeFacilityTentative(VertexType v) {
         return m_sol.remFacility(v);
     }
@@ -103,11 +103,11 @@ public:
         return *(i->second);
     }
 
-    
+
     ResultIterator begin() {
         return m_cycledFacilities.begin();
     }
-    
+
     ResultIterator end() {
         return m_cycledFacilities.end();
     }
@@ -115,7 +115,7 @@ public:
     FacilityLocationSolution & get() {
         return m_sol;
     }
-    
+
     const FacilityLocationSolution & get() const {
         return m_sol;
     }
@@ -123,9 +123,9 @@ public:
     const UnchosenCopy & getUnchosenCopy() const {
         return m_unchosenCopy;
     }
-    
+
 private:
-    FacilityLocationSolution & m_sol;    
+    FacilityLocationSolution & m_sol;
     Facilities m_facilities;
     CycledFacilities m_cycledFacilities;
     std::unordered_map<VertexType, Fac*> m_vertexToFac;

@@ -21,7 +21,7 @@ class CheckAllSizes : public T {
         void operator()(iter end) {
             VertexToEdgeIterator<iter> b(m_begin, end);
             VertexToEdgeIterator<iter> e(end, end);
-            BOOST_CHECK_EQUAL(std::distance(b, e), std::distance(m_begin, end));        
+            BOOST_CHECK_EQUAL(std::distance(b, e), std::distance(m_begin, end));
         }
 
     private:
@@ -50,9 +50,9 @@ namespace {
 
 
 BOOST_AUTO_TEST_CASE(iterator_size) {
-    T::iter i = v.begin(); 
-    T::iter end = v.end(); 
-    
+    T::iter i = v.begin();
+    T::iter end = v.end();
+
     CheckAllSizes c(v.begin());
     for(; i!= end; ++i ) {
         c(i);
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(iterator_size) {
 BOOST_AUTO_TEST_CASE(iterator_valid) {
     std::vector<T::P> sol = {T::P("1","2"), T::P("2", "3"), T::P("3","1")};
     auto end = v.begin() + 3;
-    BOOST_CHECK(vecEquals(sol.begin(), sol.end(), 
+    BOOST_CHECK(vecEquals(sol.begin(), sol.end(),
                 VertexToEdgeIterator<T::iter>(v.begin(), end),
                 VertexToEdgeIterator<T::iter>(end, end)));
 }

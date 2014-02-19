@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_on_identical_parallel_machines_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-06
@@ -26,12 +26,12 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines) {
     for(auto jobMachinePair:result){
         sumOfMachine[jobMachinePair.first]+=*jobMachinePair.second;
     }
-    
+
     Time maximumLoad=*std::max_element(sumOfMachine.begin(),sumOfMachine.end());
-    
+
     Time sumAllLoads=std::accumulate(sumOfMachine.begin(),sumOfMachine.end(),0.0);
     //print result
-    
+
     LOGLN("Solution:");
     LOGLN(maximumLoad);
     LOGLN("Upper Bound Aproxmimation Ratio:");
@@ -40,5 +40,5 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines) {
     LOGLN("");
     BOOST_CHECK(upperBoundAproxmiationRatio<=4.0/3.0);
     BOOST_CHECK((maximumLoad*numberOfMachines)/double(sumAllLoads)>=1);
-    
+
 }

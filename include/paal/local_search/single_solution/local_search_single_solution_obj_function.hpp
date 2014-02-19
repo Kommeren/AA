@@ -1,6 +1,6 @@
 /**
  * @file local_search_single_solution_obj_function.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-11
@@ -16,15 +16,15 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief traits class for SearchComponentsObjFun 
+ * @brief traits class for SearchComponentsObjFun
  *
  * @tparam SearchComponentsObjFun
  */
-template <typename SearchComponentsObjFun> 
+template <typename SearchComponentsObjFun>
 struct SearchObjFunctionComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT; 
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT; 
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<Commit>::type CommitT; 
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT;
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT;
+    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<Commit>::type CommitT;
 };
 
 namespace detail {
@@ -49,14 +49,14 @@ template <typename SearchObjFunctionComponents, typename Solution>
 class SearchObjFunctionComponentsToSearchComponents {
 private:
     typedef SearchObjFunctionComponentsTraits<
-                SearchObjFunctionComponents> traits; 
+                SearchObjFunctionComponents> traits;
 public:
-    typedef detail::FunToCheck< 
-                    typename traits::ObjFunctionT, 
-                    Solution, 
+    typedef detail::FunToCheck<
+                    typename traits::ObjFunctionT,
+                    Solution,
                     typename traits::CommitT> GainType;
     typedef SearchComponents<
-                typename traits::GetMovesT, 
+                typename traits::GetMovesT,
                          GainType,
                 typename traits::CommitT>  type;
 };
@@ -64,10 +64,10 @@ public:
 
 //TODO concepts !!!
 template <typename Solution,
-          typename SearchStrategy, 
+          typename SearchStrategy,
           typename SearchObjFunctionComponents>
 
-class LocalSearchFunctionStep : 
+class LocalSearchFunctionStep :
     public LocalSearchStep<
                 Solution,
                 SearchStrategy,
@@ -84,16 +84,16 @@ class LocalSearchFunctionStep :
                 SearchStrategy,
                 SearchComponents> base;
     public:
-    LocalSearchFunctionStep(Solution & sol, 
-            SearchObjFunctionComponents s = SearchObjFunctionComponents()) :  
-        base(sol, 
+    LocalSearchFunctionStep(Solution & sol,
+            SearchObjFunctionComponents s = SearchObjFunctionComponents()) :
+        base(sol,
              SearchComponents
                    (
                     std::move(s.template get<GetMoves>()),
                     Gain(std::move(s.template get<ObjFunction>()), base::m_searchComponents.template get<Commit>()),
                     std::move(s.template get<Commit>())
                    )
-            ) {} 
+            ) {}
 };
 } // !detail
 
@@ -110,7 +110,7 @@ class LocalSearchFunctionStep :
  * @param gsc
  * @param components
  *
- * @return 
+ * @return
  */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename PostSearchAction,
@@ -135,10 +135,10 @@ bool local_search_obj_fun(
  * @param solution
  * @param components
  *
- * @return 
+ * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename Solution, 
+template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+          typename Solution,
           typename... Components>
 bool local_search_obj_fun_simple(Solution & solution, Components... components) {
     return local_search<SearchStrategy>(solution, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);

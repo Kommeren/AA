@@ -1,6 +1,6 @@
 /**
  * @file paal/local_search/search_traits.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-19
@@ -20,11 +20,11 @@ namespace local_search {
  *
  * @tparam SearchComponents
  */
-template <typename SearchComponents> 
+template <typename SearchComponents>
 struct SearchComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT; 
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT; 
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT; 
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT;
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT;
+    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT;
 };
 
 /**
@@ -33,7 +33,7 @@ struct SearchComponentsTraits {
  * @tparam SearchComponents
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution> 
+template <typename SearchComponents, typename Solution>
 class Move {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
@@ -50,7 +50,7 @@ public:
  * @tparam SearchComponents
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution> 
+template <typename SearchComponents, typename Solution>
 class MultiMove {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
@@ -68,7 +68,7 @@ public:
  * @tparam SearchComponents
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution> 
+template <typename SearchComponents, typename Solution>
 class Fitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;
@@ -84,7 +84,7 @@ public:
  * @tparam SearchComponents
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution> 
+template <typename SearchComponents, typename Solution>
 class MultiFitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;

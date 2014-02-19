@@ -1,6 +1,6 @@
 /**
  * @file shortest_superstring_example.cpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-29
@@ -17,8 +17,8 @@
 int main() {
 //! [Shortest Superstring Example]
     std::vector<std::string> words({"ba","ab","aa","bb"});
-    
-    
+
+
     std::cout<<paal::greedy::shortestSuperstring(words)<<std::endl;
 //! [Shortest Superstring Example]
 }

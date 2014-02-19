@@ -1,12 +1,12 @@
 /**
  * @file metric_traits.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-03-04
  */
 #ifndef METRIC_TRAITS_HPP
-#define METRIC_TRAITS_HPP 
+#define METRIC_TRAITS_HPP
 #include <type_traits>
 
 #include "paal/utils/type_functions.hpp"

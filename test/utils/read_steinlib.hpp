@@ -1,6 +1,6 @@
 /**
  * @file read_orlib_fc.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
@@ -62,11 +62,11 @@ inline Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::
     E = readInt(is, "Edges");
 
     steinerPoints.resize(N);
-    
+
     std::iota(steinerPoints.begin(), steinerPoints.end(), 0);
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
-    
+
     for(int i : boost::irange(0,E)) {
         Edge e;
         std::string s;

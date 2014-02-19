@@ -1,6 +1,6 @@
 /**
  * @file object_with_copy.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -18,7 +18,7 @@ namespace data_structures {
  *
  * @tparam T type of the contain object
  */
-template <typename T> 
+template <typename T>
 class ObjectWithCopy {
 public:
     typedef T ObjectType;
@@ -38,14 +38,14 @@ public:
      */
     // if you use *. in decltype instead of -> you get
     // "sorry, unimplemented: mangling dotstar_expr" :)
-    template <typename F, typename... Args> 
+    template <typename F, typename... Args>
     typename utils::ReturnType<T, F, Args...>::type
     //typename std::result_of<F>::type //TODO investigate
-    invoke(F f, Args... args) { 
+    invoke(F f, Args... args) {
         (m_copy.*(f))(args...);
         return (m_obj.*(f))(args...);
     }
-    
+
     /**
      * @brief invokes member function on copy
      *
@@ -57,7 +57,7 @@ public:
      *
      * @return the same as f
      */
-    template <typename F, typename... Args> 
+    template <typename F, typename... Args>
     typename utils::ReturnType<T, F, Args...>::type
     invokeOnCopy(F f, Args... args) const {
         return (m_copy.*(f))(args...);
@@ -80,7 +80,7 @@ public:
     T & getObj() {
         return m_obj;
     }
-    
+
     /**
      * @brief getter for inner object
      *

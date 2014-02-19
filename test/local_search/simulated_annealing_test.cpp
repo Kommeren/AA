@@ -1,6 +1,6 @@
 /**
  * @file simulated_annealing_test.cpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2014-02-04
@@ -16,7 +16,7 @@
 #include "utils/logger.hpp"
 
 
-BOOST_AUTO_TEST_SUITE( simulated_annealing ) 
+BOOST_AUTO_TEST_SUITE( simulated_annealing )
 
 namespace ls = paal::local_search;
 using namespace paal;
@@ -24,19 +24,19 @@ using namespace paal;
     BOOST_AUTO_TEST_CASE(SimulatedAnnealingGainAdaptorTest) {
         int currentSolution(0);
         int best(0);
-        auto saGain = ls::make_SimulatedAnnealingGainAdaptor(Gain(), 
+        auto saGain = ls::make_SimulatedAnnealingGainAdaptor(Gain(),
                             ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(1), 10, 0.1));
 
-        auto recordSolutionCommit = 
+        auto recordSolutionCommit =
                 ls::make_RecordSolutionCommitAdapter(
-                        best, 
-                        Commit(), 
+                        best,
+                        Commit(),
                         paal::utils::make_FunctorToComparator(f, utils::Greater()));
-        
+
         ls::local_search_simple(currentSolution, ls::make_SearchComponents(GetMoves(), saGain, recordSolutionCommit));
         BOOST_CHECK_EQUAL(best, 6);
         LOGLN("solution " << best);
     }
-    
+
 
 BOOST_AUTO_TEST_SUITE_END()

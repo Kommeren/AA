@@ -26,7 +26,7 @@ int main() {
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution 
+    //create random solution
     std::random_shuffle(v.begin(), v.end());
     typedef data_structures::SimpleCycle<int> Cycle;
     Cycle cycle(v.begin(), v.end());

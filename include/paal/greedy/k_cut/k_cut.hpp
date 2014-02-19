@@ -1,6 +1,6 @@
 /**
  * @file k_cut.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-25
@@ -26,7 +26,7 @@ namespace greedy{
 /**
  * @brief this is solve k_cut problem
  * and return cut_cost
- * example: 
+ * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut.cpp
@@ -45,49 +45,49 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
             VertexIndexMap indexMap, EdgeWeightMap weightMap) ->
             typename boost::property_traits<EdgeWeightMap>::value_type{
     typedef typename boost::property_traits<EdgeWeightMap>::value_type cost_t;
-    
+
     typedef boost::adjacency_list<
             boost::vecS,boost::vecS,boost::undirectedS,
             boost::no_property,
-            boost::property < boost::edge_weight_t, cost_t , 
-                boost::property<boost::edge_index_t, int> > 
+            boost::property < boost::edge_weight_t, cost_t ,
+                boost::property<boost::edge_index_t, int> >
             >Graph;
-                    
+
     assert(num_vertices(graph)>=numberOfParts);
-    
+
     std::vector<int> vertexToPart(num_vertices(graph));
     typedef typename std::vector<int> VertexIndexToVertexIndex;
     VertexIndexToVertexIndex vertexInSubgraphToVertex(num_vertices(graph));
     VertexIndexToVertexIndex vertexToVertexInSubgraph(num_vertices(graph));
     int vertexInPart;
     int parts=1;
-    //cuts contain pair(x,y) 
-    // x is the cost of the cut 
+    //cuts contain pair(x,y)
+    // x is the cost of the cut
     // y and y+1 are index parts of graph after make a cut
     std::priority_queue<
             std::pair<cost_t,int>,
             std::vector<std::pair<cost_t,int> >
             ,utils::Greater> cuts;
-    
+
     int idPart=0;
-    
+
     //get part id and compute minimum cost of cut of that part and add it to queue
     auto makeCut=[&](int id){
-        
+
         vertexInPart=0;
         for(auto i:boost::make_iterator_range(vertices(graph))){
             if(vertexToPart[indexMap(i)]==id){
                 vertexInSubgraphToVertex[vertexInPart]=indexMap(i);
                 vertexToVertexInSubgraph[indexMap(i)]=vertexInPart;
                 ++vertexInPart;
-                
+
             }
         }
         Graph part(vertexInPart);
         for(auto edge : boost::make_iterator_range(edges(graph))){
             auto sour=indexMap(source(edge,graph));
             auto targ=indexMap(target(edge,graph));
-            if(vertexToPart[sour]==id && 
+            if(vertexToPart[sour]==id &&
                     vertexToPart[targ]==id &&
                     sour!=targ){
                 add_edge(vertexToVertexInSubgraph[sour],
@@ -107,7 +107,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
         auto cutCost=boost::stoer_wagner_min_cut(part,
                                           get(boost::edge_weight, part),
                                           boost::parity_map(parities));
-        
+
         for (auto i :  boost::irange(0,int(num_vertices(part)))) {
             vertexToPart[vertexInSubgraphToVertex[i]]=
                     parts+get(parities, i);//return value convertable to 0/1
@@ -115,7 +115,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
         cuts.push(std::make_pair(cutCost,parts));
         parts+=2;
     };
-    
+
     makeCut(0);
     cost_t kCutCost=cost_t();
     while(--numberOfParts){
@@ -125,7 +125,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
         makeCut(cut.second);
         makeCut(cut.second+1);
     }
-    
+
     while(!cuts.empty()){
         auto cut=cuts.top();
         cuts.pop();
@@ -144,7 +144,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
 /**
  * @brief this is solve k_cut problem
  * and return cut_cost
- * example: 
+ * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut.cpp
@@ -177,7 +177,7 @@ auto kCut(const inGraph& graph,unsigned int numberOfParts,OutputIterator result,
 /**
  * @brief this is solve k_cut problem
  * and return cut_cost
- * example: 
+ * example:
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut.cpp

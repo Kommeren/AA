@@ -1,6 +1,6 @@
 /**
  * @file scheduling_jobs_with_deadlines_on_a_single_machine.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-09-09
@@ -25,7 +25,7 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine{
 /**
  * @brief solve scheduling jobs on identical parallel machines problem
  * and fill start time of all jobs
- * example: 
+ * example:
  *  \snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
@@ -52,12 +52,12 @@ auto schedulingJobsWithDeadlinesOnASingleMachine(
     std::copy(boost::make_counting_iterator(first),
           boost::make_counting_iterator(last),
           std::back_inserter(jobs));
-    
+
     auto getDueDateFromIterator=utils::make_LiftIteratorFunctor(getDueDate);
     auto dueDateCompatator=utils::make_FunctorToComparator(getDueDateFromIterator,utils::Greater());
-    typedef std::priority_queue<InputIterator,std::vector<InputIterator>,decltype (dueDateCompatator)> QueueType; 
+    typedef std::priority_queue<InputIterator,std::vector<InputIterator>,decltype (dueDateCompatator)> QueueType;
     QueueType activeJobsIters(dueDateCompatator);
-    
+
     auto getReleaseDateFromIterator=utils::make_LiftIteratorFunctor(getReleaseDate);
     std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getReleaseDateFromIterator));
     Time startIdle=Time();
@@ -78,7 +78,7 @@ auto schedulingJobsWithDeadlinesOnASingleMachine(
     }
     while(!activeJobsIters.empty()){
         doJob();
-    } 
+    }
 
     return longestDelay;
 }

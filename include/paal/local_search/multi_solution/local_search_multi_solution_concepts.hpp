@@ -1,6 +1,6 @@
 /**
  * @file local_search_multi_solution_concepts.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -40,7 +40,7 @@ class MultiSolution  {
 };
 
 namespace detail {
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class MultiConceptsBase {
     typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
 protected:
@@ -52,7 +52,7 @@ protected:
 };
 }//detail
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class  MultiGetMoves : public detail::MultiConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(MultiGetMoves) {
@@ -66,7 +66,7 @@ class  MultiGetMoves : public detail::MultiConceptsBase<X, Solution, SearchCompo
         }
 };
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class MultiGain : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiGain) {
@@ -75,7 +75,7 @@ class MultiGain : public detail::MultiConceptsBase<X, Solution, SearchComponents
 };
 
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class MultiCommit : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiCommit) {
@@ -83,7 +83,7 @@ class MultiCommit : public detail::MultiConceptsBase<X, Solution, SearchComponen
         }
 };
 
-template <typename X, typename Solution, typename SearchComponents> 
+template <typename X, typename Solution, typename SearchComponents>
 class MultiStepStopCondition : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiStepStopCondition) {
@@ -92,9 +92,9 @@ class MultiStepStopCondition : public detail::MultiConceptsBase<X, Solution, Sea
         }
 };
 
-template <typename X, typename Solution> 
+template <typename X, typename Solution>
 class MultiSearchComponents {
-    typedef SearchComponentsTraits<X> Traits; 
+    typedef SearchComponentsTraits<X> Traits;
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
@@ -107,7 +107,7 @@ public:
 } // local_search_concepts
 } // local_search
 } //paal
- 
- 
- 
- 
+
+
+
+

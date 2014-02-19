@@ -1,6 +1,6 @@
 /**
  * @file get_all_moves_from_solution.hpp
- * @brief 
+ * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-01
@@ -30,18 +30,18 @@ struct GetAllMovesFromSolution {
      * @param sol
      * @param e
      *
-     * @return 
+     * @return
      */
-    template <typename SolutionElement, typename Solution> 
-                          std::pair<utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type>, 
-                                    utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type> > 
-            
+    template <typename SolutionElement, typename Solution>
+                          std::pair<utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type>,
+                                    utils::IteratorWithExcludedElement<typename utils::CollectionToConstIter<Solution>::type> >
+
             operator()(const Solution & sol, const SolutionElement &e) {
                 typedef typename utils::CollectionToConstIter<Solution>::type SolutionIterator;
                 typedef utils::IteratorWithExcludedElement<SolutionIterator> OutIter;
                 SolutionIterator begin = sol.begin();
                 SolutionIterator end = sol.end();
-                return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));        
+                return std::make_pair(OutIter(begin, end, e), OutIter(end, end, e));
             }
 };
 

@@ -1,6 +1,6 @@
 /**
  * @file read_ss.hpp
- * @brief 
+ * @brief
  * @author Piotr Smulewicz
  * @version 1.0
  * @date 2013-08-23
