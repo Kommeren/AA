@@ -9,6 +9,7 @@
 #define SIMULATED_ANNEALING_HPP
 
 #include <chrono>
+#include "paal/utils/fast_exp.hpp"
 
 namespace paal {
 namespace local_search {
@@ -241,7 +242,7 @@ struct SimulatedAnnealingGainAdaptor {
             if(delta > 0) {
                 return IsChosen<Delta>::makeChosen(delta);
             } else {
-                if( m_distribution(m_rand) >  exp(double(delta) / m_getTemperature())) {
+                if( m_distribution(m_rand) >  fastExp(double(delta) / m_getTemperature())) {
                     return IsChosen<Delta>::makeChosen(delta);
                 } else {
                     return IsChosen<Delta>::makeUnchosen(delta);
