@@ -16,33 +16,70 @@ namespace paal {
 namespace data_structures {
 
 
+/**
+ * @brief Cycle based on splay tree
+ *
+ * @tparam T
+ */
 template <typename T>
 class SplayCycle {
     typedef splay_tree::template Iterator<T> SIter;
     typedef splay_tree::SplayTree<T> SplayTree;
 public:
     typedef CycleIterator<SIter> VIter;
-    SplayCycle() {}
+
+    SplayCycle() = default;
+
+    /**
+     * @brief constructor from range
+     *
+     * @tparam Iter
+     * @param begin
+     * @param end
+     */
     template <typename Iter>
         SplayCycle(Iter begin, Iter end) :
             m_splayTree(begin, end),
             m_size(m_splayTree.size()) {}
 
+    /**
+     * @brief vertices begin
+     *
+     * @return
+     */
     VIter vbegin() const {
         return VIter(m_splayTree.begin(), m_splayTree.begin(), m_splayTree.end());
     }
 
+    /**
+     * @brief vertices begin (from t)
+     *
+     * @param t
+     *
+     * @return
+     */
     VIter vbegin(const T& t) const {
         std::size_t i = m_splayTree.getIdx(t);
         assert(i != std::size_t(-1));
         return VIter(SIter(m_splayTree.splay(i), &m_splayTree), m_splayTree.begin(), m_splayTree.end());
     }
 
+    /**
+     * @brief vertices end
+     *
+     * @return
+     */
     VIter vend() const {
         auto e = m_splayTree.end();
         return VIter(e, e ,e);
     }
 
+    /**
+     * @brief flips range from begin to end
+     *
+     * @param begin
+     * @param end
+     */
     void flip(const T & begin, const T & end) {
         if(begin == end) {
             return;

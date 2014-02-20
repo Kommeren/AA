@@ -23,6 +23,7 @@ int main() {
     typedef  SampleGraphsMetrics SGM;
     auto gm = SGM::getGraphMetricSmall();
     const int size = gm.size();
+    std::cout << size << std::endl;
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 

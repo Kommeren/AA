@@ -13,8 +13,15 @@
 namespace paal {
 namespace data_structures {
 
+
+    /**
+     * @brief traits for \ref cycle concept
+     *
+     * @tparam Cycle
+     */
 template <typename Cycle>
 struct CycleTraits {
+    ///Vertex iterator type
     typedef decltype(std::declval<Cycle>().vbegin()) VertexIterator;
     typedef typename std::iterator_traits<VertexIterator>::value_type CycleElem;
 };

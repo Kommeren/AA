@@ -26,6 +26,14 @@ namespace splay_tree {
     return (node == NULL) ? 0 : node->size();
   }
 
+  /**
+   * @brief copy node pointer
+   *
+   * @tparam N
+   * @param node
+   *
+   * @return
+   */
   template<typename N> inline N * copy_node(N * node) {
     return (node == NULL) ? NULL : new N(*node);
   }
@@ -48,6 +56,7 @@ namespace splay_tree {
         right_(NULL), parent_(NULL), reversed_(false), size_(1) {
       }
 
+      ///constructor
       Node(const Node & n) : val_(n.val_), left_(copy_node(n.left_)),
         right_(copy_node(n.right_)), parent_(NULL), reversed_(n.reversed_),
         size_(n.size_) {
@@ -225,7 +234,9 @@ namespace splay_tree {
         normalize();
       }
 
-      value_type val_;
+    /// value of the node
+    value_type val_;
+
 
     private:
       static const bool kDefLeft = 0;
@@ -365,10 +376,12 @@ namespace splay_tree {
         root_ = build_tree(b, e);
       }
 
+      ///constructor
       SplayTree(SplayTree && splay)  {
           *this = std::move(splay);
       }
 
+      ///operator=
       SplayTree& operator=(SplayTree && splay) {
         rotation_cnt_ = splay.rotation_cnt_;
         root_         = splay.root_;
@@ -378,12 +391,14 @@ namespace splay_tree {
         return *this;
       }
 
+      ///operator=
       SplayTree& operator=(SplayTree & splay) {
           SplayTree sp(splay);
           *this = std::move(sp);
           return *this;
       }
 
+      ///constructor
       SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
           auto i = begin();
           auto e = end();
@@ -460,6 +475,11 @@ namespace splay_tree {
         return i;
       }
 
+      /**
+       * @brief gets rotationCnt()
+       *
+       * @return
+       */
       std::size_t getRotationCnt() const {
           return rotation_cnt_;
       }

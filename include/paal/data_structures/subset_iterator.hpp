@@ -18,6 +18,7 @@ namespace paal {
 namespace data_structures {
 
 //minor TODO could be more efficient in direct array of iterators implementation
+//TODO use boost::iterator_fascade
 /**
  * @class SubsetsIterator
  * @brief Iterator to all k-subsets of given collection.
@@ -49,6 +50,12 @@ public:
     using base::m_end;
 
 
+    /**
+     * @brief constructor
+     *
+     * @param begin
+     * @param end
+     */
     SubsetsIterator(Iterator begin, Iterator end ) :
         base(begin, end), m_begin(base::m_begin) {
         if(m_begin != m_end) {
@@ -58,8 +65,13 @@ public:
         moveCurr();
     }
 
-    SubsetsIterator()  {}
+    SubsetsIterator()  = default;
 
+    /**
+     * @brief operator++
+     *
+     * @return
+     */
     SubsetsIterator & operator++(){
         ++m_begin;
         while(m_begin == m_end) {
@@ -75,37 +87,62 @@ public:
         return *this;
     }
 
+    /**
+     * @brief operator++(int)
+     *
+     * @return
+     */
     SubsetsIterator operator++(int){
         SubsetsIterator i(*this);
         operator++();
         return i;
     }
 
+    /**
+     * @brief operator!=
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
     }
 
+    /**
+     * @brief operator==
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator==(const SubsetsIterator & ei) const {
         return (m_begin == ei.m_begin && base::operator==(ei)) ||
                (m_begin == m_end && ei.m_begin == m_end);
     }
 
+    /**
+     * @brief operator->
+     *
+     * @return
+     */
     pointer const operator->() const {
         return &m_return;
     }
 
-    void operator=(SubsetsIterator ei) {
-        base::operator=(ei);
-        m_begin = ei.m_begin;
-        m_end = ei.m_end;
-        m_return = ei.m_return;
-    }
-
+    /**
+     * @brief operator*
+     *
+     * @return
+     */
     reference operator*() const {
         return m_return;
     }
 
 private:
+    /**
+     * @brief sets m_return to new value
+     */
     void moveCurr() {
         if(m_begin != m_end) {
             m_return = std::tuple_cat(base::operator*(), std::tuple<Element>(*m_begin));
@@ -114,9 +151,15 @@ private:
 
     SubsetType m_return;
 protected:
+    ///begin of collection
     Iterator m_begin;
 };
 
+/**
+ * @brief specialization for k = 1
+ *
+ * @tparam Iterator
+ */
 template <typename Iterator> class SubsetsIterator<Iterator, 1> :
     public std::iterator<std::forward_iterator_tag,
                          std::pair<std::tuple<typename std::iterator_traits<Iterator>::value_type>, Iterator>,
@@ -127,14 +170,25 @@ public:
     typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef std::tuple<Element> SubsetType;
 
+    /**
+     * @brief constructor
+     *
+     * @param begin
+     * @param end
+     */
     SubsetsIterator(Iterator begin, Iterator end ) :
         m_begin(begin), m_end(end) {
 
         moveCurr();
     }
 
-    SubsetsIterator()  {}
+    SubsetsIterator() = default;
 
+    /**
+     * @brief operator++()
+     *
+     * @return
+     */
     SubsetsIterator & operator++(){
         assert(m_begin != m_end);
         ++m_begin;
@@ -144,35 +198,61 @@ public:
         return *this;
     }
 
+    /**
+     * @brief operator++(int)
+     *
+     * @return
+     */
     SubsetsIterator operator++(int){
         SubsetsIterator i(*this);
         operator++();
         return i;
     }
 
+    /**
+     * @brief operator!=
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator!=(SubsetsIterator ei) const {
         return !operator==(ei);
     }
 
+    /**
+     * @brief operator==
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator==(SubsetsIterator ei) const {
         return m_begin == ei.m_begin;
     }
 
+    /**
+     * @brief operator->
+     *
+     * @return
+     */
     const SubsetType * const operator->() const {
         return &m_return;
     }
 
-    void operator=(SubsetsIterator ei) {
-        m_begin = ei.m_begin;
-        m_end = ei.m_end;
-        m_return = ei.m_return;
-    }
-
+    /**
+     * @brief operator*
+     *
+     * @return
+     */
     const SubsetType & operator*() const {
         return m_return;
     }
 
 private:
+    /**
+     * @brief sets m_return
+     */
     void moveCurr() {
         if(m_begin != m_end) {
             m_return = SubsetType(*m_begin);
@@ -180,11 +260,24 @@ private:
     }
     SubsetType m_return;
 protected:
+    /// begin of the collection
     Iterator m_begin;
+    /// end of the collection
     Iterator m_end;
 };
 
 
+/**
+ * @brief make for SubsetsIterator
+ *
+ * @tparam Iterator
+ * @tparam k
+ * @tparam Pointer
+ * @param b
+ * @param e
+ *
+ * @return
+ */
 template <typename Iterator,int k,
           typename Pointer = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type *,
           typename Reference = typename utils::kTuple<typename std::iterator_traits<Iterator>::value_type, k>::type const &>

@@ -9,7 +9,7 @@
 #define READ_GEN_ASS_HPP
 namespace paal {
 
-typedef data_structures::AssymetricArrayMetric<int> M;
+typedef data_structures::RectangleArrayMetric<int> M;
 
 void readGEN_ASS(std::istream & is, M & costs, M & times,
                  std::vector<int> & machinesBounds,

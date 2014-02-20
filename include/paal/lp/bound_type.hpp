@@ -10,7 +10,7 @@
 
 namespace paal {
 namespace lp {
-// free, only lower bound, only upper bound, both bounds, fix
+/// free, only lower bound, only upper bound, both bounds, fix
 enum BoundType {FR, LO, UP, DB, FX};
 }
 }

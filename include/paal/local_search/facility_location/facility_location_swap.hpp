@@ -23,23 +23,55 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
+    /**
+     * @brief swap type
+     *
+     * @tparam T
+     */
 template <typename T> class Swap {
 public:
+    /**
+     * @brief constructor
+     *
+     * @param from
+     * @param to
+     */
     Swap(T from, T to) : m_from(from), m_to(to) {}
-    Swap() {}
 
+    Swap() = default;
+
+    /**
+     * @brief from getter
+     *
+     * @return
+     */
     T getFrom() const {
         return m_from;
     }
 
+    /**
+     * @brief to getter
+     *
+     * @return
+     */
     T getTo() const {
         return m_to;
     }
 
+    /**
+     * @brief form setter
+     *
+     * @param from
+     */
     void setFrom(T from) {
         m_from = from;
     }
 
+    /**
+     * @brief from setter
+     *
+     * @param to
+     */
     void setTo(T to) {
         m_to = to;
     }
@@ -49,18 +81,44 @@ private:
     T m_to;
 };
 
+/**
+ * @brief functor that takes from in the constructor.
+ *        when operator()(to) is called, it returns Swap(from, to)
+ *
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType> class VertexToSwapMove {
 public:
+    /**
+     * @brief constructor
+     *
+     * @param v
+     */
     VertexToSwapMove(VertexType v) : m_from(v) {}
 
     VertexToSwapMove() = default;
     VertexToSwapMove(const VertexToSwapMove & u) = default;
 
+    /**
+     * @brief operator=
+     *
+     * @param u
+     *
+     * @return
+     */
     VertexToSwapMove & operator=(const VertexToSwapMove & u)  {
         m_from = u.m_from;
         return *this;
     }
 
+    /**
+     * @brief operator()
+     *
+     * @param v
+     *
+     * @return
+     */
     const Swap<VertexType> & operator()(VertexType v) const {
         m_sw.setFrom(m_from);
         m_sw.setTo(v);
@@ -72,14 +130,30 @@ private:
     VertexType m_from;
 };
 
+/**
+ * @brief gain functor for swap in facility location problem.
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
-class FacilityLocationCheckerSwap {
+class FacilityLocationGainSwap {
 public:
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param sol
+     * @param se
+     * @param s
+     *
+     * @return
+     */
         template <class Solution>
     auto operator()(Solution & sol,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
+
         typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
 
         ret   = sol.addFacilityTentative(s.getTo());
@@ -92,9 +166,22 @@ public:
 };
 
 
+/**
+ * @brief commit functor for facility location problem
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationCommitSwap {
 public:
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param sol
+     * @param se
+     * @param s
+     */
     template <typename Solution>
     void operator()(Solution & sol,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
@@ -104,8 +191,18 @@ public:
     }
 };
 
+/**
+ * @brief get moves functor for facility location problem
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationGetMovesSwap {
+    /**
+     * @brief class needed to compute return type (TODO should be removed afte c++1y)
+     *
+     * @tparam Solution
+     */
     template <typename Solution>
     struct IterType {
         typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen;
@@ -118,7 +215,8 @@ class FacilityLocationGetMovesSwap {
 public:
     typedef Facility<VertexType> Fac;
 
-    //Due to the memory optimization at one moment only one Move is valid
+    ///operator()
+    ///Due to the memory optimization at one moment only one Move is valid
     template <typename Solution> typename IterType<Solution>::TransRange
     operator()(const Solution &s, const Fac & el) {
         auto e = el.getElem();

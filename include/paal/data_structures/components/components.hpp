@@ -459,32 +459,42 @@ namespace detail {
 } //detail
 
 
-//this is class sets all defaults and return as type detail::Components<Names, Types>
-//direct implementation on variadic templates is imposible because of
-//weak support for type detection for inner template classes
+///this is class sets all defaults and return as type detail::Components<Names, Types>
+///direct implementation on variadic templates is imposible because of
+///weak support for type detection for inner template classes
 template <typename... ComponentNamesWithDefaults>
 class Components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
 
-    //get Names list from NamesWithDefaults
+    ///get Names list from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
         detail::PushBackName
             >::type Names;
 
-    //get Defaults from NamesWithDefaults
+    ///get Defaults from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
         detail::PushBackDefault
             >::type Defaults;
 
+    /**
+     * @brief for detecting references adapters
+     *
+     * @tparam T
+     */
     template <class T>
     struct special_decay {
         using type = typename std::decay<T>::type;
     };
 
+    /**
+     * @brief specialization, when type is surrounded by std::ref
+     *
+     * @tparam T
+     */
     template <class T>
     struct special_decay<std::reference_wrapper<T>> {
         using type = T&;
@@ -497,7 +507,7 @@ public:
     template <typename... ComponentTypes>
     using type = typename detail::SetDefaults<Names, Defaults, TypesVector<ComponentTypes...>>::type;
 
-
+    ///make function for components
     template <typename... Components>
     static
     type<special_decay_t<Components>...>

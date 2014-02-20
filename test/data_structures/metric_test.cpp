@@ -18,15 +18,15 @@ BOOST_AUTO_TEST_CASE(MetricTest) {
 }
 
 
-BOOST_AUTO_TEST_CASE(CopyAssymetricArrayMetric) {
-    paal::data_structures::AssymetricArrayMetric<int> m(1,2);
+BOOST_AUTO_TEST_CASE(CopyRectangleArrayMetric) {
+    paal::data_structures::RectangleArrayMetric<int> m(1,2);
     m(0,0) = 1;
     m(0,1) = 2;
 
 
     auto r1 = boost::irange(0,1);
     auto r2 = boost::irange(0,2);
-    paal::data_structures::AssymetricArrayMetric<int> copy(
+    paal::data_structures::RectangleArrayMetric<int> copy(
             m, boost::begin(r1), boost::end(r1), boost::begin(r2), boost::end(r2));
 
     BOOST_CHECK(copy(0, 0) == 1);

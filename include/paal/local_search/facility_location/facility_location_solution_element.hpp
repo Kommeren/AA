@@ -13,6 +13,9 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
+    /**
+     * @brief enum indicates if facility is chosen (open), or not
+     */
 enum is_chosen { CHOSEN, UNCHOSEN};
 
 /**
@@ -22,26 +25,64 @@ enum is_chosen { CHOSEN, UNCHOSEN};
  */
 template <typename T> class Facility {
 public:
+    /**
+     * @brief constructor
+     *
+     * @param ic
+     * @param e
+     */
     Facility(is_chosen ic, T e) : m_isChosen(ic), m_elem(e) {}
     Facility() = default;
 
+    /**
+     * @brief gettr for is_chosen
+     *
+     * @return
+     */
     is_chosen getIsChosen() const {
         return m_isChosen;
     }
 
+    /**
+     * @brief setter for is_chosen
+     *
+     * @param ic
+     */
     void setIsChosen(is_chosen ic) {
         m_isChosen = ic;
     }
 
+    /**
+     * @brief getter for element
+     *
+     * @return
+     */
     T getElem() const {
         return m_elem;
     }
 
-    //TODO this is to tricky
+    /**
+     * @brief operator== tricky!!!
+     *
+     * @param se
+     *
+     * @return
+     */
     bool operator==(const Facility & se) const {
+        //TODO this is to tricky
         return /*m_isChosen == se.m_isChosen && */m_elem == se.m_elem;
     }
 
+    /**
+     * @brief operator<<
+     *
+     * @tparam ostream
+     * @tparam TT
+     * @param o
+     * @param f
+     *
+     * @return
+     */
     template <typename ostream, typename TT>
     friend ostream & operator<<(ostream & o, Facility<TT> f) {
         o << "(" << f.getElem() << "," << f.getIsChosen() << ")";

@@ -18,6 +18,11 @@
 namespace paal {
 namespace utils {
 
+    /**
+     * @brief this iterator exlcludes one specific element from range
+     *
+     * @tparam Iterator
+     */
 template <typename Iterator>
 struct IteratorWithExcludedElement :
     public boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
@@ -25,13 +30,20 @@ struct IteratorWithExcludedElement :
                                            std::placeholders::_1)), Iterator> {
 
     typedef typename std::iterator_traits<Iterator>::value_type Element;
+    /**
+     * @brief constructor
+     *
+     * @param i
+     * @param end
+     * @param e
+     */
     IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e)
         : boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
                                                     std::declval<Element>(),
                                                     std::placeholders::_1)), Iterator >
           (std::bind(utils::NotEqualTo(), e, std::placeholders::_1), i, end )  {}
 
-    IteratorWithExcludedElement() {}
+    IteratorWithExcludedElement() = default;
 };
 
 } //utils

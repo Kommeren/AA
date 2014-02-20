@@ -16,11 +16,31 @@
 
 namespace paal {
 
+    /**
+     * @brief density functor, for given value and size
+     *
+     * @tparam Value
+     * @tparam Size
+     */
 template <typename Value, typename Size>
 struct Density {
 
+    /**
+     * @brief constructor
+     *
+     * @param value
+     * @param size
+     */
     Density(Value value, Size size) : m_value(value), m_size(size) {}
 
+    /**
+     * @brief operator()
+     *
+     * @tparam ObjectRef
+     * @param obj
+     *
+     * @return
+     */
     template <typename ObjectRef>
     double operator()(ObjectRef obj) const {
         return double(m_value(obj)) / double(m_size(obj));
@@ -30,6 +50,16 @@ private:
     Size m_size;
 };
 
+/**
+ * @brief make for Density
+ *
+ * @tparam Value
+ * @tparam Size
+ * @param value
+ * @param size
+ *
+ * @return
+ */
 template <typename Value, typename Size>
 Density<Value, Size>
 make_Density(Value value, Size size) {
@@ -37,11 +67,31 @@ make_Density(Value value, Size size) {
 }
 
 
+/**
+ * @brief functor checking if given objIter has size smaller than capacity
+ *
+ * @tparam ObjectSizeFunctor
+ * @tparam SizeType
+ */
 template <typename ObjectSizeFunctor, typename SizeType>
 struct RightSize {
+    /**
+     * @brief constructor
+     *
+     * @param size
+     * @param capacity
+     */
     RightSize(ObjectSizeFunctor size, SizeType capacity) :
         m_capacity(capacity), m_size(size) {}
 
+    /**
+     * @brief operator()
+     *
+     * @tparam ObjectsIter
+     * @param objIter
+     *
+     * @return
+     */
     template <typename ObjectsIter>
     bool operator()(ObjectsIter objIter) const {
         return m_size(*objIter) <= m_capacity;
@@ -52,6 +102,16 @@ private:
     ObjectSizeFunctor m_size;
 };
 
+/**
+ * @brief make for RightSize
+ *
+ * @tparam ObjectSizeFunctor
+ * @tparam SizeType
+ * @param size
+ * @param capacity
+ *
+ * @return
+ */
 template <typename ObjectSizeFunctor, typename SizeType>
 RightSize<ObjectSizeFunctor, SizeType>
 make_RightSize(ObjectSizeFunctor size, SizeType capacity) {
@@ -74,12 +134,31 @@ template <typename ObjectsIter,
     using FilteredSizesIterator =
              boost::filter_iterator<ObjectsIter,
                   RightSize<ObjectSizeFunctor, FunctorOnIteratorPValue<ObjectsIter, ObjectSizeFunctor>>>;
-}
+} //!detail
 
+/**
+ * @brief checks if element size is greater than zero
+ *
+ * @tparam ObjectSizeFunctor
+ */
 template <typename ObjectSizeFunctor>
 struct NotZeroSize {
+    /**
+     * @brief constructor
+     *
+     * @param size
+     */
     NotZeroSize(ObjectSizeFunctor size) :
         m_size(std::move(size)) {}
+
+    /**
+     * @brief operator()
+     *
+     * @tparam Object
+     * @param o
+     *
+     * @return
+     */
     template <typename Object>
     bool operator()(Object && o) const {
         typedef typename utils::PureResultOf<ObjectSizeFunctor(decltype(o))>::type SizeType;
@@ -90,6 +169,22 @@ private:
 };
 
 
+/**
+ * @brief upper bound is computed as biggest density times capacity +
+ *        values for all elements with size 0. It is correct upper bound for 0/1.
+ *        For unbounded case there will be no elements with size 0.
+ *
+ * @tparam ObjectsIter
+ * @tparam ObjectSizeFunctor
+ * @tparam ObjectValueFunctor
+ * @param oBegin
+ * @param oEnd
+ * @param capacity
+ * @param value
+ * @param size
+ *
+ * @return
+ */
 template <typename ObjectsIter,
            typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
@@ -101,8 +196,7 @@ template <typename ObjectsIter,
       typedef typename std::iterator_traits<ObjectsIter>::reference ObjectRef;
       auto density = make_Density(value, size);
 
-      //cannot use lambda because it is not copy assignable
-      //.also this filters are realy needed only in 0/1 case
+      //this filters are really needed only in 0/1 case
       //in not 0/1 case, there is a guarantee that sizes are not 0
       NotZeroSize<ObjectSizeFunctor> notZeroSize(size);
       auto zeroSize = utils::make_NotFunctor(notZeroSize);
@@ -118,6 +212,20 @@ template <typename ObjectsIter,
           std::accumulate(nb, ne, SizeType(), [=](SizeType s, ObjectRef o){return s + value(o);});
 }
 
+/**
+ * @brief for given range, this functions filter all elements that are larger than capacity
+ *
+ * @tparam ObjectsIter
+ * @tparam ObjectSizeFunctor
+ * @tparam ObjectValueFunctor
+ * @param oBegin
+ * @param oEnd
+ * @param capacity
+ * @param value
+ * @param size
+ *
+ * @return
+ */
 template <typename ObjectsIter,
            typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
@@ -132,14 +240,26 @@ std::pair<detail::FilteredSizesIterator<ObjectsIter, ObjectSizeFunctor>,
       return std::make_pair(begin, end);
 }
 
+/**
+ * @brief computes lower bound as  value of the most valuable element
+ *
+ * @tparam ObjectsIter
+ * @tparam ObjectSizeFunctor
+ * @tparam ObjectValueFunctor
+ * @param oBegin
+ * @param oEnd
+ * @param value
+ * @param size
+ *
+ * @return
+ */
 template <typename ObjectsIter,
            typename ObjectSizeFunctor,
            typename ObjectValueFunctor>
  detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
  getTrivalValueLowerBound(ObjectsIter oBegin, ObjectsIter oEnd,
   ObjectValueFunctor value, ObjectSizeFunctor size) {
-      auto density = make_Density(value, size);
-      return *std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(density));
+      return *std::max_element(oBegin, oEnd, utils::make_FunctorToComparator(value));
 }
 
 
@@ -225,8 +345,22 @@ using GetArithmeticSizeTag =
                                  ArithmeticSizeTag,
                                  NonArithmeticSizeTag>::type;
 
-}//detail
+}//!detail
 
+/**
+ * @brief computes multiplier for FPTAS, version for 0/1
+ *
+ * @tparam ObjectsIter
+ * @tparam Functor
+ * @param oBegin
+ * @param oEnd
+ * @param epsilon
+ * @param lowerBound
+ * @param Functor
+ * @param detail::ZeroOneTag
+ *
+ * @return
+ */
 template <typename ObjectsIter, typename Functor>
 boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
                      double epsilon, double lowerBound, Functor, detail::ZeroOneTag) {
@@ -240,6 +374,20 @@ boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
 
 
 //TODO this multiplier does not guarantee fptas
+/**
+ * @brief computes multiplier for FPTAS, unbounded version
+ *
+ * @tparam ObjectsIter
+ * @tparam Functor
+ * @param oBegin
+ * @param oEnd
+ * @param epsilon
+ * @param lowerBound
+ * @param f
+ * @param detail::NoZeroOneTag
+ *
+ * @return
+ */
 template <typename ObjectsIter, typename Functor>
 boost::optional<double> getMultiplier(ObjectsIter oBegin, ObjectsIter oEnd,
                      double epsilon, double lowerBound, Functor f, detail::NoZeroOneTag) {

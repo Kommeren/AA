@@ -13,8 +13,9 @@
 namespace paal {
 namespace data_structures {
 
+//TODO use boost:::iterator_fascade
 /**
- * @class VertexIterator
+ * @class VertexToEdgeIterator
  * @brief transforms collection to collection of pairs consecutive elements of the input collection.
  *      The last element and the first element are considered consecutive.
  *
@@ -32,13 +33,24 @@ public:
     typedef Edge *              pointer;
     typedef const Edge &        reference;
 
+    /**
+     * @brief constructor
+     *
+     * @param b
+     * @param e
+     */
     VertexToEdgeIterator(VertexIterator b, VertexIterator e) :
         m_idx(b), m_begin(b), m_end(e) {
             moveCurr();
         }
 
-    VertexToEdgeIterator()  {}
+    VertexToEdgeIterator()  = default;
 
+    /**
+     * @brief operator++ post increment
+     *
+     * @return
+     */
     VertexToEdgeIterator & operator++(){
         ++m_idx;
         moveCurr();
@@ -46,36 +58,62 @@ public:
         return *this;
     }
 
+    /**
+     * @brief operator++ pre increment
+     *
+     * @return
+     */
     VertexToEdgeIterator operator++(int){
         VertexToEdgeIterator i(*this);
         operator++();
         return i;
     }
 
+    /**
+     * @brief operator !=
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator!=(VertexToEdgeIterator ei) const {
         return !operator==(ei);
     }
 
+    /**
+     * @brief operator==
+     *
+     * @param ei
+     *
+     * @return
+     */
     bool operator==(VertexToEdgeIterator ei) const {
         return m_idx == ei.m_idx;
     }
 
+    /**
+     * @brief operator->
+     *
+     * @return
+     */
     const Edge * const operator->() const {
         return &m_curr;
     }
 
-    void operator=(VertexToEdgeIterator ei) {
-        m_idx = ei.m_idx;
-        m_begin = ei.m_begin;
-        m_curr = ei.m_curr;
-        m_end = ei.m_end;
-    }
 
+    /**
+     * @brief operator*
+     *
+     * @return
+     */
     const Edge & operator*() const {
         return m_curr;
     }
 
 private:
+    /**
+     * @brief moves iterators to next position
+     */
     void moveCurr() {
         if(m_idx != m_end) {
             m_curr.first = *m_idx;
@@ -95,12 +133,29 @@ private:
     Edge m_curr;
 };
 
+/**
+ * @brief make for VertexToEdgeIterator
+ *
+ * @tparam VertexIterator
+ * @param b
+ * @param e
+ *
+ * @return
+ */
 template <typename VertexIterator>
 VertexToEdgeIterator<VertexIterator>
 make_VertexToEdgeIterator(VertexIterator b, VertexIterator e) {
     return VertexToEdgeIterator<VertexIterator>(b,e);
 }
 
+/**
+ * @brief make for VertexToEdgeIterator form Vertex iterator pair
+ *
+ * @tparam VertexIterator
+ * @param r
+ *
+ * @return
+ */
 template <typename VertexIterator>
 VertexToEdgeIterator<VertexIterator>
 make_VertexToEdgeIterator(std::pair<VertexIterator, VertexIterator> r) {

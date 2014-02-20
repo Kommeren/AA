@@ -14,18 +14,26 @@
 namespace paal {
 namespace data_structures {
 
+    /**
+     * @brief solution for k median problem
+     *
+     * @tparam VoronoiType
+     */
 template <typename VoronoiType>
 class KMedianSolution :
     public data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> {
     typedef data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> base;
 public:
+    /**
+     * @brief constructor
+     *
+     * @param voronoi
+     * @param uf
+     * @param k
+     */
     KMedianSolution(VoronoiType voronoi,
                     typename base::UnchosenFacilitiesSet uf, int k) :
         base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(int(base::getChosenFacilities().size()) == k);}
-
-    KMedianSolution(const KMedianSolution & kmsol) : base(kmsol) {}
-
-    KMedianSolution(KMedianSolution && kmsol) : base(std::move(kmsol)) {}
 private:
     utils::ReturnZeroFunctor m_zeroFunc;
 
@@ -35,6 +43,11 @@ private:
 } //data_structures
 
 namespace data_structures {
+    /**
+     * @brief specialization of FacilityLocationSolutionTraits
+     *
+     * @tparam Voronoi
+     */
     template <typename Voronoi>
     class FacilityLocationSolutionTraits<data_structures::KMedianSolution< Voronoi>> {
         typedef VoronoiTraits<Voronoi> VT;
@@ -43,6 +56,7 @@ namespace data_structures {
         typedef typename VT::VertexType VertexType;
         typedef typename VT::DistanceType Dist;
         typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
+        ///unchosen facilities set type
         typedef puretype(std::declval<KMS>().getUnchosenFacilities()) UnchosenFacilitiesSet;
     };
 }

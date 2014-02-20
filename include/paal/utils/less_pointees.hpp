@@ -17,8 +17,10 @@ namespace paal {
  */
 template<class Comparator>
 struct less_pointees_t {
+    ///constructor
     less_pointees_t(Comparator compare) : m_compare(compare) {}
 
+    ///compare operator()
     template <typename OptionalPointee>
     bool operator() ( OptionalPointee const& x, OptionalPointee const& y ) const {
        return !y ? false : ( !x ? true : m_compare(*x, *y) ) ;

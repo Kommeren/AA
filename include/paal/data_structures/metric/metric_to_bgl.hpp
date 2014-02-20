@@ -18,6 +18,11 @@ namespace paal {
 namespace data_structures {
 //TODO it would be nice to adapt Matrix + something to bgl
 
+    /**
+     * @brief type of adjacency_matrix, for given metric
+     *
+     * @tparam Metric
+     */
 template <typename Metric>  struct AdjacencyMatrix {
     typedef data_structures::MetricTraits<Metric> MT;
     typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property,
@@ -25,8 +30,6 @@ template <typename Metric>  struct AdjacencyMatrix {
 };
 
 
- template <typename Metric, typename VertexIter>
- typename   AdjacencyMatrix<Metric>::type
  /**
   * @brief we assume that (vbegin, vend) is sequence of values  (0, vend - vbegin).
   *
@@ -34,6 +37,8 @@ template <typename Metric>  struct AdjacencyMatrix {
   * @param vbegin
   * @param vend
   */
+template <typename Metric, typename VertexIter>
+typename   AdjacencyMatrix<Metric>::type
 metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     typedef typename AdjacencyMatrix<Metric>::type Graph;
     const unsigned N = std::distance(vbegin, vend);
@@ -54,6 +59,18 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
     return g;
 }
 
+/**
+ * @brief  produces graph from metric with index
+ *
+ * @tparam Metric
+ * @tparam VertexIter
+ * @param m
+ * @param vbegin
+ * @param vend
+ * @param idx
+ *
+ * @return
+ */
 template <typename Metric, typename VertexIter>
  typename   AdjacencyMatrix<Metric>::type
 metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
@@ -68,5 +85,5 @@ metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
                                   boost::make_transform_iterator(vend, trans));
 }
 
-} //data_structures
-} //paal
+} //!data_structures
+} //!paal

@@ -14,6 +14,18 @@
 namespace paal {
 namespace simple_algo {
 
+    /**
+     * @brief returns cost for capacitated facility location
+     *
+     * @tparam Metric
+     * @tparam FCosts
+     * @tparam FLSolution
+     * @param m
+     * @param fcosts
+     * @param fls
+     *
+     * @return
+     */
     template <typename Metric, typename FCosts, typename FLSolution>
        typename data_structures::MetricTraits<Metric>::DistanceType
 getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
@@ -34,6 +46,18 @@ getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     return d;
 }
 
+/**
+ * @brief return cost for facility location
+ *
+ * @tparam Metric
+ * @tparam FCosts
+ * @tparam FLSolution
+ * @param m
+ * @param fcosts
+ * @param fls
+ *
+ * @return
+ */
 template <typename Metric, typename FCosts, typename FLSolution>
        typename data_structures::MetricTraits<Metric>::DistanceType
 getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
@@ -54,6 +78,16 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
     return d;
 }
 
+/**
+ * @brief returns cost for k-median
+ *
+ * @tparam Metric
+ * @tparam FLSolution
+ * @param m
+ * @param fls
+ *
+ * @return
+ */
 template <typename Metric, typename FLSolution>
         typename data_structures::MetricTraits<Metric>::DistanceType
 getKMCost(const Metric & m, const FLSolution & fls){

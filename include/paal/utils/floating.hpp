@@ -1,7 +1,7 @@
 /**
  * @file floating.hpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Wygocki
  * @version 1.0
  * @date 2013-09-01
  */
@@ -33,29 +33,67 @@ static InputIterator randomSelect(InputIterator iBegin, InputIterator iEnd) {
 }
 
 
-//Class for comparing floating point
+///Class for comparing floating point
 template <typename T>
 class Compare {
 public:
+    ///constructor
     Compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
 
+    /**
+     * @brief equals
+     *
+     * @param a
+     * @param b
+     *
+     * @return
+     */
     bool e(T a, T b) const {
         return std::abs(a - b) < m_epsilon;
         //return abs(a -b ) < m_epsilon; //this line breaks generalised_assignment_long_test TODO investigate
     }
 
+    /**
+     * @brief greater
+     *
+     * @param a
+     * @param b
+     *
+     * @return
+     */
     bool g(T a, T b) const {
         return a > b + m_epsilon;
     }
 
+    /**
+     * @brief greater equals
+     *
+     * @param a
+     * @param b
+     *
+     * @return
+     */
     bool ge(T a, T b) const {
         return a >= b - m_epsilon;
     }
 
+    /**
+     * @brief less equals
+     *
+     * @param a
+     * @param b
+     *
+     * @return
+     */
     bool le(T a, T b) const {
         return a <= b + m_epsilon;
     }
 
+    /**
+     * @brief getEpsilon used in comparison
+     *
+     * @return
+     */
     double getEpsilon() const {
         return m_epsilon;
     }

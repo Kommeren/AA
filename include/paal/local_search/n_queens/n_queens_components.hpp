@@ -34,11 +34,12 @@ struct NQueensCommit {
  */
 struct NQueensGetMoves {
     /**
-     * @brief operator returns all the elements
+     * @brief operator() returns all the elements
      *
      * @tparam Solution
      * @tparam Idx
      * @param solution
+     * @param idx
      *
      * @return
      */

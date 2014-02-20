@@ -25,11 +25,26 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
+    /**
+     * @brief Add move type
+     */
 struct Add {};
 
+/**
+ * @brief commit functor for add moves in facility location problem
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationCommitAdd {
 public:
+    /**
+     * @brief operator ()
+     *
+     * @tparam Solution
+     * @param s
+     * @param se
+     */
     template <typename Solution>
     void operator()(
             Solution & s,
@@ -41,15 +56,31 @@ public:
 };
 
 
+/**
+ * @brief gain functor for add moves in facility location problem
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationGetMovesAdd {
     typedef std::vector<Add> Moves;
     typedef typename Moves::iterator Iter;
 
 public:
+    /**
+     * @brief constructor
+     */
     FacilityLocationGetMovesAdd() : m_add(1) {}
     typedef Facility<VertexType> Fac;
 
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param el
+     *
+     * @return
+     */
     template <typename Solution>
         std::pair<Iter, Iter>
     operator()(const Solution &, Fac & el) {
@@ -64,9 +95,23 @@ private:
 };
 
 
+/**
+ * @brief gain functor for add moves in facility location problem
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
-class FacilityLocationCheckerAdd {
+class FacilityLocationGainAdd {
 public:
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param s
+     * @param se
+     *
+     * @return
+     */
         template <class Solution>
     auto operator()(Solution & s,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement

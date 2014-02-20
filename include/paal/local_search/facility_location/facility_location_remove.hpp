@@ -25,11 +25,28 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
+    /**
+     * @brief Remove move type
+     */
 struct Remove {};
 
+/**
+ * @brief gain functor for facility location
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
-class FacilityLocationCheckerRemove {
+class FacilityLocationGainRemove {
 public:
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param s
+     * @param se
+     *
+     * @return
+     */
         template <class Solution>
     auto operator()(Solution & s,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
@@ -46,9 +63,21 @@ public:
     }
 };
 
+/**
+ * @brief commit functor for facility location
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationCommitRemove {
 public:
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param s
+     * @param se
+     */
         template <typename Solution>
     void operator()(
             Solution & s,
@@ -58,6 +87,11 @@ public:
     }
 };
 
+/**
+ * @brief get moves functor for facility location remove
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 class FacilityLocationGetMovesRemove {
     typedef std::vector<Remove> Moves;
@@ -65,8 +99,19 @@ class FacilityLocationGetMovesRemove {
 
 public:
 
+    /**
+     * @brief constructor
+     */
     FacilityLocationGetMovesRemove() : m_remove(1) {}
 
+    /**
+     * @brief operator()
+     *
+     * @tparam Solution
+     * @param el
+     *
+     * @return
+     */
     template <typename Solution>
         typename std::pair<Iter, Iter>
     operator()(const Solution &,

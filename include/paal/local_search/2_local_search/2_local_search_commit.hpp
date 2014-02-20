@@ -27,7 +27,7 @@ struct TwoLocalSearchCommit  {
      */
     template <typename SolutionElement, typename Solution>
     void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
-        s.getWrap().flip(se.second, ae.first);
+        s.getCycle().flip(se.second, ae.first);
     }
 };
 

@@ -49,10 +49,6 @@ namespace lp {
         explicit ColId(int id) : Id(id) {}
     };
 
-    inline ColId make_ColId(int col) {
-        return ColId(col);
-    }
-
     /**
      * LP row identifier class.
      */
@@ -61,10 +57,6 @@ namespace lp {
         /// Constructor.
         explicit RowId(int id) : Id(id) {}
     };
-
-    inline RowId make_RowId(int row) {
-        return RowId(row);
-    }
 
 } // lp
 } // paal

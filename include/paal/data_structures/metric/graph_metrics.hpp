@@ -23,26 +23,51 @@ namespace graph_type {
     class Large;
 }
 
+/**
+ * @brief traits for graph metric
+ *
+ * @tparam Graph
+ */
 template <typename Graph> struct GraphMetricTraits {
     typedef graph_type::Sparse GraphTypeTag;
 };
 
 
-//impplementation of different startegies of computing metric
+///implementation of different strategies of computing metric
 namespace metric_fillers {
 
-    //generic
+    ///generic
     template <typename GraphTypeTag> struct GraphMetricFillerImpl;
 
+    /**
+     * @brief specialization for Sparse graphs
+     */
     template <> struct GraphMetricFillerImpl<graph_type::Sparse> {
+        /**
+         * @brief fillMatrix function
+         *
+         * @tparam Graph
+         * @tparam ResultMatrix
+         * @param g
+         * @param rm
+         */
         template <typename Graph, typename ResultMatrix>
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
             boost::johnson_all_pairs_shortest_paths(g, rm);
         }
     };
 
+    /**
+     * @brief specialization for Dense graphs
+     */
     template <> struct GraphMetricFillerImpl<graph_type::Dense> {
         template <typename Graph, typename ResultMatrix>
+            /**
+             * @brief fillMatrixFunction
+             *
+             * @param g
+             * @param rm
+             */
         void fillMatrix(const Graph & g, ResultMatrix & rm)  {
             boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
         }
@@ -67,6 +92,11 @@ struct  GraphMetric : public ArrayMetric<DistanceType>,
       typedef   ArrayMetric<DistanceType> GMBase;
       typedef metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> GMFBase;
 
+      /**
+       * @brief constructor
+       *
+       * @param g
+       */
     GraphMetric(const Graph & g)
         : GMBase(num_vertices(g)) {
             GMFBase::fillMatrix(g, GMBase::m_matrix);
@@ -74,14 +104,19 @@ struct  GraphMetric : public ArrayMetric<DistanceType>,
 };
 
 
-//Specialization for large graphs
 //TODO implement
+///Specialization for large graphs
 template <typename Graph, typename DistanceType>
 struct  GraphMetric<Graph, DistanceType, graph_type::Large> {
+    /**
+     * @brief constructor
+     *
+     * @param g
+     */
     GraphMetric(const Graph & g) { assert(false);}
 };
 
-//Specialization for adjacency_list
+///Specialization for adjacency_list
 template <typename OutEdgeList,
           typename VertexList,
           typename Directed,
@@ -100,7 +135,7 @@ struct GraphMetricTraits<boost::adjacency_list<
                                typedef graph_type::Sparse GraphTypeTag;
 };
 
-//Specialization for adjacency_matrix
+///Specialization for adjacency_matrix
 template <typename Directed,
           typename VertexProperty,
           typename EdgeProperty,
@@ -116,7 +151,7 @@ struct GraphMetricTraits<boost::adjacency_matrix<
 };
 
 
-} //data_structures
-} //paal
+} //!data_structures
+} //!paal
 
 #endif //GRAPH_METRICS_HPP

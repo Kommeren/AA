@@ -191,6 +191,7 @@ public:
         return m_irComponents;
     }
 
+    ///type of functor returning final values for variables
     typedef decltype(std::bind(&IterativeRounding::getVal, std::declval<const IterativeRounding *>(), std::placeholders::_1)) GetSolution;
 
     /**

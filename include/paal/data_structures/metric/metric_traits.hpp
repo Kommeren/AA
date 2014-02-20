@@ -14,12 +14,27 @@
 namespace paal {
 namespace data_structures {
 
-template <typename Metric>
-struct MetricTraits {
+    /**
+     * @brief base for metric traits
+     *
+     * @tparam Metric
+     * @tparam _VertexType
+     */
+template <typename Metric, typename _VertexType>
+struct _MetricTraits {
     typedef int VertexType;
+    ///Distance type
     typedef puretype(std::declval<Metric>()
              (std::declval<VertexType>(), std::declval<VertexType>())) DistanceType;
 };
+
+/**
+ * @brief metric traits
+ *
+ * @tparam Metric
+ */
+template <typename Metric>
+struct MetricTraits : public _MetricTraits<Metric, int> {};
 
 }
 }

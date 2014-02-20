@@ -87,7 +87,7 @@ class Voronoi {
                 m_metric(v.m_metric), m_costOfNoGenerator(v.m_costOfNoGenerator) {
         }
 
-        // returns diff between new cost and old cost
+        /// returns diff between new cost and old cost
         Dist addGenerator(VertexType f) {
             Dist cost = Dist();
             m_generators.insert(f);
@@ -116,7 +116,7 @@ class Voronoi {
             return cost;
         }
 
-        // returns diff between new cost and old cost
+        /// returns diff between new cost and old cost
         Dist remGenerator(VertexType f) {
             Dist cost = Dist();
             if(m_generators.size() == 1) {
@@ -143,14 +143,29 @@ class Voronoi {
             return cost;
         }
 
+        /**
+         * @brief getter for generators
+         *
+         * @return
+         */
         const GeneratorsSet & getGenerators() const {
             return m_generators;
         }
 
+        /**
+         * @brief getter for vertices
+         *
+         * @return
+         */
         const Vertices & getVertices() const {
             return m_vertices;
         }
 
+        /**
+         * @brief getter for vertices assigned to specific generator
+         *
+         * @param g
+         */
             decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() | boost::adaptors::map_values)
         getVerticesForGenerator(VertexType g) const {
             return m_generatorsToVertices.equal_range(g) | boost::adaptors::map_values;
@@ -158,10 +173,27 @@ class Voronoi {
 
     private:
 
+            /**
+             * @brief distance of vertex to closest generator
+             *
+             * @param v
+             *
+             * @return
+             */
         Dist dist(VertexType v) {
             return m_metric(v, vertexToGenerators(v));
         }
 
+        /**
+         * @brief find new generator for vertex
+         *             only generators satisfying filer condition are considered
+         *
+         * @tparam Filter
+         * @param v
+         * @param filter
+         *
+         * @return
+         */
         template <typename Filter = utils::ReturnTrueFunctor>
         Dist adjustVertex(VertexType v, Filter filter = Filter()) {
             bool init = true;
@@ -182,6 +214,13 @@ class Voronoi {
             return d;
         }
 
+        /**
+         * @brief get generator for given vertex
+         *
+         * @param v
+         *
+         * @return
+         */
         VertexType vertexToGenerators(VertexType v) const {
             auto i = m_verticesToGenerators.find(v);
             assert(i != m_verticesToGenerators.end());
@@ -189,6 +228,12 @@ class Voronoi {
         }
 
 
+        /**
+         * @brief assign vertex to generator
+         *
+         * @param v
+         * @param f
+         */
         void assign(VertexType v, VertexType f) {
             auto prev = m_verticesToGenerators.at(v);
             m_generatorsToVertices.erase(prev);
@@ -208,6 +253,11 @@ class Voronoi {
         const Dist m_costOfNoGenerator;
 };
 
+/**
+ * @brief specialization of VoronoiTraits
+ *
+ * @tparam Metric
+ */
 template <typename Metric>
 struct VoronoiTraits<Voronoi<Metric>> :
     public  _VoronoiTraits<Voronoi<Metric>, typename MetricTraits<Metric>::VertexType> {

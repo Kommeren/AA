@@ -19,7 +19,19 @@ namespace paal {
 namespace simple_algo {
 
 
-template <typename Metric, typename Cycle> typename Metric::DistanceType getLength(const Metric & m, const Cycle & cm) {
+/**
+  * @brief computes length of the cycle
+  *
+  * @tparam Metric
+  * @tparam Cycle
+  * @param m
+  * @param cm
+  *
+  * @return
+  */
+template <typename Metric, typename Cycle> typename Metric::DistanceType
+    getLength(const Metric & m, const Cycle & cm)
+{
     typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
     typedef typename Metric::DistanceType Dist;
 
@@ -32,8 +44,10 @@ template <typename Metric, typename Cycle> typename Metric::DistanceType getLeng
             );
 }
 
-
-template <typename Cycle, typename Stream> void print(const Cycle & cm, Stream & o, const  std::string & endl = "\n") {
+///pints cycle to std out
+template <typename Cycle, typename Stream>
+void print(const Cycle & cm, Stream & o, const  std::string & endl = "\n")
+{
     auto ebegin = data_structures::make_VertexToEdgeIterator(cm.vbegin(), cm.vend());
     auto eend = data_structures::make_VertexToEdgeIterator(cm.vend(), cm.vend());
     typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;

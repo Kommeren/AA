@@ -10,6 +10,7 @@
 
 namespace paal {
 namespace lp {
+///lp problem type
 enum ProblemType {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
 }
 }

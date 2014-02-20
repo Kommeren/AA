@@ -19,7 +19,7 @@ namespace local_search {
 namespace facility_location {
 
 /**
- * @class DefaultFLComponents
+ * @class DefaultRemoveFLComponents
  * @brief Model of MultiSearchComponents with default multi search components for facility location.
  *
  * @tparam VertexType
@@ -28,28 +28,38 @@ template <typename VertexType>
 struct DefaultRemoveFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesRemove<VertexType>,
-                FacilityLocationCheckerRemove        <VertexType>,
+                FacilityLocationGainRemove        <VertexType>,
                 FacilityLocationCommitRemove        <VertexType>> type;
 };
 
+/**
+ * @brief add components for facility location
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 struct DefaultAddFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesAdd<VertexType>,
-                FacilityLocationCheckerAdd        <VertexType>,
+                FacilityLocationGainAdd        <VertexType>,
                 FacilityLocationCommitAdd        <VertexType>> type;
 };
 
+/**
+ * @brief Swap components for facility location
+ *
+ * @tparam VertexType
+ */
 template <typename VertexType>
 struct DefaultSwapFLComponents {
     typedef MultiSearchComponents<
                 FacilityLocationGetMovesSwap<VertexType>,
-                FacilityLocationCheckerSwap        <VertexType>,
+                FacilityLocationGainSwap        <VertexType>,
                 FacilityLocationCommitSwap        <VertexType>> type;
 };
 
 /**
- * @class FacilityLocationLocalSearchStep
+ * @function facility_location_local_search
  * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search_page.<br>
  * The Move is facility_location::Move. <br>
  * The Solution is adapted data_structures::FacilityLocationSolution. <br>
@@ -84,6 +94,17 @@ bool facility_location_local_search(
     return local_search_multi_solution(flsa, std::move(psa), std::move(gsc), std::move(components)...);
 }
 
+/**
+ * @brief simple version of local search for facility location
+ *
+ * @tparam SearchStrategy
+ * @tparam FacilityLocationSolution
+ * @tparam Components
+ * @param fls
+ * @param components
+ *
+ * @return
+ */
 template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
           typename FacilityLocationSolution,
           typename... Components>

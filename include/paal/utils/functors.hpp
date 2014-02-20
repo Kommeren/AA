@@ -107,6 +107,14 @@ make_DynamicReturnSomethingFunctor(T t) {
  * @brief functor returns its argument
  */
 struct IdentityFunctor {
+    /**
+     * @brief operator()
+     *
+     * @tparam Arg
+     * @param arg
+     *
+     * @return
+     */
     template <typename Arg>
         auto  operator()(Arg&& arg) const ->
         Arg
@@ -147,6 +155,12 @@ struct ReturnOneFunctor :
  * @brief functors calls assert(false).
  */
 struct AssertFunctor {
+    /**
+     * @brief operator()
+     *
+     * @tparam Args
+     * @param args
+     */
     template <typename ... Args >
         void  operator()(Args&&... args) const {
             assert(false);
@@ -157,6 +171,14 @@ struct AssertFunctor {
  * @brief removes reference
  */
 struct RemoveReference {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param t
+     *
+     * @return
+     */
     template <typename T>
     T operator()(const T & t) const {
         return t;
@@ -233,6 +255,7 @@ template <typename Array>
             ArrayToFunctor(const Array & array, int offset = 0) :
                 m_array(&array), m_offset(offset) {}
 
+            ///Value type
             typedef decltype(std::declval<const Array>()[0]) Value;
 
             /**
@@ -331,8 +354,21 @@ make_AssignableFunctor(Functor& f) {
  */
 template <typename Functor>
 struct LiftIteratorFunctor {
+    /**
+     * @brief constructor
+     *
+     * @param f
+     */
    LiftIteratorFunctor(Functor f) : m_f(std::move(f)) {}
 
+   /**
+    * @brief operator()
+    *
+    * @tparam Iterator
+    * @param iter
+    *
+    * @return
+    */
    template <typename Iterator>
    auto operator()(Iterator iter) const -> decltype(std::declval<Functor>()(*iter)) {
       return m_f(*iter);
@@ -362,6 +398,15 @@ make_LiftIteratorFunctor(Functor f) {
  * @brief Greater functor
  */
 struct Greater {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x > y) {
@@ -373,6 +418,15 @@ struct Greater {
  * @brief Less functor
  */
 struct Less {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x < y){
@@ -384,6 +438,15 @@ struct Less {
  * @brief GreaterEqual functor
  */
 struct GreaterEqual {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x >= y){
@@ -395,6 +458,15 @@ struct GreaterEqual {
  * @brief LessEqual functor
  */
 struct LessEqual {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x <= y){
@@ -406,6 +478,15 @@ struct LessEqual {
  * @brief EqualTo functor
  */
 struct EqualTo {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x == y){
@@ -417,6 +498,15 @@ struct EqualTo {
  * @brief NotEqualTo functor
  */
 struct NotEqualTo {
+    /**
+     * @brief operator
+     *
+     * @tparam T
+     * @param x
+     * @param y
+     *
+     * @return
+     */
     template<class T>
         auto operator() (const T& x, const T& y) const ->
             decltype(x != y){
@@ -425,13 +515,28 @@ struct NotEqualTo {
 };
 
 
-//This comparator  takes functor "f" and comparator "c"
-//and for elements(x,y) returns c(f(x), f(y))
-//c is Less by default
+///This comparator  takes functor "f" and comparator "c"
+///and for elements(x,y) returns c(f(x), f(y))
+///c is Less by default
 template <typename Functor,typename Compare=Less>
     struct FunctorToComparator {
+        /**
+         * @brief constructor
+         *
+         * @param f
+         * @param c
+         */
         FunctorToComparator(Functor f,Compare c=Compare()) : m_f(f),m_c(c){}
 
+        /**
+         * @brief operator()
+         *
+         * @tparam T
+         * @param left
+         * @param right
+         *
+         * @return
+         */
         template <typename T>
             auto operator()(const T & left, const T & right) const ->
                 decltype(std::declval<Compare>()(
@@ -447,19 +552,43 @@ template <typename Functor,typename Compare=Less>
     };
 
 
+/**
+ * @brief make for functor to comparator
+ *
+ * @tparam Functor
+ * @tparam Compare
+ * @param functor
+ * @param compare
+ *
+ * @return
+ */
 template <typename Functor,typename Compare = Less>
     FunctorToComparator<Functor,Compare>
     make_FunctorToComparator(Functor functor,Compare compare=Compare()) {
         return FunctorToComparator<Functor,Compare>(std::move(functor), std::move(compare));
     };
 
-//Functor that scales another functor
+///Functor that scales another functor
 template <typename Functor, typename ScaleType, typename ReturnType = ScaleType>
 struct ScaleFunctor {
 
+    /**
+     * @brief constructor
+     *
+     * @param f
+     * @param s
+     */
     ScaleFunctor(Functor f, ScaleType s) :
         m_f(std::move(f)), m_s(s) {}
 
+    /**
+     * @brief operator()
+     *
+     * @tparam Arg
+     * @param arg
+     *
+     * @return
+     */
     template <typename Arg>
     ReturnType operator()(Arg && arg) const {
         return m_s * m_f(std::forward<Arg>(arg));
@@ -470,6 +599,17 @@ private:
     ScaleType m_s;
 };
 
+/**
+ * @brief make for ScaleFunctor
+ *
+ * @tparam ScaleType
+ * @tparam ReturnType
+ * @tparam Functor
+ * @param f
+ * @param s
+ *
+ * @return
+ */
 template <typename ScaleType, typename ReturnType = ScaleType, typename Functor>
 ScaleFunctor<Functor, ScaleType, ReturnType>
 make_ScaleFunctor(Functor f, ScaleType s) {
@@ -479,14 +619,33 @@ make_ScaleFunctor(Functor f, ScaleType s) {
 //****************************** This is set of functors representing standard boolean operation
 //that is !, &&, ||. These are equivalent to standard std:: structs but are not templated
 //(only operator() is templated)
+
+///Not
 struct Not {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     *
+     * @return
+     */
     template <typename T>
     auto operator()(const T & b ) const -> decltype(!b) {
         return !b;
     }
 };
 
+///Or
 struct Or {
+    /**
+     * @brief operator
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     *
+     * @return
+     */
     template <typename T>
     auto operator()(const T & left, const T & right) const ->
     decltype(left || right) {
@@ -494,7 +653,17 @@ struct Or {
     }
 };
 
+///And
 struct And {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     *
+     * @return
+     */
     template <typename T>
     auto operator()(const T & left, const T & right) const ->
         decltype(left && right){
@@ -503,16 +672,30 @@ struct And {
 };
 
 
-//Functor stores binary operator "o" and two functors "f" and "g"
-//for given "args" returns o(f(args), g(args))
+///Functor stores binary operator "o" and two functors "f" and "g"
+///for given "args" returns o(f(args), g(args))
 template <typename FunctorLeft, typename FunctorRight, typename Operator>
     struct LiftBinaryOperatorFunctor {
+        /**
+         * @brief constructor
+         *
+         * @param left
+         * @param right
+         * @param op
+         */
         LiftBinaryOperatorFunctor(FunctorLeft left = FunctorLeft(),
                                   FunctorRight right = FunctorRight(),
                                   Operator op = Operator()) :
             m_left(std::move(left)), m_right(std::move(right)),
             m_operator(std::move(op)) {}
 
+        /**
+         * @brief operator
+         *
+         * @tparam Args
+         *
+         * @return
+         */
         template <typename ... Args>
             auto  operator()(Args&&... args) const ->
                 decltype(std::declval<Operator>()(
@@ -529,6 +712,18 @@ template <typename FunctorLeft, typename FunctorRight, typename Operator>
         Operator m_operator;
     };
 
+/**
+ * @brief make function for LiftBinaryOperatorFunctor
+ *
+ * @tparam FunctorLeft
+ * @tparam FunctorRight
+ * @tparam Operator
+ * @param left
+ * @param right
+ * @param op
+ *
+ * @return
+ */
 template <typename FunctorLeft, typename FunctorRight, typename Operator>
     LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, Operator>
     make_LiftBinaryOperatorFunctor(
@@ -544,12 +739,24 @@ template <typename FunctorLeft, typename FunctorRight, typename Operator>
 //standard logical operators
 
 
-//Not
+///NotFunctor
 template <typename Functor>
     struct NotFunctor {
+        /**
+         * @brief constructor
+         *
+         * @param functor
+         */
         NotFunctor(Functor functor= Functor()) :
             m_functor(functor) {}
 
+        /**
+         * @brief operator()
+         *
+         * @tparam Args
+         *
+         * @return
+         */
         template <typename ... Args>
             auto operator()(Args&&... args) const ->
                 decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
@@ -560,7 +767,7 @@ template <typename Functor>
         Functor m_functor;
     };
 
-
+///make for Not
 template <typename Functor>
     NotFunctor<Functor>
     make_NotFunctor(Functor functor) {
@@ -568,25 +775,32 @@ template <typename Functor>
     }
 
 
-//Or
+///OrFunctor
 template <typename FunctorLeft, typename FunctorRight>
     class OrFunctor :
             public LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, Or> {
         typedef LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, Or> base;
 
     public:
+        /**
+         * @brief constructor
+         *
+         * @param left
+         * @param right
+         */
         OrFunctor(FunctorLeft left = FunctorLeft(),
                   FunctorRight right = FunctorRight()) :
             base(std::move(left), std::move(right)) {}
     };
 
+///make for OrFunctor
 template <typename FunctorLeft, typename FunctorRight>
     OrFunctor<FunctorLeft, FunctorRight>
     make_OrFunctor(FunctorLeft left, FunctorRight right) {
         return OrFunctor<FunctorLeft, FunctorRight>(std::move(left), std::move(right));
     }
 
-//And
+///AndFunctor
 template <typename FunctorLeft, typename FunctorRight>
     class AndFunctor :
             public LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, And> {
@@ -594,28 +808,42 @@ template <typename FunctorLeft, typename FunctorRight>
 
     public:
 
+        /**
+         * @brief constructor
+         *
+         * @param left
+         * @param right
+         */
         AndFunctor(FunctorLeft left = FunctorLeft(), FunctorRight right = FunctorRight()) :
             base(std::move(left), std::move(right)) {}
     };
 
-//Xor
+///make AndFunctor
 template <typename FunctorLeft, typename FunctorRight>
     AndFunctor<FunctorLeft, FunctorRight>
     make_AndFunctor(FunctorLeft left, FunctorRight right) {
         return AndFunctor<FunctorLeft, FunctorRight>(std::move(left), std::move(right));
     }
 
+///XorFunctor
 template <typename FunctorLeft, typename FunctorRight>
     class XorFunctor :
             public LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, NotEqualTo> {
         typedef LiftBinaryOperatorFunctor<FunctorLeft, FunctorRight, NotEqualTo> base;
 
     public:
+        /**
+         * @brief constructor
+         *
+         * @param left
+         * @param right
+         */
         XorFunctor(FunctorLeft left = FunctorLeft(), FunctorRight right = FunctorRight()) :
             base(std::move(left), std::move(right)) {}
 
     };
 
+///make for Xor
 template <typename FunctorLeft, typename FunctorRight>
     XorFunctor<FunctorLeft, FunctorRight>
     make_XorFunctor(FunctorLeft left, FunctorRight right) {

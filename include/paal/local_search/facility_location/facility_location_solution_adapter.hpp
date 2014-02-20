@@ -29,6 +29,12 @@ namespace local_search {
 namespace facility_location {
 
 
+    /**
+     * @brief FacilityLocationSolution adapter
+     *          chosen range and unchosen range must be joined into one homogenus collection of Facilities.
+     *
+     * @tparam FacilityLocationSolution
+     */
 template <typename FacilityLocationSolution>
 class FacilityLocationSolutionAdapter {
     typedef FacilityLocationSolution FLS;
@@ -39,12 +45,19 @@ public:
     typedef typename Facilities::iterator FacIter;
     typedef data_structures::CollectionStartsFromLastChange<FacIter, FacilityHash> CycledFacilities;
     typedef typename CycledFacilities::ResultIterator ResultIterator;
+    ///type of Chosen collection
     typedef decltype(std::declval<FLS>().getChosenFacilities()) Chosen;
+    ///type of Unchosen collection
     typedef decltype(std::declval<FLS>().getUnchosenFacilities()) Unchosen;
     typedef typename data_structures::FacilityLocationSolutionTraits<FLS>::Dist Dist;
     typedef std::unordered_set<VertexType> UnchosenCopy;
 public:
 
+    /**
+     * @brief constructor creates cycled range of all facilities
+     *
+     * @param sol
+     */
     FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) :
             m_sol(sol),
             m_unchosenCopy(m_sol.getUnchosenFacilities().begin(),
@@ -71,10 +84,24 @@ public:
         m_cycledFacilities = CycledFacilities(m_facilities.begin(), m_facilities.end());
     }
 
+    /**
+     * @brief adds facility tentatively (used in gain computation).
+     *
+     * @param v
+     *
+     * @return
+     */
     Dist addFacilityTentative(VertexType v) {
         return m_sol.addFacility(v);
     }
 
+    /**
+     * @brief adds facility
+     *
+     * @param se
+     *
+     * @return
+     */
     Dist addFacility(Fac & se) {
         auto ret = addFacilityTentative(se.getElem());
         assert(se.getIsChosen() == UNCHOSEN);
@@ -84,10 +111,24 @@ public:
         return ret;
     }
 
+    /**
+     * @brief ads facility tentatively (used in gain computation)
+     *
+     * @param v
+     *
+     * @return
+     */
     Dist removeFacilityTentative(VertexType v) {
         return m_sol.remFacility(v);
     }
 
+    /**
+     * @brief removes facility
+     *
+     * @param se
+     *
+     * @return
+     */
     Dist removeFacility(Fac & se) {
         auto ret = removeFacilityTentative(se.getElem());
         assert(se.getIsChosen() == CHOSEN);
@@ -97,6 +138,13 @@ public:
         return ret;
     }
 
+    /**
+     * @brief get facility at vertex
+     *
+     * @param v
+     *
+     * @return
+     */
     Fac & getFacility(VertexType v) {
         auto i = m_vertexToFac.find(v);
         assert(i != m_vertexToFac.end());
@@ -104,22 +152,47 @@ public:
     }
 
 
+    /**
+     * @brief begin of the facilities range
+     *
+     * @return
+     */
     ResultIterator begin() {
         return m_cycledFacilities.begin();
     }
 
+    /**
+     * @brief end of the facilities range
+     *
+     * @return
+     */
     ResultIterator end() {
         return m_cycledFacilities.end();
     }
 
+    /**
+     * @brief get solution
+     *
+     * @return
+     */
     FacilityLocationSolution & get() {
         return m_sol;
     }
 
+    /**
+     * @brief gets solution
+     *
+     * @return
+     */
     const FacilityLocationSolution & get() const {
         return m_sol;
     }
 
+    /**
+     * @brief gets
+     *
+     * @return
+     */
     const UnchosenCopy & getUnchosenCopy() const {
         return m_unchosenCopy;
     }

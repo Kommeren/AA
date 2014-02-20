@@ -17,6 +17,7 @@ namespace utils {
 //template <typename Idx, typename... Args>
 //On gcc 4.6 I get sorry unimplemented ... !!!
 
+/// contracts to vertices in adjacency_matrix
 template <typename Directed,
           typename VertexProperty,
           typename EdgeProperty,

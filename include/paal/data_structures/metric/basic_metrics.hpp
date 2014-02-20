@@ -16,35 +16,69 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @class AssymetricArrayMetric
+ * @class RectangleArrayMetric
  * @brief \ref metric implementation on 2 dimensional array
+ *        distance calls on this metric are valid opnly when x < N and y  < M
+ *        (N and M given in the constructor)
+ *        when we know that only certain calls occurs it might be worthwhile to use this metric
  *
  * @tparam DistanceTypeParam
  */
 template <typename DistanceTypeParam>
-class AssymetricArrayMetric {
+class RectangleArrayMetric {
     public:
         typedef DistanceTypeParam DistanceType;
         typedef int VertexType;
-        AssymetricArrayMetric(int N = 0, int M = 0) : m_matrix(boost::extents[N][M]) { }
+        /**
+         * @brief constructor
+         *
+         * @param N
+         * @param M
+         */
+        RectangleArrayMetric(int N = 0, int M = 0) : m_matrix(boost::extents[N][M]) { }
 
+        /**
+         * @brief operator(), valid only when v < N and w < M
+         *
+         * @param v
+         * @param w
+         *
+         * @return
+         */
         DistanceType operator()(const VertexType & v, const VertexType & w) const {
             return m_matrix[v][w];
         }
 
+        /**
+         * @brief operator(), valid only when v < N and w < M, nonconst version
+         *
+         * @param v
+         * @param w
+         *
+         * @return
+         */
         DistanceType & operator()(const VertexType & v, const VertexType & w) {
             return m_matrix[v][w];
         }
 
-        int size() const {
-            return m_matrix.size();
-        }
 
+        /**
+         * @brief constructor from another metric
+         *
+         * @tparam OtherMetrics
+         * @tparam XIterator
+         * @tparam YIterator
+         * @param other
+         * @param xBegin
+         * @param xEnd
+         * @param yBegin
+         * @param yEnd
+         */
         template <typename OtherMetrics, typename XIterator, typename YIterator>
-        AssymetricArrayMetric(const OtherMetrics& other,
+        RectangleArrayMetric(const OtherMetrics& other,
                    XIterator xBegin, XIterator xEnd,
                    YIterator yBegin, YIterator yEnd) :
-                        AssymetricArrayMetric(std::distance(xBegin, xEnd),
+                        RectangleArrayMetric(std::distance(xBegin, xEnd),
                                               std::distance(yBegin, yEnd)) {
             int i = 0;
             for (auto v: boost::make_iterator_range(xBegin, xEnd)) {
@@ -57,7 +91,14 @@ class AssymetricArrayMetric {
             }
         }
 
-        AssymetricArrayMetric & operator=(const AssymetricArrayMetric & am) {
+        /**
+         * @brief operator=
+         *
+         * @param am
+         *
+         * @return
+         */
+        RectangleArrayMetric & operator=(const RectangleArrayMetric & am) {
             auto shape = am.m_matrix.shape();
             std::vector<std::size_t> dim(shape, shape + DIM_NR);
             m_matrix.resize(dim);
@@ -66,17 +107,50 @@ class AssymetricArrayMetric {
         }
 
     protected:
+        /**
+         * @brief dimention of multi array
+         */
         static const int DIM_NR = 2;
         typedef boost::multi_array<DistanceType, DIM_NR> matrix_type;
+        ///matrix with data
         matrix_type m_matrix;
 };
 
+
+/**
+ * @brief this metric is RectangleArrayMetric with N == M.
+ *
+ * @tparam DistanceTypeParam
+ */
 template <typename DistanceTypeParam>
-class ArrayMetric : public AssymetricArrayMetric<DistanceTypeParam> {
-    typedef AssymetricArrayMetric<DistanceTypeParam> base;
+class ArrayMetric : public RectangleArrayMetric<DistanceTypeParam> {
+    typedef RectangleArrayMetric<DistanceTypeParam> base;
 public:
+    /**
+     * @brief constructor
+     *
+     * @param N
+     */
     ArrayMetric(int N = 0) : base(N, N) {}
 
+    /**
+     * @brief returns N
+     *
+     * @return
+     */
+    int size() const {
+        return this->m_matrix.size();
+    }
+
+    /**
+     * @brief constructor from another metric
+     *
+     * @tparam OtherMetrics
+     * @tparam ItemIterator
+     * @param other
+     * @param iBegin
+     * @param iEnd
+     */
     template <typename OtherMetrics, typename ItemIterator>
     ArrayMetric(const OtherMetrics& other, ItemIterator iBegin, ItemIterator iEnd) :
         base(other, iBegin, iEnd, iBegin, iEnd) {}

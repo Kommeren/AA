@@ -14,32 +14,60 @@ namespace paal {
 namespace local_search {
 namespace two_local_search {
 
+    /**
+     * @brief adapts cycle to have begin and end pointing to edge collection
+     *
+     * @tparam Cycle
+     */
 template < typename Cycle> class TwoLocalSearchAdapter  {
     public:
         typedef typename Cycle::VertexIterator VertexIterator;
         typedef data_structures::VertexToEdgeIterator<VertexIterator> Iterator;
+
+        /**
+         * @brief constructor
+         *
+         * @param cm
+         */
         TwoLocalSearchAdapter(Cycle & cm) : m_cycle(cm) {}
 
+        /**
+         * @brief Edges begin
+         *
+         * @return
+         */
         Iterator begin() const {
             return data_structures::make_VertexToEdgeIterator(m_cycle.vbegin(), m_cycle.vend());
         }
 
+        /**
+         * @brief Edges end
+         *
+         * @return
+         */
         Iterator end() const {
             auto end =  m_cycle.vend();
             return data_structures::make_VertexToEdgeIterator(end, end);
         }
 
-        decltype(std::declval<Cycle>().getCycle()) get()  {
-            return m_cycle.getCycle();
-        }
-
-        decltype(std::declval<const Cycle>().getCycle()) get() const {
-            return m_cycle.getCycle();
-        }
-
-        Cycle & getWrap() {
+        /**
+         * @brief gets adopted cycle
+         *
+         * @return
+         */
+        Cycle & getCycle() {
             return m_cycle;
         }
+
+        /**
+         * @brief gets adopted cycle const version
+         *
+         * @return
+         */
+        const Cycle & getCycle() const {
+            return m_cycle;
+        }
+
     private:
 
         Cycle & m_cycle;

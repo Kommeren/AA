@@ -34,30 +34,75 @@ namespace data_structures {
 template <typename Metric, typename GeneratorsCapacieties, typename VerticesDemands>
 class CapacitatedVoronoi {
 public:
+    /**
+     * @brief this class store as a distance:
+     *          - sum of distances of assigned vertices to its generators
+     *          - number of vertices without generator
+     *       in the optimum all vertices should be assigned.
+     */
     class Dist {
     public:
         typedef typename MetricTraits<Metric>::DistanceType DistI;
-        Dist() {}
+        Dist() = default;
+
+        /**
+         * @brief constructor
+         *
+         * @param real
+         * @param distToFullAssign
+         */
         Dist(DistI real, DistI distToFullAssign) :
             m_realDist(real), m_distToFullAssignment(distToFullAssign) {}
+
+        /**
+         * @brief operator-
+         *
+         * @param d
+         *
+         * @return
+         */
         Dist operator-(Dist d) {
             return Dist(m_realDist - d.m_realDist,
                         m_distToFullAssignment - d.m_distToFullAssignment);
         }
 
+        /**
+         * @brief how many vertices are not covered
+         *
+         * @return
+         */
         DistI getDistToFullAssignment() const {
             return m_distToFullAssignment;
         }
 
+        /**
+         * @brief sum of distances from vertices to facilities
+         *
+         * @return
+         */
         DistI getRealDist() const {
             return m_realDist;
         }
 
+        /**
+         * @brief operator==
+         *
+         * @param d
+         *
+         * @return
+         */
         bool operator==(Dist d) const {
             return m_realDist ==  d.m_realDist &&
                    m_distToFullAssignment == d.m_distToFullAssignment;
         }
 
+        /**
+         * @brief operator>
+         *
+         * @param d
+         *
+         * @return
+         */
         bool operator>(DistI d) {
             if(m_distToFullAssignment > DistI(0)) {
                 return true;
@@ -67,26 +112,62 @@ public:
             return m_realDist > d;
         }
 
+        /**
+         * @brief operator+=
+         *
+         * @param d
+         *
+         * @return
+         */
         const Dist & operator+=(Dist d) {
             m_realDist += d.m_realDist;
             m_distToFullAssignment += d.m_distToFullAssignment;
             return *this;
         }
 
+        /**
+         * @brief operator+
+         *
+         * @param d
+         *
+         * @return
+         */
         Dist operator+(Dist d) {
             Dist ret(d);
             ret += *this;
             return ret;
         }
 
+        /**
+         * @brief unary -operator
+         *
+         * @return
+         */
         Dist operator-() {
             return Dist(-m_realDist, -m_distToFullAssignment);
         }
 
+        /**
+         * @brief Dist  + scalar (interpreted as real distance)
+         *
+         * @param di
+         * @param d
+         *
+         * @return
+         */
         friend  Dist  operator+(DistI di, Dist d) {
             return Dist(d.m_realDist + di, d.m_distToFullAssignment);
         }
 
+        /**
+         * @brief operator<<
+         *
+         * @tparam Stream
+         * @param s
+         * @param d
+         *
+         * @return
+         */
         template <typename Stream >
         friend Stream & operator<<(Stream & s, Dist d) {
             return s << d.m_distToFullAssignment << " " <<  d.m_realDist;
@@ -121,6 +202,10 @@ private:
     typedef typename boost::property_map < Graph, boost::edge_residual_capacity_t >::type ResidualCapacity;
     typedef typename std::unordered_map<VertexType, VD, boost::hash<VertexType>> VertexToGraphVertex;
 
+    /**
+     * @brief functor transforming edge descriptor into pair :
+     * (reindexed source, flow on the edge)
+     */
     struct Trans {
         std::pair<VertexType, DistI> operator()(const ED &e) const {
             return std::make_pair(m_v->getVertexForEdge(e), m_v->getFlowOnEdge(e));
@@ -132,6 +217,16 @@ private:
 
 public:
 
+    /**
+     * @brief constructor
+     *
+     * @param gen
+     * @param ver
+     * @param m
+     * @param gc
+     * @param vd
+     * @param costOfNoGenerator
+     */
     CapacitatedVoronoi(const Generators & gen, Vertices ver,
                        const Metric & m,
                        const GeneratorsCapacieties & gc, const VerticesDemands & vd,
@@ -151,6 +246,11 @@ public:
         }
     }
 
+    /**
+     * @brief copy constructor is not default  because of rev graph property
+     *
+     * @param other
+     */
     CapacitatedVoronoi(const CapacitatedVoronoi & other) :
         m_dist(other.m_dist),
         m_dist_prev(other.m_dist_prev),
@@ -173,7 +273,7 @@ public:
             }
         }
 
-    // returns diff between new cost and old cost
+    /// returns diff between new cost and old cost
     Dist addGenerator(VertexType gen) {
         Dist costStart = getCost();
         m_generators.insert(gen);
@@ -192,7 +292,7 @@ public:
         return getCost() - costStart;
     }
 
-    // returns diff between new cost and old cost
+    /// returns diff between new cost and old cost
     Dist remGenerator(VertexType gen) {
         Dist costStart = getCost();
         m_generators.erase(gen);
@@ -227,10 +327,20 @@ public:
         return getCost() - costStart;
     }
 
+    /**
+     * @brief getter for generators
+     *
+     * @return
+     */
     const Generators & getGenerators() const {
         return m_generators;
     }
 
+    /**
+     * @brief getter for vertices
+     *
+     * @return
+     */
     const Vertices & getVertices() const {
         return m_vertices;
     }
@@ -254,6 +364,11 @@ public:
     }
 
 
+    /**
+     * @brief get total cost of the assignment
+     *
+     * @return
+     */
     Dist getCost() const  {
         auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         OEI ei, end;
@@ -266,6 +381,15 @@ public:
         return Dist(cost, resCap);
     }
 
+    /**
+     * @brief operator<<
+     *
+     * @tparam OStream
+     * @param s
+     * @param v
+     *
+     * @return
+     */
     template <typename OStream>
     friend OStream & operator<<(OStream & s, CapacitatedVoronoi & v) {
         s << num_vertices(v.m_g) << ", ";
@@ -307,6 +431,9 @@ public:
 
 private:
 
+    /**
+     * @brief resores index (name property in the graph)
+     */
     void restoreIndex() {
         const unsigned N = num_vertices(m_g);
         m_gToGraphV.clear();
@@ -317,6 +444,13 @@ private:
     }
 
 
+    /**
+     * @brief add vertex to auxiliary graph
+     *
+     * @param v
+     *
+     * @return
+     */
     VD addVertex(VertexType v = VertexType()) {
         VD vG = add_vertex(boost::property<boost::vertex_name_t, VertexType>(v), m_g);
         int N = num_vertices(m_g);
@@ -328,6 +462,14 @@ private:
     }
 
 
+    /**
+     * @brief add edge to auxiliary graph
+     *
+     * @param v
+     * @param w
+     * @param weight
+     * @param capacity
+     */
     void addEdge(VD v, VD w, DistI weight, DistI capacity) {
         auto rev = get(boost::edge_reverse, m_g);
         ED e,f;
@@ -337,6 +479,16 @@ private:
         rev[f] = e;
     }
 
+    /**
+     * @brief add directed edge
+     *
+     * @param v
+     * @param w
+     * @param weight
+     * @param capacity
+     *
+     * @return
+     */
     ED addDirEdge(VD v, VD w, DistI weight, DistI capacity) {
         bool b;
         ED e;
@@ -351,12 +503,26 @@ private:
         return e;
     }
 
+    /**
+     * @brief gets flow on edge
+     *
+     * @param e
+     *
+     * @return
+     */
     DistI getFlowOnEdge(const ED & e) const {
         auto capacityMap = get(boost::edge_capacity, m_g);
         auto residual_capacity = get(boost::edge_residual_capacity, m_g);
         return capacityMap[e] - residual_capacity[e];
     }
 
+    /**
+     * @brief get reindexed source for edge
+     *
+     * @param e
+     *
+     * @return
+     */
     VertexType getVertexForEdge(const ED & e) const  {
         auto name = get(boost::vertex_name, m_g);
         return name[source(e, m_g)];

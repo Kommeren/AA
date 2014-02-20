@@ -23,6 +23,11 @@ class ObjectWithCopy {
 public:
     typedef T ObjectType;
 
+    /**
+     * @brief constructor
+     *
+     * @param t
+     */
     ObjectWithCopy(T t) : m_obj(std::move(t)), m_copy(m_obj) {}
 
     /**

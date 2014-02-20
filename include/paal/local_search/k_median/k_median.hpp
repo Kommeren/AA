@@ -29,7 +29,7 @@ template <typename VertexType>
 struct DefaultKMedianComponents {
     typedef MultiSearchComponents<
                 facility_location::FacilityLocationGetMovesSwap <VertexType>,
-                facility_location::FacilityLocationCheckerSwap         <VertexType>,
+                facility_location::FacilityLocationGainSwap         <VertexType>,
                 facility_location::FacilityLocationCommitSwap         <VertexType>> type;
 };
 

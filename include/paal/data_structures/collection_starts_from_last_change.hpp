@@ -13,6 +13,13 @@
 namespace paal {
 namespace data_structures {
 
+    /**
+     * @brief this collection stores some range and expose setLastChange function
+     *        each time begin and end is called this class returns range which starts from last change place
+     *
+     * @tparam Iterator
+     * @tparam hash
+     */
 template <typename Iterator, typename hash = std::hash<typename std::iterator_traits<Iterator>::value_type>>
 class CollectionStartsFromLastChange {
     typedef typename std::iterator_traits<Iterator>::value_type Element;
@@ -25,14 +32,12 @@ public:
 
     CollectionStartsFromLastChange() = default;
 
-    CollectionStartsFromLastChange(CollectionStartsFromLastChange &&) = default;
-
-    CollectionStartsFromLastChange& operator=(CollectionStartsFromLastChange &&) = default;
-
-    CollectionStartsFromLastChange(const CollectionStartsFromLastChange &) = default;
-
-    CollectionStartsFromLastChange& operator=(const CollectionStartsFromLastChange &) = default;
-
+    /**
+     * @brief constructor
+     *
+     * @param begin
+     * @param end
+     */
     CollectionStartsFromLastChange(Iterator begin, Iterator end) :
         m_begin(begin), m_end(end), m_newBegin(m_begin) {
             assert(m_begin != m_end);
@@ -42,21 +47,41 @@ public:
             }
         }
 
+    /**
+     * @brief one can set the place of the last change (future start position of the range)
+     *
+     * @param el
+     */
     void setLastChange(const Element & el) {
         auto i = m_elemToIter.find(el);
         assert(i != m_elemToIter.end());
         m_newBegin = i->second;
     }
 
+    /**
+     * @brief begin
+     *
+     * @return
+     */
     JoinedIterator begin() {
         return boost::begin(getRange());
     }
 
+    /**
+     * @brief end
+     *
+     * @return
+     */
     JoinedIterator end()  {
         return boost::end(getRange());
     }
 
 private:
+    /**
+     * @brief gets range
+     *
+     * @return
+     */
     JoinedRange getRange()  {
         Range r1 = std::make_pair(m_newBegin, m_end);
         Range r2 = std::make_pair(m_begin, m_newBegin);
