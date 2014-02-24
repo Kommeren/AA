@@ -55,7 +55,9 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
 
         std::vector<int> components(N);
         std::vector<int> colorMap(N);
-        boost::connected_components(fg, &components[0], boost::color_map(&colorMap[0]));
+        auto index = get(boost::vertex_index, g);
+        auto colorPMap = boost::make_iterator_property_map(colorMap.begin(), index);
+        boost::connected_components(fg, &components[0], boost::color_map(colorPMap));
         auto treeColor = components[test.terminals.front()];
 
         for(auto v : boost::make_iterator_range(vertices(fg))) {

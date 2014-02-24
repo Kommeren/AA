@@ -47,9 +47,11 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
         put(c, SGM::D, paal::Terminals::TERMINAL);
         put(c, SGM::E, paal::Terminals::NONTERMINAL);
     }
+    auto index = get(boost::vertex_index, g);
+    auto colorPMap = boost::make_iterator_property_map(color.begin(), index);
 
     paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
-            boost::vertex_color_map(&color[0]));
+            boost::vertex_color_map(colorPMap));
     BOOST_CHECK(std::size_t(3) <= steinerEdges.size() && steinerEdges.size()<= std::size_t(4));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;

@@ -16,6 +16,7 @@ int main() {
 //! [steiner tree greedy Example]
     typedef  SampleGraphsMetrics SGM;
     auto g = SGM::getGraphSteiner();
+    auto index = get(boost::vertex_index, g);
     typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::set<Edge> steinerEdges;
     std::vector<int> color(num_vertices(g));
@@ -29,7 +30,7 @@ int main() {
     }
 
     paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
-            boost::vertex_color_map(&color[0]));
+            boost::vertex_color_map(boost::make_iterator_property_map(color.begin(), index)));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
     for(auto e: steinerEdges) {
