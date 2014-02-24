@@ -64,9 +64,10 @@ struct Gain {
 };
 
 struct Commit {
-    void operator()(Solution & s, const SolutionElement & i, Move u) {
+    bool operator()(Solution & s, const SolutionElement & i, Move u) {
         auto & el = const_cast<SolutionElement &>(i);
         el = u;
+        return true;
     }
 };
 

@@ -96,8 +96,11 @@ public:
             auto adjustmentSet = call<GetMoves>(m_solution, r);
             for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
                 if(call<Gain>(m_solution, r, move) > 0) {
-                    call<Commit>(m_solution, r, move);
-                    return true;
+                    if(call<Commit>(m_solution, r, move)) {
+                        return true;
+                    } else {
+                        continue;
+                    }
                 }
             }
         }

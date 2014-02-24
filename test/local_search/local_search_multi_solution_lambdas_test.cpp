@@ -58,6 +58,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
     auto commit = [&](Solution &, SolutionElement & se, Move u) {
         se = u;
+        return true;
     };
 
     auto ls = [=](Solution & x) {
@@ -91,6 +92,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
     auto commitG = [&](double & s, double u) {
         s = u;
+        return true;
     };
 
     local_search_simple(G, local_search::make_SearchComponents(getMovesG, gainG, commitG));

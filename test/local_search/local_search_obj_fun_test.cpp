@@ -40,8 +40,9 @@ public:
 };
 
 struct SU {
-    void operator()(int & s, int u) const {
+    bool operator()(int & s, int u) const {
         s = s + u;
+        return true;
     }
 };
 

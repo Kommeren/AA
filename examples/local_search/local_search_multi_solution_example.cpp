@@ -70,8 +70,9 @@ struct Gain {
 
 //assigns the solution to the given move
 struct Commit {
-    void operator()(Solution & s, SolutionElement & se, Move u) {
+    bool operator()(Solution & s, SolutionElement & se, Move u) {
         se = u;
+        return true;
     }
 };
 //! [Local Search Components Example]

@@ -46,12 +46,13 @@ public:
      * @param se
      */
     template <typename Solution>
-    void operator()(
+    bool operator()(
             Solution & s,
             typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Add) {
 
         s.addFacility(se);
+        return true;
     }
 };
 

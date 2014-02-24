@@ -79,11 +79,12 @@ public:
      * @param se
      */
         template <typename Solution>
-    void operator()(
+    bool operator()(
             Solution & s,
             typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Remove) {
         s.removeFacility(se);
+        return true;
     }
 };
 

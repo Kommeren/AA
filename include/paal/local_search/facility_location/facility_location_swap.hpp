@@ -183,11 +183,12 @@ public:
      * @param s
      */
     template <typename Solution>
-    void operator()(Solution & sol,
+    bool operator()(Solution & sol,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) {
         sol.addFacility(sol.getFacility(s.getTo()));
         sol.removeFacility(sol.getFacility(s.getFrom()));
+        return true;
     }
 };
 

@@ -352,11 +352,12 @@ struct RecordSolutionCommitAdapter {
      * @param move
      */
     template <typename Move>
-    void operator()(Solution & sol, const Move & move) {
-        m_commit(sol, move);
+    bool operator()(Solution & sol, const Move & move) {
+        auto ret = m_commit(sol, move);
         if(m_condition(sol, *m_solution)) {
             *m_solution = sol;
         }
+        return ret;
     }
 
     /**

@@ -33,58 +33,6 @@ struct DefaultKMedianComponents {
                 facility_location::FacilityLocationCommitSwap         <VertexType>> type;
 };
 
-
-/**
- * @class KMedianLocalSearchStep
- * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search_page.<br>
- * KMedian implementation is based on facility location solution. <br>
- * The Move is facility_location::Move. <br>
- * The Solution is adapted KMedianSolution. <br>
- * The SolutionElement is facility_location::Facility  <br>
- * Use DefaultKMedianComponents for default search components.
- *
- * The KMedianLocalSearchStep takes as constructor parameter  KMedianSolution.
- * <b> WARNING </b>
- * getSolution of the KMedianLocalSearchStep returns type ObjectWithCopy<KMedianSolution>.
- * If you want to perform search, then change the solution object and continue local search you should perform all the operations on ObjectWithCopy. <br>
- * example:
-    \snippet k_median_example.cpp K Median Search Example
- *
- * complete example is k_median_example.cpp
- *
- * @tparam Voronoi
- * @tparam MultiSearchComponents
- */
-
-
-/*template <int k, typename Voronoi,
-          typename MultiSearchComponents = typename DefaultKMedianComponents<typename Voronoi::VertexType>::type>
-
-class KMedianLocalSearchStep :
-    public LocalSearchStepMultiSolution<
-               facility_location::FacilityLocationSolutionAdapter<
-                    KMedianSolution<k, Voronoi>>,
-               search_strategies::ChooseFirstBetter,
-               MultiSearchComponents>  {
-
-public:
-    typedef KMedianSolution<k, Voronoi> KMSolution;
-    typedef facility_location::FacilityLocationSolutionAdapter<KMSolution> KMSolutionAdapter;
-
-    typedef LocalSearchStepMultiSolution<
-                KMSolutionAdapter,
-                search_strategies::ChooseFirstBetter,
-                MultiSearchComponents>  base;
-
-    KMedianLocalSearchStep(
-            KMSolution kms,
-            MultiSearchComponents sc = MultiSearchComponents()) :
-                base(KMSolutionAdapter(std::move(kms)),
-                                       std::move(sc)) {}
-};*/
-
-
-
 }
 }
 }

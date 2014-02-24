@@ -66,7 +66,7 @@ int main(int argc, char ** argv) {
     RandomMoves<decltype(randomMove)> r(randomMove);
 
     auto movesBegin = boost::make_function_input_iterator(r, 0);
-    auto movesEnd = boost::make_function_input_iterator(r, 100);
+    auto movesEnd = boost::make_function_input_iterator(r, 10000000);
 
     auto getMoves = [=](Adapter & sol)
         {return std::make_pair(movesBegin, movesEnd);};

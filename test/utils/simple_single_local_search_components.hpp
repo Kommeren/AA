@@ -34,8 +34,9 @@ struct Gain {
 };
 
 struct Commit {
-    void operator()(int & s, int u) {
+    bool operator()(int & s, int u) {
         s = s + u;
+        return true;
     }
 };
 

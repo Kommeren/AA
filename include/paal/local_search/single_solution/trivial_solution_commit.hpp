@@ -21,8 +21,9 @@ struct TrivialCommit {
      * @param u
      */
     template <typename Solution>
-    void operator()(Solution & s, const Solution & u) const {
+    bool operator()(Solution & s, const Solution & u) const {
         s = u;
+        return true;
     }
 };
 #endif /* TRIVIAL_COMMIT_HPP */

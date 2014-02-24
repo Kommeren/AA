@@ -98,6 +98,7 @@ public:
         auto su = [&](AMatrix & m, const Move & t) {
             this->contract(m, get<0>(t));
             res.push_back(m_nearestVertex[get<0>(t)]);
+            return true;
         };
 
         auto sc = local_search::make_SearchComponents(ng, obj_fun, su);

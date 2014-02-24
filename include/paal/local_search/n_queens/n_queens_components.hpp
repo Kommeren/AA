@@ -24,8 +24,9 @@ struct NQueensCommit {
          * @param solutionElement
          * @param move
          */
-    void operator()(Solution & sol, Idx solutionElement, Idx move) const {
+    bool operator()(Solution & sol, Idx solutionElement, Idx move) const {
         sol.swapQueens(solutionElement, move);
+        return false;
     }
 };
 

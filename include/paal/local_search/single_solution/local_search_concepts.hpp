@@ -15,6 +15,12 @@ namespace paal {
 namespace local_search {
 namespace concepts {
 
+namespace detail {
+    template <typename T>
+    void use(const T & t);
+}//!detail
+
+
 template <typename X, typename Solution, typename SearchComponents>
 class  ConceptsBase {
     protected:
@@ -55,7 +61,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(Commit) {
-            this->x(this->s, this->u);
+            bool b = this->x(this->s, this->u);
+            detail::use(b);
         }
 };
 

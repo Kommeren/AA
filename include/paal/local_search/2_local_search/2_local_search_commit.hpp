@@ -26,8 +26,9 @@ struct TwoLocalSearchCommit  {
      * @param ae
      */
     template <typename SolutionElement, typename Solution>
-    void operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
+    bool operator()(Solution & s, const SolutionElement & se, const SolutionElement & ae) {
         s.getCycle().flip(se.second, ae.first);
+        return true;
     }
 };
 

@@ -37,6 +37,7 @@ int main() {
 
     auto commit = [](int & sol, int move) {
         sol = sol + move;
+        return true;
     };
 
     //search

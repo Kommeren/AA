@@ -18,7 +18,7 @@ namespace local_search_concepts {
 namespace detail {
     template <typename T>
     void use(const T & t);
-}//detail
+}//!detail
 
 template <typename X>
 class MultiSolution  {
@@ -50,7 +50,7 @@ protected:
     SolutionElement e;
     Move u;
 };
-}//detail
+}//!detail
 
 template <typename X, typename Solution, typename SearchComponents>
 class  MultiGetMoves : public detail::MultiConceptsBase<X, Solution, SearchComponents> {
@@ -79,7 +79,8 @@ template <typename X, typename Solution, typename SearchComponents>
 class MultiCommit : public detail::MultiConceptsBase<X, Solution, SearchComponents>{
     public:
         BOOST_CONCEPT_USAGE(MultiCommit) {
-            this->x(this->s,this-> e, this->u);
+            bool b = this->x(this->s,this-> e, this->u);
+            detail::use(b);
         }
 };
 

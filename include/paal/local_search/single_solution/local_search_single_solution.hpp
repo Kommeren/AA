@@ -86,8 +86,9 @@ public:
 
         for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
             if(call<Gain>(m_solution, move) > 0) {
-                call<Commit>(m_solution, move);
-                return true;
+                if(call<Commit>(m_solution, move)) {
+                    return true;
+                }
             }
         }
         return base::search();
