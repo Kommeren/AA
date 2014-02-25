@@ -24,7 +24,7 @@ typedef int Dist;
 typedef std::vector<int> Terminals;
 typedef GraphMT Metric;
 
-BOOST_AUTO_TEST_CASE(steiner_long_test) {
+BOOST_AUTO_TEST_CASE(steiner_tree_long_test) {
     std::vector<SteinerTreeTest> data;
     readSTEINLIBtests(data);
     int k = 0;

@@ -34,7 +34,7 @@ void example_default_constructor_and_basic_usage() {
     typedef Comps<int, double, int> MyComps;
     MyComps comps;
     //getter
-    comps.get<names::A>();
+    assert(comps.get<names::A>() == 0); // zero initialization is guaranteed
 
     //setter
     comps.set<names::A>(7);

@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(KMedianSolutionAdapterTest) {
 
     Sol sol(std::move(voronoi), GSet{SGM:: C,SGM::D, SGM::E},k);
     FacilityLocationSolutionAdapter<Sol> sa(sol);
-    auto & realSol = sa.get();
+    auto & realSol = sa.getFacilityLocationSolution();
 
     realSol.addFacility(SGM::C);
     realSol.remFacility(SGM::A);

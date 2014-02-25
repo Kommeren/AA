@@ -51,9 +51,9 @@ public:
     auto operator()(Solution & s,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Remove) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
+                typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
 
-        typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist ret, back;
+        typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist ret, back;
 
         ret = s.removeFacilityTentative(se.getElem());
         //TODO for capacitated version we should  just restart copy

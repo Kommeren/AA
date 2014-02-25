@@ -65,18 +65,14 @@ public:
         auto const &  ch = m_sol.getChosenFacilities();
         auto const &  uch = m_sol.getUnchosenFacilities();
 
-        auto transformChosen = [](VertexType f){ return Fac(CHOSEN ,f);};
-        auto transformUnchosen = [](VertexType f){ return Fac(UNCHOSEN, f);};
-        auto transformChosenAssignable = utils::make_AssignableFunctor(transformChosen);
-        auto transformUnchosenAssignable = utils::make_AssignableFunctor(transformUnchosen);
+        m_facilities.reserve(boost::distance(ch) + boost::distance(uch));
+        for(VertexType f : ch) {
+            m_facilities.push_back(Fac(CHOSEN, f));
+        }
 
-        auto transformedChosen = boost::adaptors::transform(ch, transformChosenAssignable);
-        auto transformedUnchosen = boost::adaptors::transform(uch, transformUnchosenAssignable);
-
-        auto chosenSize = boost::distance(ch);
-        m_facilities.resize(chosenSize + boost::distance(uch));
-        boost::copy(transformedChosen, m_facilities.begin());
-        boost::copy(transformedUnchosen, m_facilities.begin() + chosenSize);
+        for(VertexType f : uch) {
+            m_facilities.push_back(Fac(UNCHOSEN, f));
+        }
 
         for(auto & f : m_facilities) {
             m_vertexToFac.insert(std::make_pair(f.getElem(), &f));
@@ -175,7 +171,7 @@ public:
      *
      * @return
      */
-    FacilityLocationSolution & get() {
+    FacilityLocationSolution & getFacilityLocationSolution() {
         return m_sol;
     }
 
@@ -184,7 +180,7 @@ public:
      *
      * @return
      */
-    const FacilityLocationSolution & get() const {
+    const FacilityLocationSolution & getFacilityLocationSolution() const {
         return m_sol;
     }
 

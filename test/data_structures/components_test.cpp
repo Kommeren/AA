@@ -48,6 +48,8 @@ BOOST_AUTO_TEST_SUITE(components)
 BOOST_AUTO_TEST_CASE(ComponentsTest) {
     //default arguments
     Comps<int, double, int> comps;
+    BOOST_CHECK_EQUAL(comps.get<names::A>(), 0); //we guarantee that POD's are value initialized
+    BOOST_CHECK_EQUAL(comps.get<names::C>(), 0);
     comps.get<names::A>();
     comps.set<names::A>(7);
     BOOST_CHECK_EQUAL(comps.get<names::A>(), 7);

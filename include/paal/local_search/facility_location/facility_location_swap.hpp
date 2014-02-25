@@ -152,9 +152,9 @@ public:
     auto operator()(Solution & sol,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist {
+                typename data_structures::FacilityLocationSolutionTraits<puretype(sol.getFacilityLocationSolution())>::Dist {
 
-        typename data_structures::FacilityLocationSolutionTraits<puretype(sol.get())>::Dist ret, back;
+        typename data_structures::FacilityLocationSolutionTraits<puretype(sol.getFacilityLocationSolution())>::Dist ret, back;
 
         ret   = sol.addFacilityTentative(s.getTo());
         ret  += sol.removeFacilityTentative(s.getFrom());

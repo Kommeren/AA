@@ -163,8 +163,9 @@ namespace detail {
     public:
         using base::get;
 
-        //default constructor
-        Components() = default;
+        ///default constructor
+        // we do not use  = default, cause we'd like to value initialize POD's.
+        Components() : base{}, m_component{} {};
 
         //default copy constructor
         Components(const Components &) = default;

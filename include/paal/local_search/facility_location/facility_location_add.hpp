@@ -117,7 +117,7 @@ public:
     auto operator()(Solution & s,
             const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             Add ) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(s.get())>::Dist {
+                typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
         auto ret = s.addFacilityTentative(se.getElem());
         auto back = s.removeFacilityTentative(se.getElem());
         assert(ret == -back);

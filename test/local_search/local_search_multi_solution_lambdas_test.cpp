@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <cstdlib>
+#include <iomanip>
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
@@ -29,8 +30,8 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
     //creating local search
 
-    const std::vector<double> neighb{.01, -.01, .001, -.001};
-    std::vector<double> neighbCut(4);
+    const std::vector<double> neighb{0.1, -0.1, .01, -.01, .001, -.001};
+    std::vector<double> neighbCut(neighb.size());
     double G{1};
 
     //components for vector
@@ -53,7 +54,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         i = u;
         auto valMove = f(s);
         i = old;
-        return valMove - val;
+        return valMove - val - 0.000001;
     };
 
     auto commit = [&](Solution &, SolutionElement & se, Move u) {
@@ -62,12 +63,13 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     };
 
     auto ls = [=](Solution & x) {
+        x = {0.3,0.3,0.3};
         local_search_multi_solution_simple(x,
             local_search::make_SearchComponents(getMoves, gain, commit));
     };
 
     //components for G.
-    std::vector<double> neighbCutG(4);
+    std::vector<double> neighbCutG(neighb.size());
     std::vector<double> x(DIM, 0);
     local_search_multi_solution_simple(x,
                 local_search::make_SearchComponents(getMoves, gain, commit));
@@ -86,23 +88,30 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         auto old = G;
         G = g;
         ls(x);
+        auto newRes = f(x);
         G = old;
-        return best - f(x);
+        return best - newRes - 0.000001;
     };
 
     auto commitG = [&](double & s, double u) {
+        assert(G == s);
         s = u;
+        best = f(x);
         return true;
     };
 
     local_search_simple(G, local_search::make_SearchComponents(getMovesG, gainG, commitG));
+
     ls(x);
 
     //printing
-    LOGLN("f(");
+    LOG(std::setprecision(10));
+    LOGLN("G = " << G);
+    G = 0;
+    LOG("f(");
     LOG_COPY_DEL(x.begin(), x.end(), ",");
-    LOGLN(") = \t" << f(x));
-    //TODO, unfinished invesitigate
-//    BOOST_CHECK_EQUAL(f(x), 6.);
+    //TODO it would be interesting how G depends on starting point ( (0.3, 0.3, 0.3) now)
+    LOGLN( ") = \t" << f(x));
+    LOGLN("approximation " << 2./f(x));
 }
 
