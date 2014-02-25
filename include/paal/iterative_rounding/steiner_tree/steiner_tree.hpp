@@ -15,6 +15,7 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/lp_row_generation.hpp"
+#include "paal/lp/separation_oracles.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_tree_oracle.hpp"
@@ -33,18 +34,17 @@ struct SteinerTreeCompareTraits {
 const double SteinerTreeCompareTraits::EPSILON = 1e-10;
 }
 
-template<typename OrigMetric, typename Terminals>
-using SteinerTreeSeparationOracle =
-        SteinerTreeOracle<typename data_structures::MetricTraits<OrigMetric>::VertexType,
-                          typename data_structures::MetricTraits<OrigMetric>::DistanceType,
-                          Terminals>;
+
+template <template <typename> class OracleStrategy = lp::RandomViolatedSeparationOracle>
+using SteinerTreeOracle = OracleStrategy<SteinerTreeViolationChecker>;
+
 
 /**
  * @class SteinerTree
  */
 template<typename OrigMetric, typename Terminals, typename Result,
     typename Strategy=AllGenerator,
-    typename Oracle = SteinerTreeSeparationOracle<OrigMetric, Terminals>>
+    typename Oracle = SteinerTreeOracle<>>
 class SteinerTree {
 public:
     typedef data_structures::MetricTraits<OrigMetric> MT;
@@ -59,12 +59,12 @@ public:
      */
     SteinerTree(const OrigMetric& metric, const Terminals& terminals,
             const Terminals& steinerVertices, Result result,
-            const Strategy& strategy = Strategy()) :
+            const Strategy& strategy = Strategy(), Oracle oracle = Oracle()) :
         m_costMap(metric, boost::begin(boost::range::join(terminals, steinerVertices)),
                 boost::end(boost::range::join(terminals, steinerVertices))),
         m_terminals(terminals), m_steinerVertices(steinerVertices),
         m_strategy(strategy), m_resultIterator(result),
-        m_compare(SteinerTreeCompareTraits::EPSILON) {
+        m_compare(SteinerTreeCompareTraits::EPSILON), m_oracle(oracle) {
     }
 
     /**
@@ -235,13 +235,14 @@ public:
 /**
  * Makes SteinerTree object. Just to avoid providing type names in template.
  */
-template<typename OrigMetric, typename Terminals, typename Result,
-        typename Strategy>
-SteinerTree<OrigMetric, Terminals, Result, Strategy> make_SteinerTree(
+template<typename Oracle = SteinerTreeOracle<>,
+        typename OrigMetric, typename Terminals, typename Result, typename Strategy>
+SteinerTree<OrigMetric, Terminals, Result, Strategy, Oracle> make_SteinerTree(
         const OrigMetric& metric, const Terminals& terminals,
-        const Terminals& steinerVertices, Result result, const Strategy& strategy) {
-    return SteinerTree<OrigMetric, Terminals, Result, Strategy>(metric,
-            terminals, steinerVertices, result, strategy);
+        const Terminals& steinerVertices, Result result, const Strategy& strategy,
+        Oracle oracle = Oracle()) {
+    return SteinerTree<OrigMetric, Terminals, Result, Strategy, Oracle>(metric,
+            terminals, steinerVertices, result, strategy, oracle);
 }
 
 template <
@@ -257,21 +258,15 @@ template <
                         RelaxCondition, Init, SetSolution, StopCondition>;
 
 
-template <typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy, typename IRComponents = SteinerTreeIRComponents<>,
-    typename Visitor = TrivialVisitor>
+template <typename Oracle = SteinerTreeOracle<>, typename Strategy = AllGenerator,
+    typename OrigMetric, typename Terminals, typename Result,
+    typename IRComponents = SteinerTreeIRComponents<>, typename Visitor = TrivialVisitor>
 void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
-        Result result, Strategy strategy, IRComponents comps = IRComponents(), Visitor vis = Visitor()) {
+        Result result, Strategy strategy, IRComponents comps = IRComponents(),
+        Oracle oracle = Oracle(), Visitor vis = Visitor()) {
 
-    auto steiner = paal::ir::make_SteinerTree(metric, terminals, steinerVertices, result, strategy);
+    auto steiner = paal::ir::make_SteinerTree(metric, terminals, steinerVertices, result, strategy, oracle);
     paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(vis));
-}
-
-template <typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy = AllGenerator>
-void solve_steiner_tree(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
-        Result result, Strategy strategy=Strategy()) {
-    steiner_tree_iterative_rounding(metric, terminals, steinerVertices, result, strategy);
 }
 
 } //ir

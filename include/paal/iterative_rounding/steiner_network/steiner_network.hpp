@@ -16,6 +16,7 @@
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network_oracle.hpp"
+#include "paal/lp/separation_oracles.hpp"
 
 
 namespace paal {
@@ -30,6 +31,9 @@ const double SteinerNetworkCompareTraits::EPSILON = 1e-10;
 }
 
 
+template <template <typename> class OracleStrategy = lp::RandomViolatedSeparationOracle>
+using SteinerNetworkOracle = OracleStrategy<SteinerNetworkViolationChecker>;
+
 /**
  * @class SteinerNetwork
  * @brief The class for solving the Steiner Network problem using Iterative Rounding.
@@ -40,8 +44,8 @@ const double SteinerNetworkCompareTraits::EPSILON = 1e-10;
  * @tparam ResultNetworkOutputIterator
  */
 template <typename Graph, typename Restrictions, typename CostMap,
-        typename ResultNetworkOutputIterator,
-        typename Oracle = SteinerNetworkOracle<>>
+          typename ResultNetworkOutputIterator,
+          typename Oracle = SteinerNetworkOracle<>>
 class SteinerNetwork {
 public:
 
@@ -71,8 +75,8 @@ public:
      * Checks if the connectivity restrictions can be fulfilled.
      */
     ErrorMessage checkInputValidity() {
-        SteinerNetworkOracle<> oracle;
-        if (!oracle.checkIfSolutionExists(*this)) {
+        SteinerNetworkViolationChecker checker;
+        if (!checker.checkIfSolutionExists(*this)) {
             return ErrorMessage("A Steiner network satisfying the restrictions does not exist.");
         }
         else {

@@ -82,19 +82,14 @@ void checkResult(const Graph & g, const ResultTree & tree,
     BOOST_CHECK(connected_components(treeG, &component[0]) == 1);
 }
 
-template <typename FindViolated = paal::lp::FindRandViolated, typename Bound>
+template <template <typename> class Oracle, typename Bound>
 void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
              const int verticesNum, const double bestCost) {
-    namespace ir = paal::ir;
-    namespace lp = paal::lp;
-
-    typedef ir::BoundedDegreeMSTOracleComponents<FindViolated> OracleComponents;
-    typedef ir::BoundedDegreeMSTOracle<OracleComponents> Oracle;
-
     ResultTree tree;
-    auto result = ir::bounded_degree_mst_iterative_rounding<Oracle>(
+    auto result = paal::ir::bounded_degree_mst_iterative_rounding<
+                paal::ir::BDMSTOracle<Oracle>>(
                         g, degBounds, std::inserter(tree, tree.end()));
-    BOOST_CHECK(result.first == lp::OPTIMAL);
+    BOOST_CHECK(result.first == paal::lp::OPTIMAL);
 
     checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
 }
@@ -121,19 +116,22 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         for (int i : boost::irange(0, 5)) {
             LOGLN("random violated, seed " << i);
             srand(i);
-            runTest(g, costs, bounds, verticesNum, bestCost);
+            runTest<paal::lp::RandomViolatedSeparationOracle>(
+                            g, costs, bounds, verticesNum, bestCost);
         }
 
         // non-default heuristics
         if (verticesNum <= 80) {
             LOGLN("most violated");
-            runTest<paal::lp::FindMostViolated>(g, costs, bounds, verticesNum, bestCost);
+            runTest<paal::lp::MostViolatedSeparationOracle>(
+                            g, costs, bounds, verticesNum, bestCost);
         }
 
-        // non-default heuristics (slow, only for smaller instances)
+        // non-default heuristics
         if (verticesNum <= 60) {
-            LOGLN("any violated");
-            runTest<paal::lp::FindAnyViolated>(g, costs, bounds, verticesNum, bestCost);
+            LOGLN("first violated");
+            runTest<paal::lp::FirstViolatedSeparationOracle>(
+                            g, costs, bounds, verticesNum, bestCost);
         }
     });
 }

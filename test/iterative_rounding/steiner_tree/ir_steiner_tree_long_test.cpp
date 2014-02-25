@@ -24,7 +24,20 @@ typedef int Dist;
 typedef std::vector<int> Terminals;
 typedef GraphMT Metric;
 
-BOOST_AUTO_TEST_CASE(steiner_tree_long_test) {
+template <template <typename> class OracleStrategy>
+void runTest(const SteinerTreeTest & test) {
+    paal::ir::RandomGenerator strategyRand(50, 5);
+    std::vector<int> result;
+    paal::ir::steiner_tree_iterative_rounding<SteinerTreeOracle<OracleStrategy>>(
+            test.metric, test.terminals, test.steinerPoints,
+            std::back_inserter(result), strategyRand);
+        ON_LOG(int res = )paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
+
+        LOG("RES " << res << "\n");
+        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
+}
+
+BOOST_AUTO_TEST_CASE(steiner_long_test) {
     std::vector<SteinerTreeTest> data;
     readSTEINLIBtests(data);
     int k = 0;
@@ -32,14 +45,17 @@ BOOST_AUTO_TEST_CASE(steiner_tree_long_test) {
         LOG("TEST " << test.testName << "\n");
         LOG("OPT " << test.optimal << "\n");
 
-        paal::ir::RandomGenerator strategyRand(50, 5);
-        std::vector<int> result;
-        paal::ir::solve_steiner_tree(test.metric, test.terminals, test.steinerPoints,
-                std::back_inserter(result), strategyRand);
-        ON_LOG(int res = )paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
+        for (int i : boost::irange(0, 5)) {
+            LOGLN("random violated, seed " << i);
+            srand(i);
+            runTest<paal::lp::RandomViolatedSeparationOracle>(test);
+        }
 
-        LOG("RES " << res << "\n");
-        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
+        LOGLN("most violated");
+        runTest<paal::lp::MostViolatedSeparationOracle>(test);
+
+        LOGLN("first violated");
+        runTest<paal::lp::FirstViolatedSeparationOracle>(test);
 
         // First tests only
         if (++k == 10) break;

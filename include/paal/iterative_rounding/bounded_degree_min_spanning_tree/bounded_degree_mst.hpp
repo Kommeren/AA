@@ -8,12 +8,14 @@
 #ifndef BOUNDED_DEGREE_MST_HPP
 #define BOUNDED_DEGREE_MST_HPP
 
+#include <boost/bimap.hpp>
 #include <boost/graph/connected_components.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle.hpp"
+#include "paal/lp/separation_oracles.hpp"
 
 
 namespace paal {
@@ -30,6 +32,10 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
 }
 
 
+template <template <typename> class OracleStrategy = lp::RandomViolatedSeparationOracle>
+using BDMSTOracle = OracleStrategy<BDMSTViolationChecker>;
+
+
 /**
  * @class BoundedDegreeMST
  * @brief The class for solving the Bounded Degree MST problem using Iterative Rounding.
@@ -41,7 +47,7 @@ const double BoundedDegreeMSTCompareTraits::EPSILON = 1e-10;
  * @tparam Oracle separation oracle
  */
 template <typename Graph, typename DegreeBounds, typename CostMap,
-        typename SpanningTreeOutputIterator, typename Oracle = BoundedDegreeMSTOracle<>>
+          typename SpanningTreeOutputIterator, typename Oracle = BDMSTOracle<>>
 class BoundedDegreeMST {
 public:
     /**
@@ -237,7 +243,7 @@ namespace detail {
  *
  * @return BoundedDegreeMST object
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>, typename Graph,
+template <typename Oracle = BDMSTOracle<>, typename Graph,
           typename DegreeBounds, typename CostMap, typename SpanningTreeOutputIterator>
 BoundedDegreeMST<Graph, DegreeBounds, CostMap, SpanningTreeOutputIterator, Oracle>
 make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
@@ -268,8 +274,8 @@ make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
  *
  * @return BoundedDegreeMST object
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>, typename Graph,
-          typename DegreeBounds, typename SpanningTreeOutputIterator,
+template <typename Oracle = BDMSTOracle<>,
+          typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator,
           typename P, typename T, typename R>
 auto
 make_BoundedDegreeMST(const Graph & g,
@@ -302,8 +308,8 @@ make_BoundedDegreeMST(const Graph & g,
  *
  * @return BoundedDegreeMST object
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>, typename Graph,
-          typename DegreeBounds, typename SpanningTreeOutputIterator>
+template <typename Oracle = BDMSTOracle<>,
+          typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator>
 auto
 make_BoundedDegreeMST(const Graph & g, const DegreeBounds & degBounds,
                       SpanningTreeOutputIterator resultSpanningTree,
@@ -502,8 +508,8 @@ namespace detail {
  *
  * @return solution status
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>, typename Graph,
-          typename DegreeBounds, typename CostMap,
+template <typename Oracle = BDMSTOracle<>,
+          typename Graph, typename DegreeBounds, typename CostMap,
           typename SpanningTreeOutputIterator,
           typename IRComponents = BDMSTIRComponents<>,
           typename Visitor = TrivialVisitor>
@@ -544,7 +550,7 @@ IRResult bounded_degree_mst_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>,
+template <typename Oracle = BDMSTOracle<>,
           typename Graph, typename DegreeBounds,
           typename SpanningTreeOutputIterator,
           typename IRComponents = BDMSTIRComponents<>,
@@ -583,7 +589,7 @@ IRResult bounded_degree_mst_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = BoundedDegreeMSTOracle<>,
+template <typename Oracle = BDMSTOracle<>,
           typename Graph, typename DegreeBounds,
           typename SpanningTreeOutputIterator,
           typename IRComponents = BDMSTIRComponents<>,

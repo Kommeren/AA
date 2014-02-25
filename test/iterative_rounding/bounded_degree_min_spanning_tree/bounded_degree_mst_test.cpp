@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(resultTree, resultTree.begin()),
-                    BDMSTIRComponents<>(), BoundedDegreeMSTOracle<>(),
+                    BDMSTIRComponents<>(), BDMSTOracle<>(),
                     LogVisitor());
 
     ON_LOG(for (auto const & e : resultTree) {
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree resultTree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin()),
-                    BDMSTIRComponents<>(), BoundedDegreeMSTOracle<>(),
+                    BDMSTIRComponents<>(), BDMSTOracle<>(),
                     LogVisitor());
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());

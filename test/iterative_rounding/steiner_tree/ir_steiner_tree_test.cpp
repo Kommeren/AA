@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(testAllGenerator) {
     // small graph
     UserMetric metrics(createSmallGraph());
     boost::tie(terminals, steinerVertices) = getSmallGraphVertices();
-    paal::ir::solve_steiner_tree(metrics, terminals, steinerVertices,
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
             std::back_inserter(result), strategyAll);
     int cost = paal::ir::SteinerUtils::countCost(result, terminals, metrics);
     BOOST_CHECK(cost == 4);
@@ -44,13 +44,14 @@ BOOST_AUTO_TEST_CASE(testAllGenerator) {
     result.clear();
     metrics = UserMetric(createBiggerGraph());
     boost::tie(terminals, steinerVertices) = getBiggerGraphVertices();
-    paal::ir::solve_steiner_tree(metrics, terminals, steinerVertices,
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
             std::back_inserter(result), strategyAll);
     cost = paal::ir::SteinerUtils::countCost(result, terminals, metrics);
     BOOST_CHECK(cost == 15);
 }
 
 BOOST_AUTO_TEST_CASE(testRandGenerator) {
+    srand(0);
     paal::ir::RandomGenerator strategyRand(10, 5);
 
     Terminals terminals, steinerVertices;
@@ -58,7 +59,7 @@ BOOST_AUTO_TEST_CASE(testRandGenerator) {
     // small graph
     UserMetric metrics(createSmallGraph());
     boost::tie(terminals, steinerVertices) = getSmallGraphVertices();
-    paal::ir::solve_steiner_tree(metrics, terminals, steinerVertices,
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
             std::back_inserter(result), strategyRand);
     int cost = paal::ir::SteinerUtils::countCost(result, terminals, metrics);
     BOOST_CHECK(cost == 4);
@@ -67,7 +68,7 @@ BOOST_AUTO_TEST_CASE(testRandGenerator) {
     result.clear();
     metrics = UserMetric(createBiggerGraph());
     boost::tie(terminals, steinerVertices) = getBiggerGraphVertices();
-    paal::ir::solve_steiner_tree(metrics, terminals, steinerVertices,
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
             std::back_inserter(result), strategyRand);
     cost = paal::ir::SteinerUtils::countCost(result, terminals, metrics);
     BOOST_CHECK(cost == 15);

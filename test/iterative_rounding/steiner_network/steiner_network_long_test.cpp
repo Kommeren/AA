@@ -189,18 +189,17 @@ int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
     return verticesNum;
 }
 
-template <typename FindViolated = paal::lp::FindRandViolated, typename Restrictions>
+template <template <typename> class Oracle, typename Restrictions>
 void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
     namespace ir = paal::ir;
     namespace lp = paal::lp;
 
     typedef std::vector<Edge> ResultNetwork;
-    typedef ir::SteinerNetworkOracleComponents<FindViolated> OracleComponents;
-    typedef ir::SteinerNetworkOracle<OracleComponents> Oracle;
     typedef ir::SteinerNetworkIRComponents<> Components;
 
     ResultNetwork resultNetwork;
-    auto steinerNetwork(ir::make_SteinerNetwork<Oracle>(g, restrictions,
+    auto steinerNetwork(ir::make_SteinerNetwork<
+                    ir::SteinerNetworkOracle<Oracle>>(g, restrictions,
                             std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
@@ -216,19 +215,19 @@ void runTest(const Graph & g, const Cost & costs, const Restrictions & restricti
     for (int i : boost::irange(0, 5)) {
         LOGLN("random violated, seed " << i);
         srand(i);
-        runSingleTest(g, costs, restrictions);
+        runSingleTest<paal::lp::RandomViolatedSeparationOracle>(g, costs, restrictions);
     }
 
     // non-default heuristics
     if (verticesNum <= 80) {
         LOGLN("most violated");
-        runSingleTest<paal::lp::FindMostViolated>(g, costs, restrictions);
+        runSingleTest<paal::lp::MostViolatedSeparationOracle>(g, costs, restrictions);
     }
 
-    // non-default heuristics (slow, only for smaller instances)
+    // non-default heuristics
     if (verticesNum <= 50) {
-        LOGLN("any violated");
-        runSingleTest<paal::lp::FindAnyViolated>(g, costs, restrictions);
+        LOGLN("first violated");
+        runSingleTest<paal::lp::FirstViolatedSeparationOracle>(g, costs, restrictions);
     }
 }
 

@@ -1,7 +1,7 @@
 /**
  * @file steiner_tree_oracle.hpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Godlewski
  * @version 1.0
  * @date 2013-08-01
  */
@@ -10,64 +10,20 @@
 
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
-
-#include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
+#include <boost/optional.hpp>
 
 namespace paal {
 namespace ir {
 
 /**
- * Separation Oracle class.
+ * @class SteinerTreeViolationChecker
+ * @brief Violations checker for the separation oracle
+ *      in the steiner tree problem.
  */
-template<typename Vertex, typename Dist, typename Terminals> class SteinerTreeOracle {
-public:
-    SteinerTreeOracle() :
-        m_terminals(NULL), m_components(NULL), m_currentGraphSize(-1) {}
-
-    /**
-     * Finds a solution that satisfies all current constrains.
-     */
-    template <typename Solution, typename LP>
-    bool feasibleSolution(Solution & sol, const LP & lp) {
-        int graphSize = sol.getTerminals().size();
-        if (graphSize != m_currentGraphSize) {
-            // Graph has changed, construct new oracle
-            m_currentGraphSize = graphSize;
-            m_components = &sol.getComponents();
-            m_terminals = &sol.getTerminals();
-            m_root = selectRoot();
-            createAuxiliaryDigraph(sol, lp);
-        } else {
-            updateAuxiliaryDigraph(sol, lp);
-        }
-        //return !findMostViolatedConstraint();
-        return !findAnyViolatedConstraint(sol);
-    }
-
-    /**
-     * Adds the violated constraint to LP.
-     * It contains all the components reachable from a given source,
-     * but its sink vertex is not reachable.
-     */
-    template <typename Solution, typename LP>
-    void addViolatedConstraint(Solution & sol, LP & lp) {
-        lp.addRow(lp::LO, 1);
-        for (int i = 0; i < m_components->size(); ++i) {
-            Vertex u = m_artifVertices[i];
-            int ver = m_components->findVersion(i);
-            Vertex v = m_components->find(i).getSink(ver);
-            if (m_violatingSet.find(u) != m_violatingSet.end()
-                   && m_violatingSet.find(v) == m_violatingSet.end()) {
-                lp::ColId colIdx = sol.findColumnLP(i);
-                lp.addNewRowCoef(colIdx);
-            }
-        }
-        lp.loadNewRow();
-    }
-
-private:
+class SteinerTreeViolationChecker {
     typedef boost::adjacency_list_traits<boost::vecS, boost::vecS,
             boost::directedS> Traits;
     typedef Traits::edge_descriptor AuxEdge;
@@ -80,6 +36,81 @@ private:
                     boost::property<boost::edge_residual_capacity_t, double,
                             boost::property<boost::edge_reverse_t, AuxEdge> > > > AuxGraph;
     typedef std::vector<AuxEdge> AuxEdgeList;
+    typedef std::unordered_set<AuxVertex> ViolatingSet;
+    typedef std::vector<ViolatingSet> ViolatingSets;
+    typedef boost::optional<double> Violation;
+
+public:
+    typedef AuxVertex Candidate;
+
+    SteinerTreeViolationChecker() :
+        m_currentGraphSize(-1) {}
+
+    /**
+     * Returns an iterator range of violated constraint candidates.
+     */
+    template <typename Problem, typename LP>
+    auto getViolationCandidates(const Problem & problem, const LP & lp)
+            -> decltype(problem.getTerminals()) {
+
+        int graphSize = problem.getTerminals().size();
+        if (graphSize != m_currentGraphSize) {
+            // Graph has changed, construct new oracle
+            m_currentGraphSize = graphSize;
+            m_root = selectRoot(problem.getTerminals());
+            createAuxiliaryDigraph(problem, lp);
+        } else {
+            updateAuxiliaryDigraph(problem, lp);
+        }
+        return problem.getTerminals();
+    }
+
+    /**
+     * Checks if the given constraint candidate is violated an if it is,
+     * returns the violation value and violated constraint ID.
+     */
+    template <typename Problem>
+    Violation checkViolation(Candidate candidate, const Problem & problem) {
+        if (candidate == m_root) {
+            return Violation();
+        }
+
+        double violation = checkMinCut(candidate, m_root, problem.getCompare());
+        if (problem.getCompare().g(violation, 0)) {
+            return Violation(violation);
+        }
+        else {
+            return Violation();
+        }
+    }
+
+    /**
+     * Adds the violated constraint to LP.
+     * It contains all the components reachable from a given source,
+     * but its sink vertex is not reachable.
+     */
+    template <typename Problem, typename LP>
+    void addViolatedConstraint(Candidate violatingTerminal, const Problem & problem, LP & lp) {
+        if (m_violatingTerminal != violatingTerminal) {
+            checkMinCut(violatingTerminal, m_root, problem.getCompare());
+        }
+
+        const auto & components = problem.getComponents();
+        lp.addRow(lp::LO, 1);
+        for (int i = 0; i < components.size(); ++i) {
+            auto u = m_artifVertices[i];
+            int ver = components.findVersion(i);
+            auto v = components.find(i).getSink(ver);
+            if (m_violatingSet.find(u) != m_violatingSet.end()
+                   && m_violatingSet.find(v) == m_violatingSet.end()) {
+                lp::ColId colIdx = problem.findColumnLP(i);
+                lp.addNewRowCoef(colIdx);
+            }
+        }
+        lp.loadNewRow();
+    }
+
+private:
 
     /**
      * @brief Creates the auxiliary directed graph used for feasibility testing
@@ -88,28 +119,29 @@ private:
      * Sources of every component have out edges with infinite weight
      * Target has in edge with weigth x_i from LP
      */
-    template <typename Solution, typename LP>
-    void createAuxiliaryDigraph(Solution &sol, const LP & lp) {
+    template <typename Problem, typename LP>
+    void createAuxiliaryDigraph(Problem &problem, const LP & lp) {
         m_auxGraph.clear();
         m_artifVertices.clear();
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
+        const auto & components = problem.getComponents();
 
-        for (int i = 0; i < (int)m_terminals->size(); ++i) {
+        for (int i = 0; i < (int)problem.getTerminals().size(); ++i) {
             add_vertex(m_auxGraph);
         }
 
-        for (int i = 0; i < m_components->size(); ++i) {
+        for (int i = 0; i < components.size(); ++i) {
             AuxVertex newV = add_vertex(m_auxGraph);
             m_artifVertices[i] = newV;
-            int ver = m_components->findVersion(i);
-            Vertex sink = m_components->find(i).getSink(ver);
-            for (Vertex w : boost::make_iterator_range(m_components->find(i).getElements())) {
+            int ver = components.findVersion(i);
+            auto sink = components.find(i).getSink(ver);
+            for (auto w : boost::make_iterator_range(components.find(i).getElements())) {
                 if (w != sink) {
                     double INF = std::numeric_limits<double>::max();
                     addEdge(w, newV, INF);
                 } else {
-                    lp::ColId x = sol.findColumnLP(i);
+                    lp::ColId x = problem.findColumnLP(i);
                     double colVal = lp.getColPrim(x);
                     addEdge(newV, sink, colVal);
                 }
@@ -120,13 +152,14 @@ private:
     /**
      * Updates the auxiliary directed graph. Should be performed after each LP iteration.
      */
-    template <typename Solution, typename LP>
-    void updateAuxiliaryDigraph(Solution &sol, const LP & lp) {
-        for (int i = 0; i < m_components->size(); ++i) {
+    template <typename Problem, typename LP>
+    void updateAuxiliaryDigraph(Problem &problem, const LP & lp) {
+        const auto & components = problem.getComponents();
+        for (int i = 0; i < components.size(); ++i) {
             AuxVertex componentV = m_artifVertices[i];
-            int ver = m_components->findVersion(i);
-            Vertex sink = m_components->find(i).getSink(ver);
-            lp::ColId x = sol.findColumnLP(i);
+            int ver = components.findVersion(i);
+            auto sink = components.find(i).getSink(ver);
+            lp::ColId x = problem.findColumnLP(i);
             double colVal = lp.getColPrim(x);
             addEdge(componentV, sink, colVal);
         }
@@ -135,9 +168,10 @@ private:
     /**
      * Select the root terminal. Max-flow will be directed to that vertex during LP oracle execution.
      */
-    Vertex selectRoot() {
+    template <typename Terminals>
+    AuxVertex selectRoot(const Terminals & terminals) {
         //TODO: Maybe it's better to select random vertex rather than first
-        Vertex ret = *m_terminals->begin();
+        AuxVertex ret = *terminals.begin();
         return ret;
     }
 
@@ -173,45 +207,13 @@ private:
     }
 
     /**
-     * Runs a max-flow algorithm from every vertex or until first violation is found.
-     */
-    template <typename Solution>
-    bool findAnyViolatedConstraint(Solution & sol) {
-        double violation = 0;
-        for (const Vertex & src : boost::make_iterator_range(*m_terminals)) {
-            if (src != m_root) {
-                violation = checkViolationBiggerThan(sol, src, m_root);
-                if (sol.getCompare().g(violation, 0)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     *  @brief Runs a max-flow from every vertex towards root.
-     */
-    template <typename Solution>
-    bool findMostViolatedConstraint(Solution & sol) {
-        double max = 0;
-        for (const Vertex & src : boost::make_iterator_range(*m_terminals)) {
-            if (src == m_root)
-                continue;
-            max = std::max(checkViolationBiggerThan(sol, src, m_root, max), max);
-        }
-        return sol.getCompare().g(max, 0);
-    }
-
-    /**
      * Runs a maxflow algorithm between given vertices.
      */
-    template <typename Solution>
-    double checkViolationBiggerThan(Solution & sol, Vertex  src, Vertex trg, double maximumViolation = 0) {
+    template <typename Compare>
+    double checkMinCut(AuxVertex src, AuxVertex trg, Compare compare) {
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double violation = 1 - minCut;
-        if (sol.getCompare().g(violation, maximumViolation)) {
-            maximumViolation = violation;
+        if (compare.g(violation, 0)) {
             findViolatingSet(src, trg);
         }
         return violation;
@@ -220,25 +222,25 @@ private:
     /**
      * Finds a set of vertices unreachable from source.
      */
-    void findViolatingSet(Vertex src, Vertex trg) {
+    void findViolatingSet(AuxVertex src, AuxVertex trg) {
         m_violatingSet.clear();
         auto colors = get(boost::vertex_color, m_auxGraph);
         auto srcColor = get(colors, src);
-        for (const AuxVertex & v : boost::make_iterator_range(vertices(m_auxGraph))) {
+        for (AuxVertex v : boost::make_iterator_range(vertices(m_auxGraph))) {
             if (get(colors, v) == srcColor) {
                 m_violatingSet.insert(v);
             }
         }
+        m_violatingTerminal = src;
     }
 
-    Terminals const * m_terminals; // current list of terminals
-    SteinerComponents<Vertex, Dist> const * m_components; // current list of components
-    Vertex m_root; // root vertex, sink of all max-flows
+    AuxVertex m_root; // root vertex, sink of all max-flows
     int m_currentGraphSize; // size of current graph
 
     AuxGraph m_auxGraph; // max-flow graph
     std::unordered_map<int, AuxVertex> m_artifVertices; // maps componentId to auxGraph vertex
-    std::unordered_set<AuxVertex> m_violatingSet; // set of unreachable vertices
+    ViolatingSet m_violatingSet; // set of unreachable vertices
+    Candidate m_violatingTerminal;
 
     boost::property_map<AuxGraph, boost::edge_capacity_t>::type m_cap; // capacity
     boost::property_map<AuxGraph, boost::edge_reverse_t>::type m_rev; // reverse edge

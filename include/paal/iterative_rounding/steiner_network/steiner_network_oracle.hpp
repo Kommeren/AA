@@ -8,44 +8,41 @@
 #ifndef STEINER_NETWORK_ORACLE_HPP
 #define STEINER_NETWORK_ORACLE_HPP
 
-#include <boost/range/iterator_range.hpp>
-#include <boost/range/join.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
-#include <boost/bimap.hpp>
-#include <unordered_set>
 
-#include "paal/data_structures/components/components.hpp"
-#include "paal/lp/lp_row_generation.hpp"
-#include "paal/lp/separation_oracle_components.hpp"
-#include "paal/utils/floating.hpp"
-#include "paal/utils/functors.hpp"
+#include <unordered_set>
 
 
 namespace paal {
 namespace ir {
 
-class FindViolated;
 
 /**
- * @brief Components of the separation oracle for the steiner network problem.
+ * @class SteinerNetworkViolationChecker
+ * @brief Violations checker for the separation oracle
+ *      in the steiner network problem.
  */
-template <typename... Args>
-    using SteinerNetworkOracleComponents =
-        data_structures::Components<
-        data_structures::NameWithDefault<FindViolated, lp::FindRandViolated> >::type<Args...>;
+class SteinerNetworkViolationChecker {
+    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
+    typedef Traits::edge_descriptor AuxEdge;
+    typedef Traits::vertex_descriptor AuxVertex;
+    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
+                                  boost::property<boost::vertex_color_t, boost::default_color_type,
+                                      boost::property<boost::vertex_distance_t, long,
+                                          boost::property<boost::vertex_predecessor_t, AuxEdge>>>,
+                                  boost::property<boost::edge_capacity_t, double,
+                                      boost::property<boost::edge_residual_capacity_t, double,
+                                          boost::property<boost::edge_reverse_t, AuxEdge>>>
+                                 > AuxGraph;
+    typedef boost::property_map<AuxGraph, boost::edge_capacity_t>::type AuxEdgeCapacity;
+    typedef boost::property_map<AuxGraph, boost::edge_reverse_t>::type  AuxEdgeReverse;
+    typedef std::unordered_set<AuxVertex> ViolatingSet;
+    typedef boost::optional<double> Violation;
 
-
-/**
- * @class SteinerNetworkOracle
- * @brief Separation oracle for the row generation in the steiner network problem.
- *
- * @tparam OracleComponents
- */
-template <typename OracleComponents = SteinerNetworkOracleComponents<>>
-class SteinerNetworkOracle {
-    typedef utils::Compare<double> Compare;
 public:
+    typedef std::pair<AuxVertex, AuxVertex> Candidate;
+
     /**
      * Checks if any solution to the problem exists.
      */
@@ -56,33 +53,59 @@ public:
         m_cap = get(boost::edge_capacity, m_auxGraph);
         m_rev = get(boost::edge_reverse, m_auxGraph);
 
-        for (auto const & e : boost::make_iterator_range(edges(g))) {
+        for (auto e : boost::make_iterator_range(edges(g))) {
             auto u = source(e, g);
             auto v = target(e, g);
             addEdge(u, v, 1);
         }
-        return !findAnyViolatedConstraint(problem);
+
+        for (auto res : problem.getRestrictionsVec()) {
+            if (checkViolation(res, problem)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * Checks if the current LP solution is a feasible solution of the problem.
+     * Returns an iterator range of violated constraint candidates.
      */
     template <typename Problem, typename LP>
-    bool feasibleSolution(Problem & problem, const LP & lp) {
+    auto getViolationCandidates(const Problem & problem, const LP & lp) ->
+            decltype(problem.getRestrictionsVec()) {
+
         fillAuxiliaryDigraph(problem, lp);
-        return !m_oracleComponents.template call<FindViolated>(
-                            problem, *this, problem.getRestrictionsVec().size());
+        return problem.getRestrictionsVec();
+    }
+
+    /**
+     * Checks if the given constraint candidate is violated an if it is,
+     * returns the violation value and violated constraint ID.
+     */
+    template <typename Problem>
+    Violation checkViolation(Candidate candidate, const Problem & problem) {
+        double violation = checkMinCut(candidate.first, candidate.second, problem);
+        if (problem.getCompare().g(violation, 0)) {
+            return Violation(violation);
+        }
+        else {
+            return Violation();
+        }
     }
 
     /**
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void addViolatedConstraint(Problem & problem, LP & lp) {
+    void addViolatedConstraint(Candidate violation, const Problem & problem, LP & lp) {
+        if (violation != m_violatedRestriction) {
+            checkMinCut(violation.first, violation.second, problem);
+        }
+
         const auto & g = problem.getGraph();
-        auto restriction = problem.getMaxRestriction(
-                                m_violatedRestriction.first,
-                                m_violatedRestriction.second);
+        auto restriction = problem.getMaxRestriction(m_violatedRestriction.first,
+                                                        m_violatedRestriction.second);
 
         for (auto const & e : problem.getEdgesInSolution()) {
             if (isEdgeInViolatingCut(e, g)) {
@@ -101,63 +124,7 @@ public:
         lp.loadNewRow();
     }
 
-    /**
-     * Finds any violated constraint and saves it or decides that no constraint is violated.
-     *
-     * @param problem Problem object
-     * @param startIndex index of the restriction from which we begin the search
-     * @return true iff a violated constraint was found
-     */
-    template <typename Problem>
-    bool findAnyViolatedConstraint(Problem & problem, int startIndex = 0) {
-        const auto & restrictionsVec = problem.getRestrictionsVec();
-        auto startIter = restrictionsVec.begin();
-        std::advance(startIter, startIndex);
-
-        for (auto const & src_trg : boost::join(boost::make_iterator_range(startIter, restrictionsVec.end()),
-                                        boost::make_iterator_range(restrictionsVec.begin(), startIter))) {
-            assert(src_trg.first != src_trg.second);
-            if (problem.getCompare().g(checkViolationBiggerThan(problem, src_trg.first, src_trg.second), 0)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Finds the most violated constraint and saves it or decides that no constraint is violated.
-     *
-     * @param problem Problem object
-     * @return true iff a violated constraint was found
-     */
-    template <typename Problem>
-    bool findMostViolatedConstraint(Problem & problem) {
-        double max = 0;
-
-        for (auto const & src_trg : problem.getRestrictionsVec()) {
-            assert(src_trg.first != src_trg.second);
-            max = std::max(checkViolationBiggerThan(problem, src_trg.first, src_trg.second, max), max);
-        }
-
-        return problem.getCompare().g(max, 0);
-    }
-
 private:
-    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
-    typedef Traits::edge_descriptor AuxEdge;
-    typedef Traits::vertex_descriptor AuxVertex;
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
-                                  boost::property<boost::vertex_color_t, boost::default_color_type,
-                                      boost::property<boost::vertex_distance_t, long,
-                                          boost::property<boost::vertex_predecessor_t, AuxEdge>>>,
-                                  boost::property<boost::edge_capacity_t, double,
-                                      boost::property<boost::edge_residual_capacity_t, double,
-                                          boost::property<boost::edge_reverse_t, AuxEdge>>>
-                                 > AuxGraph;
-    typedef boost::property_map<AuxGraph, boost::edge_capacity_t>::type AuxEdgeCapacity;
-    typedef boost::property_map<AuxGraph, boost::edge_reverse_t>::type  AuxEdgeReverse;
-    typedef std::unordered_set<AuxVertex> ViolatingSet;
 
     /**
      * Checks if a given edge belongs to the cut given by the current violating set.
@@ -230,42 +197,39 @@ private:
 
     /**
      * Finds the most violated set of vertices containing \c src and not containing
-     * \c trg and saves it if the violation is greater than \c minViolation
+     * \c trg and saves it if a violation is found.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
-     * @param minViolation minimum violation that a set should have to be saved
+     * @param problem problem object
      * @return violation of the found set
      */
     template <typename Problem>
-    double checkViolationBiggerThan(Problem & problem, AuxVertex src, AuxVertex trg,
-                double minViolation = 0.) {
+    double checkMinCut(AuxVertex src, AuxVertex trg, const Problem & problem) {
+        assert(src != trg);
         double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, src, trg);
         double restriction = problem.getMaxRestriction(src, trg);
         double violation = restriction - minCut;
 
-        if (problem.getCompare().g(violation, minViolation)) {
-            m_violatedRestriction = std::make_pair(src, trg);
-            m_violatingSet.clear();
-
+        if (problem.getCompare().g(violation, 0)) {
             auto colors = get(boost::vertex_color, m_auxGraph);
             auto srcColor = get(colors, src);
             assert(srcColor != get(colors, trg));
+            m_violatingSet.clear();
             for (auto v : boost::make_iterator_range(vertices(m_auxGraph))) {
                 if (v != trg && get(colors, v) == srcColor) {
                     m_violatingSet.insert(v);
                 }
             }
+            m_violatedRestriction = std::make_pair(src, trg);
         }
 
         return violation;
     }
 
-    OracleComponents m_oracleComponents;
-
     AuxGraph m_auxGraph;
 
     ViolatingSet m_violatingSet;
-    std::pair<AuxVertex, AuxVertex> m_violatedRestriction;
+    Candidate m_violatedRestriction;
 
     AuxEdgeCapacity m_cap;
     AuxEdgeReverse  m_rev;
