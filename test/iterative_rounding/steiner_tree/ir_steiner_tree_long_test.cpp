@@ -36,9 +36,10 @@ BOOST_AUTO_TEST_CASE(steiner_tree_long_test) {
         std::vector<int> result;
         paal::ir::solve_steiner_tree(test.metric, test.terminals, test.steinerPoints,
                 std::back_inserter(result), strategyRand);
-        int res = paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
+        ON_LOG(int res = )paal::ir::SteinerUtils::countCost(result, test.terminals, test.metric);
 
-        check_result(res,test.optimal,1.39);
+        LOG("RES " << res << "\n");
+        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
 
         // First tests only
         if (++k == 10) break;
