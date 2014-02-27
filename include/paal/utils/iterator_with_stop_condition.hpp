@@ -40,7 +40,7 @@ namespace paal {
          * @param end
          * @param stopCondition
          */
-            explicit IteratorWithStopCondition(Iterator begin, Iterator end, StopCondition stopCondition)
+            IteratorWithStopCondition(Iterator begin, Iterator end, StopCondition stopCondition)
             : m_begin(begin), m_end(end), m_stopCondtion(stopCondition) {}
 
         friend class boost::iterator_core_access;

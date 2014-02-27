@@ -16,20 +16,30 @@
 namespace paal {
 namespace utils {
 
-///for given exapresion returns its type with removed const and reference
+///for given expression returns its type with removed const and reference
 #define puretype(t)  typename std::decay<decltype(t)>::type
 
-///for iven collection returns type of its iterator
+///for given collection returns type of its iterator
 template <typename Collection> struct CollectionToIter {
     typedef decltype(std::begin(std::declval<Collection &>())) type;
 };
 
-///for iven collection returns type of its const iterator
+///for given collection returns type of its const iterator
 template <typename Collection> struct CollectionToConstIter {
     typedef decltype(std::begin(std::declval<const Collection &>())) type;
 };
 
-///for iven collection returns type of its element
+///for given collection returns type of its reference
+template <typename Collection> struct CollectionToRef {
+   typedef typename std::iterator_traits<typename CollectionToIter<Collection>::type>::reference type;
+};
+
+///for given collection returns type of its const reference
+template <typename Collection> struct CollectionToConstRef {
+   typedef typename std::iterator_traits<typename CollectionToConstIter<Collection>::type>::reference type;
+};
+
+///for given collection returns type of its element
 template <typename Collection> struct CollectionToElem {
   typedef typename std::iterator_traits<typename CollectionToIter<Collection>::type>::value_type type;
 };
@@ -45,7 +55,7 @@ template <typename T> struct kTuple<T, 1> {
     typedef std::tuple<T> type;
 };
 
-///return type of the fucntion //TODO redundant with std::result_of
+///return type of the function //TODO redundant with std::result_of
 template <typename T, typename F, typename... Args>
 struct ReturnType {
     typedef  decltype(((std::declval<T*>())->*(std::declval<F>()))(std::declval<Args>()...)) type;
