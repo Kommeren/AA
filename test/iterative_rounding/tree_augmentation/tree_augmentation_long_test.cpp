@@ -25,16 +25,16 @@ using namespace  boost;
 // create a typedef for the Graph type
 typedef adjacency_list<vecS, vecS, undirectedS,
         no_property,
-        property < edge_weight_t, double,
-        property < edge_color_t, bool> > > Graph;
+        property<edge_weight_t, double,
+        property<edge_color_t, bool>>> Graph;
 
-typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
-typedef graph_traits < Graph >::vertex_descriptor Vertex;
-typedef graph_traits < Graph >::edge_descriptor Edge;
+typedef adjacency_list_traits<vecS, vecS, undirectedS> Traits;
+typedef graph_traits<Graph>::vertex_descriptor Vertex;
+typedef graph_traits<Graph>::edge_descriptor Edge;
 
-typedef property_map < Graph, vertex_index_t >::type Index;
-typedef property_map < Graph, edge_weight_t >::type Cost;
-typedef property_map < Graph, edge_color_t >::type TreeMap;
+typedef property_map<Graph, vertex_index_t>::type Index;
+typedef property_map<Graph, edge_weight_t>::type Cost;
+typedef property_map<Graph, edge_color_t>::type TreeMap;
 
 //Read instance in format
 // @nodes 6
@@ -94,14 +94,13 @@ void readTreeAugFromStream(std::ifstream & is,
 template <typename TA>
 //the copy is intended
 double getLowerBound(TA ta) {
-    paal::ir::TreeAugmentationIRComponents<> comps;
+    TreeAugmentationIRComponents<> comps;
     lp::GLPBase lp;
     comps.call<Init>(ta, lp);
     auto probType = comps.call<SolveLPToExtremePoint>(ta, lp);
     BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
     return lp.getObjValue();
 }
-
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
     std::string testDir = "test/data/TREEAUG/";
@@ -120,18 +119,16 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         TreeMap treeMap = get(edge_color, g);
 
         readTreeAugFromStream(ifs, g, cost, treeMap);
-        typedef std::vector<Edge> SetEdge;
-        SetEdge solution;
 
-        auto treeaug(paal::ir::make_TreeAug(g, std::back_inserter(solution)));
+        std::vector<Edge> solution;
+        auto treeaug(make_TreeAug(g, std::back_inserter(solution)));
 
         auto invalid = treeaug.checkInputValidity();
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());
         LOGLN("Input validation " << filename << " ends.");
 
         double lplowerbd = getLowerBound(treeaug);
-        auto result = paal::ir::solve_iterative_rounding(treeaug,
-                                    paal::ir::TreeAugmentationIRComponents<>());
+        auto result = solve_iterative_rounding(treeaug, TreeAugmentationIRComponents<>());
         BOOST_CHECK_EQUAL(result.first, lp::OPTIMAL);
 
         double solval = treeaug.getSolutionCost();

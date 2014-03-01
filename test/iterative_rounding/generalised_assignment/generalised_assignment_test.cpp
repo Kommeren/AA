@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
         costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
-        paal::ir::GeneralAssignmentIRComponents<>(), LogVisitor());
+        paal::ir::GAIRComponents<>(), LogVisitor());
 
     ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
         LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);

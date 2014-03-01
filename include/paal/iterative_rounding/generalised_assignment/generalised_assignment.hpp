@@ -140,7 +140,7 @@ template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
          typename RelaxContition = GARelaxCondition,
          typename Init = GAInit,
          typename SetSolution = GASetSolution>
-             using  GeneralAssignmentIRComponents = IRComponents<SolveLPToExtremePoint,
+             using GAIRComponents = IRComponents<SolveLPToExtremePoint,
                 ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
@@ -368,7 +368,7 @@ make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator,
-          typename Components = GeneralAssignmentIRComponents<>,
+          typename Components = GAIRComponents<>,
           typename Visitor = TrivialVisitor>
 IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,

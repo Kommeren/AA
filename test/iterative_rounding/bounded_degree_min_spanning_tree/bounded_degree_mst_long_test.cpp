@@ -85,9 +85,10 @@ void checkResult(const Graph & g, const ResultTree & tree,
 template <template <typename> class Oracle, typename Bound>
 void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
              const int verticesNum, const double bestCost) {
+    namespace ir = paal::ir;
     ResultTree tree;
-    auto result = paal::ir::bounded_degree_mst_iterative_rounding<
-                paal::ir::BDMSTOracle<Oracle>>(
+    auto result = ir::bounded_degree_mst_iterative_rounding<
+                ir::BDMSTOracle<Oracle>>(
                         g, degBounds, std::inserter(tree, tree.end()));
     BOOST_CHECK(result.first == paal::lp::OPTIMAL);
 

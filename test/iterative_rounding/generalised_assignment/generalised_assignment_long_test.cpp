@@ -14,8 +14,8 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 
-#include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
+#include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
 #include "utils/logger.hpp"
 #include "utils/read_gen_ass.hpp"
@@ -23,7 +23,6 @@
 
 using namespace paal::ir;
 using namespace paal;
-
 
 BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
@@ -42,17 +41,15 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             is_test_cases >> opt;
             LOGLN("case " << i << " opt "<< opt);
 
-
             paal::M costs;
             paal::M times;
             std::vector<int> machinesBounds;
             boost::integer_range<int> machines(0,0);
             boost::integer_range<int> jobs(0,0);
             paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
-            auto  Tf = [&](int i){return machinesBounds[i];};
+            auto Tf = [&](int i){return machinesBounds[i];};
             std::unordered_map<int, int> jobsToMachines;
-            times(0, 0);
-            auto result = paal::ir::generalised_assignment_iterative_rounding(
+            auto result = generalised_assignment_iterative_rounding(
                 machines.begin(), machines.end(),
                 jobs.begin(), jobs.end(),
                 costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()));

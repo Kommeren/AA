@@ -124,24 +124,20 @@ public:
      */
     bool round() {
         int deleted(0);
-        bool repeat = true;
-        //TODO optimize
-        while(repeat) {
-            repeat = false;
-            for(auto cols = m_lpBase.getColumns(); cols.first != cols.second; ++cols.first) {
-                lp::ColId col = *cols.first;
-                if (m_lpBase.getColBoundType(col) != lp::FX) {
-                    auto doRound = call<RoundCondition>(m_problem, m_lpBase, col);
-                    if(doRound) {
-                        m_rounded.insert(std::make_pair(col,
-                            std::make_pair(*doRound, m_lpBase.getColCoef(col))));
-                        ++deleted;
-                        m_visitor.roundCol(m_problem, m_lpBase, col, *doRound);
-                        call<DeleteColStrategy>(m_lpBase, col, *doRound);
-                        repeat = true;
-                        break;
-                    }
-                }
+        auto cols = m_lpBase.getColumns();
+
+        while (cols.first != cols.second) {
+            lp::ColId col = *cols.first;
+            auto doRound = call<RoundCondition>(m_problem, m_lpBase, col);
+            if (doRound) {
+                ++deleted;
+                m_rounded.insert(std::make_pair(col,
+                    std::make_pair(*doRound, m_lpBase.getColCoef(col))));
+                m_visitor.roundCol(m_problem, m_lpBase, col, *doRound);
+                cols.first = deleteColumn(cols.first, *doRound);
+            }
+            else {
+                ++cols.first;
             }
         }
 
@@ -155,22 +151,17 @@ public:
      */
     bool relax() {
         int deleted(0);
-        bool repeat = true;
-        //TODO optimize
-        while(repeat) {
-            repeat = false;
+        auto rows = m_lpBase.getRows();
 
-            for(auto rows = m_lpBase.getRows(); rows.first != rows.second; ++rows.first) {
-                lp::RowId row = *rows.first;
-                if (m_lpBase.getRowBoundType(row) != lp::FR) {
-                    if(call<RelaxCondition>(m_problem, m_lpBase, row)) {
-                        ++deleted;
-                        m_visitor.relaxRow(m_problem, m_lpBase, row);
-                        call<DeleteRowStrategy>(m_lpBase, row);
-                        repeat = true;
-                        break;
-                    }
-                }
+        while (rows.first != rows.second) {
+            lp::RowId row = *rows.first;
+            if (call<RelaxCondition>(m_problem, m_lpBase, row)) {
+                ++deleted;
+                m_visitor.relaxRow(m_problem, m_lpBase, row);
+                rows.first = m_lpBase.deleteRow(rows.first);
+            }
+            else {
+                ++rows.first;
             }
         }
 
@@ -224,6 +215,23 @@ private:
         return m_irComponents.template call<Action>(std::forward<Args>(args)...);
     }
 
+    /// Deletes a column from the LP and adjusts the row bounds.
+    typename LPBase::ColIter
+    deleteColumn(typename LPBase::ColIter colIter, double value) {
+        auto column = m_lpBase.getRowsInColumn(*colIter);
+        lp::RowId row;
+        double coef;
+        for (auto const & c : boost::make_iterator_range(column)) {
+            boost::tie(row, coef) = c;
+            double currUb = m_lpBase.getRowUb(row);
+            double currLb = m_lpBase.getRowLb(row);
+            lp::BoundType currType = m_lpBase.getRowBoundType(row);
+            double diff = coef * value;
+            m_lpBase.setRowBounds(row, currType, currLb - diff, currUb - diff);
+        }
+        return m_lpBase.deleteCol(colIter);
+    };
+
     LPBase m_lpBase;
     IRComponents m_irComponents;
     Visitor m_visitor;
@@ -256,17 +264,16 @@ IRResult solve_iterative_rounding(Problem & problem, IRComponents components, Vi
         return IRResult(probType, IRSolutionCost());
     }
 
-    do {
+    while (!ir.stopCondition()) {
         bool rounded{ir.round()};
         bool relaxed{ir.relax()};
-        if (ir.stopCondition()) break;
         assert(rounded || relaxed);
 
         probType = ir.resolveLPToExtremePoint();
         if (probType != lp::OPTIMAL) {
             return IRResult(probType, IRSolutionCost());
         }
-    } while(true);
+    }
     ir.setSolution();
     return IRResult(lp::OPTIMAL, IRSolutionCost(ir.getSolutionCost()));
 }
@@ -291,16 +298,15 @@ IRResult solve_dependent_iterative_rounding(Problem & problem, IRComponents comp
         return IRResult(probType, IRSolutionCost());
     }
 
-    do {
+    while (!ir.stopCondition()) {
         ir.dependentRound();
         ir.relax();
-        if (ir.stopCondition()) break;
 
         probType = ir.resolveLPToExtremePoint();
         if (probType != lp::OPTIMAL) {
             return IRResult(probType, IRSolutionCost());
         }
-    } while (true);
+    }
     ir.setSolution();
     return IRResult(lp::OPTIMAL, IRSolutionCost(ir.getSolutionCost()));
 }

@@ -195,8 +195,6 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     namespace lp = paal::lp;
 
     typedef std::vector<Edge> ResultNetwork;
-    typedef ir::SteinerNetworkIRComponents<> Components;
-
     ResultNetwork resultNetwork;
     auto steinerNetwork(ir::make_SteinerNetwork<
                     ir::SteinerNetworkOracle<Oracle>>(g, restrictions,
@@ -204,7 +202,8 @@ void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & res
     auto invalid = steinerNetwork.checkInputValidity();
     BOOST_CHECK(!invalid);
 
-    auto result = ir::solve_iterative_rounding(steinerNetwork, Components());
+    auto result = ir::solve_iterative_rounding(steinerNetwork,
+                        ir::SteinerNetworkIRComponents<>());
     BOOST_CHECK(result.first == lp::OPTIMAL);
 }
 

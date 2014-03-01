@@ -208,54 +208,6 @@ struct DefaultResolveLPToExtremePoint {
 };
 
 /**
- * @brief Deletes a row from the LP.
- */
-struct DeleteRow {
-    /// Deletes a row from the LP.
-    template <typename LP>
-    void operator()(LP & lp, lp::RowId row) {
-        lp.deleteRow(row);
-    };
-};
-
-/**
- * @brief Deletes a column from the LP and adjusts the row bounds.
- */
-struct DeleteCol {
-    /// Deletes a column from the LP and adjusts the row bounds.
-    template <typename LP>
-    void operator()(LP & lp, lp::ColId col, double value) {
-        auto column = lp.getRowsInColumn(col);
-        lp::RowId row;
-        double coef;
-        for(auto const & c : boost::make_iterator_range(column)) {
-            boost::tie(row, coef) = c;
-            double currUb = lp.getRowUb(row);
-            double currLb = lp.getRowLb(row);
-            lp::BoundType currType = lp.getRowBoundType(row);
-            double diff = coef * value;
-            lp.setRowBounds(row, currType, currLb - diff, currUb - diff);
-        }
-        lp.deleteCol(col);
-    };
-};
-
-/* not supported now
-struct TrivializeRow {
-    template <typename LP>
-    void operator()(LP & lp, lp::RowId row) {
-        lp.setRowBounds(row, FR, 0, 0);
-    };
-};
-
-struct FixCol {
-    template <typename LP>
-    void operator()(LP & lp, lp::ColId col, double value) {
-        lp.setColBounds(col, lp::FX, value, value);
-    };
-};*/
-
-/**
  * @brief Default stop condition component.
  */
 class DefaultStopCondition {
@@ -270,7 +222,7 @@ public:
      */
     template <typename Problem, typename LP>
     bool operator()(Problem &, const LP & lp) {
-        for(lp::ColId col : boost::make_iterator_range(lp.getColumns())) {
+        for (lp::ColId col : boost::make_iterator_range(lp.getColumns())) {
             double colVal = lp.getColPrim(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;
@@ -292,8 +244,6 @@ class Init;
 class SetSolution;
 class StopCondition;
 class ResolveLPToExtremePoint;
-class DeleteRowStrategy;
-class DeleteColStrategy;
 
 typedef data_structures::Components<
         data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
@@ -302,9 +252,7 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<Init, utils::SkipFunctor>,
         data_structures::NameWithDefault<SetSolution, utils::SkipFunctor>,
-        data_structures::NameWithDefault<StopCondition, DefaultStopCondition>,
-        data_structures::NameWithDefault<DeleteRowStrategy, DeleteRow>,
-        data_structures::NameWithDefault<DeleteColStrategy, DeleteCol> > Components;
+        data_structures::NameWithDefault<StopCondition, DefaultStopCondition>> Components;
 
 /**
  * @brief Iterative rounding components.

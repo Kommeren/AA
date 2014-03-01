@@ -33,6 +33,13 @@ int restrictions(int i, int j) {
     return 2;
 }
 
+void printResult(const ResultNetwork & resultNetwork) {
+    LOGLN("Edges in steiner network");
+    ON_LOG(for(auto const e : resultNetwork) {
+        LOGLN("Edge " << e);
+    })
+}
+
 BOOST_AUTO_TEST_SUITE(steiner_network)
 BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
@@ -51,11 +58,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     steiner_network_iterative_rounding(
         g, restrictions, std::back_inserter(resultNetwork));
 
-    // printing result
-    LOGLN("Edges in steiner network");
-    ON_LOG(for(auto const  & e : resultNetwork) {
-        LOGLN("Edge " << e);
-    })
+    printResult(resultNetwork);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
@@ -81,11 +84,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
         steiner_network_iterative_rounding(g, restrictions,
             boost::weight_map(cost), std::back_inserter(resultNetwork));
 
-        // printing result
-        LOGLN("Edges in steiner network");
-        ON_LOG(for(auto const  & e : resultNetwork) {
-            LOGLN("Edge " << e);
-        })
+        printResult(resultNetwork);
     }
     {
         ResultNetwork resultNetwork;
@@ -94,11 +93,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
                     std::back_inserter(resultNetwork)));
         solve_iterative_rounding(steinerNetwork, SteinerNetworkIRComponents<>());
 
-        // printing result
-        LOGLN("Edges in steiner network");
-        ON_LOG(for(auto const  & e : resultNetwork) {
-            LOGLN("Edge " << e);
-        })
+        printResult(resultNetwork);
     }
 }
 
@@ -106,8 +101,6 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     // invalid problem (restrictions cannot be satisfied)
     LOGLN("Invalid problem (restrictions cannot be satisfied):");
     Graph g(3);
-    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
     bool b;
     b  = add_edge(0, 1, EdgeProp(0, 1), g).second;

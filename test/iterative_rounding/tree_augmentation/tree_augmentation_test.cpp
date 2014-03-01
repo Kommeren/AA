@@ -54,6 +54,7 @@ Edge addEdge(Graph & g,  int u, int v,
 
 typedef property_map < Graph, edge_weight_t >::type Cost;
 typedef property_map < Graph, edge_color_t >::type TreeMap;
+typedef std::set<Edge> SolutionTree;
 
 BOOST_AUTO_TEST_SUITE(tree_augmentation)
 
@@ -75,7 +76,6 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     addEdge(g, 2, 5, treeMap, false, cost, 1);
     addEdge(g, 4, 5, treeMap, false, cost, 1);
 
-    typedef std::set<Edge> SolutionTree;
     SolutionTree solutionTree;
 
     auto treeaug(make_TreeAug(g, std::inserter(solutionTree, solutionTree.begin())));
@@ -104,7 +104,6 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     std::vector<double> costs = {0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
     auto cost = boost::make_iterator_property_map(costs.begin(), edgeId);
 
-    typedef std::set<Edge> SolutionTree;
     {
         SolutionTree solutionTree;
         auto treeaug(make_TreeAug(g, boost::edge_color_map(treeMap).weight_map(cost),
@@ -121,6 +120,15 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     }
 }
 
+void runInvalidTest(const Graph & g){
+    SolutionTree solutionTree;
+    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
+    auto invalid = treeaug.checkInputValidity();
+
+    BOOST_CHECK(invalid);
+    LOGLN(*invalid);
+}
+
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     // invalid problem (wrong number of spanning tree edges)
     LOGLN("Invalid problem (wrong number of spanning tree edges):");
@@ -134,14 +142,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     addEdge(g, 3, 4, treeMap, false, cost, 0);
     addEdge(g, 3, 5, treeMap, false, cost, 0);
 
-    typedef std::vector<Edge> SolutionTree;
-    SolutionTree solutionTree;
-
-    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
-    auto invalid = treeaug.checkInputValidity();
-
-    BOOST_CHECK(invalid);
-    LOGLN(*invalid);
+    runInvalidTest(g);
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
@@ -160,14 +161,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     addEdge(g, 5, 4, treeMap, true, cost, 0);
     addEdge(g, 2, 3, treeMap, false, cost, 0);
 
-    typedef std::vector<Edge> SolutionTree;
-    SolutionTree solutionTree;
-
-    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
-    auto invalid = treeaug.checkInputValidity();
-
-    BOOST_CHECK(invalid);
-    LOGLN(*invalid);
+    runInvalidTest(g);
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
@@ -186,14 +180,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     addEdge(g, 5, 4, treeMap, false, cost, 0);
     addEdge(g, 2, 3, treeMap, false, cost, 0);
 
-    typedef std::vector<Edge> SolutionTree;
-    SolutionTree solutionTree;
-
-    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
-    auto invalid = treeaug.checkInputValidity();
-
-    BOOST_CHECK(invalid);
-    LOGLN(*invalid);
+    runInvalidTest(g);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -7,15 +7,12 @@
 
 * ITERATIVE ROUNDING
 ** rethink rounding
-** columns iterator is invalidated when we remove column
 ** limited number of relaxation per iteration (at least in BDMST, maybe in the rest also)?
 ** LP formulation in separate dir
 ** framework documentation
 ** restriction(v, v) case in steiner network
-** improve row generation
 ** complexities
-** removing rows/cols strategy
-** big copy-paste's in tests
+** improve row generation ?
 ** resolving solution by moving a point ?
 ** cplex support ???
 ** steiner tree doxygen warnings

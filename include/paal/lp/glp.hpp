@@ -8,6 +8,7 @@
 #ifndef LPBASE_HPP
 #define LPBASE_HPP
 #include <numeric>
+#include <unordered_set>
 #include <glpk.h>
 
 #include <boost/iterator/zip_iterator.hpp>
@@ -435,7 +436,15 @@ class GLP : public GLPBase {
                                              typename Vals::iterator>> RowsInColumnIterator;
     typedef boost::zip_iterator<boost::tuple<TransformCol,
                                              typename Vals::iterator>> ColsInRowIterator;
+
+    typedef std::unordered_set<RowId> RowSet;
+    typedef std::unordered_set<ColId> ColSet;
+
 public:
+
+    typedef RowSet::const_iterator RowIter;
+    typedef ColSet::const_iterator ColIter;
+
     /**
      * Constructor.
      *
@@ -507,7 +516,9 @@ public:
      */
     ColId addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
         resizeTmp();
-        return GLPBase::addColumn(costCoef, b, lb, ub, name);
+        ColId colId = GLPBase::addColumn(costCoef, b, lb, ub, name);
+        m_colIds.insert(colId);
+        return colId;
     }
 
     /**
@@ -522,7 +533,9 @@ public:
      */
     RowId addRow(BoundType b = UP, double lb = 0, double ub = 0, const std::string & name = "") {
         resizeTmp();
-        return GLPBase::addRow(b, lb, ub, name);
+        RowId rowId = GLPBase::addRow(b, lb, ub, name);
+        m_rowIds.insert(rowId);
+        return rowId;
     }
 
     /**
@@ -549,43 +562,44 @@ public:
     /**
      * Removes a row form the LP.
      *
-     * @param row identifier of the row to be removed
+     * @param row iterator of the row to be removed
+     *
+     * @return iterator following the removed row
      */
-    void deleteRow(RowId row) {
+    RowIter deleteRow(RowIter row) {
         int arr[2];
-        arr[1] = getRow(row);
-        m_rowIdx.erase(row.get());
+        arr[1] = getRow(*row);
+        m_rowIdx.erase(row->get());
         glp_del_rows(m_lp, 1, arr);
+        return m_rowIds.erase(row);
     }
 
     /**
      * Removes a column form the LP.
      *
-     * @param col identifier of the column to be removed
+     * @param col iterator of the column to be removed
+     *
+     * @return iterator following the removed column
      */
-    void deleteCol(ColId col) {
+    ColIter deleteCol(ColIter col) {
         int arr[2];
-        arr[1] = getCol(col);
-        m_colIdx.erase(col.get());
+        arr[1] = getCol(*col);
+        m_colIdx.erase(col->get());
         glp_del_cols(m_lp, 1, arr);
+        return m_colIds.erase(col);
     }
 
-    //TODO rewrite
     /**
      * Clears the LP instance.
      */
     void clear() {
-        while (true) {
-            auto rows = getRows();
-            if (rows.first == rows.second) break;
-            RowId row = *rows.first;
-            deleteRow(row);
+        auto rows = getRows();
+        while (rows.first != rows.second) {
+            rows.first = deleteRow(rows.first);
         }
-        while (true) {
-            auto cols = getColumns();
-            if (cols.first == cols.second) break;
-            ColId col = *cols.first;
-            deleteCol(col);
+        auto cols = getColumns();
+        while (cols.first != cols.second) {
+            cols.first = deleteCol(cols.first);
         }
     }
 
@@ -708,24 +722,18 @@ public:
                 boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idxTmp.begin() + size + 1, std::bind(&GLP::getColIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1 + size)));
     }
 
-    typedef boost::transform_iterator<ColTrans, decltype(boost::begin(boost::irange(0,0))), ColId> ColIter;
     /**
      * Returns all column identifiers (as an iterator range).
      */
     std::pair<ColIter, ColIter> getColumns() const {
-        auto range = boost::irange(1, glp_get_num_cols(m_lp) + 1);
-        return std::make_pair(ColIter(boost::begin(range), std::bind(&GLP::getColIdx, this, std::placeholders::_1)),
-                              ColIter(boost::end(range)  , std::bind(&GLP::getColIdx, this, std::placeholders::_1)));
+        return std::make_pair(m_colIds.begin(), m_colIds.end());
     }
 
-    typedef boost::transform_iterator<RowTrans, decltype(boost::begin(boost::irange(0,0))), RowId> RowIter;
     /**
      * Returns all row identifiers (as an iterator range).
      */
     std::pair<RowIter, RowIter> getRows() const {
-        auto range = boost::irange(1, glp_get_num_rows(m_lp) + 1);
-        return std::make_pair(RowIter(boost::begin(range), std::bind(&GLP::getRowIdx, this, std::placeholders::_1)),
-                              RowIter(boost::end(range)  , std::bind(&GLP::getRowIdx, this, std::placeholders::_1)));
+        return std::make_pair(m_rowIds.begin(), m_rowIds.end());
     }
 
 private:
@@ -744,6 +752,9 @@ private:
 
     mutable Ids m_idxTmp;
     mutable Vals m_valTmp;
+
+    ColSet m_colIds;
+    RowSet m_rowIds;
 };
 
 } //lp
