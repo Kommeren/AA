@@ -26,30 +26,25 @@ BOOST_AUTO_TEST_CASE(FacilityLocationSolutionAdapterTest) {
     Sol sol(std::move(voronoi), FSet{SGM::A,SGM::B}, cost);
 
     FacilityLocationSolutionAdapter<Sol> sa(sol);
-    std::vector<Facility<int>> saSorted;
-    std::copy(sa.begin(), sa.end(), std::back_inserter(saSorted));
+    std::vector<int> saSorted;
+
+    BOOST_CHECK_EQUAL(boost::distance(sa.getChosenCopy()), 0);
+
+    boost::copy(sa.getUnchosenCopy(), std::back_inserter(saSorted));
     boost::sort(saSorted);
     auto b = saSorted.begin();
     auto e = saSorted.end();
     auto A = *b;
-    BOOST_CHECK_EQUAL(*b, Facility<int>(UNCHOSEN, SGM::A));
+    BOOST_CHECK_EQUAL(*b, SGM::A);
     BOOST_CHECK(b != e);
-    BOOST_CHECK_EQUAL(*(++b), Facility<int>(UNCHOSEN, SGM::B));
+    BOOST_CHECK_EQUAL(*(++b), SGM::B);
     auto B = *b;
     BOOST_CHECK(b != e);
     BOOST_CHECK(++b == e);
 
     sa.addFacility(A);
-
-    saSorted.clear();
-    std::copy(sa.begin(), sa.end(), std::back_inserter(saSorted));
-    boost::sort(saSorted);
-
-    b = saSorted.begin();
-    e = saSorted.end();
-    BOOST_CHECK_EQUAL(*b, A);
-    BOOST_CHECK(b != e);
-    BOOST_CHECK_EQUAL(*(++b), B);
-    BOOST_CHECK(b != e);
-    BOOST_CHECK(++b == e);
+    BOOST_CHECK_EQUAL(boost::distance(sa.getChosenCopy()), 1);
+    BOOST_CHECK_EQUAL(boost::distance(sa.getUnchosenCopy()), 1);
+    BOOST_CHECK_EQUAL(*std::begin(sa.getChosenCopy()), A);
+    BOOST_CHECK_EQUAL(*std::begin(sa.getUnchosenCopy()), B);
 }

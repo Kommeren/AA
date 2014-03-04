@@ -7,7 +7,7 @@
  */
 
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
-#include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
+#include "paal/local_search/single_solution/local_search_single_solution.hpp"
 
 #include "facility_location_solution_adapter.hpp"
 #include "facility_location_add.hpp"
@@ -91,7 +91,7 @@ bool facility_location_local_search(
             Components... components) {
     typedef FacilityLocationSolutionAdapter<FacilityLocationSolution> FLSA;
     FLSA flsa(fls);
-    return local_search_multi_solution(flsa, std::move(psa), std::move(gsc), std::move(components)...);
+    return local_search(flsa, std::move(psa), std::move(gsc), std::move(components)...);
 }
 
 /**

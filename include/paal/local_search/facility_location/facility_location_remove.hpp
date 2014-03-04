@@ -18,17 +18,11 @@
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
-#include "paal/local_search/facility_location/facility_location_solution_element.hpp"
 
 
 namespace paal {
 namespace local_search {
 namespace facility_location {
-
-    /**
-     * @brief Remove move type
-     */
-struct Remove {};
 
 /**
  * @brief gain functor for facility location
@@ -43,21 +37,20 @@ public:
      *
      * @tparam Solution
      * @param s
-     * @param se
+     * @param e
      *
      * @return
      */
-        template <class Solution>
+        template <typename Solution, typename ChosenElement>
     auto operator()(Solution & s,
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
-            Remove) ->
+            ChosenElement e) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
 
         typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist ret, back;
 
-        ret = s.removeFacilityTentative(se.getElem());
+        ret = s.removeFacilityTentative(e);
         //TODO for capacitated version we should  just restart copy
-        back = s.addFacilityTentative(se.getElem());
+        back = s.addFacilityTentative(e);
         assert(ret == -back);
         return -ret;
     }
@@ -76,14 +69,13 @@ public:
      *
      * @tparam Solution
      * @param s
-     * @param se
+     * @param e
      */
-        template <typename Solution>
+        template <typename Solution, typename ChosenElement>
     bool operator()(
             Solution & s,
-            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
-            Remove) {
-        s.removeFacility(se);
+            ChosenElement e) {
+        s.removeFacility(e);
         return true;
     }
 };
@@ -94,37 +86,22 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGetMovesRemove {
-    typedef std::vector<Remove> Moves;
-    typedef typename Moves::iterator Iter;
-
-public:
-
-    /**
-     * @brief constructor
-     */
-    FacilityLocationGetMovesRemove() : m_remove(1) {}
-
+struct FacilityLocationGetMovesRemove {
     /**
      * @brief operator()
      *
      * @tparam Solution
-     * @param el
      *
      * @return
      */
     template <typename Solution>
-        typename std::pair<Iter, Iter>
-    operator()(const Solution &,
-            typename utils::CollectionToElem<Solution>::type & el) {
-        if(el.getIsChosen() == CHOSEN) {
-            //the move of CHOSEN could be remove
-            return std::make_pair(m_remove.begin(), m_remove.end());
-        }
-        return std::pair<Iter, Iter>();
+    auto operator()(const Solution & sol) ->
+        std::pair<decltype(sol.getChosenCopy().begin()),
+                  decltype(sol.getChosenCopy().end())>
+    {
+        auto const & ch = sol.getChosenCopy();
+        return std::make_pair(ch.begin(), ch.end());
     }
-private:
-    Moves m_remove;
 };
 
 } // facility_location

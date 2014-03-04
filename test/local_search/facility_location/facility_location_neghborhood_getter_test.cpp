@@ -23,47 +23,24 @@ BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     typedef FacilityLocationSolution<decltype(cost), VorType> Sol;
     Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
     FacilityLocationSolutionAdapter<Sol> sa(sol);
-    Facility<int> facChosen(CHOSEN, SGM::A);
-    Facility<int> facUnchosen(UNCHOSEN, SGM::B);
 
     {
         FacilityLocationGetMovesRemove<int> ng;
-        auto r = ng(sa, facChosen);
+        auto r = ng(sa);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
-        FacilityLocationGetMovesRemove<int> ng;
-        auto r = ng(sa, facUnchosen);
-        auto b = r.first;
-        auto e = r.second;
-        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-    }
-    {
         FacilityLocationGetMovesAdd<int> ng;
-        auto r = ng(sa, facChosen);
-        auto b = r.first;
-        auto e = r.second;
-        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-    }
-    {
-        FacilityLocationGetMovesAdd<int> ng;
-        auto r = ng(sa, facUnchosen);
+        auto r = ng(sa);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
         FacilityLocationGetMovesSwap<int> ng;
-        auto r = ng(sa, facUnchosen);
-        auto b = r.first;
-        auto e = r.second;
-        BOOST_CHECK_EQUAL(std::distance(b, e), 0);
-    }
-    {
-        FacilityLocationGetMovesSwap<int> ng;
-        auto r = ng(sa, facChosen);
+        auto r = ng(sa);
         auto b = r.first;
         auto e = r.second;
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);

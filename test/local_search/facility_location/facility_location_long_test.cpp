@@ -17,6 +17,7 @@
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
+#define LOGGER_ON
 #include "utils/logger.hpp"
 #include "utils/read_orlib_fl.hpp"
 #include "utils/parse_file.hpp"

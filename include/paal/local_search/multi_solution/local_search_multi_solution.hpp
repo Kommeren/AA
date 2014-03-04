@@ -12,8 +12,11 @@
 #include <algorithm>
 #include <functional>
 
+#include "boost/range/iterator_range.hpp"
+
+
 #include "local_search_multi_solution_concepts.hpp"
-#include "paal/local_search/local_search.hpp"
+#include "paal/local_search/search_loop.hpp"
 #include "paal/local_search/search_traits.hpp"
 #include "paal/utils/type_functions.hpp"
 

@@ -17,7 +17,9 @@
 #include "paal/local_search/simulated_annealing.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "utils/logger.hpp"
+
 
 struct Move {
     int m_from;

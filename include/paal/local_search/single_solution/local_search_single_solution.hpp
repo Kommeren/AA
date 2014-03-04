@@ -15,7 +15,7 @@
 
 #include <boost/range/iterator_range.hpp>
 
-#include "paal/local_search/local_search.hpp"
+#include "paal/local_search/search_loop.hpp"
 #include "local_search_concepts.hpp"
 
 namespace paal {
@@ -65,7 +65,7 @@ template <typename Solution,
 
 class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponents, SearchComponentsRest...> :
     public LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> {
-private:
+protected:
     BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
 
     typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;

@@ -17,7 +17,7 @@
 
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/local_search/facility_location/facility_location_solution_element.hpp"
+#include "paal/data_structures/combine_iterator.hpp"
 
 namespace paal {
 namespace local_search {
@@ -81,53 +81,14 @@ private:
     T m_to;
 };
 
-/**
- * @brief functor that takes from in the constructor.
- *        when operator()(to) is called, it returns Swap(from, to)
- *
- *
- * @tparam VertexType
- */
-template <typename VertexType> class VertexToSwapMove {
-public:
-    /**
-     * @brief constructor
-     *
-     * @param v
-     */
-    VertexToSwapMove(VertexType v) : m_from(v) {}
-
-    VertexToSwapMove() = default;
-    VertexToSwapMove(const VertexToSwapMove & u) = default;
-
-    /**
-     * @brief operator=
-     *
-     * @param u
-     *
-     * @return
-     */
-    VertexToSwapMove & operator=(const VertexToSwapMove & u)  {
-        m_from = u.m_from;
-        return *this;
+///operator() creates Swap  from (from, to)
+struct MakeSwap {
+    ///operator()
+    template <typename T>
+    Swap<T>
+    operator()(T from, T to) const {
+        return Swap<T>(from, to);
     }
-
-    /**
-     * @brief operator()
-     *
-     * @param v
-     *
-     * @return
-     */
-    const Swap<VertexType> & operator()(VertexType v) const {
-        m_sw.setFrom(m_from);
-        m_sw.setTo(v);
-        return m_sw;
-    }
-
-private:
-    mutable Swap<VertexType> m_sw;
-    VertexType m_from;
 };
 
 /**
@@ -136,21 +97,18 @@ private:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGainSwap {
-public:
+struct FacilityLocationGainSwap {
     /**
      * @brief operator()
      *
      * @tparam Solution
      * @param sol
-     * @param se
      * @param s
      *
      * @return
      */
         template <class Solution>
     auto operator()(Solution & sol,
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(sol.getFacilityLocationSolution())>::Dist {
 
@@ -172,22 +130,19 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationCommitSwap {
-public:
+struct FacilityLocationCommitSwap {
     /**
      * @brief operator()
      *
      * @tparam Solution
      * @param sol
-     * @param se
      * @param s
      */
     template <typename Solution>
     bool operator()(Solution & sol,
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
             const Swap<VertexType> & s) {
-        sol.addFacility(sol.getFacility(s.getTo()));
-        sol.removeFacility(sol.getFacility(s.getFrom()));
+        sol.addFacility(s.getTo());
+        sol.removeFacility(s.getFrom());
         return true;
     }
 };
@@ -198,40 +153,33 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGetMovesSwap {
-    /**
-     * @brief class needed to compute return type (TODO should be removed afte c++1y)
-     *
-     * @tparam Solution
-     */
-    template <typename Solution>
-    struct IterType {
-        typedef puretype(std::declval<const Solution &>().getUnchosenCopy()) Unchosen;
-        typedef typename utils::CollectionToIter<const Unchosen>::type UchIter;
-        typedef boost::transform_iterator<VertexToSwapMove<VertexType>,
-                 UchIter, const Swap<VertexType> &> TransIter;
-        typedef std::pair<TransIter, TransIter> TransRange;
-    };
-
-public:
-    typedef Facility<VertexType> Fac;
+struct FacilityLocationGetMovesSwap {
 
     ///operator()
-    ///Due to the memory optimization at one moment only one Move is valid
-    template <typename Solution> typename IterType<Solution>::TransRange
-    operator()(const Solution &s, const Fac & el) {
-        auto e = el.getElem();
+    template <typename Solution>
+    auto operator()(const Solution &s) ->
+        std::pair<data_structures::CombineIterator<MakeSwap
+                    , puretype(s.getChosenCopy())
+                    , puretype(s.getUnchosenCopy())>
+                 , data_structures::CombineIterator<MakeSwap
+                    , puretype(s.getChosenCopy())
+                    , puretype(s.getUnchosenCopy())>>
 
-        typedef typename IterType<Solution>::TransIter TransIter;
-
-        if(el.getIsChosen() == CHOSEN) {
-            //the move of CHOSEN could be swap with some unchosen
-            auto const & uch = s.getUnchosenCopy();
-            VertexToSwapMove<VertexType> uchToUE(e);
-            return std::make_pair(TransIter(uch.begin(), uchToUE),
-                                  TransIter(uch.end()  , uchToUE));
-        }
-        return std::make_pair(TransIter(), TransIter());
+        //this does NOT work on clang-3.4!!!
+    /*    std::pair<
+        decltype(data_structures::make_CombineIterator(MakeSwap{}
+                , s.getUnchosenCopy()
+                , s.getChosenCopy())),
+        decltype(data_structures::make_CombineIterator(MakeSwap{}
+                , s.getUnchosenCopy()
+                , s.getChosenCopy()))>*/
+    {
+        auto begin = data_structures::make_CombineIterator(MakeSwap{}
+                , s.getChosenCopy()
+                , s.getUnchosenCopy()
+                );
+        decltype(begin) end;
+        return std::make_pair(begin, end);
     }
 };
 

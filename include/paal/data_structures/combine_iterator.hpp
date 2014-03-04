@@ -1,5 +1,5 @@
 /**
- * @file subset_iterator.hpp
+ * @file combine_iterator.hpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
@@ -13,8 +13,8 @@
 
 #include "paal/utils/type_functions.hpp"
 
-#ifndef SUBSET_ITERATOR_HPP
-#define SUBSET_ITERATOR_HPP
+#ifndef COMBINE_ITERATOR_HPP
+#define COMBINE_ITERATOR_HPP
 
 namespace paal {
 namespace data_structures {
@@ -250,7 +250,7 @@ template <typename Joiner, typename... Ranges>
             return false;
         }
 
-        using reference =  decltype(CombineIteratorEngine<Ranges...>().call(std::declval<Joiner>()));
+        using ref =  decltype(CombineIteratorEngine<Ranges...>().call(std::declval<Joiner>()));
 
         friend class boost::iterator_core_access;
 
@@ -281,7 +281,7 @@ template <typename Joiner, typename... Ranges>
          *
          * @return
          */
-        reference dereference() const { return m_iteratorEngine.call(m_joiner); }
+        ref dereference() const { return m_iteratorEngine.call(m_joiner); }
 
         Joiner m_joiner;
         CombineIteratorEngine<Ranges...> m_iteratorEngine;
@@ -307,5 +307,5 @@ template <typename Joiner, typename... Ranges>
 } //data_structures
 } //paal
 
-#endif // SUBSET_ITERATOR_HPP
+#endif // COMBINE_ITERATOR_HPP
 

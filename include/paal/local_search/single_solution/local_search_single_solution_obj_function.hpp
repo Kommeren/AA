@@ -11,6 +11,7 @@
 #include "local_search_single_solution.hpp"
 #include "trivial_solution_commit.hpp"
 #include "search_obj_func_components.hpp"
+#include "paal/data_structures/components/component_traits.hpp"
 
 namespace paal {
 namespace local_search {
@@ -28,6 +29,7 @@ struct SearchObjFunctionComponentsTraits {
 };
 
 namespace detail {
+
 template <typename F, typename Solution, typename Commit> class FunToCheck {
         typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
     public:

@@ -9,6 +9,7 @@
 #define SEARCH_OCJ_FUNC_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
+#include "paal/local_search/search_components.hpp"
 #include "paal/utils/functors.hpp"
 
 namespace paal {

@@ -18,17 +18,11 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/local_search/facility_location/facility_location_solution_element.hpp"
 
 
 namespace paal {
 namespace local_search {
 namespace facility_location {
-
-    /**
-     * @brief Add move type
-     */
-struct Add {};
 
 /**
  * @brief commit functor for add moves in facility location problem
@@ -43,15 +37,14 @@ public:
      *
      * @tparam Solution
      * @param s
-     * @param se
+     * @param e
      */
-    template <typename Solution>
+    template <typename Solution, typename UnchosenElement>
     bool operator()(
             Solution & s,
-            typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
-            Add) {
-
-        s.addFacility(se);
+            UnchosenElement & e)  //SolutionElement
+    {
+        s.addFacility(e);
         return true;
     }
 };
@@ -63,36 +56,26 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGetMovesAdd {
-    typedef std::vector<Add> Moves;
-    typedef typename Moves::iterator Iter;
-
-public:
-    /**
-     * @brief constructor
-     */
-    FacilityLocationGetMovesAdd() : m_add(1) {}
-    typedef Facility<VertexType> Fac;
+struct FacilityLocationGetMovesAdd {
 
     /**
      * @brief operator()
      *
      * @tparam Solution
-     * @param el
      *
      * @return
      */
     template <typename Solution>
-        std::pair<Iter, Iter>
-    operator()(const Solution &, Fac & el) {
-        if(el.getIsChosen() == UNCHOSEN) {
-            //the move of UNCHOSEN could be added to the solution
-            return std::make_pair(m_add.begin(), m_add.end());
-        }
-        return std::pair<Iter, Iter>();
+    auto operator()(const Solution & sol) ->
+        std::pair<decltype(sol.getUnchosenCopy().begin()),
+                  decltype(sol.getUnchosenCopy().end())
+        >
+
+    {
+        //the move of UNCHOSEN could be added to the solution
+        auto const & uch = sol.getUnchosenCopy();
+        return std::make_pair(uch.begin(), uch.end());
     }
-private:
-    Moves m_add;
 };
 
 
@@ -109,17 +92,16 @@ public:
      *
      * @tparam Solution
      * @param s
-     * @param se
+     * @param e
      *
      * @return
      */
-        template <class Solution>
+        template <typename Solution, typename UnchosenElement>
     auto operator()(Solution & s,
-            const  typename utils::CollectionToElem<Solution>::type & se,  //SolutionElement
-            Add ) ->
+                UnchosenElement e) ->
                 typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
-        auto ret = s.addFacilityTentative(se.getElem());
-        auto back = s.removeFacilityTentative(se.getElem());
+        auto ret = s.addFacilityTentative(e);
+        auto back = s.removeFacilityTentative(e);
         assert(ret == -back);
         return -ret;
 
