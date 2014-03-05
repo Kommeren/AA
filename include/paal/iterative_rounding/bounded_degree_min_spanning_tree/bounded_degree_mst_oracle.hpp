@@ -8,17 +8,14 @@
 #ifndef BOUNDED_DEGREE_MST_ORACLE_HPP
 #define BOUNDED_DEGREE_MST_ORACLE_HPP
 
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/boykov_kolmogorov_max_flow.hpp>
-#include <boost/optional.hpp>
+#include "paal/iterative_rounding/min_cut.hpp"
 
-#include <unordered_set>
+#include <boost/optional.hpp>
 #include <vector>
 
 
 namespace paal {
 namespace ir {
-
 
 /**
  * @class BDMSTViolationChecker
@@ -26,21 +23,9 @@ namespace ir {
  *      in the bounded degree minimum spanning tree problem.
  */
 class BDMSTViolationChecker {
-    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
-    typedef Traits::edge_descriptor AuxEdge;
-    typedef Traits::vertex_descriptor AuxVertex;
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
-                                  boost::property<boost::vertex_color_t, boost::default_color_type,
-                                      boost::property<boost::vertex_distance_t, long,
-                                          boost::property<boost::vertex_predecessor_t, AuxEdge>>>,
-                                  boost::property<boost::edge_capacity_t, double,
-                                      boost::property<boost::edge_residual_capacity_t, double,
-                                          boost::property<boost::edge_reverse_t, AuxEdge>>>
-                                 > AuxGraph;
-    typedef boost::property_map<AuxGraph, boost::edge_capacity_t>::type AuxEdgeCapacity;
-    typedef boost::property_map<AuxGraph, boost::edge_reverse_t>::type  AuxEdgeReverse;
+    typedef MinCutFinder::Edge AuxEdge;
+    typedef MinCutFinder::Vertex AuxVertex;
     typedef std::vector<AuxEdge> AuxEdgeList;
-    typedef std::unordered_set<AuxVertex> ViolatingSet;
     typedef boost::optional<double> Violation;
 
 public:
@@ -53,7 +38,7 @@ public:
     template <typename Problem, typename LP>
     const CandidateList & getViolationCandidates(const Problem & problem, const LP & lp) {
         fillAuxiliaryDigraph(problem, lp);
-        initializeCandidates();
+        initializeCandidates(problem);
         return m_candidateList;
     }
 
@@ -63,7 +48,7 @@ public:
      */
     template <typename Problem>
     Violation checkViolation(Candidate candidate, const Problem & problem) {
-        double violation = checkMinCut(candidate.first, candidate.second, problem.getCompare());
+        double violation = checkMinCut(candidate.first, candidate.second);
         if (problem.getCompare().g(violation, 0)) {
             return Violation(violation);
         }
@@ -77,19 +62,17 @@ public:
      */
     template <typename Problem, typename LP>
     void addViolatedConstraint(Candidate violatingPair, const Problem & problem, LP & lp) {
-        if (violatingPair != m_violatingPair) {
-            checkMinCut(violatingPair.first, violatingPair.second, problem.getCompare());
+        if (violatingPair != m_minCut.getLastCut()) {
+            checkMinCut(violatingPair.first, violatingPair.second);
         }
 
         const auto & g = problem.getGraph();
-        lp.addRow(lp::UP, 0, m_violatingSet.size() - 1);
+        lp.addRow(lp::UP, 0, m_minCut.sourceSetSize() - 2);
 
         for (auto const & e : problem.getEdgeMap().right) {
             auto u = source(e.second, g);
             auto v = target(e.second, g);
-
-            if ((m_violatingSet.find(u) != m_violatingSet.end())
-                && (m_violatingSet.find(v) != m_violatingSet.end())) {
+            if (m_minCut.isInSourceSet(u) && m_minCut.isInSourceSet(v)) {
                 lp.addNewRowCoef(e.first);
             }
         }
@@ -105,12 +88,10 @@ private:
     template <typename Problem, typename LP>
     void fillAuxiliaryDigraph(const Problem & problem, const LP & lp) {
         const auto & g = problem.getGraph();
-        m_auxGraph = AuxGraph(num_vertices(g));
-        m_cap = get(boost::edge_capacity, m_auxGraph);
-        m_rev = get(boost::edge_reverse, m_auxGraph);
-
-        m_srcToV.resize(num_vertices(g));
-        m_vToTrg.resize(num_vertices(g));
+        m_verticesNum = num_vertices(g);
+        m_minCut.init(m_verticesNum);
+        m_srcToV.resize(m_verticesNum);
+        m_vToTrg.resize(m_verticesNum);
 
         for (auto const & e : problem.getEdgeMap().right) {
             lp::ColId colIdx = e.first;
@@ -119,69 +100,34 @@ private:
             if (!problem.getCompare().e(colVal, 0)) {
                 auto u = source(e.second, g);
                 auto v = target(e.second, g);
-                addEdge(u, v, colVal);
+                m_minCut.addEdge(u, v, colVal, colVal);
             }
         }
 
-        m_src = add_vertex(m_auxGraph);
-        m_trg = add_vertex(m_auxGraph);
+        m_src = m_minCut.addVertex();
+        m_trg = m_minCut.addVertex();
 
         for (auto v : boost::make_iterator_range(vertices(g))) {
-            m_srcToV[v] = addEdge(m_src, v, degreeOf(problem, v, lp) / 2, true);
-            m_vToTrg[v] = addEdge(v, m_trg, 1, true);
+            m_srcToV[v] = m_minCut.addEdge(m_src, v, degreeOf(problem, v, lp) / 2).first;
+            m_vToTrg[v] = m_minCut.addEdge(v, m_trg, 1).first;
         }
     }
 
     /**
      * Initializes the list of cut candidates.
      */
-    void initializeCandidates() {
-        auto src = *(std::next(vertices(m_auxGraph).first, rand() % (num_vertices(m_auxGraph) - 2)));
-        assert(src != m_src && src != m_trg);
+    template <typename Problem>
+    void initializeCandidates(const Problem & problem) {
+        const auto & g = problem.getGraph();
+        auto src = *(std::next(vertices(g).first, rand() % m_verticesNum));
         m_candidateList.clear();
-        for (AuxVertex v : boost::make_iterator_range(vertices(m_auxGraph))) {
-            if (v != src && v != m_src && v != m_trg) {
+        for (auto v : boost::make_iterator_range(vertices(g))) {
+            if (v != src) {
                 m_candidateList.push_back(std::make_pair(src, v));
                 m_candidateList.push_back(std::make_pair(v, src));
             }
         }
     }
-
-    /**
-     * Adds an edge to the auxiliary graph.
-     * @param vSrc source vertex of for the added edge
-     * @param vTrg target vertex of for the added edge
-     * @param cap capacity of the added edge
-     * @param noRev if the reverse edge should have zero capacity
-     * @return created edge of the auxiliary graph
-     *
-     * @tparam SrcVertex
-     * @tparam TrgVertex
-     */
-    template <typename SrcVertex, typename TrgVertex>
-    AuxEdge addEdge(const SrcVertex & vSrc, const TrgVertex & vTrg, double cap, bool noRev = false) {
-        bool b, bRev;
-        AuxEdge e, eRev;
-
-        std::tie(e, b) = add_edge(vSrc, vTrg, m_auxGraph);
-        std::tie(eRev, bRev) = add_edge(vTrg, vSrc, m_auxGraph);
-
-        assert(b && bRev);
-
-        put(m_cap, e, cap);
-        if (noRev) {
-            put(m_cap, eRev, 0);
-        }
-        else {
-            put(m_cap, eRev, cap);
-        }
-
-        put(m_rev, e, eRev);
-        put(m_rev, eRev, e);
-
-        return e;
-    }
-
 
     /**
      * Calculates the sum of the variables for edges incident with a given vertex.
@@ -201,51 +147,33 @@ private:
     }
 
     /**
-     * Finds the most violated set of vertices containing \c src and not containing
-     * \c trg and saves it if a violation is found.
+     * Finds the most violated set of vertices containing \c src and not containing \c trg.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
-     * @param compare double comparison object
      * @return violation of the found set
      */
-    template <typename Compare>
-    double checkMinCut(AuxVertex src, AuxVertex trg, Compare compare) {
-        int numVertices(num_vertices(m_auxGraph) - 2);
-        double origVal = get(m_cap, m_srcToV[src]);
+    double checkMinCut(AuxVertex src, AuxVertex trg) {
+        double origCap = m_minCut.getCapacity(m_srcToV[src]);
 
-        put(m_cap, m_srcToV[src], numVertices);
+        m_minCut.setCapacity(m_srcToV[src], m_verticesNum);
         // capacity of srcToV[trg] does not change
-        put(m_cap, m_vToTrg[src], 0);
-        put(m_cap, m_vToTrg[trg], numVertices);
+        m_minCut.setCapacity(m_vToTrg[src], 0);
+        m_minCut.setCapacity(m_vToTrg[trg], m_verticesNum);
 
-        // TODO better flow algorithm
-        double minCut = boost::boykov_kolmogorov_max_flow(m_auxGraph, m_src, m_trg);
-        double violation = numVertices - 1 - minCut;
-
-        if (compare.g(violation, 0)) {
-            auto colors = get(boost::vertex_color, m_auxGraph);
-            auto srcColor = get(colors, m_src);
-            assert(srcColor != get(colors, m_trg));
-            m_violatingSet.clear();
-            for (auto v : boost::make_iterator_range(vertices(m_auxGraph))) {
-                if (v != m_src && v != m_trg && get(colors, v) == srcColor) {
-                    m_violatingSet.insert(v);
-                }
-            }
-            m_violatingPair = std::make_pair(src, trg);
-        }
+        double minCut = m_minCut.findMinCut(m_src, m_trg);
+        double violation = m_verticesNum - 1 - minCut;
 
         // reset the original values for the capacities
-        put(m_cap, m_srcToV[src], origVal);
+        m_minCut.setCapacity(m_srcToV[src], origCap);
         // capacity of srcToV[trg] does not change
-        put(m_cap, m_vToTrg[src], 1);
-        put(m_cap, m_vToTrg[trg], 1);
+        m_minCut.setCapacity(m_vToTrg[src], 1);
+        m_minCut.setCapacity(m_vToTrg[trg], 1);
 
         return violation;
     }
 
+    int m_verticesNum;
 
-    AuxGraph m_auxGraph;
     AuxVertex   m_src;
     AuxVertex   m_trg;
 
@@ -253,11 +181,8 @@ private:
     AuxEdgeList  m_vToTrg;
 
     CandidateList m_candidateList;
-    ViolatingSet m_violatingSet;
-    Candidate m_violatingPair;
 
-    AuxEdgeCapacity m_cap;
-    AuxEdgeReverse  m_rev;
+    MinCutFinder m_minCut;
 };
 
 

@@ -9,7 +9,6 @@
 ** rethink rounding
 ** columns iterator is invalidated when we remove column
 ** limited number of relaxation per iteration (at least in BDMST, maybe in the rest also)?
-** there is some common code in the steiner network and DBMST (and steiner tree) oracles
 ** LP formulation in separate dir
 ** framework documentation
 ** restriction(v, v) case in steiner network
