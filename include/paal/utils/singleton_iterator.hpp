@@ -28,7 +28,7 @@ namespace utils {
         >
    {
       template<typename E> friend SingletonIterator<E> make_SingletonIteratorBegin(E);
-      template<typename E> friend SingletonIterator<E> make_SingletonIteratorEnd(E);
+      template<typename E> friend SingletonIterator<E> make_SingletonIteratorEnd();
 
       /**
        * @brief private constructor. Use make_SingletonIteratorBegin,
