@@ -31,8 +31,8 @@ BOOST_AUTO_TEST_CASE(KCenter) {
     auto items=boost::irange(0,NUM_ITEMS);
     std::vector<int> centers;
     //solution
-    int radious=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
+    int radius=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
     BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
-    check_result(radious,P1,APPROXIMATION_RATIO,paal::utils::LessEqual(),0,"lower bound ","upper bound for approximation ratio ");
-    paal::inBalls(items,centers,metric,radious);
+    check_result(radius,P1,APPROXIMATION_RATIO,paal::utils::LessEqual(),0,"lower bound ","upper bound for approximation ratio ");
+    paal::inBalls(items,centers,metric,radius);
 }

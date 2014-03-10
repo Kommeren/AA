@@ -22,8 +22,12 @@ BOOST_AUTO_TEST_CASE(KCenter) {
     auto items=boost::irange(0,NUM_ITEMS);
     std::vector<int> centers;
     //solution
-    double radious=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
+    double radius=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
+    LOGLN("Radius " << radius);
+    LOGLN("Centers:");
+    LOG_COPY_RANGE_DEL(centers, " ");
+    LOGLN("");
     BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
-    check_result(radious,OPTIMAL,APPROXIMATION_RATIO);
-    paal::inBalls(items,centers,metric,radious);
+    check_result(radius,OPTIMAL,APPROXIMATION_RATIO);
+    paal::inBalls(items,centers,metric,radius);
 }

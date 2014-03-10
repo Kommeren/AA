@@ -34,24 +34,24 @@ auto kCenter(const Metric& metric,unsigned int numberOfClusters, const ItemItera
         std::vector<Dist> distance_from_closest_center(std::distance(iBegin,iEnd),std::numeric_limits<Dist>::max());
         ItemIterator last_centre=iBegin;
         ItemIterator farthest_centre=iBegin;
-        Dist radious;
-        ++numberOfClusters;
-        while(--numberOfClusters){
+        Dist radius;
+        assert(numberOfClusters>0);
+        do{
             *result= *farthest_centre;
             ++result;
-            radious=std::numeric_limits<Dist>::min();
+            radius=std::numeric_limits<Dist>::min();
             auto it=distance_from_closest_center.begin();
             for(auto i=iBegin;i!=iEnd;++i){
                 *it=std::min(*it,metric(*last_centre,*i));
-                if(*it>radious){
+                if(*it>radius){
                     farthest_centre=i;
-                    radious=*it;
+                    radius=*it;
                 }
                 ++it;
             }
             last_centre=farthest_centre;
-        }
-        return radious;
+        }while(--numberOfClusters);
+        return radius;
 }
 
 }//!greedy
