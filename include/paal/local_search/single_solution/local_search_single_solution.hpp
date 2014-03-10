@@ -70,8 +70,8 @@ protected:
 
     typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
     using base::m_solution;
-    typedef typename Move<SearchComponents, Solution>::reference MoveRef;
-    typedef typename Move<SearchComponents, Solution>::type Move;
+    typedef typename MoveType<SearchComponents, Solution>::reference MoveRef;
+    typedef typename MoveType<SearchComponents, Solution>::type Move;
 
 public:
     LocalSearchStep(Solution & solution) :
@@ -124,7 +124,7 @@ class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponen
     typedef LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...> base;
     typedef typename Fitness<SearchComponents, Solution>::type Fitness;
     using base::m_solution;
-    typedef typename  Move<SearchComponents, Solution>::type Move;
+    typedef typename  MoveType<SearchComponents, Solution>::type Move;
 
 public:
     LocalSearchStep(Solution & solution) :

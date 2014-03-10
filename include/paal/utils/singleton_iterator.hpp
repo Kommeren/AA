@@ -76,7 +76,6 @@ namespace utils {
      * @brief function to create end of SingletonIterator
      *
      * @tparam Elem
-     * @param elem
      *
      * @return
      */

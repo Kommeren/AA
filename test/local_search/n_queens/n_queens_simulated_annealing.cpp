@@ -21,23 +21,37 @@
 #include "utils/logger.hpp"
 
 
-struct Move {
-    int m_from;
-    int m_to;
-};
 
-    //This is needed because of boost bug in function_input_iterator!!!
+//This is needed because of boost bug in function_input_iterator!!!
     template <typename F>
     struct RandomMoves {
         RandomMoves(F _f) : f(_f) {}
-        typedef Move result_type;
+        typedef paal::local_search::Move result_type;
 
-        Move operator()() const {
+        result_type operator()() const {
             return f();
         }
 
         mutable F f;
     };
+
+/**
+ * @brief NQueensCommit functor, optimized fo SA puropses
+ */
+struct NQueensCommitSA {
+    template <typename Solution, typename Idx>
+        /**
+         * @brief Operator swaps elements of the solution range
+         *
+         * @param sol
+         * @param solutionElement
+         * @param move
+         */
+    bool operator()(Solution & sol, Idx solutionElement, Idx move) const {
+        sol.swapQueens(solutionElement, move);
+        return false;
+    }
+};
 
 int main(int argc, char ** argv) {
     if(argc != 2) {
@@ -56,13 +70,11 @@ int main(int argc, char ** argv) {
     std::uniform_int_distribution<int> distribution(0,number_of_queens);
 
     //TODO add multisolution -> single solution
-    auto gain = [](Adapter & sol, Move m){return ls::NQueensGain()(sol, m.m_from, m.m_to);};
-    auto commit = [](Adapter & sol, Move m){return ls::NQueensCommit()(sol, m.m_from, m.m_to);};
+    auto gain = ls::NQueensGain{};
+    auto commit = [](Adapter & sol, ls::Move m){return NQueensCommitSA()(sol, m.getFrom(), m.getTo());};
     auto randomMove = [=]() mutable {
-                            Move m;
-                            m.m_from = distribution(rand);
-                            m.m_to = distribution(rand);
-                            return m;
+                            return ls::Move(distribution(rand),
+                                            distribution(rand));
     };
 
     RandomMoves<decltype(randomMove)> r(randomMove);

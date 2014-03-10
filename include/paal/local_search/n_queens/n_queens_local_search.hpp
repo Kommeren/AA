@@ -8,7 +8,8 @@
 #ifndef N_QUEENS_LOCAL_SEARCH_HPP
 #define N_QUEENS_LOCAL_SEARCH_HPP
 
-#include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
+#define BOOST_RESULT_OF_USE_DECLTYPE
+#include "paal/local_search/single_solution/local_search_single_solution.hpp"
 #include "paal/local_search/search_components.hpp"
 
 #include "paal/local_search/n_queens/n_queens_solution.hpp"
@@ -55,7 +56,7 @@ namespace local_search {
                          GlobalStopCondition gsc,
                          Components... nQueensComponents) {
                      NQueensSolutionAdapter<NQueensPositionsVector> nqueens(pos);
-                     return local_search_multi_solution(nqueens, std::move(psa),
+                     return local_search(nqueens, std::move(psa),
                                 std::move(gsc), std::move(nQueensComponents)...);
                  }
 

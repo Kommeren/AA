@@ -26,7 +26,7 @@ class  ConceptsBase {
     protected:
         X x;
         Solution s;
-        typedef typename Move<SearchComponents, Solution>::type Move;
+        typedef typename MoveType<SearchComponents, Solution>::type Move;
         Move u;
 };
 

@@ -34,7 +34,7 @@ struct SearchComponentsTraits {
  * @tparam Solution
  */
 template <typename SearchComponents, typename Solution>
-class Move {
+class MoveType {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
     typedef typename std::result_of<NG(Solution &)>::type MovesRange;
@@ -72,7 +72,7 @@ template <typename SearchComponents, typename Solution>
 class Fitness {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GainT Gain;
-    typedef typename Move<SearchComponents, Solution>::type Move;
+    typedef typename MoveType<SearchComponents, Solution>::type Move;
 public:
     typedef typename utils::PureResultOf<Gain(Solution &, Move &)>::type type;
 };

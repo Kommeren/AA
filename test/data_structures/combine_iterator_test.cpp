@@ -10,11 +10,12 @@
 #define LOGGER_ON
 #include "utils/logger.hpp"
 #include "paal/data_structures/combine_iterator.hpp"
+#include "paal/utils/make_tuple.hpp"
 
 template <typename CombinedEngine>
 void checkMove(CombinedEngine & combined, int i, int j) {
     BOOST_CHECK(combined.next());
-    BOOST_CHECK(combined.call(paal::data_structures::MakeTuple()) == std::make_tuple(i,j));
+    BOOST_CHECK(combined.call(paal::MakeTuple()) == std::make_tuple(i,j));
 }
 
 template <typename CombinedIter>
@@ -28,7 +29,7 @@ BOOST_AUTO_TEST_CASE(CombineIteratorEngineTest) {
     auto r1 = {1, 2, 3, 4};
     auto r2 = {4, 5, 6, 7, 8};
     auto combined = paal::data_structures::make_CombineIteratorEngine(r1, r2);
-    BOOST_CHECK(combined.call(paal::data_structures::MakeTuple()) == std::make_tuple(1,4));
+    BOOST_CHECK(combined.call(paal::MakeTuple()) == std::make_tuple(1,4));
     checkMove(combined, 1, 5);
     checkMove(combined, 1, 6);
     checkMove(combined, 1, 7);
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_CASE(CombineIteratorTest) {
     auto r2 = {6., 7., 8.};
     auto r3 = {9};
     auto iter = paal::data_structures::make_CombineIterator(
-            paal::data_structures::MakeTuple{},
+            paal::MakeTuple{},
             r1,
             r2,
             r3);
@@ -82,7 +83,7 @@ BOOST_AUTO_TEST_CASE(CombineIteratorEmptyTest) {
     auto r2 = std::vector<double>{};
     auto r3 = {9};
     auto iter = paal::data_structures::make_CombineIterator(
-            paal::data_structures::MakeTuple{}
+            paal::MakeTuple{}
             , r1, r2, r3);
     decltype(iter) end;
     BOOST_CHECK(iter == end);
@@ -90,7 +91,7 @@ BOOST_AUTO_TEST_CASE(CombineIteratorEmptyTest) {
 
 BOOST_AUTO_TEST_CASE(CombineIteratorEmpty2Test) {
     auto iter = paal::data_structures::make_CombineIterator(
-            paal::data_structures::MakeTuple{});
+            paal::MakeTuple{});
     decltype(iter) end;
     BOOST_CHECK(iter == end);
 }

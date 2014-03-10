@@ -24,8 +24,21 @@ template <typename T> void printTuple3(T t) {
 typedef typename std::vector<int>::iterator It;
 vector<int> v{1,2,3,4,5,6,7};
 
+BOOST_AUTO_TEST_CASE(subset_iterator_engine_test) {
+    auto engine = paal::data_structures::make_SubsetsIteratorEngine<3>(v.begin(), v.begin() + 4);
+
+    BOOST_CHECK(engine.call(paal::MakeTuple{}) == std::make_tuple(1, 2, 3));
+    BOOST_CHECK(engine.next());
+    BOOST_CHECK(engine.call(paal::MakeTuple{}) == std::make_tuple(1, 2, 4));
+    BOOST_CHECK(engine.next());
+    BOOST_CHECK(engine.call(paal::MakeTuple{}) == std::make_tuple(1, 3, 4));
+    BOOST_CHECK(engine.next());
+    BOOST_CHECK(engine.call(paal::MakeTuple{}) == std::make_tuple(2, 3, 4));
+    BOOST_CHECK(!engine.next());
+}
+
 BOOST_AUTO_TEST_CASE(subset_iterator_test) {
-    auto r =  paal::data_structures::make_SubsetsIteratorrange<It, 3>(v.begin(), v.end());
+    auto r =  paal::data_structures::make_SubsetsIteratorRange<3>(v.begin(), v.end());
     typedef std::tuple<int, int, int> tup;
     BOOST_CHECK_EQUAL(std::get<0>(*r.first), 1);
     BOOST_CHECK_EQUAL(std::get<1>(*r.first), 2);
@@ -34,7 +47,7 @@ BOOST_AUTO_TEST_CASE(subset_iterator_test) {
 }
 
 void testDist(int i, int res) {
-    auto r =  paal::data_structures::make_SubsetsIteratorrange<It, 3>(v.begin(), v.begin() + i);
+    auto r =  paal::data_structures::make_SubsetsIteratorRange<3>(v.begin(), v.begin() + i);
     BOOST_CHECK_EQUAL(distance(r.first, r.second), res);
 }
 
@@ -47,5 +60,4 @@ BOOST_AUTO_TEST_CASE(subset_iterator_corner_test) {
     testDist(1, 0);
     testDist(0, 0);
 }
-
 

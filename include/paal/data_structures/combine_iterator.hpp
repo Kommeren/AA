@@ -21,25 +21,6 @@ namespace data_structures {
 
 
 /**
- * @brief function object  for std::make_tuple
- */
-struct MakeTuple {
-    /**
-     * @brief operator()
-     *
-     * @tparam Args
-     *
-     * @return
-     */
-    template <typename... Args>
-        auto operator()(Args&&...args) const ->
-        decltype(std::make_tuple(std::forward<Args>(args)...)) {
-            return std::make_tuple(std::forward<Args>(args)...);
-        }
-};
-
-
-/**
  * @brief class representing set of ranges with two operation next and call
  *
  * @tparam Ranges
@@ -56,7 +37,7 @@ template <typename... Ranges>
  */
 template <typename Range, typename... RangesRest>
     class CombineIteratorEngine<Range, RangesRest...> :
-     CombineIteratorEngine<RangesRest...> {
+     private CombineIteratorEngine<RangesRest...> {
 
         public:
             using base = CombineIteratorEngine<RangesRest...>;

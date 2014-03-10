@@ -140,10 +140,10 @@ private:
     typedef std::vector<Dist> ThreeSubsetsDists;
     typedef std::unordered_map<ThreeTuple, VertexType, boost::hash<ThreeTuple>> NearstByThreeSubsets;
 
-        template <typename Iter> std::pair<data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>,
-                                           data_structures::SubsetsIterator<Iter,SUSBSET_SIZE, ThreeTuple *, ThreeTuple>>
+        template <typename Iter> std::pair<data_structures::SubsetsIterator<SUSBSET_SIZE, Iter>,
+                                           data_structures::SubsetsIterator<SUSBSET_SIZE, Iter>>
     makeThreeSubsetRange(Iter b, Iter e) {
-        return data_structures::make_SubsetsIteratorrange<Iter, SUSBSET_SIZE, ThreeTuple *, ThreeTuple>(b,e);
+        return data_structures::make_SubsetsIteratorRange<SUSBSET_SIZE>(b,e);
     }
 
     void uniqueRes(ResultSteinerVertices & res) {
