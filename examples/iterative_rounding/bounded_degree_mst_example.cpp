@@ -8,11 +8,11 @@
 
 
 #include "paal/utils/functors.hpp"
-#include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
+#include <iostream>
 #include <vector>
 
 int main() {
@@ -27,14 +27,13 @@ int main() {
     std::vector<int> bounds {3,2,2,2,2,2};
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 6);
-    auto degreeBounds = paal::utils::make_array_to_functor(bounds);
+    auto degree_bounds = paal::utils::make_array_to_functor(bounds);
 
-    typedef std::vector<Edge> ResultTree;
-    ResultTree resultTree;
+    std::vector<Edge> result_tree;
 
     // optional input validity checking
     auto bdmst = paal::ir::make_bounded_degree_mst(
-                    g, degreeBounds, std::back_inserter(resultTree));
+                    g, degree_bounds, std::back_inserter(result_tree));
     auto error = bdmst.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -44,12 +43,12 @@ int main() {
 
     // solve it
     auto result = paal::ir::bounded_degree_mst_iterative_rounding(
-                    g, degreeBounds, std::back_inserter(resultTree));
+                    g, degree_bounds, std::back_inserter(result_tree));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
         std::cout << "Edges in the spanning tree" << std::endl;
-        for (auto const & e : resultTree) {
+        for (auto e : result_tree) {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;

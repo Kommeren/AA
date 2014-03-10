@@ -31,7 +31,7 @@ complete usage example can be found in file glp_example.cpp
 
 \section rowgen  Row generation
 
-Some of the LP formulations used in different algorithms have got an
+Some of the LP formulations used in different algorithms have an
 exponential number of rows. To solve such instances we use a technique
 called row generation, which uses the concept of a "separation oracle".
 The separation oracle is an algorithm, which given the values of LP variables
@@ -40,12 +40,78 @@ it returns some violated LP row.
 
 Using a separation oracle we can create a simple method of solving LPs
 with exponential number of rows:
-- start with a subset (maybe empty) of rows and solve the LP,
-- while the obtained solution is infeasible add a violated row to the LP
-and resolve it.
 
-\subsection References
+<pre>
+ solve_lp_row_generation()
+ {
+     init(LP)
+     solve(LP)
+     while (not SeparationOracle.feasible_solution(LP))
+     {
+         LP <- SeparationOracle.add_violated_row(LP)
+         resolve(LP)
+     }
+ }
+</pre>
 
-http://www.gnu.org/software/glpk/ - GLPK library
+In other words we start with a subset (maybe empty) of rows and solve the LP, and then while the obtained solution is infeasible add a violated row to the LP and resolve it.
+
+\subsection row_generation_interface  Row generation interface
+The row generation LP (re)solving is implemented by two classes: paal::lp::row_generation_solve_lp and paal::lp::row_generation_resolve_lp, both of which implement the following interface:
+<pre>
+ row_generation_solve_lp {
+     paal::lp::problem_type operator(Problem & problem, LP & lp);
+ }
+</pre>
+
+Here <i>LP</i> is the linear programming instance type.<br>
+<i>Problem</i> is the problem instance type: a class representing the problem described by the LP.<br>
+<i>Problem</i> must implement the following interface:
+<pre>
+ ProblemArchetype {
+     Oracle & get_oracle();
+ }
+</pre>
+
+<i>Oracle</i> is the Separation Oracle concept class. It is responsible for checking if the current LP solution is a feasible solution to the given Problem and if not, adding some violated constraint to the LP. It must implement the following interface:
+<pre>
+ OracleArchetype {
+    bool feasibleSolution(const Problem & problem, const LP & lp);
+
+    void addViolatedConstraint(const Problem & problem, LP & lp);
+ }
+</pre>
+
+\subsection oracle_strategies Separation oracle strategies
+Typical separation oracles iterate over a set of the constraints that could be violated and choose one violated row to be added to the LP. The library provides a number of typical separation oracle strategies using this model:
+<ol>
+<li> paal::lp::most_violated_separation_oracle
+<li> paal::lp::first_violated_separation_oracle
+<li> paal::lp::random_violated_separation_oracle
+</ol>
+
+To use one of those oracles the user must provide a <i>ViolationsChecker</i> concept class specific to the given problem.
+This class is responsible for:
+<ol>
+<li> providing the oracle with a set of constraints (candidates) that could be violated,
+<li> checking whether a given constraint (candidate) is violated, and if so by how much,
+<li> adding a given violated constraint to the LP.
+</ol>
+<i>ViolationsChecker</i> must implement the following interface:
+<pre>
+ ViolationsCheckerArchetype {
+     CandidateIteratorRange get_violation_vandidates(const Problem & problem, const LP & lp);
+
+     boost::optional<double> check_violation(Candidate candidate, const Problem & problem);
+
+     void add_violated_constraint(Candidate candidate, const Problem & problem, LP & lp);
+ }
+</pre>
+
+<i>CandidateIteratorRange</i> is an iterator range of possible constraints (candidates) that could be violated. <i>Candidate</i> is a single constraint (candidate) that could be violated.
+
+\section References
+
+http://www.gnu.org/software/glpk/ - GLPK library (used in PAAl for LP solving)
 
 */

@@ -45,8 +45,8 @@ struct ga_set_solution {
     /**
      * Creates the result assignment form the LP (all edges with value 1).
      */
-    template <typename Problem, typename Solution>
-    void operator()(Problem & problem, const Solution & solution) {
+    template <typename Problem, typename GetSolution>
+    void operator()(Problem & problem, const GetSolution & solution) {
         auto jbegin = problem.get_jobs().first;
         auto mbegin = problem.get_machines().first;
         auto & colIdx = problem.getcol_idx();
@@ -137,14 +137,11 @@ class ga_init {
         }
 };
 
-template <typename SolveLPToExtremePoint = default_solve_lp_to_extreme_point,
-         typename Resolve_lp_to_extreme_point = default_resolve_lp_to_extreme_point,
+template <typename Init = ga_init,
          typename RoundCondition = default_round_condition,
          typename RelaxContition = ga_relax_condition,
-         typename Init = ga_init,
          typename SetSolution = ga_set_solution>
-             using GAIRcomponents = IRcomponents<SolveLPToExtremePoint,
-                Resolve_lp_to_extreme_point, RoundCondition, RelaxContition, Init, SetSolution>;
+             using ga_ir_components = IRcomponents<Init, RoundCondition, RelaxContition, SetSolution>;
 
 
 /**
@@ -353,7 +350,7 @@ make_generalised_assignment(MachineIter mbegin, MachineIter mend,
  * @tparam ProceedingTime
  * @tparam MachineAvailableTime
  * @tparam JobsToMachinesOutputIterator
- * @tparam components
+ * @tparam Components
  * @tparam Visitor
  * @param mbegin begin machines iterator
  * @param mend end machines iterator
@@ -371,17 +368,17 @@ make_generalised_assignment(MachineIter mbegin, MachineIter mend,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator,
-          typename components = GAIRcomponents<>,
+          typename Components = ga_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
-                JobsToMachinesOutputIterator jobToMachines,
-                components comps = components(), Visitor visitor = Visitor()) {
+                JobsToMachinesOutputIterator jobsToMachines,
+                Components components = Components(), Visitor visitor = Visitor()) {
     auto gaSolution = make_generalised_assignment(
             mbegin, mend, jbegin, jend,
-            c, t, T, jobToMachines);
-    return solve_iterative_rounding(gaSolution, std::move(comps), std::move(visitor));
+            c, t, T, jobsToMachines);
+    return solve_iterative_rounding(gaSolution, std::move(components), std::move(visitor));
 }
 
 

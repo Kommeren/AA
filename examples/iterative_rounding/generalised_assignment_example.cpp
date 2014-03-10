@@ -9,7 +9,7 @@
 
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
-
+#include <iostream>
 #include <vector>
 
 int main() {
@@ -35,16 +35,16 @@ int main() {
     std::vector<int> T = {2, 2};
     auto Tf = [&](int i){return T[i];};
 
-    std::vector<std::pair<int, int>> jobsToMachines;
+    std::vector<std::pair<int, int>> jobs_to_machines;
 
     // solve it
     auto result = paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-            costf, timef, Tf, std::back_inserter(jobsToMachines));
+            costf, timef, Tf, std::back_inserter(jobs_to_machines));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
-        for (auto const & jm : jobsToMachines) {
+        for (auto const & jm : jobs_to_machines) {
             std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
@@ -52,10 +52,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-//! [Generalised Assignment Example]
-
     paal::lp::GLP::free_env();
-
+//! [Generalised Assignment Example]
     return 0;
 }
-

@@ -22,7 +22,7 @@ using namespace  paal::ir;
 
 struct log_visitor : public trivial_visitor {
     template <typename Problem, typename LP>
-    void solve_lp_to_extreme_point(const Problem &, LP & lp) {
+    void solve_lp(const Problem &, LP & lp) {
         LOGLN(lp);
     }
 
@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(resultTree, resultTree.begin()),
-                    BDMSTIRcomponents<>(), BDMSTOracle<>(),
+                    bdmst_ir_components<>(), bdmst_oracle<>(),
                     log_visitor());
 
     ON_LOG(for (auto const & e : resultTree) {
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree resultTree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin()),
-                    BDMSTIRcomponents<>(), BDMSTOracle<>(),
+                    bdmst_ir_components<>(), bdmst_oracle<>(),
                     log_visitor());
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree resultTree;
         auto bdmst(make_bounded_degree_mst(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin())));
-        solve_iterative_rounding(bdmst, BDMSTIRcomponents<>(), log_visitor());
+        solve_iterative_rounding(bdmst, bdmst_ir_components<>(), log_visitor());
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
         BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     BOOST_CHECK(!invalid);
 
-    auto result = solve_iterative_rounding(bdmst, BDMSTIRcomponents<>());
+    auto result = solve_iterative_rounding(bdmst, bdmst_ir_components<>());
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
 }

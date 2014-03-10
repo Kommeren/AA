@@ -7,17 +7,15 @@
  */
 
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
+#include <iostream>
 #include <vector>
 
-
-//! [Steiner Network Example]
-
 int main() {
+//! [Steiner Network Example]
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
     typedef boost::graph_traits<Graph>::edge_descriptor Edge;
@@ -29,13 +27,12 @@ int main() {
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 3);
 
-    typedef std::vector<Edge> ResultNetwork;
-    ResultNetwork resultNetwork;
+    std::vector<Edge> result_network;
 
     // optional input validity checking
-    auto steinerNetwork = paal::ir::make_steiner_network(g, restrictions,
-                                std::back_inserter(resultNetwork));
-    auto error = steinerNetwork.check_input_validity();
+    auto steiner_network = paal::ir::make_steiner_network(g, restrictions,
+                                std::back_inserter(result_network));
+    auto error = steiner_network.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
         std::cerr << *error << std::endl;
@@ -44,12 +41,12 @@ int main() {
 
     // solve it
     auto result = paal::ir::steiner_network_iterative_rounding(
-                    g, restrictions, std::back_inserter(resultNetwork));
+                    g, restrictions, std::back_inserter(result_network));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
         std::cout << "Edges in steiner network" << std::endl;
-        for (auto const  & e : resultNetwork) {
+        for (auto const  & e : result_network) {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
@@ -58,8 +55,7 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::GLP::free_env();
-
+//! [Steiner Network Example]
     return 0;
 }
-//! [Steiner Network Example]
 

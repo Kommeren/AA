@@ -38,7 +38,7 @@ const double steiner_tree_compare_traits::EPSILON = 1e-10;
 
 
 template <template <typename> class OracleStrategy = lp::random_violated_separation_oracle>
-using steiner_treeOracle = OracleStrategy<steiner_tree_violation_checker>;
+using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
 
 
 /**
@@ -46,7 +46,7 @@ using steiner_treeOracle = OracleStrategy<steiner_tree_violation_checker>;
  */
 template<typename OrigMetric, typename Terminals, typename Result,
     typename Strategy=all_generator,
-    typename Oracle = steiner_treeOracle<>>
+    typename Oracle = steiner_tree_oracle<>>
 class steiner_tree {
 public:
     typedef data_structures::metric_traits<OrigMetric> MT;
@@ -237,7 +237,7 @@ public:
 /**
  * Makes steiner_tree object. Just to avoid providing type names in template.
  */
-template<typename Oracle = steiner_treeOracle<>,
+template<typename Oracle = steiner_tree_oracle<>,
         typename OrigMetric, typename Terminals, typename Result, typename Strategy>
 steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
         const OrigMetric& metric, const Terminals& terminals,
@@ -248,27 +248,45 @@ steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
 }
 
 template <
-         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-         typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
+         typename Init = steiner_tree_init,
          typename RoundCondition = steiner_tree_round_condition,
          typename RelaxCondition = utils::always_false,
-         typename StopCondition = steiner_tree_stop_condition,
-         typename Init = steiner_tree_init,
-         typename SetSolution = utils::skip_functor>
-             using  steiner_treeIRcomponents = IRcomponents<SolveLPToExtremePoint,
-                        Resolve_lp_to_extreme_point, RoundCondition,
-                        RelaxCondition, Init, SetSolution, StopCondition>;
+         typename SetSolution = utils::skip_functor,
+         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
+         typename ResolveLPToExtremePoint = lp::row_generation_solve_lp,
+         typename StopCondition = steiner_tree_stop_condition>
+             using steiner_tree_ir_components = IRcomponents<Init, RoundCondition, RelaxCondition,
+                        SetSolution, SolveLPToExtremePoint, ResolveLPToExtremePoint, StopCondition>;
 
 
-template <typename Oracle = steiner_treeOracle<>, typename Strategy = all_generator,
+/**
+ * @brief Solves the Steiner Tree problem using Iterative Rounding.
+ *
+ * @tparam Oracle
+ * @tparam Strategy
+ * @tparam OrigMetric
+ * @tparam Terminals
+ * @tparam Result
+ * @tparam IRComponents
+ * @tparam Visitor
+ * @param metric
+ * @param terminals
+ * @param steinerVertices
+ * @param result
+ * @param strategy
+ * @param comps
+ * @param oracle
+ * @param visitor
+ */
+template <typename Oracle = steiner_tree_oracle<>, typename Strategy = all_generator,
     typename OrigMetric, typename Terminals, typename Result,
-    typename IRcomponents = steiner_treeIRcomponents<>, typename Visitor = trivial_visitor>
+    typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
 void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
         Result result, Strategy strategy, IRcomponents comps = IRcomponents(),
-        Oracle oracle = Oracle(), Visitor vis = Visitor()) {
+        Oracle oracle = Oracle(), Visitor visitor = Visitor()) {
 
     auto steiner = paal::ir::make_steiner_tree(metric, terminals, steinerVertices, result, strategy, oracle);
-    paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(vis));
+    paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));
 }
 
 } //ir

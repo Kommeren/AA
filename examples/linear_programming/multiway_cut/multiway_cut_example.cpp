@@ -51,5 +51,6 @@ int main(){
     for(auto i:verticesParts){
         std::cout<<"  "<<i.first<<"      ( "<<i.second<<" )"<<std::endl;
     }
+    paal::lp::GLP::free_env();
 //! [Multiway Cut Example]
 }

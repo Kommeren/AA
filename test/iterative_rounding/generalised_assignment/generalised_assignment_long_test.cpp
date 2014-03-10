@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignmentLong) {
             {
                 LOGLN("Relaxations limit = 1/iter");
                 std::unordered_map<int, int> jobsToMachines;
-                ir::GAIRcomponents<> comps;
+                ir::ga_ir_components<> comps;
                 auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
                                     ir::relaxations_limit_condition(), comps);
                 auto result = generalised_assignment_iterative_rounding(
@@ -105,5 +105,4 @@ BOOST_AUTO_TEST_CASE(generalised_assignmentLong) {
         char buf[MAX_LINE];
         is_test_cases.getline(buf, MAX_LINE);
     });
-
 }

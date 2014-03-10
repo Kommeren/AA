@@ -54,7 +54,7 @@ struct bool_map_to_tree_filter {
 
     template <typename Edge>
     bool operator()(const Edge & e) const {
-            return get(ebmap, e);
+        return get(ebmap, e);
     }
 
     EdgeBoolMap ebmap;
@@ -68,7 +68,7 @@ struct bool_map_to_non_tree_filter {
 
     template <typename Edge>
     bool operator()(const Edge & e) const {
-            return !get(ebmap, e);
+        return !get(ebmap, e);
     }
 
     EdgeBoolMap ebmap;
@@ -207,14 +207,10 @@ private:
 };
 
 template <
-    typename SolveLPToExtremePoint = default_solve_lp_to_extreme_point,
-    typename Resolve_lp_to_extreme_point = default_resolve_lp_to_extreme_point,
-    typename RoundCondition = ta_round_condition,
-    typename RelaxContition = ta_relax_condition,
     typename Init = ta_init,
-    typename SetSolution = utils::skip_functor>
-        using  tree_augmentationIRcomponents = IRcomponents<SolveLPToExtremePoint,
-                Resolve_lp_to_extreme_point, RoundCondition, RelaxContition, Init, SetSolution>;
+    typename RoundCondition = ta_round_condition,
+    typename RelaxContition = ta_relax_condition>
+        using tree_augmentation_ir_components = IRcomponents<Init, RoundCondition, RelaxContition>;
 
 /**
  * @brief This is Jain's iterative rounding
@@ -248,8 +244,8 @@ public:
     typedef std::unordered_map<Edge, EdgeList, edge_hash<Graph>> CoverMap;
 
     //cross reference between links and columns
-    typedef boost::bimap<Edge, lp::col_id> EdgeTocol_id;
-    typedef std::unordered_map<lp::row_id, Edge> row_idToEdge;
+    typedef boost::bimap<Edge, lp::col_id> EdgeToColId;
+    typedef std::unordered_map<lp::row_id, Edge> RowIdToEdge;
 
     typedef boost::optional<std::string> ErrorMessage;
 
@@ -331,17 +327,17 @@ public:
      * Adds an edge corresponding to the given LP column to the result set.
      */
     void add_to_solution(lp::col_id col) {
-        *m_solution = m_edge_tocol_id.right.at(col);
+        *m_solution = m_edge_to_col_id.right.at(col);
         ++m_solution;
-        m_sol_cost += m_cost_map[m_edge_tocol_id.right.at(col)];
-        m_edge_tocol_id.right.erase(col);
+        m_sol_cost += m_cost_map[m_edge_to_col_id.right.at(col)];
+        m_edge_to_col_id.right.erase(col);
     }
 
     /**
      * Binds a graph edge to a LP column.
      */
     void bind_edge_to_col(Edge e, lp::col_id col) {
-        auto tmp = m_edge_tocol_id.insert(typename EdgeTocol_id::value_type(e, col));
+        auto tmp = m_edge_to_col_id.insert(typename EdgeToColId::value_type(e, col));
         assert(tmp.second);
     }
 
@@ -349,7 +345,7 @@ public:
      * Binds a graph edge to a LP row.
      */
     void bind_edge_to_row(Edge e, lp::row_id row) {
-        auto tmp = m_row_id_to_edge.insert(typename row_idToEdge::value_type(row, e));
+        auto tmp = m_row_id_to_edge.insert(typename RowIdToEdge::value_type(row, e));
         assert(tmp.second);
     }
 
@@ -393,7 +389,7 @@ public:
      * Returns the LP columnn corresponding to a graph edge.
      */
     lp::col_id edge_to_col(Edge e) const {
-        return m_edge_tocol_id.left.at(e);
+        return m_edge_to_col_id.left.at(e);
     }
 
     /**
@@ -407,7 +403,7 @@ public:
      * Checks if an edge belongs to the solution.
      */
     bool is_in_solution(Edge e) const {
-        return m_edge_tocol_id.left.find(e) == m_edge_tocol_id.left.end();
+        return m_edge_to_col_id.left.find(e) == m_edge_to_col_id.left.end();
     }
 
     /**
@@ -421,7 +417,7 @@ private:
 
     /// Input graph
     const Graph & m_g;
-    /// Input thee edges map
+    /// Input tree edges map
     TreeMap m_tree_map;
     /// Input edge cost map
     CostMap m_cost_map;
@@ -430,7 +426,7 @@ private:
     EdgeSetOutputIterator m_solution;
 
     /// Auxiliary data structures
-    EdgeTocol_id m_edge_tocol_id;
+    EdgeToColId m_edge_to_col_id;
 
     /// The spanning tree
     TreeGraph  m_tree;
@@ -440,8 +436,8 @@ private:
     CostValue m_sol_cost;
     /// Structures for the "m_covered_by" relations
     CoverMap m_covered_by;
-    /// Reference between tree edges and row names
-    row_idToEdge m_row_id_to_edge;
+    /// Reference between tree edges and row ids
+    RowIdToEdge m_row_id_to_edge;
 };
 
 namespace detail {
@@ -485,7 +481,7 @@ make_tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIt
  */
 template <typename Graph, typename TreeMap,
           typename CostMap, typename EdgeSetOutputIterator,
-          typename IRcomponents = tree_augmentationIRcomponents<>,
+          typename IRcomponents = tree_augmentation_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
@@ -566,7 +562,7 @@ make_tree_aug(const Graph & g, EdgeSetOutputIterator solution) ->
  * @return solution status
  */
 template <typename Graph, typename EdgeSetOutputIterator,
-          typename IRcomponents = tree_augmentationIRcomponents<>,
+          typename IRcomponents = tree_augmentation_ir_components<>,
           typename Visitor = trivial_visitor,
           typename P, typename T, typename R>
 IRResult tree_augmentation_iterative_rounding(
@@ -596,7 +592,7 @@ IRResult tree_augmentation_iterative_rounding(
  * @return solution status
  */
 template <typename Graph, typename EdgeSetOutputIterator,
-          typename IRcomponents = tree_augmentationIRcomponents<>,
+          typename IRcomponents = tree_augmentation_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,

@@ -197,13 +197,13 @@ void run_single_test(const Graph & g, const Cost & costs, const Restrictions & r
     typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
     auto steinerNetwork(ir::make_steiner_network<
-                    ir::steiner_networkOracle<Oracle>>(g, restrictions,
+                    ir::steiner_network_oracle<Oracle>>(g, restrictions,
                             std::back_inserter(resultNetwork)));
     auto invalid = steinerNetwork.check_input_validity();
     BOOST_CHECK(!invalid);
 
     auto result = ir::solve_iterative_rounding(steinerNetwork,
-                        ir::steiner_networkIRcomponents<>());
+                        ir::steiner_network_ir_components<>());
     BOOST_CHECK(result.first == lp::OPTIMAL);
 }
 

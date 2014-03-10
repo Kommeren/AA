@@ -1,6 +1,6 @@
 /*! \page gen_ass Generalised Assignment
 
-\section def Problem definition.  
+\section def Problem definition.
 
 In the Generalized Assignment problem we are given a set of jobs \f$J\f$
 and a set of machines \f$M\f$. For each job \f$j\in J\f$ and machine
@@ -15,10 +15,10 @@ An LP relaxation of the problem is as follows. We introduce a binary variable
 \f$x_e\f$ for every \f$e=(i,j)\f$ job-machine pair such that \f$t_{ij} \leq T_i\f$.
 \f{eqnarray*}
 \mbox{minimize:} & & \\
-& \sum_{e=(i,j)} c_e x_e & \\ 
+& \sum_{e=(i,j)} c_e x_e & \\
 \mbox{subject to:} & & \\
-& \sum_{e\in\delta(j)} x_e = 1 & \mbox{ for every } j\in J\\ 
-& \sum_{e\in\delta(i)} t_e x_e \leq T_i & \mbox{ for every } i\in M\\ 
+& \sum_{e\in\delta(j)} x_e = 1 & \mbox{ for every } j\in J\\
+& \sum_{e\in\delta(i)} t_e x_e \leq T_i & \mbox{ for every } i\in M\\
 & x_e \geq 0 & \mbox{ for every } e\\
 \f}
 
@@ -27,17 +27,26 @@ An LP relaxation of the problem is as follows. We introduce a binary variable
 We solve the problem using the Shmoys and Tardos 2-approximation iterative
 rounding algorithm (using the above LP formulation).
 
-example: 
+example:
    \snippet generalised_assignment_example.cpp Generalised Assignment Example
- 
+
 complete example of the usage can be found in file generalised_assignment_example.cpp
 
-\subsection app_gen_ass Approximation Ratio equals 2.
+\subsection app_gen_ass Approximation Ratio
 The cost of the solution is at most the cost of the optimal solution
 and each time limit \f$T_i\f$ is violated at most by a factor of 2.
 
-\subsection References
+\subsection com_gen_ass Complexity
+The time complexity of the algorithm is \f$O((|J|+|M|)*(|J|*|M|+LP_{time}(|J|*|M|,|J|+|M|)))\f$,
+where \f$|J|\f$ and \f$|M|\f$ are respectively the numbers of jobs and machines
+and \f$LP_{time}(col, row)\f$ is the time of solving the LP with \f$O(col)\f$
+columns and \f$O(row)\f$ rows.
 
+The memory complexity of the algorithm is \f$O(|J|*|M|+LP_{mem}(|J|*|M|,|J|+|M|))\f$,
+where \f$LP_{mem}(col, row)\f$ is the memory complexity of solving the LP with
+\f$O(col)\f$ columns and \f$O(row)\f$ rows.
+
+\subsection References
 The iterative rounding 2-approximation by Shmoys and Tardos is described in
 \cite ShmoysTardosGAP.
 

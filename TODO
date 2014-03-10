@@ -6,11 +6,7 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** rethink rounding
 ** LP formulation in separate dir
-** framework documentation
-** restriction(v, v) case in steiner network
-** complexities
 ** improve row generation ?
 ** resolving solution by moving a point ?
 ** cplex support ???

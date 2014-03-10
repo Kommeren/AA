@@ -9,8 +9,9 @@
 #define PROBLEM_TYPE_HPP
 
 namespace paal {
+/// Linear Programming namespace.
 namespace lp {
-///lp problem type
+/// LP problem type.
 enum problem_type {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
 }
 }

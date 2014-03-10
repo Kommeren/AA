@@ -35,7 +35,7 @@ const double bounded_degree_mst_compare_traits::EPSILON = 1e-10;
 
 
 template <template <typename> class OracleStrategy = lp::random_violated_separation_oracle>
-using BDMSTOracle = OracleStrategy<bdmst_violation_checker>;
+using bdmst_oracle = OracleStrategy<bdmst_violation_checker>;
 
 
 /**
@@ -49,7 +49,7 @@ using BDMSTOracle = OracleStrategy<bdmst_violation_checker>;
  * @tparam Oracle separation oracle
  */
 template <typename Graph, typename DegreeBounds, typename CostMap,
-          typename SpanningTreeOutputIterator, typename Oracle = BDMSTOracle<>>
+          typename SpanningTreeOutputIterator, typename Oracle = bdmst_oracle<>>
 class bounded_degree_mst {
 public:
     /**
@@ -245,7 +245,7 @@ namespace detail {
  *
  * @return bounded_degree_mst object
  */
-template <typename Oracle = BDMSTOracle<>, typename Graph,
+template <typename Oracle = bdmst_oracle<>, typename Graph,
           typename DegreeBounds, typename CostMap, typename SpanningTreeOutputIterator>
 bounded_degree_mst<Graph, DegreeBounds, CostMap, SpanningTreeOutputIterator, Oracle>
 make_bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds,
@@ -276,7 +276,7 @@ make_bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds,
  *
  * @return bounded_degree_mst object
  */
-template <typename Oracle = BDMSTOracle<>,
+template <typename Oracle = bdmst_oracle<>,
           typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator,
           typename P, typename T, typename R>
 auto
@@ -310,7 +310,7 @@ make_bounded_degree_mst(const Graph & g,
  *
  * @return bounded_degree_mst object
  */
-template <typename Oracle = BDMSTOracle<>,
+template <typename Oracle = bdmst_oracle<>,
           typename Graph, typename DegreeBounds, typename SpanningTreeOutputIterator>
 auto
 make_bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds,
@@ -479,14 +479,14 @@ private:
 };
 
 template <
-         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-         typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
+         typename Init = bdmst_init,
          typename RoundCondition = bdmst_round_condition,
          typename RelaxContition = bdmst_relax_condition,
-         typename Init = bdmst_init,
-         typename SetSolution = bdmst_set_solution>
-             using  BDMSTIRcomponents = IRcomponents<SolveLPToExtremePoint, Resolve_lp_to_extreme_point,
-                                RoundCondition, RelaxContition, Init, SetSolution>;
+         typename SetSolution = bdmst_set_solution,
+         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
+         typename ResolveLpToExtremePoint = lp::row_generation_resolve_lp>
+             using bdmst_ir_components = IRcomponents<Init, RoundCondition, RelaxContition,
+                                SetSolution, SolveLPToExtremePoint, ResolveLpToExtremePoint>;
 
 
 namespace detail {
@@ -510,10 +510,10 @@ namespace detail {
  *
  * @return solution status
  */
-template <typename Oracle = BDMSTOracle<>,
+template <typename Oracle = bdmst_oracle<>,
           typename Graph, typename DegreeBounds, typename CostMap,
           typename SpanningTreeOutputIterator,
-          typename IRcomponents = BDMSTIRcomponents<>,
+          typename IRcomponents = bdmst_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult bounded_degree_mst_iterative_rounding(
         const Graph & g,
@@ -552,10 +552,10 @@ IRResult bounded_degree_mst_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = BDMSTOracle<>,
+template <typename Oracle = bdmst_oracle<>,
           typename Graph, typename DegreeBounds,
           typename SpanningTreeOutputIterator,
-          typename IRcomponents = BDMSTIRcomponents<>,
+          typename IRcomponents = bdmst_ir_components<>,
           typename Visitor = trivial_visitor,
           typename P, typename T, typename R>
 IRResult bounded_degree_mst_iterative_rounding(
@@ -591,10 +591,10 @@ IRResult bounded_degree_mst_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = BDMSTOracle<>,
+template <typename Oracle = bdmst_oracle<>,
           typename Graph, typename DegreeBounds,
           typename SpanningTreeOutputIterator,
-          typename IRcomponents = BDMSTIRcomponents<>,
+          typename IRcomponents = bdmst_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult bounded_degree_mst_iterative_rounding(
             const Graph & g,

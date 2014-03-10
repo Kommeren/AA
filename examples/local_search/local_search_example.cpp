@@ -9,11 +9,10 @@
 
 #include "paal/local_search/local_search.hpp"
 
-
 #include <vector>
 #include <iostream>
 
-//! [Local Search components Example]
+//! [Local Search Components Example]
 namespace ls =  paal::local_search;
 using namespace  paal;
 
@@ -33,22 +32,22 @@ struct get_moves {
     }
 };
 
-struct Gain {
+struct gain {
     int operator()(int s, int u) {
         return f(s + u) - f(s);
     }
 };
 
-struct Commit {
+struct commit {
     bool operator()(int & s, int u) {
         s = s + u;
         return true;
     }
 };
 
-typedef  ls::search_components<get_moves, Gain, Commit> search_comps;
+typedef  ls::search_components<get_moves, gain, commit> search_comps;
 
-//! [Local Search components Example]
+//! [Local Search Components Example]
 
 int main() {
     //! [Local Search Example]

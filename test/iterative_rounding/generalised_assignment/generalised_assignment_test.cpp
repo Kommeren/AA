@@ -33,56 +33,54 @@ struct log_visitor : public trivial_visitor {
 
 BOOST_AUTO_TEST_SUITE(generalised_assignment)
 BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
-    //sample problem
-    LOGLN("sample problem:");
-    auto machines = boost::irange(0,2);
-    auto jobs = boost::irange(0,2);
+     //sample problem
+     LOGLN("sample problem:");
+     auto machines = boost::irange(0,2);
+     auto jobs = boost::irange(0,2);
 
-    std::vector<std::vector<int>> cost(2, std::vector<int>(2));
-    cost[0][0] = 2;
-    cost[0][1] = 3;
-    cost[1][0] = 1;
-    cost[1][1] = 3;
-    auto  costf = [&](int i, int j){return cost[i][j];};
+     std::vector<std::vector<int>> cost(2, std::vector<int>(2));
+     cost[0][0] = 2;
+     cost[0][1] = 3;
+     cost[1][0] = 1;
+     cost[1][1] = 3;
+     auto  costf = [&](int i, int j){return cost[i][j];};
 
+     std::vector<std::vector<int>> time(2, std::vector<int>(2));
+     time[0][0] = 2;
+     time[0][1] = 2;
+     time[1][0] = 1;
+     time[1][1] = 1;
+     auto  timef = [&](int i, int j){return time[i][j];};
 
-    std::vector<std::vector<int>> time(2, std::vector<int>(2));
-    time[0][0] = 2;
-    time[0][1] = 2;
-    time[1][0] = 1;
-    time[1][1] = 1;
-    auto  timef = [&](int i, int j){return time[i][j];};
+     std::vector<int> T = {2, 2};
+     auto  Tf = [&](int i){return T[i];};
 
-    std::vector<int> T = {2, 2};
-    auto  Tf = [&](int i){return T[i];};
+     std::unordered_map<int, int> jobsToMachines;
 
-    std::unordered_map<int, int> jobsToMachines;
+     paal::ir::generalised_assignment_iterative_rounding(
+         machines.begin(), machines.end(),
+         jobs.begin(), jobs.end(),
+         costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
+         paal::ir::ga_ir_components<>(), log_visitor());
 
-    paal::ir::generalised_assignment_iterative_rounding(
-        machines.begin(), machines.end(),
-        jobs.begin(), jobs.end(),
-        costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
-        paal::ir::GAIRcomponents<>(), log_visitor());
+     ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
+         LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);
+     })
 
-    ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
-        LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);
-    })
+    auto j0 = jobsToMachines.find(0);
+    BOOST_CHECK(j0 != jobsToMachines.end() && j0->second == 0);
 
-   auto j0 = jobsToMachines.find(0);
-   BOOST_CHECK(j0 != jobsToMachines.end() && j0->second == 0);
+    auto j1 = jobsToMachines.find(1);
+    BOOST_CHECK(j1 != jobsToMachines.end() && j1->second == 0);
 
-   auto j1 = jobsToMachines.find(1);
-   BOOST_CHECK(j1 != jobsToMachines.end() && j1->second == 0);
-
-   //compile with trivial visitor
-   {
-        std::unordered_map<int, int> jobsToMachines2;
-        paal::ir::generalised_assignment_iterative_rounding(
-           machines.begin(), machines.end(),
-           jobs.begin(), jobs.end(),
-           costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
-   }
-
+    //compile with trivial visitor
+    {
+         std::unordered_map<int, int> jobsToMachines2;
+         paal::ir::generalised_assignment_iterative_rounding(
+            machines.begin(), machines.end(),
+            jobs.begin(), jobs.end(),
+            costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {

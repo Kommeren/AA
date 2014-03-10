@@ -34,7 +34,7 @@ const double steiner_network_compare_traits::EPSILON = 1e-10;
 
 
 template <template <typename> class OracleStrategy = lp::random_violated_separation_oracle>
-using steiner_networkOracle = OracleStrategy<steiner_network_violation_checker>;
+using steiner_network_oracle = OracleStrategy<steiner_network_violation_checker>;
 
 /**
  * @class steiner_network
@@ -47,7 +47,7 @@ using steiner_networkOracle = OracleStrategy<steiner_network_violation_checker>;
  */
 template <typename Graph, typename Restrictions, typename CostMap,
           typename ResultNetworkOutputIterator,
-          typename Oracle = steiner_networkOracle<>>
+          typename Oracle = steiner_network_oracle<>>
 class steiner_network {
 public:
 
@@ -207,7 +207,7 @@ namespace detail {
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_networkOracle<>,
+template <typename Oracle = steiner_network_oracle<>,
     typename Graph, typename Restrictions, typename CostMap,
     typename ResultNetworkOutputIterator>
 steiner_network<Graph, Restrictions, CostMap, ResultNetworkOutputIterator, Oracle>
@@ -239,7 +239,7 @@ make_steiner_network(const Graph & g, const Restrictions & restrictions,
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_networkOracle<>,
+template <typename Oracle = steiner_network_oracle<>,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
     typename P, typename T, typename R>
 auto
@@ -271,7 +271,7 @@ make_steiner_network(const Graph & g, const Restrictions & restrictions,
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_networkOracle<>,
+template <typename Oracle = steiner_network_oracle<>,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator>
 auto
 make_steiner_network(const Graph & g, const Restrictions & restrictions,
@@ -347,14 +347,14 @@ private:
 };
 
 template <
-         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-         typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
+         typename Init = steiner_network_init,
          typename RoundCondition = steiner_network_round_condition,
          typename RelaxContition = utils::always_false,
-         typename Init = steiner_network_init,
-         typename SetSolution = utils::skip_functor>
-             using  steiner_networkIRcomponents = IRcomponents<SolveLPToExtremePoint,
-                        Resolve_lp_to_extreme_point, RoundCondition, RelaxContition, Init, SetSolution>;
+         typename SetSolution = utils::skip_functor,
+         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
+         typename ResolveLPToExtremePoint = lp::row_generation_resolve_lp>
+             using steiner_network_ir_components = IRcomponents<Init, RoundCondition, RelaxContition,
+                        SetSolution, SolveLPToExtremePoint, ResolveLPToExtremePoint>;
 
 
 namespace detail {
@@ -378,9 +378,9 @@ namespace detail {
  *
  * @return solution status
  */
-template <typename Oracle = steiner_networkOracle<>, typename Graph,
+template <typename Oracle = steiner_network_oracle<>, typename Graph,
           typename Restrictions, typename CostMap, typename ResultNetworkOutputIterator,
-          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename IRcomponents = steiner_network_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult steiner_network_iterative_rounding(
         const Graph & g,
@@ -416,9 +416,9 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = steiner_networkOracle<>, typename Graph,
+template <typename Oracle = steiner_network_oracle<>, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
-          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename IRcomponents = steiner_network_ir_components<>,
           typename Visitor = trivial_visitor,
           typename P, typename T, typename R>
 IRResult steiner_network_iterative_rounding(
@@ -452,9 +452,9 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = steiner_networkOracle<>, typename Graph,
+template <typename Oracle = steiner_network_oracle<>, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
-          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename IRcomponents = steiner_network_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult steiner_network_iterative_rounding(
         const Graph & g,

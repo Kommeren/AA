@@ -67,6 +67,5 @@ BOOST_AUTO_TEST_CASE(multiway_cutS) {
     check_result(costCut,optimal,2);
     LOGLN("Cost Cut Verification: "<<costCutVerification );
     BOOST_CHECK_EQUAL(costCut,costCutVerification);
-
 }
 

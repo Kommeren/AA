@@ -256,22 +256,22 @@ private:
     int m_limit;
 };
 
-class SolveLPToExtremePoint;
+class Init;
 class RoundCondition;
 class RelaxCondition;
-class Init;
 class SetSolution;
+class SolveLP;
+class ResolveLP;
 class StopCondition;
-class Resolve_lp_to_extreme_point;
 class RelaxationsLimit;
 
 typedef data_structures::components<
-        data_structures::NameWithDefault<SolveLPToExtremePoint, default_solve_lp_to_extreme_point>,
-        data_structures::NameWithDefault<Resolve_lp_to_extreme_point, default_resolve_lp_to_extreme_point>,
+        Init,
         data_structures::NameWithDefault<RoundCondition, default_round_condition>,
         data_structures::NameWithDefault<RelaxCondition, utils::always_false>,
-        data_structures::NameWithDefault<Init, utils::skip_functor>,
         data_structures::NameWithDefault<SetSolution, utils::skip_functor>,
+        data_structures::NameWithDefault<SolveLP, default_solve_lp_to_extreme_point>,
+        data_structures::NameWithDefault<ResolveLP, default_resolve_lp_to_extreme_point>,
         data_structures::NameWithDefault<StopCondition, default_stop_condition>,
         data_structures::NameWithDefault<RelaxationsLimit, utils::always_false>> components;
 

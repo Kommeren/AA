@@ -8,7 +8,7 @@
   \section Introduction
     The PAAl is a header-only, generic library consisting of approximation algorithms,
     data structures and several complete solution for the various optimization problems.
-    The PAAl is implemented taking advantage of the new features of C++ introduced in the c++0x standard,
+    The PAAl is implemented taking advantage of the new features of C++ introduced in the C++0x standard,
     which in many cases simplify greatly creation of generic code.
 
   \section Installation
@@ -35,7 +35,7 @@
             <li>\ref kmedian
             <li>\ref cfl
             </ul>
-        <li> Iterative Rounding
+        <li>\ref iterative_rounding
             <ul>
             <li>\ref bdmst
             <li>\ref gen_ass
@@ -135,8 +135,8 @@
   Similarly, if the user wants to swap the metric implementation to use specific properties of his topology, this is not a problem at all! <br>
 
  \section Platforms
- Currently the library compiles on the gcc 4.7.3. and clang 3.4. Unfortunately, the library does not
- compile on the newest Microsoft Visual Studio 2013 due to its poor support of c++0x.
+ Currently the library compiles on the gcc 4.8.1. and clang 3.4. Unfortunately, the library does not
+ compile on the newest Microsoft Visual Studio 2013 due to its poor support of C++0x.
 
  \section Contact
  In case of any questions / suggestions / pull requests / contribution please contact Piotr Wygocki (wygos at mimuw.edu.pl).

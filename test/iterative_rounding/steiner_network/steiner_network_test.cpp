@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
         auto steinerNetwork(make_steiner_network(g, restrictions,
                     boost::weight_map(cost),
                     std::back_inserter(resultNetwork)));
-        solve_iterative_rounding(steinerNetwork, steiner_networkIRcomponents<>());
+        solve_iterative_rounding(steinerNetwork, steiner_network_ir_components<>());
 
         print_result(resultNetwork);
     }

@@ -1,44 +1,70 @@
 /*! \page multiway_cut Multiway Cut
 
 \section def Problem definition.
-In Multiway Cut problem we have graph G(V,E) and sets of k terminals.
+In the Multiway Cut problem we are given a graph \f$G(V,E)\f$ and a sets of \f$k\f$ terminals.
 The goal is to find minimum cost set of edges whose removal disconnects each pair of terminals.
 
-Consider the following formulation of the problem: 
+Consider the following formulation of the problem:
 \f{eqnarray*}
-\mbox{minimize:} & 1/2*\sum_{e\in E} \ c_e \sum_{i \in \{1,2, ... ,k\}} |c_{s(e),i}-c_{t(e),i}|& \\ 
+\mbox{minimize:} & 1/2*\sum_{e\in E} \ c_e \sum_{i \in \{1,2, ... ,k\}} |c_{s(e),i}-c_{t(e),i}|& \\
 \mbox{subject to:} & & \\
 & \sum_{i \in \{1,2, ... , k\}} c_{v,i} = 1 & \mbox{ for every } v \in V\\
 & c_{t,i}=1 & \mbox{ if t belong to i-th terminal }\\
 & c_{v,i} \in \{0,1\} & \mbox{ for every } v \in V \mbox{ for every } i \in \{1,2, ... ,k\}\\
 \f}
-comment \f$ c{_v,i}=1 iff v is in part i\f$
+comment \f$ c_{v,i}=1\f$ iff \f$v\f$ is in part \f$i\f$
 
 \section Solution
 
 We put terminals in k dimensional space, with Manhattan metric,
 i-th terminal in point 0, 0, 0, ... 0, 0, 1(i-th position), 0, 0, ... 0, 0.
-All others vertices have sum of coordinates equal 1.
-We minimise sum for each edge: edge cost multiply by edge length in <a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan metric </a>
+All others vertices have sum of coordinates equal to 1.
+We minimize sum of all edges: edge cost multiply by edge length in <a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan metric </a>
 We solve the following lp to find the location of the others vertices.
 \f{eqnarray*}
-\mbox{minimize:} & 1/2*\sum_{e\in E} \ c_e \sum_{i \in \{1,2, ... ,k\}} |c_{s(e),i}-c_{t(e),i}|& \\ 
+\mbox{minimize:} & 1/2*\sum_{e\in E} \ c_e \sum_{i \in \{1,2, ... ,k\}} |c_{s(e),i}-c_{t(e),i}|& \\
 \mbox{subject to:} & & \\
 & \sum_{i \in \{1,2, ... , k\}} c_{v,i} = 1 & \mbox{ for every } v \in V\\
 & c_{t,i}=1 & \mbox{ if t belong to i-th terminal }\\
 \f}
 
-Then we several times randomly chose radius from each terminal,
-and we put each vertex in components, correspond to the first terminal, whose ball contains that vertex.
+Then several times we:
+1. randomly chose radius from each terminal,
+2. put each vertex in component, correspond to the first terminal, whose ball contains that vertex.
+
 We select cheapest solution, from all randomly chosen.
 
-  example: 
+  example:
 \snippet multiway_cut_example.cpp Multiway Cut Example
- 
+
   complete example is multiway_cut_example.cpp
 
-\subsection app_multiway_cut 
-Expected Approximation Ratio equals 2, what is the reason to choose rays many times
+\subsection parameters_multiway_cut Parameters
+
+IN: const Graph& g
+
+OUT: OutputIterator result
+The pair of vertex descriptor and id of part will be output to the result output iterator
+The iterator type must be a model of Output Iterator
+
+IN: const boost::bgl_named_params<P, T, R>& params
+
+IN Rand && random_engine=std::default_random_engine(5426u)
+
+\subsection named_parameters_multiway_cut Named Parameters
+
+IN: iterations(int iterations)
+
+IN: vertex_index_map(VertexIndexMap indexMap)
+
+IN: weight_map(EdgeWeightMap weightMap)
+map contains weights of edges
+
+IN: vertex_color(VertexColorMap colorMap)
+
+\subsection app_multiway_cut Approximation ratio.
+Expected Approximation Ratio equals 2.
+We choose rays many times to increase chance to get 2 approximation.
 
 \subsection com_multiway_cut The complexity
 

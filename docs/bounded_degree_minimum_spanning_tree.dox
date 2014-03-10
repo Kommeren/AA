@@ -1,11 +1,12 @@
 /*! \page bdmst Bounded-Degree Minimum Spanning Tree
 
-\section def Problem definition.  
+\section def Problem definition.
 
 In the Bounded-Degree Minimum Spanning Tree problem we are given:
 a connected, undirected graph \f$G=(V,E)\f$ with edge costs \f$c:E\to
 R\f$ and degree upper bounds \f$B_v\f$ for each \f$v\in V\f$. The goal is
-to find a spanning tree of minimum cost, which satisfies the degree bounds.
+to find a spanning tree \f$T\f$ of minimum cost, which satisfies the degree bounds,
+that is: \f$deg_T(v) \leq B_v\f$ for each \f$v\in V\f$.
 Both finding the optimal spanning tree and deciding whether a
 spanning tree satisfying the degree bounds exists are NP-complete problems.
 
@@ -16,25 +17,24 @@ incident with \f$v\f$ in \f$G\f$. For a set of vertices \f$S\subseteq
 V\f$ let \f$E(S)\f$ denote the the set of edges \f$e\in E\f$ with
 both endpoints in \f$S\f$. Also, let \f$x(A) = \sum_{e\in A} x_e\f$.
 \f{eqnarray*}
-\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\ 
+\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\
 \mbox{subject to:} & & \\
 & x(E(V))=|V|-1 & \\
 & x(E(S)) \leq |S|-1 & \mbox{ for every } \emptyset \neq S \subset V \\
-& x(\delta(v))\leq B_v & \mbox{ for every } v \in V\\ 
-& x_e \in \{0,1\} & \mbox{ for every } e\in E\\ 
+& x(\delta(v))\leq B_v & \mbox{ for every } v \in V\\
+& x_e \in \{0,1\} & \mbox{ for every } e\in E\\
 \f}
-
 
 \section Solution
 
 We use a natural relaxation of the above IP formulation, where we
 replace condition:
 \f{eqnarray*}
-& x_e \in \{0,1\} & \mbox{ for every } e\in E\\ 
+& x_e \in \{0,1\} & \mbox{ for every } e\in E\\
 \f}
 with:
 \f{eqnarray*}
-& 0 \leq x_e \leq 1 & \mbox{ for every } e\in E\\ 
+& 0 \leq x_e \leq 1 & \mbox{ for every } e\in E\\
 \f}
 The algorithm then follows the Iterative Rounding framework:
 
@@ -48,17 +48,29 @@ until solution to the LP is integral.
 As the LP formulation has got an exponential number of constraints, we need
 to use a separation oracle and the row generation technique to solve it.
 
-example: 
+example:
    \snippet bounded_degree_mst_example.cpp Bounded-Degree Minimum Spanning Tree Example
- 
+
 complete example of the usage can be found in file bounded_degree_mst_example.cpp
 
-\subsection app_bdmst The algorithm gives an additive one approximation.
-The cost of the solution is at most the cost of
-the optimal solution and each degree bound is violated by at most 1.
+\subsection app_bdmst Approximation ratio
+This algorithm doesn't have an approximation ratio in classical sense, but is a bicriteria approximation:
+one criteria is the cost, whereas the other one is violation of the degree bounds.
+The solution returned by the algorithm has lower cost than the optimal one but can violate the constraints by one.
+
+\subsection com_bdmst Complexity
+The time complexity of the algorithm is \f$O(|V|*(|V|+|E|+LP_{rowgen}))\f$, where
+\f$|V|\f$ and \f$|E|\f$ are respectively the numbers of vertices and edges
+whereas \f$LP_{rowgen}\f$ is the time of solving the LP using row generation technique.
+\f$LP_{rowgen}=O(rows * (|V|^4 + LP_{time}(|E|,|V|)))\f$, where \f$rows\f$ is the number
+of generated rows and \f$LP_{time}(col, row)\f$ is the time of solving
+the LP with \f$O(col)\f$ columns and \f$O(row)\f$ rows.
+
+The memory complexity of the algorithm is \f$O(|V|+|E|+LP_{mem}(|E|,|V|))\f$, where
+\f$LP_{mem}(col, row)\f$ is the memory complexity of solving the LP with
+\f$O(col)\f$ columns and \f$O(row)\f$ rows.
 
 \subsection References
-
-The iterative rounding additive one approximation by Singh and Lau is described in
+This iterative rounding additive one approximation by Singh and Lau is described in
 \cite SinghLauBDMST.
 */

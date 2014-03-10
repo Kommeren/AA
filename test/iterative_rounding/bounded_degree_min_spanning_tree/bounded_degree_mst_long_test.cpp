@@ -91,7 +91,7 @@ void run_test(const Graph & g, const Cost & costs, const Bound & degBounds,
         LOGLN("Unlimited relaxations");
         ResultTree tree;
         auto result = ir::bounded_degree_mst_iterative_rounding<
-                        ir::BDMSTOracle<Oracle>>(
+                        ir::bdmst_oracle<Oracle>>(
                             g, degBounds, std::inserter(tree, tree.end()));
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
         check_result(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
@@ -99,11 +99,11 @@ void run_test(const Graph & g, const Cost & costs, const Bound & degBounds,
     {
         LOGLN("Relaxations limit = 1/iter");
         ResultTree tree;
-        ir::BDMSTIRcomponents<> comps;
+        ir::bdmst_ir_components<> comps;
         auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
                             ir::relaxations_limit_condition(), comps);
         auto result = ir::bounded_degree_mst_iterative_rounding<
-                        ir::BDMSTOracle<Oracle>>(
+                        ir::bdmst_oracle<Oracle>>(
                             g, degBounds, std::inserter(tree, tree.end()), components);
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
         check_result(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));

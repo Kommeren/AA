@@ -1,6 +1,6 @@
 /*! \page tree_aug Tree Augmentation
 
-\section def Problem definition.  
+\section def Problem definition.
 
 The Tree Augmentation problem is the
 following: given a 2-edge-connected graph \f$G=(V,T\cup E)\f$, in
@@ -17,10 +17,10 @@ a binary variable \f$x_e\f$ for every link \f$e\f$. For a tree edge \f$t\f$,
 let \f$\delta_E(t)\f$ denote the set of links that connect the 2 components of
 the graph \f$(V,T-t)\f$. Also, let \f$x(A) = \sum_{e\in A} x_e\f$.
 \f{eqnarray*}
-\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\ 
+\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\
 \mbox{subject to:} & & \\
-& x(\delta_E(t))\ge 1 & \mbox{ for every } t\in T\\ 
-& x_e \in \{0,1\} & \mbox{ for every }e\in E\\ 
+& x(\delta_E(t))\ge 1 & \mbox{ for every } t\in T\\
+& x_e \in \{0,1\} & \mbox{ for every }e\in E\\
 \f}
 
 
@@ -33,18 +33,29 @@ characteristic of this special case is that the LP relaxation that we
 use has polynomial size: we use the following natural relaxation of
 the above formulation.
 \f{eqnarray*}
-\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\ 
+\mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\
 \mbox{subject to:} & & \\
-& x(\delta_E(t))\ge 1 & \mbox{ for every } t\in T\\ 
-& x_e \ge 0 & \mbox{ for every }e\in E\\ 
+& x(\delta_E(t))\ge 1 & \mbox{ for every } t\in T\\
+& x_e \ge 0 & \mbox{ for every }e\in E\\
 \f}
 
-example: 
+example:
    \snippet tree_augmentation_example.cpp Tree Augmentation Example
- 
+
 complete example of the usage can be found in file tree_augmentation_example.cpp
 
-\subsection app_ta Approximation Ratio equals 2.
+\subsection app_ta Approximation Ratio
+The approximation ratio of this algorithm equals 2.
+
+\subsection com_ta Complexity
+The time complexity of the algorithm is \f$O(|T|*(|T|+|E|+LP_{time}(|E|,|T|)))\f$,
+where \f$|T|\f$ and \f$|E|\f$ are respectively the numbers of tree edges and links
+and \f$LP_{time}(col, row)\f$ is the time of solving the LP with \f$O(col)\f$
+columns and \f$O(row)\f$ rows.
+
+The memory complexity of the algorithm is \f$O(|E|+|T|+LP_{mem}(|E|,|T|))\f$,
+where \f$LP_{mem}(col, row)\f$ is the memory complexity of solving the LP with
+\f$O(col)\f$ columns and \f$O(row)\f$ rows.
 
 \subsection References
 
