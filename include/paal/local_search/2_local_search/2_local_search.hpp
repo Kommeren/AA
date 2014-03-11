@@ -9,11 +9,9 @@
 #ifndef TWO_LOCAL_SEARCH_HPP
 #define TWO_LOCAL_SEARCH_HPP
 
-#include "paal/local_search/multi_solution/get_all_moves_from_solution.hpp"
 #include "paal/local_search/search_components.hpp"
-#include "paal/local_search/multi_solution/local_search_multi_solution.hpp"
-#include "paal/local_search/2_local_search/2_local_search_commit.hpp"
-#include "paal/local_search/2_local_search/2_local_search_checker.hpp"
+#include "paal/local_search/single_solution/local_search_single_solution.hpp"
+#include "paal/local_search/2_local_search/2_local_search_components.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
 #include "paal/data_structures/cycle/cycle_start_from_last_change.hpp"
 #include "paal/data_structures/cycle/cycle_concept.hpp"
@@ -43,7 +41,7 @@ namespace two_local_search {
 template <typename... Args>
 using TwoLocalComponents = data_structures::Components<
             Gain,
-            data_structures::NameWithDefault<GetMoves, GetAllMovesFromSolution>,
+            data_structures::NameWithDefault<GetMoves, TwoLocalSearchGetMoves>,
             data_structures::NameWithDefault<Commit, TwoLocalSearchCommit>
                 >::type<Args...>;
 
@@ -59,7 +57,7 @@ using TwoLocalComponents = data_structures::Components<
  * @return
  */
 template <typename Gain,
-          typename GetMoves = GetAllMovesFromSolution>
+          typename GetMoves = TwoLocalSearchGetMoves>
 TwoLocalComponents<Gain, GetMoves>
 
     make_TwoLocalSearchComponents(Gain ch,
@@ -109,7 +107,7 @@ bool two_local_search(
     typedef data_structures::CycleStartFromLastChange<Cycle> CSFLCh;
     CSFLCh cycleSFLCh(cycle);
     local_search::two_local_search::TwoLocalSearchAdapter<CSFLCh> cycleAdapted(cycleSFLCh);
-    return local_search_multi_solution(cycleAdapted, std::move(psa), std::move(gsc), std::move(components)...);
+    return local_search(cycleAdapted, std::move(psa), std::move(gsc), std::move(components)...);
 }
 
 /**
