@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <utility>
 #include <tuple>
+#include <boost/range.hpp>
 
 
 namespace paal {
@@ -19,29 +20,14 @@ namespace utils {
 ///for given expression returns its type with removed const and reference
 #define puretype(t)  typename std::decay<decltype(t)>::type
 
-///for given collection returns type of its iterator
-template <typename Collection> struct CollectionToIter {
-    typedef decltype(std::begin(std::declval<Collection &>())) type;
-};
-
-///for given collection returns type of its const iterator
-template <typename Collection> struct CollectionToConstIter {
-    typedef decltype(std::begin(std::declval<const Collection &>())) type;
-};
-
 ///for given collection returns type of its reference
 template <typename Collection> struct CollectionToRef {
-   typedef typename std::iterator_traits<typename CollectionToIter<Collection>::type>::reference type;
-};
-
-///for given collection returns type of its const reference
-template <typename Collection> struct CollectionToConstRef {
-   typedef typename std::iterator_traits<typename CollectionToConstIter<Collection>::type>::reference type;
+   typedef typename std::iterator_traits<typename boost::range_iterator<Collection>::type>::reference type;
 };
 
 ///for given collection returns type of its element
 template <typename Collection> struct CollectionToElem {
-  typedef typename std::iterator_traits<typename CollectionToIter<Collection>::type>::value_type type;
+  typedef typename std::iterator_traits<typename boost::range_iterator<Collection>::type>::value_type type;
 };
 
 ///returns tuple consisting of k times type T

@@ -10,7 +10,7 @@
 #define TWO_LOCAL_SEARCH_HPP
 
 #include "paal/local_search/search_components.hpp"
-#include "paal/local_search/single_solution/local_search_single_solution.hpp"
+#include "paal/local_search/local_search.hpp"
 #include "paal/local_search/2_local_search/2_local_search_components.hpp"
 #include "paal/local_search/2_local_search/2_local_search_solution_adapter.hpp"
 #include "paal/data_structures/cycle/cycle_start_from_last_change.hpp"

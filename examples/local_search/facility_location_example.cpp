@@ -13,8 +13,6 @@
 
 using namespace paal::local_search::facility_location;
 
-
-
 int main() {
 //! [FL Search Example]
     // sample data

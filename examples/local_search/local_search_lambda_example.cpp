@@ -16,19 +16,17 @@ int main() {
     namespace ls =  paal::local_search;
 
     auto f = [](int x) {
-        return -x*x + 12 * x -27;
+        return -x * x + 12 * x - 27;
     };
-    //creating solution
-    int solution(0);
+    int solution {0};
 
-    //neighborhood
-    const std::vector<int> neighb{10, -10, 1, -1};
+    const std::vector<int> neighb {10, -10, 1, -1};
 
-    auto getMoves = [=](int){
-            return std::make_pair(neighb.begin(), neighb.end());
+    auto getMoves = [neighb](int){
+        return std::make_pair(neighb.begin(), neighb.end());
     };
 
-    auto gain = [=](int sol, int move) {
+    auto gain = [f](int sol, int move) {
         return f(sol + move) - f(sol);
     };
 
@@ -37,10 +35,9 @@ int main() {
         return true;
     };
 
-    //search
-    ls::local_search_simple(solution, ls::make_SearchComponents(getMoves, gain, commit));
+    ls::local_search_simple(solution,
+            ls::make_SearchComponents(getMoves, gain, commit));
 
-    //print
     std::cout << "Local search solution: " <<  solution << std::endl;
     //! [Local Search Example]
     return 0;

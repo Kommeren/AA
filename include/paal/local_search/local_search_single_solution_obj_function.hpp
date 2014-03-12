@@ -8,7 +8,7 @@
 #ifndef LOCAL_SEARCH_SINGLE_SOLUTION_OBJ_FUNCTION_HPP
 #define LOCAL_SEARCH_SINGLE_SOLUTION_OBJ_FUNCTION_HPP
 
-#include "local_search_single_solution.hpp"
+#include "local_search.hpp"
 #include "trivial_solution_commit.hpp"
 #include "search_obj_func_components.hpp"
 #include "paal/data_structures/components/component_traits.hpp"

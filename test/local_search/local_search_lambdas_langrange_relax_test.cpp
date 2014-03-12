@@ -16,9 +16,24 @@
 
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_components.hpp"
+#include "paal/data_structures/combine_iterator.hpp"
 #include "utils/logger.hpp"
 
 using namespace  paal;
+
+
+    struct ValueDiff {
+        ValueDiff(double & value, double diff) :
+            m_value(value), m_diff(diff) {}
+        double & m_value;
+        double m_diff;
+    };
+
+    struct MakeValueDiff {
+        ValueDiff operator()(double & value, double diff) const {
+            return ValueDiff{value, diff};
+        }
+    };
 
 BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     typedef  double SolutionElement;
@@ -28,8 +43,8 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     const double LOWER_BOUND = 0.;
     const double UPPER_BOUND = 1.;
 
-    //creating local search
 
+    //creating local search
     const std::vector<double> neighb{0.1, -0.1, .01, -.01, .001, -.001};
     std::vector<double> neighbCut(neighb.size());
     double G{1};
@@ -40,38 +55,40 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3 + G * (2- (x1 + x2 + x3));
     };
 
-    auto getMoves =[&] (const Solution & s, SolutionElement i) {
-        for(int j : boost::irange(std::size_t(0), neighb.size())) {
-            neighbCut[j] = std::max(neighb[j] + i, LOWER_BOUND);
-            neighbCut[j] = std::min(neighbCut[j], UPPER_BOUND);
-        }
-        return std::make_pair(neighbCut.begin(), neighbCut.end());
+    auto normalize = [=](SolutionElement el) {
+        el = std::max(el, LOWER_BOUND);
+        return std::min(el, UPPER_BOUND);
     };
 
-    auto gain = [&](Solution & s, SolutionElement & i, Move u) {
-        auto old = i;
+    auto getMoves =[&] (Solution & s) {
+        auto b = data_structures::make_CombineIterator(MakeValueDiff{}, s, neighb);
+        return std::make_pair(b, decltype(b){});
+    };
+
+    auto gain = [&](Solution & s, ValueDiff vd) {
+        auto old = vd.m_value;
         auto val = f(s);
-        i = u;
+        vd.m_value = normalize(vd.m_value + vd.m_diff);
         auto valMove = f(s);
-        i = old;
+        vd.m_value = old;
         return valMove - val - 0.000001;
     };
 
-    auto commit = [&](Solution &, SolutionElement & se, Move u) {
-        se = u;
+    auto commit = [&](Solution &, ValueDiff vd) {
+        vd.m_value = normalize(vd.m_value + vd.m_diff);
         return true;
     };
 
     auto ls = [=](Solution & x) {
         x = {0.3,0.3,0.3};
-        local_search_multi_solution_simple(x,
+        local_search_simple(x,
             local_search::make_SearchComponents(getMoves, gain, commit));
     };
 
     //components for G.
     std::vector<double> neighbCutG(neighb.size());
     std::vector<double> x(DIM, 0);
-    local_search_multi_solution_simple(x,
+    local_search_simple(x,
                 local_search::make_SearchComponents(getMoves, gain, commit));
     double best = f(x);
 

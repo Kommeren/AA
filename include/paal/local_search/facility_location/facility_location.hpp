@@ -7,7 +7,7 @@
  */
 
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
-#include "paal/local_search/single_solution/local_search_single_solution.hpp"
+#include "paal/local_search/local_search.hpp"
 
 #include "facility_location_solution_adapter.hpp"
 #include "facility_location_add.hpp"

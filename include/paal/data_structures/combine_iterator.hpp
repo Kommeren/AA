@@ -41,7 +41,7 @@ template <typename Range, typename... RangesRest>
 
         public:
             using base = CombineIteratorEngine<RangesRest...>;
-            using Iterator = decltype(std::begin(std::declval<Range>()));
+            using Iterator = typename boost::range_iterator<Range>::type;
 
             /**
              * @brief constructor
@@ -49,7 +49,7 @@ template <typename Range, typename... RangesRest>
              * @param range
              * @param rest
              */
-            CombineIteratorEngine(const Range & range, const RangesRest & ... rest) :
+            CombineIteratorEngine(Range & range, RangesRest & ... rest) :
                 base(rest...)
                 , m_begin(std::begin(range))
                 , m_curr(std::begin(range))
@@ -86,7 +86,7 @@ template <typename Range, typename... RangesRest>
              * @return
              */
             template <typename F, typename... Args>
-                auto call(F f, Args&& ... args) const ->
+                auto call(F f, Args&& ... args) ->
                 decltype(std::declval<base>().call(std::move(f), std::forward<Args>(args)..., *std::declval<Iterator>())) {
                     return base::call(std::move(f), std::forward<Args>(args)..., *m_curr);
                 }
@@ -139,7 +139,7 @@ template <>
              * @return
              */
             template <typename F, typename... Args>
-                auto call(F f, Args&& ... args) const -> decltype(f(std::forward<Args>(args)...)) {
+                auto call(F f, Args&& ... args) -> decltype(f(std::forward<Args>(args)...)) {
                     return f(std::forward<Args>(args)...);
                 }
 
@@ -156,6 +156,12 @@ template <>
             }
     };
 
+namespace detail {
+    //TODO can you do this without alias???
+    template <typename T>
+    using rem_ref = typename std::remove_reference<T>::type;
+}
+
 
 /**
  * @brief make for CombineIteratorEngine
@@ -166,9 +172,10 @@ template <>
  * @return
  */
 template <typename... Ranges>
-    CombineIteratorEngine<Ranges...>
-    make_CombineIteratorEngine(const Ranges& ...  ranges) {
-        return CombineIteratorEngine<Ranges...>{ranges...};
+    CombineIteratorEngine<detail::rem_ref<Ranges>...>
+    make_CombineIteratorEngine(Ranges&& ...  ranges) {
+        //see comments in make_CombineIterator
+        return CombineIteratorEngine<detail::rem_ref<Ranges>...>{ranges...};
     }
 
 /**
@@ -192,7 +199,7 @@ template <typename Joiner, typename... Ranges>
          * @param joiner
          * @param ranges
          */
-        CombineIterator(Joiner joiner, const Ranges & ... ranges) :
+        CombineIterator(Joiner joiner, Ranges & ... ranges) :
             m_joiner(joiner), m_iteratorEngine(ranges...),
             m_end(sizeof...(Ranges) ? isEmpty(ranges...) : true)
         { }
@@ -265,9 +272,10 @@ template <typename Joiner, typename... Ranges>
         ref dereference() const { return m_iteratorEngine.call(m_joiner); }
 
         Joiner m_joiner;
-        CombineIteratorEngine<Ranges...> m_iteratorEngine;
+        mutable CombineIteratorEngine<Ranges...> m_iteratorEngine;
         bool m_end;
 };
+
 
 /**
  * @brief make for CombineIterator
@@ -280,9 +288,11 @@ template <typename Joiner, typename... Ranges>
  * @return
  */
 template <typename Joiner, typename... Ranges>
-    CombineIterator<Joiner, Ranges...>
-    make_CombineIterator(Joiner joiner, const Ranges& ...  ranges) {
-        return CombineIterator<Joiner, Ranges...>{joiner, ranges...};
+    CombineIterator<Joiner, detail::rem_ref<Ranges>...>
+    make_CombineIterator(Joiner joiner, Ranges&& ...  ranges) {
+        //we do not forward the ranges, because CombineIterator expects lvalues
+        //we Use Ranges && because, we'd like to cover const/nonconst cases
+        return CombineIterator<Joiner, detail::rem_ref<Ranges>...>{joiner, ranges...};
     }
 
 } //data_structures

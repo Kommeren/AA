@@ -64,11 +64,11 @@ template <typename IntegralTag,
           typename Objects,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename paal::detail::KnapsackBase<typename paal::utils::CollectionToIter<Objects>::type,
+typename paal::detail::KnapsackBase<typename boost::range_iterator<Objects>::type,
     ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
     detail_knapsack(const Objects & objects,
                      paal::detail::FunctorOnIteratorPValue<ObjectSizeFunctor,
-                        typename paal::utils::CollectionToIter<Objects>::type> capacity, //capacity is of size type
+                        typename boost::range_iterator<Objects>::type> capacity, //capacity is of size type
                      ObjectSizeFunctor size,
                      ObjectValueFunctor value)
 {
@@ -94,11 +94,11 @@ template <typename IsZeroOne,
           typename Objects,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename paal::detail::KnapsackBase<typename paal::utils::CollectionToIter<Objects>::type,
+typename paal::detail::KnapsackBase<typename boost::range_iterator<Objects>::type,
     ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
     detail_knapsack_fptas(double epsilon, const Objects & objects,
                      paal::detail::FunctorOnIteratorPValue<ObjectSizeFunctor,
-                        typename paal::utils::CollectionToIter<Objects>::type> capacity, //capacity is of size type
+                        typename boost::range_iterator<Objects>::type> capacity, //capacity is of size type
                      ObjectSizeFunctor size,
                      ObjectValueFunctor value,
                      OnValueTag)
@@ -120,11 +120,11 @@ template <typename IsZeroOne,
           typename Objects,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename paal::detail::KnapsackBase<typename paal::utils::CollectionToIter<Objects>::type,
+typename paal::detail::KnapsackBase<typename boost::range_iterator<Objects>::type,
     ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
     detail_knapsack_fptas(double epsilon, const Objects & objects,
                      paal::detail::FunctorOnIteratorPValue<ObjectSizeFunctor,
-                        typename paal::utils::CollectionToIter<Objects>::type> capacity, //capacity is of size type
+                        typename boost::range_iterator<Objects>::type> capacity, //capacity is of size type
                      ObjectSizeFunctor size,
                      ObjectValueFunctor value,
                      OnSizeTag)

@@ -4,8 +4,7 @@ Index:
     <li> \ref Preliminaries - containing preliminaries to Local Search and our interpretation of it.
     <li> \ref local_search_interface - containing c++ interfaces of Local Search classes.
     <ul>
-    <li> \ref local_search_single
-    <li> \ref local_search_multi
+    <li> \ref local_search
     <li> \ref custom_components
     </ul>
 </ul>
@@ -43,33 +42,6 @@ Let us write the pseudo code for this operation:  <br><br>
 
 Note that we are working on moves (not on the full solution). This idea is going to be used in the c++ code. <br> 
 The reason of this is the fact that usually the moves are much lighter than the full solutions. <br>
-<br>
-Note that in many cases, eg. k-local search or facility location, our solution is  the collection of the elements.<br>
-In many cases for such solutions we search the neighborhood of each solution element and try to improve it by changing some part of the solution near the chosen solution element. <br>
-<br>
-In this cases it is more convenient to proceed in the following way:<br>
-
-<pre>
- local_search() 
- {
-     x -> random_solution(X) 
-     for_each(Element e of x)
-     {
-      for_each(Move u in N(e)) 
-      { 
-         if(gain(apply u on x) > 0) 
-         {
-             x -> apply u on x 
-         }
-      }
-     }
-     return x
- }
-</pre>
-<br>
-We find this algorithm schema  extremely useful in our implementation! <br>
-We will refer to this schema as LocalSearchMultiSolution. <br>
-Also if necessary we will refer to the "normal" LS as LocalSearchSingleSolution.
 
 \section local_search_interface  LOCAL SEARCH INTERFACE
 Our local search is divided into steps. One step of the local search consists on checking possible moves and finding move with positive gain (or the move with the biggest gain in the SteepestSlope strategy). 
@@ -97,9 +69,9 @@ As mentioned before there are two possible strategies in step excecution.
 <li> We can iterate through all moves and chose one with the largest gain. This strategy is called SteepestSlope.
 </ul>
 
-The \ref local_search_single and  \ref local_search_multi section introduce complete interface of the local search.
+The \ref local_search section introduces complete interface of the local search.
 
-\subsection local_search_single LOCAL SEARCH SINGLE SOLUTION
+\subsection local_search LOCAL SEARCH INTERFACE 
 
 In order to present the local search step interface we need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Move</i> is the type of single move. <br>
@@ -178,91 +150,6 @@ After we've defined components we run LS.
 
 \snippet local_search_example.cpp Local Search Example
 
-\subsection local_search_multi LOCAL SEARCH MULTI SOLUTION 
-
-The interface and concepts of the  LocalSearchMultiSolution are very similar to the LocalSearchSingleSolution ones.<br>
-
-<br>
-Note that <i>SolutionElement</i> is the type of the specific element of the solution. <br>
-<i>SolutionElementIterator</i> is assumed to be the type of iterators over solution. <br><br>
-
-Concepts:
-<ol>
-    <li> <i>MultiSolution</i>  is a concept class representing the  solution  
-    <pre>
-    MultiSolutionArchetype {
-        SolutionElementIterator begin();
-        SolutionElementIterator end();
-    }
-    </pre>
-    <li> <i>MultiGetMoves</i>  is a concept class responsible for getting the neighborhood of the current solution  
-    <pre>
-    MultiGetMovesArchetype {
-        MoveIteratorsRange operator()(const Solution & s, const SolutionElement &)
-    }
-    </pre>
-    <li> <i>MultiGain</i> is a concept class responsible for checking if the specific move element improve the solution.
-    <pre>
-    MultiGainArchetype {
-        int operator()(const Solution & s, const SolutionElement &, const Move & move);
-    }
-    </pre>
-    <li> <i>MultiCommit</i> is a concept class responsible for updating the solution with the Move.
-    <pre>
-    MultiSolutionUdaterArchetype {
-        int operator()(Solution & s, const SolutionElement &, const Move & move);
-    }
-    </pre>
-    
-    
-    <li> <i>MultiSearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with three components: GetMoves, Gain, Commit.
-    </li>
-</ol>
-
-Now we can introduce the paal::local_search::multi_local_search interface. Note that you can pass arbitrary number of MultiSearchComponents to one local search. If your problem have many different Move types it might be useful to provide SearchComponents for each type of Move.
-
-Simple version:
-<pre>
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter, 
-          typename Solution, 
-          typename... Components>
-bool local_search_multi_solution_simple(Solution & solution, Components... components);
-</pre>
-
-More sophisticated version:
-
-<pre>
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
-          typename PostSearchAction,
-          typename GlobalStopCondition,
-          typename Solution,
-          typename... Components>
-bool local_search_multi_solution(
-            Solution & solution,
-            PostSearchAction psa,
-            GlobalStopCondition gsc,
-            Components... components);
-</pre>
-
-
-\subsubsection Example
-complete example: local_search_multi_solution_example.cpp
-
-In this example we are going to maximize function<br> x1*x2 + x2*x3 + x3*x1 -3*x1*x2*x3<br> for  x1, x2, x3 in <0,1> interval.<br> 
-In this problem solution is just a float vector, solution element is float and move is also a float which denotes the new value for solution element.
-We start with defining search components, that is:
-<ol>
-<li> GetMoves functor
-<li> Gain functor
-<li> Commit functor
-</ol>
-
-\snippet local_search_multi_solution_example.cpp Local Search Components Example
-
-After we've defined components we run LS.
-
-\snippet local_search_multi_solution_example.cpp Local Search Example
-
 \section custom_components CUSTOM COMPONENTS
 
 The library provides a number of custom components which might be very helpful.
@@ -271,14 +158,19 @@ The library provides a number of custom components which might be very helpful.
 <li> paal::local_search::StopConditionTimeLimit
 <li> paal::local_search::StopConditionCountLimit
 <li> paal::local_search::ComputeGainWrapper
+<li> paal::local_search::RecordSolutionCommitAdapter
+<li> paal::local_search::TabuGainAdaptor
+<li> paal::local_search::SimulatedAnnealingGainAdaptor
 </ol>
 
 Since library employs the iterators, the following utilities might be helpful 
 <ol>
-<li> boost::trasform_iterator
+<li> boost::transform_iterator
 <li> boost::filter_iterator
 <li> boost::function_input_iterator
 <li> paal::IteratorWithStopCondition
+<li> paal::data_structures::CombineIterator
+<li> paal::data_structures::SubsetsIterator
 </ol>
 */
 

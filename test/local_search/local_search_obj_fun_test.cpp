@@ -10,8 +10,8 @@
 
 #include <vector>
 
-#include "paal/local_search/single_solution/search_obj_func_components.hpp"
-#include "paal/local_search/single_solution/local_search_single_solution_obj_function.hpp"
+#include "paal/local_search/search_obj_func_components.hpp"
+#include "paal/local_search/local_search_single_solution_obj_function.hpp"
 #include "utils/logger.hpp"
 
 
