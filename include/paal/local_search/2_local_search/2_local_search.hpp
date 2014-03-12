@@ -94,20 +94,21 @@ getDefaultTwoLocalComponents(const Metric & m) {
  *
  * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
           typename Cycle,
           typename... Components>
 bool two_local_search(
             Cycle & cycle,
+            SearchStrategy searchStrategy,
             PostSearchAction psa,
             GlobalStopCondition gsc,
             Components... components) {
     typedef data_structures::CycleStartFromLastChange<Cycle> CSFLCh;
     CSFLCh cycleSFLCh(cycle);
     local_search::two_local_search::TwoLocalSearchAdapter<CSFLCh> cycleAdapted(cycleSFLCh);
-    return local_search(cycleAdapted, std::move(psa), std::move(gsc), std::move(components)...);
+    return local_search(cycleAdapted, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(components)...);
 }
 
 /**
@@ -121,11 +122,13 @@ bool two_local_search(
  *
  * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
-          typename Cycle,
+template <typename Cycle,
           typename... Components>
 bool two_local_search_simple(Cycle & cycle, Components... components) {
-    return two_local_search(cycle, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return two_local_search(cycle, ChooseFirstBetterStrategy{},
+                utils::SkipFunctor{},
+                utils::ReturnFalseFunctor{},
+                std::move(components)...);
 }
 
 

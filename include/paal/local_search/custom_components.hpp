@@ -342,7 +342,8 @@ struct RecordSolutionCommitAdapter {
                                 Commit commit = Commit(),
                                 Condition cond = Condition()) :
         m_solution(&solution), m_commit(std::move(commit)),
-        m_condition(std::move(cond)) { }
+        m_condition(std::move(cond)) {
+        }
 
     /**
      * @brief operator

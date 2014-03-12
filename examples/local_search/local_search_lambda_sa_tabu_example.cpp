@@ -28,7 +28,7 @@ int main() {
     std::vector<int> neighb{10, -10, 1, -1};
 
     auto getMoves = [=](int){
-            return std::make_pair(neighb.begin(), neighb.end());
+            return boost::make_iterator_range(neighb.begin(), neighb.end());
     };
 
     auto gain = [=](int sol, int move) {
@@ -66,7 +66,7 @@ int main() {
     std::uniform_int_distribution<> dist(0,4);
     auto getMovesRandom = [=](int) mutable {
         auto iter = neighb.begin() + dist(engine);
-        return std::make_pair(iter, iter + 1);
+        return boost::make_iterator_range(iter, iter + 1);
     };
 
     ls::StopConditionCountLimit stopCondition(1000);
@@ -81,7 +81,7 @@ int main() {
                     paal::utils::make_FunctorToComparator(f, paal::utils::Greater()));// recordSolutionCommit must know how to compare solutions
 
     //random walk
-    ls::local_search(currentSolution, postSearchAtion, stopCondition,
+    ls::local_search(currentSolution, ls::ChooseFirstBetterStrategy{}, postSearchAtion, stopCondition,
             ls::make_SearchComponents(getMovesRandom, paal::utils::ReturnOneFunctor(), recordSolutionCommit));
 
     //print
@@ -96,8 +96,8 @@ int main() {
                         paal::data_structures::TabuListRememberSolutionAndMove<int, int>(20), gain);
 
 
-    ls::local_search<ls::search_strategies::SteepestSlope>
-        (currentSolution, postSearchAtion, stopCondition, ls::make_SearchComponents(getMoves, gainTabu, recordSolutionCommit));
+    ls::local_search
+        (currentSolution, ls::SteepestSlopeStrategy{}, postSearchAtion, stopCondition, ls::make_SearchComponents(getMoves, gainTabu, recordSolutionCommit));
 
     //print
     std::cout << "Tabu solution: " << best << std::endl;

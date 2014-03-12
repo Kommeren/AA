@@ -112,6 +112,8 @@ class NQueensGetMoves {
         using SolutionIter = decltype(std::declval<Solution>().begin());
         using Subset = data_structures::SubsetsIterator<2, SolutionIter, MakeMove>;
         using IterPair = std::pair<Subset, Subset>;
+        using Range = boost::iterator_range<Subset>;
+
     };
 
 public:
@@ -125,10 +127,10 @@ public:
      */
     template <typename Solution>
     auto operator()(const Solution & solution) const ->
-        typename TypesEval<Solution>::IterPair
+        typename TypesEval<Solution>::Range
     {
-        return data_structures::make_SubsetsIteratorRange<2>
-                        (solution.begin(), solution.end(), MakeMove{})
+        return boost::make_iterator_range(data_structures::make_SubsetsIteratorRange<2>
+                        (solution.begin(), solution.end(), MakeMove{}));
             ;
     }
 };

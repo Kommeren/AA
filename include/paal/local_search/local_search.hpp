@@ -13,188 +13,189 @@
 #include <algorithm>
 #include <functional>
 
-#include <boost/range/iterator_range.hpp>
+#include <boost/fusion/include/vector.hpp>
+#include <boost/range/algorithm/max_element.hpp>
 
-#include "paal/local_search/search_loop.hpp"
 #include "local_search_concepts.hpp"
+#include "paal/data_structures/static_lazy_join.hpp"
+#include "paal/data_structures/components/component_traits.hpp"
 
 namespace paal {
 namespace local_search {
 
-namespace search_strategies {
+/**
+ * @brief this predicates returns true if there is a move with positive gain
+ *        and the commit was succesfull
+ */
+struct FindPositivePredicate {
+
     /**
-     * @brief In this strategy, we iterate through moves until we find the move with positive gain.
+     * @brief operator()
+     *
+     * @tparam ComponentsAndSolution
+     * @param compsAndSol
+     *
+     * @return
      */
-    class ChooseFirstBetter;
-    /**
-     * @brief In this strategy, we iterate through all moves and chose one with the largest gain.
-     */
-    class SteepestSlope;
-}
+    template <typename ComponentsAndSolution>
+    bool operator()(ComponentsAndSolution & compsAndSol) const {
+        auto & solution = compsAndSol.second;
+        auto & comps = compsAndSol.first;
 
-namespace detail {
+        using MoveRef = typename MoveType<puretype(comps), puretype(solution)>::reference;
 
-template <typename Solution>
-class LocalSearchStepBase {
-protected:
-    LocalSearchStepBase(Solution & solution) :
-        m_solution(solution) {}
-
-    Solution & m_solution;
-
-public:
-
-    Solution & getSolution() {
-        return m_solution;
-    }
-};
-
-template <typename Solution,
-          typename SearchStrategy,
-          typename... SearchComponents>
-
-class LocalSearchStep  {
-    static_assert(std::is_same<SearchStrategy, search_strategies::ChooseFirstBetter>::value ||
-                  std::is_same<SearchStrategy, search_strategies::SteepestSlope>::value, "Wrong search strategy");
-    LocalSearchStep() = delete;
-};
-
-template <typename Solution,
-          typename SearchComponents,
-          typename... SearchComponentsRest>
-
-class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponents, SearchComponentsRest...> :
-    public LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> {
-protected:
-    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
-
-    typedef LocalSearchStep<Solution, search_strategies::ChooseFirstBetter, SearchComponentsRest...> base;
-    using base::m_solution;
-    typedef typename MoveType<SearchComponents, Solution>::reference MoveRef;
-    typedef typename MoveType<SearchComponents, Solution>::type Move;
-
-public:
-    LocalSearchStep(Solution & solution) :
-        base(solution) {}
-
-    LocalSearchStep(Solution & solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
-        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {
-        }
-
-    bool search() {
-        auto adjustmentSet = call<GetMoves>(m_solution);
+        decltype(comps.template call<GetMoves>(solution))
+            adjustmentSet = comps.template call<GetMoves>(solution);
 
         for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
-            if(call<Gain>(m_solution, move) > 0) {
-                if(call<Commit>(m_solution, move)) {
+            if(comps.template call<Gain>(solution, move) > 0) {
+                if(comps.template call<Commit>(solution, move)) {
                     return true;
                 }
             }
         }
-        return base::search();
-    }
-protected:
-    template <typename Action, typename... Args>
-    auto call(Args&&... args) ->
-    decltype(std::declval<SearchComponents>().template call<Action>(args...)){
-        return m_searchComponents.template call<Action>(args...);
-    }
 
-    SearchComponents m_searchComponents;
-};
-
-template <typename Solution>
-class LocalSearchStep<Solution, search_strategies::ChooseFirstBetter> :
-    public LocalSearchStepBase<Solution> {
-public:
-    typedef LocalSearchStepBase<Solution> base;
-    LocalSearchStep(Solution & sol) : base(sol) {
-    }
-
-    bool search() {
         return false;
     }
-
 };
 
-template <typename Solution, typename SearchComponents, typename... SearchComponentsRest>
-class LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponents, SearchComponentsRest...>
-        : public LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...>  {
-    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
-    typedef LocalSearchStep<Solution, search_strategies::SteepestSlope, SearchComponentsRest...> base;
-    typedef typename Fitness<SearchComponents, Solution>::type Fitness;
-    using base::m_solution;
-    typedef typename  MoveType<SearchComponents, Solution>::type Move;
 
-public:
-    LocalSearchStep(Solution & solution) :
-        base(solution) {}
 
-    LocalSearchStep(Solution & solution, SearchComponents searchComponents, SearchComponentsRest... rest) :
-        base(solution, std::move(rest)...), m_searchComponents(std::move(searchComponents)) {
+/**
+ * @brief This strategy uses FindPositivePredicate as stop condition
+ */
+struct ChooseFirstBetterStrategy {
+    /**
+     * @brief operator()
+     *
+     * @tparam SearchJoin
+     * @param join
+     *
+     * @return
+     */
+    template <typename SearchJoin>
+        bool operator()(SearchJoin & join) const {
+            return m_satisfy(m_pred, join);
+        }
+    private:
+    FindPositivePredicate m_pred;
+    data_structures::Satisfy m_satisfy;
+};
+
+
+/**
+ * @brief functor used in fold on StaticLazyJoin in order to find the most improving move.
+ */
+struct MaxFunctor {
+
+    /**
+     * @brief operator()
+     *
+     * @tparam ComponentsAndSolution
+     * @tparam AccumulatorFunctor
+     * @tparam AccumulatorData
+     * @tparam Continuation
+     * @param compsAndSol
+     * @param accumulatorFunctor
+     * @param accumulatorData
+     * @param continuation
+     *
+     * @return
+     */
+    template <typename ComponentsAndSolution,
+              typename AccumulatorFunctor,
+              typename AccumulatorData,
+              typename Continuation>
+                 bool operator()(
+                        ComponentsAndSolution & compsAndSol,
+                        AccumulatorFunctor accumulatorFunctor,
+                        AccumulatorData accumulatorData,
+                        Continuation continuation
+                    ) const {
+        auto & comps = compsAndSol.first;
+        auto  & solution = compsAndSol.second;
+
+        using Move = typename MoveType<puretype(comps), puretype(solution)>::value_type;
+        using MoveRef = typename MoveType<puretype(comps), puretype(solution)>::reference;
+
+        decltype(comps.template call<GetMoves>(solution))
+            adjustmentSet = comps.template call<GetMoves>(solution);
+
+        if(boost::empty(adjustmentSet)) {
+            return continuation(accumulatorFunctor, accumulatorData);
         }
 
-    bool search() {
-        return base::searchAndPassBest(best());
-    }
-private:
-    typedef std::tuple<Fitness, SearchComponents &, Move> BestDesc;
-    BestDesc best() {
-        Fitness max = Fitness();
-        bool init = false;
-        auto adjustmentSet = call<GetMoves>(m_solution);
-        auto currMove = adjustmentSet.first;
-        Move bestMove = Move();
+        Move maxMove = *std::begin(adjustmentSet);
+        auto maxGain = comps.template call<Gain>(solution, maxMove);
 
-        for(;currMove !=  adjustmentSet.second; ++currMove) {
-            Fitness gain = call<Gain>(m_solution, *currMove);
-            if(!init || gain > max) {
-                bestMove = *currMove;
-                max = gain;
-                init = true;
+
+        for(MoveRef move : boost::make_iterator_range(++std::begin(adjustmentSet), std::end(adjustmentSet))) {
+            auto gain = comps.template call<Gain>(solution, move);
+            if(gain > maxGain) {
+                maxMove = move;
+                maxGain = gain;
             }
         }
 
-        return BestDesc(max, m_searchComponents, bestMove);
-    }
-protected:
-
-    template <typename Best>
-    bool searchAndPassBest(const Best & b) {
-        auto b2 = best();
-        if(std::get<0>(b) > std::get<0>(b2)) {
-            return base::searchAndPassBest(b);
+        if(maxGain > accumulatorData) {
+            auto commit = std::bind(std::ref(comps.template get<Commit>()), std::ref(solution), maxMove);
+            return continuation(commit, maxGain);
         } else {
-            return base::searchAndPassBest(b2);
+            return continuation(accumulatorFunctor, accumulatorData);
         }
+
     }
 
-    template <typename Action, typename... Args>
-    auto call(Args&&... args) ->
-    decltype(std::declval<SearchComponents>().template call<Action>(args...)){
-        return m_searchComponents.template call<Action>(args...);
-    }
+};
 
-    SearchComponents m_searchComponents;
+/**
+ * @brief This strategy chooses the best possible move and applies it to the solution
+ */
+struct SteepestSlopeStrategy {
+    /**
+     * @brief operator()
+     *
+     * @tparam SearchJoin
+     * @param join
+     *
+     * @return
+     */
+    template <typename SearchJoin>
+    bool operator()(SearchJoin & join) const {
+        return m_fold(m_fun
+                , utils::ReturnFalseFunctor{}
+                , 0
+                , join
+                );
+    }
+private:
+    MaxFunctor m_fun;
+    data_structures::PolymorficFold m_fold;
+};
+
+namespace detail {
+
+template <typename Solution,
+          typename... SearchComponentsPack>
+struct LocalSearchConsepts;
+
+template <typename Solution,
+          typename SearchComponents, typename... SearchComponentsPack>
+struct LocalSearchConsepts<Solution, SearchComponents, SearchComponentsPack...> :
+    public LocalSearchConsepts<Solution, SearchComponentsPack...>{
+    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
 };
 
 template <typename Solution>
-class LocalSearchStep<Solution, search_strategies::SteepestSlope>
-        : public LocalSearchStepBase<Solution>  {
-public:
-    typedef LocalSearchStepBase<Solution> base;
-    LocalSearchStep(Solution & sol) : base(sol) {}
+struct LocalSearchConsepts<Solution>{
 
-    template <typename Best>
-    bool searchAndPassBest(const Best &b) {
-        if(std::get<0>(b) > 0) {
-            std::get<1>(b).template call<Commit>(this->m_solution, std::get<2>(b));
-        }
-        return std::get<0>(b) > 0;
+    /**
+     * @brief dummy member to avoid warnings
+     */
+    void use() const {}
+    };
 
-    }
-};
-} // ! detail
+} //!detail
 
 /**
  * @brief local search simple solution
@@ -206,18 +207,37 @@ public:
  *
  * @return true if the solution is improved
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
           typename Solution,
           typename... Components>
 bool local_search(
-            Solution & solution,
-            PostSearchAction psa,
-            GlobalStopCondition gsc,
-            Components... components) {
-    detail::LocalSearchStep<Solution, SearchStrategy, Components...> lss(solution, std::move(components)...);
-    return search(lss, psa, gsc);
+            Solution & solution
+          , SearchStrategy searchStrategy
+          , PostSearchAction psa
+          , GlobalStopCondition gsc
+          , Components... components) {
+    detail::LocalSearchConsepts<Solution, Components...> concepts;
+    concepts.use();
+
+
+    using SearchComponentsVector = boost::fusion::vector<std::pair<Components, Solution &>...>;
+
+    SearchComponentsVector searchComponentsVector(
+            std::pair<Components, Solution &>(std::move(components), solution)...);
+
+    if(!searchStrategy(searchComponentsVector)) {
+        return false;
+    }
+
+    if(!gsc(solution)) {
+        psa(solution);
+        while(searchStrategy(searchComponentsVector) && !gsc(solution)) {
+            psa(solution);
+        }
+    }
+    return true;
 }
 
 /**
@@ -228,11 +248,11 @@ bool local_search(
  *
  * @return true if the solution is improved
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
-          typename Solution,
+template <typename Solution,
           typename... Components>
 bool local_search_simple(Solution & solution, Components... components) {
-    return local_search<SearchStrategy>(solution, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return local_search(solution, ChooseFirstBetterStrategy{},
+            utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
 }
 
 

@@ -51,7 +51,8 @@ void test() {
     auto logger = utils::make_twoLSLogger(mtx);
 
     //search
-    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));
+    two_local_search(cycle, paal::local_search::ChooseFirstBetterStrategy{},
+            logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
@@ -93,16 +94,18 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
 
     //printing
     LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
+    paal::local_search::ChooseFirstBetterStrategy strategy{};
 
     //search
     for(int j = 0; j < 20; ++j) {
         epsilon /= 2;
         LOGLN("epsilon = " << epsilon);
         cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
-        two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
+        two_local_search(cycle, strategy,
+                logger, utils::ReturnFalseFunctor(), cutLsc);
     }
 
     LOGLN("Normal search at the end");
-    two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
+    two_local_search(cycle, strategy, logger, utils::ReturnFalseFunctor(), lsc);
 }
 

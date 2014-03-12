@@ -45,18 +45,19 @@ namespace local_search {
      *
      * @return
      */
-    template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+    template <typename SearchStrategy,
              typename PostSearchAction,
              typename GlobalStopCondition,
              typename NQueensPositionsVector,
              typename... Components>
                  bool nQueensSolutionLocalSearch(
                          NQueensPositionsVector & pos,
+                         SearchStrategy searchStrategy,
                          PostSearchAction psa,
                          GlobalStopCondition gsc,
                          Components... nQueensComponents) {
                      NQueensSolutionAdapter<NQueensPositionsVector> nqueens(pos);
-                     return local_search(nqueens, std::move(psa),
+                     return local_search(nqueens, std::move(searchStrategy), std::move(psa),
                                 std::move(gsc), std::move(nQueensComponents)...);
                  }
 
@@ -71,8 +72,9 @@ namespace local_search {
     template <typename NQueensPositionsVector, typename... Components>
         void nQueensSolutionLocalSearchSimple(NQueensPositionsVector & pos, Components... nQueensComponents) {
             nQueensSolutionLocalSearch(pos,
-                                       utils::SkipFunctor(),
-                                       utils::ReturnFalseFunctor(),
+                                       ChooseFirstBetterStrategy{},
+                                       utils::SkipFunctor{},
+                                       utils::ReturnFalseFunctor{},
                                        std::move(nQueensComponents)...);
         }
 

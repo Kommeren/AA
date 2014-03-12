@@ -58,7 +58,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         DefaultSwapFLComponents<int>::type   swap;
         utils::ReturnFalseFunctor nop;
 
-        facility_location_local_search(sol, nop, nop, rem, add, swap);
+        facility_location_local_search(sol, paal::local_search::ChooseFirstBetterStrategy{},
+                    nop, nop, rem, add, swap);
 
         long long c = simple_algo::getFLCost(metric, cost, sol);
         check_result(c,opt,3.,paal::utils::LessEqual(),MULTIPL);

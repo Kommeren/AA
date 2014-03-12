@@ -83,7 +83,7 @@ int main(int argc, char ** argv) {
     auto movesEnd = boost::make_function_input_iterator(r, 10000000);
 
     auto getMoves = [=](Adapter & sol)
-        {return std::make_pair(movesBegin, movesEnd);};
+        {return boost::make_iterator_range(movesBegin, movesEnd);};
 
     int nr_of_iterations(0);
     auto countingGain = paal::utils::make_CountingFunctorAdaptor(gain, nr_of_iterations);

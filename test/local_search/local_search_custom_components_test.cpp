@@ -39,7 +39,7 @@ using namespace paal;
         auto condGain =  ls::make_TabuGainAdaptor(
                 data_structures::TabuListRememberSolutionAndMove<int, int>(20),
                 utils::ReturnTrueFunctor(),
-                [](int s, int m){return s + m <= 3. && s + m >= 0.;});
+                [](int s, int m){ return s + m <= 3. && s + m >= 0.;});
 
         auto recordSolutionCommit =
                 ls::make_RecordSolutionCommitAdapter(

@@ -23,7 +23,7 @@ int main() {
     const std::vector<int> neighb {10, -10, 1, -1};
 
     auto getMoves = [neighb](int){
-        return std::make_pair(neighb.begin(), neighb.end());
+        return boost::make_iterator_range(neighb.begin(), neighb.end());
     };
 
     auto gain = [f](int sol, int move) {

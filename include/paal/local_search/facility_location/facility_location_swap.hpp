@@ -158,10 +158,7 @@ struct FacilityLocationGetMovesSwap {
     ///operator()
     template <typename Solution>
     auto operator()(const Solution &s) ->
-        std::pair<data_structures::CombineIterator<MakeSwap
-                    , puretype(s.getChosenCopy())
-                    , puretype(s.getUnchosenCopy())>
-                 , data_structures::CombineIterator<MakeSwap
+        boost::iterator_range<data_structures::CombineIterator<MakeSwap
                     , puretype(s.getChosenCopy())
                     , puretype(s.getUnchosenCopy())>>
 
@@ -179,7 +176,7 @@ struct FacilityLocationGetMovesSwap {
                 , s.getUnchosenCopy()
                 );
         decltype(begin) end;
-        return std::make_pair(begin, end);
+        return boost::make_iterator_range(begin, end);
     }
 };
 

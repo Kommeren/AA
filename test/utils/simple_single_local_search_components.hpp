@@ -16,14 +16,14 @@ int f(int x) {
 }
 
 struct GetMoves {
-    typedef typename std::vector<int>::const_iterator Iter;
-    const std::vector<int> neighb;
+    typedef const std::vector<int> Neighb;
+    Neighb neighb;
 public:
 
     GetMoves() : neighb{10, -10, 1, -1} {}
 
-    std::pair<Iter, Iter> operator()(int x) {
-        return std::make_pair(neighb.begin(), neighb.end());
+    Neighb & operator()(int x) {
+        return neighb;
     }
 };
 

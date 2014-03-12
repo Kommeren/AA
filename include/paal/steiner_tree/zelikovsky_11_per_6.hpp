@@ -87,7 +87,7 @@ public:
         auto subsets = this->makeThreeSubsetRange(ti.begin(), ti.end());
 
         auto ng = [&](const AMatrix & t) {
-            return std::make_pair(boost::make_zip_iterator(boost::make_tuple(subsets.first,
+            return boost::make_iterator_range(boost::make_zip_iterator(boost::make_tuple(subsets.first,
                                         boost::make_transform_iterator(m_subsDists.begin(), utils::RemoveReference()))),
                                   boost::make_zip_iterator(boost::make_tuple(subsets.second,
                                         boost::make_transform_iterator(m_subsDists.end(), utils::RemoveReference()))));
@@ -112,8 +112,9 @@ public:
         fillSubDists();
 
         findSave(lsSolution);
-        local_search::local_search<local_search::search_strategies::SteepestSlope>(
+        local_search::local_search(
                 lsSolution,
+                local_search::SteepestSlopeStrategy{},
                 [&](AMatrix & a){this->findSave(a);},
                 utils::ReturnFalseFunctor(),
                 sc);

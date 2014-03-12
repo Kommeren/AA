@@ -96,11 +96,9 @@ struct FacilityLocationGetMovesRemove {
      */
     template <typename Solution>
     auto operator()(const Solution & sol) ->
-        std::pair<decltype(sol.getChosenCopy().begin()),
-                  decltype(sol.getChosenCopy().end())>
+        decltype(sol.getChosenCopy())
     {
-        auto const & ch = sol.getChosenCopy();
-        return std::make_pair(ch.begin(), ch.end());
+        return sol.getChosenCopy();
     }
 };
 

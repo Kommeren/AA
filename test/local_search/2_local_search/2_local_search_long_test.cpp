@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         auto logger = utils::make_twoLSLogger(mtx, 100);
 
         //search
-        two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
+        two_local_search(cycle, paal::local_search::ChooseFirstBetterStrategy{}, logger, utils::ReturnFalseFunctor(), lsc);
         check_result(float(simple_algo::getLength(mtx, cycle)),opt,4*sqrt(size));
     }
 }

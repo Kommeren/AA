@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
     auto getMoves =[&] (Solution & s) {
         auto b = data_structures::make_CombineIterator(MakeValueDiff{}, s, neighb);
-        return std::make_pair(b, decltype(b){});
+        return boost::make_iterator_range(b, decltype(b){});
     };
 
     auto gain = [&](Solution & s, ValueDiff vd) {
@@ -93,11 +93,11 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     double best = f(x);
 
 
-    auto getMovesG =[&] (const double g) {
+    auto getMovesG =[&] (const double g) -> const std::vector<double> & {
         for(int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCutG[j] = neighb[j] + g;
         }
-        return std::make_pair(neighbCutG.begin(), neighbCutG.end());
+        return neighbCutG;
     };
 
     auto gainG = [&](double, double g) {

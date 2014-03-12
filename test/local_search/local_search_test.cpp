@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
    utils::ReturnFalseFunctor nop;
 
    //search
-   BOOST_CHECK(ls::local_search(solution, logAction, nop, SearchComp()));
+   BOOST_CHECK(ls::local_search(solution, ls::ChooseFirstBetterStrategy{}, logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(solution, 6);
 }
 
@@ -48,7 +48,8 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
    utils::ReturnFalseFunctor nop;
 
    //search
-   BOOST_CHECK(ls::local_search<ls::search_strategies::SteepestSlope>(s, logAction, nop, SearchComp()));
+   BOOST_CHECK(ls::local_search(s, ls::SteepestSlopeStrategy{},
+                logAction, nop, SearchComp()));
    BOOST_CHECK_EQUAL(s, 6);
 }
 BOOST_AUTO_TEST_SUITE_END()

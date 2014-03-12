@@ -58,7 +58,7 @@ SolutionElement normalize(SolutionElement el) {
 struct GetMoves {
     typedef std::vector<Move> Neigh;
     using Iter = paal::data_structures::CombineIterator<MakeValueDiff, Solution, const Neigh>;
-    using IterPair = std::pair<Iter, Iter>;
+    using IterPair = boost::iterator_range<Iter>;
 
     const Neigh neighb;
 public:
@@ -67,7 +67,7 @@ public:
 
     IterPair operator()(Solution & s) {
         auto b = data_structures::make_CombineIterator(MakeValueDiff{}, s, neighb);
-        return std::make_pair(b, decltype(b){});
+        return boost::make_iterator_range(b, decltype(b){});
     }
 };
 
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
     ON_LOG(i = 0);
 
     //search
-    local_search::local_search(sol, logger, utils::ReturnFalseFunctor(), SearchComp());
+    local_search::local_search(sol, local_search::ChooseFirstBetterStrategy{}, logger, utils::ReturnFalseFunctor(), SearchComp());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }
 
@@ -141,7 +141,8 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
     ON_LOG(i = 0);
 
     //search
-    local_search::local_search<local_search::search_strategies::SteepestSlope>
-        (sol, logger, utils::ReturnFalseFunctor(), SearchComp());
+    local_search::local_search
+        (sol, local_search::SteepestSlopeStrategy{},
+            logger, utils::ReturnFalseFunctor(), SearchComp());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }

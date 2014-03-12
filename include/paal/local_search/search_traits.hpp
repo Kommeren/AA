@@ -37,10 +37,11 @@ template <typename SearchComponents, typename Solution>
 class MoveType {
     typedef typename SearchComponentsTraits<
                 SearchComponents>::GetMovesT NG;
-    typedef typename std::result_of<NG(Solution &)>::type MovesRange;
-    typedef decltype(std::declval<MovesRange>().first) MoveIterator;
+    typedef typename std::remove_reference<
+        typename std::result_of<NG(Solution &)>::type>::type MovesRange;
+    typedef typename boost::range_iterator<MovesRange>::type MoveIterator;
 public:
-   typedef typename std::iterator_traits<MoveIterator>::value_type type;
+   typedef typename std::iterator_traits<MoveIterator>::value_type value_type;
    typedef typename std::iterator_traits<MoveIterator>::reference reference;
 };
 
@@ -56,7 +57,7 @@ class MultiMove {
                 SearchComponents>::GetMovesT NG;
     typedef typename utils::CollectionToElem<Solution>::type Element;
     typedef typename std::result_of<NG(Solution &, Element &)>::type MovesRange;
-    typedef decltype(std::declval<MovesRange>().first) MoveIterator;
+    typedef typename boost::range_iterator<MovesRange>::type MoveIterator;
 public:
    typedef typename std::iterator_traits<MoveIterator>::value_type type;
    typedef typename std::iterator_traits<MoveIterator>::reference reference;

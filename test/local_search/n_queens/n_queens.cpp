@@ -16,9 +16,13 @@
 
 
 int main(int argc, char ** argv) {
-    if(argc != 2) {
-        std::cout << argv[0] <<  " " << "number_of_queens"  << std::endl;
+    std::string strategy = "FirstBetter";
+    if(argc != 2 && argc != 3) {
+        std::cout << argv[0] <<  " " << "number_of_queens strategy=FirstBetter"  << std::endl;
         return 1;
+    } else if(argc == 3) {
+        strategy = argv[2];
+        assert(strategy == "FirstBetter" || strategy == "SteepestSlope");
     }
     const int number_of_queens = std::stoi(argv[1]);
 
@@ -32,7 +36,12 @@ int main(int argc, char ** argv) {
     auto countingGain = paal::utils::make_CountingFunctorAdaptor(comps.get<ls::Gain>(), nr_of_iterations);
     auto countingComps = paal::data_structures::replace<ls::Gain>(countingGain, comps);
 
-    ls::nQueensSolutionLocalSearchSimple(queens, countingComps);
+    if(strategy == "FirstBetter") {
+        ls::nQueensSolutionLocalSearchSimple(queens, countingComps);
+    } else {
+        paal::utils::ReturnFalseFunctor nop;
+        ls::nQueensSolutionLocalSearch(queens, ls::SteepestSlopeStrategy{}, nop, nop, countingComps);
+    }
     std::cout <<  Adapter(queens).objFun() << " " << nr_of_iterations << std::endl;
 
     return 0;

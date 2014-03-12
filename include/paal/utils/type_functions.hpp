@@ -22,12 +22,14 @@ namespace utils {
 
 ///for given collection returns type of its reference
 template <typename Collection> struct CollectionToRef {
-   typedef typename std::iterator_traits<typename boost::range_iterator<Collection>::type>::reference type;
+   typedef typename std::iterator_traits<typename boost::range_iterator<
+       typename std::remove_reference<Collection>::type>::type>::reference type;
 };
 
 ///for given collection returns type of its element
 template <typename Collection> struct CollectionToElem {
-  typedef typename std::iterator_traits<typename boost::range_iterator<Collection>::type>::value_type type;
+  typedef typename std::iterator_traits<typename boost::range_iterator<
+      typename std::remove_reference<Collection>::type>::type>::value_type type;
 };
 
 ///returns tuple consisting of k times type T

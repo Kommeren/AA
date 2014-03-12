@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "paal/local_search/search_obj_func_components.hpp"
-#include "paal/local_search/local_search_single_solution_obj_function.hpp"
+#include "paal/local_search/local_search_obj_function.hpp"
 #include "utils/logger.hpp"
 
 
@@ -29,13 +29,12 @@ struct F {
 class NG {
     typedef const std::vector<int> Neighb;
     Neighb neighb;
-    typedef typename Neighb::const_iterator Iter;
 public:
 
     NG() : neighb{10, -10, 1, -1} {}
 
-    std::pair<Iter, Iter> operator()(int x) const {
-        return std::make_pair(neighb.begin(), neighb.end());
+    Neighb & operator()(int x) const {
+        return neighb;
     }
 };
 
@@ -63,6 +62,7 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
         };
 
     //search
-    ls::local_search_obj_fun(s, logger, utils::ReturnFalseFunctor(), SearchComp());
+    ls::local_search_obj_fun(s, ls::ChooseFirstBetterStrategy{},
+                logger, utils::ReturnFalseFunctor(), SearchComp());
     BOOST_CHECK_EQUAL(s, 6);
 }

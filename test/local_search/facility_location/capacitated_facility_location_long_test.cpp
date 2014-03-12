@@ -129,9 +129,10 @@ struct SolveAddRemoveSwap : public SolveAddRemove {
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
-        facility_location_local_search(sol, a, nop, rem);
-        facility_location_local_search(sol, a, nop, rem, add);
-        facility_location_local_search(sol, a, nop, rem, add, swap);
+        paal::local_search::ChooseFirstBetterStrategy strategy;
+        facility_location_local_search(sol, strategy, a, nop, rem);
+        facility_location_local_search(sol, strategy, a, nop, rem, add);
+        facility_location_local_search(sol, strategy, a, nop, rem, add, swap);
     }
 
 };

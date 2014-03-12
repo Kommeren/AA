@@ -138,7 +138,7 @@ class TwoLocalSearchGetMoves  {
     struct TypesEval {
         using SolutionIter = decltype(std::declval<Solution>().begin());
         using Subset = data_structures::SubsetsIterator<2, SolutionIter, MakeSwap>;
-        using IterPair = std::pair<Subset, Subset>;
+        using Range = boost::iterator_range<Subset>;
     };
 
 public:
@@ -150,10 +150,10 @@ public:
      */
     template <typename Solution>
     auto operator()(Solution & solution) const ->
-        typename TypesEval<Solution>::IterPair
+        typename TypesEval<Solution>::Range
     {
-        return data_structures::make_SubsetsIteratorRange<2>
-                        (solution.begin(), solution.end(), MakeSwap{});
+        return boost::make_iterator_range(data_structures::make_SubsetsIteratorRange<2>
+                        (solution.begin(), solution.end(), MakeSwap{}));
     }
 };
 

@@ -79,19 +79,20 @@ struct DefaultSwapFLComponents {
  * @tparam FacilityCost
  * @tparam MultiSearchComponents
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
+template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
           typename FacilityLocationSolution,
           typename... Components>
 bool facility_location_local_search(
             FacilityLocationSolution & fls,
+            SearchStrategy searchStrategy,
             PostSearchAction psa,
             GlobalStopCondition gsc,
             Components... components) {
     typedef FacilityLocationSolutionAdapter<FacilityLocationSolution> FLSA;
     FLSA flsa(fls);
-    return local_search(flsa, std::move(psa), std::move(gsc), std::move(components)...);
+    return local_search(flsa, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(components)...);
 }
 
 /**
@@ -105,11 +106,13 @@ bool facility_location_local_search(
  *
  * @return
  */
-template <typename SearchStrategy = search_strategies::ChooseFirstBetter,
-          typename FacilityLocationSolution,
+template <typename FacilityLocationSolution,
           typename... Components>
 bool facility_location_local_search_simple(FacilityLocationSolution & fls, Components... components) {
-    return facility_location_local_search(fls, utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+    return facility_location_local_search(fls, ChooseFirstBetterStrategy{},
+            utils::SkipFunctor{},
+            utils::ReturnFalseFunctor{},
+            std::move(components)...);
 }
 
 

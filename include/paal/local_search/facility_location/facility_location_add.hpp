@@ -67,14 +67,10 @@ struct FacilityLocationGetMovesAdd {
      */
     template <typename Solution>
     auto operator()(const Solution & sol) ->
-        std::pair<decltype(sol.getUnchosenCopy().begin()),
-                  decltype(sol.getUnchosenCopy().end())
-        >
-
+        decltype(sol.getUnchosenCopy())
     {
         //the move of UNCHOSEN could be added to the solution
-        auto const & uch = sol.getUnchosenCopy();
-        return std::make_pair(uch.begin(), uch.end());
+        return sol.getUnchosenCopy();
     }
 };
 

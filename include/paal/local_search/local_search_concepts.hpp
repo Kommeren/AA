@@ -26,7 +26,7 @@ class  ConceptsBase {
     protected:
         X x;
         Solution s;
-        typedef typename MoveType<SearchComponents, Solution>::type Move;
+        typedef typename MoveType<SearchComponents, Solution>::value_type Move;
         Move u;
 };
 
@@ -39,8 +39,8 @@ class  GetMoves : protected ConceptsBase<X, Solution, SearchComponents> {
     public:
         BOOST_CONCEPT_USAGE(GetMoves) {
             auto i = this->x(this->s);
-            auto b = i.first;
-            auto e = i.second;
+            auto b = std::begin(i);
+            auto e = std::end(i);
             for(auto x = b; x != e; ++x) {
                 const typename ConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
                 use(u);

@@ -57,6 +57,7 @@ struct TabuListRememberMove {
         assert(!isTabu(move));
         m_forbidenMovesSet.insert(move);
         if(m_forbidenMovesFIFO.size() == m_size) {
+            m_forbidenMovesSet.erase(m_forbidenMovesFIFO.front());
             m_forbidenMovesFIFO.pop_front();
         }
         m_forbidenMovesFIFO.push_back(std::move(move));

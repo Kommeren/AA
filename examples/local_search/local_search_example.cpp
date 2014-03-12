@@ -22,12 +22,12 @@ int f(int x) {
 struct GetMoves {
     typedef typename std::vector<int>::const_iterator Iter;
     const std::vector<int> neighb;
-public:
+    public:
 
     GetMoves() : neighb{10, -10, 1, -1} {}
 
-    std::pair<Iter, Iter> operator()(int x) {
-        return std::make_pair(neighb.begin(), neighb.end());
+    const std::vector<int> & operator()(int x)  const {
+        return neighb;
     }
 };
 
@@ -49,16 +49,16 @@ typedef  ls::SearchComponents<GetMoves, Gain, Commit> SearchComp;
 //! [Local Search Components Example]
 
 int main() {
-//! [Local Search Example]
-   //creating solution
-   int solution(0);
+    //! [Local Search Example]
+    //creating solution
+    int solution(0);
 
-   //search
-   local_search_simple(solution, SearchComp());
+    //search
+    local_search_simple(solution, SearchComp());
 
-   //print
-   std::cout << "Local search solution: " <<  solution << std::endl;
-//! [Local Search Example]
-  return 0;
+    //print
+    std::cout << "Local search solution: " <<  solution << std::endl;
+    //! [Local Search Example]
+    return 0;
 }
 

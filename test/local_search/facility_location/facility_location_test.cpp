@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     LOGLN("");
 
     BOOST_CHECK(facility_location_local_search(
-                    sol, nop, oneRoundSearch, rem, add, swap));
+                    sol, paal::local_search::ChooseFirstBetterStrategy{}, nop, oneRoundSearch, rem, add, swap));
 
     LOGLN("Solution after the first search");
     LOG_COPY_RANGE_DEL(ch, ",");
