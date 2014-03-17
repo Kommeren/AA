@@ -237,6 +237,25 @@ protected:
     const utils::Compare<double> m_compare;
 };
 
+/**
+ * @brief Checks if the relaxations limit was reached.
+ */
+class RelaxationsLimitCondition {
+public:
+    /// Constructor.
+    RelaxationsLimitCondition(int limit = 1) : m_limit(limit) { }
+
+    /**
+     * @brief Checks if the relaxations limit was reached.
+     */
+    bool operator()(int relaxed) {
+        return relaxed >= m_limit;
+    }
+
+private:
+    int m_limit;
+};
+
 class SolveLPToExtremePoint;
 class RoundCondition;
 class RelaxCondition;
@@ -244,6 +263,7 @@ class Init;
 class SetSolution;
 class StopCondition;
 class ResolveLPToExtremePoint;
+class RelaxationsLimit;
 
 typedef data_structures::Components<
         data_structures::NameWithDefault<SolveLPToExtremePoint, DefaultSolveLPToExtremePoint>,
@@ -252,7 +272,8 @@ typedef data_structures::Components<
         data_structures::NameWithDefault<RelaxCondition, utils::ReturnFalseFunctor>,
         data_structures::NameWithDefault<Init, utils::SkipFunctor>,
         data_structures::NameWithDefault<SetSolution, utils::SkipFunctor>,
-        data_structures::NameWithDefault<StopCondition, DefaultStopCondition>> Components;
+        data_structures::NameWithDefault<StopCondition, DefaultStopCondition>,
+        data_structures::NameWithDefault<RelaxationsLimit, utils::ReturnFalseFunctor>> Components;
 
 /**
  * @brief Iterative rounding components.

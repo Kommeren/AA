@@ -159,6 +159,9 @@ public:
                 ++deleted;
                 m_visitor.relaxRow(m_problem, m_lpBase, row);
                 rows.first = m_lpBase.deleteRow(rows.first);
+                if (call<RelaxationsLimit>(deleted)) {
+                    break;
+                }
             }
             else {
                 ++rows.first;

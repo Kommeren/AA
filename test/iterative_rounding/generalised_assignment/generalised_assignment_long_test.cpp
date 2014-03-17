@@ -1,5 +1,5 @@
 /**
- * @file generalised_assignemnt_long_test.cpp
+ * @file generalised_assignment_long_test.cpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
@@ -15,6 +15,7 @@
 #include <boost/range/irange.hpp>
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
 #include "utils/logger.hpp"
@@ -23,6 +24,35 @@
 
 using namespace paal::ir;
 using namespace paal;
+
+template <typename Machines, typename JobsToMachines, typename Times,
+        typename MachineBounds, typename Jobs>
+void checkResult(IRResult result, const Machines & machines,
+        const JobsToMachines & jobsToMachines, const Times & times,
+        const MachineBounds & machinesBounds, const Jobs & jobs, int opt) {
+
+    BOOST_CHECK(result.first == lp::OPTIMAL);
+
+    std::vector<int> machinesLoad(machines.size(), 0);
+    for (const std::pair<int, int> & jm : jobsToMachines) {
+        LOGLN("job " << jm.first << " assigned to machine " << jm.second);
+        machinesLoad[jm.second] += times(jm.first, jm.second);
+    }
+    double approximationRatio = 1.;
+    for (int m : machines) {
+        BOOST_CHECK(machinesLoad[m] <= 2 * machinesBounds[m]);
+        approximationRatio = std::max(approximationRatio, double(machinesLoad[m]) / double(machinesBounds[m]));
+    }
+
+    for (int j : jobs) {
+        BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
+    }
+    BOOST_CHECK(abs(std::round(*(result.second))-*(result.second)<0.000001));
+    int c=std::round(*(result.second));
+    LOGLN("cost " << c);
+    BOOST_CHECK(c <= opt);
+    LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
+}
 
 BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
@@ -48,33 +78,28 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             boost::integer_range<int> jobs(0,0);
             paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
             auto Tf = [&](int i){return machinesBounds[i];};
-            std::unordered_map<int, int> jobsToMachines;
-            auto result = generalised_assignment_iterative_rounding(
-                machines.begin(), machines.end(),
-                jobs.begin(), jobs.end(),
-                costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()));
-
-            BOOST_CHECK(result.first == lp::OPTIMAL);
-
-            std::vector<int> machinesLoad(machines.size(), 0);
-            for (const std::pair<int, int> & jm : jobsToMachines) {
-                LOGLN("job " << jm.first << " assigned to machine " << jm.second);
-                machinesLoad[jm.second] += times(jm.first, jm.second);
+            {
+                LOGLN("Unlimited relaxations");
+                std::unordered_map<int, int> jobsToMachines;
+                auto result = generalised_assignment_iterative_rounding(
+                    machines.begin(), machines.end(),
+                    jobs.begin(), jobs.end(),
+                    costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()));
+                checkResult(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
             }
-            double approximationRatio = 1.;
-            for (int m : machines) {
-                BOOST_CHECK(machinesLoad[m] <= 2 * machinesBounds[m]);
-                approximationRatio = std::max(approximationRatio, double(machinesLoad[m]) / double(machinesBounds[m]));
+            {
+                LOGLN("Relaxations limit = 1/iter");
+                std::unordered_map<int, int> jobsToMachines;
+                ir::GAIRComponents<> comps;
+                auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
+                                    ir::RelaxationsLimitCondition(), comps);
+                auto result = generalised_assignment_iterative_rounding(
+                    machines.begin(), machines.end(),
+                    jobs.begin(), jobs.end(),
+                    costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
+                    components);
+                checkResult(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
             }
-
-            for (int j : jobs) {
-                BOOST_CHECK(jobsToMachines.find(j) != jobsToMachines.end());
-            }
-            BOOST_CHECK(abs(std::round(*(result.second))-*(result.second)<0.000001));
-            int c=std::round(*(result.second));
-            LOGLN("cost " << c);
-            BOOST_CHECK(c <= opt);
-            LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
         }
         int MAX_LINE = 256;
         char buf[MAX_LINE];

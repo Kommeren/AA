@@ -15,6 +15,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
 
+#include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 #include "paal/utils/functors.hpp"
@@ -86,13 +87,27 @@ template <template <typename> class Oracle, typename Bound>
 void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
              const int verticesNum, const double bestCost) {
     namespace ir = paal::ir;
-    ResultTree tree;
-    auto result = ir::bounded_degree_mst_iterative_rounding<
-                ir::BDMSTOracle<Oracle>>(
-                        g, degBounds, std::inserter(tree, tree.end()));
-    BOOST_CHECK(result.first == paal::lp::OPTIMAL);
-
-    checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
+    {
+        LOGLN("Unlimited relaxations");
+        ResultTree tree;
+        auto result = ir::bounded_degree_mst_iterative_rounding<
+                        ir::BDMSTOracle<Oracle>>(
+                            g, degBounds, std::inserter(tree, tree.end()));
+        BOOST_CHECK(result.first == paal::lp::OPTIMAL);
+        checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
+    }
+    {
+        LOGLN("Relaxations limit = 1/iter");
+        ResultTree tree;
+        ir::BDMSTIRComponents<> comps;
+        auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
+                            ir::RelaxationsLimitCondition(), comps);
+        auto result = ir::bounded_degree_mst_iterative_rounding<
+                        ir::BDMSTOracle<Oracle>>(
+                            g, degBounds, std::inserter(tree, tree.end()), components);
+        BOOST_CHECK(result.first == paal::lp::OPTIMAL);
+        checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
+    }
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {

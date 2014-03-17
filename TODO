@@ -7,7 +7,6 @@
 
 * ITERATIVE ROUNDING
 ** rethink rounding
-** limited number of relaxation per iteration (at least in BDMST, maybe in the rest also)?
 ** LP formulation in separate dir
 ** framework documentation
 ** restriction(v, v) case in steiner network
