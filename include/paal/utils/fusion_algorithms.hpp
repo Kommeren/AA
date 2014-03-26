@@ -1,5 +1,5 @@
 /**
- * @file static_lazy_join.hpp
+ * @file fusion_algorithms.hpp
  :* @brief
  * @author Piotr Wygocki
  * @version 1.0

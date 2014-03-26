@@ -17,7 +17,7 @@
 #include <boost/range/algorithm/max_element.hpp>
 
 #include "local_search_concepts.hpp"
-#include "paal/data_structures/static_lazy_join.hpp"
+#include "paal/utils/fusion_algorithms.hpp"
 #include "paal/data_structures/components/component_traits.hpp"
 
 namespace paal {
@@ -25,7 +25,7 @@ namespace local_search {
 
 /**
  * @brief this predicates returns true if there is a move with positive gain
- *        and the commit was succesfull
+ *        and the commit was successful
  */
 struct FindPositivePredicate {
 

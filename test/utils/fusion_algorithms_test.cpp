@@ -1,5 +1,5 @@
 /**
- * @file static_lazy_join_test.cpp
+ * @file fusion_alogrithms.cpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "paal/data_structures/static_lazy_join.hpp"
+#include "paal/utils/fusion_algorithms.hpp"
 #include "paal/utils/functors.hpp"
 
 #include <boost/fusion/include/vector.hpp>
