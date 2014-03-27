@@ -19,39 +19,39 @@ namespace paal {
 namespace data_structures {
 
 template <int k, typename Iterator>
-    class SubsetsIteratorEngine :
-    private SubsetsIteratorEngine<k - 1, Iterator>{
+    class subsets_iterator_engine :
+    private subsets_iterator_engine<k - 1, Iterator>{
         protected:
             /**
              * @brief current being
              *
              * @return
              */
-            Iterator getBegin() {
+            Iterator get_begin() {
                 return m_begin;
             }
 
 
             /**
-             * @brief end is stored in the SubsetsIteratorEngine<0>
+             * @brief end is stored in the subsets_iterator_engine<0>
              *
              * @return
              */
-            Iterator getEnd() {
-                return base::getEnd();
+            Iterator get_end() {
+                return base::get_end();
             }
 
             /**
              * @brief sets all iterators to m_end
              */
-            void setToEnd() {
-                m_begin = getEnd();
-                base::setToEnd();
+            void set_to_end() {
+                m_begin = get_end();
+                base::set_to_end();
             }
 
 
         public:
-            using base = SubsetsIteratorEngine<k - 1, Iterator>;
+            using base = subsets_iterator_engine<k - 1, Iterator>;
 
             /**
              * @brief constructor
@@ -59,26 +59,26 @@ template <int k, typename Iterator>
              * @param begin
              * @param end
              */
-            SubsetsIteratorEngine(Iterator begin, Iterator end) :
+            subsets_iterator_engine(Iterator begin, Iterator end) :
                 base(begin, end) {
                     if(k == 1) {
                         m_begin = begin;
                     } else {
-                        auto baseBegin = base::getBegin();
+                        auto baseBegin = base::get_begin();
                         if(baseBegin != end) {
                             m_begin = ++baseBegin;
                             if(m_begin == end) {
                                 //when we are at the end all iterators are set to m_end
-                                base::setToEnd();
+                                base::set_to_end();
                             }
                         } else {
                             //when we are at the end all iterators are set to m_end
-                            setToEnd();
+                            set_to_end();
                         }
                     }
                 }
 
-            SubsetsIteratorEngine()  = default;
+            subsets_iterator_engine()  = default;
 
             /**
              * @brief sets next configuration of iterators, pointing to next subset
@@ -87,12 +87,12 @@ template <int k, typename Iterator>
              */
             bool next() {
                 ++m_begin;
-                while(m_begin == getEnd()) {
+                while(m_begin == get_end()) {
                     if(base::next()) {
-                        m_begin = base::getBegin();
-                        if(m_begin == getEnd()) {
+                        m_begin = base::get_begin();
+                        if(m_begin == get_end()) {
                             //when we are at the end all iterators are set to m_end
-                            base::setToEnd();
+                            base::set_to_end();
                             return false;
                         }
                         ++m_begin;
@@ -129,7 +129,7 @@ template <int k, typename Iterator>
              *
              * @return
              */
-            friend bool operator==(const SubsetsIteratorEngine & left, const SubsetsIteratorEngine & right) {
+            friend bool operator==(const subsets_iterator_engine & left, const subsets_iterator_engine & right) {
                 return left.m_begin == right.m_begin &&
                         static_cast<base>(left) == static_cast<base>(right);
             }
@@ -146,7 +146,7 @@ template <int k, typename Iterator>
  * @tparam Iterator
  */
 template <typename Iterator>
-    class SubsetsIteratorEngine<0, Iterator> {
+    class subsets_iterator_engine<0, Iterator> {
         protected:
             /**
              * @brief constructor
@@ -154,33 +154,33 @@ template <typename Iterator>
              * @param begin
              * @param end
              */
-            SubsetsIteratorEngine(Iterator begin, Iterator end )
+            subsets_iterator_engine(Iterator begin, Iterator end )
                 : m_end(end) {}
 
-            SubsetsIteratorEngine()  = default;
+            subsets_iterator_engine()  = default;
 
             /**
-             * @brief getBegin, fake returns m_end
+             * @brief get_begin, fake returns m_end
              *
              * @return
              */
-            Iterator getBegin() {
+            Iterator get_begin() {
                 return m_end;
             }
 
             /**
-             * @brief getEnd, returns end of the input collection
+             * @brief get_end, returns end of the input collection
              *
              * @return
              */
-            Iterator getEnd() {
+            Iterator get_end() {
                 return m_end;
             }
 
             /**
              * @brief boundary case, does nothing
              */
-            void setToEnd() {
+            void set_to_end() {
             }
 
         public:
@@ -216,7 +216,7 @@ template <typename Iterator>
              *
              * @return
              */
-            friend bool operator==(const SubsetsIteratorEngine & left, const SubsetsIteratorEngine & right) {
+            friend bool operator==(const subsets_iterator_engine & left, const subsets_iterator_engine & right) {
                 return true;
             }
 
@@ -225,7 +225,7 @@ template <typename Iterator>
     };
 
 /**
- * @brief make for SubsetsIteratorEngine
+ * @brief make for subsets_iterator_engine
  *
  * @tparam k
  * @tparam Iterator
@@ -235,25 +235,25 @@ template <typename Iterator>
  * @return
  */
 template <int k, typename Iterator>
-    SubsetsIteratorEngine<k, Iterator>
-    make_SubsetsIteratorEngine(Iterator b, Iterator e)  {
-        return SubsetsIteratorEngine<k, Iterator>(b, e);
+    subsets_iterator_engine<k, Iterator>
+    make_subsets_iterator_engine(Iterator b, Iterator e)  {
+        return subsets_iterator_engine<k, Iterator>(b, e);
     }
 
 /**
- * @class SubsetsIterator
+ * @class subsets_iterator
  * @brief Iterator to all k-subsets of given collection.
  *
  * @tparam Iterator
  * @tparam k
  */
-template <int k, typename Iterator, typename Joiner = MakeTuple>
-    class SubsetsIterator :
-        public boost::iterator_facade<SubsetsIterator<k, Iterator, Joiner>
-        , puretype((SubsetsIteratorEngine<k, Iterator>().call(std::declval<Joiner>())))
+template <int k, typename Iterator, typename Joiner = make_tuple>
+    class subsets_iterator :
+        public boost::iterator_facade<subsets_iterator<k, Iterator, Joiner>
+        , puretype((subsets_iterator_engine<k, Iterator>().call(std::declval<Joiner>())))
         //                            , typename std::iterator_traits<Iterator>::iterator_category //TODO above forward tags are not yet implemented
         , typename boost::forward_traversal_tag
-        , decltype(SubsetsIteratorEngine<k, Iterator>().call(std::declval<Joiner>()))
+        , decltype(subsets_iterator_engine<k, Iterator>().call(std::declval<Joiner>()))
         >
     {
         public:
@@ -264,21 +264,21 @@ template <int k, typename Iterator, typename Joiner = MakeTuple>
              * @param end
              * @param joiner
              */
-            SubsetsIterator(Iterator begin, Iterator end, Joiner joiner = Joiner{}) :
-                m_joiner(joiner), m_iteratorEngine(begin, end)
+            subsets_iterator(Iterator begin, Iterator end, Joiner joiner = Joiner{}) :
+                m_joiner(joiner), m_iterator_engine(begin, end)
                 { }
 
             /**
              * @brief default constructor represents end of the range
              */
-            SubsetsIterator() = default;
+            subsets_iterator() = default;
 
         private:
 
             /**
              * @brief reference type of the iterator
              */
-            using ref =  decltype(SubsetsIteratorEngine<k, Iterator>().call(std::declval<Joiner>()));
+            using ref =  decltype(subsets_iterator_engine<k, Iterator>().call(std::declval<Joiner>()));
 
             friend class boost::iterator_core_access;
 
@@ -286,7 +286,7 @@ template <int k, typename Iterator, typename Joiner = MakeTuple>
              * @brief increments iterator
              */
             void increment() {
-                m_iteratorEngine.next();
+                m_iterator_engine.next();
             }
 
             /**
@@ -296,9 +296,9 @@ template <int k, typename Iterator, typename Joiner = MakeTuple>
              *
              * @return
              */
-            bool equal(SubsetsIterator const& other) const
+            bool equal(subsets_iterator const& other) const
             {
-                return this->m_iteratorEngine == other.m_iteratorEngine;
+                return this->m_iterator_engine == other.m_iterator_engine;
             }
 
             /**
@@ -306,16 +306,16 @@ template <int k, typename Iterator, typename Joiner = MakeTuple>
              *
              * @return
              */
-            ref dereference() const { return m_iteratorEngine.call(m_joiner); }
+            ref dereference() const { return m_iterator_engine.call(m_joiner); }
             //TODO add random access support
 
             Joiner m_joiner;
-            SubsetsIteratorEngine<k, Iterator> m_iteratorEngine;
+            subsets_iterator_engine<k, Iterator> m_iterator_engine;
     };
 
 
 /**
- * @brief make for SubsetsIterator
+ * @brief make for subsets_iterator
  *
  * @tparam Iterator
  * @tparam k
@@ -325,10 +325,10 @@ template <int k, typename Iterator, typename Joiner = MakeTuple>
  *
  * @return
  */
-template <int k, typename Iterator, typename Joiner = MakeTuple>
-    std::pair<SubsetsIterator<k, Iterator, Joiner>, SubsetsIterator<k, Iterator, Joiner>>
-    make_SubsetsIteratorRange(Iterator b, Iterator e, Joiner joiner = Joiner{})  {
-        typedef SubsetsIterator<k, Iterator, Joiner> SI;
+template <int k, typename Iterator, typename Joiner = make_tuple>
+    std::pair<subsets_iterator<k, Iterator, Joiner>, subsets_iterator<k, Iterator, Joiner>>
+    make_subsets_iterator_range(Iterator b, Iterator e, Joiner joiner = Joiner{})  {
+        typedef subsets_iterator<k, Iterator, Joiner> SI;
         return std::make_pair(SI(b,e, joiner), SI(e,e, joiner));
     }
 

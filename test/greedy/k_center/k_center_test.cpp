@@ -29,5 +29,5 @@ BOOST_AUTO_TEST_CASE(KCenter) {
     LOGLN("");
     BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
     check_result(radius,OPTIMAL,APPROXIMATION_RATIO);
-    paal::inBalls(items,centers,metric,radius);
+    paal::in_balls(items,centers,metric,radius);
 }

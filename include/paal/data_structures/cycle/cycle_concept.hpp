@@ -27,8 +27,8 @@ public:
     }
 private:
     X x;
-    typename CycleTraits<X>::CycleElem ce;
-    typename CycleTraits<X>::VertexIterator ve;
+    typename cycle_traits<X>::CycleElem ce;
+    typename cycle_traits<X>::vertex_iterator ve;
 };
 
 }

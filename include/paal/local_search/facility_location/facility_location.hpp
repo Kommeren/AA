@@ -19,17 +19,17 @@ namespace local_search {
 namespace facility_location {
 
 /**
- * @class DefaultRemoveFLComponents
- * @brief Model of MultiSearchComponents with default multi search components for facility location.
+ * @class default_remove_fl_components
+ * @brief Model of Multisearch_components with default multi search components for facility location.
  *
  * @tparam VertexType
  */
 template <typename VertexType>
-struct DefaultRemoveFLComponents {
-    typedef MultiSearchComponents<
-                FacilityLocationGetMovesRemove<VertexType>,
-                FacilityLocationGainRemove        <VertexType>,
-                FacilityLocationCommitRemove        <VertexType>> type;
+struct default_remove_fl_components {
+    typedef Multisearch_components<
+                facility_locationget_moves_remove<VertexType>,
+                facility_location_gain_remove        <VertexType>,
+                facility_location_commit_remove        <VertexType>> type;
 };
 
 /**
@@ -38,11 +38,11 @@ struct DefaultRemoveFLComponents {
  * @tparam VertexType
  */
 template <typename VertexType>
-struct DefaultAddFLComponents {
-    typedef MultiSearchComponents<
-                FacilityLocationGetMovesAdd<VertexType>,
-                FacilityLocationGainAdd        <VertexType>,
-                FacilityLocationCommitAdd        <VertexType>> type;
+struct default_add_fl_components {
+    typedef Multisearch_components<
+                facility_locationget_moves_add<VertexType>,
+                facility_location_gain_add        <VertexType>,
+                facility_location_commit_add        <VertexType>> type;
 };
 
 /**
@@ -51,68 +51,68 @@ struct DefaultAddFLComponents {
  * @tparam VertexType
  */
 template <typename VertexType>
-struct DefaultSwapFLComponents {
-    typedef MultiSearchComponents<
-                FacilityLocationGetMovesSwap<VertexType>,
-                FacilityLocationGainSwap        <VertexType>,
-                FacilityLocationCommitSwap        <VertexType>> type;
+struct default_swap_fl_components {
+    typedef Multisearch_components<
+                facility_locationget_moves_swap<VertexType>,
+                facility_location_gain_swap        <VertexType>,
+                facility_location_commit_swap        <VertexType>> type;
 };
 
 /**
  * @function facility_location_local_search
  * @brief this is model of LocalSearchStepMultiSolution concept. See \ref local_search_page.<br>
  * The Move is facility_location::Move. <br>
- * The Solution is adapted data_structures::FacilityLocationSolution. <br>
+ * The Solution is adapted data_structures::facility_location_solution. <br>
  * The SolutionElement is facility_location::Facility  <br>
- * Use DefaultFLComponents for default search components.
+ * Use DefaultFLcomponents for default search components.
  *
- * The FacilityLocationLocalSearchStep takes as constructor parameter  data_structures::FacilityLocationSolution.
+ * The FacilityLocationLocalSearchStep takes as constructor parameter  data_structures::facility_location_solution.
  * <b> WARNING </b>
- * getSolution of the FacilityLocationLocalSearchStep returns type ObjectWithCopy<FacilityLocationSolution>.
- * If you want to perform search, then change the solution object and continue local search you should perform all the operations on ObjectWithCopy. <br>
+ * get_solution of the FacilityLocationLocalSearchStep returns type object_with_copy<facility_location_solution>.
+ * If you want to perform search, then change the solution object and continue local search you should perform all the operations on object_with_copy. <br>
  * example:
     \snippet facility_location_example.cpp FL Search Example
  *
  * complete example is facility_location_example.cpp
  *
- * @tparam Voronoi
+ * @tparam voronoi
  * @tparam FacilityCost
- * @tparam MultiSearchComponents
+ * @tparam Multisearch_components
  */
 template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
-          typename FacilityLocationSolution,
-          typename... Components>
+          typename facility_location_solution,
+          typename... components>
 bool facility_location_local_search(
-            FacilityLocationSolution & fls,
+            facility_location_solution & fls,
             SearchStrategy searchStrategy,
             PostSearchAction psa,
             GlobalStopCondition gsc,
-            Components... components) {
-    typedef FacilityLocationSolutionAdapter<FacilityLocationSolution> FLSA;
+            components... comps) {
+    typedef facility_location_solution_adapter<facility_location_solution> FLSA;
     FLSA flsa(fls);
-    return local_search(flsa, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(components)...);
+    return local_search(flsa, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(comps)...);
 }
 
 /**
  * @brief simple version of local search for facility location
  *
  * @tparam SearchStrategy
- * @tparam FacilityLocationSolution
- * @tparam Components
+ * @tparam facility_location_solution
+ * @tparam components
  * @param fls
  * @param components
  *
  * @return
  */
-template <typename FacilityLocationSolution,
-          typename... Components>
-bool facility_location_local_search_simple(FacilityLocationSolution & fls, Components... components) {
-    return facility_location_local_search(fls, ChooseFirstBetterStrategy{},
-            utils::SkipFunctor{},
-            utils::ReturnFalseFunctor{},
-            std::move(components)...);
+template <typename facility_location_solution,
+          typename... components>
+bool facility_location_local_search_simple(facility_location_solution & fls, components... comps) {
+    return facility_location_local_search(fls, choose_first_better_strategy{},
+            utils::skip_functor{},
+            utils::return_false_functor{},
+            std::move(comps)...);
 }
 
 

@@ -16,21 +16,21 @@ namespace paal {
 
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS,
           boost::property<boost::vertex_color_t, int>, boost::property < boost::edge_weight_t, int > > Graph;
-typedef paal::data_structures::GraphMetric<Graph, int> GraphMT;
+typedef paal::data_structures::graph_metric<Graph, int> GraphMT;
 
-struct SteinerTreeTest {
-    SteinerTreeTest(std::string name, int opt, std::vector<int> term, std::vector<int> steiner, Graph g):
-        testName(name), optimal(opt), terminals(term), steinerPoints(steiner), graph(g), metric(g) {}
+struct steiner_tree_test {
+    steiner_tree_test(std::string name, int opt, std::vector<int> term, std::vector<int> steiner, Graph g):
+        test_name(name), optimal(opt), terminals(term), steiner_points(steiner), graph(g), metric(g) {}
 
-    std::string testName;
+    std::string test_name;
     int optimal;
     std::vector<int> terminals;
-    std::vector<int> steinerPoints;
+    std::vector<int> steiner_points;
     Graph graph;
     GraphMT metric;
 };
 
-inline std::istream & goTo(std::istream & is, const std::string & s){
+inline std::istream & go_to(std::istream & is, const std::string & s){
     static const int MAX_LINE_SIZE = 1024;
     char line[MAX_LINE_SIZE];
     memset(line, 0, MAX_LINE_SIZE);
@@ -40,11 +40,11 @@ inline std::istream & goTo(std::istream & is, const std::string & s){
     return is;
 }
 
-inline std::istream & goToSection(std::istream & is, const std::string & s){
-    return goTo(is, "SECTION " + s);
+inline std::istream & go_to_section(std::istream & is, const std::string & s){
+    return go_to(is, "SECTION " + s);
 }
 
-inline int readInt(std::istream & is, const std::string & token){
+inline int read_int(std::istream & is, const std::string & token){
     std::string s;
     int i;
     is >> s >> i;
@@ -52,18 +52,18 @@ inline int readInt(std::istream & is, const std::string & token){
     return i;
 }
 
-inline Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::vector<int> & steinerPoints) {
+inline Graph read_steinlib(std::istream & is, std::vector<int> & terminals, std::vector<int> & steiner_points) {
     typedef std::pair<int, int> Edge;
 
-    goToSection(is, "Graph");
+    go_to_section(is, "Graph");
     int N, E, T;
-    N = readInt(is, "Nodes");
+    N = read_int(is, "Nodes");
     ++N; // Nodes are nubered from 1 in STEINLIB
-    E = readInt(is, "Edges");
+    E = read_int(is, "Edges");
 
-    steinerPoints.resize(N);
+    steiner_points.resize(N);
 
-    std::iota(steinerPoints.begin(), steinerPoints.end(), 0);
+    std::iota(steiner_points.begin(), steiner_points.end(), 0);
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
 
@@ -75,41 +75,41 @@ inline Graph readSTEINLIB(std::istream & is, std::vector<int> & terminals, std::
         assert(s == "E");
     }
     Graph g(edges.begin(), edges.end(), &weights[0], N);
-    goToSection(is, "Terminals");
-    T = readInt(is, "Terminals");
+    go_to_section(is, "Terminals");
+    T = read_int(is, "Terminals");
     terminals.resize(T);
     auto color = get(boost::vertex_color, g);
     for(int i : boost::irange(0,T)) {
-        terminals[i] = readInt(is, "T");
+        terminals[i] = read_int(is, "T");
         put(color, terminals[i], 1);
     }
     return g;
 }
 
-inline void readLine(std::istream & is, std::string & fname, int & OPT) {
+inline void read_line(std::istream & is, std::string & fname, int & OPT) {
     int dummy;
     std::string dummys;
     is >> fname >> dummy >> dummy >> dummy >> dummys >> OPT;
     fname += ".stp";
 }
 
-inline void readSTEINLIBtests(std::vector<SteinerTreeTest>& data) {
+inline void read_steinlib_tests(std::vector<steiner_tree_test>& data) {
     std::string testDir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(testDir + "/index");
     assert(is_test_cases.good());
     while (is_test_cases.good()) {
         std::string fname;
         int opt;
-        readLine(is_test_cases, fname, opt);
+        read_line(is_test_cases, fname, opt);
         if (fname == ".stp")
             return;
         std::ifstream ifs(testDir + "/I080/" + fname);
         assert(ifs.good());
         assert(ifs.good());
         std::vector<int> terminals;
-        std::vector<int> steinerPoints;
-        Graph graph(paal::readSTEINLIB(ifs, terminals, steinerPoints));
-        SteinerTreeTest test(fname, opt, terminals, steinerPoints, graph);
+        std::vector<int> steiner_points;
+        Graph graph(paal::read_steinlib(ifs, terminals, steiner_points));
+        steiner_tree_test test(fname, opt, terminals, steiner_points, graph);
         data.push_back(test);
     }
 }

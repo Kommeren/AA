@@ -11,14 +11,14 @@
 #include "paal/utils/iterator_with_stop_condition.hpp"
 #include "paal/local_search/custom_components.hpp"
 
-BOOST_AUTO_TEST_CASE(IteratorWithStopConditionTest) {
+BOOST_AUTO_TEST_CASE(iterator_with_stop_conditionTest) {
     std::vector<int> v{1,2,3,4,5,6,7,8};
-    paal::local_search::StopConditionCountLimit stopcondition(3);
+    paal::local_search::stop_condition_count_limit stopcondition(3);
 
-    auto begin = paal::makeBeginIteratorWithStopCondition(
+    auto begin = paal::make_beginiterator_with_stop_condition(
                     v.begin(), v.end(), stopcondition);
 
-    auto end = paal::makeEndIteratorWithStopCondition(
+    auto end = paal::make_enditerator_with_stop_condition(
                     v.end(), stopcondition);
 
     BOOST_CHECK(begin != end);

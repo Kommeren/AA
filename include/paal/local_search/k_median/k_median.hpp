@@ -19,17 +19,17 @@ namespace local_search {
 namespace k_median {
 
 /**
- * @class DefaultKMedianComponents
- * @brief Model of MultiSearchComponents with default multi search components for k-median.
+ * @class default_k_median_components
+ * @brief Model of Multisearch_components with default multi search components for k-median.
  *
  * @tparam VertexType
  */
 template <typename VertexType>
-struct DefaultKMedianComponents {
-    typedef MultiSearchComponents<
-                facility_location::FacilityLocationGetMovesSwap <VertexType>,
-                facility_location::FacilityLocationGainSwap         <VertexType>,
-                facility_location::FacilityLocationCommitSwap         <VertexType>> type;
+struct default_k_median_components {
+    typedef Multisearch_components<
+                facility_location::facility_locationget_moves_swap <VertexType>,
+                facility_location::facility_location_gain_swap         <VertexType>,
+                facility_location::facility_location_commit_swap         <VertexType>> type;
 };
 
 }

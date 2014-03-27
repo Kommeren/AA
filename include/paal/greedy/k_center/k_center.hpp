@@ -22,15 +22,15 @@ namespace greedy{
  * @param Metric metric
  * @param int numberOfClusters
  * @param OutputIterator result ItemIterators
- * @tparam ArrayMetric
+ * @tparam array_metric
  * @tparam OutputIterator
  * @tparam ItemIterator
  */
 template<typename Metric,class OutputIterator,typename ItemIterator>
 auto kCenter(const Metric& metric,unsigned int numberOfClusters, const ItemIterator iBegin, const ItemIterator iEnd, OutputIterator result) ->
-        typename data_structures::MetricTraits<Metric>::DistanceType{
+        typename data_structures::metric_traits<Metric>::DistanceType{
 
-        typedef typename data_structures::MetricTraits<Metric>::DistanceType Dist;
+        typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
         std::vector<Dist> distance_from_closest_center(std::distance(iBegin,iEnd),std::numeric_limits<Dist>::max());
         ItemIterator last_centre=iBegin;
         ItemIterator farthest_centre=iBegin;

@@ -16,9 +16,9 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief Name for GetMoves component
+ * @brief Name for get_moves component
  */
-struct GetMoves;
+struct get_moves;
 /**
  * @brief Name for ObjFunction component
  */
@@ -29,34 +29,34 @@ struct ObjFunction;
 struct Commit;
 
 /**
- * @brief Components for objective function local search.
- *        This usually this class is not used. See SearchComponentsObjFun class.
+ * @brief components for objective function local search.
+ *        This usually this class is not used. See search_componentsObjFun class.
  */
-typedef data_structures::Components<
-            GetMoves,
+typedef data_structures::components<
+            get_moves,
             ObjFunction,
             Commit
-                > ComponentsObjFun;
+                > componentsObjFun;
 
 /**
- * @brief SearchComponentsObjFun alias to components.
+ * @brief search_componentsObjFun alias to components.
  *
  * @tparam Args
  */
 template <typename... Args>
-    using SearchComponentsObjFun = typename ComponentsObjFun::type<Args...> ;
+    using search_componentsObjFun = typename componentsObjFun::type<Args...> ;
 
 /**
- * @brief make function for SearchComponentsObjFun
+ * @brief make function for search_componentsObjFun
  *
  * @tparam Args
- * @param ComponentsObjFun::make_components(std::forward(args
+ * @param componentsObjFun::make_components(std::forward(args
  *
  * @return
  */
 template <typename... Args>
-auto make_SearchComponentsObjFun(Args&&... args) -> decltype(ComponentsObjFun::make_components(std::forward<Args>(args)...)) {
-      return ComponentsObjFun::make_components(std::forward<Args>(args)...);
+auto make_search_componentsObjFun(Args&&... args) -> decltype(componentsObjFun::make_components(std::forward<Args>(args)...)) {
+      return componentsObjFun::make_components(std::forward<Args>(args)...);
 }
 
 } //local_search

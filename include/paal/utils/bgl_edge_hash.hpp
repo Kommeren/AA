@@ -19,7 +19,7 @@ namespace paal {
  * @tparam Enable
  */
 template <typename Graph, class Enable = void>
-struct EdgeHash {
+struct edge_hash {
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     /**
      * @brief operator()
@@ -43,7 +43,7 @@ struct EdgeHash {
  */
 
 template <typename Graph>
-struct EdgeHash<Graph, typename std::enable_if<std::is_same<typename boost::graph_traits<Graph>::directed_category, boost::directed_tag>::value>::type>
+struct edge_hash<Graph, typename std::enable_if<std::is_same<typename boost::graph_traits<Graph>::directed_category, boost::directed_tag>::value>::type>
 {
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     /**

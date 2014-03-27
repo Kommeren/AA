@@ -18,7 +18,7 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @class RectangleArrayMetric
+ * @class rectangle_array_metric
  * @brief \ref metric implementation on 2 dimensional array
  *        distance calls on this metric are valid opnly when x < N and y  < M
  *        (N and M given in the constructor)
@@ -27,7 +27,7 @@ namespace data_structures {
  * @tparam DistanceTypeParam
  */
 template <typename DistanceTypeParam>
-class RectangleArrayMetric {
+class rectangle_array_metric {
     public:
         typedef DistanceTypeParam DistanceType;
         typedef int VertexType;
@@ -37,7 +37,7 @@ class RectangleArrayMetric {
          * @param N
          * @param M
          */
-        RectangleArrayMetric(int N = 0, int M = 0) : m_matrix(boost::extents[N][M]) { }
+        rectangle_array_metric(int N = 0, int M = 0) : m_matrix(boost::extents[N][M]) { }
 
         /**
          * @brief operator(), valid only when v < N and w < M
@@ -77,10 +77,10 @@ class RectangleArrayMetric {
          * @param yEnd
          */
         template <typename OtherMetrics, typename XIterator, typename YIterator>
-        RectangleArrayMetric(const OtherMetrics& other,
+        rectangle_array_metric(const OtherMetrics& other,
                    XIterator xBegin, XIterator xEnd,
                    YIterator yBegin, YIterator yEnd) :
-                        RectangleArrayMetric(std::distance(xBegin, xEnd),
+                        rectangle_array_metric(std::distance(xBegin, xEnd),
                                               std::distance(yBegin, yEnd)) {
             int i = 0;
             for (auto v: boost::make_iterator_range(xBegin, xEnd)) {
@@ -100,7 +100,7 @@ class RectangleArrayMetric {
          *
          * @return
          */
-        RectangleArrayMetric & operator=(const RectangleArrayMetric & am) {
+        rectangle_array_metric & operator=(const rectangle_array_metric & am) {
             auto shape = am.m_matrix.shape();
             std::vector<std::size_t> dim(shape, shape + DIM_NR);
             m_matrix.resize(dim);
@@ -120,20 +120,20 @@ class RectangleArrayMetric {
 
 
 /**
- * @brief this metric is RectangleArrayMetric with N == M.
+ * @brief this metric is rectangle_array_metric with N == M.
  *
  * @tparam DistanceTypeParam
  */
 template <typename DistanceTypeParam>
-class ArrayMetric : public RectangleArrayMetric<DistanceTypeParam> {
-    typedef RectangleArrayMetric<DistanceTypeParam> base;
+class array_metric : public rectangle_array_metric<DistanceTypeParam> {
+    typedef rectangle_array_metric<DistanceTypeParam> base;
 public:
     /**
      * @brief constructor
      *
      * @param N
      */
-    ArrayMetric(int N = 0) : base(N, N) {}
+    array_metric(int N = 0) : base(N, N) {}
 
     /**
      * @brief returns N
@@ -154,7 +154,7 @@ public:
      * @param iEnd
      */
     template <typename OtherMetrics, typename ItemIterator>
-    ArrayMetric(const OtherMetrics& other, ItemIterator iBegin, ItemIterator iEnd) :
+    array_metric(const OtherMetrics& other, ItemIterator iBegin, ItemIterator iEnd) :
         base(other, iBegin, iEnd, iBegin, iEnd) {}
 };
 

@@ -30,13 +30,13 @@ namespace simple_algo {
   * @return
   */
 template <typename Metric, typename Cycle> typename Metric::DistanceType
-    getLength(const Metric & m, const Cycle & cm)
+    get_length(const Metric & m, const Cycle & cm)
 {
-    typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
+    typedef typename data_structures::cycle_traits<Cycle>::CycleElem El;
     typedef typename Metric::DistanceType Dist;
 
-    auto ebegin = data_structures::make_VertexToEdgeIterator(cm.vbegin(), cm.vend());
-    auto eend = data_structures::make_VertexToEdgeIterator(cm.vend(), cm.vend());
+    auto ebegin = data_structures::make_vertex_to_edge_iterator(cm.vbegin(), cm.vend());
+    auto eend = data_structures::make_vertex_to_edge_iterator(cm.vend(), cm.vend());
     return std::accumulate(ebegin, eend, Dist(), [&m]
             (Dist a, const std::pair<El, El> & p)->Dist {
                 return a + m(p.first, p.second);
@@ -48,9 +48,9 @@ template <typename Metric, typename Cycle> typename Metric::DistanceType
 template <typename Cycle, typename Stream>
 void print(const Cycle & cm, Stream & o, const  std::string & endl = "\n")
 {
-    auto ebegin = data_structures::make_VertexToEdgeIterator(cm.vbegin(), cm.vend());
-    auto eend = data_structures::make_VertexToEdgeIterator(cm.vend(), cm.vend());
-    typedef typename data_structures::CycleTraits<Cycle>::CycleElem El;
+    auto ebegin = data_structures::make_vertex_to_edge_iterator(cm.vbegin(), cm.vend());
+    auto eend = data_structures::make_vertex_to_edge_iterator(cm.vend(), cm.vend());
+    typedef typename data_structures::cycle_traits<Cycle>::CycleElem El;
 
     for(const std::pair<El, El> & p : boost::make_iterator_range(ebegin, eend)){
         o <<  "(" << p.first << "," << p.second << ")->";

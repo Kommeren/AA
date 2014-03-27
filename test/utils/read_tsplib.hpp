@@ -21,7 +21,7 @@ namespace read_tsplib {
 
 struct TSPLIB_Matrix {
     typedef long long DistanceType;
-    typedef paal::data_structures::ArrayMetric<int> Metric;
+    typedef paal::data_structures::array_metric<int> metric;
     TSPLIB_Matrix() : size_(0) {}
     typedef double value_type;
     typedef int (*Dist)(double,double);
@@ -42,11 +42,11 @@ struct TSPLIB_Matrix {
             X.reset(new double[_size]);
             //badalloc below will invalidate the object
             Y.reset(new double[_size]);
-            mtx = Metric(0);
+            mtx = metric(0);
         }
         else
         {
-            mtx = Metric(_size);
+            mtx = metric(_size);
             X.reset();
             Y.reset();
         }
@@ -57,10 +57,10 @@ struct TSPLIB_Matrix {
 
     Dist dist_;
     size_t size_;
-    Metric mtx; 
+    metric mtx;
     std::unique_ptr<double[]> X,Y;
 };
-    
+
 typedef std::vector<std::stringstream> VSS;
 inline void push(VSS &vss, size_t i){}
 template<typename T, typename ...Args>
@@ -80,12 +80,12 @@ template<typename ...Args>
 struct TSPLIB_Directory {
     std::string dir;
     std::ifstream index;
-    TSPLIB_Directory(const std::string &_dir, const std::string & indexFName = "/index") : 
+    TSPLIB_Directory(const std::string &_dir, const std::string & indexFName = "/index") :
            dir(_dir), index(dir+indexFName) {
         assert(index);
     }
 
-    bool getGraph(std::string & fname, float &opt) {
+    bool get_graph(std::string & fname, float &opt) {
         std::string header;
         if(get_header(index,header) >> opt) {
              fname = dir+"/"+header+".tsp";
@@ -105,16 +105,16 @@ struct TSPLIB_Directory {
         static double geo_rad(double x) {
             const double PI = 3.141592;
             int deg = x;
-            return PI * (int(deg) + 5*(x-deg)/3) / 180; 
+            return PI * (int(deg) + 5*(x-deg)/3) / 180;
         }
 
         static double geo_dist(double longitude1, double latitude1,
                 double longitude2, double latitude2) {
             const double RRR = 6378.388;
 
-            double q1 = cos(longitude1 - longitude2); 
-            double q2 = cos(latitude1 - latitude2); 
-            double q3 = cos(latitude1 + latitude2); 
+            double q1 = cos(longitude1 - longitude2);
+            double q2 = cos(latitude1 - latitude2);
+            double q3 = cos(latitude1 + latitude2);
             return int(RRR * acos(.5*((1.+q1)*q2 - (1.-q1)*q3)) + 1.0);
         }
 
@@ -130,12 +130,12 @@ struct TSPLIB_Directory {
                 if(ewf=="FULL_MATRIX")
                     for(size_t i=0; i<n; ++i) for(size_t j=0; j<n; ++j)
                         assert(is >> m.mtx(i,j));
-                else if(ewf=="UPPER_ROW") {	
+                else if(ewf=="UPPER_ROW") {
                     for(size_t i=0; i<n; ++i) m.mtx(i,i) = 0;
-                    for(size_t i=0; i<n; ++i) for(size_t j=i+1; j<n; ++j) { 
-                        int d; 
-                        assert(is >> d); 
-                        m.mtx(i,j) = m.mtx(j,i) = d; 
+                    for(size_t i=0; i<n; ++i) for(size_t j=i+1; j<n; ++j) {
+                        int d;
+                        assert(is >> d);
+                        m.mtx(i,j) = m.mtx(j,i) = d;
                     }
                 } else if(ewf=="LOWER_DIAG_ROW")
                     for(size_t i=0; i<n; ++i) for(size_t j=0; j<=i; ++j)
@@ -162,8 +162,8 @@ struct TSPLIB_Directory {
                 else throw std::runtime_error(
                         format("EDGE_WEIGHT_TYPE % is unimplemented",ewt));
                 expect(is,"NODE_COORD_SECTION");
-               
-                int _; 
+
+                int _;
                 for(size_t i=0; i<n; ++i) assert(is >> _ >> m.X[i] >> m.Y[i]);
             }
         }

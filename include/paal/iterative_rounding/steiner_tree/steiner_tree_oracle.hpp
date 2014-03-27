@@ -18,39 +18,39 @@ namespace paal {
 namespace ir {
 
 /**
- * @class SteinerTreeViolationChecker
+ * @class steiner_tree_violation_checker
  * @brief Violations checker for the separation oracle
  *      in the steiner tree problem.
  */
-class SteinerTreeViolationChecker {
-    typedef MinCutFinder::Edge AuxEdge;
-    typedef MinCutFinder::Vertex AuxVertex;
+class steiner_tree_violation_checker {
+    typedef min_cut_finder::Edge AuxEdge;
+    typedef min_cut_finder::Vertex AuxVertex;
     typedef std::vector<AuxEdge> AuxEdgeList;
     typedef boost::optional<double> Violation;
 
 public:
     typedef AuxVertex Candidate;
 
-    SteinerTreeViolationChecker() :
-        m_currentGraphSize(-1) {}
+    steiner_tree_violation_checker() :
+        m_current_graph_size(-1) {}
 
     /**
      * Returns an iterator range of violated constraint candidates.
      */
     template <typename Problem, typename LP>
-    auto getViolationCandidates(const Problem & problem, const LP & lp)
-            -> decltype(problem.getTerminals()) {
+    auto get_violation_candidates(const Problem & problem, const LP & lp)
+            -> decltype(problem.get_terminals()) {
 
-        int graphSize = problem.getTerminals().size();
-        if (graphSize != m_currentGraphSize) {
+        int graphSize = problem.get_terminals().size();
+        if (graphSize != m_current_graph_size) {
             // Graph has changed, construct new oracle
-            m_currentGraphSize = graphSize;
-            m_root = selectRoot(problem.getTerminals());
-            createAuxiliaryDigraph(problem, lp);
+            m_current_graph_size = graphSize;
+            m_root = select_root(problem.get_terminals());
+            create_auxiliary_digraph(problem, lp);
         } else {
-            updateAuxiliaryDigraph(problem, lp);
+            update_auxiliary_digraph(problem, lp);
         }
-        return problem.getTerminals();
+        return problem.get_terminals();
     }
 
     /**
@@ -58,13 +58,13 @@ public:
      * returns the violation value and violated constraint ID.
      */
     template <typename Problem>
-    Violation checkViolation(Candidate candidate, const Problem & problem) {
+    Violation check_violation(Candidate candidate, const Problem & problem) {
         if (candidate == m_root) {
             return Violation();
         }
 
-        double violation = checkMinCut(candidate);
-        if (problem.getCompare().g(violation, 0)) {
+        double violation = check_min_cut(candidate);
+        if (problem.get_compare().g(violation, 0)) {
             return Violation(violation);
         }
         else {
@@ -78,23 +78,23 @@ public:
      * but its sink vertex is not reachable.
      */
     template <typename Problem, typename LP>
-    void addViolatedConstraint(Candidate violatingTerminal, const Problem & problem, LP & lp) {
-        if (std::make_pair(violatingTerminal, m_root) != m_minCut.getLastCut()) {
-            checkMinCut(violatingTerminal);
+    void add_violated_constraint(Candidate violatingTerminal, const Problem & problem, LP & lp) {
+        if (std::make_pair(violatingTerminal, m_root) != m_min_cut.get_last_cut()) {
+            check_min_cut(violatingTerminal);
         }
 
-        const auto & components = problem.getComponents();
-        lp.addRow(lp::LO, 1);
+        const auto & components = problem.get_components();
+        lp.add_row(lp::LO, 1);
         for (int i = 0; i < components.size(); ++i) {
-            auto u = m_artifVertices[i];
-            int ver = components.findVersion(i);
-            auto v = components.find(i).getSink(ver);
-            if (m_minCut.isInSourceSet(u) && !m_minCut.isInSourceSet(v)) {
-                lp::ColId colIdx = problem.findColumnLP(i);
-                lp.addNewRowCoef(colIdx);
+            auto u = m_artif_vertices[i];
+            int ver = components.find_version(i);
+            auto v = components.find(i).get_sink(ver);
+            if (m_min_cut.is_in_source_set(u) && !m_min_cut.is_in_source_set(v)) {
+                lp::col_id colIdx = problem.find_column_lp(i);
+                lp.add_new_row_coef(colIdx);
             }
         }
-        lp.loadNewRow();
+        lp.load_new_row();
     }
 
 private:
@@ -107,24 +107,24 @@ private:
      * Target has in edge with weigth x_i from LP
      */
     template <typename Problem, typename LP>
-    void createAuxiliaryDigraph(Problem &problem, const LP & lp) {
-        m_minCut.init(problem.getTerminals().size());
-        m_artifVertices.clear();
-        const auto & components = problem.getComponents();
+    void create_auxiliary_digraph(Problem &problem, const LP & lp) {
+        m_min_cut.init(problem.get_terminals().size());
+        m_artif_vertices.clear();
+        const auto & components = problem.get_components();
 
         for (int i = 0; i < components.size(); ++i) {
-            AuxVertex newV = m_minCut.addVertex();
-            m_artifVertices[i] = newV;
-            int ver = components.findVersion(i);
-            auto sink = components.find(i).getSink(ver);
-            for (auto w : boost::make_iterator_range(components.find(i).getElements())) {
+            AuxVertex newV = m_min_cut.add_vertex_to_graph();
+            m_artif_vertices[i] = newV;
+            int ver = components.find_version(i);
+            auto sink = components.find(i).get_sink(ver);
+            for (auto w : boost::make_iterator_range(components.find(i).get_elements())) {
                 if (w != sink) {
                     double INF = std::numeric_limits<double>::max();
-                    m_minCut.addEdge(w, newV, INF);
+                    m_min_cut.add_edge_to_graph(w, newV, INF);
                 } else {
-                    lp::ColId x = problem.findColumnLP(i);
-                    double colVal = lp.getColPrim(x);
-                    m_minCut.addEdge(newV, sink, colVal);
+                    lp::col_id x = problem.find_column_lp(i);
+                    double colVal = lp.get_col_prim(x);
+                    m_min_cut.add_edge_to_graph(newV, sink, colVal);
                 }
             }
         }
@@ -134,15 +134,15 @@ private:
      * Updates the auxiliary directed graph. Should be performed after each LP iteration.
      */
     template <typename Problem, typename LP>
-    void updateAuxiliaryDigraph(Problem &problem, const LP & lp) {
-        const auto & components = problem.getComponents();
+    void update_auxiliary_digraph(Problem &problem, const LP & lp) {
+        const auto & components = problem.get_components();
         for (int i = 0; i < components.size(); ++i) {
-            AuxVertex componentV = m_artifVertices[i];
-            int ver = components.findVersion(i);
-            auto sink = components.find(i).getSink(ver);
-            lp::ColId x = problem.findColumnLP(i);
-            double colVal = lp.getColPrim(x);
-            m_minCut.addEdge(componentV, sink, colVal);
+            AuxVertex componentV = m_artif_vertices[i];
+            int ver = components.find_version(i);
+            auto sink = components.find(i).get_sink(ver);
+            lp::col_id x = problem.find_column_lp(i);
+            double colVal = lp.get_col_prim(x);
+            m_min_cut.add_edge_to_graph(componentV, sink, colVal);
         }
     }
 
@@ -150,7 +150,7 @@ private:
      * Select the root terminal. Max-flow will be directed to that vertex during LP oracle execution.
      */
     template <typename Terminals>
-    AuxVertex selectRoot(const Terminals & terminals) {
+    AuxVertex select_root(const Terminals & terminals) {
         //TODO: Maybe it's better to select random vertex rather than first
         AuxVertex ret = *terminals.begin();
         return ret;
@@ -159,17 +159,17 @@ private:
     /**
      * Runs a maxflow algorithm between given source and root.
      */
-    double checkMinCut(AuxVertex src) {
-        double minCut = m_minCut.findMinCut(src, m_root);
+    double check_min_cut(AuxVertex src) {
+        double minCut = m_min_cut.find_min_cut(src, m_root);
         return 1 - minCut;
     }
 
     AuxVertex m_root; // root vertex, sink of all max-flows
-    int m_currentGraphSize; // size of current graph
+    int m_current_graph_size; // size of current graph
 
-    std::unordered_map<int, AuxVertex> m_artifVertices; // maps componentId to auxGraph vertex
+    std::unordered_map<int, AuxVertex> m_artif_vertices; // maps componentId to auxGraph vertex
 
-    MinCutFinder m_minCut;
+    min_cut_finder m_min_cut;
 };
 
 } //ir

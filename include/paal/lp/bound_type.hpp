@@ -11,7 +11,7 @@
 namespace paal {
 namespace lp {
 /// free, only lower bound, only upper bound, both bounds, fix
-enum BoundType {FR, LO, UP, DB, FX};
+enum bound_type {FR, LO, UP, DB, FX};
 }
 }
 #endif /* BOUND_TYPE_HPP */

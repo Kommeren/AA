@@ -81,17 +81,17 @@
     <li> Data Structures
         <ul>
         <li>\ref comps
-        <li>\ref paal::data_structures::GraphMetric
-        <li>\ref paal::data_structures::ArrayMetric
-        <li>\ref paal::data_structures::SimpleCycle
-        <li>\ref paal::data_structures::SplayCycle
-        <li>\ref paal::data_structures::ObjectWithCopy
-        <li>\ref paal::data_structures::FacilityLocationSolution
-        <li>\ref paal::data_structures::Voronoi
-        <li>\ref paal::data_structures::CapacitatedVoronoi
-        <li>\ref paal::data_structures::SubsetsIterator
-        <li>\ref paal::data_structures::VertexToEdgeIterator
-        <li>\ref paal::data_structures::BiMap
+        <li>\ref paal::data_structures::graph_metric
+        <li>\ref paal::data_structures::array_metric
+        <li>\ref paal::data_structures::simple_cycle
+        <li>\ref paal::data_structures::splay_cycle
+        <li>\ref paal::data_structures::object_with_copy
+        <li>\ref paal::data_structures::facility_location_solution
+        <li>\ref paal::data_structures::voronoi
+        <li>\ref paal::data_structures::capacitated_voronoi
+        <li>\ref paal::data_structures::subsets_iterator
+        <li>\ref paal::data_structures::vertex_to_edge_iterator
+        <li>\ref paal::data_structures::bimap
         </ul>
     </ul>
 

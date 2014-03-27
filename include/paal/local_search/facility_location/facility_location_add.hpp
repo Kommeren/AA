@@ -30,7 +30,7 @@ namespace facility_location {
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationCommitAdd {
+class facility_location_commit_add {
 public:
     /**
      * @brief operator ()
@@ -44,7 +44,7 @@ public:
             Solution & s,
             UnchosenElement & e)  //SolutionElement
     {
-        s.addFacility(e);
+        s.add_facility(e);
         return true;
     }
 };
@@ -56,7 +56,7 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-struct FacilityLocationGetMovesAdd {
+struct facility_locationget_moves_add {
 
     /**
      * @brief operator()
@@ -81,7 +81,7 @@ struct FacilityLocationGetMovesAdd {
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGainAdd {
+class facility_location_gain_add {
 public:
     /**
      * @brief operator()
@@ -95,9 +95,9 @@ public:
         template <typename Solution, typename UnchosenElement>
     auto operator()(Solution & s,
                 UnchosenElement e) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
-        auto ret = s.addFacilityTentative(e);
-        auto back = s.removeFacilityTentative(e);
+                typename data_structures::facility_location_solution_traits<puretype(s.getfacility_location_solution())>::Dist {
+        auto ret = s.add_facility_tentative(e);
+        auto back = s.remove_facility_tentative(e);
         assert(ret == -back);
         return -ret;
 

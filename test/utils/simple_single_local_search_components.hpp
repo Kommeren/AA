@@ -15,12 +15,12 @@ int f(int x) {
     return -x*x + 12 * x -27;
 }
 
-struct GetMoves {
+struct get_moves {
     typedef const std::vector<int> Neighb;
     Neighb neighb;
 public:
 
-    GetMoves() : neighb{10, -10, 1, -1} {}
+    get_moves() : neighb{10, -10, 1, -1} {}
 
     Neighb & operator()(int x) {
         return neighb;
@@ -40,7 +40,7 @@ struct Commit {
     }
 };
 
-typedef  paal::local_search::SearchComponents<GetMoves, Gain, Commit> SearchComp;
+typedef  paal::local_search::search_components<get_moves, Gain, Commit> search_comps;
 } //anonymous namespace
 
 #endif /* SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP */

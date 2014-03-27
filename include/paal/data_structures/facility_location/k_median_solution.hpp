@@ -17,12 +17,12 @@ namespace data_structures {
     /**
      * @brief solution for k median problem
      *
-     * @tparam VoronoiType
+     * @tparam voronoiType
      */
-template <typename VoronoiType>
-class KMedianSolution :
-    public data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> {
-    typedef data_structures::FacilityLocationSolution<utils::ReturnZeroFunctor, VoronoiType> base;
+template <typename voronoiType>
+class k_median_solution :
+    public data_structures::facility_location_solution<utils::return_zero_functor, voronoiType> {
+    typedef data_structures::facility_location_solution<utils::return_zero_functor, voronoiType> base;
 public:
     /**
      * @brief constructor
@@ -31,11 +31,11 @@ public:
      * @param uf
      * @param k
      */
-    KMedianSolution(VoronoiType voronoi,
+    k_median_solution(voronoiType voronoi,
                     typename base::UnchosenFacilitiesSet uf, int k) :
-        base(std::move(voronoi), std::move(uf), m_zeroFunc) {assert(int(base::getChosenFacilities().size()) == k);}
+        base(std::move(voronoi), std::move(uf), m_zero_func) {assert(int(base::get_chosen_facilities().size()) == k);}
 private:
-    utils::ReturnZeroFunctor m_zeroFunc;
+    utils::return_zero_functor m_zero_func;
 
 };
 
@@ -44,20 +44,20 @@ private:
 
 namespace data_structures {
     /**
-     * @brief specialization of FacilityLocationSolutionTraits
+     * @brief specialization of facility_location_solution_traits
      *
-     * @tparam Voronoi
+     * @tparam voronoi
      */
-    template <typename Voronoi>
-    class FacilityLocationSolutionTraits<data_structures::KMedianSolution< Voronoi>> {
-        typedef VoronoiTraits<Voronoi> VT;
-        typedef data_structures::KMedianSolution< Voronoi> KMS;
+    template <typename voronoi>
+    class facility_location_solution_traits<data_structures::k_median_solution< voronoi>> {
+        typedef voronoi_traits<voronoi> VT;
+        typedef data_structures::k_median_solution< voronoi> KMS;
     public:
         typedef typename VT::VertexType VertexType;
         typedef typename VT::DistanceType Dist;
         typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
         ///unchosen facilities set type
-        typedef puretype(std::declval<KMS>().getUnchosenFacilities()) UnchosenFacilitiesSet;
+        typedef puretype(std::declval<KMS>().get_unchosen_facilities()) UnchosenFacilitiesSet;
     };
 }
 

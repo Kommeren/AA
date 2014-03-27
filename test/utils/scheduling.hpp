@@ -20,7 +20,7 @@
 #include <boost/functional/hash.hpp>
 
 template <class Machines, class Time, class GetSpeed>
-std::vector<long long> generateJobLoads(Machines machines,
+std::vector<long long> generate_job_loads(Machines machines,
    double minJobsOnMachine, Time time, GetSpeed getSpeed){
    std::vector<long long> loads;
    for (const auto machine: machines) {
@@ -35,7 +35,7 @@ std::vector<long long> generateJobLoads(Machines machines,
 }
 
 template <class Result, class Job>
-void checkJobs(Result result, std::vector<Job> jobs) {
+void check_jobs(Result result, std::vector<Job> jobs) {
    std::vector<Job> gotJobs;
    for (const auto& it: result) {
       gotJobs.push_back(*it.second);
@@ -46,8 +46,8 @@ void checkJobs(Result result, std::vector<Job> jobs) {
 }
 
 template <class Result, class GetSpeed>
-double getMaxTime(const Result& result, GetSpeed getSpeed) {
-   typedef typename paal::utils::CollectionToElem<Result>::type::first_type MachineIter;
+double get_max_time(const Result& result, GetSpeed getSpeed) {
+   typedef typename paal::utils::collection_to_elem<Result>::type::first_type MachineIter;
    typedef typename std::iterator_traits<MachineIter>::value_type Machine;
    std::unordered_map<Machine, double, boost::hash<Machine>> machineTime;
    for (const auto& machineJobPair: result) {

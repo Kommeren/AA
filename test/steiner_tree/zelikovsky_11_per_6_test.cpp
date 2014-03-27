@@ -25,29 +25,29 @@ namespace std {
 
 
 BOOST_AUTO_TEST_CASE(zelikowsky_test) {
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSteiner();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_steiner();
     typedef decltype(gm) Metric;
-    typedef paal::data_structures::Voronoi<Metric> VoronoiT;
-    typedef typename VoronoiT::GeneratorsSet FSet;
-    VoronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);
+    typedef paal::data_structures::voronoi<Metric> voronoiT;
+    typedef typename voronoiT::GeneratorsSet FSet;
+    voronoiT voronoi(FSet{SGM::A, SGM::B, SGM::C, SGM::D},FSet{SGM::E}, gm);
 
     std::vector<int> steiner;
 
-    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(gm, voronoi, std::back_inserter(steiner));
+    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(gm, voronoi, std::back_inserter(steiner));
     BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), SGM::E);
 }
 
 BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
-    paal::EuclideanMetric em;
+    paal::euclidean_metric em;
     using std::make_pair;
-    typedef paal::data_structures::Voronoi<paal::EuclideanMetric> VoronoiT;
-    typedef typename VoronoiT::GeneratorsSet FSet;
-    VoronoiT voronoi(FSet{{0,0}, {0,2}, {2, 0}, {2, 2}}, FSet{{1,1}}, em);
+    typedef paal::data_structures::voronoi<paal::euclidean_metric> voronoiT;
+    typedef typename voronoiT::GeneratorsSet FSet;
+    voronoiT voronoi(FSet{{0,0}, {0,2}, {2, 0}, {2, 2}}, FSet{{1,1}}, em);
     std::vector<std::pair<int, int>> steiner;
 
-    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(em, voronoi, std::back_inserter(steiner));
+    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(em, voronoi, std::back_inserter(steiner));
     BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), make_pair(1,1));
 }

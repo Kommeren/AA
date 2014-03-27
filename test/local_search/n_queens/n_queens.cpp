@@ -27,22 +27,22 @@ int main(int argc, char ** argv) {
     const int number_of_queens = std::stoi(argv[1]);
 
     namespace ls = paal::local_search;
-    typedef ls::NQueensSolutionAdapter<std::vector<int>> Adapter;
+    typedef ls::n_queens_solution_adapter<std::vector<int>> Adapter;
     std::vector<int> queens(number_of_queens);
     boost::iota(queens, 0);
 
-    ls::NQueensLocalSearchComponents<> comps;
+    ls::n_queens_local_search_components<> comps;
     int nr_of_iterations(0);
-    auto countingGain = paal::utils::make_CountingFunctorAdaptor(comps.get<ls::Gain>(), nr_of_iterations);
+    auto countingGain = paal::utils::make_counting_functor_adaptor(comps.get<ls::Gain>(), nr_of_iterations);
     auto countingComps = paal::data_structures::replace<ls::Gain>(countingGain, comps);
 
     if(strategy == "FirstBetter") {
-        ls::nQueensSolutionLocalSearchSimple(queens, countingComps);
+        ls::n_queens_solution_local_search_simple(queens, countingComps);
     } else {
-        paal::utils::ReturnFalseFunctor nop;
-        ls::nQueensSolutionLocalSearch(queens, ls::SteepestSlopeStrategy{}, nop, nop, countingComps);
+        paal::utils::return_false_functor nop;
+        ls::n_queens_solution_local_search(queens, ls::steepest_slope_strategy{}, nop, nop, countingComps);
     }
-    std::cout <<  Adapter(queens).objFun() << " " << nr_of_iterations << std::endl;
+    std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
 
     return 0;
 }

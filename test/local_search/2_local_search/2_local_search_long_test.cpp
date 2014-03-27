@@ -10,7 +10,7 @@
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/local_search/custom_components.hpp"
 
-#include "utils/read_tsplib.h"
+#include "utils/read_tsplib.hpp"
 #include "2_local_search_logger.hpp"
 #include "utils/test_result_check.hpp"
 
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;
-    while(dir.getGraph(fname ,opt))  {
+    while(dir.get_graph(fname ,opt))  {
         std::ifstream is(fname);
         read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
@@ -38,22 +38,22 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         //create random solution
         std::random_shuffle(v.begin(), v.end());
-        data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
+        data_structures::simple_cycle<int> cycle(v.begin(), v.end());
 
         //creating local search
-        auto lsc = getDefaultTwoLocalComponents(mtx);
+        auto lsc = get_default_two_local_components(mtx);
 
         //printing
         LOGLN("Graph:\t" << fname);
-        LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
+        LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
 
 
         //setting logger
-        auto logger = utils::make_twoLSLogger(mtx, 100);
+        auto logger = utils::make_two_ls_logger(mtx, 100);
 
         //search
-        two_local_search(cycle, paal::local_search::ChooseFirstBetterStrategy{}, logger, utils::ReturnFalseFunctor(), lsc);
-        check_result(float(simple_algo::getLength(mtx, cycle)),opt,4*sqrt(size));
+        two_local_search(cycle, paal::local_search::choose_first_better_strategy{}, logger, utils::return_false_functor(), lsc);
+        check_result(float(simple_algo::get_length(mtx, cycle)),opt,4*sqrt(size));
     }
 }
 
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 //
 //
 
-/*using paal::local_search::SearchComponents;
+/*using paal::local_search::search_components;
 
 BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     const string indexFName = "index.long";
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;
-    while(dir.getGraph(fname ,opt))  {
+    while(dir.get_graph(fname ,opt))  {
         std::ifstream is(fname);
         read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
@@ -80,34 +80,34 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 
         //create random solution
         std::random_shuffle(v.begin(), v.end());
-        data_structures::SimpleCycle<int> cycle(v.begin(), v.end());
-        int startLen = simple_algo::getLength(mtx, cycle);
+        data_structures::simple_cycle<int> cycle(v.begin(), v.end());
+        int startLen = simple_algo::get_length(mtx, cycle);
 
         //creating local search
-        auto lsc = getDefaultTwoLocalComponents(mtx);
-        typedef local_search::SearchComponentsTraits<puretype(lsc)>::GainT GainT;
-        typedef paal::local_search::GainCutSmallImproves<GainT, int> CIC;
+        auto lsc = get_default_two_local_components(mtx);
+        typedef local_search::search_components_traits<puretype(lsc)>::GainT GainT;
+        typedef paal::local_search::gain_cut_small_improves<GainT, int> CIC;
         double epsilon = 0.001;
         CIC  cut(lsc.get<local_search::Gain>(), startLen, epsilon);
         auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
 
         //setting logger
-        auto logger = utils::make_twoLSLogger(mtx, 100);
+        auto logger = utils::make_two_ls_logger(mtx, 100);
 
         //printing
         LOGLN("Graph:\t" << fname);
-        LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
+        LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
 
         //search
         for(int j = 0; j < 20; ++j) {
             epsilon /= 2;
             LOGLN("epsilon = " << epsilon);
-            cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
-            two_local_search(cycle, logger, utils::ReturnFalseFunctor(), cutLsc);
+            cutLsc.get<local_search::Gain>().set_epsilon(epsilon);
+            two_local_search(cycle, logger, utils::return_false_functor(), cutLsc);
         }
 
         LOGLN("Normal search at the end");
-        two_local_search(cycle, logger, utils::ReturnFalseFunctor(), lsc);
+        two_local_search(cycle, logger, utils::return_false_functor(), lsc);
     }
 }*/
 

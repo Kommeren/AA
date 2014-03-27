@@ -19,7 +19,7 @@ namespace data_structures {
 /**
  * @brief class for polymorphic join on boost fusion sequence
  */
-class PolymorficFold {
+class polymorfic_fold {
 
     struct Fold {
         template <typename Functor,

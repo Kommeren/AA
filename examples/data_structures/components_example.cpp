@@ -26,7 +26,7 @@ namespace ds = paal::data_structures;
 
 //definition of Comps with names names::A, names::B, names::C
 template <typename... Args>
-using Comps = typename  ds::Components<
+using Comps = typename  ds::components<
     names::A, names::B, names::C>::type<Args...> ;
 
 void example_default_constructor_and_basic_usage() {
@@ -84,7 +84,7 @@ void example_replacing() {
     //components with replaceped type
     typedef Comps<int(*)(int), double, int> CompsF;
 
-    typedef ds::ReplacedType<names::A, std::pair<int, int>, CompsF>::type Replaced;
+    typedef ds::replaced_type<names::A, std::pair<int, int>, CompsF>::type Replaced;
     typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
     static_assert(std::is_same<Replaced, ReplacedCheck>::value, "Invalid replaceped type");
 
@@ -131,7 +131,7 @@ struct Z {
 
 //comnponts with defaults
 template <typename... Args>
-using CompsWithDefaults = typename  ds::Components<
+using CompsWithDefaults = typename  ds::components<
     names::A, names::B, ds::NameWithDefault<names::C, X>>::type<Args...> ;
 
 void example_default_parameters() {
@@ -149,7 +149,7 @@ void example_default_parameters() {
 
 //definition of Comps with names names::A, names::B
 template <typename... Args>
-using CompsToReplace = typename  ds::Components<
+using CompsToReplace = typename  ds::components<
     names::A, names::B>::type<Args...>;
 
 void example_replacing_struct_without_default_constructors() {
@@ -181,7 +181,7 @@ void example_create_using_make() {
 
 void example_create_using_copy_tag() {
     typedef Comps<int, double, float> SomeComps;
-    SomeComps someComps(CompsToReplace<int, int>(1,2), ds::CopyTag());
+    SomeComps someComps(CompsToReplace<int, int>(1,2), ds::copy_tag());
     assert(someComps.get<names::A>() == 1);
     assert(someComps.get<names::B>() == 2);
 }
@@ -197,7 +197,7 @@ void example_references() {
 
 void example_make_components() {
     //this is the way of constructing components without providing actual types
-    typedef ds::Components<names::A, names::B> MComps;
+    typedef ds::components<names::A, names::B> MComps;
 
     int a;
     auto mComps = MComps::make_components(1,std::ref(a));
@@ -206,7 +206,7 @@ void example_make_components() {
 
 //this shouldn't compile
 //template <typename... Args>
-//using CompsWithDefaultsIncorrect = typename  ds::Components<
+//using CompsWithDefaultsIncorrect = typename  ds::components<
 //        names::A, ds::NameWithDefault<names::B, X>, names::C>::type<Args...> ;
 
 

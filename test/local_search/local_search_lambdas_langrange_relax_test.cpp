@@ -22,16 +22,16 @@
 using namespace  paal;
 
 
-    struct ValueDiff {
-        ValueDiff(double & value, double diff) :
+    struct value_diff {
+        value_diff(double & value, double diff) :
             m_value(value), m_diff(diff) {}
         double & m_value;
         double m_diff;
     };
 
-    struct MakeValueDiff {
-        ValueDiff operator()(double & value, double diff) const {
-            return ValueDiff{value, diff};
+    struct make_value_diff {
+        value_diff operator()(double & value, double diff) const {
+            return value_diff{value, diff};
         }
     };
 
@@ -61,11 +61,11 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     };
 
     auto getMoves =[&] (Solution & s) {
-        auto b = data_structures::make_CombineIterator(MakeValueDiff{}, s, neighb);
+        auto b = data_structures::make_combine_iterator(make_value_diff{}, s, neighb);
         return boost::make_iterator_range(b, decltype(b){});
     };
 
-    auto gain = [&](Solution & s, ValueDiff vd) {
+    auto gain = [&](Solution & s, value_diff vd) {
         auto old = vd.m_value;
         auto val = f(s);
         vd.m_value = normalize(vd.m_value + vd.m_diff);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         return valMove - val - 0.000001;
     };
 
-    auto commit = [&](Solution &, ValueDiff vd) {
+    auto commit = [&](Solution &, value_diff vd) {
         vd.m_value = normalize(vd.m_value + vd.m_diff);
         return true;
     };
@@ -82,14 +82,14 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
     auto ls = [=](Solution & x) {
         x = {0.3,0.3,0.3};
         local_search_simple(x,
-            local_search::make_SearchComponents(getMoves, gain, commit));
+            local_search::make_search_components(getMoves, gain, commit));
     };
 
     //components for G.
     std::vector<double> neighbCutG(neighb.size());
     std::vector<double> x(DIM, 0);
     local_search_simple(x,
-                local_search::make_SearchComponents(getMoves, gain, commit));
+                local_search::make_search_components(getMoves, gain, commit));
     double best = f(x);
 
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         return true;
     };
 
-    local_search_simple(G, local_search::make_SearchComponents(getMovesG, gainG, commitG));
+    local_search_simple(G, local_search::make_search_components(getMovesG, gainG, commitG));
 
     ls(x);
 

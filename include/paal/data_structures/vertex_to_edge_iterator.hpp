@@ -15,16 +15,16 @@ namespace data_structures {
 
 //TODO use boost:::iterator_fascade
 /**
- * @class VertexToEdgeIterator
+ * @class vertex_to_edge_iterator
  * @brief transforms collection to collection of pairs consecutive elements of the input collection.
  *      The last element and the first element are considered consecutive.
  *
- * @tparam VertexIterator
+ * @tparam vertex_iterator
  */
-template <typename VertexIterator>
-class VertexToEdgeIterator  {
+template <typename vertex_iterator>
+class vertex_to_edge_iterator  {
 public:
-    typedef typename std::iterator_traits<VertexIterator>::value_type Vertex;
+    typedef typename std::iterator_traits<vertex_iterator>::value_type Vertex;
     typedef std::pair<Vertex, Vertex> Edge;
 
     typedef std::forward_iterator_tag iterator_category;
@@ -39,21 +39,21 @@ public:
      * @param b
      * @param e
      */
-    VertexToEdgeIterator(VertexIterator b, VertexIterator e) :
+    vertex_to_edge_iterator(vertex_iterator b, vertex_iterator e) :
         m_idx(b), m_begin(b), m_end(e) {
-            moveCurr();
+            move_curr();
         }
 
-    VertexToEdgeIterator()  = default;
+    vertex_to_edge_iterator()  = default;
 
     /**
      * @brief operator++ post increment
      *
      * @return
      */
-    VertexToEdgeIterator & operator++(){
+    vertex_to_edge_iterator & operator++(){
         ++m_idx;
-        moveCurr();
+        move_curr();
 
         return *this;
     }
@@ -63,8 +63,8 @@ public:
      *
      * @return
      */
-    VertexToEdgeIterator operator++(int){
-        VertexToEdgeIterator i(*this);
+    vertex_to_edge_iterator operator++(int){
+        vertex_to_edge_iterator i(*this);
         operator++();
         return i;
     }
@@ -76,7 +76,7 @@ public:
      *
      * @return
      */
-    bool operator!=(VertexToEdgeIterator ei) const {
+    bool operator!=(vertex_to_edge_iterator ei) const {
         return !operator==(ei);
     }
 
@@ -87,7 +87,7 @@ public:
      *
      * @return
      */
-    bool operator==(VertexToEdgeIterator ei) const {
+    bool operator==(vertex_to_edge_iterator ei) const {
         return m_idx == ei.m_idx;
     }
 
@@ -114,10 +114,10 @@ private:
     /**
      * @brief moves iterators to next position
      */
-    void moveCurr() {
+    void move_curr() {
         if(m_idx != m_end) {
             m_curr.first = *m_idx;
-            VertexIterator next = m_idx;
+            vertex_iterator next = m_idx;
             ++next;
             if(next == m_end) {
                 m_curr.second = *m_begin;
@@ -127,39 +127,39 @@ private:
         }
     }
 
-    VertexIterator m_idx;
-    VertexIterator m_begin;
-    VertexIterator m_end;
+    vertex_iterator m_idx;
+    vertex_iterator m_begin;
+    vertex_iterator m_end;
     Edge m_curr;
 };
 
 /**
- * @brief make for VertexToEdgeIterator
+ * @brief make for vertex_to_edge_iterator
  *
- * @tparam VertexIterator
+ * @tparam vertex_iterator
  * @param b
  * @param e
  *
  * @return
  */
-template <typename VertexIterator>
-VertexToEdgeIterator<VertexIterator>
-make_VertexToEdgeIterator(VertexIterator b, VertexIterator e) {
-    return VertexToEdgeIterator<VertexIterator>(b,e);
+template <typename vertex_iterator>
+vertex_to_edge_iterator<vertex_iterator>
+make_vertex_to_edge_iterator(vertex_iterator b, vertex_iterator e) {
+    return vertex_to_edge_iterator<vertex_iterator>(b,e);
 }
 
 /**
- * @brief make for VertexToEdgeIterator form Vertex iterator pair
+ * @brief make for vertex_to_edge_iterator form Vertex iterator pair
  *
- * @tparam VertexIterator
+ * @tparam vertex_iterator
  * @param r
  *
  * @return
  */
-template <typename VertexIterator>
-VertexToEdgeIterator<VertexIterator>
-make_VertexToEdgeIterator(std::pair<VertexIterator, VertexIterator> r) {
-    return VertexToEdgeIterator<VertexIterator>(r.first, r.second);
+template <typename vertex_iterator>
+vertex_to_edge_iterator<vertex_iterator>
+make_vertex_to_edge_iterator(std::pair<vertex_iterator, vertex_iterator> r) {
+    return vertex_to_edge_iterator<vertex_iterator>(r.first, r.second);
 }
 
 }//data_structures

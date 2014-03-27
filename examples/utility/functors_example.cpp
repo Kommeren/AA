@@ -9,36 +9,36 @@ using namespace paal::utils;
 
 void functors_example() {
     //skip
-    SkipFunctor skip;
+    skip_functor skip;
 
     skip(2, 2.1, "asda");
 
     //identity
-    IdentityFunctor id;
+    identity_functor id;
 
     assert(id("asd") == std::string("asd"));
     assert(id(7) == 7);
 
     //return something
-    ReturnTrueFunctor retTrue;
-    ReturnFalseFunctor retFalse;
-    ReturnZeroFunctor retZero;
+    return_true_functor retTrue;
+    return_false_functor retFalse;
+    return_zero_functor retZero;
 
     assert(retTrue(2, 2.3, "abc"));
     assert(!retFalse(2, 2.3, "abc"));
     assert(retZero(2, 2.3, "abc") == 0);
 
     //assert
-    //AssertFunctor assertFun;
+    //assert_functor assertFun;
     //assertFun(); //aborts
 
 
     //array to functor
     std::vector<int> vec{1,2,3};
-    auto vecFun = make_ArrayToFunctor(vec);
+    auto vecFun = make_array_to_functor(vec);
     assert(vecFun(1) == 2);
 
-    auto vecFunWithOffset = make_ArrayToFunctor(vec, 1);
+    auto vecFunWithOffset = make_array_to_functor(vec, 1);
     assert(vecFunWithOffset(1) == 3);
 };
 
@@ -46,9 +46,9 @@ void compare_functors() {
     Greater g;
     GreaterEqual ge;
     Less l;
-    LessEqual le;
-    EqualTo e;
-    NotEqualTo ne;
+    less_equal le;
+    equal_to e;
+    not_equal_to ne;
 
     assert(!g(1,2));
     assert(!g(1,1));
@@ -77,11 +77,11 @@ void compare_functors() {
 
 void comparator_functor() {
     auto getFirst = [](std::pair<int, int> p){return p.first;};
-    auto compareFirst = make_FunctorToComparator(getFirst);
+    auto compareFirst = make_functor_to_comparator(getFirst);
 
     assert(!compareFirst(std::make_pair(1,2), std::make_pair(0,1)));
 
-    auto compareFirstDesc = make_FunctorToComparator(getFirst, Greater());
+    auto compareFirstDesc = make_functor_to_comparator(getFirst, Greater());
 
     assert(compareFirstDesc(std::make_pair(1,2), std::make_pair(0,1)));
 }
@@ -107,40 +107,40 @@ void boolean_functors() {
 
 void lift_operator_functor() {
     auto oper = [](int a, int b) {return a + b > 0;};
-    ReturnZeroFunctor zero;
-    ReturnSomethingFunctor<int, 5> five;
+    return_zero_functor zero;
+    return_something_functor<int, 5> five;
 
-    auto f =  make_LiftBinaryOperatorFunctor(zero, five, oper);
+    auto f =  make_lift_binary_operator_functor(zero, five, oper);
 
     assert(f(1, 2, 41243.2, "dada"));
 }
 
 void boolean_functors_on_functors() {
-    ReturnTrueFunctor retTrue;
-    ReturnFalseFunctor retFalse;
+    return_true_functor retTrue;
+    return_false_functor retFalse;
 
     {
-        auto trueFunctor = make_NotFunctor(retFalse);
+        auto trueFunctor = make_not_functor(retFalse);
         assert(trueFunctor(1.2, "xada", 3));
     }
 
     {
-        auto falseFunctor = make_NotFunctor(retTrue);
+        auto falseFunctor = make_not_functor(retTrue);
         assert(!falseFunctor(1.2, "xada", 3));
     }
 
     {
-        auto trueFunctor = make_OrFunctor(retTrue, retFalse);
+        auto trueFunctor = make_or_functor(retTrue, retFalse);
         assert(trueFunctor(1.2, "xada", 3));
     }
 
     {
-        auto falseFunctor = make_AndFunctor(retTrue, retFalse);
+        auto falseFunctor = make_and_functor(retTrue, retFalse);
         assert(!falseFunctor(1.2, "xada", 3));
     }
 
     {
-        auto trueFunctor = make_XorFunctor(retTrue, retFalse);
+        auto trueFunctor = make_xor_functor(retTrue, retFalse);
         assert(trueFunctor(1.2, "xada", 3));
     }
 }

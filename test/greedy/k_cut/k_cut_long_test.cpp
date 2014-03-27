@@ -14,31 +14,31 @@
 #include "utils/logger.hpp"
 #include "utils/test_result_check.hpp"
 
-const int nuVertices=500;
-const int nuEdges=1000*100;
+const int nu_vertices=500;
+const int nu_edges=1000*100;
 const int seed=43;
 const int parts=20;
-const int maxEdgeWeightInComponents=10000;
-const int maxEdgeWeightBetweenComponents=10;
+const int max_edge_weight_in_components=10000;
+const int max_edge_weight_between_components=10;
 BOOST_AUTO_TEST_CASE(KCut) {
-    LOGLN("wertices: "<<nuVertices<<" edges: "<<nuEdges);
+    LOGLN("wertices: "<<nu_vertices<<" edges: "<<nu_edges);
     LOGLN("parts: "<<parts);
     //generate graph
     std::vector<std::pair<int,int> > edgesP;
     std::vector<long long> costEdges;
     std::srand(seed);
-    long long costCutOnComponents=0;
+    long long costCutOncomponents=0;
     {
-        int source,target,edgeCost,nuEdgesCopy=nuEdges;
-        while(--nuEdgesCopy){
-            source=rand()%nuVertices;
-            target=rand()%nuVertices;
+        int source,target,edgeCost,nu_edgesCopy=nu_edges;
+        while(--nu_edgesCopy){
+            source=rand()%nu_vertices;
+            target=rand()%nu_vertices;
             edgesP.push_back(std::make_pair(source,target));
             if(source%parts==target%parts){
-                edgeCost=(rand()%maxEdgeWeightInComponents);
+                edgeCost=(rand()%max_edge_weight_in_components);
             }else{
-                edgeCost=(rand()%maxEdgeWeightBetweenComponents);
-                costCutOnComponents+=edgeCost;
+                edgeCost=(rand()%max_edge_weight_between_components);
+                costCutOncomponents+=edgeCost;
             }
             costEdges.push_back(edgeCost);
         }
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(KCut) {
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::no_property,
                     boost::property < boost::edge_weight_t, int>
-                    > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nuVertices);
+                    > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nu_vertices);
     //solve
     std::vector<std::pair<int,int> > verticesParts;
     long long costCut=paal::greedy::kCut(graph,parts,back_inserter(verticesParts));
@@ -70,6 +70,6 @@ BOOST_AUTO_TEST_CASE(KCut) {
     BOOST_CHECK_EQUAL(costCut,costCutVerification);
 	LOGLN("Number of parts: "<<parts);
     //estimate aproximation ratio
-    check_result_compare_to_bound(costCutVerification,costCutOnComponents,2.0-2.0/double(parts),paal::utils::LessEqual(),
+    check_result_compare_to_bound(costCutVerification,costCutOncomponents,2.0-2.0/double(parts),paal::utils::less_equal(),
                   0LL,"cut cost on components: ");
 }

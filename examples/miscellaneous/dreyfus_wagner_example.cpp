@@ -12,24 +12,24 @@
 int main() {
 //! [Dreyfus Wagner Example]
     // prepare metric
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSteiner();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_steiner();
 
     // prepare terminals and Steiner vertices
     std::vector<int> terminals = {SGM::A, SGM::B, SGM::C, SGM::D};
     std::vector<int> nonterminals = {SGM::E};
 
     // run algorithm
-    auto dw = paal::steiner_tree::make_DreyfusWagner(gm, terminals, nonterminals);
+    auto dw = paal::steiner_tree::make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
 
     // print result
-    std::cout << "Cost = " << dw.getCost() << std::endl;
+    std::cout << "Cost = " << dw.get_cost() << std::endl;
     std::cout << "Steiner points:" << std::endl;
-    std::set<int> steinerPoints = dw.steinerTreeZelikovsky11per6approximation();
-    std::copy(steinerPoints.begin(), steinerPoints.end(), std::ostream_iterator<int>(std::cout, "\n"));
+    std::set<int> steiner_points = dw.steiner_tree_zelikovsky11per6approximation();
+    std::copy(steiner_points.begin(), steiner_points.end(), std::ostream_iterator<int>(std::cout, "\n"));
     std::cout << "Edges:" << std::endl;
-    for (auto edge: dw.getEdges()) {
+    for (auto edge: dw.get_edges()) {
         std::cout << "(" << edge.first << "," << edge.second << ")" << std::endl;
     }
 

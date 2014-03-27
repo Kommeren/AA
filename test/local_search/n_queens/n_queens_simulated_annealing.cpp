@@ -24,8 +24,8 @@
 
 //This is needed because of boost bug in function_input_iterator!!!
     template <typename F>
-    struct RandomMoves {
-        RandomMoves(F _f) : f(_f) {}
+    struct random_moves {
+        random_moves(F _f) : f(_f) {}
         typedef paal::local_search::Move result_type;
 
         result_type operator()() const {
@@ -36,9 +36,9 @@
     };
 
 /**
- * @brief NQueensCommit functor, optimized fo SA puropses
+ * @brief n_queens_commit functor, optimized fo SA puropses
  */
-struct NQueensCommitSA {
+struct n_queens_commit_sa {
     template <typename Solution, typename Idx>
         /**
          * @brief Operator swaps elements of the solution range
@@ -48,7 +48,7 @@ struct NQueensCommitSA {
          * @param move
          */
     bool operator()(Solution & sol, Idx solutionElement, Idx move) const {
-        sol.swapQueens(solutionElement, move);
+        sol.swap_queens(solutionElement, move);
         return false;
     }
 };
@@ -62,7 +62,7 @@ int main(int argc, char ** argv) {
     const int number_of_queens = std::stoi(argv[1]);
 
     namespace ls = paal::local_search;
-    typedef ls::NQueensSolutionAdapter<std::vector<int>> Adapter;
+    typedef ls::n_queens_solution_adapter<std::vector<int>> Adapter;
     std::vector<int> queens(number_of_queens);
     boost::iota(queens, 0);
 
@@ -70,14 +70,14 @@ int main(int argc, char ** argv) {
     std::uniform_int_distribution<int> distribution(0,number_of_queens);
 
     //TODO add multisolution -> single solution
-    auto gain = ls::NQueensGain{};
-    auto commit = [](Adapter & sol, ls::Move m){return NQueensCommitSA()(sol, m.getFrom(), m.getTo());};
+    auto gain = ls::n_queens_gain{};
+    auto commit = [](Adapter & sol, ls::Move m){return n_queens_commit_sa()(sol, m.get_from(), m.get_to());};
     auto randomMove = [=]() mutable {
                             return ls::Move(distribution(rand),
                                             distribution(rand));
     };
 
-    RandomMoves<decltype(randomMove)> r(randomMove);
+    random_moves<decltype(randomMove)> r(randomMove);
 
     auto movesBegin = boost::make_function_input_iterator(r, 0);
     auto movesEnd = boost::make_function_input_iterator(r, 10000000);
@@ -86,17 +86,17 @@ int main(int argc, char ** argv) {
         {return boost::make_iterator_range(movesBegin, movesEnd);};
 
     int nr_of_iterations(0);
-    auto countingGain = paal::utils::make_CountingFunctorAdaptor(gain, nr_of_iterations);
+    auto countingGain = paal::utils::make_counting_functor_adaptor(gain, nr_of_iterations);
 
     //alternative cooling strategy
-    ///auto coolingStrategy =  ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(10), 100, 0.1);
-    auto coolingStrategy = ls::ExponentialCoolingSchemaDependantOnIteration(10, 0.9999, 1000);
-    auto saGain = ls::make_SimulatedAnnealingGainAdaptor(countingGain, coolingStrategy);
-    auto comps = ls::make_SearchComponents(getMoves, saGain, commit);
+    ///auto coolingStrategy =  ls::make_exponential_cooling_schema_dependant_on_time(std::chrono::seconds(10), 100, 0.1);
+    auto coolingStrategy = ls::exponential_cooling_schema_dependant_on_iteration(10, 0.9999, 1000);
+    auto saGain = ls::make_simulated_annealing_gain_adaptor(countingGain, coolingStrategy);
+    auto comps = ls::make_search_components(getMoves, saGain, commit);
 
     Adapter adaptor(queens);
     ls::local_search_simple(adaptor, comps);
-    std::cout <<  Adapter(queens).objFun() << " " << nr_of_iterations << std::endl;
+    std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
 
     return 0;
 }

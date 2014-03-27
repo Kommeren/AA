@@ -15,12 +15,12 @@
 #include "utils/sample_graph.hpp"
 #include "utils/test_result_check.hpp"
 
-BOOST_AUTO_TEST_SUITE(SteinerTreeGreedy)
+BOOST_AUTO_TEST_SUITE(steiner_treeGreedy)
 static const int OPTIMAL=4;
 static const int APPROXIMATION_RATIO =2;
-BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
-    typedef  SampleGraphsMetrics SGM;
-    auto g = SGM::getGraphSteiner();
+BOOST_AUTO_TEST_CASE(steiner_tree_test) {
+    typedef  sample_graphs_metrics SGM;
+    auto g = SGM::get_graph_steiner();
     typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::set<Edge> steinerEdges;
 
@@ -34,9 +34,9 @@ BOOST_AUTO_TEST_CASE(SteinerTreeTest) {
     check_result(sum,OPTIMAL,APPROXIMATION_RATIO);
 }
 
-BOOST_AUTO_TEST_CASE(SteinerTreeTestParameters) {
-    typedef  SampleGraphsMetrics SGM;
-    auto g = SGM::getGraphSteiner();
+BOOST_AUTO_TEST_CASE(steiner_tree_testParameters) {
+    typedef  sample_graphs_metrics SGM;
+    auto g = SGM::get_graph_steiner();
     typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::set<Edge> steinerEdges;
     std::vector<int> color(num_vertices(g));

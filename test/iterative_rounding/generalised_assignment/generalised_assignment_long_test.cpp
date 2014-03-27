@@ -27,7 +27,7 @@ using namespace paal;
 
 template <typename Machines, typename JobsToMachines, typename Times,
         typename MachineBounds, typename Jobs>
-void checkResult(IRResult result, const Machines & machines,
+void check_result(IRResult result, const Machines & machines,
         const JobsToMachines & jobsToMachines, const Times & times,
         const MachineBounds & machinesBounds, const Jobs & jobs, int opt) {
 
@@ -54,7 +54,7 @@ void checkResult(IRResult result, const Machines & machines,
     LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
 }
 
-BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
+BOOST_AUTO_TEST_CASE(generalised_assignmentLong) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
     parse(testDir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         int opt;
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
             std::vector<int> machinesBounds;
             boost::integer_range<int> machines(0,0);
             boost::integer_range<int> jobs(0,0);
-            paal::readGEN_ASS(ifs, costs, times, machinesBounds, machines, jobs);
+            paal::read_gen_ASS(ifs, costs, times, machinesBounds, machines, jobs);
             auto Tf = [&](int i){return machinesBounds[i];};
             {
                 LOGLN("Unlimited relaxations");
@@ -85,20 +85,20 @@ BOOST_AUTO_TEST_CASE(GeneralisedAssignmentLong) {
                     machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(),
                     costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()));
-                checkResult(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
+                check_result(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
             }
             {
                 LOGLN("Relaxations limit = 1/iter");
                 std::unordered_map<int, int> jobsToMachines;
-                ir::GAIRComponents<> comps;
+                ir::GAIRcomponents<> comps;
                 auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
-                                    ir::RelaxationsLimitCondition(), comps);
+                                    ir::relaxations_limit_condition(), comps);
                 auto result = generalised_assignment_iterative_rounding(
                     machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(),
                     costs, times, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
                     components);
-                checkResult(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
+                check_result(result, machines, jobsToMachines, times, machinesBounds, jobs, opt);
             }
         }
         int MAX_LINE = 256;

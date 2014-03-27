@@ -19,10 +19,10 @@ namespace data_structures {
      * @tparam Cycle
      */
 template <typename Cycle>
-class CycleStartFromLastChange {
+class cycle_start_from_last_change {
 public:
-    typedef typename  CycleTraits<Cycle>::CycleElem CycleElem;
-    typedef typename  CycleTraits<Cycle>::VertexIterator VertexIterator;
+    typedef typename  cycle_traits<Cycle>::CycleElem CycleElem;
+    typedef typename  cycle_traits<Cycle>::vertex_iterator vertex_iterator;
 
 
     /**
@@ -30,7 +30,7 @@ public:
      *
      * @param c
      */
-    CycleStartFromLastChange(Cycle & c) :
+    cycle_start_from_last_change(Cycle & c) :
         m_cycle(c), m_element(*c.vbegin()) {}
 
     /**
@@ -49,7 +49,7 @@ public:
      *
      * @return
      */
-    VertexIterator vbegin() const {
+    vertex_iterator vbegin() const {
         return m_cycle.vbegin(m_element);
     }
 
@@ -60,7 +60,7 @@ public:
      *
      * @return
      */
-    VertexIterator vbegin(const CycleElem & ce) const {
+    vertex_iterator vbegin(const CycleElem & ce) const {
         return m_cycle.vbegin(ce);
     }
 
@@ -69,7 +69,7 @@ public:
      *
      * @return
      */
-    VertexIterator vend() const {
+    vertex_iterator vend() const {
         return m_cycle.vend();
     }
 
@@ -78,7 +78,7 @@ public:
      *
      * @return
      */
-    Cycle & getCycle() {
+    Cycle & get_cycle() {
         return m_cycle;
     }
 
@@ -87,7 +87,7 @@ public:
      *
      * @return
      */
-    const Cycle & getCycle() const {
+    const Cycle & get_cycle() const {
         return m_cycle;
     }
 

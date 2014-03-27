@@ -22,17 +22,17 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @class BiMapMIC
+ * @class bimap_mic
  * @brief the same as Bimap, but implemented using boost::multi_index_container. Unfortunately slower
  *
  * @tparam T
  * @tparam Idx
  */
 template <typename T, typename Idx = int>
-class BiMapMIC {
+class bimap_mic {
 public:
 
-    BiMapMIC() = default;
+    bimap_mic() = default;
 
     /**
      * @brief constructor
@@ -41,7 +41,7 @@ public:
      * @param b
      * @param e
      */
-    template <typename Iter> BiMapMIC(Iter b, Iter e) {
+    template <typename Iter> bimap_mic(Iter b, Iter e) {
         std::size_t s = std::distance(b, e);
         m_index.reserve(s);
         for(const T & t : boost::make_iterator_range(b,e)) {
@@ -51,13 +51,13 @@ public:
 
 
     /**
-     * @brief getIdx on element t
+     * @brief get_idx on element t
      *
      * @param t
      *
      * @return
      */
-    Idx getIdx(const T & t) const {
+    Idx get_idx(const T & t) const {
         auto const & idx = m_index.template get<1>();
         return m_index.template project<0>(idx.find(t)) - m_index.begin();
     }
@@ -69,7 +69,7 @@ public:
      *
      * @return
      */
-    const T & getVal(Idx i) const {
+    const T & get_val(Idx i) const {
 #ifdef NDEBUG
         return m_index[i];
 #else
@@ -110,19 +110,19 @@ private:
 
 //minor TODO write specification when T is integral (copy instead of reference)
 /**
- * @class BiMap
+ * @class bimap
  * @brief implements both sides mapping from the collection to (0,size(collection)) interval.
  *
  * @tparam T
  * @tparam Idx
  */
 template <typename T, typename Idx = int>
-class BiMap {
+class bimap {
     typedef std::unordered_map<T,Idx, boost::hash<T>> TToID;
 public:
     typedef typename TToID::const_iterator Iterator;
 
-    BiMap() = default;
+    bimap() = default;
 
     /**
      * @brief constructor
@@ -131,10 +131,10 @@ public:
      * @param b
      * @param e
      */
-    template <typename Iter> BiMap(Iter b, Iter e) {
+    template <typename Iter> bimap(Iter b, Iter e) {
         std::size_t s = std::distance(b, e);
-        m_idToT.reserve(s);
-        m_tToID.reserve(s);
+        m_id_to_t.reserve(s);
+        m_t_to_id.reserve(s);
         for(const T & t : boost::make_iterator_range(b,e)) {
             add(t);
         }
@@ -147,9 +147,9 @@ public:
      *
      * @return
      */
-    Idx getIdx(const T & t) const {
-        auto iter = m_tToID.find(t);
-        assert(iter != m_tToID.end());
+    Idx get_idx(const T & t) const {
+        auto iter = m_t_to_id.find(t);
+        assert(iter != m_t_to_id.end());
         return iter->second;
     }
 
@@ -160,11 +160,11 @@ public:
      *
      * @return
      */
-    const T & getVal(Idx i) const {
+    const T & get_val(Idx i) const {
 #ifdef NDEBUG
-        return m_idToT[i];
+        return m_id_to_t[i];
 #else
-        return m_idToT.at(i);
+        return m_id_to_t.at(i);
 #endif
     }
 
@@ -174,7 +174,7 @@ public:
      * @return
      */
     std::size_t size() const {
-        return  m_idToT.size();
+        return  m_id_to_t.size();
     }
 
     /**
@@ -185,10 +185,10 @@ public:
      * @return
      */
     Idx add(const T & t) {
-        assert(m_tToID.find(t) == m_tToID.end());
+        assert(m_t_to_id.find(t) == m_t_to_id.end());
         Idx idx = size();
-        m_tToID[t] = idx;
-        m_idToT.push_back(t);
+        m_t_to_id[t] = idx;
+        m_id_to_t.push_back(t);
         return idx;
     }
 
@@ -197,16 +197,16 @@ public:
      *
      * @return
      */
-    std::pair<Iterator, Iterator> getRange() const {
-        return std::make_pair(m_tToID.begin(), m_tToID.end());
+    std::pair<Iterator, Iterator> get_range() const {
+        return std::make_pair(m_t_to_id.begin(), m_t_to_id.end());
     }
 
 
 protected:
     ///mapping from id to element
-    std::vector<T> m_idToT;
+    std::vector<T> m_id_to_t;
     ///mapping from elements to ids
-    TToID m_tToID;
+    TToID m_t_to_id;
 };
 
 
@@ -217,10 +217,10 @@ protected:
  * @tparam Idx
  */
 template <typename T, typename Idx = int>
-class EraseableBiMap : public BiMap<T, Idx> {
-    typedef BiMap<T, Idx> base;
-    using base::m_tToID;
-    using base::m_idToT;
+class eraseable_bimap : public bimap<T, Idx> {
+    typedef bimap<T, Idx> base;
+    using base::m_t_to_id;
+    using base::m_id_to_t;
 public:
     /**
      * @brief erases element (takes linear time)
@@ -228,15 +228,15 @@ public:
      * @param t
      */
     void erase(const T & t) {
-        auto i = m_tToID.find(t);
-        assert(i != m_tToID.end());
+        auto i = m_t_to_id.find(t);
+        assert(i != m_t_to_id.end());
         Idx idx = i->second;
-        m_tToID.erase(i);
-        m_idToT.erase(m_idToT.begin() + idx);
+        m_t_to_id.erase(i);
+        m_id_to_t.erase(m_id_to_t.begin() + idx);
 
-        for(int i : boost::irange(idx, Idx(m_idToT.size()))) {
-            assert(m_tToID.at(m_idToT[i]) == i + 1);
-            m_tToID[m_idToT[i]] = i;
+        for(int i : boost::irange(idx, Idx(m_id_to_t.size()))) {
+            assert(m_t_to_id.at(m_id_to_t[i]) == i + 1);
+            m_t_to_id[m_id_to_t[i]] = i;
         }
     }
 };
@@ -248,12 +248,12 @@ public:
  * @tparam T
  * @tparam Idx
  */
-template <typename T, typename Idx = int> class BiMapOfConsecutive {
+template <typename T, typename Idx = int> class bimap_of_consecutive {
     //TODO maybe it should be passed but only on debug
     static const Idx INVALID_IDX = -1;
 public:
     static_assert(std::is_integral<T>::value, "Type T has to be integral");
-    BiMapOfConsecutive() = default;
+    bimap_of_consecutive() = default;
 
     /**
      * @brief constructor
@@ -262,16 +262,16 @@ public:
      * @param b
      * @param e
      */
-    template <typename Iter> BiMapOfConsecutive(Iter b, Iter e) {
+    template <typename Iter> bimap_of_consecutive(Iter b, Iter e) {
         if(b == e)
             return;
 
         std::size_t size = std::distance(b, e);
-        m_idToT.resize(size);
-        std::copy(b, e, m_idToT.begin());
+        m_id_to_t.resize(size);
+        std::copy(b, e, m_id_to_t.begin());
 
-        m_tToID.resize(size, INVALID_IDX);
-        rank(m_idToT,m_tToID,INVALID_IDX);
+        m_t_to_id.resize(size, INVALID_IDX);
+        rank(m_id_to_t,m_t_to_id,INVALID_IDX);
 
     }
 
@@ -282,8 +282,8 @@ public:
      *
      * @return
      */
-    Idx getIdx(const T & t) const {
-        return m_tToID[t];
+    Idx get_idx(const T & t) const {
+        return m_t_to_id[t];
     }
 
     /**
@@ -293,8 +293,8 @@ public:
      *
      * @return
      */
-    const T & getVal(Idx i) const {
-        return m_idToT[i];
+    const T & get_val(Idx i) const {
+        return m_id_to_t[i];
     }
 
     /**
@@ -303,12 +303,12 @@ public:
      * @return
      */
     std::size_t size() const {
-        return  m_idToT.size();
+        return  m_id_to_t.size();
     }
 
 private:
-    std::vector<T>   m_idToT;
-    std::vector<Idx> m_tToID;
+    std::vector<T>   m_id_to_t;
+    std::vector<Idx> m_t_to_id;
 };
 
 /**
@@ -318,43 +318,43 @@ private:
  * @tparam IdxT
  */
 template <typename ValT, typename IdxT>
-struct BiMapTraits<BiMap<ValT, IdxT>> {
+struct bimap_traits<bimap<ValT, IdxT>> {
     typedef ValT Val;
     typedef IdxT Idx;
 };
 
 /**
- * @brief traits specialization for EraseableBiMap
+ * @brief traits specialization for eraseable_bimap
  *
  * @tparam ValT
  * @tparam IdxT
  */
 template <typename ValT, typename IdxT>
-struct BiMapTraits<EraseableBiMap<ValT, IdxT>>  {
+struct bimap_traits<eraseable_bimap<ValT, IdxT>>  {
     typedef ValT Val;
     typedef IdxT Idx;
 };
 
 /**
- * @brief traits specialization for BiMapOfConsecutive
+ * @brief traits specialization for bimap_of_consecutive
  *
  * @tparam ValT
  * @tparam IdxT
  */
 template <typename ValT, typename IdxT>
-struct BiMapTraits<BiMapOfConsecutive<ValT, IdxT>>  {
+struct bimap_traits<bimap_of_consecutive<ValT, IdxT>>  {
     typedef ValT Val;
     typedef IdxT Idx;
 };
 
 /**
- * @brief traits specialization for BiMapMIC
+ * @brief traits specialization for bimap_mic
  *
  * @tparam ValT
  * @tparam IdxT
  */
 template <typename ValT, typename IdxT>
-struct BiMapTraits<BiMapMIC<ValT, IdxT>>  {
+struct bimap_traits<bimap_mic<ValT, IdxT>>  {
     typedef ValT Val;
     typedef IdxT Idx;
 };
@@ -364,17 +364,17 @@ struct BiMapTraits<BiMapMIC<ValT, IdxT>>  {
  *
  * @tparam T
  * @tparam Idx
- * @param m_idToT
- * @param m_tToID
+ * @param m_id_to_t
+ * @param m_t_to_id
  * @param INVALID_IDX
  */
 template <typename T, typename Idx = int>
-void rank(std::vector<T> const& m_idToT,std::vector<Idx> &m_tToID,int INVALID_IDX=0){
+void rank(std::vector<T> const& m_id_to_t,std::vector<Idx> &m_t_to_id,int INVALID_IDX=0){
     static_assert(std::is_integral<T>::value, "Type T has to be integral");
-    unsigned long size = m_tToID.size();
+    unsigned long size = m_t_to_id.size();
     for(auto i : boost::irange(0ul,size)) {
-            Idx & idx = m_tToID[m_idToT[i]];
-            assert(m_idToT[i] < int(size) && idx == INVALID_IDX);
+            Idx & idx = m_t_to_id[m_id_to_t[i]];
+            assert(m_id_to_t[i] < int(size) && idx == INVALID_IDX);
             idx = i;
             }
 }

@@ -12,24 +12,24 @@
 int main() {
 //! [Steiner Tree Example]
     //sample metric
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSteiner();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_steiner();
     typedef decltype(gm) Metric;
 
     //sample voronoi
-    typedef paal::data_structures::Voronoi<Metric> VoronoiT;
-    typedef paal::data_structures::VoronoiTraits<VoronoiT> VT;
+    typedef paal::data_structures::voronoi<Metric> voronoiT;
+    typedef paal::data_structures::voronoi_traits<voronoiT> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    VoronoiT voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D}, VSet{SGM::E}, gm);
+    voronoiT voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D}, VSet{SGM::E}, gm);
 
     //run algorithm
-    std::vector<int> steinerPoints;
-    paal::steiner_tree::steinerTreeZelikovsky11per6approximation(gm, voronoi, std::back_inserter(steinerPoints));
+    std::vector<int> steiner_points;
+    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(gm, voronoi, std::back_inserter(steiner_points));
 
     //print result
     std::cout << "Steiner points:" << std::endl;
-    std::copy(steinerPoints.begin(), steinerPoints.end(), std::ostream_iterator<int>(std::cout, "\n"));
+    std::copy(steiner_points.begin(), steiner_points.end(), std::ostream_iterator<int>(std::cout, "\n"));
 //! [Steiner Tree Example]
     return 0;
 }

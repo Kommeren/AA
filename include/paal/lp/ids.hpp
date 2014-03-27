@@ -43,19 +43,19 @@ namespace lp {
     /**
      * LP column identifier class.
      */
-    struct ColId : Id {
-        ColId() {}
+    struct col_id : Id {
+        col_id() {}
         /// Constructor.
-        explicit ColId(int id) : Id(id) {}
+        explicit col_id(int id) : Id(id) {}
     };
 
     /**
      * LP row identifier class.
      */
-    struct RowId : Id {
-        RowId() {}
+    struct row_id : Id {
+        row_id() {}
         /// Constructor.
-        explicit RowId(int id) : Id(id) {}
+        explicit row_id(int id) : Id(id) {}
     };
 
 } // lp
@@ -78,10 +78,10 @@ namespace std {
     };
 
     template <>
-    struct hash<paal::lp::RowId> : public hash<paal::lp::Id> {};
+    struct hash<paal::lp::row_id> : public hash<paal::lp::Id> {};
 
     template <>
-    struct hash<paal::lp::ColId> : public hash<paal::lp::Id> {};
+    struct hash<paal::lp::col_id> : public hash<paal::lp::Id> {};
 
 } //std
 

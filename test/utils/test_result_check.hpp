@@ -13,7 +13,7 @@
 #include "utils/logger.hpp"
 #include "paal/utils/functors.hpp"
 
-template<typename T,typename T2,typename Comparator=paal::utils::LessEqual>
+template<typename T,typename T2,typename Comparator=paal::utils::less_equal>
 void check_result(T result,T optimal,T2 aproximation_ratio,Comparator comp = Comparator(),
                   T eps=0,
                   std::string opt="optimal: ",
@@ -28,8 +28,8 @@ void check_result(T result,T optimal,T2 aproximation_ratio,Comparator comp = Com
     );
 };
 
-template<typename T,typename T2,typename Comaparator=paal::utils::LessEqual>
-void check_result_compare_to_bound(T result,T upper_bound_for_optimal,T2 aproximation_ratio,Comaparator comp = paal::utils::LessEqual(),
+template<typename T,typename T2,typename Comaparator=paal::utils::less_equal>
+void check_result_compare_to_bound(T result,T upper_bound_for_optimal,T2 aproximation_ratio,Comaparator comp = paal::utils::less_equal(),
                   T eps=0,
                   std::string ub="Solution is not better than: ",
                   std::string apr_ratio="Aproxmimation ratio is not worst than: "){

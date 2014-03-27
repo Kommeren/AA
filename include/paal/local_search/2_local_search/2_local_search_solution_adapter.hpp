@@ -19,17 +19,17 @@ namespace two_local_search {
      *
      * @tparam Cycle
      */
-template < typename Cycle> class TwoLocalSearchAdapter  {
+template < typename Cycle> class two_local_search_adapter  {
     public:
-        typedef typename Cycle::VertexIterator VertexIterator;
-        typedef data_structures::VertexToEdgeIterator<VertexIterator> Iterator;
+        typedef typename Cycle::vertex_iterator vertex_iterator;
+        typedef data_structures::vertex_to_edge_iterator<vertex_iterator> Iterator;
 
         /**
          * @brief constructor
          *
          * @param cm
          */
-        TwoLocalSearchAdapter(Cycle & cm) : m_cycle(cm) {}
+        two_local_search_adapter(Cycle & cm) : m_cycle(cm) {}
 
         /**
          * @brief Edges begin
@@ -37,7 +37,7 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
          * @return
          */
         Iterator begin() const {
-            return data_structures::make_VertexToEdgeIterator(m_cycle.vbegin(), m_cycle.vend());
+            return data_structures::make_vertex_to_edge_iterator(m_cycle.vbegin(), m_cycle.vend());
         }
 
         /**
@@ -47,7 +47,7 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
          */
         Iterator end() const {
             auto end =  m_cycle.vend();
-            return data_structures::make_VertexToEdgeIterator(end, end);
+            return data_structures::make_vertex_to_edge_iterator(end, end);
         }
 
         /**
@@ -55,7 +55,7 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
          *
          * @return
          */
-        Cycle & getCycle() {
+        Cycle & get_cycle() {
             return m_cycle;
         }
 
@@ -64,7 +64,7 @@ template < typename Cycle> class TwoLocalSearchAdapter  {
          *
          * @return
          */
-        const Cycle & getCycle() const {
+        const Cycle & get_cycle() const {
             return m_cycle;
         }
 

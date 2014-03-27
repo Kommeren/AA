@@ -22,15 +22,15 @@ namespace data_structures {
  * @tparam Move
  */
 template <typename Move>
-struct TabuListRememberMove {
+struct tabu_list_remember_move {
 
     /**
-     * @brief TabuListRememberMove constructor
+     * @brief tabu_list_remember_move constructor
      *
      * @param size
      */
-    TabuListRememberMove(unsigned size) :
-        m_size(size), m_forbidenMovesSet(size) {
+    tabu_list_remember_move(unsigned size) :
+        m_size(size), m_forbiden_moves_set(size) {
         }
 
     /**
@@ -42,8 +42,8 @@ struct TabuListRememberMove {
      * @return
      */
     template <typename Solution>
-    bool isTabu(const Solution &, Move move) const {
-        return isTabu(std::move(move));
+    bool is_tabu(const Solution &, Move move) const {
+        return is_tabu(std::move(move));
     }
 
     /**
@@ -54,13 +54,13 @@ struct TabuListRememberMove {
      */
     template <typename Solution>
     void accept(const Solution &, Move move) {
-        assert(!isTabu(move));
-        m_forbidenMovesSet.insert(move);
-        if(m_forbidenMovesFIFO.size() == m_size) {
-            m_forbidenMovesSet.erase(m_forbidenMovesFIFO.front());
-            m_forbidenMovesFIFO.pop_front();
+        assert(!is_tabu(move));
+        m_forbiden_moves_set.insert(move);
+        if(m_forbiden_moves_fifo.size() == m_size) {
+            m_forbiden_moves_set.erase(m_forbiden_moves_fifo.front());
+            m_forbiden_moves_fifo.pop_front();
         }
-        m_forbidenMovesFIFO.push_back(std::move(move));
+        m_forbiden_moves_fifo.push_back(std::move(move));
     }
 
 private:
@@ -71,43 +71,43 @@ private:
      *
      * @return
      */
-    bool isTabu(const Move & move) const {
-        return m_forbidenMovesSet.find(move) != m_forbidenMovesSet.end();
+    bool is_tabu(const Move & move) const {
+        return m_forbiden_moves_set.find(move) != m_forbiden_moves_set.end();
     }
 
     unsigned m_size;
-    std::unordered_set<Move, boost::hash<Move>> m_forbidenMovesSet;
-    std::deque<Move> m_forbidenMovesFIFO;
+    std::unordered_set<Move, boost::hash<Move>> m_forbiden_moves_set;
+    std::deque<Move> m_forbiden_moves_fifo;
 };
 
 /**
  * @brief This Tabu list remember both current solution and move
- *        It is implemented as TabuListRememberMove<pair<Solution, Move>> with nullptr passed as dummy solution
+ *        It is implemented as tabu_list_remember_move<pair<Solution, Move>> with nullptr passed as dummy solution
  *
  * @tparam Solution
  * @tparam Move
  */
 template <typename Solution, typename Move>
-class TabuListRememberSolutionAndMove : TabuListRememberMove<std::pair<Solution, Move>> {
-    typedef TabuListRememberMove<std::pair<Solution, Move>> base;
+class tabu_list_remember_solution_and_move : tabu_list_remember_move<std::pair<Solution, Move>> {
+    typedef tabu_list_remember_move<std::pair<Solution, Move>> base;
 public:
     /**
      * @brief constructor
      *
      * @param size
      */
-    TabuListRememberSolutionAndMove(unsigned size) : base(size) {}
+    tabu_list_remember_solution_and_move(unsigned size) : base(size) {}
 
     /**
-     * @brief isTabu redirects work to base class
+     * @brief is_tabu redirects work to base class
      *
      * @param s
      * @param move
      *
      * @return
      */
-    bool isTabu(Solution s, Move move) const {
-        return base::isTabu(nullptr, std::make_pair(std::move(s), std::move(move)));
+    bool is_tabu(Solution s, Move move) const {
+        return base::is_tabu(nullptr, std::make_pair(std::move(s), std::move(move)));
     }
 
     /**

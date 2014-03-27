@@ -39,25 +39,25 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         std::ifstream ifs(testDir + "/cases/" + fname+".txt");
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_KM(ifs, fac, clients);
+        auto metric = paal::read_orlib_KM(ifs, fac, clients);
 
-        typedef paal::data_structures::Voronoi<decltype(metric)> VorType;
-        typedef paal::data_structures::KMedianSolution
+        typedef paal::data_structures::voronoi<decltype(metric)> VorType;
+        typedef paal::data_structures::k_median_solution
             <VorType> Sol;
-        typedef paal::data_structures::VoronoiTraits<VorType> VT;
+        typedef paal::data_structures::voronoi_traits<VorType> VT;
         typedef typename VorType::GeneratorsSet GSet;
         typedef typename VT::VerticesSet VSet;
         typedef typename Sol::UnchosenFacilitiesSet USet;
         VorType voronoi( GSet{fac.begin(), fac.end()},  VSet(fac.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),fac.size());
-        paal::local_search::k_median::DefaultKMedianComponents<int>::type swap;
+        paal::local_search::k_median::default_k_median_components<int>::type swap;
 
         facility_location_local_search_simple(sol, swap);
 
-        double c = simple_algo::getKMCost(metric, sol);
-        LOGLN("chosen ("<< (sol.getChosenFacilities()).size()<<"):");
-        VSet chosen=sol.getChosenFacilities();
+        double c = simple_algo::get_km_cost(metric, sol);
+        LOGLN("chosen ("<< (sol.get_chosen_facilities()).size()<<"):");
+        VSet chosen=sol.get_chosen_facilities();
         LOG_COPY_RANGE_DEL(chosen," ");
-        check_result(c,opt,5.,paal::utils::LessEqual(),0.01);
+        check_result(c,opt,5.,paal::utils::less_equal(),0.01);
     });
 }

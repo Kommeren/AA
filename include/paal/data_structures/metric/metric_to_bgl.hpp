@@ -23,8 +23,8 @@ namespace data_structures {
      *
      * @tparam Metric
      */
-template <typename Metric>  struct AdjacencyMatrix {
-    typedef data_structures::MetricTraits<Metric> MT;
+template <typename Metric>  struct adjacency_matrix {
+    typedef data_structures::metric_traits<Metric> MT;
     typedef boost::adjacency_matrix<boost::undirectedS, boost::no_property,
                 boost::property<boost::edge_weight_t, typename MT::DistanceType> > type;
 };
@@ -38,11 +38,11 @@ template <typename Metric>  struct AdjacencyMatrix {
   * @param vend
   */
 template <typename Metric, typename VertexIter>
-typename   AdjacencyMatrix<Metric>::type
-metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
-    typedef typename AdjacencyMatrix<Metric>::type Graph;
+typename   adjacency_matrix<Metric>::type
+metric_to_bgl( const Metric & m, VertexIter vbegin, VertexIter vend) {
+    typedef typename adjacency_matrix<Metric>::type Graph;
     const unsigned N = std::distance(vbegin, vend);
-    typedef MetricTraits<Metric> MT;
+    typedef metric_traits<Metric> MT;
     typedef typename MT::VertexType VertexType;
     typedef typename MT::DistanceType Dist;
     Graph g(N);
@@ -72,16 +72,16 @@ metricToBGL( const Metric & m, VertexIter vbegin, VertexIter vend) {
  * @return
  */
 template <typename Metric, typename VertexIter>
- typename   AdjacencyMatrix<Metric>::type
-metricToBGLWithIndex(const Metric & m, VertexIter vbegin, VertexIter vend,
-                     BiMap<typename std::iterator_traits<VertexIter>::value_type> & idx) {
-    typedef data_structures::MetricTraits<Metric> MT;
+ typename   adjacency_matrix<Metric>::type
+metric_to_bgl_with_index(const Metric & m, VertexIter vbegin, VertexIter vend,
+                     bimap<typename std::iterator_traits<VertexIter>::value_type> & idx) {
+    typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::VertexType VertexType;
-    idx = data_structures::BiMap<VertexType>(vbegin, vend);
-    auto  idxMetric = data_structures::make_metricOnIdx(m, idx);
-    auto transLambda = [&](VertexType v) {return idx.getIdx(v);};
-    auto trans = utils::make_AssignableFunctor(transLambda);
-    return metricToBGL(idxMetric, boost::make_transform_iterator(vbegin, trans),
+    idx = data_structures::bimap<VertexType>(vbegin, vend);
+    auto  idxMetric = data_structures::make_metric_on_idx(m, idx);
+    auto transLambda = [&](VertexType v) {return idx.get_idx(v);};
+    auto trans = utils::make_assignable_functor(transLambda);
+    return metric_to_bgl(idxMetric, boost::make_transform_iterator(vbegin, trans),
                                   boost::make_transform_iterator(vend, trans));
 }
 

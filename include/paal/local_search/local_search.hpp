@@ -27,25 +27,25 @@ namespace local_search {
  * @brief this predicates returns true if there is a move with positive gain
  *        and the commit was successful
  */
-struct FindPositivePredicate {
+struct find_positive_predicate {
 
     /**
      * @brief operator()
      *
-     * @tparam ComponentsAndSolution
+     * @tparam componentsAndSolution
      * @param compsAndSol
      *
      * @return
      */
-    template <typename ComponentsAndSolution>
-    bool operator()(ComponentsAndSolution & compsAndSol) const {
+    template <typename componentsAndSolution>
+    bool operator()(componentsAndSolution & compsAndSol) const {
         auto & solution = compsAndSol.second;
         auto & comps = compsAndSol.first;
 
-        using MoveRef = typename MoveType<puretype(comps), puretype(solution)>::reference;
+        using MoveRef = typename move_type<puretype(comps), puretype(solution)>::reference;
 
-        decltype(comps.template call<GetMoves>(solution))
-            adjustmentSet = comps.template call<GetMoves>(solution);
+        decltype(comps.template call<get_moves>(solution))
+            adjustmentSet = comps.template call<get_moves>(solution);
 
         for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
             if(comps.template call<Gain>(solution, move) > 0) {
@@ -62,9 +62,9 @@ struct FindPositivePredicate {
 
 
 /**
- * @brief This strategy uses FindPositivePredicate as stop condition
+ * @brief This strategy uses find_positive_predicate as stop condition
  */
-struct ChooseFirstBetterStrategy {
+struct choose_first_better_strategy {
     /**
      * @brief operator()
      *
@@ -78,7 +78,7 @@ struct ChooseFirstBetterStrategy {
             return m_satisfy(m_pred, join);
         }
     private:
-    FindPositivePredicate m_pred;
+    find_positive_predicate m_pred;
     data_structures::Satisfy m_satisfy;
 };
 
@@ -86,12 +86,12 @@ struct ChooseFirstBetterStrategy {
 /**
  * @brief functor used in fold on StaticLazyJoin in order to find the most improving move.
  */
-struct MaxFunctor {
+struct max_functor {
 
     /**
      * @brief operator()
      *
-     * @tparam ComponentsAndSolution
+     * @tparam componentsAndSolution
      * @tparam AccumulatorFunctor
      * @tparam AccumulatorData
      * @tparam Continuation
@@ -102,12 +102,12 @@ struct MaxFunctor {
      *
      * @return
      */
-    template <typename ComponentsAndSolution,
+    template <typename componentsAndSolution,
               typename AccumulatorFunctor,
               typename AccumulatorData,
               typename Continuation>
                  bool operator()(
-                        ComponentsAndSolution & compsAndSol,
+                        componentsAndSolution & compsAndSol,
                         AccumulatorFunctor accumulatorFunctor,
                         AccumulatorData accumulatorData,
                         Continuation continuation
@@ -115,11 +115,11 @@ struct MaxFunctor {
         auto & comps = compsAndSol.first;
         auto  & solution = compsAndSol.second;
 
-        using Move = typename MoveType<puretype(comps), puretype(solution)>::value_type;
-        using MoveRef = typename MoveType<puretype(comps), puretype(solution)>::reference;
+        using Move = typename move_type<puretype(comps), puretype(solution)>::value_type;
+        using MoveRef = typename move_type<puretype(comps), puretype(solution)>::reference;
 
-        decltype(comps.template call<GetMoves>(solution))
-            adjustmentSet = comps.template call<GetMoves>(solution);
+        decltype(comps.template call<get_moves>(solution))
+            adjustmentSet = comps.template call<get_moves>(solution);
 
         if(boost::empty(adjustmentSet)) {
             return continuation(accumulatorFunctor, accumulatorData);
@@ -151,7 +151,7 @@ struct MaxFunctor {
 /**
  * @brief This strategy chooses the best possible move and applies it to the solution
  */
-struct SteepestSlopeStrategy {
+struct steepest_slope_strategy {
     /**
      * @brief operator()
      *
@@ -163,31 +163,31 @@ struct SteepestSlopeStrategy {
     template <typename SearchJoin>
     bool operator()(SearchJoin & join) const {
         return m_fold(m_fun
-                , utils::ReturnFalseFunctor{}
+                , utils::return_false_functor{}
                 , 0
                 , join
                 );
     }
 private:
-    MaxFunctor m_fun;
-    data_structures::PolymorficFold m_fold;
+    max_functor m_fun;
+    data_structures::polymorfic_fold m_fold;
 };
 
 namespace detail {
 
 template <typename Solution,
-          typename... SearchComponentsPack>
-struct LocalSearchConsepts;
+          typename... search_componentsPack>
+struct local_search_consepts;
 
 template <typename Solution,
-          typename SearchComponents, typename... SearchComponentsPack>
-struct LocalSearchConsepts<Solution, SearchComponents, SearchComponentsPack...> :
-    public LocalSearchConsepts<Solution, SearchComponentsPack...>{
-    BOOST_CONCEPT_ASSERT((concepts::SearchComponents<SearchComponents, Solution>));
+          typename search_components, typename... search_componentsPack>
+struct local_search_consepts<Solution, search_components, search_componentsPack...> :
+    public local_search_consepts<Solution, search_componentsPack...>{
+    BOOST_CONCEPT_ASSERT((concepts::search_components<search_components, Solution>));
 };
 
 template <typename Solution>
-struct LocalSearchConsepts<Solution>{
+struct local_search_consepts<Solution>{
 
     /**
      * @brief dummy member to avoid warnings
@@ -211,29 +211,29 @@ template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
           typename Solution,
-          typename... Components>
+          typename... components>
 bool local_search(
             Solution & solution
           , SearchStrategy searchStrategy
           , PostSearchAction psa
           , GlobalStopCondition gsc
-          , Components... components) {
-    detail::LocalSearchConsepts<Solution, Components...> concepts;
+          , components... comps) {
+    detail::local_search_consepts<Solution, components...> concepts;
     concepts.use();
 
 
-    using SearchComponentsVector = boost::fusion::vector<std::pair<Components, Solution &>...>;
+    using search_componentsVector = boost::fusion::vector<std::pair<components, Solution &>...>;
 
-    SearchComponentsVector searchComponentsVector(
-            std::pair<Components, Solution &>(std::move(components), solution)...);
+    search_componentsVector searchcomponentsVector(
+            std::pair<components, Solution &>(std::move(comps), solution)...);
 
-    if(!searchStrategy(searchComponentsVector)) {
+    if(!searchStrategy(searchcomponentsVector)) {
         return false;
     }
 
     if(!gsc(solution)) {
         psa(solution);
-        while(searchStrategy(searchComponentsVector) && !gsc(solution)) {
+        while(searchStrategy(searchcomponentsVector) && !gsc(solution)) {
             psa(solution);
         }
     }
@@ -249,10 +249,10 @@ bool local_search(
  * @return true if the solution is improved
  */
 template <typename Solution,
-          typename... Components>
-bool local_search_simple(Solution & solution, Components... components) {
-    return local_search(solution, ChooseFirstBetterStrategy{},
-            utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components)...);
+          typename... components>
+bool local_search_simple(Solution & solution, components... comps) {
+    return local_search(solution, choose_first_better_strategy{},
+            utils::skip_functor(), utils::return_false_functor(), std::move(comps)...);
 }
 
 

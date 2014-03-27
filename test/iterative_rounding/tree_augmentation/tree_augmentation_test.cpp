@@ -16,15 +16,15 @@ using namespace  paal;
 using namespace  paal::ir;
 using namespace  boost;
 
-struct LogVisitor : public TrivialVisitor {
+struct log_visitor : public trivial_visitor {
 
     template <typename LP>
-    void roundCol(LP & lp, int col, double val) {
+    void round_col(LP & lp, int col, double val) {
         LOGLN("Column "<< col << " rounded to " << val);
     }
 
     template <typename LP>
-    void relaxRow(LP & lp, int row) {
+    void relax_row(LP & lp, int row) {
         LOGLN("Relax row " << row);
     }
 };
@@ -40,7 +40,7 @@ typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
 typedef graph_traits < Graph >::edge_descriptor Edge;
 
 template <typename Graph, typename TreeMap, typename Cost>
-Edge addEdge(Graph & g,  int u, int v,
+Edge add_edge_to_graph(Graph & g,  int u, int v,
         TreeMap tree, bool inT,
         Cost & cost, double c) {
     bool b;
@@ -65,21 +65,21 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
-    addEdge(g, 0, 1, treeMap, true, cost, 0);
-    addEdge(g, 1, 2, treeMap, true, cost, 0);
-    addEdge(g, 1, 3, treeMap, true, cost, 0);
-    addEdge(g, 3, 4, treeMap, true, cost, 0);
-    addEdge(g, 3, 5, treeMap, true, cost, 0);
-    addEdge(g, 0, 3, treeMap, false, cost, 1);
-    addEdge(g, 0, 2, treeMap, false, cost, 1);
-    addEdge(g, 2, 4, treeMap, false, cost, 1);
-    addEdge(g, 2, 5, treeMap, false, cost, 1);
-    addEdge(g, 4, 5, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 0, 3, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 0, 2, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 2, 4, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 2, 5, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 4, 5, treeMap, false, cost, 1);
 
     SolutionTree solutionTree;
 
-    auto treeaug(make_TreeAug(g, std::inserter(solutionTree, solutionTree.begin())));
-    paal::ir::solve_iterative_rounding(treeaug, paal::ir::TreeAugmentationIRComponents<>());
+    auto treeaug(make_tree_aug(g, std::inserter(solutionTree, solutionTree.begin())));
+    paal::ir::solve_iterative_rounding(treeaug, paal::ir::tree_augmentationIRcomponents<>());
     BOOST_CHECK(!solutionTree.empty());
 }
 
@@ -106,9 +106,9 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
 
     {
         SolutionTree solutionTree;
-        auto treeaug(make_TreeAug(g, boost::edge_color_map(treeMap).weight_map(cost),
+        auto treeaug(make_tree_aug(g, boost::edge_color_map(treeMap).weight_map(cost),
                 std::inserter(solutionTree, solutionTree.begin())));
-        paal::ir::solve_iterative_rounding(treeaug, paal::ir::TreeAugmentationIRComponents<>());
+        paal::ir::solve_iterative_rounding(treeaug, paal::ir::tree_augmentationIRcomponents<>());
         BOOST_CHECK(!solutionTree.empty());
     }
     {
@@ -120,10 +120,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     }
 }
 
-void runInvalidTest(const Graph & g){
+void run_invalid_test(const Graph & g){
     SolutionTree solutionTree;
-    auto treeaug(make_TreeAug(g, std::back_inserter(solutionTree)));
-    auto invalid = treeaug.checkInputValidity();
+    auto treeaug(make_tree_aug(g, std::back_inserter(solutionTree)));
+    auto invalid = treeaug.check_input_validity();
 
     BOOST_CHECK(invalid);
     LOGLN(*invalid);
@@ -136,13 +136,13 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
-    addEdge(g, 0, 1, treeMap, true, cost, 0);
-    addEdge(g, 1, 2, treeMap, true, cost, 0);
-    addEdge(g, 1, 3, treeMap, false, cost, 0);
-    addEdge(g, 3, 4, treeMap, false, cost, 0);
-    addEdge(g, 3, 5, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 3, 4, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 3, 5, treeMap, false, cost, 0);
 
-    runInvalidTest(g);
+    run_invalid_test(g);
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
@@ -152,16 +152,16 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
-    addEdge(g, 0, 1, treeMap, true, cost, 0);
-    addEdge(g, 1, 2, treeMap, true, cost, 0);
-    addEdge(g, 1, 3, treeMap, false, cost, 0);
-    addEdge(g, 3, 4, treeMap, true, cost, 0);
-    addEdge(g, 3, 5, treeMap, true, cost, 0);
-    addEdge(g, 1, 4, treeMap, false, cost, 0);
-    addEdge(g, 5, 4, treeMap, true, cost, 0);
-    addEdge(g, 2, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 4, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 5, 4, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 2, 3, treeMap, false, cost, 0);
 
-    runInvalidTest(g);
+    run_invalid_test(g);
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
@@ -171,16 +171,16 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
-    addEdge(g, 0, 1, treeMap, true, cost, 0);
-    addEdge(g, 1, 2, treeMap, true, cost, 0);
-    addEdge(g, 1, 3, treeMap, true, cost, 0);
-    addEdge(g, 3, 4, treeMap, true, cost, 0);
-    addEdge(g, 3, 5, treeMap, true, cost, 0);
-    addEdge(g, 1, 4, treeMap, false, cost, 0);
-    addEdge(g, 5, 4, treeMap, false, cost, 0);
-    addEdge(g, 2, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
+    add_edge_to_graph(g, 1, 4, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 5, 4, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 2, 3, treeMap, false, cost, 0);
 
-    runInvalidTest(g);
+    run_invalid_test(g);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

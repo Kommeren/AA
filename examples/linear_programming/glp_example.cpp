@@ -14,48 +14,48 @@ int main() {
         // sample problem
         paal::lp::GLP lpInstance;
 
-        lpInstance.setMaxObjFun();
-        auto colX = lpInstance.addColumn(500);
-        auto colY = lpInstance.addColumn(300);
-        auto row1 = lpInstance.addRow(paal::lp::DB, 7, 10);
-        auto row2 = lpInstance.addRow(paal::lp::UP, 0, 1200);
-        lpInstance.addConstraintCoef(row1, colX);
-        lpInstance.addConstraintCoef(row1, colY);
-        lpInstance.addConstraintCoef(row2, colX, 200);
-        lpInstance.addConstraintCoef(row2, colY, 100);
-        lpInstance.loadMatrix();
+        lpInstance.set_max_obj_fun();
+        auto colX = lpInstance.add_column(500);
+        auto colY = lpInstance.add_column(300);
+        auto row1 = lpInstance.add_row(paal::lp::DB, 7, 10);
+        auto row2 = lpInstance.add_row(paal::lp::UP, 0, 1200);
+        lpInstance.add_constraint_coef(row1, colX);
+        lpInstance.add_constraint_coef(row1, colY);
+        lpInstance.add_constraint_coef(row2, colX, 200);
+        lpInstance.add_constraint_coef(row2, colY, 100);
+        lpInstance.load_matrix();
 
         // solve it
-        auto status = lpInstance.solveToExtremePointPrimal();
+        auto status = lpInstance.solve_to_extreme_point_primal();
 
         if (status == paal::lp::OPTIMAL) {
-            std::cout << "Optimal solution cost: " << lpInstance.getObjValue() << std::endl;
-            std::cout << "X = " << lpInstance.getColPrim(colX) << std::endl;
-            std::cout << "Y = " << lpInstance.getColPrim(colY) << std::endl;
+            std::cout << "Optimal solution cost: " << lpInstance.get_obj_value() << std::endl;
+            std::cout << "X = " << lpInstance.get_col_prim(colX) << std::endl;
+            std::cout << "Y = " << lpInstance.get_col_prim(colY) << std::endl;
         }
         else {
             std::cout << "Optimal solution not found" << std::endl;
         }
 
         // add new row
-        lpInstance.addRow(paal::lp::UP, 0, 12);
-        lpInstance.addNewRowCoef(colX);
-        lpInstance.addNewRowCoef(colY, 2);
-        lpInstance.loadNewRow();
+        lpInstance.add_row(paal::lp::UP, 0, 12);
+        lpInstance.add_new_row_coef(colX);
+        lpInstance.add_new_row_coef(colY, 2);
+        lpInstance.load_new_row();
 
         // resolve it
-        status = lpInstance.resolveToExtremePointDual();
+        status = lpInstance.resolve_to_extreme_point_dual();
 
         if (status == paal::lp::OPTIMAL) {
-            std::cout << "Optimal solution cost: " << lpInstance.getObjValue() << std::endl;
-            std::cout << "X = " << lpInstance.getColPrim(colX) << std::endl;
-            std::cout << "Y = " << lpInstance.getColPrim(colY) << std::endl;
+            std::cout << "Optimal solution cost: " << lpInstance.get_obj_value() << std::endl;
+            std::cout << "X = " << lpInstance.get_col_prim(colX) << std::endl;
+            std::cout << "Y = " << lpInstance.get_col_prim(colY) << std::endl;
         }
         else {
             std::cout << "Optimal solution not found" << std::endl;
         }
     }
-    paal::lp::GLP::freeEnv();
+    paal::lp::GLP::free_env();
 //! [GLP Example]
 
     return 0;

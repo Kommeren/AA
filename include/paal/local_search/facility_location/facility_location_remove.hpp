@@ -30,7 +30,7 @@ namespace facility_location {
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationGainRemove {
+class facility_location_gain_remove {
 public:
     /**
      * @brief operator()
@@ -44,13 +44,13 @@ public:
         template <typename Solution, typename ChosenElement>
     auto operator()(Solution & s,
             ChosenElement e) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist {
+                typename data_structures::facility_location_solution_traits<puretype(s.getfacility_location_solution())>::Dist {
 
-        typename data_structures::FacilityLocationSolutionTraits<puretype(s.getFacilityLocationSolution())>::Dist ret, back;
+        typename data_structures::facility_location_solution_traits<puretype(s.getfacility_location_solution())>::Dist ret, back;
 
-        ret = s.removeFacilityTentative(e);
+        ret = s.remove_facility_tentative(e);
         //TODO for capacitated version we should  just restart copy
-        back = s.addFacilityTentative(e);
+        back = s.add_facility_tentative(e);
         assert(ret == -back);
         return -ret;
     }
@@ -62,7 +62,7 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-class FacilityLocationCommitRemove {
+class facility_location_commit_remove {
 public:
     /**
      * @brief operator()
@@ -75,7 +75,7 @@ public:
     bool operator()(
             Solution & s,
             ChosenElement e) {
-        s.removeFacility(e);
+        s.remove_facility(e);
         return true;
     }
 };
@@ -86,7 +86,7 @@ public:
  * @tparam VertexType
  */
 template <typename VertexType>
-struct FacilityLocationGetMovesRemove {
+struct facility_locationget_moves_remove {
     /**
      * @brief operator()
      *

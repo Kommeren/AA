@@ -15,12 +15,12 @@ struct T {
     typedef std::pair<string, string> P;
 };
 
-class CheckAllSizes : public T {
+class check_all_sizes : public T {
     public:
-        CheckAllSizes(iter begin) : m_begin(begin)  {}
+        check_all_sizes(iter begin) : m_begin(begin)  {}
         void operator()(iter end) {
-            VertexToEdgeIterator<iter> b(m_begin, end);
-            VertexToEdgeIterator<iter> e(end, end);
+            vertex_to_edge_iterator<iter> b(m_begin, end);
+            vertex_to_edge_iterator<iter> e(end, end);
             BOOST_CHECK_EQUAL(std::distance(b, e), std::distance(m_begin, end));
         }
 
@@ -36,7 +36,7 @@ template  <typename I> void  pe(I b, I e) {
     }
 }
 
-template <typename I1, typename I2> bool vecEquals(I1 b1, I1 e1, I2 b2, I2 e2) {
+template <typename I1, typename I2> bool vec_equals(I1 b1, I1 e1, I2 b2, I2 e2) {
     if(std::distance(b1, e1) != std::distance(b2, e2)) {
         return false;
     }
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(iterator_size) {
     T::iter i = v.begin();
     T::iter end = v.end();
 
-    CheckAllSizes c(v.begin());
+    check_all_sizes c(v.begin());
     for(; i!= end; ++i ) {
         c(i);
     }
@@ -62,8 +62,8 @@ BOOST_AUTO_TEST_CASE(iterator_size) {
 BOOST_AUTO_TEST_CASE(iterator_valid) {
     std::vector<T::P> sol = {T::P("1","2"), T::P("2", "3"), T::P("3","1")};
     auto end = v.begin() + 3;
-    BOOST_CHECK(vecEquals(sol.begin(), sol.end(),
-                VertexToEdgeIterator<T::iter>(v.begin(), end),
-                VertexToEdgeIterator<T::iter>(end, end)));
+    BOOST_CHECK(vec_equals(sol.begin(), sol.end(),
+                vertex_to_edge_iterator<T::iter>(v.begin(), end),
+                vertex_to_edge_iterator<T::iter>(end, end)));
 }
 

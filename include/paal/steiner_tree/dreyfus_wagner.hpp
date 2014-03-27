@@ -22,9 +22,9 @@ namespace steiner_tree {
  * The algorithm finds optimal Steiner Tree in exponential time, 3^k * n.
  */
 template<typename Metric, typename Terminals, typename NonTerminals, unsigned int TerminalsLimit = 32>
-class DreyfusWagner {
+class dreyfus_wagner {
 public:
-    typedef data_structures::MetricTraits<Metric> MT;
+    typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::VertexType Vertex;
     typedef typename MT::DistanceType Dist;
     typedef typename std::pair<Vertex, Vertex> Edge;
@@ -34,11 +34,11 @@ public:
     /**
      * Constructor used for solving Steiner Tree problem.
      */
-    DreyfusWagner(const Metric & costMap, const Terminals & term, const NonTerminals & nonTerminals) :
-            m_costMap(costMap), m_terminals(term), m_nonTerminals(nonTerminals) {
+    dreyfus_wagner(const Metric & costMap, const Terminals & term, const NonTerminals & nonTerminals) :
+            m_cost_map(costMap), m_terminals(term), m_non_terminals(nonTerminals) {
 
         for (int i = 0; i < (int)m_terminals.size(); i++) {
-            m_elementsMap[m_terminals[i]] = i;
+            m_elements_map[m_terminals[i]] = i;
         }
     }
 
@@ -47,7 +47,7 @@ public:
      * @param start Vertex to start the recurrence from.
      */
     void solve(int start = 0) {
-        int n = m_elementsMap.size();
+        int n = m_elements_map.size();
         assert(start >= 0 && start < n);
         TerminalsBitSet remaining;
         // set all terminals except 'start' to 1
@@ -56,30 +56,30 @@ public:
         }
         remaining.reset(start);
 
-        m_cost = connectVertex(m_terminals[start], remaining);
-        retrieveSolutionConnect(m_terminals[start], remaining);
+        m_cost = connect_vertex(m_terminals[start], remaining);
+        retrieve_solution_connect(m_terminals[start], remaining);
 
     }
 
     /**
      * Gets the optimal Steiner Tree cost.
      */
-    Dist getCost() {
+    Dist get_cost() {
         return m_cost;
     }
 
     /**
      * Gets edges belonging to optimal tree.
      */
-    const std::vector<Edge> & getEdges() {
+    const std::vector<Edge> & get_edges() {
         return m_edges;
     }
 
     /**
      * Gets selected Steiner vertices.
      */
-    const std::set<Vertex> & steinerTreeZelikovsky11per6approximation() {
-        return m_steinerElements;
+    const std::set<Vertex> & steiner_tree_zelikovsky11per6approximation() {
+        return m_steiner_elements;
     }
 
 private:
@@ -88,38 +88,38 @@ private:
      * @param v vertex currently processed
      * @param mask vertices not yet processed has corresponding bits set to 1
      */
-    Dist connectVertex(Vertex v, TerminalsBitSet remaining) {
+    Dist connect_vertex(Vertex v, TerminalsBitSet remaining) {
         if (remaining.none()) {
             return 0;
         }
         if (remaining.count() == 1) {
-            int k = smallestBit(remaining);
-            Dist cost = m_costMap(v, m_terminals[k]);
-            m_bestCand[codeState(v, remaining)] = std::make_pair(cost, m_terminals[k]);
+            int k = smallest_bit(remaining);
+            Dist cost = m_cost_map(v, m_terminals[k]);
+            m_best_cand[code_state(v, remaining)] = std::make_pair(cost, m_terminals[k]);
             return cost;
         }
         // Check in the map if already computed
-        if (m_bestCand.find(codeState(v, remaining)) != m_bestCand.end()) {
-            return m_bestCand[codeState(v, remaining)].first;
+        if (m_best_cand.find(code_state(v, remaining)) != m_best_cand.end()) {
+            return m_best_cand[code_state(v, remaining)].first;
         }
-        Dist best = splitVertex(v, remaining);
+        Dist best = split_vertex(v, remaining);
         Vertex cand = v;
 
-        for (Vertex w: m_nonTerminals) {
-            Dist val = splitVertex(w, remaining);
-            val += m_costMap(v, w);
+        for (Vertex w: m_non_terminals) {
+            Dist val = split_vertex(w, remaining);
+            val += m_cost_map(v, w);
             if (best < 0 || val < best) {
                 best = val;
                 cand = w;
             }
         }
-        for (auto vertexAndTerminalId: m_elementsMap) {
+        for (auto vertexAndTerminalId: m_elements_map) {
             Vertex w = vertexAndTerminalId.first;
             int terminalId = vertexAndTerminalId.second;
             if (!remaining.test(terminalId)) continue;
             remaining.reset(terminalId);
-            Dist val = connectVertex(w, remaining);
-            val += m_costMap(v, w);
+            Dist val = connect_vertex(w, remaining);
+            val += m_cost_map(v, w);
             remaining.set(terminalId);
 
             if (best < 0 || val < best) {
@@ -127,35 +127,35 @@ private:
                 cand = w;
             }
         }
-        m_bestCand[codeState(v, remaining)] = std::make_pair(best, cand);
+        m_best_cand[code_state(v, remaining)] = std::make_pair(best, cand);
         return best;
     }
 
     /**
      * @brief Computes minimal cost by splitting the tree in two parts.
      */
-    Dist splitVertex(Vertex v, TerminalsBitSet remaining) {
+    Dist split_vertex(Vertex v, TerminalsBitSet remaining) {
         if (remaining.count() < 2) {
             return 0;
         }
         // Check in the map if already computed
-        if (m_bestSplit.find(codeState(v, remaining)) != m_bestSplit.end()) {
-            return m_bestSplit[codeState(v, remaining)].first;
+        if (m_best_split.find(code_state(v, remaining)) != m_best_split.end()) {
+            return m_best_split[code_state(v, remaining)].first;
         }
-        int k = smallestBit(remaining) + 1; // optimalization, to avoid checking subset twice
-        std::pair<Dist, TerminalsBitSet> best = bestSplit(v, remaining, remaining, k);
-        m_bestSplit[codeState(v, remaining)] = best;
+        int k = smallest_bit(remaining) + 1; // optimalization, to avoid checking subset twice
+        std::pair<Dist, TerminalsBitSet> best = best_split(v, remaining, remaining, k);
+        m_best_split[code_state(v, remaining)] = best;
         return best.first;
     }
 
     /**
      * Generates all splits of given set of vertices and finds the best one.
      */
-    std::pair<Dist, TerminalsBitSet> bestSplit(const Vertex v, const TerminalsBitSet remaining, TerminalsBitSet subset, int k) {
+    std::pair<Dist, TerminalsBitSet> best_split(const Vertex v, const TerminalsBitSet remaining, TerminalsBitSet subset, int k) {
         if (k == (int)m_terminals.size()) {
             TerminalsBitSet complement = remaining ^ subset;
             if (!subset.none() && !complement.none()) {
-                Dist val = connectVertex(v, subset) + connectVertex(v, complement);
+                Dist val = connect_vertex(v, subset) + connect_vertex(v, complement);
                 return make_pair(val, subset);
             }
             else {
@@ -163,10 +163,10 @@ private:
             }
         } else {
             std::pair<Dist, TerminalsBitSet> ret1, ret2;
-            ret1 = bestSplit(v, remaining, subset, k + 1);
+            ret1 = best_split(v, remaining, subset, k + 1);
             if (remaining.test(k)) {
                 subset.flip(k);
-                ret2 = bestSplit(v, remaining, subset, k + 1);
+                ret2 = best_split(v, remaining, subset, k + 1);
                 if (ret1.first < 0 || ret1.first > ret2.first) {
                     ret1 = ret2;
                 }
@@ -176,42 +176,42 @@ private:
     }
 
     /**
-     * Retrieves the path of the optimal solution returned by connectVertex method.
+     * Retrieves the path of the optimal solution returned by connect_vertex method.
      */
-    void retrieveSolutionConnect(Vertex v, TerminalsBitSet remaining) {
+    void retrieve_solution_connect(Vertex v, TerminalsBitSet remaining) {
         if (remaining.none())
             return;
-        Vertex next = m_bestCand.at(codeState(v, remaining)).second;
+        Vertex next = m_best_cand.at(code_state(v, remaining)).second;
 
-        auto terminalIdIter = m_elementsMap.find(next);
+        auto terminalIdIter = m_elements_map.find(next);
         if (v == next) { // called wagner directly from dreyfus
-            retrieveSolutionSplit(next, remaining);
-        } else if (terminalIdIter == m_elementsMap.end()) { // nonterminal
-            addVertex(next);
-            addEdge(v, next);
-            retrieveSolutionSplit(next, remaining);
+            retrieve_solution_split(next, remaining);
+        } else if (terminalIdIter == m_elements_map.end()) { // nonterminal
+            add_vertex_to_graph(next);
+            add_edge_to_graph(v, next);
+            retrieve_solution_split(next, remaining);
         } else { // terminal
-            addEdge(v, next);
+            add_edge_to_graph(v, next);
             remaining.flip(terminalIdIter->second);
-            retrieveSolutionConnect(next, remaining);
+            retrieve_solution_connect(next, remaining);
         }
     }
 
     /**
-     * Retrieves the path of the optimal solution returned by splitVertex method.
+     * Retrieves the path of the optimal solution returned by split_vertex method.
      */
-    void retrieveSolutionSplit(Vertex v, TerminalsBitSet remaining) {
+    void retrieve_solution_split(Vertex v, TerminalsBitSet remaining) {
         if (remaining.none())
             return;
-        TerminalsBitSet split = m_bestSplit.at(codeState(v, remaining)).second;
-        retrieveSolutionConnect(v, split);
-        retrieveSolutionConnect(v, remaining ^ split);
+        TerminalsBitSet split = m_best_split.at(code_state(v, remaining)).second;
+        retrieve_solution_connect(v, split);
+        retrieve_solution_connect(v, remaining ^ split);
     }
 
     /**
      * Codes current state to the structure that fits as the map key.
      */
-    State codeState(Vertex v, TerminalsBitSet remaining) {
+    State code_state(Vertex v, TerminalsBitSet remaining) {
         // TODO: can be optimized
         return std::make_pair(v, remaining);
     }
@@ -219,7 +219,7 @@ private:
     /**
      * Hash function for State, used in unordered_maps.
      */
-    struct StateHash {
+    struct state_hash {
         std::size_t operator()(const State& k) const {
             return std::hash<Vertex>()(k.first) ^
                 (std::hash<TerminalsBitSet>()(k.second) << 1);
@@ -229,7 +229,7 @@ private:
     /**
      * Adds the edge to the solution.
      */
-    void addEdge(Vertex u, Vertex w) {
+    void add_edge_to_graph(Vertex u, Vertex w) {
         Edge e = std::make_pair(u, w);
         m_edges.push_back(e);
     }
@@ -237,38 +237,38 @@ private:
     /**
      * Adds Steiner vertex to the solution.
      */
-    void addVertex(Vertex v) {
-        m_steinerElements.insert(v);
+    void add_vertex_to_graph(Vertex v) {
+        m_steiner_elements.insert(v);
     }
 
     /**
      * Finds the index of the first nonempty bit in given mask.
      */
-    int smallestBit(TerminalsBitSet mask) {
+    int smallest_bit(TerminalsBitSet mask) {
         int k = 0;
         while (!mask.test(k)) k++;
         return k;
     }
 
-    const Metric& m_costMap; // stores the cost for each edge
+    const Metric& m_cost_map; // stores the cost for each edge
     const Terminals& m_terminals; // terminals to be connected
-    const NonTerminals& m_nonTerminals; // list of all non-terminals
+    const NonTerminals& m_non_terminals; // list of all non-terminals
 
     Dist m_cost; // cost of optimal Steiner Tree
-    std::set<Vertex> m_steinerElements; // non-terminals selected for spanning tree
+    std::set<Vertex> m_steiner_elements; // non-terminals selected for spanning tree
     std::vector<Edge> m_edges; // edges spanning the component
 
-    std::unordered_map<Vertex, int> m_elementsMap; // maps Vertex to position in m_terminals vector
+    std::unordered_map<Vertex, int> m_elements_map; // maps Vertex to position in m_terminals vector
     typedef std::pair<Dist, Vertex> StateV;
     typedef std::pair<Dist, TerminalsBitSet> StateBM;
-    std::unordered_map<State, StateV, StateHash> m_bestCand; // stores result of dreyfus method for given state
-    std::unordered_map<State, StateBM, StateHash> m_bestSplit; // stores result of wagner method for given state
+    std::unordered_map<State, StateV, state_hash> m_best_cand; // stores result of dreyfus method for given state
+    std::unordered_map<State, StateBM, state_hash> m_best_split; // stores result of wagner method for given state
 };
 
 template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals, typename NonTerminals>
-DreyfusWagner<Metric, Terminals, NonTerminals, TerminalsLimit>
-make_DreyfusWagner(const Metric& metric, const Terminals& terminals, const NonTerminals& nonTerminals) {
-    return DreyfusWagner<Metric, Terminals, NonTerminals, TerminalsLimit>(metric, terminals, nonTerminals);
+dreyfus_wagner<Metric, Terminals, NonTerminals, TerminalsLimit>
+make_dreyfus_wagner(const Metric& metric, const Terminals& terminals, const NonTerminals& nonTerminals) {
+    return dreyfus_wagner<Metric, Terminals, NonTerminals, TerminalsLimit>(metric, terminals, nonTerminals);
 }
 
 } // steiner_tree

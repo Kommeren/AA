@@ -19,7 +19,7 @@
 #include "utils/test_result_check.hpp"
 
 template <typename Edge>
-struct EdgeFilter{
+struct edge_filter{
     bool operator()(Edge e) const {
         return edges.find(e) != edges.end();
     }
@@ -28,18 +28,18 @@ struct EdgeFilter{
 
 BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
 
-    std::vector<paal::SteinerTreeTest> data;
+    std::vector<paal::steiner_tree_test> data;
     LOGLN("READING INPUT...");
-    readSTEINLIBtests(data);
-    for (paal::SteinerTreeTest& test : data) {
-        LOGLN("TEST " << test.testName);
+    read_steinlib_tests(data);
+    for (paal::steiner_tree_test& test : data) {
+        LOGLN("TEST " << test.test_name);
         LOGLN("OPT " << test.optimal);
 
         auto const & g = test.graph;
         auto N = num_vertices(g);
         typedef puretype(g) Graph;
         typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-        EdgeFilter<Edge> eFilter;
+        edge_filter<Edge> eFilter;
 
         paal::steiner_tree_greedy(g, std::inserter(eFilter.edges, eFilter.edges.begin()));
 
@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
         LOGLN("chosen edges:");
         LOG_COPY_RANGE_DEL(eFilter.edges, "'");
         LOGLN("");
-        boost::filtered_graph<Graph, EdgeFilter<Edge>>
+        boost::filtered_graph<Graph, edge_filter<Edge>>
                  fg(g, eFilter);
 
         std::vector<int> components(N);

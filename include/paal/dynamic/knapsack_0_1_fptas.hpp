@@ -18,7 +18,7 @@ template <typename OutputIterator,
           typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
@@ -26,14 +26,14 @@ knapsack_0_1_on_value_fptas(double epsilon, ObjectsIter oBegin,
         ObjectSizeFunctor size,
         ObjectValueFunctor value) {
     return detail::knapsack_general_on_value_fptas_retrieve(
-              epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::zero_one_tag());
 }
 
 template <typename OutputIterator,
           typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
@@ -41,35 +41,35 @@ knapsack_0_1_on_size_fptas(double epsilon, ObjectsIter oBegin,
         ObjectSizeFunctor size,
         ObjectValueFunctor value) {
     return detail::knapsack_general_on_size_fptas_retrieve(
-              epsilon, oBegin, oEnd, capacity, out, size, value, detail::ZeroOneTag());
+              epsilon, oBegin, oEnd, capacity, out, size, value, detail::zero_one_tag());
 }
 
 template <typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack_0_1_no_output_on_value_fptas(double epsilon, ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size,
         ObjectValueFunctor value) {
-    auto out = boost::make_function_output_iterator(utils::SkipFunctor());
+    auto out = boost::make_function_output_iterator(utils::skip_functor());
     return detail::knapsack_general_on_value_fptas(epsilon, oBegin, oEnd,
-            capacity, out, size, value, detail::ZeroOneTag(), detail::NoRetrieveSolutionTag());
+            capacity, out, size, value, detail::zero_one_tag(), detail::no_retrieve_solution_tag());
 }
 
 template <typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack_0_1_no_output_on_size_fptas(double epsilon, ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         ObjectSizeFunctor size,
         ObjectValueFunctor value) {
-    auto out = boost::make_function_output_iterator(utils::SkipFunctor());
+    auto out = boost::make_function_output_iterator(utils::skip_functor());
     return detail::knapsack_general_on_size_fptas(epsilon, oBegin, oEnd,
-            capacity, out, size, value, detail::ZeroOneTag(), detail::NoRetrieveSolutionTag());
+            capacity, out, size, value, detail::zero_one_tag(), detail::no_retrieve_solution_tag());
 }
 
 } //paal

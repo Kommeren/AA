@@ -22,13 +22,13 @@ namespace data_structures {
  * @tparam T
  */
 template <typename T>
-class SplayCycle {
+class splay_cycle {
     typedef splay_tree::template Iterator<T> SIter;
-    typedef splay_tree::SplayTree<T> SplayTree;
+    typedef splay_tree::splay_tree<T> splay_tree;
 public:
-    typedef CycleIterator<SIter> VIter;
+    typedef cycle_iterator<SIter> VIter;
 
-    SplayCycle() = default;
+    splay_cycle() = default;
 
     /**
      * @brief constructor from range
@@ -38,9 +38,9 @@ public:
      * @param end
      */
     template <typename Iter>
-        SplayCycle(Iter begin, Iter end) :
-            m_splayTree(begin, end),
-            m_size(m_splayTree.size()) {}
+        splay_cycle(Iter begin, Iter end) :
+            m_splay_tree(begin, end),
+            m_size(m_splay_tree.size()) {}
 
     /**
      * @brief vertices begin
@@ -48,7 +48,7 @@ public:
      * @return
      */
     VIter vbegin() const {
-        return VIter(m_splayTree.begin(), m_splayTree.begin(), m_splayTree.end());
+        return VIter(m_splay_tree.begin(), m_splay_tree.begin(), m_splay_tree.end());
     }
 
     /**
@@ -59,9 +59,9 @@ public:
      * @return
      */
     VIter vbegin(const T& t) const {
-        std::size_t i = m_splayTree.getIdx(t);
+        std::size_t i = m_splay_tree.get_idx(t);
         assert(i != std::size_t(-1));
-        return VIter(SIter(m_splayTree.splay(i), &m_splayTree), m_splayTree.begin(), m_splayTree.end());
+        return VIter(SIter(m_splay_tree.splay(i), &m_splay_tree), m_splay_tree.begin(), m_splay_tree.end());
     }
 
     /**
@@ -70,7 +70,7 @@ public:
      * @return
      */
     VIter vend() const {
-        auto e = m_splayTree.end();
+        auto e = m_splay_tree.end();
         return VIter(e, e ,e);
     }
 
@@ -84,20 +84,20 @@ public:
         if(begin == end) {
             return;
         }
-        std::size_t b = m_splayTree.getIdx(begin);
+        std::size_t b = m_splay_tree.get_idx(begin);
         assert(b != std::size_t(-1));
-        std::size_t e = m_splayTree.getIdx(end);
+        std::size_t e = m_splay_tree.get_idx(end);
         assert(e != std::size_t(-1));
         if(b < e) {
-            m_splayTree.reverse(b, e);
+            m_splay_tree.reverse(b, e);
         } else {
-            m_splayTree.reverse(e + 1, b - 1);
-            m_splayTree.reverse(0, m_size-1);
+            m_splay_tree.reverse(e + 1, b - 1);
+            m_splay_tree.reverse(0, m_size-1);
         }
     }
 
 private:
-    SplayTree m_splayTree;
+    splay_tree m_splay_tree;
     const std::size_t m_size;
 };
 

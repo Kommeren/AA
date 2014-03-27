@@ -32,23 +32,23 @@ namespace detail {
                     FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
                     std::pair<ObjectsIterIter, ObjectsIterIter>>
-              getGreedyFill (
+              get_greedy_fill (
                         ObjectsIterIter oBegin,
                         ObjectsIterIter oEnd,
                         FunctorOnIteratorPValue<ObjectSizeFunctor,
                             typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
                         ObjectValueFunctor value,
                         ObjectSizeFunctor size,
-                        ZeroOneTag)
+                        zero_one_tag)
               {
                     typedef typename std::iterator_traits<ObjectsIterIter>::value_type ObjectsIter;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
-                    auto starValue = utils::make_LiftIteratorFunctor(value);
-                    auto starSize = utils::make_LiftIteratorFunctor(size);
+                    auto starValue = utils::make_lift_iterator_functor(value);
+                    auto starSize = utils::make_lift_iterator_functor(size);
                     auto density = make_Density(starValue, starSize);
-                    auto compare = utils::make_FunctorToComparator(density, utils::Greater());
+                    auto compare = utils::make_functor_to_comparator(density, utils::Greater());
 
                     //finding the biggest set elements with the greatest density
                     std::sort(oBegin, oEnd, compare);
@@ -71,10 +71,10 @@ namespace detail {
         template <
           typename ObjectsRange,
           typename OutputIter>
-              void greedyToOutput (
+              void greedy_to_output (
                         ObjectsRange range,
                         OutputIter out,
-                        ZeroOneTag)
+                        zero_one_tag)
               {
                     for(auto obj : boost::make_iterator_range(range)) {
                         *out = *obj;
@@ -88,7 +88,7 @@ template <typename OutputIterator,
           typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack_0_1_two_app(ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
@@ -96,7 +96,7 @@ knapsack_0_1_two_app(ObjectsIter oBegin,
         ObjectValueFunctor value,
         ObjectSizeFunctor size) {
         return detail::knapsack_general_two_app(oBegin, oEnd, capacity,
-                    out, value, size, detail::ZeroOneTag());
+                    out, value, size, detail::zero_one_tag());
     }
 
 }

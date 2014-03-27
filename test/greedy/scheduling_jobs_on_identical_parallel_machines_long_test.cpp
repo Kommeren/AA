@@ -12,37 +12,37 @@
 #include "utils/logger.hpp"
 #include "../utils/scheduling.hpp"
 #include "utils/test_result_check.hpp"
-const long long maxTime=1000000000;
-const long minMachines=10;
-const long maxMachines=1000000;
-const long stepMachines=10;
-const double minJobsOnMachineStart=1.0;
-const double minJobsOnMachineEnd=5.0;
-const double minJobsOnMachineStep=0.33;
+const long long max_time=1000000000;
+const long min_machines=10;
+const long max_machines=1000000;
+const long step_machines=10;
+const double min_jobs_on_machine_start=1.0;
+const double min_jobs_on_machine_end=5.0;
+const double min_jobs_on_machine_step=0.33;
 const long seed=42;
 typedef long long Time;
 
 BOOST_AUTO_TEST_CASE(test_1) {
     std::srand(seed);
-    for(int numberOfMachines=minMachines;
-         numberOfMachines<=maxMachines;
-         numberOfMachines*=stepMachines){
-        for(double minJobsOnMachine=minJobsOnMachineStart;
-                minJobsOnMachine<minJobsOnMachineEnd;
-                minJobsOnMachine+=minJobsOnMachineStep){
+    for(int numberOfMachines=min_machines;
+         numberOfMachines<=max_machines;
+         numberOfMachines*=step_machines){
+        for(double minJobsOnMachine=min_jobs_on_machine_start;
+                minJobsOnMachine<min_jobs_on_machine_end;
+                minJobsOnMachine+=min_jobs_on_machine_step){
             LOGLN("machines: "<<numberOfMachines);
 
             std::vector<int> machines(numberOfMachines);
-            std::vector<Time> jobs = generateJobLoads(machines,minJobsOnMachine,
-               maxTime,paal::utils::ReturnSomethingFunctor<int, 1>());
+            std::vector<Time> jobs = generate_job_loads(machines,minJobsOnMachine,
+               max_time,paal::utils::return_something_functor<int, 1>());
             LOGLN("jobs: "<<jobs.size());
 
             std::vector< std::pair<int, decltype(jobs)::iterator> > result;
 
-            paal::greedy::schedulingJobsOnIdenticalParallelMachines(numberOfMachines,
+            paal::greedy::scheduling_jobs_on_identical_parallel_machines(numberOfMachines,
                      jobs.begin(),jobs.end(),back_inserter(result),
-                     paal::utils::IdentityFunctor());
-            checkJobs(result, jobs);
+                     paal::utils::identity_functor());
+            check_jobs(result, jobs);
             std::vector<Time> sumOfMachine;
             sumOfMachine.resize(numberOfMachines);
             for(auto jobMachinePair:result){

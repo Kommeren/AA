@@ -12,7 +12,7 @@ namespace paal {
 namespace data_structures {
 
 template <typename Bimap>
-struct BiMapTraits;
+struct bimap_traits;
 
 
 } //data_structures

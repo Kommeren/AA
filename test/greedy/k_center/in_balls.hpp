@@ -14,7 +14,7 @@
 namespace paal {
 
 template<typename IT,typename CE, typename Metric,typename Dist>
-void inBalls(const IT& items,const CE& centers,const Metric& metric,Dist radius) {
+void in_balls(const IT& items,const CE& centers,const Metric& metric,Dist radius) {
     static const auto EPSILON = 0.00001;
     for(auto j:items){
         bool inBall=false;

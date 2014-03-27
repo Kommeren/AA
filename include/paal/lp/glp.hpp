@@ -24,10 +24,10 @@ namespace lp {
 
 
 /**
- * @class GLPBase
+ * @class glp_base
  * @brief This class contains member functions needed to initialize the GLPK LP solver.
  */
-class GLPBase {
+class glp_base {
 public:
     /**
      * Constructor.
@@ -36,16 +36,16 @@ public:
      * @param numberOfColumns initial number of columns in the LP instance
      * @param numberOfNonZerosInMatrix number of non-zero values in the initial LP instance matrix
      */
-    GLPBase(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
-            m_lp(glp_create_prob()), m_totalColNr(0), m_totalRowNr(0) {
+    glp_base(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
+            m_lp(glp_create_prob()), m_total_col_nr(0), m_total_row_nr(0) {
         glp_term_out(GLP_OFF);
-        initVec(m_row, numberOfNonZerosInMatrix);
-        initVec(m_col, numberOfNonZerosInMatrix);
-        initVec(m_val, numberOfNonZerosInMatrix);
-        initVec(m_newRowCol);
-        initVec(m_newRowVal);
-        glp_init_smcp(&m_glpkControl);
-        m_glpkControl.msg_lev = GLP_MSG_OFF;
+        init_vec(m_row, numberOfNonZerosInMatrix);
+        init_vec(m_col, numberOfNonZerosInMatrix);
+        init_vec(m_val, numberOfNonZerosInMatrix);
+        init_vec(m_new_row_col);
+        init_vec(m_new_row_val);
+        glp_init_smcp(&m_glpk_control);
+        m_glpk_control.msg_lev = GLP_MSG_OFF;
     }
 
     /**
@@ -54,12 +54,12 @@ public:
      * @param numberOfRows initial number of rows in the LP instance
      * @param numberOfColumns initial number of columns in the LP instance
      */
-    GLPBase(int numberOfRows = 0, int numberOfColumns = 0) : GLPBase(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
+    glp_base(int numberOfRows = 0, int numberOfColumns = 0) : glp_base(numberOfRows, numberOfColumns, numberOfRows * numberOfColumns)  {}
 
     /**
      * Destructor.
      */
-    ~GLPBase() {
+    ~glp_base() {
         glp_delete_prob(m_lp);
     }
 
@@ -67,63 +67,63 @@ public:
      * Frees GLPK resources, common for all LP instances.
      * Should be called after all LP instances are destructed.
      */
-    static void freeEnv() {
+    static void free_env() {
         glp_free_env();
     }
 
     /**
      * Sets the name of the LP instance.
      */
-    void setLPName(const std::string & s){
+    void set_lp_name(const std::string & s){
         glp_set_prob_name(m_lp, s.c_str());
     }
 
     /**
      * Sets the problem to be an minimization problem.
      */
-    void setMinObjFun() {
+    void set_min_obj_fun() {
         glp_set_obj_dir(m_lp, GLP_MIN);
     }
 
     /**
      * Sets the problem to be an maximization problem.
      */
-    void setMaxObjFun() {
+    void set_max_obj_fun() {
         glp_set_obj_dir(m_lp, GLP_MAX);
     }
 
     /**
      * Solves the LP using the primal simplex method.
      */
-    ProblemType solveToExtremePointPrimal() {
-        m_glpkControl.meth = GLP_PRIMAL;
-        return runSimplex();
+    problem_type solve_to_extreme_point_primal() {
+        m_glpk_control.meth = GLP_PRIMAL;
+        return run_simplex();
     }
 
     /**
      * Solves the LP using the dual simplex method.
      */
-    ProblemType solveToExtremePointDual() {
-        m_glpkControl.meth = GLP_DUAL;
-        return runSimplex();
+    problem_type solve_to_extreme_point_dual() {
+        m_glpk_control.meth = GLP_DUAL;
+        return run_simplex();
     }
 
     /**
      * Resolves the LP (starting from the previously found solution)
      * using the primal simplex method.
      */
-    ProblemType resolveToExtremePointPrimal() {
-        m_glpkControl.meth = GLP_PRIMAL;
-        return runSimplex(true);
+    problem_type resolve_to_extreme_point_primal() {
+        m_glpk_control.meth = GLP_PRIMAL;
+        return run_simplex(true);
     }
 
     /**
      * Resolves the LP (starting from the previously found solution)
      * using the dual simplex method.
      */
-    ProblemType resolveToExtremePointDual() {
-        m_glpkControl.meth = GLP_DUAL;
-        return runSimplex(true);
+    problem_type resolve_to_extreme_point_dual() {
+        m_glpk_control.meth = GLP_DUAL;
+        return run_simplex(true);
     }
 
     /**
@@ -131,7 +131,7 @@ public:
      * Should be called only after the LP has been solved and if it
      * wasn't modified afterwards.
      */
-    double getObjValue() const {
+    double get_obj_value() const {
         return glp_get_obj_val(m_lp);
     }
 
@@ -147,16 +147,16 @@ public:
      *
      * @return column identifier
      */
-    ColId addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
+    col_id add_column(double costCoef = 0, bound_type b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
         int colNr = glp_add_cols(m_lp, 1);
         if(name != "") {
             glp_set_col_name(m_lp, colNr, name.c_str());
         }
-        glp_set_col_bnds(m_lp, colNr, boundTypeToGLP(b), lb, ub);
+        glp_set_col_bnds(m_lp, colNr, bound_type_to_glp(b), lb, ub);
         glp_set_obj_coef(m_lp, colNr, costCoef);
-        ++m_totalColNr;
-        m_colIdx.add(m_totalColNr - 1);
-        return ColId(m_totalColNr - 1);
+        ++m_total_col_nr;
+        m_col_idx.add(m_total_col_nr - 1);
+        return col_id(m_total_col_nr - 1);
     }
 
     /**
@@ -169,30 +169,30 @@ public:
      *
      * @return row identifier
      */
-    RowId addRow(BoundType b=UP, double lb=0, double ub=0, const std::string & name = "") {
+    row_id add_row(bound_type b=UP, double lb=0, double ub=0, const std::string & name = "") {
         int rowNr = glp_add_rows(m_lp, 1);
         if(name != "") {
             glp_set_row_name(m_lp, rowNr, name.c_str());
         }
-        glp_set_row_bnds(m_lp, rowNr, boundTypeToGLP(b), lb, ub);
-        ++m_totalRowNr;
-        m_rowIdx.add(m_totalRowNr - 1);
-        return RowId(m_totalRowNr - 1);
+        glp_set_row_bnds(m_lp, rowNr, bound_type_to_glp(b), lb, ub);
+        ++m_total_row_nr;
+        m_row_idx.add(m_total_row_nr - 1);
+        return row_id(m_total_row_nr - 1);
     }
 
     /**
      * Adds a new coefficient of the LP constraint matrix.
      *
      * The coefficient for a given (row, column) pair should not be added more then once.
-     * All non-zero coefficients have to be added before calling the loadMatrix() method.
+     * All non-zero coefficients have to be added before calling the load_matrix() method.
      *
      * @param row row identifier
      * @param col column identifier
      * @param coef coefficient value
      */
-    void addConstraintCoef(RowId row, ColId col, double coef = 1) {
-        m_row.push_back(getRow(row));
-        m_col.push_back(getCol(col));
+    void add_constraint_coef(row_id row, col_id col, double coef = 1) {
+        m_row.push_back(get_row(row));
+        m_col.push_back(get_col(col));
         m_val.push_back(coef);
     }
 
@@ -200,43 +200,43 @@ public:
      * Loads the LP constraint matrix.
      *
      * This method must be called after adding a certain initial amount of rows and columns
-     * using addRow() and addColumn() methods and setting the non-zero constraint matrix coefficients
-     * using addConstraintCoef() method.
+     * using add_row() and add_column() methods and setting the non-zero constraint matrix coefficients
+     * using add_constraint_coef() method.
      */
-    void loadMatrix() {
+    void load_matrix() {
         glp_load_matrix(m_lp, m_row.size() - 1, &m_row[0], &m_col[0], &m_val[0]);
     }
 
 
     /**
      * Adds a new coefficient of the LP constraint matrix for a row added
-     * to the LP after loading the initial matrix using loadMatrix() method.
+     * to the LP after loading the initial matrix using load_matrix() method.
      *
      * The coefficient for a given (row, column) pair should not be added more then once.
-     * All non-zero coefficients have to be added before calling the loadNewRow() method.
+     * All non-zero coefficients have to be added before calling the load_new_row() method.
      *
      * @param col column identifier
      * @param coef coefficient value
      */
-    void addNewRowCoef(ColId col, double coef = 1) {
-        m_newRowCol.push_back(getCol(col));
-        m_newRowVal.push_back(coef);
+    void add_new_row_coef(col_id col, double coef = 1) {
+        m_new_row_col.push_back(get_col(col));
+        m_new_row_val.push_back(coef);
     }
 
     /**
      * Loads a new LP row coefficients.
      *
-     * This method must be called after adding a new row to the LP (after the initial loadMatrix() call)
-     * using addRow() methods and setting the non-zero row coefficients
-     * using addNewRowCoef() method.
+     * This method must be called after adding a new row to the LP (after the initial load_matrix() call)
+     * using add_row() methods and setting the non-zero row coefficients
+     * using add_new_row_coef() method.
      */
-    void loadNewRow() {
+    void load_new_row() {
         int rowNr = glp_get_num_rows(m_lp);
-        glp_set_mat_row(m_lp, rowNr, m_newRowCol.size() - 1, &m_newRowCol[0], &m_newRowVal[0]);
-        m_newRowCol.clear();
-        m_newRowVal.clear();
-        initVec(m_newRowCol);
-        initVec(m_newRowVal);
+        glp_set_mat_row(m_lp, rowNr, m_new_row_col.size() - 1, &m_new_row_col[0], &m_new_row_val[0]);
+        m_new_row_col.clear();
+        m_new_row_val.clear();
+        init_vec(m_new_row_col);
+        init_vec(m_new_row_val);
     }
 
     /**
@@ -247,8 +247,8 @@ public:
      * @param lb row lower bound value
      * @param ub row upper bound value
      */
-    void setRowBounds(RowId row, BoundType b, double lb, double ub) {
-        glp_set_row_bnds(m_lp, getRow(row), boundTypeToGLP(b), lb, ub);
+    void set_row_bounds(row_id row, bound_type b, double lb, double ub) {
+        glp_set_row_bnds(m_lp, get_row(row), bound_type_to_glp(b), lb, ub);
     }
 
     /**
@@ -259,8 +259,8 @@ public:
      * @param lb row lower bound value
      * @param ub row upper bound value
      */
-    void setColBounds(ColId col, BoundType b, double lb, double ub) {
-        glp_set_col_bnds(m_lp, getCol(col), boundTypeToGLP(b), lb, ub);
+    void set_col_bounds(col_id col, bound_type b, double lb, double ub) {
+        glp_set_col_bnds(m_lp, get_col(col), bound_type_to_glp(b), lb, ub);
     }
 
 protected:
@@ -270,26 +270,26 @@ protected:
      *
      * @return solution status
      */
-    ProblemType runSimplex(bool resolve = false) {
+    problem_type run_simplex(bool resolve = false) {
         if (!resolve) {
             glp_adv_basis(m_lp, 0);
         }
-        int ret = glp_simplex(m_lp, &m_glpkControl);
+        int ret = glp_simplex(m_lp, &m_glpk_control);
         if (resolve && ret != 0) {
             // if basis is not valid, create basis and try again
             glp_adv_basis(m_lp, 0);
-            ret = glp_simplex(m_lp, &m_glpkControl);
+            ret = glp_simplex(m_lp, &m_glpk_control);
         }
         assert(ret == 0);
-        return getPrimalType();
+        return get_primal_type();
     }
 
     /**
-     * Converts the GLPK soltion status into paal::lp::ProblemType.
+     * Converts the GLPK soltion status into paal::lp::problem_type.
      *
      * @return solution status
      */
-    ProblemType getPrimalType() {
+    problem_type get_primal_type() {
         if (glp_get_status(m_lp) == GLP_OPT) {
             return OPTIMAL;
         }
@@ -316,29 +316,29 @@ protected:
     /**
      * Converts column identifier to the GLPK column index.
      */
-    int getCol(ColId col) const {
-        return m_colIdx.getIdx(col.get()) + 1;
+    int get_col(col_id col) const {
+        return m_col_idx.get_idx(col.get()) + 1;
     }
 
     /**
      * Converts row identifier to the GLPK row index.
      */
-    int getRow(RowId row) const {
-        return m_rowIdx.getIdx(row.get()) + 1;
+    int get_row(row_id row) const {
+        return m_row_idx.get_idx(row.get()) + 1;
     }
 
     /**
      * Converts GLPK column index to the column identifier.
      */
-    ColId getColIdx(int col) const {
-        return ColId(m_colIdx.getVal(col - 1));
+    col_id getcol_idx(int col) const {
+        return col_id(m_col_idx.get_val(col - 1));
     }
 
     /**
      * Converts GLPK row index to the row identifier.
      */
-    RowId getRowIdx(int row) const {
-        return RowId(m_rowIdx.getVal(row - 1));
+    row_id get_row_idx(int row) const {
+        return row_id(m_row_idx.get_val(row - 1));
     }
 
     typedef std::vector<int> Ids;
@@ -348,15 +348,15 @@ protected:
      * Initializes a given vector.
      */
     template <typename Vec>
-    static void initVec(Vec & v, int numberOfNonZerosInMatrix = 0) {
+    static void init_vec(Vec & v, int numberOfNonZerosInMatrix = 0) {
         v.reserve(++numberOfNonZerosInMatrix);
         v.push_back(0);
     }
 
     /**
-     * Converts paal::lp:BoundType to the GLPK bound type.
+     * Converts paal::lp:bound_type to the GLPK bound type.
      */
-    static int boundTypeToGLP(BoundType b) {
+    static int bound_type_to_glp(bound_type b) {
         switch(b) {
             case FR:
                 return GLP_FR; //free
@@ -375,9 +375,9 @@ protected:
     }
 
     /**
-     * Converts the GLPK bound type to paal::lp:BoundType.
+     * Converts the GLPK bound type to paal::lp:bound_type.
      */
-    static BoundType glpToBoundType(int b) {
+    static bound_type glp_tobound_type(int b) {
         switch(b) {
             case GLP_FR:
                 return FR;
@@ -398,23 +398,23 @@ protected:
     /// GLPK problem object
     glp_prob * m_lp;
     /// mapping between GLPK column numbers and column IDs
-    data_structures::EraseableBiMap<int> m_colIdx;
+    data_structures::eraseable_bimap<int> m_col_idx;
     /// mapping between GLPK row numbers and column IDs
-    data_structures::EraseableBiMap<int> m_rowIdx;
+    data_structures::eraseable_bimap<int> m_row_idx;
 
 private:
 
-    GLPBase(GLPBase &&) {}
-    GLPBase(const GLPBase &) {}
+    glp_base(glp_base &&) {}
+    glp_base(const glp_base &) {}
 
     Ids m_row;
     Ids m_col;
     Vals m_val;
-    Ids m_newRowCol;
-    Vals m_newRowVal;
-    glp_smcp m_glpkControl;
-    int m_totalColNr;
-    int m_totalRowNr;
+    Ids m_new_row_col;
+    Vals m_new_row_val;
+    glp_smcp m_glpk_control;
+    int m_total_col_nr;
+    int m_total_row_nr;
 };
 
 
@@ -427,18 +427,18 @@ private:
  * @snippet glp_example.cpp GLP Example
  * Complete example can be found in glp_example.cpp
  */
-class GLP : public GLPBase {
-    typedef decltype(std::bind(&GLP::getRowIdx, std::declval<const GLP *>(), std::placeholders::_1)) RowTrans;
-    typedef decltype(std::bind(&GLP::getColIdx, std::declval<const GLP *>(), std::placeholders::_1)) ColTrans;
-    typedef typename boost::transform_iterator<RowTrans, typename Ids::iterator, RowId> TransformRow;
-    typedef typename boost::transform_iterator<ColTrans, typename Ids::iterator, ColId> TransformCol;
+class GLP : public glp_base {
+    typedef decltype(std::bind(&GLP::get_row_idx, std::declval<const GLP *>(), std::placeholders::_1)) RowTrans;
+    typedef decltype(std::bind(&GLP::getcol_idx, std::declval<const GLP *>(), std::placeholders::_1)) ColTrans;
+    typedef typename boost::transform_iterator<RowTrans, typename Ids::iterator, row_id> TransformRow;
+    typedef typename boost::transform_iterator<ColTrans, typename Ids::iterator, col_id> TransformCol;
     typedef boost::zip_iterator<boost::tuple<TransformRow,
                                              typename Vals::iterator>> RowsInColumnIterator;
     typedef boost::zip_iterator<boost::tuple<TransformCol,
                                              typename Vals::iterator>> ColsInRowIterator;
 
-    typedef std::unordered_set<RowId> RowSet;
-    typedef std::unordered_set<ColId> ColSet;
+    typedef std::unordered_set<row_id> RowSet;
+    typedef std::unordered_set<col_id> ColSet;
 
 public:
 
@@ -453,10 +453,10 @@ public:
      * @param numberOfNonZerosInMatrix number of non-zero values in the initial LP instance matrix
      */
     GLP(int numberOfRows, int numberOfColumns, int numberOfNonZerosInMatrix) :
-            GLPBase(numberOfRows, numberOfColumns, numberOfNonZerosInMatrix) {
+            glp_base(numberOfRows, numberOfColumns, numberOfNonZerosInMatrix) {
         int maxRowCol = std::max(numberOfRows, numberOfColumns);
-        initVec(m_idxTmp, maxRowCol);
-        initVec(m_valTmp, maxRowCol);
+        init_vec(m_idx_tmp, maxRowCol);
+        init_vec(m_val_tmp, maxRowCol);
     }
 
     /**
@@ -475,28 +475,28 @@ public:
     friend ostream & operator<<(ostream & o, const  GLP & glp) {
         o << "Problem name: " << glp_get_prob_name(glp.m_lp) << std::endl << "Obj function" << std::endl;
 
-        for(ColId col : boost::make_iterator_range(glp.getColumns())) {
-            o << glp.getColCoef(col) << ", ";
+        for(col_id col : boost::make_iterator_range(glp.get_columns())) {
+            o << glp.get_col_coef(col) << ", ";
         }
         o << std::endl << "Rows" << std::endl;
 
-        for(RowId row : boost::make_iterator_range(glp.getRows())) {
-            auto cols = glp.getColumnsInRow(row);
+        for(row_id row : boost::make_iterator_range(glp.get_rows())) {
+            auto cols = glp.get_columns_in_row(row);
             if(cols.first == cols.second) {
                 continue;
             }
-            o << "Row " << glp.getRowName(row) << std::endl;
-            o << "Bounds " << "type =  " << glp.getRowBoundType(row) << " lb = " << glp.getRowLb(row) << " ub = " << glp.getRowUb(row) << std::endl;
+            o << "Row " << glp.get_row_name(row) << std::endl;
+            o << "Bounds " << "type =  " << glp.get_rowbound_type(row) << " lb = " << glp.get_row_lb(row) << " ub = " << glp.get_row_ub(row) << std::endl;
             for(auto colAndVal : boost::make_iterator_range(cols)) {
-                ColId  col = boost::get<0>(colAndVal);
+                col_id  col = boost::get<0>(colAndVal);
                 double val = boost::get<1>(colAndVal);
-                o << "(col = " << col.get() << " name = " << glp.getColName(col) << ", coef = " << val << ") - ";
+                o << "(col = " << col.get() << " name = " << glp.get_col_name(col) << ", coef = " << val << ") - ";
             }
             o << std::endl;
         }
         o << "Current solution: "<<std::endl;
-        for(ColId col : boost::make_iterator_range(glp.getColumns())) {
-            o  << glp.getColPrim(col) << ", ";
+        for(col_id col : boost::make_iterator_range(glp.get_columns())) {
+            o  << glp.get_col_prim(col) << ", ";
         }
         o << std::endl;
 
@@ -514,10 +514,10 @@ public:
      *
      * @return column identifier
      */
-    ColId addColumn(double costCoef = 0, BoundType b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
-        resizeTmp();
-        ColId colId = GLPBase::addColumn(costCoef, b, lb, ub, name);
-        m_colIds.insert(colId);
+    col_id add_column(double costCoef = 0, bound_type b = LO, double lb = 0, double ub = 0, const std::string & name = "") {
+        resize_tmp();
+        col_id colId = glp_base::add_column(costCoef, b, lb, ub, name);
+        m_col_ids.insert(colId);
         return colId;
     }
 
@@ -531,31 +531,31 @@ public:
      *
      * @return row identifier
      */
-    RowId addRow(BoundType b = UP, double lb = 0, double ub = 0, const std::string & name = "") {
-        resizeTmp();
-        RowId rowId = GLPBase::addRow(b, lb, ub, name);
-        m_rowIds.insert(rowId);
+    row_id add_row(bound_type b = UP, double lb = 0, double ub = 0, const std::string & name = "") {
+        resize_tmp();
+        row_id rowId = glp_base::add_row(b, lb, ub, name);
+        m_row_ids.insert(rowId);
         return rowId;
     }
 
     /**
      * Returns column primal value.
      */
-    double getColPrim(ColId col) const {
-        return glp_get_col_prim(m_lp, getCol(col));
+    double get_col_prim(col_id col) const {
+        return glp_get_col_prim(m_lp, get_col(col));
     }
 
     /**
      * Returns the number of columns in the LP.
      */
-    int colSize() const {
+    int col_size() const {
         return glp_get_num_cols(m_lp);
     }
 
     /**
      * Returns the number of rows in the LP.
      */
-    int rowSize() const {
+    int row_size() const {
         return glp_get_num_rows(m_lp);
     }
 
@@ -566,12 +566,12 @@ public:
      *
      * @return iterator following the removed row
      */
-    RowIter deleteRow(RowIter row) {
+    RowIter delete_row(RowIter row) {
         int arr[2];
-        arr[1] = getRow(*row);
-        m_rowIdx.erase(row->get());
+        arr[1] = get_row(*row);
+        m_row_idx.erase(row->get());
         glp_del_rows(m_lp, 1, arr);
-        return m_rowIds.erase(row);
+        return m_row_ids.erase(row);
     }
 
     /**
@@ -581,56 +581,56 @@ public:
      *
      * @return iterator following the removed column
      */
-    ColIter deleteCol(ColIter col) {
+    ColIter delete_col(ColIter col) {
         int arr[2];
-        arr[1] = getCol(*col);
-        m_colIdx.erase(col->get());
+        arr[1] = get_col(*col);
+        m_col_idx.erase(col->get());
         glp_del_cols(m_lp, 1, arr);
-        return m_colIds.erase(col);
+        return m_col_ids.erase(col);
     }
 
     /**
      * Clears the LP instance.
      */
     void clear() {
-        auto rows = getRows();
+        auto rows = get_rows();
         while (rows.first != rows.second) {
-            rows.first = deleteRow(rows.first);
+            rows.first = delete_row(rows.first);
         }
-        auto cols = getColumns();
+        auto cols = get_columns();
         while (cols.first != cols.second) {
-            cols.first = deleteCol(cols.first);
+            cols.first = delete_col(cols.first);
         }
     }
 
     /**
      * Returns the number of non-zero coefficients in the given LP matrix column.
      */
-    int getColDegree(ColId col) const {
-        return glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], &m_valTmp[0]);
+    int get_col_degree(col_id col) const {
+        return glp_get_mat_col(m_lp, get_col(col), &m_idx_tmp[0], &m_val_tmp[0]);
     }
 
     /**
      * Returns the number of non-zero coefficients in the given LP matrix row.
      */
-    int getRowDegree(RowId row) const {
-        return glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], &m_valTmp[0]);
+    int get_row_degree(row_id row) const {
+        return glp_get_mat_row(m_lp, get_row(row), &m_idx_tmp[0], &m_val_tmp[0]);
     }
 
     /**
      * Returns the sum of the values of those columns, which have got non-zero coefficients
      * in the given LP row.
      */
-    double getRowSum(RowId row) const {
-        int size = glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], NULL);
-        return getSolSumForIds(m_idxTmp.begin() + 1, m_idxTmp.begin() + size + 1);
+    double get_row_sum(row_id row) const {
+        int size = glp_get_mat_row(m_lp, get_row(row), &m_idx_tmp[0], NULL);
+        return get_sol_sum_for_ids(m_idx_tmp.begin() + 1, m_idx_tmp.begin() + size + 1);
     }
 
     /**
      * Returns the column symbolic name.
      */
-    std::string getColName(ColId col) const {
-        const char * name = glp_get_col_name(m_lp, getCol(col));
+    std::string get_col_name(col_id col) const {
+        const char * name = glp_get_col_name(m_lp, get_col(col));
         if(name == NULL) {
             return "";
         }
@@ -640,29 +640,29 @@ public:
     /**
      * Returns the column cost function coefficient.
      */
-    double getColCoef(ColId col) const {
-        return glp_get_obj_coef(m_lp, getCol(col));
+    double get_col_coef(col_id col) const {
+        return glp_get_obj_coef(m_lp, get_col(col));
     }
 
     /**
      * Returns the column upper bound.
      */
-    double getColUb(ColId col) const {
-        return glp_get_col_ub(m_lp, getCol(col));
+    double get_col_ub(col_id col) const {
+        return glp_get_col_ub(m_lp, get_col(col));
     }
 
     /**
      * Returns the column lower bound.
      */
-    double getColLb(ColId col) const {
-        return glp_get_col_lb(m_lp, getCol(col));
+    double get_col_lb(col_id col) const {
+        return glp_get_col_lb(m_lp, get_col(col));
     }
 
     /**
      * Returns the row symbolic name.
      */
-    std::string getRowName(RowId row) const {
-        const char * name = glp_get_row_name(m_lp, getRow(row));
+    std::string get_row_name(row_id row) const {
+        const char * name = glp_get_row_name(m_lp, get_row(row));
         if(name == NULL) {
             return "";
         }
@@ -672,29 +672,29 @@ public:
     /**
      * Returns the row upper bound.
      */
-    double getRowUb(RowId row) const {
-        return glp_get_row_ub(m_lp, getRow(row));
+    double get_row_ub(row_id row) const {
+        return glp_get_row_ub(m_lp, get_row(row));
     }
 
     /**
      * Returns the row lower bound.
      */
-    double getRowLb(RowId row) const {
-        return glp_get_row_lb(m_lp, getRow(row));
+    double get_row_lb(row_id row) const {
+        return glp_get_row_lb(m_lp, get_row(row));
     }
 
     /**
      * Returns the row bound type.
      */
-    BoundType getRowBoundType(RowId row) const {
-        return glpToBoundType(glp_get_row_type(m_lp, getRow(row)));
+    bound_type get_rowbound_type(row_id row) const {
+        return glp_tobound_type(glp_get_row_type(m_lp, get_row(row)));
     }
 
     /**
      * Returns the column bound type.
      */
-    BoundType getColBoundType(ColId col) const {
-        return glpToBoundType(glp_get_col_type(m_lp, getCol(col)));
+    bound_type get_colbound_type(col_id col) const {
+        return glp_tobound_type(glp_get_col_type(m_lp, get_col(col)));
     }
 
 
@@ -703,11 +703,11 @@ public:
      * which constraint matrix coefficient is non-zero (as an iterator range).
      */
     std::pair<RowsInColumnIterator, RowsInColumnIterator>
-            getRowsInColumn(ColId col) const {
-        int size = glp_get_mat_col(m_lp, getCol(col), &m_idxTmp[0], &m_valTmp[0]);
+            get_rows_in_column(col_id col) const {
+        int size = glp_get_mat_col(m_lp, get_col(col), &m_idx_tmp[0], &m_val_tmp[0]);
         return std::make_pair(
-                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idxTmp.begin() + 1, std::bind(&GLP::getRowIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1)),
-                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idxTmp.begin() + size + 1, std::bind(&GLP::getRowIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1 + size)));
+                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idx_tmp.begin() + 1, std::bind(&GLP::get_row_idx, this, std::placeholders::_1)), m_val_tmp.begin() + 1)),
+                boost::make_zip_iterator(boost::make_tuple(TransformRow(m_idx_tmp.begin() + size + 1, std::bind(&GLP::get_row_idx, this, std::placeholders::_1)), m_val_tmp.begin() + 1 + size)));
     }
 
     /**
@@ -715,46 +715,46 @@ public:
      * which constraint matrix coefficient is non-zero (as an iterator range).
      */
     std::pair<ColsInRowIterator, ColsInRowIterator>
-            getColumnsInRow(RowId row) const {
-        int size = glp_get_mat_row(m_lp, getRow(row), &m_idxTmp[0], &m_valTmp[0]);
+            get_columns_in_row(row_id row) const {
+        int size = glp_get_mat_row(m_lp, get_row(row), &m_idx_tmp[0], &m_val_tmp[0]);
         return std::make_pair(
-                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idxTmp.begin() + 1, std::bind(&GLP::getColIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1)),
-                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idxTmp.begin() + size + 1, std::bind(&GLP::getColIdx, this, std::placeholders::_1)), m_valTmp.begin() + 1 + size)));
+                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idx_tmp.begin() + 1, std::bind(&GLP::getcol_idx, this, std::placeholders::_1)), m_val_tmp.begin() + 1)),
+                boost::make_zip_iterator(boost::make_tuple(TransformCol(m_idx_tmp.begin() + size + 1, std::bind(&GLP::getcol_idx, this, std::placeholders::_1)), m_val_tmp.begin() + 1 + size)));
     }
 
     /**
      * Returns all column identifiers (as an iterator range).
      */
-    std::pair<ColIter, ColIter> getColumns() const {
-        return std::make_pair(m_colIds.begin(), m_colIds.end());
+    std::pair<ColIter, ColIter> get_columns() const {
+        return std::make_pair(m_col_ids.begin(), m_col_ids.end());
     }
 
     /**
      * Returns all row identifiers (as an iterator range).
      */
-    std::pair<RowIter, RowIter> getRows() const {
-        return std::make_pair(m_rowIds.begin(), m_rowIds.end());
+    std::pair<RowIter, RowIter> get_rows() const {
+        return std::make_pair(m_row_ids.begin(), m_row_ids.end());
     }
 
 private:
 
     template <typename Iter>
-    double getSolSumForIds(Iter begin, Iter end) const  {
+    double get_sol_sum_for_ids(Iter begin, Iter end) const  {
         return std::accumulate(begin, end, 0., [=](double sum, int u){
             return sum + glp_get_col_prim(m_lp, u);
         });
     }
 
-    void resizeTmp() {
-        m_idxTmp.push_back(0);
-        m_valTmp.push_back(0);
+    void resize_tmp() {
+        m_idx_tmp.push_back(0);
+        m_val_tmp.push_back(0);
     }
 
-    mutable Ids m_idxTmp;
-    mutable Vals m_valTmp;
+    mutable Ids m_idx_tmp;
+    mutable Vals m_val_tmp;
 
-    ColSet m_colIds;
-    RowSet m_rowIds;
+    ColSet m_col_ids;
+    RowSet m_row_ids;
 };
 
 } //lp

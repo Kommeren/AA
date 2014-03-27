@@ -2,7 +2,7 @@
  * @file types_vector.hpp
  * @brief This is implementation of type vector taking advantage of variadic template.
  *        This implementation is NOT  c++11 adaptation of mpl.
- *        It is small set of functon needed for Components class purpose.
+ *        It is small set of functon needed for components class purpose.
  *        It is also less general than mpl. The implementation is create to avoid
  *        some problems with mpl. The c++11 techniques makes it much simpler and clearer.
  *        When boost::mpl11 apears this code should be removed

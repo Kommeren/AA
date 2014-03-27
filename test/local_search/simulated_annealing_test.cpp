@@ -21,19 +21,19 @@ BOOST_AUTO_TEST_SUITE( simulated_annealing )
 namespace ls = paal::local_search;
 using namespace paal;
 
-    BOOST_AUTO_TEST_CASE(SimulatedAnnealingGainAdaptorTest) {
+    BOOST_AUTO_TEST_CASE(simulated_annealing_gain_adaptorTest) {
         int currentSolution(0);
         int best(0);
-        auto saGain = ls::make_SimulatedAnnealingGainAdaptor(Gain(),
-                            ls::make_ExponentialCoolingSchemaDependantOnTime(std::chrono::seconds(1), 10, 0.1));
+        auto saGain = ls::make_simulated_annealing_gain_adaptor(Gain(),
+                            ls::make_exponential_cooling_schema_dependant_on_time(std::chrono::seconds(1), 10, 0.1));
 
         auto recordSolutionCommit =
-                ls::make_RecordSolutionCommitAdapter(
+                ls::make_record_solution_commit_adapter(
                         best,
                         Commit(),
-                        paal::utils::make_FunctorToComparator(f, utils::Greater()));
+                        paal::utils::make_functor_to_comparator(f, utils::Greater()));
 
-        ls::local_search_simple(currentSolution, ls::make_SearchComponents(GetMoves(), saGain, recordSolutionCommit));
+        ls::local_search_simple(currentSolution, ls::make_search_components(get_moves(), saGain, recordSolutionCommit));
         BOOST_CHECK_EQUAL(best, 6);
         LOGLN("solution " << best);
     }

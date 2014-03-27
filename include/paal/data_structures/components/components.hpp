@@ -28,13 +28,13 @@ struct NameWithDefault;
 
 
 /**
- * @brief Indicates that Components constructor is in fact a Copy/Move Constructor
+ * @brief Indicates that components constructor is in fact a Copy/Move Constructor
  */
-struct CopyTag {};
+struct copy_tag {};
 
 
 /**
- * @brief This namespace block contains implementation of the main class Components<Names,Types> and needed meta functions
+ * @brief This namespace block contains implementation of the main class components<Names,Types> and needed meta functions
  */
 namespace detail {
 
@@ -44,7 +44,7 @@ namespace detail {
      * @tparam T
      */
     template <typename T>
-    struct WrapToConstructable {
+    struct wrap_to_constructable {
         typedef T type;
     };
 
@@ -56,10 +56,10 @@ namespace detail {
      * @tparam Types
      */
     template <typename Name, typename Names, typename Types>
-    struct TypeForName {
+    struct type_for_name {
         typedef typename remove_n_first<1, Names>::type NewNames;
         typedef typename remove_n_first<1, Types>::type NewTypes;
-        typedef typename TypeForName<Name, NewNames, NewTypes>::type type;
+        typedef typename type_for_name<Name, NewNames, NewTypes>::type type;
     };
 
     /**
@@ -71,7 +71,7 @@ namespace detail {
      * @tparam TypesRest
      */
     template <typename Name,typename Type, typename... NamesRest, typename... TypesRest>
-    struct TypeForName<Name, TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>>{
+    struct type_for_name<Name, TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>>{
         typedef Type type;
     };
 
@@ -83,7 +83,7 @@ namespace detail {
      * @tparam Name
      */
     template <typename T, typename Name>
-    class HasTemplateGet {
+    class has_template_get {
     private:
         /**
          * @brief positive case
@@ -93,7 +93,7 @@ namespace detail {
          * @return return type is char
          */
         template <typename C>
-            static char f(WrapToConstructable<decltype(std::declval<const C>().template get<Name>()) (C::*)() const>*);
+            static char f(wrap_to_constructable<decltype(std::declval<const C>().template get<Name>()) (C::*)() const>*);
 
         /**
          * @brief negative case
@@ -118,42 +118,42 @@ namespace detail {
     /**
      * @brief Tag indicating that given object is movable
      */
-    struct MovableTag{};
+    struct movable_tag{};
     /**
      * @brief Tag indicating that given object is not movable
      */
-    struct NotMovableTag{};
+    struct Notmovable_tag{};
 
 
-    //declaration of main class Components
+    //declaration of main class components
     template <typename Names, typename Types>
-    class Components;
+    class components;
 
     //specialization for empty Names list
     template <>
-    class Components<TypesVector<>, TypesVector<>> {
+    class components<TypesVector<>, TypesVector<>> {
     public:
         void get() const;
         void call() const;
         void call2() const;
 
         template <typename... Unused>
-        Components(const Unused &... ) {}
+        components(const Unused &... ) {}
     };
 
     //specialization for nonempty types list
     //class keeps first component as data memer
     //rest of the components are kept in superclass.
     template <typename Name, typename Type, typename... NamesRest, typename... TypesRest>
-    class Components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> :
-    public Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> {
-        typedef Components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> base;
+    class components<TypesVector<Name, NamesRest...>, TypesVector<Type, TypesRest...>> :
+    public components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> {
+        typedef components<TypesVector<NamesRest...>, TypesVector<TypesRest...>> base;
         typedef TypesVector<Name, NamesRest...> Names;
         typedef TypesVector<Type, TypesRest...> Types;
 
 
         /**
-         * @brief Evaluates to valid type iff ComponentsName == Name
+         * @brief Evaluates to valid type iff componentsName == Name
          *
          * @tparam ComponentName
          */
@@ -165,40 +165,40 @@ namespace detail {
 
         ///default constructor
         // we do not use  = default, cause we'd like to value initialize POD's.
-        Components() : base{}, m_component{} {};
+        components() : base{}, m_component{} {};
 
         //default copy constructor
-        Components(const Components &) = default;
+        components(const components &) = default;
 
         //doesn't work on clang 3.2 // change in the standard
-        //Components(Components &) = default;
+        //components(components &) = default;
         //constructor taking nonconst lvalue reference
-        Components(Components & comps) :
+        components(components & comps) :
             base(static_cast<base &>(comps)),
             m_component(comps.get<Name>()) {}
 
         //default move constructor
-        Components(Components &&) = default;
+        components(components &&) = default;
 
         //default assignemnt operator
-        Components& operator=(const Components &) = default;
+        components& operator=(const components &) = default;
 
         //doesn't work on clang 3.2 // change in the standard
-        //Components& operator=(Components &) = default;
+        //components& operator=(components &) = default;
         //assignemnt operator taking nonconst lvalue reference
-        Components& operator=(Components & comps) {
+        components& operator=(components & comps) {
             static_cast<base &>(*this) = static_cast<base &>(comps);
             m_component = comps.get<Name>();
             return *this;
         }
 
         //default move operator
-        Components& operator=(Components &&) = default;
+        components& operator=(components &&) = default;
 
 
         /**
          * @brief constructor takes some number of arguments,
-         *      This arguments has to be convertible to the same number of the first components in Components class.
+         *      This arguments has to be convertible to the same number of the first components in components class.
          *      Arguments can be both rvalue and lvalue references
          *
          * @tparam T, first component, it must be convertible to Type.
@@ -207,25 +207,25 @@ namespace detail {
          * @param types
          */
         template <typename T, typename... TypesPrefix>
-        Components(T&& t, TypesPrefix&&... types) :
+        components(T&& t, TypesPrefix&&... types) :
             base(std::forward<TypesPrefix>(types)...), m_component(std::forward<T>(t))
         {}
 
         //     copy constructor takes class wich has get<Name> member function
         //     the get<> function dosn't have to be available for all names.
-        //     @param CopyTag is helps identify  this constructor
+        //     @param copy_tag is helps identify  this constructor
         template <typename Comps>
-        Components(const Comps & comps, CopyTag) :
-            Components(comps, NotMovableTag()) {}
+        components(const Comps & comps, copy_tag) :
+            components(comps, Notmovable_tag()) {}
 
         //   move  constructor takes class wich has get<Name> member function
         //     the get<> function dosn't have to be available for all names.
         //     In this version each of the components taken from comps
         //     is going to be moved.
-        //     @param CopyTag is helps identify  this constructor
+        //     @param copy_tag is helps identify  this constructor
         template <typename Comps>
-        Components(Comps&& comps, CopyTag) :
-                Components(comps, MovableTag()) {}
+        components(Comps&& comps, copy_tag) :
+                components(comps, movable_tag()) {}
 
         /**
          * @brief This fucntion returns Component for name Name, nonconst version
@@ -237,7 +237,7 @@ namespace detail {
          * @return
          */
         template <typename ComponentName, typename = is_my_name<ComponentName>>
-        Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) {
+        Type & get(wrap_to_constructable<Name> dummy = wrap_to_constructable<Name>()) {
             return m_component;
         }
 
@@ -251,7 +251,7 @@ namespace detail {
          * @return
          */
         template <typename ComponentName, typename = is_my_name<ComponentName>>
-        const Type & get(WrapToConstructable<Name> dummy = WrapToConstructable<Name>()) const{
+        const Type & get(wrap_to_constructable<Name> dummy = wrap_to_constructable<Name>()) const{
             return m_component;
         }
 
@@ -268,7 +268,7 @@ namespace detail {
          */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) ->
-        decltype(std::declval<typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
+        decltype(std::declval<typename type_for_name<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
             return this->template get<ComponentName>()(std::forward<Args>(args)...);
         }
 
@@ -286,7 +286,7 @@ namespace detail {
          */
         template <typename ComponentName, typename... Args>
         auto call(Args&&... args) const ->
-        decltype(std::declval<const typename TypeForName<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
+        decltype(std::declval<const typename type_for_name<ComponentName, Names, Types>::type>()(std::forward<Args>(args)...)) {
             return this->template get<ComponentName>()(std::forward<Args>(args)...);
         }
 
@@ -297,13 +297,13 @@ namespace detail {
          * @param comp
          */
         template <typename ComponentName>
-        void set(const typename TypeForName<ComponentName, Names, Types>::type  comp) {
+        void set(const typename type_for_name<ComponentName, Names, Types>::type  comp) {
             get<ComponentName>() = std::move(comp);
         }
 
 
         /**
-         * @brief function creating Components class,
+         * @brief function creating components class,
          *        takes arguments only for assigned Names
          *
          * @tparam NamesSubset
@@ -313,14 +313,14 @@ namespace detail {
          * @return
          */
         template <typename... NamesSubset, typename... SomeTypes>
-        static Components<Names, Types>
+        static components<Names, Types>
         //make(SomeTypes... types) {
           //  static_assert(sizeof...(NamesSubset) == sizeof...(SomeTypes), "Incorrect number of arguments.");
-            //return Components<Names, Types>(Components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>>(std::move(types)...), CopyTag());
+            //return components<Names, Types>(components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>>(std::move(types)...), copy_tag());
         make(SomeTypes&&... types) {
             static_assert(sizeof...(NamesSubset) == sizeof...(SomeTypes), "Incorrect number of arguments.");
-            Components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>> comps(std::forward<SomeTypes>(types)...);
-            return Components<Names, Types>(std::move(comps), CopyTag());
+            components<TypesVector<NamesSubset...>, TypesVector<SomeTypes...>> comps(std::forward<SomeTypes>(types)...);
+            return components<Names, Types>(std::move(comps), copy_tag());
         }
 
 
@@ -328,19 +328,19 @@ namespace detail {
 
         //object is moved if move = true, otherwise passed by reference
         template <bool move, typename A>
-        A moveOrPassReference(const A & a) {
+        A move_or_pass_reference(const A & a) {
             return std::move(a);
         }
 
         // const reference case
         template <bool move, typename A, typename = typename std::enable_if<!move>::type>
-        const A & moveOrPassReference(const A & a) {
+        const A & move_or_pass_reference(const A & a) {
             return a;
         }
 
         //nonconst reference case
         template <bool move, typename A, typename = typename std::enable_if<!move>::type>
-        A & moveOrPassReference(A & a) {
+        A & move_or_pass_reference(A & a) {
             return a;
         }
 
@@ -349,26 +349,26 @@ namespace detail {
 
         //case: movable object, has the appropriate get member function
         template <typename Comps,
-                  typename dummy =     typename std::enable_if<HasTemplateGet<Comps, Name    >::value, int>::type>
-        Components(Comps && comps, MovableTag m, dummy d = dummy()) :
+                  typename dummy =     typename std::enable_if<has_template_get<Comps, Name    >::value, int>::type>
+        components(Comps && comps, movable_tag m, dummy d = dummy()) :
             base(std::forward<Comps>(comps), std::move(m)),
             //if Type is not reference type, comps.get<Name>() is moved otherwise reference is  passed
-            m_component(moveOrPassReference<!std::is_lvalue_reference<Type>::value>(comps.template get<Name>())) {}
+            m_component(move_or_pass_reference<!std::is_lvalue_reference<Type>::value>(comps.template get<Name>())) {}
 
         //case: movable object, does not have the appropriate get member function
-        template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, MovableTag m) :
+        template <typename Comps, typename dummy = typename std::enable_if<!has_template_get<Comps, Name>::value>::type>
+        components(Comps && comps, movable_tag m) :
             base(std::forward<Comps>(comps), std::move(m)) {}
 
         //case: not movable object, has the appropriate get member function
-        template <typename Comps, typename dummy = typename std::enable_if<HasTemplateGet<Comps, Name>::value, int>::type>
-        Components(Comps && comps, NotMovableTag m, dummy d = dummy()) :
+        template <typename Comps, typename dummy = typename std::enable_if<has_template_get<Comps, Name>::value, int>::type>
+        components(Comps && comps, Notmovable_tag m, dummy d = dummy()) :
             base(std::forward<Comps>(comps), std::move(m)),
             m_component(comps.template get<Name>()) {}
 
         //case: not movable object, does not  have the appropriate get member function
-        template <typename Comps, typename dummy = typename std::enable_if<!HasTemplateGet<Comps, Name>::value>::type>
-        Components(Comps && comps, NotMovableTag m) :
+        template <typename Comps, typename dummy = typename std::enable_if<!has_template_get<Comps, Name>::value>::type>
+        components(Comps && comps, Notmovable_tag m) :
             base(std::forward<Comps>(comps), std::move(m)) {}
     private:
         Type m_component;
@@ -383,7 +383,7 @@ namespace detail {
 namespace detail {
 
     template <typename Names, typename Defaults, typename TypesPrefix>
-    class SetDefaults {
+    class set_defaults {
         static const int N = size<Names>::value;
         static const int TYPES_NR = size<TypesPrefix>::value;
         static_assert(TYPES_NR <= N, "Incrrect number of parameters");
@@ -395,7 +395,7 @@ namespace detail {
 
         typedef typename join<TypesPrefix, NeededDefaults>::type Types;
     public:
-        typedef detail::Components<Names, Types> type;
+        typedef detail::components<Names, Types> type;
     };
 } //detail
 
@@ -406,25 +406,25 @@ namespace detail {
  */
 namespace detail {
     /**
-     * @brief GetName, gets name for either Name, or NamesWithDefaults struct
+     * @brief get_name, gets name for either Name, or NamesWithDefaults struct
      *        this is the Name case
      *
      * @tparam T
      */
     template <typename T>
-    struct GetName {
+    struct get_name {
         typedef T type;
     };
 
     /**
-     * @brief GetName, gets name for either Name, or NamesWithDefaults struct
+     * @brief get_name, gets name for either Name, or NamesWithDefaults struct
      *        this is the NamesWithDefaults case
      *
      * @tparam Name
      * @tparam Default
      */
     template <typename Name, typename Default>
-    struct GetName<NameWithDefault<Name, Default>> {
+    struct get_name<NameWithDefault<Name, Default>> {
         typedef Name type;
     };
 
@@ -432,10 +432,10 @@ namespace detail {
      * @brief Meta function takes NameWithDefault and Vector
      *        the result is new vector with new Name appended Name
      */
-    struct PushBackName {
+    struct push_back_name {
     template <typename Vector, typename NameWithDefault>
         struct apply {
-            typedef typename push_back<Vector, typename GetName<NameWithDefault>::type>::type type;
+            typedef typename push_back<Vector, typename get_name<NameWithDefault>::type>::type type;
         };
     };
 
@@ -443,7 +443,7 @@ namespace detail {
      * @brief Meta function takes NameWithDefault and Vector
      *        the result is new vector with new Name appended Default
      */
-    struct PushBackDefault {
+    struct push_back_default {
         //  This case applies to when NameWithDefault is only name
         template <typename Vector, typename Name>
         struct apply {
@@ -460,25 +460,25 @@ namespace detail {
 } //detail
 
 
-///this is class sets all defaults and return as type detail::Components<Names, Types>
+///this is class sets all defaults and return as type detail::components<Names, Types>
 ///direct implementation on variadic templates is imposible because of
 ///weak support for type detection for inner template classes
 template <typename... ComponentNamesWithDefaults>
-class Components {
+class components {
     typedef TypesVector<ComponentNamesWithDefaults...> NamesWithDefaults;
 
     ///get Names list from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
-        detail::PushBackName
+        detail::push_back_name
             >::type Names;
 
     ///get Defaults from NamesWithDefaults
     typedef typename fold<
         NamesWithDefaults,
         TypesVector<>,
-        detail::PushBackDefault
+        detail::push_back_default
             >::type Defaults;
 
     /**
@@ -506,14 +506,14 @@ class Components {
 
 public:
     template <typename... ComponentTypes>
-    using type = typename detail::SetDefaults<Names, Defaults, TypesVector<ComponentTypes...>>::type;
+    using type = typename detail::set_defaults<Names, Defaults, TypesVector<ComponentTypes...>>::type;
 
     ///make function for components
-    template <typename... Components>
+    template <typename... components>
     static
-    type<special_decay_t<Components>...>
-    make_components(Components&&... comps) {
-        return type<special_decay_t<Components>...>(std::forward<Components>(comps)...);
+    type<special_decay_t<components>...>
+    make_components(components&&... comps) {
+        return type<special_decay_t<components>...>(std::forward<components>(comps)...);
     }
 private:
     //in this block we check if the defaults are on the last positions in the NamesWithDefaults
@@ -523,7 +523,7 @@ private:
     typedef typename fold<
         DefaultPart,
         TypesVector<>,
-        detail::PushBackDefault
+        detail::push_back_default
             >::type DefaultsTest;
     static_assert(std::is_same<DefaultsTest, Defaults>::value, "Defaults values could be only on subsequent number of last parameters");
 };

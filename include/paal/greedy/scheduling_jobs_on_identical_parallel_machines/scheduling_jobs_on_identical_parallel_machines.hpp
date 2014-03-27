@@ -34,9 +34,9 @@ namespace greedy{
  * @tparam _RandomAccessIter
  */
 template<class InputIterator, class OutputIterator,class GetTime>
-void schedulingJobsOnIdenticalParallelMachines(int n_machines,InputIterator first,InputIterator last, OutputIterator result,GetTime getTime){
+void scheduling_jobs_on_identical_parallel_machines(int n_machines,InputIterator first,InputIterator last, OutputIterator result,GetTime getTime){
     typedef typename std::iterator_traits<InputIterator>::reference JobReference;
-    typedef typename utils::PureResultOf<GetTime(JobReference)>::type Time;
+    typedef typename utils::pure_result_of<GetTime(JobReference)>::type Time;
 
     std::sort(first,last,utils::Greater());
     std::priority_queue<std::pair<Time,int> > machines;

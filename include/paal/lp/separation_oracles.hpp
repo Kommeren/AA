@@ -17,96 +17,96 @@ namespace paal {
 namespace lp {
 
 /**
- * @class SeparationOracle
+ * @class separation_oracle
  * @brief Separation oracle for the row generation.
  *
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
-class SeparationOracle {
+class separation_oracle {
 public:
     /// Constructor.
-    SeparationOracle(ViolationChecker checker = ViolationChecker())
-        : m_violationsChecker(checker)
+    separation_oracle(ViolationChecker checker = ViolationChecker())
+        : m_violations_checker(checker)
     { }
 
     /**
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void addViolatedConstraint(const Problem & problem, LP & lp) {
-        m_violationsChecker.addViolatedConstraint(m_violatedConstraint, problem, lp);
+    void add_violated_constraint(const Problem & problem, LP & lp) {
+        m_violations_checker.add_violated_constraint(m_violated_constraint, problem, lp);
     }
 
 protected:
     /// violations checker
-    ViolationChecker m_violationsChecker;
+    ViolationChecker m_violations_checker;
     /// violated constraint ID
-    typename ViolationChecker::Candidate m_violatedConstraint;
+    typename ViolationChecker::Candidate m_violated_constraint;
 };
 
 /**
- * @class MostViolatedSeparationOracle
+ * @class most_violated_separation_oracle
  * @brief Separation oracle for the row generation, using the most violated strategy.
  *
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
-class MostViolatedSeparationOracle : public SeparationOracle<ViolationChecker> {
-    typedef SeparationOracle<ViolationChecker> base;
-    using base::m_violationsChecker;
-    using base::m_violatedConstraint;
+class most_violated_separation_oracle : public separation_oracle<ViolationChecker> {
+    typedef separation_oracle<ViolationChecker> base;
+    using base::m_violations_checker;
+    using base::m_violated_constraint;
 public:
     /// Constructor.
-    MostViolatedSeparationOracle(ViolationChecker checker = ViolationChecker())
-        : SeparationOracle<ViolationChecker>(checker)
+    most_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
+        : separation_oracle<ViolationChecker>(checker)
     { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
-    bool feasibleSolution(const Problem & problem, const LP & lp) {
+    bool feasible_solution(const Problem & problem, const LP & lp) {
         double maximumViolation = 0;
 
-        for (auto candidate : m_violationsChecker.getViolationCandidates(problem, lp)) {
-            auto violation = m_violationsChecker.checkViolation(candidate, problem);
+        for (auto candidate : m_violations_checker.get_violation_candidates(problem, lp)) {
+            auto violation = m_violations_checker.check_violation(candidate, problem);
             if (violation && *violation > maximumViolation) {
                 maximumViolation = *violation;
-                m_violatedConstraint = candidate;
+                m_violated_constraint = candidate;
             }
         }
 
-        return !problem.getCompare().g(maximumViolation, 0);
+        return !problem.get_compare().g(maximumViolation, 0);
     }
 };
 
 /**
- * @class FirstViolatedSeparationOracle
+ * @class first_violated_separation_oracle
  * @brief Separation oracle for the row generation, using the first violated strategy.
  *
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
-class FirstViolatedSeparationOracle : public SeparationOracle<ViolationChecker> {
-    typedef SeparationOracle<ViolationChecker> base;
-    using base::m_violationsChecker;
-    using base::m_violatedConstraint;
+class first_violated_separation_oracle : public separation_oracle<ViolationChecker> {
+    typedef separation_oracle<ViolationChecker> base;
+    using base::m_violations_checker;
+    using base::m_violated_constraint;
 public:
     /// Constructor.
-    FirstViolatedSeparationOracle(ViolationChecker checker = ViolationChecker())
-        : SeparationOracle<ViolationChecker>(checker)
+    first_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
+        : separation_oracle<ViolationChecker>(checker)
     { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
-    bool feasibleSolution(const Problem & problem, const LP & lp) {
-        for (auto candidate : m_violationsChecker.getViolationCandidates(problem, lp)) {
-            auto violation = m_violationsChecker.checkViolation(candidate, problem);
+    bool feasible_solution(const Problem & problem, const LP & lp) {
+        for (auto candidate : m_violations_checker.get_violation_candidates(problem, lp)) {
+            auto violation = m_violations_checker.check_violation(candidate, problem);
             if (violation) {
-                m_violatedConstraint = candidate;
+                m_violated_constraint = candidate;
                 return false;
             }
         }
@@ -116,28 +116,28 @@ public:
 };
 
 /**
- * @class RandomViolatedSeparationOracle
+ * @class random_violated_separation_oracle
  * @brief Separation oracle for the row generation, using the random violated strategy.
  *
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
-class RandomViolatedSeparationOracle : public SeparationOracle<ViolationChecker> {
-    typedef SeparationOracle<ViolationChecker> base;
-    using base::m_violationsChecker;
-    using base::m_violatedConstraint;
+class random_violated_separation_oracle : public separation_oracle<ViolationChecker> {
+    typedef separation_oracle<ViolationChecker> base;
+    using base::m_violations_checker;
+    using base::m_violated_constraint;
 public:
     /// Constructor.
-    RandomViolatedSeparationOracle(ViolationChecker checker = ViolationChecker())
-        : SeparationOracle<ViolationChecker>(checker)
+    random_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
+        : separation_oracle<ViolationChecker>(checker)
     { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
-    bool feasibleSolution(const Problem & problem, const LP & lp) {
-        auto const & range = m_violationsChecker.getViolationCandidates(problem, lp);
+    bool feasible_solution(const Problem & problem, const LP & lp) {
+        auto const & range = m_violations_checker.get_violation_candidates(problem, lp);
         auto rangeSize = boost::distance(range);
         if (rangeSize == 0) {
             return true;
@@ -147,9 +147,9 @@ public:
         for (auto candidate : boost::join(
                                 boost::make_iterator_range(middle, range.end()),
                                 boost::make_iterator_range(range.begin(), middle))) {
-            auto violation = m_violationsChecker.checkViolation(candidate, problem);
+            auto violation = m_violations_checker.check_violation(candidate, problem);
             if (violation) {
-                m_violatedConstraint = candidate;
+                m_violated_constraint = candidate;
                 return false;
             }
         }

@@ -41,13 +41,13 @@ template <typename ValueIterator,
           typename Init,
           typename GetPositionRange>
 detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-fillKnapsackDynamicTable(ValueIterator valuesBegin, ValueIterator valuesEnd,
+fill_knapsack_dynamic_table(ValueIterator valuesBegin, ValueIterator valuesEnd,
          ObjectsIter oBegin, ObjectsIter oEnd,
          ObjectSizeFunctor size,
          Combine combine,
          Compare compare,
          Init init,
-         GetPositionRange getRange) {
+         GetPositionRange get_range) {
     typedef typename std::iterator_traits<ValueIterator>::value_type ValueOrNull;
     ValueOrNull nullVallue = ValueOrNull();
     typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
@@ -58,7 +58,7 @@ fillKnapsackDynamicTable(ValueIterator valuesBegin, ValueIterator valuesEnd,
     std::fill(valuesBegin + 1, valuesEnd, nullVallue);
     init(*valuesBegin);
 
-    auto posRange = getRange(0, maxSize);
+    auto posRange = get_range(0, maxSize);
     for(auto objIter = oBegin;
             objIter != oEnd; ++objIter) {
         ObjectRef obj = *objIter;

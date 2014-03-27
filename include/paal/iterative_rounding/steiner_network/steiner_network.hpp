@@ -23,19 +23,19 @@ namespace paal {
 namespace ir {
 
 namespace {
-struct SteinerNetworkCompareTraits {
+struct steiner_network_compare_traits {
     static const double EPSILON;
 };
 
-const double SteinerNetworkCompareTraits::EPSILON = 1e-10;
+const double steiner_network_compare_traits::EPSILON = 1e-10;
 }
 
 
-template <template <typename> class OracleStrategy = lp::RandomViolatedSeparationOracle>
-using SteinerNetworkOracle = OracleStrategy<SteinerNetworkViolationChecker>;
+template <template <typename> class OracleStrategy = lp::random_violated_separation_oracle>
+using steiner_networkOracle = OracleStrategy<steiner_network_violation_checker>;
 
 /**
- * @class SteinerNetwork
+ * @class steiner_network
  * @brief The class for solving the Steiner Network problem using Iterative Rounding.
  *
  * @tparam Graph input graph
@@ -45,25 +45,25 @@ using SteinerNetworkOracle = OracleStrategy<SteinerNetworkViolationChecker>;
  */
 template <typename Graph, typename Restrictions, typename CostMap,
           typename ResultNetworkOutputIterator,
-          typename Oracle = SteinerNetworkOracle<>>
-class SteinerNetwork {
+          typename Oracle = steiner_networkOracle<>>
+class steiner_network {
 public:
 
     /**
      * Constructor.
      */
-    SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+    steiner_network(const Graph & g, const Restrictions & restrictions,
                    CostMap costMap, ResultNetworkOutputIterator resultNetwork,
                    Oracle oracle = Oracle()) :
             m_g(g), m_restrictions(restrictions),
-            m_costMap(costMap), m_resultNetwork(resultNetwork),
-            m_restrictionsVec(pruneRestrictionsToTree(m_restrictions, num_vertices(m_g))),
-            m_compare(SteinerNetworkCompareTraits::EPSILON), m_oracle(oracle) {}
+            m_cost_map(costMap), m_result_network(resultNetwork),
+            m_restrictions_vec(prune_restrictions_to_tree(m_restrictions, num_vertices(m_g))),
+            m_compare(steiner_network_compare_traits::EPSILON), m_oracle(oracle) {}
 
     typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
     typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
-    typedef std::unordered_map<lp::ColId, Edge> EdgeMap;
+    typedef std::unordered_map<lp::col_id, Edge> EdgeMap;
     typedef std::vector<Edge> EdgeList;
     typedef std::vector<Vertex> VertexList;
 
@@ -74,9 +74,9 @@ public:
     /**
      * Checks if the connectivity restrictions can be fulfilled.
      */
-    ErrorMessage checkInputValidity() {
-        SteinerNetworkViolationChecker checker;
-        if (!checker.checkIfSolutionExists(*this)) {
+    ErrorMessage check_input_validity() {
+        steiner_network_violation_checker checker;
+        if (!checker.check_if_solution_exists(*this)) {
             return ErrorMessage("A Steiner network satisfying the restrictions does not exist.");
         }
         else {
@@ -87,21 +87,21 @@ public:
     /**
      * Returns the separation oracle.
      */
-    Oracle & getOracle() {
+    Oracle & get_oracle() {
         return m_oracle;
     }
 
     /**
      * Returns the map from LP column IDs to edges.
      */
-    const EdgeMap & getEdgeMap() const  {
-        return m_edgeMap;
+    const EdgeMap & get_edge_map() const  {
+        return m_edge_map;
     }
 
     /**
      * Returns the input graph.
      */
-    const Graph & getGraph() const {
+    const Graph & get_graph() const {
         return m_g;
     }
 
@@ -116,73 +116,73 @@ public:
     /**
      * Returns the restrictions vector.
      */
-    const RestrictionsVector & getRestrictionsVec() const {
-        return m_restrictionsVec;
+    const RestrictionsVector & get_restrictions_vec() const {
+        return m_restrictions_vec;
     }
 
     /**
      * Returns the cost of an edge.
      */
-    auto getCost(Edge e) -> decltype(get(std::declval<CostMap>(), e)) {
-        return get(m_costMap, e);
+    auto get_cost(Edge e) -> decltype(get(std::declval<CostMap>(), e)) {
+        return get(m_cost_map, e);
     }
 
     /**
      * Binds a graph edge to a LP column.
      */
-    void bindEdgeToCol(Edge e, lp::ColId col) {
-        m_edgeMap.insert(typename EdgeMap::value_type(col, e));
+    void bind_edge_to_col(Edge e, lp::col_id col) {
+        m_edge_map.insert(typename EdgeMap::value_type(col, e));
     }
 
     /**
      * Removes an LP column and the graph edge corresponding to it.
      */
-    void removeColumn(lp::ColId colId) {
-        auto ret = m_edgeMap.erase(colId);
+    void remove_column(lp::col_id colId) {
+        auto ret = m_edge_map.erase(colId);
         assert(ret == 1);
     }
 
     /**
      * Adds an edge corresponding to the given column to the result set.
      */
-    void addColumnToSolution(lp::ColId colId) {
-        auto e = colToEdge(colId);
-        *m_resultNetwork = e;
-        ++m_resultNetwork;
-        m_resultList.push_back(e);
+    void add_column_to_solution(lp::col_id colId) {
+        auto e = col_to_edge(colId);
+        *m_result_network = e;
+        ++m_result_network;
+        m_result_list.push_back(e);
     }
 
     /**
      * Returns the list of edges that are already added to the solution.
      */
-    const EdgeList & getEdgesInSolution() const {
-        return m_resultList;
+    const EdgeList & get_edges_in_solution() const {
+        return m_result_list;
     }
 
     /**
      * Returns the double comparison object.
      */
-    Compare getCompare() const {
+    Compare get_compare() const {
         return m_compare;
     }
 
 private:
 
-    Edge colToEdge(lp::ColId col) {
-        auto i = m_edgeMap.find(col);
-        assert(i != m_edgeMap.end());
+    Edge col_to_edge(lp::col_id col) {
+        auto i = m_edge_map.find(col);
+        assert(i != m_edge_map.end());
         return i->second;
     }
 
     const Graph & m_g;
     const Restrictions & m_restrictions;
-    CostMap m_costMap;
-    ResultNetworkOutputIterator m_resultNetwork;
+    CostMap m_cost_map;
+    ResultNetworkOutputIterator m_result_network;
 
-    RestrictionsVector m_restrictionsVec;
+    RestrictionsVector m_restrictions_vec;
 
-    EdgeMap m_edgeMap;
-    EdgeList m_resultList;
+    EdgeMap m_edge_map;
+    EdgeList m_result_list;
 
     Compare m_compare;
 
@@ -191,7 +191,7 @@ private:
 
 namespace detail {
 /**
- * @brief Creates a SteinerNetwork object. Non-named version.
+ * @brief Creates a steiner_network object. Non-named version.
  *
  * @tparam Graph
  * @tparam Restrictions
@@ -203,22 +203,22 @@ namespace detail {
  * @param resultNetwork
  * @param oracle
  *
- * @return SteinerNetwork object
+ * @return steiner_network object
  */
-template <typename Oracle = SteinerNetworkOracle<>,
+template <typename Oracle = steiner_networkOracle<>,
     typename Graph, typename Restrictions, typename CostMap,
     typename ResultNetworkOutputIterator>
-SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkOutputIterator, Oracle>
-make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+steiner_network<Graph, Restrictions, CostMap, ResultNetworkOutputIterator, Oracle>
+make_steiner_network(const Graph & g, const Restrictions & restrictions,
                     CostMap costMap, ResultNetworkOutputIterator resultNetwork,
                     Oracle oracle = Oracle()) {
-    return SteinerNetwork<Graph, Restrictions, CostMap, ResultNetworkOutputIterator, Oracle>(
+    return steiner_network<Graph, Restrictions, CostMap, ResultNetworkOutputIterator, Oracle>(
                                     g, restrictions, costMap, resultNetwork, oracle);
 }
 } // detail
 
 /**
- * Creates a SteinerNetwork object. Named version.
+ * Creates a steiner_network object. Named version.
  * The returned object can be used to check input validity or to get a lower bound on the
  * optimal solution cost.
  *
@@ -235,26 +235,26 @@ make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
  * @param resultNetwork
  * @param oracle
  *
- * @return SteinerNetwork object
+ * @return steiner_network object
  */
-template <typename Oracle = SteinerNetworkOracle<>,
+template <typename Oracle = steiner_networkOracle<>,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
     typename P, typename T, typename R>
 auto
-make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+make_steiner_network(const Graph & g, const Restrictions & restrictions,
                     const boost::bgl_named_params<P, T, R>& params,
                     ResultNetworkOutputIterator resultNetwork,
                     Oracle oracle = Oracle()) ->
-       SteinerNetwork<Graph, Restrictions,
+       steiner_network<Graph, Restrictions,
             decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
             ResultNetworkOutputIterator, Oracle> {
-    return detail::make_SteinerNetwork(g, restrictions,
+    return detail::make_steiner_network(g, restrictions,
                 choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
                 resultNetwork, oracle);
 }
 
 /**
- * Creates a SteinerNetwork object. All default parameters.
+ * Creates a steiner_network object. All default parameters.
  * The returned object can be used to check input validity or to get a lower bound on the
  * optimal solution cost.
  *
@@ -267,40 +267,40 @@ make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
  * @param resultNetwork
  * @param oracle
  *
- * @return SteinerNetwork object
+ * @return steiner_network object
  */
-template <typename Oracle = SteinerNetworkOracle<>,
+template <typename Oracle = steiner_networkOracle<>,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator>
 auto
-make_SteinerNetwork(const Graph & g, const Restrictions & restrictions,
+make_steiner_network(const Graph & g, const Restrictions & restrictions,
                     ResultNetworkOutputIterator resultNetwork, Oracle oracle = Oracle()) ->
-        decltype(make_SteinerNetwork(g, restrictions, boost::no_named_parameters(), resultNetwork, oracle)) {
-    return make_SteinerNetwork(g, restrictions, boost::no_named_parameters(), resultNetwork, oracle);
+        decltype(make_steiner_network(g, restrictions, boost::no_named_parameters(), resultNetwork, oracle)) {
+    return make_steiner_network(g, restrictions, boost::no_named_parameters(), resultNetwork, oracle);
 }
 
 /**
  * Initialization of the IR Steiner Network algorithm.
  */
-class SteinerNetworkInit {
+class steiner_network_init {
 public:
     /**
      * Initializes the LP: variables for edges.
      */
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
-        lp.setLPName("steiner network");
-        lp.setMinObjFun();
-        addVariables(problem, lp);
-        lp.loadMatrix();
+        lp.set_lp_name("steiner network");
+        lp.set_min_obj_fun();
+        add_variables(problem, lp);
+        lp.load_matrix();
     }
 
 private:
     //adding variables
     template <typename Problem, typename LP>
-    void addVariables(Problem & problem, LP & lp) {
-        for(auto e : boost::make_iterator_range(edges(problem.getGraph()))) {
-            lp::ColId col = lp.addColumn(problem.getCost(e), lp::DB, 0, 1);
-            problem.bindEdgeToCol(e, col);
+    void add_variables(Problem & problem, LP & lp) {
+        for(auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
+            lp::col_id col = lp.add_column(problem.get_cost(e), lp::DB, 0, 1);
+            problem.bind_edge_to_col(e, col);
         }
     }
 };
@@ -309,12 +309,12 @@ private:
 /**
  * Round Condition of the IR Steiner Network algorithm.
  */
-struct SteinerNetworkRoundCondition {
+struct steiner_network_round_condition {
     /**
      * Constructor. Takes epsilon used in double comparison.
      */
-    SteinerNetworkRoundCondition(double epsilon = SteinerNetworkCompareTraits::EPSILON) :
-        m_roundHalf(epsilon), m_roundZero(epsilon) {}
+    steiner_network_round_condition(double epsilon = steiner_network_compare_traits::EPSILON) :
+        m_round_half(epsilon), m_round_zero(epsilon) {}
 
     /**
      * Checks if a given column of the LP can be rounded to 0 or if it is greater
@@ -324,35 +324,35 @@ struct SteinerNetworkRoundCondition {
      * is added to the solution.
      */
     template <typename Problem, typename LP>
-    boost::optional<double> operator()(Problem & problem, const LP & lp, lp::ColId colId) {
-        auto ret = m_roundZero(problem, lp, colId);
+    boost::optional<double> operator()(Problem & problem, const LP & lp, lp::col_id colId) {
+        auto ret = m_round_zero(problem, lp, colId);
         if(ret) {
             //removing edge
-            problem.removeColumn(colId);
+            problem.remove_column(colId);
             return ret;
         } else {
-            ret = m_roundHalf(problem, lp, colId);
+            ret = m_round_half(problem, lp, colId);
             if(ret) {
-                problem.addColumnToSolution(colId);
-                problem.removeColumn(colId);
+                problem.add_column_to_solution(colId);
+                problem.remove_column(colId);
             }
             return ret;
         }
     }
 private:
-    RoundConditionGreaterThanHalf m_roundHalf;
-    RoundConditionEquals<0>       m_roundZero;
+    round_condition_greater_than_half m_round_half;
+    round_condition_equals<0>       m_round_zero;
 };
 
 template <
-         typename SolveLPToExtremePoint = lp::RowGenerationSolveLP,
-         typename ResolveLPToExtremePoint = lp::RowGenerationResolveLP,
-         typename RoundCondition = SteinerNetworkRoundCondition,
-         typename RelaxContition = utils::ReturnFalseFunctor,
-         typename Init = SteinerNetworkInit,
-         typename SetSolution = utils::SkipFunctor>
-             using  SteinerNetworkIRComponents = IRComponents<SolveLPToExtremePoint,
-                        ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
+         typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
+         typename RoundCondition = steiner_network_round_condition,
+         typename RelaxContition = utils::return_false_functor,
+         typename Init = steiner_network_init,
+         typename SetSolution = utils::skip_functor>
+             using  steiner_networkIRcomponents = IRcomponents<SolveLPToExtremePoint,
+                        Resolve_lp_to_extreme_point, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
 namespace detail {
@@ -364,7 +364,7 @@ namespace detail {
  * @tparam Restrictions
  * @tparam CostMap
  * @tparam ResultNetworkOutputIterator
- * @tparam IRComponents
+ * @tparam IRcomponents
  * @tparam Visitor
  * @param g
  * @param restrictions
@@ -376,18 +376,18 @@ namespace detail {
  *
  * @return solution status
  */
-template <typename Oracle = SteinerNetworkOracle<>, typename Graph,
+template <typename Oracle = steiner_networkOracle<>, typename Graph,
           typename Restrictions, typename CostMap, typename ResultNetworkOutputIterator,
-          typename IRComponents = SteinerNetworkIRComponents<>,
-          typename Visitor = TrivialVisitor>
+          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename Visitor = trivial_visitor>
 IRResult steiner_network_iterative_rounding(
         const Graph & g,
         const Restrictions & restrictions,
         CostMap cost, ResultNetworkOutputIterator result,
-        IRComponents components = IRComponents(),
+        IRcomponents components = IRcomponents(),
         Oracle oracle = Oracle(),
         Visitor visitor = Visitor()) {
-    auto steiner = make_SteinerNetwork(g, restrictions, cost, result, oracle);
+    auto steiner = make_steiner_network(g, restrictions, cost, result, oracle);
     return solve_iterative_rounding(steiner, std::move(components), std::move(visitor));
 }
 } // detail
@@ -399,7 +399,7 @@ IRResult steiner_network_iterative_rounding(
  * @tparam Graph
  * @tparam Restrictions
  * @tparam ResultNetworkOutputIterator
- * @tparam IRComponents
+ * @tparam IRcomponents
  * @tparam Visitor
  * @tparam P
  * @tparam T
@@ -414,17 +414,17 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = SteinerNetworkOracle<>, typename Graph,
+template <typename Oracle = steiner_networkOracle<>, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
-          typename IRComponents = SteinerNetworkIRComponents<>,
-          typename Visitor = TrivialVisitor,
+          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename Visitor = trivial_visitor,
           typename P, typename T, typename R>
 IRResult steiner_network_iterative_rounding(
         const Graph & g,
         const Restrictions & restrictions,
         const boost::bgl_named_params<P, T, R> & params,
         ResultNetworkOutputIterator result,
-        IRComponents components = IRComponents(),
+        IRcomponents components = IRcomponents(),
         Oracle oracle = Oracle(),
         Visitor visitor = Visitor()) {
     return detail::steiner_network_iterative_rounding(g, restrictions,
@@ -439,7 +439,7 @@ IRResult steiner_network_iterative_rounding(
  * @tparam Graph
  * @tparam Restrictions
  * @tparam ResultNetworkOutputIterator
- * @tparam IRComponents
+ * @tparam IRcomponents
  * @tparam Visitor
  * @param g
  * @param restrictions
@@ -450,15 +450,15 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = SteinerNetworkOracle<>, typename Graph,
+template <typename Oracle = steiner_networkOracle<>, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
-          typename IRComponents = SteinerNetworkIRComponents<>,
-          typename Visitor = TrivialVisitor>
+          typename IRcomponents = steiner_networkIRcomponents<>,
+          typename Visitor = trivial_visitor>
 IRResult steiner_network_iterative_rounding(
         const Graph & g,
         const Restrictions & restrictions,
         ResultNetworkOutputIterator result,
-        IRComponents components = IRComponents(),
+        IRcomponents components = IRcomponents(),
         Oracle oracle = Oracle(),
         Visitor visitor = Visitor()) {
     return steiner_network_iterative_rounding(g, restrictions, boost::no_named_parameters(),

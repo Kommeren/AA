@@ -22,10 +22,10 @@ namespace detail {
               typename ObjectValueFunctor,
               typename Is_0_1_Tag>
     FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd,
+    get_value_upper_bound(ObjectsIter oBegin, ObjectsIter oEnd,
      FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-     ObjectValueFunctor value, ObjectSizeFunctor size, NonArithmeticSizeTag, Is_0_1_Tag) {
-         return getDensityBasedValueUpperBound(oBegin, oEnd, value, size);
+     ObjectValueFunctor value, ObjectSizeFunctor size, Nonarithmetic_size_tag, Is_0_1_Tag) {
+         return get_density_based_value_upper_bound(oBegin, oEnd, value, size);
     }
 
     template <typename ObjectsIter,
@@ -33,13 +33,13 @@ namespace detail {
               typename ObjectValueFunctor,
               typename Is_0_1_Tag>
     FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd,
+    get_value_upper_bound(ObjectsIter oBegin, ObjectsIter oEnd,
      FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
-     ObjectValueFunctor value, ObjectSizeFunctor size, ArithmeticSizeTag, Is_0_1_Tag is_0_1_Tag) {
-         auto out = boost::make_function_output_iterator(utils::SkipFunctor());
+     ObjectValueFunctor value, ObjectSizeFunctor size, arithmetic_size_tag, Is_0_1_Tag is_0_1_Tag) {
+         auto out = boost::make_function_output_iterator(utils::skip_functor());
 
          return std::min(2 * knapsack_general_two_app(oBegin, oEnd, capacity, out, value, size, is_0_1_Tag).first,
-                         getDensityBasedValueUpperBound(oBegin, oEnd, capacity, value, size));
+                         get_density_based_value_upper_bound(oBegin, oEnd, capacity, value, size));
     }
 
     template <typename ObjectsIter,
@@ -47,11 +47,11 @@ namespace detail {
               typename ObjectValueFunctor,
               typename Is_0_1_Tag>
     FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-    getValueUpperBound(ObjectsIter oBegin, ObjectsIter oEnd,
+    get_value_upper_bound(ObjectsIter oBegin, ObjectsIter oEnd,
      FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
      ObjectValueFunctor value, ObjectSizeFunctor size, Is_0_1_Tag is_0_1_Tag) {
          typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-         return getValueUpperBound(oBegin, oEnd, capacity, value, size, GetArithmeticSizeTag<SizeType>(), is_0_1_Tag);
+         return get_value_upper_bound(oBegin, oEnd, capacity, value, size, Getarithmetic_size_tag<SizeType>(), is_0_1_Tag);
     }
 
 }//detail

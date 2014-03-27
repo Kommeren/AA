@@ -15,18 +15,18 @@ namespace paal {
 namespace ir {
 
 /**
- * @class MinCutFinder
+ * @class min_cut_finder
  * @brief Class for creating and modifying directed graphs with edge capacities
  *  and finding directed minimum cuts between given vertices.
  */
-class MinCutFinder {
+class min_cut_finder {
     typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
 public:
     typedef Traits::edge_descriptor Edge;
     typedef Traits::vertex_descriptor Vertex;
 
     /// Constructor.
-    MinCutFinder() :
+    min_cut_finder() :
         m_graph(0),
         m_cap(get(boost::edge_capacity, m_graph)),
         m_rev(get(boost::edge_reverse, m_graph)),
@@ -39,7 +39,7 @@ public:
     void init(int verticesNum) {
         m_graph.clear();
         for (int i = 0; i < verticesNum; ++i) {
-            addVertex();
+            add_vertex_to_graph();
         }
         m_cap = get(boost::edge_capacity, m_graph);
         m_rev = get(boost::edge_reverse, m_graph);
@@ -48,7 +48,7 @@ public:
     /**
      * Adds a new vertex to the graph.
      */
-    Vertex addVertex() {
+    Vertex add_vertex_to_graph() {
         return add_vertex(m_graph);
     }
 
@@ -62,7 +62,7 @@ public:
      * @return created edge of the graph and the created reverse edge
      */
     std::pair<Edge, Edge>
-    addEdge(Vertex src, Vertex trg, double cap, double revCap = 0.) {
+    add_edge_to_graph(Vertex src, Vertex trg, double cap, double revCap = 0.) {
         bool b, bRev;
         Edge e, eRev;
 
@@ -89,51 +89,51 @@ public:
      *
      * @return min cut value
      */
-    double findMinCut(Vertex src, Vertex trg) {
+    double find_min_cut(Vertex src, Vertex trg) {
         assert(src != trg);
         double minCutVal = boost::boykov_kolmogorov_max_flow(m_graph, src, trg);
         m_colors = get(boost::vertex_color, m_graph);
-        m_srcColor = get(m_colors, src);
-        m_lastCut = std::make_pair(src, trg);
-        assert(!isInSourceSet(trg));
+        m_src_color = get(m_colors, src);
+        m_last_cut = std::make_pair(src, trg);
+        assert(!is_in_source_set(trg));
         return minCutVal;
     }
 
     /**
      * Checks if the given vertex belongs to the source side of the last checked cut.
      */
-    bool isInSourceSet(Vertex v) const {
-        return (m_srcColor == get(m_colors, v));
+    bool is_in_source_set(Vertex v) const {
+        return (m_src_color == get(m_colors, v));
     }
 
     /**
      * Returns the number of vertices in the source size of the last checked cut.
      */
-    int sourceSetSize() const {
+    int source_set_size() const {
         auto verts = vertices(m_graph);
         return std::accumulate(verts.first, verts.second, 0,
-                [&](int count, Vertex v){ return count + isInSourceSet(v); });
+                [&](int count, Vertex v){ return count + is_in_source_set(v); });
     }
 
 
     /**
      * Returns the pair of vertices defining the last checked cut.
      */
-    std::pair<Vertex, Vertex> getLastCut() const {
-        return m_lastCut;
+    std::pair<Vertex, Vertex> get_last_cut() const {
+        return m_last_cut;
     }
 
     /**
      * Returns the capacity of a given edge.
      */
-    double getCapacity(Edge e) const {
+    double get_capacity(Edge e) const {
         return get(m_cap, e);
     }
 
     /**
      * Sets the capacity of a given edge.
      */
-    void setCapacity(Edge e, double cap) {
+    void set_capacity(Edge e, double cap) {
         put(m_cap, e, cap);
     }
 
@@ -156,8 +156,8 @@ private:
     EdgeReverse  m_rev;
     VertexColors m_colors;
 
-    boost::default_color_type m_srcColor;
-    std::pair<Vertex, Vertex> m_lastCut;
+    boost::default_color_type m_src_color;
+    std::pair<Vertex, Vertex> m_last_cut;
 };
 
 

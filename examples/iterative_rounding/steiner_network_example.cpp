@@ -32,9 +32,9 @@ int main() {
     ResultNetwork resultNetwork;
 
     // optional input validity checking
-    auto steinerNetwork = paal::ir::make_SteinerNetwork(g, restrictions,
+    auto steinerNetwork = paal::ir::make_steiner_network(g, restrictions,
                                 std::back_inserter(resultNetwork));
-    auto error = steinerNetwork.checkInputValidity();
+    auto error = steinerNetwork.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
         std::cerr << *error << std::endl;
@@ -56,7 +56,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-    paal::lp::GLP::freeEnv();
+    paal::lp::GLP::free_env();
 
     return 0;
 }

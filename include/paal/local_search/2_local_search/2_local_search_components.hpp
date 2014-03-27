@@ -33,7 +33,7 @@ struct Swap {
      *
      * @return
      */
-    Element getFrom() const {
+    Element get_from() const {
         return m_from;
     }
 
@@ -42,7 +42,7 @@ struct Swap {
      *
      * @return
      */
-    Element getTo() const {
+    Element get_to() const {
         return m_to;
     }
 private:
@@ -53,7 +53,7 @@ private:
 /**
  * @brief Functor creating Move
  */
-struct MakeSwap {
+struct make_swap {
     /**
      * @brief operator()
      *
@@ -75,14 +75,14 @@ struct MakeSwap {
  * @tparam Metric
  */
 template <typename Metric>
-    class GainTwoOpt {
+    class gain_two_opt {
     public:
         /**
          * @brief
          *
          * @param m fulfills \ref metric concept.
         */
-        GainTwoOpt(const Metric & m) : m_metric(m) {}
+        gain_two_opt(const Metric & m) : m_metric(m) {}
 
         /**
          * @brief returns gain for given adjustment
@@ -95,8 +95,8 @@ template <typename Metric>
          */
         template <typename Solution, typename SolutionElement>
         int operator()(const Solution &, const Swap<SolutionElement> & swap) {
-            auto from = swap.getFrom();
-            auto to = swap.getTo();
+            auto from = swap.get_from();
+            auto to = swap.get_to();
             return m_metric(from.first, from.second) + m_metric(to.first, to.second) -
                m_metric(from.first, to.first) - m_metric(from.second, to.second);
         }
@@ -108,7 +108,7 @@ template <typename Metric>
 /**
  * @brief Commit class for local_search
  */
-struct TwoLocalSearchCommit  {
+struct two_local_search_commit  {
     /**
      * @brief flips appropriate segment in the solution
      *
@@ -119,7 +119,7 @@ struct TwoLocalSearchCommit  {
      */
     template <typename SolutionElement, typename Solution>
     bool operator()(Solution & s, const Swap<SolutionElement> & swap) {
-        s.getCycle().flip(swap.getFrom().second, swap.getTo().first);
+        s.get_cycle().flip(swap.get_from().second, swap.get_to().first);
         return true;
     }
 };
@@ -127,7 +127,7 @@ struct TwoLocalSearchCommit  {
 /**
  * @brief Commit class for local_search
  */
-class TwoLocalSearchGetMoves  {
+class two_local_searchget_moves  {
 
     /**
      * @brief Functor needed for type computation
@@ -135,9 +135,9 @@ class TwoLocalSearchGetMoves  {
      * @tparam Solution
      */
     template <typename Solution>
-    struct TypesEval {
+    struct types_eval {
         using SolutionIter = decltype(std::declval<Solution>().begin());
-        using Subset = data_structures::SubsetsIterator<2, SolutionIter, MakeSwap>;
+        using Subset = data_structures::subsets_iterator<2, SolutionIter, make_swap>;
         using Range = boost::iterator_range<Subset>;
     };
 
@@ -150,10 +150,10 @@ public:
      */
     template <typename Solution>
     auto operator()(Solution & solution) const ->
-        typename TypesEval<Solution>::Range
+        typename types_eval<Solution>::Range
     {
-        return boost::make_iterator_range(data_structures::make_SubsetsIteratorRange<2>
-                        (solution.begin(), solution.end(), MakeSwap{}));
+        return boost::make_iterator_range(data_structures::make_subsets_iterator_range<2>
+                        (solution.begin(), solution.end(), make_swap{}));
     }
 };
 

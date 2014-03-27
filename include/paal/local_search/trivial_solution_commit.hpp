@@ -12,7 +12,7 @@
 /**
  * @brief Used in case when update is actually the new solution
  */
-struct TrivialCommit {
+struct trivial_commit {
     /**
      * @brief We assume that operator() receives a new solution
      *

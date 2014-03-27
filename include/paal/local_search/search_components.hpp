@@ -16,9 +16,9 @@ namespace local_search {
 
 
     /**
-     * @brief name for the GetMoves component
+     * @brief name for the get_moves component
      */
-    struct GetMoves;
+    struct get_moves;
     /**
      * @brief name for the Gain component
      */
@@ -29,41 +29,41 @@ namespace local_search {
     struct Commit;
 
     /**
-     * @brief Definition for the Components class for local search
-     * usually this class is not directly used, see SearchComponents.
+     * @brief Definition for the components class for local search
+     * usually this class is not directly used, see search_components.
      */
-    typedef data_structures::Components<
-                GetMoves,
+    typedef data_structures::components<
+                get_moves,
                 Gain,
                 Commit
-                    > Components;
+                    > components;
 
     /**
-     * @brief SearchComponents template alias
+     * @brief search_components template alias
      *
      * @tparam Args
      */
     template <typename... Args>
-        using SearchComponents = typename Components::type<Args...> ;
+        using search_components = typename components::type<Args...> ;
 
     /**
-     * @brief MultiSearchComponents template alias
+     * @brief Multisearch_components template alias
      *
      * @tparam Args
      */
     template <typename... Args>
-        using MultiSearchComponents = SearchComponents<Args...> ;
+        using Multisearch_components = search_components<Args...> ;
 
     /**
      * @brief make function for search components
      *
      * @tparam Args
      *
-     * @return SearchComponents or MultiSearchComponents
+     * @return search_components or Multisearch_components
      */
     template <typename... Args>
-    auto make_SearchComponents(Args&&... args) -> decltype(Components::make_components(std::forward<Args>(args)...)) {
-          return Components::make_components(std::forward<Args>(args)...);
+    auto make_search_components(Args&&... args) -> decltype(components::make_components(std::forward<Args>(args)...)) {
+          return components::make_components(std::forward<Args>(args)...);
     }
 
 

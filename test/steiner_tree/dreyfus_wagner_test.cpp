@@ -14,25 +14,25 @@ using namespace paal;
 using namespace paal::steiner_tree;
 
 BOOST_AUTO_TEST_CASE(testBasic) {
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSteiner();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_steiner();
     std::vector<int> terminals = {SGM::A, SGM::B, SGM::C, SGM::D};
     std::vector<int> nonterminals = {SGM::E};
-    auto dw = make_DreyfusWagner(gm, terminals, nonterminals);
+    auto dw = make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
-    BOOST_CHECK_EQUAL(dw.getCost(), 4);
-    BOOST_CHECK_EQUAL(int(dw.steinerTreeZelikovsky11per6approximation().size()), 1);
-    BOOST_CHECK_EQUAL(dw.getEdges().size(), 4);
+    BOOST_CHECK_EQUAL(dw.get_cost(), 4);
+    BOOST_CHECK_EQUAL(int(dw.steiner_tree_zelikovsky11per6approximation().size()), 1);
+    BOOST_CHECK_EQUAL(dw.get_edges().size(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(testMedium) {
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricMedium();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_medium();
     std::vector<int> terminals = {SGM::A, SGM::B, SGM::C, SGM::F, SGM::G, SGM::H};
     std::vector<int> nonterminals = {SGM::D, SGM::E};
-    auto dw = make_DreyfusWagner(gm, terminals, nonterminals);
+    auto dw = make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
-    BOOST_CHECK_EQUAL(dw.getCost(), 15);
-    BOOST_CHECK_EQUAL(dw.steinerTreeZelikovsky11per6approximation().size(), 0);
-    BOOST_CHECK_EQUAL(dw.getEdges().size(), 5);
+    BOOST_CHECK_EQUAL(dw.get_cost(), 15);
+    BOOST_CHECK_EQUAL(dw.steiner_tree_zelikovsky11per6approximation().size(), 0);
+    BOOST_CHECK_EQUAL(dw.get_edges().size(), 5);
 }

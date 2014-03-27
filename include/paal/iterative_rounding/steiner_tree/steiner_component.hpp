@@ -19,74 +19,74 @@ namespace paal {
 namespace ir {
 
 /**
- * @class SteinerComponent
+ * @class steiner_component
  * @brief Class represents k-components of Steiner Tree.
  * Component is a subtree whose terminals coincide with leaves.
  */
 template <typename Vertex, typename Dist>
-class SteinerComponent {
+class steiner_component {
 public:
     typedef typename std::pair<Vertex, Vertex> Edge;
 
     template<typename Metric, typename Terminals>
-    SteinerComponent(std::vector<Vertex> & el, const Metric & costMap,
+    steiner_component(std::vector<Vertex> & el, const Metric & costMap,
             const Terminals & term, const Terminals& steinerVertices) :
         m_elements(el), m_size(el.size()) {
-        auto dw = paal::steiner_tree::make_DreyfusWagner(costMap, m_elements, steinerVertices);
+        auto dw = paal::steiner_tree::make_dreyfus_wagner(costMap, m_elements, steinerVertices);
         dw.solve();
-        m_cost = dw.getCost();
-        auto & steiner = dw.steinerTreeZelikovsky11per6approximation();
-        m_steinerElements.insert(m_steinerElements.begin(), steiner.begin(), steiner.end());
-        m_edges = std::move(dw.getEdges());
+        m_cost = dw.get_cost();
+        auto & steiner = dw.steiner_tree_zelikovsky11per6approximation();
+        m_steiner_elements.insert(m_steiner_elements.begin(), steiner.begin(), steiner.end());
+        m_edges = std::move(dw.get_edges());
     }
 
     /**
      * @brief Each component has versions, where sink is chosen from its terminals
      */
-    Vertex getSink(int version) const {
-        assert(version < countTerminals());
+    Vertex get_sink(int version) const {
+        assert(version < count_terminals());
         return m_elements[version];
     }
 
     /**
      * Returns vector composed of component's terminals.
      */
-    const std::vector<Vertex>& getElements() const {
+    const std::vector<Vertex>& get_elements() const {
         return m_elements;
     }
 
     /**
      * Returns vector composed of component's nonterminals, i.e. Steiner elements.
      */
-    const std::vector<Vertex>& getSteinerElements() const {
-        return m_steinerElements;
+    const std::vector<Vertex>& get_steiner_elements() const {
+        return m_steiner_elements;
     }
 
     /**
      * Returns edges spanning the component.
      */
-    const std::vector<Edge>& getEdges() const {
+    const std::vector<Edge>& get_edges() const {
         return m_edges;
     }
 
     /**
      * Returns degree of component, i.e. number of terminals.
      */
-    int countTerminals() const {
+    int count_terminals() const {
         return m_size;
     }
 
     /**
      * Returns minimal cost of spanning a component.
      */
-    Dist getCost() const {
+    Dist get_cost() const {
         return m_cost;
     }
 
     /**
      * Prints the component.
      */
-    friend std::ostream& operator<< (std::ostream& stream, const SteinerComponent& component) {
+    friend std::ostream& operator<< (std::ostream& stream, const steiner_component& component) {
         for (int i = 0; i < component.m_size; i++) {
             stream << component.m_elements[i] << " ";
         }
@@ -102,7 +102,7 @@ private:
     const std::vector<Vertex> m_elements; // terminals of the component
     int m_size; // m_elements.size()
     Dist m_cost; // minimal cost of spanning the component
-    std::vector<Vertex> m_steinerElements; // non-terminals selected for spanning tree
+    std::vector<Vertex> m_steiner_elements; // non-terminals selected for spanning tree
     std::vector<Edge> m_edges; // edges spanning the component
 };
 

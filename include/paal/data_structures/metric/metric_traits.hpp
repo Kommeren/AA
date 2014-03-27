@@ -21,7 +21,7 @@ namespace data_structures {
      * @tparam _VertexType
      */
 template <typename Metric, typename _VertexType>
-struct _MetricTraits {
+struct _metric_traits {
     typedef int VertexType;
     ///Distance type
     typedef puretype(std::declval<Metric>()
@@ -34,7 +34,7 @@ struct _MetricTraits {
  * @tparam Metric
  */
 template <typename Metric>
-struct MetricTraits : public _MetricTraits<Metric, int> {};
+struct metric_traits : public _metric_traits<Metric, int> {};
 
 }
 }

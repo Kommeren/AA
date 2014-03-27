@@ -45,7 +45,7 @@ double test(Graph graph){
     BOOST_CHECK_EQUAL(costCut,costCutVerification);
     return costCut;
 }
-auto envToAddEdge =[](std::vector<std::pair<int,int> >& edges,std::vector<long long>& costEdges){
+auto env_to_add_edge =[](std::vector<std::pair<int,int> >& edges,std::vector<long long>& costEdges){
     return [&](int source,int target,int edgeCost){
         edges.push_back(std::make_pair(source,target));
         costEdges.push_back(edgeCost);
@@ -54,10 +54,10 @@ auto envToAddEdge =[](std::vector<std::pair<int,int> >& edges,std::vector<long l
 };
 
 }
-BOOST_AUTO_TEST_SUITE(MultiwayCut)
+BOOST_AUTO_TEST_SUITE(multiway_cut)
 
 
-BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
+BOOST_AUTO_TEST_CASE(multiway_cutRandom) {
     static const int NU_VERTICES=1000;
     static const int NU_RANDOM_EDGES=1000;
     static const int NU_TERMINAL_EDGES=1000;
@@ -70,7 +70,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
     std::vector<std::pair<int,int> > edgesP;
     std::vector<long long> costEdges;
     std::srand(SEED);
-    auto addEdge=envToAddEdge(edgesP,costEdges);
+    auto add_edge_to_graph=env_to_add_edge(edgesP,costEdges);
     auto randVertexID=[&](){
         return rand()%NU_VERTICES;
     };
@@ -79,33 +79,33 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
     };
     {
         //add edges to terminals
-        int source,target,nuEdgesCopy=NU_TERMINAL_EDGES;
-        while(--nuEdgesCopy){
+        int source,target,nu_edgesCopy=NU_TERMINAL_EDGES;
+        while(--nu_edgesCopy){
             do{
                 source=randVertexID();
                 target=source%NU_COMPONENTS;
             }while(source==target);
-            addEdge(source,target,CONECT_TO_TERMINAL_COST);
+            add_edge_to_graph(source,target,CONECT_TO_TERMINAL_COST);
         }
 
         //add edges in components
-        nuEdgesCopy=NU_COMPONENTS_EDGES;
-        while(--nuEdgesCopy){
+        nu_edgesCopy=NU_COMPONENTS_EDGES;
+        while(--nu_edgesCopy){
             do{
                 source=randVertexID();
                 target=randVertexIDinComponent(source);
             }while(source==target);
-            addEdge(source,target,CONECT_IN_COMPONENT_COST);
+            add_edge_to_graph(source,target,CONECT_IN_COMPONENT_COST);
         }
 
         //add random edges
-        nuEdgesCopy=NU_RANDOM_EDGES;
-        while(--nuEdgesCopy){
+        nu_edgesCopy=NU_RANDOM_EDGES;
+        while(--nu_edgesCopy){
             do{
                 source=randVertexID();
                 target=randVertexID();
             }while(source==target);
-            addEdge(source,target,CONECT_BETWEEN_COMPONENTS_COST);
+            add_edge_to_graph(source,target,CONECT_BETWEEN_COMPONENTS_COST);
         }
     }
     std::vector<int> terminals={0,1,2};
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutRandom) {
     ::test(graph);
 }
 
-BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
+BOOST_AUTO_TEST_CASE(multiway_cutTriangle) {
     //We place 33*33 points on the grid
     //each point above diagonal have edge to right, down and left-down neighbor
     //each point on diagonal have edge to left-down neighbor
@@ -147,7 +147,7 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
     std::srand(SEED);
     auto coordinates= [&](int x,int y){return x*SIZ+y;};
     auto sizeRange=boost::irange(0,SIZ);
-    auto addEdge=envToAddEdge(edgesP,costEdges);
+    auto add_edge_to_graph=env_to_add_edge(edgesP,costEdges);
     auto genCost=[](int position){
         long long cost=1;
         while(position%2==0){
@@ -161,13 +161,13 @@ BOOST_AUTO_TEST_CASE(MultiwayCutTriangle) {
         for(auto j:sizeRange){
             if(i+j<SIZ-1){
                 //add horizontal edges
-                addEdge(coordinates(i,j),coordinates(i,j+1),genCost(i+SIZ-1));
+                add_edge_to_graph(coordinates(i,j),coordinates(i,j+1),genCost(i+SIZ-1));
                 //add vertical edges
-                addEdge(coordinates(i,j),coordinates(i+1,j),genCost(j+SIZ-1));
+                add_edge_to_graph(coordinates(i,j),coordinates(i+1,j),genCost(j+SIZ-1));
             }
             if(i+j<SIZ&&i>0){
                 //add diagonal edges
-                addEdge(coordinates(i,j),coordinates(i-1,j+1),genCost(i+j));
+                add_edge_to_graph(coordinates(i,j),coordinates(i-1,j+1),genCost(i+j));
             }
         }
     }

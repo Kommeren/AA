@@ -25,14 +25,14 @@ int main(){
                                             {6,7},{6,8},{7,8}
 
     };
-    int nuVertices=6;
+    int nu_vertices=6;
     std::vector<int> costEdges{100,100,100,100,100,100,10,10,10,10,10,10,1,1,1};
 
     std::vector<int> terminals={0,1,2};
     boost::adjacency_list<boost::vecS,boost::vecS,boost::undirectedS,
                     boost::property < boost::vertex_color_t, int>,
                     boost::property < boost::edge_weight_t, int>
-                    > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nuVertices);
+                    > graph(edgesP.begin(),edgesP.end(),costEdges.begin(),nu_vertices);
 
     for(std::size_t i=1;i<=terminals.size();i++)
         put (boost::vertex_color,graph,terminals[i-1],i);

@@ -37,43 +37,43 @@ namespace detail{
             typename boost::property_traits<
                     puretype(get(boost::edge_weight,std::declval<Graph>()))
                     >::value_type;
-    class MultiwayCutLP {
+    class multiway_cut_lp {
         public:
             ///Initialize the cut LP.
             template <typename Graph, typename LP>
             void init(Graph & graph, LP & lp,int k) {
 
-                lp.setLPName("Multiway Cut");
-                lp.setMinObjFun();
+                lp.set_lp_name("Multiway Cut");
+                lp.set_min_obj_fun();
 
-                addVariables(graph, lp, k);
+                add_variables(graph, lp, k);
 
-                addConstraints(graph, lp, k);
+                add_constraints(graph, lp, k);
 
-                lp.loadMatrix();
+                lp.load_matrix();
             }
         private:
             //adding variables
             //returns the number of variables
             template <typename Graph, typename LP>
-            void addVariables(Graph & graph, LP & lp,int k) {
+            void add_variables(Graph & graph, LP & lp,int k) {
                 auto weight=get(boost::edge_weight,graph);
                 for(auto e : boost::make_iterator_range(edges(graph))) {
                     for(int i=0;i<k;++i){
-                        auto colIdx = lp.addColumn(weight(e));
+                        auto colIdx = lp.add_column(weight(e));
                         edges_column.push_back(colIdx);
                     }
                 }
                 for(unsigned vertex=0;vertex<=num_vertices(graph);vertex++){
                     for(int i=0;i<k;++i){
-                        auto colIdx = lp.addColumn(0);
+                        auto colIdx = lp.add_column(0);
                         vertices_column.push_back(colIdx);
                     }
                 }
             }
 
         template <typename Graph, typename LP>
-            void addConstraints(Graph & graph, LP & lp,int k) {
+            void add_constraints(Graph & graph, LP & lp,int k) {
 
                 int dbIndex = 0;
                 for(auto edge: boost::make_iterator_range(edges(graph))){
@@ -81,10 +81,10 @@ namespace detail{
                     auto targ=target(edge,graph);
                     for(auto i: boost::irange(0,k)){
                         for(auto j:boost::irange(0,2)){
-                            auto rowIdx = lp.addRow(lp::LO, 0);
-                            lp.addConstraintCoef(rowIdx,edges_column[vertices_column_index(dbIndex,k,i)]);
-                            lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(sour,k,i)],j*2-1);
-                            lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(targ,k,i)],1-2*j);
+                            auto rowIdx = lp.add_row(lp::LO, 0);
+                            lp.add_constraint_coef(rowIdx,edges_column[vertices_column_index(dbIndex,k,i)]);
+                            lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(sour,k,i)],j*2-1);
+                            lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(targ,k,i)],1-2*j);
 
                         }
                     }
@@ -94,31 +94,32 @@ namespace detail{
                 for(auto vertex : boost::make_iterator_range(vertices(graph))){
                     auto col=get(boost::vertex_color,graph,vertex);
                     if(col!=0){
-                        auto rowIdx = lp.addRow(lp::FX, 1);
-                        lp.addConstraintCoef(rowIdx, vertices_column[vertices_column_index(dbIndex,k,col-1)]);
+                        auto rowIdx = lp.add_row(lp::FX, 1);
+                        lp.add_constraint_coef(rowIdx, vertices_column[vertices_column_index(dbIndex,k,col-1)]);
                     }
-                    auto rowIdx = lp.addRow(lp::FX, 1);
+                    auto rowIdx = lp.add_row(lp::FX, 1);
                     for(auto i: boost::irange(0,k)){
-                        lp.addConstraintCoef(rowIdx,vertices_column[vertices_column_index(dbIndex,k,i)]);
+                        lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(dbIndex,k,i)]);
                     }
                     ++dbIndex;
                 }
             }
     public:
-        std::vector<lp::ColId> edges_column;
-        std::vector<lp::ColId> vertices_column;
+        std::vector<lp::col_id> edges_column;
+        std::vector<lp::col_id> vertices_column;
     };
 
 
 
 template <typename Graph,typename LP>
-class MultiwayCut{
+class multiway_cut{
 public:
-    MultiwayCutLP multiwayCutLP;
-    MultiwayCut(const Graph & g,LP & lp,int k) :
+    multiway_cut_lp m_multiway_cut_lp;
+
+    multiway_cut(const Graph & g,LP & lp,int k) :
                 m_g(g),m_k(k){
-                    multiwayCutLP.init(g,lp,m_k);
-                    lp.solveToExtremePointDual();
+                    m_multiway_cut_lp.init(g,lp,m_k);
+                    lp.solve_to_extreme_point_dual();
                 };
 
      private:
@@ -128,7 +129,7 @@ public:
 };
 
 template <typename Graph,typename Dist,typename Rand,typename Lp>
-auto makeCut(const Graph & graph,int k,Dist &dist,Rand && random_engine,Lp &lp,MultiwayCutLP &mcLp,std::vector<int>& vertexToPart)->
+auto makeCut(const Graph & graph,int k,Dist &dist,Rand && random_engine,Lp &lp,multiway_cut_lp &mcLp,std::vector<int>& vertexToPart)->
         detail::CostType<Graph>{
     double cut_cost=0;
     auto weight=get(boost::edge_weight,graph);
@@ -139,11 +140,11 @@ auto makeCut(const Graph & graph,int k,Dist &dist,Rand && random_engine,Lp &lp,M
     }
     vertexToPart.resize(num_vertices(graph));
     auto index= get(boost::vertex_index, graph);
-    auto getColumn = [&] (int vertex,int dimension)->double {return lp.getColPrim(mcLp.vertices_column[vertices_column_index(vertex,k,dimension)]);};
+    auto get_column = [&] (int vertex,int dimension)->double {return lp.get_col_prim(mcLp.vertices_column[vertices_column_index(vertex,k,dimension)]);};
     for(auto vertex:boost::make_iterator_range(vertices(graph))){
         for(int dimension=0;dimension<k;++dimension)
-            if(1.0-getColumn(index(vertex),dimension)<randomRadiuses[dimension] || dimension==k-1){
-                //because each vertex have sum of coordinates equal 1, 1.0-getColumn(vertex,dimension) is proportional to distance
+            if(1.0-get_column(index(vertex),dimension)<randomRadiuses[dimension] || dimension==k-1){
+                //because each vertex have sum of coordinates equal 1, 1.0-get_column(vertex,dimension) is proportional to distance
                 //to vertex correspond to dimension
                 vertexToPart[index(vertex)]=dimension;
                 break;
@@ -184,13 +185,13 @@ auto multiway_cut_dispatch(Graph &graph,
                 for(auto vertex : boost::make_iterator_range(vertices(graph))){
                     terminals=std::max(terminals,colorMap(vertex));
                 }
-                detail::MultiwayCut<Graph,LP> mc(graph,lp,terminals);
+                detail::multiway_cut<Graph,LP> mc(graph,lp,terminals);
                 CostType cut_cost=std::numeric_limits<CostType>::max();
                 std::vector<int> best_solution;
                 std::vector<int> solution;
                 for(int i=0;i<iterations;++i){
                     solution.clear();
-                    int res=detail::makeCut(graph,terminals,dis,random_engine,lp,mc.multiwayCutLP,solution);
+                    int res=detail::makeCut(graph,terminals,dis,random_engine,lp,mc.m_multiway_cut_lp,solution);
                     if(res<cut_cost){
                         swap(solution,best_solution);
                         cut_cost=res;

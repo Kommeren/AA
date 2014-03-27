@@ -18,7 +18,7 @@
 #include "paal/local_search/custom_components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 
-#include "utils/read_tsplib.h"
+#include "utils/read_tsplib.hpp"
 #include "2_local_search_logger.hpp"
 
 using std::vector;
@@ -45,25 +45,25 @@ void test() {
 
     //printing
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
-    LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
+    LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
 
     //setting logger
-    auto logger = utils::make_twoLSLogger(mtx);
+    auto logger = utils::make_two_ls_logger(mtx);
 
     //search
-    two_local_search(cycle, paal::local_search::ChooseFirstBetterStrategy{},
-            logger, utils::ReturnFalseFunctor(), getDefaultTwoLocalComponents(mtx));
+    two_local_search(cycle, paal::local_search::choose_first_better_strategy{},
+            logger, utils::return_false_functor(), get_default_two_local_components(mtx));
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
-    test<paal::data_structures::SimpleCycle<int>>();
+    test<paal::data_structures::simple_cycle<int>>();
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
-    test<paal::data_structures::SplayCycle<int>>();
+    test<paal::data_structures::splay_cycle<int>>();
 }
 
-using paal::local_search::SearchComponents;
+using paal::local_search::search_components;
 
 
 //TODO probably optimization does not optimize...
@@ -76,36 +76,36 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     std::iota(v.begin(), v.end(), 0);
 
     //create random solution
-    typedef data_structures::SimpleCycle<int> Cycle;
+    typedef data_structures::simple_cycle<int> Cycle;
     std::random_shuffle(v.begin(), v.end());
     Cycle cycle(v.begin(), v.end());
-    int startLen = simple_algo::getLength(mtx, cycle);
+    int startLen = simple_algo::get_length(mtx, cycle);
 
     //creating local search
-    auto lsc = getDefaultTwoLocalComponents(mtx);
-    typedef local_search::SearchComponentsTraits<puretype(lsc)>::GainT GainT;
-    typedef local_search::GainCutSmallImproves<GainT, int> CIC;
+    auto lsc = get_default_two_local_components(mtx);
+    typedef local_search::search_components_traits<puretype(lsc)>::GainT GainT;
+    typedef local_search::gain_cut_small_improves<GainT, int> CIC;
     double epsilon = 0.001;
     CIC  cut(lsc.get<paal::local_search::Gain>(), startLen, epsilon);
     auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
 
     //setting logger
-    auto logger = utils::make_twoLSLogger(mtx);
+    auto logger = utils::make_two_ls_logger(mtx);
 
     //printing
-    LOGLN("Length before\t" << simple_algo::getLength(mtx, cycle));
-    paal::local_search::ChooseFirstBetterStrategy strategy{};
+    LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
+    paal::local_search::choose_first_better_strategy strategy{};
 
     //search
     for(int j = 0; j < 20; ++j) {
         epsilon /= 2;
         LOGLN("epsilon = " << epsilon);
-        cutLsc.get<local_search::Gain>().setEpsilon(epsilon);
+        cutLsc.get<local_search::Gain>().set_epsilon(epsilon);
         two_local_search(cycle, strategy,
-                logger, utils::ReturnFalseFunctor(), cutLsc);
+                logger, utils::return_false_functor(), cutLsc);
     }
 
     LOGLN("Normal search at the end");
-    two_local_search(cycle, strategy, logger, utils::ReturnFalseFunctor(), lsc);
+    two_local_search(cycle, strategy, logger, utils::return_false_functor(), lsc);
 }
 

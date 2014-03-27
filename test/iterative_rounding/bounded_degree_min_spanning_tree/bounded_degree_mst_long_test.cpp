@@ -35,7 +35,7 @@ typedef boost::property_map<Graph, boost::edge_weight_t>::type Cost;
 typedef std::set<Edge> ResultTree;
 
 template <typename Bound>
-void checkResult(const Graph & g, const ResultTree & tree,
+void check_result(const Graph & g, const ResultTree & tree,
                  const Cost & costs, const Bound & degBounds,
                  int verticesNum, double bestCost, double treeCost) {
     int treeEdges(tree.size());
@@ -84,7 +84,7 @@ void checkResult(const Graph & g, const ResultTree & tree,
 }
 
 template <template <typename> class Oracle, typename Bound>
-void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
+void run_test(const Graph & g, const Cost & costs, const Bound & degBounds,
              const int verticesNum, const double bestCost) {
     namespace ir = paal::ir;
     {
@@ -94,19 +94,19 @@ void runTest(const Graph & g, const Cost & costs, const Bound & degBounds,
                         ir::BDMSTOracle<Oracle>>(
                             g, degBounds, std::inserter(tree, tree.end()));
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
-        checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
+        check_result(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
     }
     {
         LOGLN("Relaxations limit = 1/iter");
         ResultTree tree;
-        ir::BDMSTIRComponents<> comps;
+        ir::BDMSTIRcomponents<> comps;
         auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
-                            ir::RelaxationsLimitCondition(), comps);
+                            ir::relaxations_limit_condition(), comps);
         auto result = ir::bounded_degree_mst_iterative_rounding<
                         ir::BDMSTOracle<Oracle>>(
                             g, degBounds, std::inserter(tree, tree.end()), components);
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
-        checkResult(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
+        check_result(g, tree, costs, degBounds, verticesNum, bestCost, *(result.second));
     }
 }
 
@@ -124,29 +124,29 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         Cost costs      = get(boost::edge_weight, g);
         std::vector<int> degBounds(verticesNum);
 
-        paal::readBDMST(ifs, verticesNum, edgesNum, g, costs,
+        paal::read_bdmst(ifs, verticesNum, edgesNum, g, costs,
                         degBounds, bestCost);
-        auto bounds = paal::utils::make_ArrayToFunctor(degBounds);
+        auto bounds = paal::utils::make_array_to_functor(degBounds);
 
         // default heuristics
         for (int i : boost::irange(0, 5)) {
             LOGLN("random violated, seed " << i);
             srand(i);
-            runTest<paal::lp::RandomViolatedSeparationOracle>(
+            run_test<paal::lp::random_violated_separation_oracle>(
                             g, costs, bounds, verticesNum, bestCost);
         }
 
         // non-default heuristics
         if (verticesNum <= 80) {
             LOGLN("most violated");
-            runTest<paal::lp::MostViolatedSeparationOracle>(
+            run_test<paal::lp::most_violated_separation_oracle>(
                             g, costs, bounds, verticesNum, bestCost);
         }
 
         // non-default heuristics
         if (verticesNum <= 60) {
             LOGLN("first violated");
-            runTest<paal::lp::FirstViolatedSeparationOracle>(
+            run_test<paal::lp::first_violated_separation_oracle>(
                             g, costs, bounds, verticesNum, bestCost);
         }
     });

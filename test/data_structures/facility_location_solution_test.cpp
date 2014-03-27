@@ -11,24 +11,24 @@
 #include "paal/data_structures/voronoi/voronoi.hpp"
 #include "utils/sample_graph.hpp"
 
-BOOST_AUTO_TEST_CASE(FacilityLocationSolutionTest) {
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+BOOST_AUTO_TEST_CASE(facility_location_solutionTest) {
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
     std::vector<int> fcosts{7,8};
     auto cost = [&](int i){ return fcosts[i];};
 
-    typedef paal::data_structures::Voronoi<decltype(gm)> VorType;
-    typedef paal::data_structures::FacilityLocationSolution
+    typedef paal::data_structures::voronoi<decltype(gm)> VorType;
+    typedef paal::data_structures::facility_location_solution
         < decltype(cost), VorType> Sol;
     typedef typename VorType::GeneratorsSet FSet;
     VorType voronoi( FSet{},   FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
 
     Sol sol(voronoi, FSet{SGM::A, SGM::B}, cost);
 
-    sol.addFacility(SGM::A);
-    auto ab_min_a = sol.addFacility(SGM::B);
-    auto b_min_ab = sol.remFacility(SGM::A);
-    BOOST_CHECK_EQUAL(sol.addFacility(SGM::A), -b_min_ab );
-    BOOST_CHECK_EQUAL(sol.remFacility(SGM::B), -ab_min_a);
+    sol.add_facility(SGM::A);
+    auto ab_min_a = sol.add_facility(SGM::B);
+    auto b_min_ab = sol.rem_facility(SGM::A);
+    BOOST_CHECK_EQUAL(sol.add_facility(SGM::A), -b_min_ab );
+    BOOST_CHECK_EQUAL(sol.rem_facility(SGM::B), -ab_min_a);
 
 }

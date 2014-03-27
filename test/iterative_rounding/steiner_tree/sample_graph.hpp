@@ -13,7 +13,7 @@ typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS, bo
 typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 typedef std::vector<int> Terminals;
 
-Graph createSmallGraph() {
+Graph create_small_graph() {
     Graph g(6);
     bool b;
     b = add_edge(0, 1, EdgeProp(2), g).second;
@@ -38,7 +38,7 @@ Graph createSmallGraph() {
     return g;
 }
 
-std::pair<Terminals, Terminals> getSmallGraphVertices() {
+std::pair<Terminals, Terminals> get_small_graph_vertices() {
     Terminals terminals, nonTerminals;
     for(int i = 0; i < 6; i++) {
         if (i < 4) terminals.push_back(i);
@@ -47,7 +47,7 @@ std::pair<Terminals, Terminals> getSmallGraphVertices() {
     return make_pair(terminals, nonTerminals);
 }
 
-Graph createBiggerGraph(int p = 3, int q = 2) {
+Graph create_bigger_graph(int p = 3, int q = 2) {
     bool b;
     int n = p + p * q;
     Graph g(n);
@@ -66,7 +66,7 @@ Graph createBiggerGraph(int p = 3, int q = 2) {
     return g;
 }
 
-std::pair<Terminals, Terminals> getBiggerGraphVertices(int p = 3, int q = 2) {
+std::pair<Terminals, Terminals> get_bigger_graph_vertices(int p = 3, int q = 2) {
     int n = p + p * q;
     Terminals terminals, nonTerminals;
     for (int i = 0; i < n; i++) {

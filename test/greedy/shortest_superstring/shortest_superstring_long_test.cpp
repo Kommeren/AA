@@ -23,7 +23,7 @@
 
 using namespace paal;
 
-BOOST_AUTO_TEST_CASE(ShortestSuperstringLong) {
+BOOST_AUTO_TEST_CASE(shortest_superstringLong) {
     std::string testDir = "test/data/SS/";
     parse(testDir + "capopt.txt", [&](const std::string  & fname, std::istream & is_test_cases) {
         int opt;

@@ -28,12 +28,12 @@ namespace data_structures {
  * The generators of the voronoi are the facilities and the vertices are the clients.
  *
  * @tparam FacilityCost
- * @tparam VoronoiType
+ * @tparam voronoiType
  */
-template <typename FacilityCost, typename VoronoiType>
-class FacilityLocationSolution {
+template <typename FacilityCost, typename voronoiType>
+class facility_location_solution {
     public:
-        typedef VoronoiTraits<VoronoiType> VT;
+        typedef voronoi_traits<voronoiType> VT;
         typedef typename VT::VertexType VertexType;
         typedef typename VT::DistanceType Dist;
         typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
@@ -46,71 +46,71 @@ class FacilityLocationSolution {
          * @param uf
          * @param c
          */
-        FacilityLocationSolution(VoronoiType  voronoi,
+        facility_location_solution(voronoiType  voronoi,
                                  UnchosenFacilitiesSet uf,
                                  const FacilityCost & c) :
-            m_voronoi(std::move(voronoi)), m_unchosenFacilities(std::move(uf)), m_facCosts(c) {}
+            m_voronoi(std::move(voronoi)), m_unchosen_facilities(std::move(uf)), m_fac_costs(c) {}
 
         /// returns diff between new cost and old cost
-        Dist addFacility(VertexType f) {
-            assert(m_unchosenFacilities.find(f) != m_unchosenFacilities.end());
-            m_unchosenFacilities.erase(f);
+        Dist add_facility(VertexType f) {
+            assert(m_unchosen_facilities.find(f) != m_unchosen_facilities.end());
+            m_unchosen_facilities.erase(f);
 
-            return  m_facCosts(f) + m_voronoi.addGenerator(f);
+            return  m_fac_costs(f) + m_voronoi.add_generator(f);
         }
 
         /// returns diff between new cost and old cost
-        Dist remFacility(VertexType f) {
-            assert(m_unchosenFacilities.find(f) == m_unchosenFacilities.end());
-            m_unchosenFacilities.insert(f);
+        Dist rem_facility(VertexType f) {
+            assert(m_unchosen_facilities.find(f) == m_unchosen_facilities.end());
+            m_unchosen_facilities.insert(f);
 
-            return -m_facCosts(f) + m_voronoi.remGenerator(f);
+            return -m_fac_costs(f) + m_voronoi.rem_generator(f);
         }
 
         ///getter for unchosen facilities
-        const UnchosenFacilitiesSet & getUnchosenFacilities() const {
-            return m_unchosenFacilities;
+        const UnchosenFacilitiesSet & get_unchosen_facilities() const {
+            return m_unchosen_facilities;
         }
 
         ///setter for unchosen facilities
-        const ChosenFacilitiesSet & getChosenFacilities() const {
-            return m_voronoi.getGenerators();
+        const ChosenFacilitiesSet & get_chosen_facilities() const {
+            return m_voronoi.get_generators();
         }
 
         ///gets clients assigned to specific facility
-        decltype(std::declval<VoronoiType>().getVerticesForGenerator(std::declval<VertexType>()))
-        getClientsForFacility(VertexType f) const {
-            return m_voronoi.getVerticesForGenerator(f);
+        decltype(std::declval<voronoiType>().get_vertices_for_generator(std::declval<VertexType>()))
+        get_clients_for_facility(VertexType f) const {
+            return m_voronoi.get_vertices_for_generator(f);
         }
 
         /// gets voronoi
-        const VoronoiType & getVoronoi() const {
+        const voronoiType & get_voronoi() const {
             return m_voronoi;
         }
 
     private:
 
-        VoronoiType m_voronoi;
-        UnchosenFacilitiesSet m_unchosenFacilities;
-        const FacilityCost & m_facCosts;
+        voronoiType m_voronoi;
+        UnchosenFacilitiesSet m_unchosen_facilities;
+        const FacilityCost & m_fac_costs;
 };
 
 /**
- * @brief traits for FacilityLocationSolution
+ * @brief traits for facility_location_solution
  *
  * @tparam FacilityCost
- * @tparam Voronoi
+ * @tparam voronoi
  */
-template <typename FacilityCost, typename Voronoi>
-class FacilityLocationSolutionTraits<FacilityLocationSolution<FacilityCost, Voronoi>> {
-    typedef VoronoiTraits<Voronoi> VT;
-    typedef FacilityLocationSolution<FacilityCost, Voronoi> FLS;
+template <typename FacilityCost, typename voronoi>
+class facility_location_solution_traits<facility_location_solution<FacilityCost, voronoi>> {
+    typedef voronoi_traits<voronoi> VT;
+    typedef facility_location_solution<FacilityCost, voronoi> FLS;
 public:
     typedef typename VT::VertexType VertexType;
     typedef typename VT::DistanceType Dist;
     typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
     ///unchosen facilities set
-    typedef puretype(std::declval<FLS>().getUnchosenFacilities()) UnchosenFacilitiesSet;
+    typedef puretype(std::declval<FLS>().get_unchosen_facilities()) UnchosenFacilitiesSet;
 };
 
 

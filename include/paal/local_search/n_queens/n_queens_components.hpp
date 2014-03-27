@@ -33,7 +33,7 @@ struct Move {
      *
      * @return
      */
-    int getFrom() const {
+    int get_from() const {
         return m_from;
     }
 
@@ -42,7 +42,7 @@ struct Move {
      *
      * @return
      */
-    int getTo() const {
+    int get_to() const {
         return m_to;
     }
 
@@ -54,7 +54,7 @@ private:
 /**
  * @brief Functor creating Move
  */
-struct MakeMove {
+struct make_move {
     /**
      * @brief operator()
      *
@@ -70,9 +70,9 @@ struct MakeMove {
 };
 
 /**
- * @brief NQueensCommit functor
+ * @brief n_queens_commit functor
  */
-struct NQueensCommit {
+struct n_queens_commit {
     template <typename Solution>
         /**
          * @brief Operator swaps elements of the solution range
@@ -81,14 +81,14 @@ struct NQueensCommit {
          * @param move
          */
     bool operator()(Solution & sol, Move move) const {
-        sol.swapQueens(move.getFrom(), move.getTo());
+        sol.swap_queens(move.get_from(), move.get_to());
         return true;
     }
 };
 
 namespace detail {
 
-    struct TupleToMove {
+    struct tuple_to_move {
         using result_type = Move;
         result_type operator() (std::tuple<int, int> t) const {
             return Move(std::get<0>(t), std::get<1>(t));
@@ -97,9 +97,9 @@ namespace detail {
 }//!detail
 
 /**
- * @brief NQueensGetMoves functor
+ * @brief n_queensget_moves functor
  */
-class NQueensGetMoves {
+class n_queensget_moves {
 
 
     /**
@@ -108,9 +108,9 @@ class NQueensGetMoves {
      * @tparam Solution
      */
     template <typename Solution>
-    struct TypesEval {
+    struct types_eval {
         using SolutionIter = decltype(std::declval<Solution>().begin());
-        using Subset = data_structures::SubsetsIterator<2, SolutionIter, MakeMove>;
+        using Subset = data_structures::subsets_iterator<2, SolutionIter, make_move>;
         using IterPair = std::pair<Subset, Subset>;
         using Range = boost::iterator_range<Subset>;
 
@@ -127,18 +127,18 @@ public:
      */
     template <typename Solution>
     auto operator()(const Solution & solution) const ->
-        typename TypesEval<Solution>::Range
+        typename types_eval<Solution>::Range
     {
-        return boost::make_iterator_range(data_structures::make_SubsetsIteratorRange<2>
-                        (solution.begin(), solution.end(), MakeMove{}));
+        return boost::make_iterator_range(data_structures::make_subsets_iterator_range<2>
+                        (solution.begin(), solution.end(), make_move{}));
             ;
     }
 };
 
 /**
- * @brief NQueensGain functor
+ * @brief n_queens_gain functor
  */
-struct NQueensGain {
+struct n_queens_gain {
     /**
      * @brief computes difference in cost
      *
@@ -150,15 +150,15 @@ struct NQueensGain {
      */
     template <typename Solution>
     int operator()(const Solution & solution, Move move) const {
-        int x1 = move.getFrom();
-        int y1 = solution.getY(x1);
-        int x2 = move.getTo();
-        int y2 = solution.getY(x2);
+        int x1 = move.get_from();
+        int y1 = solution.get_y(x1);
+        int x2 = move.get_to();
+        int y2 = solution.get_y(x2);
 
-        return - solution.getNumAttacing(x1, y2)
-               - solution.getNumAttacing(x2, y1)
-               + solution.getNumAttacing(x1, y1) - 2
-               + solution.getNumAttacing(x2, y2) - 2
+        return - solution.get_num_attacing(x1, y2)
+               - solution.get_num_attacing(x2, y1)
+               + solution.get_num_attacing(x1, y1) - 2
+               + solution.get_num_attacing(x2, y2) - 2
                - 2 * (std::abs(x1 - x2) == std::abs(y1 - y2));
     }
 };

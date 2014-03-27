@@ -13,7 +13,7 @@
 namespace paal {
 
 template <typename Graph, typename Cost>
-void addEdge(Graph & g, Cost & cost, int u, int v, double c) {
+void add_edge_to_graph(Graph & g, Cost & cost, int u, int v, double c) {
     bool b;
     typename boost::graph_traits < Graph >::edge_descriptor e;
     std::tie(e, b) = add_edge(u, v, g);
@@ -22,7 +22,7 @@ void addEdge(Graph & g, Cost & cost, int u, int v, double c) {
 }
 
 template <typename Graph, typename Cost, typename Bounds>
-inline void readBDMST(std::istream & is, int verticesNum, int edgesNum,
+inline void read_bdmst(std::istream & is, int verticesNum, int edgesNum,
                 Graph & g, Cost & costs, Bounds & degBounds, double & bestCost) {
     std::string s;
     int u, v, b;
@@ -39,7 +39,7 @@ inline void readBDMST(std::istream & is, int verticesNum, int edgesNum,
 
     for (int i = 0; i < edgesNum; i++) {
         is >> u >> v >> b >> c;
-        addEdge(g, costs, u, v, c);
+        add_edge_to_graph(g, costs, u, v, c);
     }
 
     is >> s; is >> s;

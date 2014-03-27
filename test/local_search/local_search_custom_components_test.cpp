@@ -21,33 +21,33 @@ BOOST_AUTO_TEST_SUITE( local_search_custom_components )
 namespace ls = paal::local_search;
 using namespace paal;
 
-    BOOST_AUTO_TEST_CASE(ConditionalGainAdaptorTest) {
+    BOOST_AUTO_TEST_CASE(conditional_gain_adaptorTest) {
         int solution(0);
 
-        auto condGain =  ls::make_ConditionalGainAdaptor(SearchComp().get<ls::Gain>(),
+        auto condGain =  ls::make_conditional_gain_adaptor(search_comps().get<ls::Gain>(),
                 [](int sol, int move){return sol + move <= 3;});
 
-        ls::local_search_simple(solution, paal::data_structures::replace<ls::Gain>(condGain, SearchComp()));
+        ls::local_search_simple(solution, paal::data_structures::replace<ls::Gain>(condGain, search_comps()));
         BOOST_CHECK_EQUAL(solution, 3);
         LOGLN("solution " << solution);
     }
 
-    BOOST_AUTO_TEST_CASE(TabuGainAdaptorTest) {
+    BOOST_AUTO_TEST_CASE(tabu_gain_adaptorTest) {
         int currentSolution(0);
         int best(0);
 
-        auto condGain =  ls::make_TabuGainAdaptor(
-                data_structures::TabuListRememberSolutionAndMove<int, int>(20),
-                utils::ReturnTrueFunctor(),
+        auto condGain =  ls::make_tabu_gain_adaptor(
+                data_structures::tabu_list_remember_solution_and_move<int, int>(20),
+                utils::return_true_functor(),
                 [](int s, int m){ return s + m <= 3. && s + m >= 0.;});
 
         auto recordSolutionCommit =
-                ls::make_RecordSolutionCommitAdapter(
+                ls::make_record_solution_commit_adapter(
                         best,
                         Commit(),
-                        paal::utils::make_FunctorToComparator(f, utils::Greater()));
+                        paal::utils::make_functor_to_comparator(f, utils::Greater()));
 
-        ls::local_search_simple(currentSolution, ls::make_SearchComponents(GetMoves(), condGain, recordSolutionCommit));
+        ls::local_search_simple(currentSolution, ls::make_search_components(get_moves(), condGain, recordSolutionCommit));
 
         BOOST_CHECK_EQUAL(best, 3);
         LOGLN("solution " << best);

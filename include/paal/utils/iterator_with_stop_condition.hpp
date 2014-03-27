@@ -21,9 +21,9 @@ namespace paal {
      * @tparam StopCondition
      */
     template <typename Iterator, typename StopCondition>
-        class IteratorWithStopCondition
+        class iterator_with_stop_condition
         : public boost::iterator_facade<
-          IteratorWithStopCondition<Iterator, StopCondition>
+          iterator_with_stop_condition<Iterator, StopCondition>
           , typename std::iterator_traits<Iterator>::value_type
           , typename std::iterator_traits<Iterator>::iterator_category
           , typename std::iterator_traits<Iterator>::reference
@@ -33,31 +33,31 @@ namespace paal {
         typedef  typename std::iterator_traits<Iterator>::reference reference;
 
         /**
-         * @brief private constructor. Use makeBeginIteratorWithStopCondition,
-         *              makeEndIteratorWithStopCondition.
+         * @brief private constructor. Use make_beginiterator_with_stop_condition,
+         *              make_enditerator_with_stop_condition.
          *
          * @param begin
          * @param end
-         * @param stopCondition
+         * @param stop_condition
          */
-            IteratorWithStopCondition(Iterator begin, Iterator end, StopCondition stopCondition)
-            : m_begin(begin), m_end(end), m_stopCondtion(stopCondition) {}
+            iterator_with_stop_condition(Iterator begin, Iterator end, StopCondition stop_condition)
+            : m_begin(begin), m_end(end), m_stop_condtion(stop_condition) {}
 
         friend class boost::iterator_core_access;
         template <typename I, typename SC>
-            friend IteratorWithStopCondition<I,SC>
-                makeBeginIteratorWithStopCondition(I, I, SC);
+            friend iterator_with_stop_condition<I,SC>
+                make_beginiterator_with_stop_condition(I, I, SC);
 
         template <typename I, typename SC>
-            friend IteratorWithStopCondition<I,SC>
-                makeEndIteratorWithStopCondition(I, SC);
+            friend iterator_with_stop_condition<I,SC>
+                make_enditerator_with_stop_condition(I, SC);
 
         /**
-         * @brief checked if stopCondition is fullfiled
+         * @brief checked if stop_condition is fullfiled
          *        moves m_begin to m_end if yes.
          */
-        void checkStop() {
-            if(m_stopCondtion()) {
+        void check_stop() {
+            if(m_stop_condtion()) {
                 m_begin = m_end;
             }
         }
@@ -67,7 +67,7 @@ namespace paal {
          */
         void increment() {
             ++m_begin;
-            checkStop();
+            check_stop();
         }
 
         /**
@@ -75,7 +75,7 @@ namespace paal {
          */
         void decrement() {
             --m_begin;
-            checkStop();
+            check_stop();
         }
 
         /**
@@ -85,7 +85,7 @@ namespace paal {
          *
          * @return
          */
-        bool equal(IteratorWithStopCondition const& other) const
+        bool equal(iterator_with_stop_condition const& other) const
         {
             return this->m_begin == other.m_begin;
         }
@@ -104,7 +104,7 @@ namespace paal {
          */
         void advance(typename std::iterator_traits<Iterator>::difference_type n) {
             m_begin += n;
-            checkStop();
+            check_stop();
         }
 
         /**
@@ -114,47 +114,47 @@ namespace paal {
          *
          * @return
          */
-        std::size_t distance_to(IteratorWithStopCondition other) {
+        std::size_t distance_to(iterator_with_stop_condition other) {
             return other.m_begin - m_begin;
         }
 
 
         Iterator m_begin;
         Iterator m_end;
-        StopCondition m_stopCondtion;
+        StopCondition m_stop_condtion;
     };
 
     /**
-     * @brief function to create begin of IteratorWithStopCondition
+     * @brief function to create begin of iterator_with_stop_condition
      *
      * @tparam Iterator
      * @tparam StopCondition
      * @param begin
      * @param end
-     * @param stopCondition
+     * @param stop_condition
      *
      * @return
      */
     template <typename Iterator, typename StopCondition>
-        IteratorWithStopCondition<Iterator, StopCondition>
-        makeBeginIteratorWithStopCondition(Iterator begin, Iterator end, StopCondition stopCondition) {
-            return IteratorWithStopCondition<Iterator, StopCondition>(begin, end, stopCondition);
+        iterator_with_stop_condition<Iterator, StopCondition>
+        make_beginiterator_with_stop_condition(Iterator begin, Iterator end, StopCondition stop_condition) {
+            return iterator_with_stop_condition<Iterator, StopCondition>(begin, end, stop_condition);
         }
 
     /**
-     * @brief function to create end of IteratorWithStopCondition
+     * @brief function to create end of iterator_with_stop_condition
      *
      * @tparam Iterator
      * @tparam StopCondition
      * @param end
-     * @param stopCondition
+     * @param stop_condition
      *
      * @return
      */
     template <typename Iterator, typename StopCondition>
-        IteratorWithStopCondition<Iterator, StopCondition>
-        makeEndIteratorWithStopCondition(Iterator end, StopCondition stopCondition) {
-            return IteratorWithStopCondition<Iterator, StopCondition>(end, end, stopCondition);
+        iterator_with_stop_condition<Iterator, StopCondition>
+        make_enditerator_with_stop_condition(Iterator end, StopCondition stop_condition) {
+            return iterator_with_stop_condition<Iterator, StopCondition>(end, end, stop_condition);
         }
 
 

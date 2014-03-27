@@ -16,25 +16,25 @@
 
 namespace ls = paal::local_search;
 
-struct VirtualGain {
-    virtual int operator()(ls::NQueensSolutionAdapter<std::vector<int>> & sol,
+struct virtual_gain {
+    virtual int operator()(ls::n_queens_solution_adapter<std::vector<int>> & sol,
                 ls::Move m) {
-        return ls::NQueensGain{}(sol, m);
+        return ls::n_queens_gain{}(sol, m);
     }
 };
 
-struct VirtualGetMoves {
-    virtual auto operator()(ls::NQueensSolutionAdapter<std::vector<int>> & sol) ->
-    decltype(ls::NQueensGetMoves{}(sol))
+struct Virtualget_moves {
+    virtual auto operator()(ls::n_queens_solution_adapter<std::vector<int>> & sol) ->
+    decltype(ls::n_queensget_moves{}(sol))
     {
-        return ls::NQueensGetMoves{}(sol);
+        return ls::n_queensget_moves{}(sol);
     }
 };
 
-struct VirtualCommit {
-    virtual bool operator()(ls::NQueensSolutionAdapter<std::vector<int>> & sol,
+struct virtual_commit {
+    virtual bool operator()(ls::n_queens_solution_adapter<std::vector<int>> & sol,
                 ls::Move m) {
-        return ls::NQueensCommit{}(sol, m);
+        return ls::n_queens_commit{}(sol, m);
     }
 };
 
@@ -49,35 +49,35 @@ int main(int argc, char ** argv) {
     }
     const int number_of_queens = std::stoi(argv[1]);
 
-    typedef ls::NQueensSolutionAdapter<std::vector<int>> Adapter;
+    typedef ls::n_queens_solution_adapter<std::vector<int>> Adapter;
     std::vector<int> queens(number_of_queens);
     boost::iota(queens, 0);
 
-    VirtualGain vgain;
-    VirtualCommit vcommit;
-    VirtualGetMoves vgetMoves;
+    virtual_gain vgain;
+    virtual_commit vcommit;
+    Virtualget_moves vgetMoves;
 
-    auto gain = [&](ls::NQueensSolutionAdapter<std::vector<int>> & sol,
+    auto gain = [&](ls::n_queens_solution_adapter<std::vector<int>> & sol,
                 ls::Move m) {return vgain(sol, m);};
 
-    auto commit = [&](ls::NQueensSolutionAdapter<std::vector<int>> & sol,
+    auto commit = [&](ls::n_queens_solution_adapter<std::vector<int>> & sol,
                 ls::Move m) {return vcommit(sol, m);};
 
-    auto getMoves = [&](ls::NQueensSolutionAdapter<std::vector<int>> & sol
+    auto getMoves = [&](ls::n_queens_solution_adapter<std::vector<int>> & sol
             ) {return vgetMoves(sol);};
 
-    ls::NQueensLocalSearchComponents<> comps;
+    ls::n_queens_local_search_components<> comps;
     int nr_of_iterations(0);
-    auto countingGain = paal::utils::make_CountingFunctorAdaptor(gain, nr_of_iterations);
-    auto countingComps = paal::local_search::make_SearchComponents(getMoves, countingGain, commit);
+    auto countingGain = paal::utils::make_counting_functor_adaptor(gain, nr_of_iterations);
+    auto countingComps = paal::local_search::make_search_components(getMoves, countingGain, commit);
 
     if(strategy == "FirstBetter") {
-        ls::nQueensSolutionLocalSearchSimple(queens, countingComps);
+        ls::n_queens_solution_local_search_simple(queens, countingComps);
     } else {
-        paal::utils::ReturnFalseFunctor nop;
-        ls::nQueensSolutionLocalSearch(queens, ls::SteepestSlopeStrategy{}, nop, nop, countingComps);
+        paal::utils::return_false_functor nop;
+        ls::n_queens_solution_local_search(queens, ls::steepest_slope_strategy{}, nop, nop, countingComps);
     }
-    std::cout <<  Adapter(queens).objFun() << " " << nr_of_iterations << std::endl;
+    std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
 
     return 0;
 }

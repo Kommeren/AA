@@ -22,8 +22,8 @@ int main() {
     std::cout << "Knapsack 0 / 1 no output" << std::endl;
     auto maxValue = paal::knapsack_0_1_no_output(std::begin(objects), std::end(objects),
             capacity,
-            paal::utils::make_ArrayToFunctor(sizes),
-            paal::utils::make_ArrayToFunctor(values));
+            paal::utils::make_array_to_functor(sizes),
+            paal::utils::make_array_to_functor(values));
 
     std::cout << "Max value " << maxValue.first << ", Total size "  << maxValue.second << std::endl;
 //! [Knapsack Example]

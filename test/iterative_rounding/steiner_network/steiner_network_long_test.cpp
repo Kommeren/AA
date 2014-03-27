@@ -45,12 +45,12 @@ int rand(int min, int max) {
     return ::rand() % (max - min + 1) + min;
 }
 
-int randCost() {
+int rand_cost() {
     static const int MAX_COST = 100;
     return rand(1, MAX_COST);
 }
 
-void generateRestrictions(RestrictionVec & res, int maxRes) {
+void generate_restrictions(RestrictionVec & res, int maxRes) {
     for (int i : boost::irange(0, int(res.size()))) {
         for (int j : boost::irange(i+1, int(res.size()))) {
             res[i][j] = res[j][i] = rand(2, maxRes);
@@ -58,7 +58,7 @@ void generateRestrictions(RestrictionVec & res, int maxRes) {
     }
 }
 
-bool nonZero(const std::vector<int> & vec) {
+bool non_zero(const std::vector<int> & vec) {
     for (auto v : vec)
         if (v != 0)
             return true;
@@ -66,9 +66,9 @@ bool nonZero(const std::vector<int> & vec) {
     return false;
 }
 
-bool nonZero(const RestrictionVec & res) {
+bool non_zero(const RestrictionVec & res) {
     for (auto row : res)
-        if (nonZero(row))
+        if (non_zero(row))
             return true;
 
     return false;
@@ -79,7 +79,7 @@ void dec(std::vector<int> & vec) {
         v = std::max(0, v-1);
 }
 
-void addEdge(Edges & edges, int u, int v, int & edgeNum) {
+void add_edge_to_graph(Edges & edges, int u, int v, int & edgeNum) {
     auto edge = std::make_pair(std::min(u,v), std::max(u,v));
     if (edges.find(edge) == edges.end()) {
         edges.insert(std::make_pair(edge, 1));
@@ -91,7 +91,7 @@ void addEdge(Edges & edges, int u, int v, int & edgeNum) {
     }
 }
 
-void randomTree(Edges & edges, RestrictionVec & restrictions,
+void random_tree(Edges & edges, RestrictionVec & restrictions,
         int specialVertices, int verticesNum, int & edgeNum) {
     int first = rand(specialVertices, verticesNum - 2);
     std::vector<int> vertices(1, first);
@@ -99,7 +99,7 @@ void randomTree(Edges & edges, RestrictionVec & restrictions,
     // Generates edge between current vertex and already processed (tree) vertices.
     auto generateTreeEdge = [&](int v){
         int index = rand(0, vertices.size() - 1);
-        addEdge(edges, v, vertices[index], edgeNum);
+        add_edge_to_graph(edges, v, vertices[index], edgeNum);
         vertices.push_back(v);
     };
 
@@ -113,34 +113,34 @@ void randomTree(Edges & edges, RestrictionVec & restrictions,
     // There is be a path in the tree between every pair of vertices,
     // so we decrement special vertices restrictions.
     for (int v : boost::irange(0, specialVertices)) {
-        if (nonZero(restrictions[v])) {
+        if (non_zero(restrictions[v])) {
             generateTreeEdge(v);
             dec(restrictions[v]);
         }
     }
 }
 
-void fillGraph(Graph & g, const Edges & edges, int & verticesNum) {
+void fill_graph(Graph & g, const Edges & edges, int & verticesNum) {
     g.clear();
     auto cost = get(boost::edge_weight, g);
     for (auto e : edges) {
         // add regular edge
-        paal::addEdge(g, cost, e.first.first, e.first.second, randCost());
+        paal::add_edge_to_graph(g, cost, e.first.first, e.first.second, rand_cost());
         // add new vertices on multi-edges, so that we get a graph not a multigraph
         for (int i = 1; i < e.second; ++i) {
-            paal::addEdge(g, cost, e.first.first, verticesNum, randCost());
-            paal::addEdge(g, cost, e.first.second, verticesNum, randCost());
+            paal::add_edge_to_graph(g, cost, e.first.first, verticesNum, rand_cost());
+            paal::add_edge_to_graph(g, cost, e.first.second, verticesNum, rand_cost());
             ++verticesNum;
         }
     }
 }
 
-struct CliqueTag{};
-struct SparseGraphTag{};
+struct clique_tag{};
+struct sparse_graph_tag{};
 
-int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
+int generate_instance(Graph & g, RestrictionVec & res, int verticesNum,
         int minEdgeNum, int specialVertices, int maxRes, unsigned int seed,
-        SparseGraphTag) {
+        sparse_graph_tag) {
     srand(seed);
     assert(specialVertices + 1 < verticesNum);
     assert(maxRes >= 2);
@@ -149,40 +149,40 @@ int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
     Edges edges;
     res = RestrictionVec(specialVertices, std::vector<int>(specialVertices, 0));
 
-    generateRestrictions(res, maxRes);
+    generate_restrictions(res, maxRes);
     RestrictionVec tempRes = res;
 
-    while (nonZero(tempRes)) {
-        randomTree(edges, tempRes, specialVertices, verticesNum, edgeNum);
+    while (non_zero(tempRes)) {
+        random_tree(edges, tempRes, specialVertices, verticesNum, edgeNum);
     }
 
     while (edgeNum < minEdgeNum) {
         int u = rand(0, verticesNum - 1);
         int v = rand(u + 1, verticesNum);
-        addEdge(edges, u, v, edgeNum);
+        add_edge_to_graph(edges, u, v, edgeNum);
     }
 
-    fillGraph(g, edges, verticesNum);
+    fill_graph(g, edges, verticesNum);
 
     LOGLN("edges: " << edgeNum);
 
     return verticesNum;
 }
 
-int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
+int generate_instance(Graph & g, RestrictionVec & res, int verticesNum,
         int minEdgeNum, int restrictedVertices, int maxRes, unsigned int seed,
-        CliqueTag) {
+        clique_tag) {
     srand(seed);
     assert(restrictedVertices <= verticesNum);
     assert(maxRes >= 2);
 
     res = RestrictionVec(restrictedVertices, std::vector<int>(restrictedVertices, 0));
-    generateRestrictions(res, maxRes);
+    generate_restrictions(res, maxRes);
 
     auto cost = get(boost::edge_weight, g);
     for (int i : boost::irange(0, verticesNum)) {
         for (int j : boost::irange(i+1, verticesNum)) {
-            paal::addEdge(g, cost, i, j, randCost());
+            paal::add_edge_to_graph(g, cost, i, j, rand_cost());
         }
     }
 
@@ -190,48 +190,48 @@ int generateInstance(Graph & g, RestrictionVec & res, int verticesNum,
 }
 
 template <template <typename> class Oracle, typename Restrictions>
-void runSingleTest(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
+void run_single_test(const Graph & g, const Cost & costs, const Restrictions & restrictions) {
     namespace ir = paal::ir;
     namespace lp = paal::lp;
 
     typedef std::vector<Edge> ResultNetwork;
     ResultNetwork resultNetwork;
-    auto steinerNetwork(ir::make_SteinerNetwork<
-                    ir::SteinerNetworkOracle<Oracle>>(g, restrictions,
+    auto steinerNetwork(ir::make_steiner_network<
+                    ir::steiner_networkOracle<Oracle>>(g, restrictions,
                             std::back_inserter(resultNetwork)));
-    auto invalid = steinerNetwork.checkInputValidity();
+    auto invalid = steinerNetwork.check_input_validity();
     BOOST_CHECK(!invalid);
 
     auto result = ir::solve_iterative_rounding(steinerNetwork,
-                        ir::SteinerNetworkIRComponents<>());
+                        ir::steiner_networkIRcomponents<>());
     BOOST_CHECK(result.first == lp::OPTIMAL);
 }
 
 template <typename Restrictions>
-void runTest(const Graph & g, const Cost & costs, const Restrictions & restrictions,
+void run_test(const Graph & g, const Cost & costs, const Restrictions & restrictions,
         int verticesNum) {
     // default heuristics
     for (int i : boost::irange(0, 5)) {
         LOGLN("random violated, seed " << i);
         srand(i);
-        runSingleTest<paal::lp::RandomViolatedSeparationOracle>(g, costs, restrictions);
+        run_single_test<paal::lp::random_violated_separation_oracle>(g, costs, restrictions);
     }
 
     // non-default heuristics
     if (verticesNum <= 80) {
         LOGLN("most violated");
-        runSingleTest<paal::lp::MostViolatedSeparationOracle>(g, costs, restrictions);
+        run_single_test<paal::lp::most_violated_separation_oracle>(g, costs, restrictions);
     }
 
     // non-default heuristics
     if (verticesNum <= 50) {
         LOGLN("first violated");
-        runSingleTest<paal::lp::FirstViolatedSeparationOracle>(g, costs, restrictions);
+        run_single_test<paal::lp::first_violated_separation_oracle>(g, costs, restrictions);
     }
 }
 
 template <typename GraphTypeTag>
-void runTestCase(const std::vector<int> & verticesNum, const std::vector<int> & minEdgeNum,
+void run_test_case(const std::vector<int> & verticesNum, const std::vector<int> & minEdgeNum,
         const std::vector<int> & specialVertices, const std::vector<int> & maxRes,
         GraphTypeTag graphTypeTag) {
     Graph g;
@@ -239,7 +239,7 @@ void runTestCase(const std::vector<int> & verticesNum, const std::vector<int> & 
     auto seed = [](int x) {return 12345 * x;};
 
     for (int i : boost::irange(0, int(verticesNum.size()))) {
-        int vertices = generateInstance(g, res, verticesNum[i], minEdgeNum[i],
+        int vertices = generate_instance(g, res, verticesNum[i], minEdgeNum[i],
                 specialVertices[i], maxRes[i], seed(i), graphTypeTag);
         LOGLN("vertices: " << vertices);
         LOGLN("special vertices: " << specialVertices[i]);
@@ -252,13 +252,13 @@ void runTestCase(const std::vector<int> & verticesNum, const std::vector<int> & 
                     return 1;
             };
 
-        runTest(g, get(boost::edge_weight, g), restrictions, vertices);
+        run_test(g, get(boost::edge_weight, g), restrictions, vertices);
     }
 }
 
 } //namespace
 
-BOOST_AUTO_TEST_SUITE(SteinerNetwork)
+BOOST_AUTO_TEST_SUITE(steiner_network)
 
 BOOST_AUTO_TEST_CASE(steiner_network_long) {
     std::vector<int> verticesNum     = { 6, 10, 10,  10,  15,  20,  40,  50,  75};
@@ -266,7 +266,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_long) {
     std::vector<int> specialVertices = { 4,  4,  6,   5,   5,  10,  15,  15,  20};
     std::vector<int> maxRes          = { 3,  3,  5,   6,   7,   5,   8,   6,   6};
 
-    runTestCase(verticesNum, minEdgeNum, specialVertices, maxRes, SparseGraphTag());
+    run_test_case(verticesNum, minEdgeNum, specialVertices, maxRes, sparse_graph_tag());
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_long_clique) {
@@ -275,7 +275,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_long_clique) {
     std::vector<int> specialVertices = { 5,  5, 20, 40, 60};
     std::vector<int> maxRes          = { 5,  8, 15, 25, 30};
 
-    runTestCase(verticesNum, minEdgeNum, specialVertices, maxRes, CliqueTag());
+    run_test_case(verticesNum, minEdgeNum, specialVertices, maxRes, clique_tag());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

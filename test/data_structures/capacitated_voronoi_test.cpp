@@ -17,15 +17,15 @@ auto cdem = [&](int i){ return cdemv[i];};
 
 BOOST_AUTO_TEST_SUITE( capacitated_voronoi_test_suite )
 
-BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
+BOOST_AUTO_TEST_CASE(GeneratorLocationvoronoiutionWithClientAssignmentsTest) {
     LOGLN("Test 0");
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
 
-    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
-    typedef typename Voronoi::Generators GSet;
-    typedef typename Voronoi::Vertices VSet;
-    Voronoi voronoi(GSet{},
+    typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)> voronoi;
+    typedef typename voronoi::Generators GSet;
+    typedef typename voronoi::Vertices VSet;
+    voronoi vor(GSet{},
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
     /*for(int i = 0; i < 5; ++i)
@@ -34,100 +34,100 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationVoronoiutionWithClientAssignmentsTest) {
     for(int i = 0; i < 5; ++i)
         LOGLN(gm(SGM::B, i));*/
 
-    voronoi.addGenerator(SGM::A);
-    auto ab_min_a = voronoi.addGenerator(SGM::B);
-    auto b_min_ab = voronoi.remGenerator(SGM::A);
-    BOOST_CHECK_EQUAL(voronoi.addGenerator(SGM::A), -b_min_ab );
-    BOOST_CHECK_EQUAL(voronoi.remGenerator(SGM::B), -ab_min_a);
+    vor.add_generator(SGM::A);
+    auto ab_min_a = vor.add_generator(SGM::B);
+    auto b_min_ab = vor.rem_generator(SGM::A);
+    BOOST_CHECK_EQUAL(vor.add_generator(SGM::A), -b_min_ab );
+    BOOST_CHECK_EQUAL(vor.rem_generator(SGM::B), -ab_min_a);
 
 }
 
 BOOST_AUTO_TEST_CASE(test_1) {
     LOGLN("Test 1");
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
 
-    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
-    typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
+    typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)> voronoi;
+    typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B},
+    voronoi vor(GSet{SGM::A, SGM::B},
             VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm, fcap, cdem);
 
-    voronoi.addGenerator(SGM::C);
-    voronoi.remGenerator(SGM::A);
-    voronoi.addGenerator(SGM::A);
-    voronoi.remGenerator(SGM::C);
-    voronoi.addGenerator(SGM::D);
-    voronoi.remGenerator(SGM::A);
+    vor.add_generator(SGM::C);
+    vor.rem_generator(SGM::A);
+    vor.add_generator(SGM::A);
+    vor.rem_generator(SGM::C);
+    vor.add_generator(SGM::D);
+    vor.rem_generator(SGM::A);
 }
 
-template <typename Voronoi>
-void remAdd(Voronoi & v, int g) {
-    auto back = v.remGenerator(g);
-    auto ret = v.addGenerator(g);
+template <typename voronoi>
+void rem_add(voronoi & v, int g) {
+    auto back = v.rem_generator(g);
+    auto ret = v.add_generator(g);
     assert(-back == ret);
 }
 
-template <typename Voronoi>
-void remAddOWC(paal::data_structures::ObjectWithCopy<Voronoi> & v, int g) {
-    auto back = v.invokeOnCopy(&Voronoi::remGenerator, g);
-    auto ret = v.invokeOnCopy(&Voronoi::addGenerator, g);
+template <typename voronoi>
+void rem_add_owc(paal::data_structures::object_with_copy<voronoi> & v, int g) {
+    auto back = v.invoke_on_copy(&voronoi::rem_generator, g);
+    auto ret = v.invoke_on_copy(&voronoi::add_generator, g);
     assert(-back == ret);
-    back = v.invoke(&Voronoi::remGenerator, g);
-    ret = v.invoke(&Voronoi::addGenerator, g);
+    back = v.invoke(&voronoi::rem_generator, g);
+    ret = v.invoke(&voronoi::add_generator, g);
     assert(-back == ret);
 }
 
 BOOST_AUTO_TEST_CASE(test_2) {
     LOGLN("Test 2");
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricMedium();
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_medium();
 
-    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
-    typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
+    typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)> voronoi;
+    typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
+    voronoi vor(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, gm, fcap, cdem);
     for(int i = 0;i  < 8; ++i) {
-        remAdd(voronoi, i);
+        rem_add(vor, i);
     }
 }
 
 BOOST_AUTO_TEST_CASE(test_3) {
     LOGLN("Test 3");
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
 
-    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
-    typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
+    typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)> voronoi;
+    typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A/*, SGM::B*//*, SGM::C, SGM::D, SGM::E*/},
+    voronoi vor(GSet{SGM::A/*, SGM::B*//*, SGM::C, SGM::D, SGM::E*/},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E}, gm, fcap, cdem);
 
-    Voronoi vCopy(voronoi);
+    voronoi vCopy(vor);
 
     for(int i = 0;i  < 1/*5*/; ++i) {
-        remAdd(vCopy, i);
+        rem_add(vCopy, i);
     }
 }
 
 BOOST_AUTO_TEST_CASE(test_4) {
     LOGLN("Test 4");
-    typedef SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricMedium();
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_medium();
 
-    typedef CapacitatedVoronoi<decltype(gm), decltype(fcap), decltype(cdem)> Voronoi;
-    typedef paal::data_structures::VoronoiTraits<Voronoi> VT;
+    typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)> voronoi;
+    typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    Voronoi voronoi(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
+    voronoi vor(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H},
                     VSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H}, gm, fcap, cdem);
     for(int i = 0;i  < 8; ++i) {
-        paal::data_structures::ObjectWithCopy<Voronoi> owc(voronoi);
-        remAddOWC(owc, i);
+        paal::data_structures::object_with_copy<voronoi> owc(vor);
+        rem_add_owc(owc, i);
     }
 }
 BOOST_AUTO_TEST_SUITE_END()

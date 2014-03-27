@@ -26,7 +26,7 @@ namespace local_search {
      */
 template <typename Duration = std::chrono::seconds,
           typename Clock    = std::chrono::system_clock>
-struct ExponentialCoolingSchemaDependantOnTime {
+struct exponential_cooling_schema_dependant_on_time {
 
     /**
      * @brief Constructor
@@ -35,7 +35,7 @@ struct ExponentialCoolingSchemaDependantOnTime {
      * @param startTemperature
      * @param endTemperature
      */
-    ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) :
+    exponential_cooling_schema_dependant_on_time(Duration duration, double startTemperature, double endTemperature) :
         m_duration(duration), m_start(Clock::now()),
         m_multiplier(startTemperature),
         m_base(std::pow(endTemperature/startTemperature, 1. / duration.count())) {}
@@ -66,7 +66,7 @@ private:
 };
 
 /**
- * @brief make function for ExponentialCoolingSchemaDependantOnTime
+ * @brief make function for exponential_cooling_schema_dependant_on_time
  *
  * @tparam Clock
  * @tparam Duration
@@ -78,9 +78,9 @@ private:
  */
 template <typename Clock    = std::chrono::system_clock,
           typename Duration>
-ExponentialCoolingSchemaDependantOnTime<Duration, Clock>
-make_ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemperature, double endTemperature) {
-    return ExponentialCoolingSchemaDependantOnTime<Duration, Clock>(duration, startTemperature, endTemperature);
+exponential_cooling_schema_dependant_on_time<Duration, Clock>
+make_exponential_cooling_schema_dependant_on_time(Duration duration, double startTemperature, double endTemperature) {
+    return exponential_cooling_schema_dependant_on_time<Duration, Clock>(duration, startTemperature, endTemperature);
 }
 
 
@@ -89,7 +89,7 @@ make_ExponentialCoolingSchemaDependantOnTime(Duration duration, double startTemp
      * schema. The start potential equals given startTemperature, once per numberOFRoundsWithSameTemperature
      * the temperature is multiplied by given multiplier
      */
-struct ExponentialCoolingSchemaDependantOnIteration {
+struct exponential_cooling_schema_dependant_on_iteration {
 
     /**
      * @brief Constructor
@@ -98,10 +98,10 @@ struct ExponentialCoolingSchemaDependantOnIteration {
      * @param multiplier
      * @param numberOFRoundsWithSameTemperature
      */
-    ExponentialCoolingSchemaDependantOnIteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) :
+    exponential_cooling_schema_dependant_on_iteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) :
         m_temperature(startTemperature),
         m_multiplier(multiplier),
-        m_numberOFRoundsWithSameTemperature(numberOFRoundsWithSameTemperature) {}
+        m_number_of_rounds_with_same_temperature(numberOFRoundsWithSameTemperature) {}
 
 
     /**
@@ -110,9 +110,9 @@ struct ExponentialCoolingSchemaDependantOnIteration {
      * @return
      */
     double operator()() {
-        if(++m_cntFromLastMultiply == m_numberOFRoundsWithSameTemperature) {
+        if(++m_cnt_from_last_multiply == m_number_of_rounds_with_same_temperature) {
             m_temperature *= m_multiplier;
-            m_cntFromLastMultiply = 0;
+            m_cnt_from_last_multiply = 0;
         }
         return m_temperature;
     }
@@ -120,8 +120,8 @@ struct ExponentialCoolingSchemaDependantOnIteration {
 private:
     double m_temperature;
     double m_multiplier;
-    int    m_numberOFRoundsWithSameTemperature;
-    int    m_cntFromLastMultiply = 0;
+    int    m_number_of_rounds_with_same_temperature;
+    int    m_cnt_from_last_multiply = 0;
 };
 
 
@@ -132,10 +132,10 @@ private:
  *
  * @tparam Gain
  * @tparam GetTemperature
- * @tparam RandomGenerator
+ * @tparam random_generator
  */
-template <typename Gain, typename GetTemperature, typename RandomGenerator = std::default_random_engine>
-struct SimulatedAnnealingGainAdaptor {
+template <typename Gain, typename GetTemperature, typename random_generator = std::default_random_engine>
+struct simulated_annealing_gain_adaptor {
     /**
      * @brief constructor
      *
@@ -143,10 +143,10 @@ struct SimulatedAnnealingGainAdaptor {
      * @param getTemperature
      * @param rand
      */
-    SimulatedAnnealingGainAdaptor(Gain gain,
+    simulated_annealing_gain_adaptor(Gain gain,
             GetTemperature getTemperature,
-            RandomGenerator rand = RandomGenerator()) :
-        m_gain(gain), m_getTemperature(getTemperature),
+            random_generator rand = random_generator()) :
+        m_gain(gain), m_get_temperature(getTemperature),
         m_rand(rand), m_distribution(0.0, 1.0) {}
 
     /**
@@ -155,27 +155,27 @@ struct SimulatedAnnealingGainAdaptor {
      * @tparam Delta
      */
     template <typename Delta>
-    struct IsChosen {
+    struct is_chosen {
         /**
-         * @brief creates IsChosen for Move  object
+         * @brief creates is_chosen for Move  object
          *
          * @param d
          *
          * @return
          */
-        static IsChosen makeChosen(Delta d) {
-            return IsChosen(true, d);
+        static is_chosen make_chosen(Delta d) {
+            return is_chosen(true, d);
         }
 
         /**
-         * @brief creates IsChosen fo Move which is not chosen
+         * @brief creates is_chosen fo Move which is not chosen
          *
          * @param d
          *
          * @return
          */
-        static IsChosen makeUnchosen(Delta d) {
-            return IsChosen(false, d);
+        static is_chosen make_unchosen(Delta d) {
+            return is_chosen(false, d);
         }
 
         /**
@@ -184,8 +184,8 @@ struct SimulatedAnnealingGainAdaptor {
          *
          * @param i given int must be 0
          */
-        IsChosen(int i) :
-            m_isChosen(false),
+        is_chosen(int i) :
+            m_is_chosen(false),
             m_delta(std::numeric_limits<Delta>::max()) {assert(i == 0);}
 
         /**
@@ -195,9 +195,9 @@ struct SimulatedAnnealingGainAdaptor {
          *
          * @return
          */
-        bool operator<(IsChosen other) const {
-            if(m_isChosen != other.m_isChosen) {
-                return m_isChosen < other.isChosen;
+        bool operator<(is_chosen other) const {
+            if(m_is_chosen != other.m_is_chosen) {
+                return m_is_chosen < other.isChosen;
             } else {
                 return m_delta < other.m_delta;
             }
@@ -214,14 +214,14 @@ struct SimulatedAnnealingGainAdaptor {
 
     private:
         /**
-         * @brief constructor, use makeChosen and makeUnchosen for construction.
+         * @brief constructor, use make_chosen and make_unchosen for construction.
          *
          * @param isChosen
          * @param d
          */
-        IsChosen(bool isChosen, Delta d) :
-            m_isChosen(isChosen), m_delta(d) {}
-        bool m_isChosen;
+        is_chosen(bool isChosen, Delta d) :
+            m_is_chosen(isChosen), m_delta(d) {}
+        bool m_is_chosen;
         Delta m_delta;
     };
 
@@ -236,16 +236,16 @@ struct SimulatedAnnealingGainAdaptor {
      */
     template <typename... Args>
     auto operator()(Args&&... args) ->
-        IsChosen<typename std::result_of<Gain(Args...)>::type> {
+        is_chosen<typename std::result_of<Gain(Args...)>::type> {
             auto delta =  m_gain(std::forward<Args>(args)...);
             using Delta = decltype(delta);
             if(delta > 0) {
-                return IsChosen<Delta>::makeChosen(delta);
+                return is_chosen<Delta>::make_chosen(delta);
             } else {
-                if( m_distribution(m_rand) >  fastExp(double(delta) / m_getTemperature())) {
-                    return IsChosen<Delta>::makeChosen(delta);
+                if( m_distribution(m_rand) >  fast_exp(double(delta) / m_get_temperature())) {
+                    return is_chosen<Delta>::make_chosen(delta);
                 } else {
-                    return IsChosen<Delta>::makeUnchosen(delta);
+                    return is_chosen<Delta>::make_unchosen(delta);
                 }
             }
     }
@@ -253,31 +253,31 @@ struct SimulatedAnnealingGainAdaptor {
 
 private:
     Gain m_gain;
-    GetTemperature m_getTemperature;
-    RandomGenerator m_rand;
+    GetTemperature m_get_temperature;
+    random_generator m_rand;
     std::uniform_real_distribution<double> m_distribution;
 };
 
 
 /**
- * @brief make function for SimulatedAnnealingGainAdaptor
+ * @brief make function for simulated_annealing_gain_adaptor
  *
  * @tparam Gain
  * @tparam GetTemperature
- * @tparam RandomGenerator
+ * @tparam random_generator
  * @param gain
  * @param getTemperature
  * @param rand
  *
  * @return
  */
-template <typename Gain, typename GetTemperature, typename RandomGenerator = std::default_random_engine>
-SimulatedAnnealingGainAdaptor<Gain, GetTemperature, RandomGenerator>
-make_SimulatedAnnealingGainAdaptor(
+template <typename Gain, typename GetTemperature, typename random_generator = std::default_random_engine>
+simulated_annealing_gain_adaptor<Gain, GetTemperature, random_generator>
+make_simulated_annealing_gain_adaptor(
          Gain gain, GetTemperature getTemperature,
-         RandomGenerator rand = RandomGenerator()) {
-     return SimulatedAnnealingGainAdaptor
-                <Gain, GetTemperature, RandomGenerator>(
+         random_generator rand = random_generator()) {
+     return simulated_annealing_gain_adaptor
+                <Gain, GetTemperature, random_generator>(
                     std::move(gain), std::move(getTemperature), std::move(rand));
 }
 

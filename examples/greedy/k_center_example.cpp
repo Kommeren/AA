@@ -16,7 +16,7 @@ int main(){
 //! [K Center Example]
     // sample data
     const int parts=2;
-    paal::data_structures::ArrayMetric<int> m(3);
+    paal::data_structures::array_metric<int> m(3);
     m(0,1)=3;
     m(0,2)=4;
     m(1,2)=5;

@@ -20,21 +20,21 @@ std::vector<int> vec(s);
 std::vector<int> ids(nr);
 
 template <typename Bimap>
-void testGetVal(const Bimap & b) {
+void test_get_val(const Bimap & b) {
     int t(0);
     for(int j  : boost::irange(0,50)) {
         std::ignore = j; //removes warning
         for(int i : ids) {
-            t+=b.getVal(i); //has to do addition, because without it compiler removes the whole loop
+            t+=b.get_val(i); //has to do addition, because without it compiler removes the whole loop
         }
     }
     LOGLN(t);
 }
 
 template <typename Bimap>
-void testGetIdx(const Bimap & b) {
+void test_get_idx(const Bimap & b) {
     for(int i : ids) {
-        b.getIdx(vec[i]);
+        b.get_idx(vec[i]);
     }
 }
 
@@ -45,12 +45,12 @@ void test() {
     ON_LOG(time_t t2 = time(NULL));
     LOGLN("construction time " << t2 - t1);
     ON_LOG(t1 = t2);
-    testGetVal(b);
+    test_get_val(b);
     ON_LOG(t2 = time(NULL));
     LOGLN("getval time " << t2 - t1);
 
     ON_LOG(t1 = t2);
-    testGetIdx(b);
+    test_get_idx(b);
     ON_LOG(t2 = time(NULL));
     LOGLN("getidx time " << t2 - t1);
 }
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(bimap) {
     }
 
     LOGLN("boost::mulit_index Bimap");
-    test<paal::data_structures::BiMapMIC<int>>();
+    test<paal::data_structures::bimap_mic<int>>();
     LOGLN("paal Bimap");
-    test<paal::data_structures::BiMap<int>>();
+    test<paal::data_structures::bimap<int>>();
 }

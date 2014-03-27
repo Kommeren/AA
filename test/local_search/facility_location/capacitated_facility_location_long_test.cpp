@@ -29,17 +29,17 @@ using namespace paal;
 
 
 template <typename Metric, typename Cost>
-class FLLogger  {
+class fl_logger  {
 public:
-FLLogger(const Metric & m, const Cost & c) :
+fl_logger(const Metric & m, const Cost & c) :
             m_metric(m), m_cost(c) {}
 
 template <typename Sol>
 void operator()(Sol & sol) {
-           ON_LOG(auto const & ch =  sol.getFacilityLocationSolution().getChosenFacilities());
+           ON_LOG(auto const & ch =  sol.getfacility_location_solution().get_chosen_facilities());
            LOG_COPY_RANGE_DEL(ch, ",");
-           ON_LOG(auto c = sol.getFacilityLocationSolution().getVoronoi().getCost());
-           LOGLN("current cost " << simple_algo::getCFLCost(m_metric, m_cost, sol.getFacilityLocationSolution()) << " (dist to full assign " <<  c.getDistToFullAssignment()<< ")");
+           ON_LOG(auto c = sol.getfacility_location_solution().get_voronoi().get_cost());
+           LOGLN("current cost " << simple_algo::get_cfl_cost(m_metric, m_cost, sol.getfacility_location_solution()) << " (dist to full assign " <<  c.get_dist_to_full_assignment()<< ")");
         };
 
 private:
@@ -48,15 +48,15 @@ private:
 };
 
 template <typename Metric, typename Cost>
-FLLogger<Metric, Cost>
-make_fLLogger(const Metric & m , const Cost & c)  {
-    return FLLogger<Metric, Cost>(m, c);
+fl_logger<Metric, Cost>
+make_fl_logger(const Metric & m , const Cost & c)  {
+    return fl_logger<Metric, Cost>(m, c);
 };
 
 
 
 template <typename Solve>
-void runTests(const std::string & fname, Solve solve) {
+void run_tests(const std::string & fname, Solve solve) {
     std::string testDir = "test/data/CFL_ORLIB/";
     std::ifstream is_test_cases(testDir + fname);
 
@@ -79,18 +79,18 @@ void runTests(const std::string & fname, Solve solve) {
         std::vector<int> demands;
         boost::integer_range<int> fac(0,0);
         boost::integer_range<int> clients(0,0);
-        auto metric = paal::readORLIB_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
+        auto metric = paal::read_orlib_FL<cap::capacitated>(ifs, facCost, facCap, demands, fac, clients);
         int firstClient = clients.front();
 
-        auto cost = paal::utils::make_ArrayToFunctor(facCost);
-        auto verticesDemands = paal::utils::make_ArrayToFunctor(demands, -firstClient);
-        auto facCapacities = paal::utils::make_ArrayToFunctor(facCap);
+        auto cost = paal::utils::make_array_to_functor(facCost);
+        auto verticesDemands = paal::utils::make_array_to_functor(demands, -firstClient);
+        auto facCapacities = paal::utils::make_array_to_functor(facCap);
         LOGLN( "demands sum" << std::accumulate(clients.begin(), clients.end(),
                                     0, [&](int d, int v){return d + verticesDemands(v);}));
 
-        typedef paal::data_structures::CapacitatedVoronoi<decltype(metric), decltype(facCapacities), decltype(verticesDemands)> VorType;
+        typedef paal::data_structures::capacitated_voronoi<decltype(metric), decltype(facCapacities), decltype(verticesDemands)> VorType;
 
-        typedef paal::data_structures::FacilityLocationSolution
+        typedef paal::data_structures::facility_location_solution
             <decltype(cost), VorType> Sol;
         typedef typename VorType::Generators FSet;
         typedef typename VorType::Vertices VSet;
@@ -101,35 +101,35 @@ void runTests(const std::string & fname, Solve solve) {
 
 
 
-        solve.template operator()<VorType>(sol, metric, cost, opt, make_fLLogger(metric, cost));
+        solve.template operator()<VorType>(sol, metric, cost, opt, make_fl_logger(metric, cost));
 
-        double c = simple_algo::getCFLCost(metric, cost, sol);
-        check_result(c,opt,6.,paal::utils::LessEqual(),0.01);
+        double c = simple_algo::get_cfl_cost(metric, cost, sol);
+        check_result(c,opt,6.,paal::utils::less_equal(),0.01);
 
     }
 }
 
-struct SolveAddRemove {
-    DefaultRemoveFLComponents<int>::type rem;
-    DefaultAddFLComponents<int>::type    add;
-    utils::ReturnFalseFunctor nop;
+struct solve_add_remove {
+    default_remove_fl_components<int>::type rem;
+    default_add_fl_components<int>::type    add;
+    utils::return_false_functor nop;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
         facility_location_local_search(sol, a, nop, rem);
         facility_location_local_search(sol, a, nop, rem, add);
 
-        ON_LOG(double c = simple_algo::getCFLCost(metric, cost, sol));
+        ON_LOG(double c = simple_algo::get_cfl_cost(metric, cost, sol));
         LOGLN(std::setprecision(20) << "BEFORE SWAP APPROXIMATION RATIO: " << c / opt);
     }
 };
 
-struct SolveAddRemoveSwap : public SolveAddRemove {
-    DefaultSwapFLComponents<int>::type   swap;
+struct solve_add_remove_swap : public solve_add_remove {
+    default_swap_fl_components<int>::type   swap;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
-        paal::local_search::ChooseFirstBetterStrategy strategy;
+        paal::local_search::choose_first_better_strategy strategy;
         facility_location_local_search(sol, strategy, a, nop, rem);
         facility_location_local_search(sol, strategy, a, nop, rem, add);
         facility_location_local_search(sol, strategy, a, nop, rem, add, swap);
@@ -139,7 +139,7 @@ struct SolveAddRemoveSwap : public SolveAddRemove {
 
 
 BOOST_AUTO_TEST_CASE(CapacitatedFacilityLocationLong) {
-    runTests("capopt.txt", SolveAddRemoveSwap());
+    run_tests("capopt.txt", solve_add_remove_swap());
 }
 
 //currently this is too long !
@@ -147,5 +147,5 @@ BOOST_AUTO_TEST_CASE(CapacitatedFacilityLocationLong) {
 //
 //
 //BOOST_AUTO_TEST_CASE(CapacitatedFacilityLocationVeryLong) {
-//    runTests("capopt_long.txt", SolveAddRemove());
+//    run_tests("capopt_long.txt", solve_add_remove());
 //}

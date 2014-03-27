@@ -11,7 +11,7 @@
 namespace paal {
 namespace lp {
 ///lp problem type
-enum ProblemType {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
+enum problem_type {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
 }
 }
 #endif /* PROBLEM_TYPE_HPP */

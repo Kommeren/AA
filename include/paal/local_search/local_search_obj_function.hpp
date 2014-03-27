@@ -17,48 +17,48 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief traits class for SearchComponentsObjFun
+ * @brief traits class for search_componentsObjFun
  *
- * @tparam SearchComponentsObjFun
+ * @tparam search_componentsObjFun
  */
-template <typename SearchComponentsObjFun>
-struct SearchObjFunctionComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<GetMoves>::type GetMovesT;
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<ObjFunction>::type ObjFunctionT;
-    typedef typename data_structures::ComponentTraits<SearchComponentsObjFun>::template type<Commit>::type CommitT;
+template <typename search_componentsObjFun>
+struct search_obj_function_components_traits {
+    typedef typename data_structures::component_traits<search_componentsObjFun>::template type<get_moves>::type get_movesT;
+    typedef typename data_structures::component_traits<search_componentsObjFun>::template type<ObjFunction>::type ObjFunctionT;
+    typedef typename data_structures::component_traits<search_componentsObjFun>::template type<Commit>::type CommitT;
 };
 
 namespace detail {
 
-template <typename F, typename Solution, typename Commit> class FunToCheck {
+template <typename F, typename Solution, typename Commit> class fun_to_check {
         typedef decltype(std::declval<F>()(std::declval<Solution>())) Dist;
     public:
-        FunToCheck(F f, const Commit & commit) : m_f(std::move(f)), m_commitFunctor(commit) {}
+        fun_to_check(F f, const Commit & commit) : m_f(std::move(f)), m_commit_functor(commit) {}
 
         template <typename Move> Dist operator()(const Solution &s , const Move &u) {
             Solution newS(s);
-            m_commitFunctor(newS, u);
+            m_commit_functor(newS, u);
             return m_f(newS) - m_f(s);
         }
 
     private:
 
         F m_f;
-        const Commit m_commitFunctor;
+        const Commit m_commit_functor;
 };
 
-template <typename SearchObjFunctionComponents, typename Solution>
-class SearchObjFunctionComponentsToSearchComponents {
+template <typename SearchObjFunctioncomponents, typename Solution>
+class search_obj_function_components_tosearch_components {
 private:
-    typedef SearchObjFunctionComponentsTraits<
-                SearchObjFunctionComponents> traits;
+    typedef search_obj_function_components_traits<
+                SearchObjFunctioncomponents> traits;
 public:
-    typedef detail::FunToCheck<
+    typedef detail::fun_to_check<
                     typename traits::ObjFunctionT,
                     Solution,
                     typename traits::CommitT> GainType;
-    typedef SearchComponents<
-                typename traits::GetMovesT,
+    typedef search_components<
+                typename traits::get_movesT,
                          GainType,
                 typename traits::CommitT>  type;
 };
@@ -74,7 +74,7 @@ public:
  * @tparam PostSearchAction
  * @tparam GlobalStopCondition
  * @tparam Solution
- * @tparam Components
+ * @tparam components
  * @param solution
  * @param psa
  * @param gsc
@@ -86,26 +86,26 @@ template <typename SearchStrategy,
           typename PostSearchAction,
           typename GlobalStopCondition,
           typename Solution,
-          typename SearchObjFunctionComponents>
+          typename SearchObjFunctioncomponents>
 bool local_search_obj_fun(
             Solution & solution,
             SearchStrategy searchStrategy,
             PostSearchAction psa,
             GlobalStopCondition gsc,
-            SearchObjFunctionComponents components) {
-    typedef detail::SearchObjFunctionComponentsToSearchComponents<
-        SearchObjFunctionComponents, Solution> Convert;
+            SearchObjFunctioncomponents components) {
+    typedef detail::search_obj_function_components_tosearch_components<
+        SearchObjFunctioncomponents, Solution> Convert;
 
-    typedef typename Convert::type SearchComponents;
+    typedef typename Convert::type search_components;
     typedef typename Convert::GainType Gain;
 
-    SearchComponents searchComponents{
-                    std::move(components.template get<GetMoves>()),
+    search_components searchcomponents{
+                    std::move(components.template get<get_moves>()),
                     Gain(std::move(components.template get<ObjFunction>()), components.template get<Commit>()),
                     std::move(components.template get<Commit>())};
 
 
-    return local_search(solution, searchStrategy, psa, gsc, searchComponents);
+    return local_search(solution, searchStrategy, psa, gsc, searchcomponents);
 }
 
 /**
@@ -113,7 +113,7 @@ bool local_search_obj_fun(
  *
  * @tparam SearchStrategy
  * @tparam Solution
- * @tparam Components
+ * @tparam components
  * @param solution
  * @param components
  *
@@ -121,10 +121,10 @@ bool local_search_obj_fun(
  */
 template <typename SearchStrategy,
           typename Solution,
-          typename Components>
-bool local_search_obj_fun_simple(Solution & solution, Components components) {
-    return local_search<SearchStrategy>(solution, ChooseFirstBetterStrategy{},
-                utils::SkipFunctor(), utils::ReturnFalseFunctor(), std::move(components));
+          typename components>
+bool local_search_obj_fun_simple(Solution & solution, components comps) {
+    return local_search<SearchStrategy>(solution, choose_first_better_strategy{},
+                utils::skip_functor(), utils::return_false_functor(), std::move(comps));
 }
 
 

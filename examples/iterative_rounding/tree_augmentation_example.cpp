@@ -30,8 +30,8 @@ int main() {
     EdgeSet solution;
 
     // optional input validity checking
-    auto treeAug = paal::ir::make_TreeAug(g, std::back_inserter(solution));
-    auto error = treeAug.checkInputValidity();
+    auto treeAug = paal::ir::make_tree_aug(g, std::back_inserter(solution));
+    auto error = treeAug.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
         std::cerr << *error << std::endl;
@@ -52,7 +52,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-    paal::lp::GLP::freeEnv();
+    paal::lp::GLP::free_env();
 //! [Tree Augmentation Example]
 
     return 0;

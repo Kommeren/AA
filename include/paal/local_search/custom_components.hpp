@@ -21,8 +21,8 @@ namespace local_search {
      * @tparam Gain
      * @tparam Condition
      */
-template <typename Gain = utils::ReturnOneFunctor, typename Condition = utils::ReturnTrueFunctor>
-struct ConditionalGainAdaptor {
+template <typename Gain = utils::return_one_functor, typename Condition = utils::return_true_functor>
+struct conditional_gain_adaptor {
 
     /**
      * @brief constructor
@@ -30,7 +30,7 @@ struct ConditionalGainAdaptor {
      * @param gain
      * @param cond
      */
-    ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) :
+    conditional_gain_adaptor(Gain gain = Gain(), Condition cond = Condition()) :
         m_gain(std::move(gain)), m_condition(std::move(cond))
     { }
 
@@ -55,7 +55,7 @@ private:
 };
 
 /**
- * @brief make for ConditionalGainAdaptor
+ * @brief make for conditional_gain_adaptor
  *
  * @tparam Gain
  * @tparam Condition
@@ -64,10 +64,10 @@ private:
  *
  * @return
  */
-template <typename Gain = utils::ReturnOneFunctor, typename Condition = utils::ReturnTrueFunctor>
-ConditionalGainAdaptor<Gain, Condition>
-make_ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) {
-    return ConditionalGainAdaptor<Gain, Condition>(std::move(gain), std::move(cond));
+template <typename Gain = utils::return_one_functor, typename Condition = utils::return_true_functor>
+conditional_gain_adaptor<Gain, Condition>
+make_conditional_gain_adaptor(Gain gain = Gain(), Condition cond = Condition()) {
+    return conditional_gain_adaptor<Gain, Condition>(std::move(gain), std::move(cond));
 }
 
 /**
@@ -78,7 +78,7 @@ make_ConditionalGainAdaptor(Gain gain = Gain(), Condition cond = Condition()) {
  * @tparam ValueType
  */
 template <typename Gain, typename ValueType>
-class GainCutSmallImproves {
+class gain_cut_small_improves {
 public:
     /**
      * @brief Constructor,
@@ -87,8 +87,8 @@ public:
      * @param currOpt - current optimum
      * @param epsilon - gain limit, gains smaller than epsilon * currOpt are cut
      */
-    GainCutSmallImproves(Gain gain, ValueType currOpt, double epsilon) :
-                m_gain(std::move(gain)), m_currOpt(currOpt), m_epsilon(epsilon)  {}
+    gain_cut_small_improves(Gain gain, ValueType currOpt, double epsilon) :
+                m_gain(std::move(gain)), m_curr_opt(currOpt), m_epsilon(epsilon)  {}
 
     /**
      * @brief transfers arguments to original gain, if the value is to small it is changed to 0.
@@ -101,8 +101,8 @@ public:
     template <typename... Args> ValueType
         operator()(Args&&... args) {
         ValueType dist = m_gain(std::forward<Args>(args)...);
-        if(dist > m_epsilon * m_currOpt) {
-            m_currOpt -= dist;
+        if(dist > m_epsilon * m_curr_opt) {
+            m_curr_opt -= dist;
             return dist;
         }
         return 0;
@@ -113,7 +113,7 @@ public:
      *
      * @param e
      */
-    void setEpsilon(double e) {
+    void set_epsilon(double e) {
         m_epsilon = e;
     }
 
@@ -122,13 +122,13 @@ public:
      *
      * @param opt
      */
-    void setCurrentOpt(ValueType opt) {
-        m_currOpt = opt;
+    void set_current_opt(ValueType opt) {
+        m_curr_opt = opt;
     }
 
 private:
     Gain m_gain;
-    ValueType m_currOpt;
+    ValueType m_curr_opt;
     double m_epsilon;
 };
 
@@ -137,14 +137,14 @@ private:
 /**
  * @brief This is custom StopCondition , it returns true after given count limit
  */
-class StopConditionCountLimit {
+class stop_condition_count_limit {
 public:
     /**
      * @brief Constructor
      *
      * @param limit given count limit
      */
-    StopConditionCountLimit(unsigned limit) : m_cnt(0), m_limit(limit) {}
+    stop_condition_count_limit(unsigned limit) : m_cnt(0), m_limit(limit) {}
 
     /**
      * @brief increment the counter and checks if the given limit is reached.
@@ -168,14 +168,14 @@ private:
  */
 template <typename duration = std::chrono::seconds,
           typename clock    = std::chrono::system_clock>
-class StopConditionTimeLimit {
+class stop_condition_time_limit {
 public:
     /**
      * @brief Constructor
      *
      * @param d - time to wait
      */
-    StopConditionTimeLimit(duration d) :  m_duration(d), m_start(clock::now()) {}
+    stop_condition_time_limit(duration d) :  m_duration(d), m_start(clock::now()) {}
 
     /**
      * @brief Checks if the time is up
@@ -211,14 +211,14 @@ private:
  * @tparam ValueType
  */
 template <typename Gain, typename ValueType>
-struct ComputeGainWrapper {
+struct compute_gain_wrapper {
     /**
      * @brief Constructor
      *
      * @param gain
      * @param val
      */
-    ComputeGainWrapper(ComputeGainWrapper gain, ValueType & val) : m_gain(gain), m_val(val) {}
+    compute_gain_wrapper(compute_gain_wrapper gain, ValueType & val) : m_gain(gain), m_val(val) {}
 
     /**
      * @brief forwards args to original gain. Sum up the improvements.
@@ -240,7 +240,7 @@ struct ComputeGainWrapper {
      *
      * @return
      */
-    ValueType getVal() const {
+    ValueType get_val() const {
         return m_val;
     }
 
@@ -258,9 +258,9 @@ private:
  * @tparam AspirationCriteria
  */
 template <typename TabuList,
-          typename Gain = utils::ReturnOneFunctor,
-          typename AspirationCriteria = utils::ReturnTrueFunctor>
-struct TabuGainAdaptor {
+          typename Gain = utils::return_one_functor,
+          typename AspirationCriteria = utils::return_true_functor>
+struct tabu_gain_adaptor {
 
     /**
      * @brief constructor
@@ -269,10 +269,10 @@ struct TabuGainAdaptor {
      * @param gain
      * @param aspirationCriteria
      */
-    TabuGainAdaptor(TabuList tabuList = TabuList(), Gain gain = Gain(),
+    tabu_gain_adaptor(TabuList tabuList = TabuList(), Gain gain = Gain(),
                     AspirationCriteria aspirationCriteria
                         = AspirationCriteria()) :
-       m_tabuList(std::move(tabuList)), m_aspirationCriteriaGain(std::move(gain), std::move(aspirationCriteria))
+       m_tabu_list(std::move(tabuList)), m_aspiration_criteria_gain(std::move(gain), std::move(aspirationCriteria))
     { }
 
     /**
@@ -284,10 +284,10 @@ struct TabuGainAdaptor {
      */
     template <typename... Args>
     auto operator()(Args&&... args) -> decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
-        if(!m_tabuList.isTabu(std::forward<Args>(args)...)) {
-            auto diff = m_aspirationCriteriaGain(std::forward<Args>(args)...);
+        if(!m_tabu_list.is_tabu(std::forward<Args>(args)...)) {
+            auto diff = m_aspiration_criteria_gain(std::forward<Args>(args)...);
             if(diff > 0) {
-                m_tabuList.accept(std::forward<Args>(args)...);
+                m_tabu_list.accept(std::forward<Args>(args)...);
             }
             return diff;
         }
@@ -295,12 +295,12 @@ struct TabuGainAdaptor {
     }
 
 private:
-    TabuList m_tabuList;
-    ConditionalGainAdaptor<Gain, AspirationCriteria> m_aspirationCriteriaGain;
+    TabuList m_tabu_list;
+    conditional_gain_adaptor<Gain, AspirationCriteria> m_aspiration_criteria_gain;
 };
 
 /**
- * @brief make function for TabuGainAdaptor
+ * @brief make function for tabu_gain_adaptor
  *
  * @tparam TabuList
  * @tparam Gain
@@ -312,11 +312,11 @@ private:
  * @return
  */
 template <typename TabuList,
-          typename Gain = utils::ReturnTrueFunctor,
-          typename AspirationCriteria = utils::ReturnTrueFunctor>
-TabuGainAdaptor<TabuList, Gain, AspirationCriteria>
-make_TabuGainAdaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria aspirationCriteria = AspirationCriteria()) {
-    return TabuGainAdaptor<TabuList, Gain, AspirationCriteria>(std::move(tabuList), std::move(gain), std::move(aspirationCriteria));
+          typename Gain = utils::return_true_functor,
+          typename AspirationCriteria = utils::return_true_functor>
+tabu_gain_adaptor<TabuList, Gain, AspirationCriteria>
+make_tabu_gain_adaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria aspirationCriteria = AspirationCriteria()) {
+    return tabu_gain_adaptor<TabuList, Gain, AspirationCriteria>(std::move(tabuList), std::move(gain), std::move(aspirationCriteria));
 }
 
 /**
@@ -329,7 +329,7 @@ make_TabuGainAdaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria a
  * @tparam Condition
  */
 template <typename Commit, typename Solution, typename Condition>
-struct RecordSolutionCommitAdapter {
+struct record_solution_commit_adapter {
 
     /**
      * @brief constructor
@@ -338,7 +338,7 @@ struct RecordSolutionCommitAdapter {
      * @param commit
      * @param cond
      */
-    RecordSolutionCommitAdapter(Solution & solution,
+    record_solution_commit_adapter(Solution & solution,
                                 Commit commit = Commit(),
                                 Condition cond = Condition()) :
         m_solution(&solution), m_commit(std::move(commit)),
@@ -366,7 +366,7 @@ struct RecordSolutionCommitAdapter {
      *
      * @return
      */
-    const Solution & getSolution() const {
+    const Solution & get_solution() const {
         return *m_solution;
     }
 
@@ -375,7 +375,7 @@ struct RecordSolutionCommitAdapter {
      *
      * @return
      */
-    Solution & getSolution() {
+    Solution & get_solution() {
         return *m_solution;
     }
 
@@ -386,7 +386,7 @@ private:
 };
 
 /**
- * @brief make function for RecordSolutionCommitAdapter
+ * @brief make function for record_solution_commit_adapter
  *
  * @tparam Commit
  * @tparam Solution
@@ -398,9 +398,9 @@ private:
  * @return
  */
 template <typename Commit, typename Solution, typename Condition>
-RecordSolutionCommitAdapter<Commit, Solution, Condition>
-make_RecordSolutionCommitAdapter(Solution & s, Commit commit, Condition c) {
-    return RecordSolutionCommitAdapter<Commit, Solution, Condition>(s, std::move(commit), std::move(c));
+record_solution_commit_adapter<Commit, Solution, Condition>
+make_record_solution_commit_adapter(Solution & s, Commit commit, Condition c) {
+    return record_solution_commit_adapter<Commit, Solution, Condition>(s, std::move(commit), std::move(c));
 }
 
 

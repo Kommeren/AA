@@ -28,10 +28,10 @@ typedef  std::vector<float> Solution;
 typedef  float SolutionElement;
 typedef  SolutionElement Move;
 
-struct ValueDiff {
-    ValueDiff(SolutionElement & value, float diff) :
+struct value_diff {
+    value_diff(SolutionElement & value, float diff) :
         m_value(&value), m_diff(diff) {}
-    ValueDiff() = default;
+    value_diff() = default;
     SolutionElement * m_value;
     float m_diff;
 };
@@ -43,9 +43,9 @@ float f(const Solution & x) {
 }
 
 
-struct MakeValueDiff {
-    ValueDiff operator()(SolutionElement & value, float diff) const {
-        return ValueDiff{value, diff};
+struct make_value_diff {
+    value_diff operator()(SolutionElement & value, float diff) const {
+        return value_diff{value, diff};
     }
 };
 
@@ -55,24 +55,24 @@ SolutionElement normalize(SolutionElement el) {
 }
 
 
-struct GetMoves {
+struct get_moves {
     typedef std::vector<Move> Neigh;
-    using Iter = paal::data_structures::CombineIterator<MakeValueDiff, Solution, const Neigh>;
+    using Iter = paal::data_structures::combine_iterator<make_value_diff, Solution, const Neigh>;
     using IterPair = boost::iterator_range<Iter>;
 
     const Neigh neighb;
 public:
 
-    GetMoves() : neighb{.01, -.01, .001, -.001} {}
+    get_moves() : neighb{.01, -.01, .001, -.001} {}
 
     IterPair operator()(Solution & s) {
-        auto b = data_structures::make_CombineIterator(MakeValueDiff{}, s, neighb);
+        auto b = data_structures::make_combine_iterator(make_value_diff{}, s, neighb);
         return boost::make_iterator_range(b, decltype(b){});
     }
 };
 
 struct Gain {
-    float operator()(Solution & s, ValueDiff vd) {
+    float operator()(Solution & s, value_diff vd) {
         auto & el = *vd.m_value;
         auto old = el;
         auto val = f(s);
@@ -84,15 +84,15 @@ struct Gain {
 };
 
 struct Commit {
-    bool operator()(Solution & s, ValueDiff vd) {
+    bool operator()(Solution & s, value_diff vd) {
         *vd.m_value = normalize(*vd.m_value + vd.m_diff);
         return true;
     }
 };
 
-typedef  local_search::SearchComponents<GetMoves, Gain, Commit> SearchComp;
+typedef  local_search::search_components<get_moves, Gain, Commit> search_comps;
 
-void fillRand(Solution &s) {
+void fill_rand(Solution &s) {
     const int MAX_VAL = 10000;
     for(float & el : s) {
         el = float(std::rand() % MAX_VAL) / float(MAX_VAL);
@@ -115,7 +115,7 @@ auto logger = [&](const Solution & s) {
 BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
     //creating local search
     Solution sol(DIM, 0);
-    fillRand(sol);
+    fill_rand(sol);
 
     //printing
     LOGLN("f(");
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
     ON_LOG(i = 0);
 
     //search
-    local_search::local_search(sol, local_search::ChooseFirstBetterStrategy{}, logger, utils::ReturnFalseFunctor(), SearchComp());
+    local_search::local_search(sol, local_search::choose_first_better_strategy{}, logger, utils::return_false_functor(), search_comps());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }
 
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
 BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
     //creating local search
     Solution sol(DIM, 0);
-    fillRand(sol);
+    fill_rand(sol);
 
     //printing
     LOGLN("f(");
@@ -142,7 +142,7 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
 
     //search
     local_search::local_search
-        (sol, local_search::SteepestSlopeStrategy{},
-            logger, utils::ReturnFalseFunctor(), SearchComp());
+        (sol, local_search::steepest_slope_strategy{},
+            logger, utils::return_false_functor(), search_comps());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }

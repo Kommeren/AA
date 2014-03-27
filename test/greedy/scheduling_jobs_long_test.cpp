@@ -23,21 +23,21 @@ BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
 
    const unsigned seed = 68;
    const Time optTime = 10000;
-   const long minMachines = 10;
-   const long maxMachines = 100000;
-   const long stepMachines = 10;
+   const long min_machines = 10;
+   const long max_machines = 100000;
+   const long step_machines = 10;
    const long maxMachineSpeed = 100;
-   const double minJobsOnMachineStart = 1.0;
-   const double minJobsOnMachineEnd = 5.0;
-   const double minJobsOnMachineStep = 0.33;
+   const double min_jobs_on_machine_start = 1.0;
+   const double min_jobs_on_machine_end = 5.0;
+   const double min_jobs_on_machine_step = 0.33;
 
    std::srand(seed);
-   for (int numberOfMachines = minMachines;
-         numberOfMachines <= maxMachines;
-         numberOfMachines *= stepMachines) {
-      for (double minJobsOnMachine = minJobsOnMachineStart;
-            minJobsOnMachine < minJobsOnMachineEnd;
-            minJobsOnMachine += minJobsOnMachineStep){
+   for (int numberOfMachines = min_machines;
+         numberOfMachines <= max_machines;
+         numberOfMachines *= step_machines) {
+      for (double minJobsOnMachine = min_jobs_on_machine_start;
+            minJobsOnMachine < min_jobs_on_machine_end;
+            minJobsOnMachine += min_jobs_on_machine_step){
          LOGLN("machines: " << numberOfMachines);
          std::vector<Machine> machines(numberOfMachines);
          for (auto machineID: boost::irange(0, numberOfMachines)) {
@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
          }
          auto getSpeed = [](Machine machine) { return machine.second; };
 
-         std::vector<Job> jobs = generateJobLoads(machines,
+         std::vector<Job> jobs = generate_job_loads(machines,
                minJobsOnMachine, optTime, getSpeed);
          LOGLN("jobs: " << jobs.size());
 
@@ -53,17 +53,17 @@ BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
             decltype(jobs)::iterator>> Result;
          Result resultRandomized, resultDeterministic;
 
-         paal::greedy::scheduleRandomized(machines.begin(), machines.end(),
+         paal::greedy::schedule_randomized(machines.begin(), machines.end(),
                jobs.begin(), jobs.end(), back_inserter(resultRandomized),
-               getSpeed, paal::utils::IdentityFunctor());
-         paal::greedy::scheduleDeterministic(machines.begin(), machines.end(),
+               getSpeed, paal::utils::identity_functor());
+         paal::greedy::schedule_deterministic(machines.begin(), machines.end(),
             jobs.begin(), jobs.end(), back_inserter(resultDeterministic),
-               getSpeed, paal::utils::IdentityFunctor());
+               getSpeed, paal::utils::identity_functor());
 
          auto checkAndPrint = [&] (const Result& result) {
-            checkJobs(result, jobs);
-            double maxTime = getMaxTime(result, getSpeed);
-            check_result(maxTime,double(optTime),2);
+            check_jobs(result, jobs);
+            double max_time = get_max_time(result, getSpeed);
+            check_result(max_time,double(optTime),2);
          };
          checkAndPrint(resultRandomized);
          checkAndPrint(resultDeterministic);

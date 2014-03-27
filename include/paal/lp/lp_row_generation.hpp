@@ -14,11 +14,11 @@ namespace paal {
 namespace lp {
 
 /**
- * @class LPRowGeneration
+ * @class lp_row_generation
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-class LPRowGeneration {
+class lp_row_generation {
 public:
     /**
      * Finds an extreme point solution to the LP using the row genereation technique:
@@ -28,52 +28,52 @@ public:
      * feasible solution to the full LP is found.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(Problem & problem, LP & lp, ProblemType probType) {
-        auto & oracle = problem.getOracle();
-        while (probType == OPTIMAL && !oracle.feasibleSolution(problem, lp)) {
-            oracle.addViolatedConstraint(problem, lp);
-            probType = lp.resolveToExtremePointDual();
+    problem_type operator()(Problem & problem, LP & lp, problem_type probType) {
+        auto & oracle = problem.get_oracle();
+        while (probType == OPTIMAL && !oracle.feasible_solution(problem, lp)) {
+            oracle.add_violated_constraint(problem, lp);
+            probType = lp.resolve_to_extreme_point_dual();
         }
         return probType;
     }
 };
 
 /**
- * @class RowGenerationSolveLP
+ * @class row_generation_solve_lp
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-class RowGenerationSolveLP {
+class row_generation_solve_lp {
 public:
     /**
      * Finds an extreme point solution to the LP using the row genereation technique.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(Problem & problem, LP & lp) {
-        return m_rowGeneration(problem, lp, lp.solveToExtremePointPrimal());
+    problem_type operator()(Problem & problem, LP & lp) {
+        return m_row_generation(problem, lp, lp.solve_to_extreme_point_primal());
     }
 
 private:
-    LPRowGeneration m_rowGeneration;
+    lp_row_generation m_row_generation;
 };
 
 /**
- * @class RowGenerationResolveLP
+ * @class row_generation_resolve_lp
  *
  * @brief Finds an extreme point solution to the LP using the row generation technique.
  */
-class RowGenerationResolveLP {
+class row_generation_resolve_lp {
 public:
     /**
      * Finds an extreme point solution to the LP using the row genereation technique.
      */
     template <typename Problem, typename LP>
-    ProblemType operator()(Problem & problem, LP & lp) {
-        return m_rowGeneration(problem, lp, lp.resolveToExtremePointPrimal());
+    problem_type operator()(Problem & problem, LP & lp) {
+        return m_row_generation(problem, lp, lp.resolve_to_extreme_point_primal());
     }
 
 private:
-    LPRowGeneration m_rowGeneration;
+    lp_row_generation m_row_generation;
 };
 
 } //lp

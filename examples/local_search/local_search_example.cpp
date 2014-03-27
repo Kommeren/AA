@@ -11,7 +11,7 @@
 
 #include "paal/local_search/local_search.hpp"
 
-//! [Local Search Components Example]
+//! [Local Search components Example]
 namespace ls =  paal::local_search;
 using namespace  paal;
 
@@ -19,12 +19,12 @@ int f(int x) {
     return -x*x + 12 * x -27;
 }
 
-struct GetMoves {
+struct get_moves {
     typedef typename std::vector<int>::const_iterator Iter;
     const std::vector<int> neighb;
     public:
 
-    GetMoves() : neighb{10, -10, 1, -1} {}
+    get_moves() : neighb{10, -10, 1, -1} {}
 
     const std::vector<int> & operator()(int x)  const {
         return neighb;
@@ -44,9 +44,9 @@ struct Commit {
     }
 };
 
-typedef  ls::SearchComponents<GetMoves, Gain, Commit> SearchComp;
+typedef  ls::search_components<get_moves, Gain, Commit> search_comps;
 
-//! [Local Search Components Example]
+//! [Local Search components Example]
 
 int main() {
     //! [Local Search Example]
@@ -54,7 +54,7 @@ int main() {
     int solution(0);
 
     //search
-    local_search_simple(solution, SearchComp());
+    local_search_simple(solution, search_comps());
 
     //print
     std::cout << "Local search solution: " <<  solution << std::endl;

@@ -15,7 +15,7 @@ namespace utils {
  * Selects one element according to probability.
  */
 template <bool FailIfEmpty = true, typename InputIterator>
-static InputIterator randomSelect(InputIterator iBegin, InputIterator iEnd) {
+static InputIterator random_select(InputIterator iBegin, InputIterator iEnd) {
     typedef typename std::iterator_traits<InputIterator>::value_type Dist;
     Dist total = std::accumulate(iBegin, iEnd, Dist());
     Dist r = total * (rand() / (double(RAND_MAX) + 1));
@@ -90,11 +90,11 @@ public:
     }
 
     /**
-     * @brief getEpsilon used in comparison
+     * @brief get_epsilon used in comparison
      *
      * @return
      */
-    double getEpsilon() const {
+    double get_epsilon() const {
         return m_epsilon;
     }
 
@@ -103,7 +103,7 @@ public:
      *
      * @return
      */
-    static T defaultEpsilon() {
+    static T default_epsilon() {
         return std::numeric_limits<T>::epsilon();
     }
 

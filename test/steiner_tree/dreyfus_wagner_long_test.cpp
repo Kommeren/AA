@@ -23,15 +23,15 @@
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(steinlib_test) {
-    std::vector<SteinerTreeTest> data;
+    std::vector<steiner_tree_test> data;
     LOGLN("READING INPUT...");
-    readSTEINLIBtests(data);
+    read_steinlib_tests(data);
     int k = 0;
-    for (const SteinerTreeTest& test : data) {
-        LOGLN("TEST " << test.testName);
-        auto dw = paal::steiner_tree::make_DreyfusWagner(test.metric, test.terminals, test.steinerPoints);
+    for (const steiner_tree_test& test : data) {
+        LOGLN("TEST " << test.test_name);
+        auto dw = paal::steiner_tree::make_dreyfus_wagner(test.metric, test.terminals, test.steiner_points);
         dw.solve();
-        int res = dw.getCost();
+        int res = dw.get_cost();
         BOOST_CHECK_EQUAL(res, test.optimal);
         // Smaller tests only
         if (++k == 50) break;

@@ -12,7 +12,7 @@
 
 namespace {
 struct Config {
-    ~Config()  {paal::lp::GLP::freeEnv(); }
+    ~Config()  {paal::lp::GLP::free_env(); }
 };
 }
 

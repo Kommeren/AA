@@ -41,7 +41,7 @@ int main() {
     };
 
     //search
-    ls::local_search_simple(solution, ls::make_SearchComponents(getMoves, gain, commit));
+    ls::local_search_simple(solution, ls::make_search_components(getMoves, gain, commit));
 
     //print
     std::cout << "Local search solution: " <<  solution << std::endl;
@@ -51,9 +51,9 @@ int main() {
     //now each move is accepted with certain probability depending on
     //the move quality and iteration id.
     solution = 0;
-    auto cooling = ls::ExponentialCoolingSchemaDependantOnIteration(1000, 0.999); //this is just a functor returning double
-    auto gainSA = ls::make_SimulatedAnnealingGainAdaptor(gain, cooling); // we create new gain by adopting the old one
-    ls::local_search_simple(solution, ls::make_SearchComponents(getMoves, gainSA, commit));// we run local search
+    auto cooling = ls::exponential_cooling_schema_dependant_on_iteration(1000, 0.999); //this is just a functor returning double
+    auto gainSA = ls::make_simulated_annealing_gain_adaptor(gain, cooling); // we create new gain by adopting the old one
+    ls::local_search_simple(solution, ls::make_search_components(getMoves, gainSA, commit));// we run local search
 
     //print
     std::cout << "Simulated annealing solution: " <<  solution << std::endl;
@@ -69,20 +69,20 @@ int main() {
         return boost::make_iterator_range(iter, iter + 1);
     };
 
-    ls::StopConditionCountLimit stopCondition(1000);
-    paal::utils::SkipFunctor postSearchAtion;
+    ls::stop_condition_count_limit stop_condition(1000);
+    paal::utils::skip_functor postSearchAtion;
 
     //this commit remembers the best solution
     //in many cases it should be also used in simulated annealing
     auto recordSolutionCommit =
-            ls::make_RecordSolutionCommitAdapter(
+            ls::make_record_solution_commit_adapter(
                     best, //the reference to the best found solution which is going to be updated during the search
                     commit,
-                    paal::utils::make_FunctorToComparator(f, paal::utils::Greater()));// recordSolutionCommit must know how to compare solutions
+                    paal::utils::make_functor_to_comparator(f, paal::utils::Greater()));// recordSolutionCommit must know how to compare solutions
 
     //random walk
-    ls::local_search(currentSolution, ls::ChooseFirstBetterStrategy{}, postSearchAtion, stopCondition,
-            ls::make_SearchComponents(getMovesRandom, paal::utils::ReturnOneFunctor(), recordSolutionCommit));
+    ls::local_search(currentSolution, ls::choose_first_better_strategy{}, postSearchAtion, stop_condition,
+            ls::make_search_components(getMovesRandom, paal::utils::return_one_functor(), recordSolutionCommit));
 
     //print
     std::cout << "Random walk solution: " << best << std::endl;
@@ -92,12 +92,12 @@ int main() {
 
     currentSolution = 0;
     best = 0;
-    auto gainTabu =  ls::make_TabuGainAdaptor(
-                        paal::data_structures::TabuListRememberSolutionAndMove<int, int>(20), gain);
+    auto gainTabu =  ls::make_tabu_gain_adaptor(
+                        paal::data_structures::tabu_list_remember_solution_and_move<int, int>(20), gain);
 
 
     ls::local_search
-        (currentSolution, ls::SteepestSlopeStrategy{}, postSearchAtion, stopCondition, ls::make_SearchComponents(getMoves, gainTabu, recordSolutionCommit));
+        (currentSolution, ls::steepest_slope_strategy{}, postSearchAtion, stop_condition, ls::make_search_components(getMoves, gainTabu, recordSolutionCommit));
 
     //print
     std::cout << "Tabu solution: " << best << std::endl;

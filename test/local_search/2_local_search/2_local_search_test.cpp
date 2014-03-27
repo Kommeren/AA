@@ -26,29 +26,29 @@ using namespace  paal;
 BOOST_AUTO_TEST_CASE(two_local_search_test) {
     //! [Two Local Search Example]
     //sample data
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
     const int size = gm.size();
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
     //create random solution
     std::random_shuffle(v.begin(), v.end());
-    typedef data_structures::SimpleCycle<int> Cycle;
+    typedef data_structures::simple_cycle<int> Cycle;
     Cycle cycle(v.begin(), v.end());
 
     //creating local search components
-    auto lsc = getDefaultTwoLocalComponents(gm);
+    auto lsc = get_default_two_local_components(gm);
 
     //printing
-    LOGLN("Length \t" << simple_algo::getLength(gm, cycle));
+    LOGLN("Length \t" << simple_algo::get_length(gm, cycle));
 
     //setting logger
-    auto logger = utils::make_twoLSLogger(gm, 100);
+    auto logger = utils::make_two_ls_logger(gm, 100);
 
     //search
-    two_local_search(cycle, local_search::ChooseFirstBetterStrategy{},
-                logger, utils::ReturnFalseFunctor(), lsc);
+    two_local_search(cycle, local_search::choose_first_better_strategy{},
+                logger, utils::return_false_functor(), lsc);
     //! [Two Local Search Example]
 }
 

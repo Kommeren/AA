@@ -26,21 +26,21 @@ namespace data_structures {
  * @tparam Ranges
  */
 template <typename... Ranges>
-    class CombineIteratorEngine;
+    class combine_iterator_engine;
 
 /**
- * @class CombineIteratorEngine
+ * @class combine_iterator_engine
  * @brief actual implementation
  *
  * @tparam Range
  * @tparam RangesRest
  */
 template <typename Range, typename... RangesRest>
-    class CombineIteratorEngine<Range, RangesRest...> :
-     private CombineIteratorEngine<RangesRest...> {
+    class combine_iterator_engine<Range, RangesRest...> :
+     private combine_iterator_engine<RangesRest...> {
 
         public:
-            using base = CombineIteratorEngine<RangesRest...>;
+            using base = combine_iterator_engine<RangesRest...>;
             using Iterator = typename boost::range_iterator<Range>::type;
 
             /**
@@ -49,14 +49,14 @@ template <typename Range, typename... RangesRest>
              * @param range
              * @param rest
              */
-            CombineIteratorEngine(Range & range, RangesRest & ... rest) :
+            combine_iterator_engine(Range & range, RangesRest & ... rest) :
                 base(rest...)
                 , m_begin(std::begin(range))
                 , m_curr(std::begin(range))
                 , m_end(std::end(range))
         {}
 
-            CombineIteratorEngine()  = default;
+            combine_iterator_engine()  = default;
 
             /**
              * @brief move iterators to the next position
@@ -99,7 +99,7 @@ template <typename Range, typename... RangesRest>
              *
              * @return
              */
-            friend bool operator==(const CombineIteratorEngine & left, const CombineIteratorEngine & right) {
+            friend bool operator==(const combine_iterator_engine & left, const combine_iterator_engine & right) {
                 return left.m_begin == right.m_begin
                        && left.m_end == right.m_end
                        && left.m_curr == right.m_curr
@@ -116,7 +116,7 @@ template <typename Range, typename... RangesRest>
  * @brief specialization for empty ranges lists
  */
 template <>
-    class CombineIteratorEngine<> {
+    class combine_iterator_engine<> {
         public:
             /**
              * @brief no next configuration
@@ -151,7 +151,7 @@ template <>
              *
              * @return
              */
-            friend bool operator==(const CombineIteratorEngine & left, const CombineIteratorEngine & right) {
+            friend bool operator==(const combine_iterator_engine & left, const combine_iterator_engine & right) {
                 return true;
             }
     };
@@ -164,7 +164,7 @@ namespace detail {
 
 
 /**
- * @brief make for CombineIteratorEngine
+ * @brief make for combine_iterator_engine
  *
  * @tparam Ranges
  * @param ranges
@@ -172,24 +172,24 @@ namespace detail {
  * @return
  */
 template <typename... Ranges>
-    CombineIteratorEngine<detail::rem_ref<Ranges>...>
-    make_CombineIteratorEngine(Ranges&& ...  ranges) {
-        //see comments in make_CombineIterator
-        return CombineIteratorEngine<detail::rem_ref<Ranges>...>{ranges...};
+    combine_iterator_engine<detail::rem_ref<Ranges>...>
+    make_combine_iterator_engine(Ranges&& ...  ranges) {
+        //see comments in make_combine_iterator
+        return combine_iterator_engine<detail::rem_ref<Ranges>...>{ranges...};
     }
 
 /**
- * @brief CombineIterator iterates through all combinations of values from given ranges
+ * @brief combine_iterator iterates through all combinations of values from given ranges
  *        and returns them joined together using given Joiner
  *
  * @tparam Joiner
  * @tparam Ranges
  */
 template <typename Joiner, typename... Ranges>
-    class CombineIterator : public boost::iterator_facade<CombineIterator<Joiner, Ranges...>
-                            , puretype(CombineIteratorEngine<Ranges...>().call(std::declval<Joiner>()))
+    class combine_iterator : public boost::iterator_facade<combine_iterator<Joiner, Ranges...>
+                            , puretype(combine_iterator_engine<Ranges...>().call(std::declval<Joiner>()))
                             , boost::forward_traversal_tag //TODO this should be minimal tag of the ranges
-                            , decltype(CombineIteratorEngine<Ranges...>().call(std::declval<Joiner>()))
+                            , decltype(combine_iterator_engine<Ranges...>().call(std::declval<Joiner>()))
                             >
 {
     public:
@@ -199,15 +199,15 @@ template <typename Joiner, typename... Ranges>
          * @param joiner
          * @param ranges
          */
-        CombineIterator(Joiner joiner, Ranges & ... ranges) :
-            m_joiner(joiner), m_iteratorEngine(ranges...),
-            m_end(sizeof...(Ranges) ? isEmpty(ranges...) : true)
+        combine_iterator(Joiner joiner, Ranges & ... ranges) :
+            m_joiner(joiner), m_iterator_engine(ranges...),
+            m_end(sizeof...(Ranges) ? is_empty(ranges...) : true)
         { }
 
         /**
          * @brief default constructor represents end of the range
          */
-        CombineIterator() : m_end(true) {};
+        combine_iterator() : m_end(true) {};
 
     private:
         /**
@@ -221,24 +221,24 @@ template <typename Joiner, typename... Ranges>
          * @return
          */
         template <typename Range, typename... RangesRest>
-            bool isEmpty(const Range & range, const RangesRest & ... rest) {
+            bool is_empty(const Range & range, const RangesRest & ... rest) {
                 if(boost::empty(range))  {
                     return true;
                 } else {
-                    return isEmpty(rest...);
+                    return is_empty(rest...);
                 }
             }
 
         /**
-         * @brief boundary case for isEmpty
+         * @brief boundary case for is_empty
          *
          * @return
          */
-        bool isEmpty() {
+        bool is_empty() {
             return false;
         }
 
-        using ref =  decltype(CombineIteratorEngine<Ranges...>().call(std::declval<Joiner>()));
+        using ref =  decltype(combine_iterator_engine<Ranges...>().call(std::declval<Joiner>()));
 
         friend class boost::iterator_core_access;
 
@@ -246,7 +246,7 @@ template <typename Joiner, typename... Ranges>
          * @brief increments iterator
          */
         void increment() {
-            if(!m_iteratorEngine.next()) {
+            if(!m_iterator_engine.next()) {
                 m_end = true;
             }
         }
@@ -258,10 +258,10 @@ template <typename Joiner, typename... Ranges>
          *
          * @return
          */
-        bool equal(CombineIterator const& other) const
+        bool equal(combine_iterator const& other) const
         {
             return this->m_end == other.m_end &&
-                (this->m_end || this->m_iteratorEngine == other.m_iteratorEngine);
+                (this->m_end || this->m_iterator_engine == other.m_iterator_engine);
         }
 
         /**
@@ -269,16 +269,16 @@ template <typename Joiner, typename... Ranges>
          *
          * @return
          */
-        ref dereference() const { return m_iteratorEngine.call(m_joiner); }
+        ref dereference() const { return m_iterator_engine.call(m_joiner); }
 
         Joiner m_joiner;
-        mutable CombineIteratorEngine<Ranges...> m_iteratorEngine;
+        mutable combine_iterator_engine<Ranges...> m_iterator_engine;
         bool m_end;
 };
 
 
 /**
- * @brief make for CombineIterator
+ * @brief make for combine_iterator
  *
  * @tparam Joiner
  * @tparam Ranges
@@ -288,11 +288,11 @@ template <typename Joiner, typename... Ranges>
  * @return
  */
 template <typename Joiner, typename... Ranges>
-    CombineIterator<Joiner, detail::rem_ref<Ranges>...>
-    make_CombineIterator(Joiner joiner, Ranges&& ...  ranges) {
-        //we do not forward the ranges, because CombineIterator expects lvalues
+    combine_iterator<Joiner, detail::rem_ref<Ranges>...>
+    make_combine_iterator(Joiner joiner, Ranges&& ...  ranges) {
+        //we do not forward the ranges, because combine_iterator expects lvalues
         //we Use Ranges && because, we'd like to cover const/nonconst cases
-        return CombineIterator<Joiner, detail::rem_ref<Ranges>...>{joiner, ranges...};
+        return combine_iterator<Joiner, detail::rem_ref<Ranges>...>{joiner, ranges...};
     }
 
 } //data_structures

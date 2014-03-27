@@ -18,7 +18,7 @@ namespace data_structures {
 // minor TODO class can specialized for randomaccess iterators
 
 /**
- * @class CycleIterator
+ * @class cycle_iterator
  * @brief For given collection (begin -> end) and start iterator pointing to an element inside
  *        collection (begin -> ... -> start -> ... ->end), returns new collection created by shifting the old collection to start.
  *
@@ -27,16 +27,16 @@ namespace data_structures {
  *        1 -> 2 -> 3 (start) -> 4 -> 5 -> end
  *
  *        The collection
- *        ( CycleIterator(start, begin, end), CycleIterator() )
+ *        ( cycle_iterator(start, begin, end), cycle_iterator() )
  *        describes collection
  *        3 -> 4 -> 5 -> 1 -> 2 -> end
  *
  * @tparam Iter type of iterator
  */
 template <typename Iter>
-class CycleIterator :
+class cycle_iterator :
     public boost::iterator_facade<
-        CycleIterator<Iter>,
+        cycle_iterator<Iter>,
         typename std::iterator_traits<Iter>::value_type,
         typename boost::forward_traversal_tag,
         typename std::iterator_traits<Iter>::reference,
@@ -49,19 +49,19 @@ class CycleIterator :
 public:
 
     /**
-     * @brief constructing of CycleIterator
+     * @brief constructing of cycle_iterator
      *
      * @param start new start
      * @param begin old start
      * @param end   old end
      */
-    CycleIterator(Iter start, Iter begin, Iter end) :
-        m_curr(start), m_start(start), m_begin(begin), m_end(end), m_isEnd(false) {}
+    cycle_iterator(Iter start, Iter begin, Iter end) :
+        m_curr(start), m_start(start), m_begin(begin), m_end(end), m_is_end(false) {}
 
     /**
      * @brief Points to end of the collection
      */
-    CycleIterator() : m_isEnd(true) {}
+    cycle_iterator() : m_is_end(true) {}
 
 private:
     friend class boost::iterator_core_access;
@@ -77,13 +77,13 @@ private:
         }
 
         if(m_curr == m_start) {
-            m_isEnd = true;
+            m_is_end = true;
             m_curr = m_end;
         }
     }
 
-    bool equal(CycleIterator ei) const {
-        return (m_isEnd && ei.m_isEnd) || m_curr == ei.m_curr;
+    bool equal(cycle_iterator ei) const {
+        return (m_is_end && ei.m_is_end) || m_curr == ei.m_curr;
     }
 
     ref dereference() const {
@@ -94,7 +94,7 @@ private:
     Iter m_start;
     Iter m_begin;
     Iter m_end;
-    bool m_isEnd = false;
+    bool m_is_end = false;
 };
 
 }

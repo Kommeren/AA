@@ -20,24 +20,24 @@ namespace data_structures {
      * @tparam Vertex
      */
 template <typename V, typename Vertex>
-struct _VoronoiTraits {
+struct _voronoi_traits {
     typedef Vertex VertexType;
     ///distance type
-    typedef decltype(std::declval<V>().addGenerator(std::declval<VertexType>()))
+    typedef decltype(std::declval<V>().add_generator(std::declval<VertexType>()))
                 DistanceType;
 
     /// Generators set
-    typedef puretype(std::declval<V>().getGenerators())
+    typedef puretype(std::declval<V>().get_generators())
                 GeneratorsSet;
 
     ///vertices set
-    typedef puretype(std::declval<V>().getVertices())
+    typedef puretype(std::declval<V>().get_vertices())
                 VerticesSet;
 };
 
 ///default VertexType is int.
 template <typename V>
-struct VoronoiTraits : public _VoronoiTraits<V, int> {
+struct voronoi_traits : public _voronoi_traits<V, int> {
 };
 
 }

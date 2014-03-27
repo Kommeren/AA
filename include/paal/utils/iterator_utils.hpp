@@ -24,8 +24,8 @@ namespace utils {
      * @tparam Iterator
      */
 template <typename Iterator>
-struct IteratorWithExcludedElement :
-    public boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
+struct iterator_with_excluded_element :
+    public boost::filter_iterator<decltype(std::bind(utils::not_equal_to(),
                                            std::declval<typename std::iterator_traits<Iterator>::value_type>() ,
                                            std::placeholders::_1)), Iterator> {
 
@@ -37,13 +37,13 @@ struct IteratorWithExcludedElement :
      * @param end
      * @param e
      */
-    IteratorWithExcludedElement(Iterator i, Iterator end, const Element &  e)
-        : boost::filter_iterator<decltype(std::bind(utils::NotEqualTo(),
+    iterator_with_excluded_element(Iterator i, Iterator end, const Element &  e)
+        : boost::filter_iterator<decltype(std::bind(utils::not_equal_to(),
                                                     std::declval<Element>(),
                                                     std::placeholders::_1)), Iterator >
-          (std::bind(utils::NotEqualTo(), e, std::placeholders::_1), i, end )  {}
+          (std::bind(utils::not_equal_to(), e, std::placeholders::_1), i, end )  {}
 
-    IteratorWithExcludedElement() = default;
+    iterator_with_excluded_element() = default;
 };
 
 } //utils

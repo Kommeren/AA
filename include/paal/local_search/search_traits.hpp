@@ -16,27 +16,27 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief Traits class for SearchComponents
+ * @brief Traits class for search_components
  *
- * @tparam SearchComponents
+ * @tparam search_components
  */
-template <typename SearchComponents>
-struct SearchComponentsTraits {
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<GetMoves>::type GetMovesT;
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Gain>::type GainT;
-    typedef typename data_structures::ComponentTraits<SearchComponents>::template type<Commit>::type CommitT;
+template <typename search_components>
+struct search_components_traits {
+    typedef typename data_structures::component_traits<search_components>::template type<get_moves>::type get_movesT;
+    typedef typename data_structures::component_traits<search_components>::template type<Gain>::type GainT;
+    typedef typename data_structures::component_traits<search_components>::template type<Commit>::type CommitT;
 };
 
 /**
  * @brief metafunction returns move type in single_solution case
  *
- * @tparam SearchComponents
+ * @tparam search_components
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution>
-class MoveType {
-    typedef typename SearchComponentsTraits<
-                SearchComponents>::GetMovesT NG;
+template <typename search_components, typename Solution>
+class move_type {
+    typedef typename search_components_traits<
+                search_components>::get_movesT NG;
     typedef typename std::remove_reference<
         typename std::result_of<NG(Solution &)>::type>::type MovesRange;
     typedef typename boost::range_iterator<MovesRange>::type MoveIterator;
@@ -48,14 +48,14 @@ public:
 /**
  * @brief metafunction returns move type in multi_solution case
  *
- * @tparam SearchComponents
+ * @tparam search_components
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution>
-class MultiMove {
-    typedef typename SearchComponentsTraits<
-                SearchComponents>::GetMovesT NG;
-    typedef typename utils::CollectionToElem<Solution>::type Element;
+template <typename search_components, typename Solution>
+class multi_move {
+    typedef typename search_components_traits<
+                search_components>::get_movesT NG;
+    typedef typename utils::collection_to_elem<Solution>::type Element;
     typedef typename std::result_of<NG(Solution &, Element &)>::type MovesRange;
     typedef typename boost::range_iterator<MovesRange>::type MoveIterator;
 public:
@@ -66,33 +66,33 @@ public:
 /**
  * @brief metafunction returns Fitness type in single_solution case
  *
- * @tparam SearchComponents
+ * @tparam search_components
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution>
+template <typename search_components, typename Solution>
 class Fitness {
-    typedef typename SearchComponentsTraits<
-                SearchComponents>::GainT Gain;
-    typedef typename MoveType<SearchComponents, Solution>::type Move;
+    typedef typename search_components_traits<
+                search_components>::GainT Gain;
+    typedef typename move_type<search_components, Solution>::type Move;
 public:
-    typedef typename utils::PureResultOf<Gain(Solution &, Move &)>::type type;
+    typedef typename utils::pure_result_of<Gain(Solution &, Move &)>::type type;
 };
 
 
 /**
  * @brief metafunction returns Fitness type in multi_solution case
  *
- * @tparam SearchComponents
+ * @tparam search_components
  * @tparam Solution
  */
-template <typename SearchComponents, typename Solution>
-class MultiFitness {
-    typedef typename SearchComponentsTraits<
-                SearchComponents>::GainT Gain;
-    typedef typename MultiMove<SearchComponents, Solution>::type Move;
-    typedef typename utils::CollectionToElem<Solution>::type SolutionElement;
+template <typename search_components, typename Solution>
+class multi_fitness {
+    typedef typename search_components_traits<
+                search_components>::GainT Gain;
+    typedef typename multi_move<search_components, Solution>::type Move;
+    typedef typename utils::collection_to_elem<Solution>::type SolutionElement;
 public:
-    typedef typename utils::PureResultOf<Gain(Solution &, SolutionElement &, Move &)>::type type;
+    typedef typename utils::pure_result_of<Gain(Solution &, SolutionElement &, Move &)>::type type;
 };
 
 } // local_search

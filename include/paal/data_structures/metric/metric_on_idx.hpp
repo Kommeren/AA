@@ -22,11 +22,11 @@ namespace data_structures {
      * @tparam Bimap
      */
 template <typename Metric, typename Bimap>
-class MetricOnIdx {
+class metric_on_idx {
 public:
-    typedef data_structures::MetricTraits<Metric> MT;
+    typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::DistanceType DistanceType;
-    typedef typename BiMapTraits<Bimap>::Idx  VertexType;
+    typedef typename bimap_traits<Bimap>::Idx  VertexType;
 
     /**
      * @brief constructor
@@ -34,7 +34,7 @@ public:
      * @param m
      * @param idx
      */
-    MetricOnIdx(const Metric & m, const Bimap & idx) : m_metric(m), m_idx(idx) {}
+    metric_on_idx(const Metric & m, const Bimap & idx) : m_metric(m), m_idx(idx) {}
 
     /**
      * @brief operator()
@@ -45,7 +45,7 @@ public:
      * @return
      */
     DistanceType operator()(VertexType i, VertexType j) const {
-        return m_metric(m_idx.getVal(i), m_idx.getVal(j));
+        return m_metric(m_idx.get_val(i), m_idx.get_val(j));
     }
 private:
     const Metric & m_metric;
@@ -53,7 +53,7 @@ private:
 };
 
 /**
- * @brief make for MetricOnIdx
+ * @brief make for metric_on_idx
  *
  * @tparam Metric
  * @tparam Bimap
@@ -63,9 +63,9 @@ private:
  * @return
  */
 template <typename Metric, typename Bimap>
-MetricOnIdx<Metric, Bimap>
-make_metricOnIdx(const Metric & m, const Bimap & b) {
-    return MetricOnIdx<Metric, Bimap>(m, b);
+metric_on_idx<Metric, Bimap>
+make_metric_on_idx(const Metric & m, const Bimap & b) {
+    return metric_on_idx<Metric, Bimap>(m, b);
 }
 
 }

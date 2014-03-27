@@ -28,7 +28,7 @@ namespace graph_type {
  *
  * @tparam Graph
  */
-template <typename Graph> struct GraphMetricTraits {
+template <typename Graph> struct graph_metric_traits {
     typedef graph_type::Sparse GraphTypeTag;
 };
 
@@ -37,14 +37,14 @@ template <typename Graph> struct GraphMetricTraits {
 namespace metric_fillers {
 
     ///generic
-    template <typename GraphTypeTag> struct GraphMetricFillerImpl;
+    template <typename GraphTypeTag> struct graph_metric_filler_impl;
 
     /**
      * @brief specialization for Sparse graphs
      */
-    template <> struct GraphMetricFillerImpl<graph_type::Sparse> {
+    template <> struct graph_metric_filler_impl<graph_type::Sparse> {
         /**
-         * @brief fillMatrix function
+         * @brief fill_matrix function
          *
          * @tparam Graph
          * @tparam ResultMatrix
@@ -52,7 +52,7 @@ namespace metric_fillers {
          * @param rm
          */
         template <typename Graph, typename ResultMatrix>
-        void fillMatrix(const Graph & g, ResultMatrix & rm)  {
+        void fill_matrix(const Graph & g, ResultMatrix & rm)  {
             boost::johnson_all_pairs_shortest_paths(g, rm);
         }
     };
@@ -60,15 +60,15 @@ namespace metric_fillers {
     /**
      * @brief specialization for Dense graphs
      */
-    template <> struct GraphMetricFillerImpl<graph_type::Dense> {
+    template <> struct graph_metric_filler_impl<graph_type::Dense> {
         template <typename Graph, typename ResultMatrix>
             /**
-             * @brief fillMatrixFunction
+             * @brief fill_matrixFunction
              *
              * @param g
              * @param rm
              */
-        void fillMatrix(const Graph & g, ResultMatrix & rm)  {
+        void fill_matrix(const Graph & g, ResultMatrix & rm)  {
             boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
         }
     };
@@ -76,7 +76,7 @@ namespace metric_fillers {
 
 
 /**
- * @class GraphMetric
+ * @class graph_metric
  * @brief Adopts boost graph as \ref metric.
  *
  * @tparam Graph
@@ -86,20 +86,20 @@ namespace metric_fillers {
 // GENERIC
 // GraphType could be sparse, dense, large ...
 template <typename Graph, typename DistanceType,
-          typename GraphType = typename GraphMetricTraits<Graph>::GraphTypeTag >
-struct  GraphMetric : public ArrayMetric<DistanceType>,
-            public metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> {
-      typedef   ArrayMetric<DistanceType> GMBase;
-      typedef metric_fillers::GraphMetricFillerImpl<typename GraphMetricTraits<Graph>::GraphTypeTag> GMFBase;
+          typename GraphType = typename graph_metric_traits<Graph>::GraphTypeTag >
+struct  graph_metric : public array_metric<DistanceType>,
+            public metric_fillers::graph_metric_filler_impl<typename graph_metric_traits<Graph>::GraphTypeTag> {
+      typedef   array_metric<DistanceType> GMBase;
+      typedef metric_fillers::graph_metric_filler_impl<typename graph_metric_traits<Graph>::GraphTypeTag> GMFBase;
 
       /**
        * @brief constructor
        *
        * @param g
        */
-    GraphMetric(const Graph & g)
+    graph_metric(const Graph & g)
         : GMBase(num_vertices(g)) {
-            GMFBase::fillMatrix(g, GMBase::m_matrix);
+            GMFBase::fill_matrix(g, GMBase::m_matrix);
     }
 };
 
@@ -107,13 +107,13 @@ struct  GraphMetric : public ArrayMetric<DistanceType>,
 //TODO implement
 ///Specialization for large graphs
 template <typename Graph, typename DistanceType>
-struct  GraphMetric<Graph, DistanceType, graph_type::Large> {
+struct  graph_metric<Graph, DistanceType, graph_type::Large> {
     /**
      * @brief constructor
      *
      * @param g
      */
-    GraphMetric(const Graph & g) { assert(false);}
+    graph_metric(const Graph & g) { assert(false);}
 };
 
 ///Specialization for adjacency_list
@@ -124,7 +124,7 @@ template <typename OutEdgeList,
           typename EdgeProperties,
           typename GraphProperties,
           typename EdgeList>
-struct GraphMetricTraits<boost::adjacency_list<
+struct graph_metric_traits<boost::adjacency_list<
                              OutEdgeList,
                              VertexList,
                              Directed,
@@ -141,7 +141,7 @@ template <typename Directed,
           typename EdgeProperty,
           typename GraphProperty,
           typename Allocator>
-struct GraphMetricTraits<boost::adjacency_matrix<
+struct graph_metric_traits<boost::adjacency_matrix<
                             Directed,
                             VertexProperty,
                             EdgeProperty,

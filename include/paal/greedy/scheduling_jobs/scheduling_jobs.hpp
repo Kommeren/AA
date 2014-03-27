@@ -40,8 +40,8 @@ namespace detail {
    struct Types {
       typedef typename std::iterator_traits<MachineIterator>::reference MachineReference;
       typedef typename std::iterator_traits<JobIterator>::reference JobReference;
-      typedef typename utils::PureResultOf<GetSpeed(MachineReference)>::type Speed;
-      typedef typename utils::PureResultOf<GetLoad(JobReference)>::type Load;
+      typedef typename utils::pure_result_of<GetSpeed(MachineReference)>::type Speed;
+      typedef typename utils::pure_result_of<GetLoad(JobReference)>::type Load;
       typedef data_structures::Fraction<Load, Speed> Frac;
    };
 
@@ -50,7 +50,7 @@ namespace detail {
             class GetSpeed,
             class GetLoad>
    typename Types<MachineIterator, JobIterator, GetSpeed, GetLoad>::Frac
-   calculateBound(const MachineIterator mFirst, const MachineIterator mLast,
+   calculate_bound(const MachineIterator mFirst, const MachineIterator mLast,
                   const JobIterator jFirst, const JobIterator jLast,
                   GetSpeed getSpeed, GetLoad getLoad) {
       typedef Types<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
@@ -78,7 +78,7 @@ namespace detail {
          auto condition = [=] (MachinesNumType i) { return getSummed(i) < getSingle(i); };
          auto machinesIDs = boost::counting_range(static_cast<MachinesNumType>(0), machinesNum);
          auto it = boost::lower_bound(
-            machinesIDs | boost::adaptors::transformed(utils::make_AssignableFunctor(condition)),
+            machinesIDs | boost::adaptors::transformed(utils::make_assignable_functor(condition)),
             true
          ).base();
          MachinesNumType machineID = (it != machinesIDs.end()) ? *it : machinesNum - 1;
@@ -113,15 +113,15 @@ namespace detail {
 
       std::vector<MachineIterator> machines;
       boost::copy(boost::counting_range(mFirst, mLast), std::back_inserter(machines));
-      auto getSpeedFromIterator = utils::make_LiftIteratorFunctor(getSpeed);
-      boost::sort(machines, utils::make_FunctorToComparator(getSpeedFromIterator, utils::Greater()));
+      auto getSpeedFromIterator = utils::make_lift_iterator_functor(getSpeed);
+      boost::sort(machines, utils::make_functor_to_comparator(getSpeedFromIterator, utils::Greater()));
 
       std::vector<JobIterator> jobs;
       boost::copy(boost::counting_range(jFirst, jLast), std::back_inserter(jobs));
-      auto getLoadFromIterator = utils::make_LiftIteratorFunctor(getLoad);
-      boost::sort(jobs, utils::make_FunctorToComparator(getLoadFromIterator, utils::Greater()));
+      auto getLoadFromIterator = utils::make_lift_iterator_functor(getLoad);
+      boost::sort(jobs, utils::make_functor_to_comparator(getLoadFromIterator, utils::Greater()));
 
-      auto bound = detail::calculateBound(machines.begin(), machines.end(), jobs.begin(), jobs.end(),
+      auto bound = detail::calculate_bound(machines.begin(), machines.end(), jobs.begin(), jobs.end(),
          getSpeedFromIterator, getLoadFromIterator);
       Load boundLoad = bound.num;
       Speed boundSpeed = bound.den;
@@ -186,10 +186,10 @@ template<class MachineIterator,
    class OutputIterator,
    class GetSpeed,
    class GetLoad>
-void scheduleDeterministic(const MachineIterator mFirst, const MachineIterator mLast,
+void schedule_deterministic(const MachineIterator mFirst, const MachineIterator mLast,
    const JobIterator jFirst, const JobIterator jLast,
    OutputIterator result, GetSpeed getSpeed, GetLoad getLoad) {
-   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, utils::ReturnTrueFunctor());
+   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, utils::return_true_functor());
 }
 
 /*
@@ -219,7 +219,7 @@ template<class MachineIterator,
    class GetSpeed,
    class GetLoad,
    class RandomNumberGenerator>
-void scheduleRandomized(const MachineIterator mFirst, const MachineIterator mLast,
+void schedule_randomized(const MachineIterator mFirst, const MachineIterator mLast,
       const JobIterator jFirst, const JobIterator jLast,
       OutputIterator result, GetSpeed getSpeed, GetLoad getLoad, RandomNumberGenerator&& gen) {
    typedef typename detail::Types<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
@@ -256,10 +256,10 @@ template<class MachineIterator,
    class OutputIterator,
    class GetSpeed,
    class GetLoad>
-void scheduleRandomized(const MachineIterator mFirst, const MachineIterator mLast,
+void schedule_randomized(const MachineIterator mFirst, const MachineIterator mLast,
       const JobIterator jFirst, const JobIterator jLast,
       OutputIterator result, GetSpeed getSpeed, GetLoad getLoad) {
-   scheduleRandomized(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, std::default_random_engine(97345631u));
+   schedule_randomized(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, std::default_random_engine(97345631u));
 }
 
 }//!greedy

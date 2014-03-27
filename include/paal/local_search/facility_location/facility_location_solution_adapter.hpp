@@ -28,17 +28,17 @@ namespace local_search {
 namespace facility_location {
 
     /**
-     * @brief FacilityLocationSolution adapter
+     * @brief facility_location_solution adapter
      *          chosen range and unchosen range must be joined into one homogenus collection of Facilities.
      *
-     * @tparam FacilityLocationSolution
+     * @tparam facility_location_solution
      */
-template <typename FacilityLocationSolution>
-class FacilityLocationSolutionAdapter {
-    typedef FacilityLocationSolution FLS;
+template <typename facility_location_solution>
+class facility_location_solution_adapter {
+    typedef facility_location_solution FLS;
 
     template <typename Collection>
-    auto getCycledCopy(const Collection & col, std::size_t index) const ->
+    auto get_cycledCopy(const Collection & col, std::size_t index) const ->
         decltype(boost::join(
                   boost::make_iterator_range(std::declval<typename Collection::const_iterator>(), std::declval<typename Collection::const_iterator>())
                 , boost::make_iterator_range(std::declval<typename Collection::const_iterator>(), std::declval<typename Collection::const_iterator>())
@@ -50,12 +50,12 @@ class FacilityLocationSolutionAdapter {
     }
 
 public:
-    typedef typename FacilityLocationSolution::VertexType VertexType;
+    typedef typename facility_location_solution::VertexType VertexType;
     ///type of Chosen collection
-    typedef decltype(std::declval<FLS>().getChosenFacilities()) Chosen;
+    typedef decltype(std::declval<FLS>().get_chosen_facilities()) Chosen;
     ///type of Unchosen collection
-    typedef decltype(std::declval<FLS>().getUnchosenFacilities()) Unchosen;
-    typedef typename data_structures::FacilityLocationSolutionTraits<FLS>::Dist Dist;
+    typedef decltype(std::declval<FLS>().get_unchosen_facilities()) Unchosen;
+    typedef typename data_structures::facility_location_solution_traits<FLS>::Dist Dist;
     typedef std::vector<VertexType> UnchosenCopy;
     typedef std::vector<VertexType> ChosenCopy;
 
@@ -64,14 +64,14 @@ public:
      *
      * @param sol
      */
-    FacilityLocationSolutionAdapter(FacilityLocationSolution & sol) :
+    facility_location_solution_adapter(facility_location_solution & sol) :
             m_sol(sol),
-            m_unchosenCopy(m_sol.getUnchosenFacilities().begin(),
-                         m_sol.getUnchosenFacilities().end()),
-            m_chosenCopy(m_sol.getChosenFacilities().begin(),
-                         m_sol.getChosenFacilities().end()),
-            m_lastUsedUnchosen{},
-            m_lastUsedChosen{}
+            m_unchosen_copy(m_sol.get_unchosen_facilities().begin(),
+                         m_sol.get_unchosen_facilities().end()),
+            m_chosen_copy(m_sol.get_chosen_facilities().begin(),
+                         m_sol.get_chosen_facilities().end()),
+            m_last_used_unchosen{},
+            m_last_used_chosen{}
     {}
 
     /**
@@ -81,8 +81,8 @@ public:
      *
      * @return
      */
-    Dist addFacilityTentative(VertexType v) {
-        return m_sol.addFacility(v);
+    Dist add_facility_tentative(VertexType v) {
+        return m_sol.add_facility(v);
     }
 
     /**
@@ -92,13 +92,13 @@ public:
      *
      * @return
      */
-    Dist addFacility(VertexType v) {
-        auto ret = addFacilityTentative(v);
-        auto elemIter = boost::find(m_unchosenCopy, v);
-        assert(elemIter != m_unchosenCopy.end());
-        elemIter = m_unchosenCopy.erase(elemIter);
-        m_lastUsedUnchosen = elemIter - m_unchosenCopy.begin();
-        m_chosenCopy.push_back(v);
+    Dist add_facility(VertexType v) {
+        auto ret = add_facility_tentative(v);
+        auto elemIter = boost::find(m_unchosen_copy, v);
+        assert(elemIter != m_unchosen_copy.end());
+        elemIter = m_unchosen_copy.erase(elemIter);
+        m_last_used_unchosen = elemIter - m_unchosen_copy.begin();
+        m_chosen_copy.push_back(v);
         return ret;
     }
 
@@ -109,8 +109,8 @@ public:
      *
      * @return
      */
-    Dist removeFacilityTentative(VertexType v) {
-        return m_sol.remFacility(v);
+    Dist remove_facility_tentative(VertexType v) {
+        return m_sol.rem_facility(v);
     }
 
     /**
@@ -120,13 +120,13 @@ public:
      *
      * @return
      */
-    Dist removeFacility(VertexType v) {
-        auto ret = removeFacilityTentative(v);
-        m_unchosenCopy.push_back(v);
-        auto elemIter = boost::find(m_chosenCopy, v);
-        assert(elemIter != m_chosenCopy.end());
-        elemIter = m_chosenCopy.erase(elemIter);
-        m_lastUsedChosen = elemIter - m_chosenCopy.begin();
+    Dist remove_facility(VertexType v) {
+        auto ret = remove_facility_tentative(v);
+        m_unchosen_copy.push_back(v);
+        auto elemIter = boost::find(m_chosen_copy, v);
+        assert(elemIter != m_chosen_copy.end());
+        elemIter = m_chosen_copy.erase(elemIter);
+        m_last_used_chosen = elemIter - m_chosen_copy.begin();
         return ret;
     }
 
@@ -135,7 +135,7 @@ public:
      *
      * @return
      */
-    FacilityLocationSolution & getFacilityLocationSolution() {
+    facility_location_solution & getfacility_location_solution() {
         return m_sol;
     }
 
@@ -144,7 +144,7 @@ public:
      *
      * @return
      */
-    const FacilityLocationSolution & getFacilityLocationSolution() const {
+    const facility_location_solution & getfacility_location_solution() const {
         return m_sol;
     }
 
@@ -155,8 +155,8 @@ public:
      * @return
      */
     auto getUnchosenCopy() const ->
-        decltype(std::declval<FacilityLocationSolutionAdapter>().getCycledCopy(UnchosenCopy{}, std::size_t{})) {
-            return getCycledCopy(m_unchosenCopy, m_lastUsedUnchosen);
+        decltype(std::declval<facility_location_solution_adapter>().get_cycledCopy(UnchosenCopy{}, std::size_t{})) {
+            return get_cycledCopy(m_unchosen_copy, m_last_used_unchosen);
     }
 
     /**
@@ -167,21 +167,21 @@ public:
      * @return
      */
     auto getChosenCopy() const ->
-        decltype(std::declval<FacilityLocationSolutionAdapter>().getCycledCopy(ChosenCopy{}, std::size_t{})) {
-            return getCycledCopy(m_chosenCopy, m_lastUsedChosen);
+        decltype(std::declval<facility_location_solution_adapter>().get_cycledCopy(ChosenCopy{}, std::size_t{})) {
+            return get_cycledCopy(m_chosen_copy, m_last_used_chosen);
     }
 
 private:
 
-    FacilityLocationSolution & m_sol;
+    facility_location_solution & m_sol;
     ///copy of all unchosen facilities
-    UnchosenCopy m_unchosenCopy;
+    UnchosenCopy m_unchosen_copy;
     ///copy of all chosen facilities
-    ChosenCopy m_chosenCopy;
+    ChosenCopy m_chosen_copy;
     ///index of last facility removed from unchosen
-    std::size_t m_lastUsedUnchosen;
+    std::size_t m_last_used_unchosen;
     ///index of last facility removed from chosen
-    std::size_t m_lastUsedChosen;
+    std::size_t m_last_used_chosen;
 };
 
 

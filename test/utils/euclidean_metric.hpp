@@ -12,7 +12,7 @@
 
 namespace paal {
 
-struct EuclideanMetric {
+struct euclidean_metric {
     int operator()(const std::pair<int, int> & p1, const std::pair<int, int> & p2) const {
         return sqrt(pow(p1.first - p2.first, 2) + pow(p1.second - p2.second, 2));
     }
@@ -21,7 +21,7 @@ struct EuclideanMetric {
 namespace data_structures {
 
     template <>
-    struct MetricTraits<EuclideanMetric> {
+    struct metric_traits<euclidean_metric> {
         typedef std::pair<int, int> VertexType;
         typedef int DistanceType;
     };

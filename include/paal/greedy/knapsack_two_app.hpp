@@ -33,23 +33,23 @@ namespace detail {
                     FunctorOnIteratorPValue<ObjectValueFunctor,
                         typename std::iterator_traits<ObjectsIterIter>::value_type>,
                     std::pair<ObjectsIterIter, unsigned>>
-              getGreedyFill (
+              get_greedy_fill (
                         ObjectsIterIter oBegin,
                         ObjectsIterIter oEnd,
                         FunctorOnIteratorPValue<ObjectSizeFunctor,
                             typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
                         ObjectValueFunctor value,
                         ObjectSizeFunctor size,
-                        NoZeroOneTag)
+                        no_zero_one_tag)
               {
                     typedef typename std::iterator_traits<ObjectsIterIter>::value_type ObjectsIter;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
                     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
 
-                    auto starValue = utils::make_LiftIteratorFunctor(value);
-                    auto starSize = utils::make_LiftIteratorFunctor(size);
+                    auto starValue = utils::make_lift_iterator_functor(value);
+                    auto starSize = utils::make_lift_iterator_functor(size);
                     auto density = make_Density(starValue, starSize);
-                    auto compare = utils::make_FunctorToComparator(density);
+                    auto compare = utils::make_functor_to_comparator(density);
                     auto mostDenseIter = std::max_element(oBegin, oEnd, compare);
 
                     unsigned nr = capacity / size(**mostDenseIter);
@@ -61,10 +61,10 @@ namespace detail {
         template <
           typename ObjectsIterAndNr,
           typename OutputIter>
-              void greedyToOutput (
+              void greedy_to_output (
                         ObjectsIterAndNr mostDenseIterAndNr,
                         OutputIter out,
-                        NoZeroOneTag)
+                        no_zero_one_tag)
               {
                     auto nr = mostDenseIterAndNr.second;
                     auto mostDenseIter = mostDenseIterAndNr.first;
@@ -89,7 +89,7 @@ knapsack_two_app(ObjectsIter oBegin,
         ObjectValueFunctor value,
         ObjectSizeFunctor size) {
     return detail::knapsack_general_two_app(oBegin, oEnd, capacity,
-                    out, value, size, detail::NoZeroOneTag());
+                    out, value, size, detail::no_zero_one_tag());
 }
 
 }

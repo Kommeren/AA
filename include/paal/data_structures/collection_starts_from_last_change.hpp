@@ -14,14 +14,14 @@ namespace paal {
 namespace data_structures {
 
     /**
-     * @brief this collection stores some range and expose setLastChange function
+     * @brief this collection stores some range and expose set_last_change function
      *        each time begin and end is called this class returns range which starts from last change place
      *
      * @tparam Iterator
      * @tparam hash
      */
 template <typename Iterator, typename hash = std::hash<typename std::iterator_traits<Iterator>::value_type>>
-class CollectionStartsFromLastChange {
+class collection_starts_from_last_change {
     typedef typename std::iterator_traits<Iterator>::value_type Element;
     typedef std::unordered_map<Element, Iterator, hash> ElemToIter;
     typedef std::pair<Iterator, Iterator> Range;
@@ -30,7 +30,7 @@ class CollectionStartsFromLastChange {
 public:
     typedef JoinedIterator ResultIterator;
 
-    CollectionStartsFromLastChange() = default;
+    collection_starts_from_last_change() = default;
 
     /**
      * @brief constructor
@@ -38,11 +38,11 @@ public:
      * @param begin
      * @param end
      */
-    CollectionStartsFromLastChange(Iterator begin, Iterator end) :
-        m_begin(begin), m_end(end), m_newBegin(m_begin) {
+    collection_starts_from_last_change(Iterator begin, Iterator end) :
+        m_begin(begin), m_end(end), m_new_begin(m_begin) {
             assert(m_begin != m_end);
             for(auto i = m_begin; i != m_end; ++i) {
-                bool b = m_elemToIter.emplace(*i, i).second;
+                bool b = m_elem_to_iter.emplace(*i, i).second;
                 assert(b);
             }
         }
@@ -52,10 +52,10 @@ public:
      *
      * @param el
      */
-    void setLastChange(const Element & el) {
-        auto i = m_elemToIter.find(el);
-        assert(i != m_elemToIter.end());
-        m_newBegin = i->second;
+    void set_last_change(const Element & el) {
+        auto i = m_elem_to_iter.find(el);
+        assert(i != m_elem_to_iter.end());
+        m_new_begin = i->second;
     }
 
     /**
@@ -64,7 +64,7 @@ public:
      * @return
      */
     JoinedIterator begin() {
-        return boost::begin(getRange());
+        return boost::begin(get_range());
     }
 
     /**
@@ -73,7 +73,7 @@ public:
      * @return
      */
     JoinedIterator end()  {
-        return boost::end(getRange());
+        return boost::end(get_range());
     }
 
 private:
@@ -82,16 +82,16 @@ private:
      *
      * @return
      */
-    JoinedRange getRange()  {
-        Range r1 = std::make_pair(m_newBegin, m_end);
-        Range r2 = std::make_pair(m_begin, m_newBegin);
+    JoinedRange get_range()  {
+        Range r1 = std::make_pair(m_new_begin, m_end);
+        Range r2 = std::make_pair(m_begin, m_new_begin);
         return boost::join(r1, r2);
     }
 
     Iterator m_begin;
     Iterator m_end;
-    Iterator m_newBegin;
-    ElemToIter m_elemToIter;
+    Iterator m_new_begin;
+    ElemToIter m_elem_to_iter;
 };
 
 }

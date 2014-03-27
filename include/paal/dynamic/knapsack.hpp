@@ -28,7 +28,7 @@ namespace detail {
     /**
      * @brief For knapsack dynamic algorithm for given element the table has to be traversed from the lowest to highest element
      */
-    struct KnapsackGetPositionRange {
+    struct knapsack_get_position_range {
         template <typename T>
             auto operator()(T begin, T end) -> decltype(boost::irange(begin, end)) {
                 return boost::irange(begin, end);
@@ -41,7 +41,7 @@ namespace detail {
               typename OutputIterator,
               typename GetBestElement,
               typename ValuesComparator>
-    typename KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+    typename knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
     knapsack_dynamic(ObjectsIter oBegin,
             ObjectsIter oEnd,
             detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> maxSize,
@@ -50,7 +50,7 @@ namespace detail {
             ObjectValueFunctor value,
             GetBestElement getBest ,
             ValuesComparator compareValues) {
-        typedef KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
+        typedef knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
         typedef typename base::ObjectRef  ObjectRef;
         typedef typename base::SizeType   SizeType;
         typedef typename base::ValueType  ValueType;
@@ -64,13 +64,13 @@ namespace detail {
 
         auto objectOnSizeBegin = objectOnSize.begin();
         auto objectOnSizeEnd = objectOnSize.end();
-        fillKnapsackDynamicTable(objectOnSizeBegin, objectOnSizeEnd,
+        fill_knapsack_dynamic_table(objectOnSizeBegin, objectOnSizeEnd,
                 oBegin, oEnd, size,
                 [&](ObjIterWithValueOrNull val, ObjectsIter obj) -> ObjIterWithValueOrNull
                 {return std::make_pair(obj, val->second + value(*obj));},
                 compare,
                 [](ObjIterWithValueOrNull & val) {val = std::make_pair(ObjectsIter(), ValueType());},
-                detail::KnapsackGetPositionRange());
+                detail::knapsack_get_position_range());
 
         //getting position of the max value in the objectOnSize array
         auto maxPos = getBest(objectOnSizeBegin, objectOnSizeEnd, compare);
@@ -85,14 +85,14 @@ namespace detail {
             remainingSpaceInKnapsack -= size(obj);
         }
 
-        typedef std::pair<ValueType, SizeType> ReturnType;
+        typedef std::pair<ValueType, SizeType> return_type;
 
         //returning result
         if(maxPos != objectOnSizeEnd) {
             assert(*maxPos);
-            return ReturnType((*maxPos)->second, maxPos - objectOnSizeBegin);
+            return return_type((*maxPos)->second, maxPos - objectOnSizeBegin);
         } else {
-            return ReturnType(ValueType(), SizeType());
+            return return_type(ValueType(), SizeType());
         }
     }
 
@@ -111,27 +111,27 @@ template <typename OutputIterator,
           typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack(ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out,
         ObjectSizeFunctor size,
         ObjectValueFunctor value,
-        NoZeroOneTag,
-        IntegralValueTag,
-        RetrieveSolutionTag) {
-    typedef detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
+        no_zero_one_tag,
+        integral_value_tag,
+        retrieve_solution_tag) {
+    typedef detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
     typedef typename base::ValueType ValueType;
     typedef typename base::SizeType   SizeType;
-    typedef typename base::ReturnType ReturnType;
+    typedef typename base::return_type return_type;
     typedef boost::optional<std::pair<ObjectsIter, ValueType>> TableElementType;
     if(oBegin == oEnd) {
-        return ReturnType();
+        return return_type();
     }
-    auto maxSize = getValueUpperBound(oBegin, oEnd, capacity, value, size, NoZeroOneTag());
+    auto maxSize = get_value_upper_bound(oBegin, oEnd, capacity, value, size, no_zero_one_tag());
     auto ret = knapsack_dynamic(oBegin, oEnd, maxSize, out, value, size,
-            GetMaxElementOnValueIndexedCollection<TableElementType, SizeType>(
+            get_max_element_on_value_indexed_collection<TableElementType, SizeType>(
                 TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
             utils::Greater());
     return std::make_pair(ret.second, ret.first);
@@ -151,19 +151,19 @@ template <typename ObjectsIter,
          typename OutputIterator,
          typename ObjectSizeFunctor,
          typename ObjectValueFunctor>
-typename detail::KnapsackBase<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::ReturnType
+typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>::return_type
 knapsack(ObjectsIter oBegin,
         ObjectsIter oEnd,
         detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity, //capacity is of size type
         OutputIterator out,
         ObjectSizeFunctor size,
         ObjectValueFunctor value,
-        NoZeroOneTag,
-        IntegralSizeTag,
-        RetrieveSolutionTag) {
+        no_zero_one_tag,
+        integral_size_tag,
+        retrieve_solution_tag) {
     typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     return knapsack_dynamic(oBegin, oEnd, capacity, out, size, value,
-            detail::GetMaxElementOnCapacityIndexedCollection<ValueType>(), std::less<ValueType>());
+            detail::get_max_element_on_capacity_indexed_collection<ValueType>(), std::less<ValueType>());
 }
 
 } //detail
@@ -183,7 +183,7 @@ knapsack(ObjectsIter oBegin,
 template <typename ObjectsIter,
          typename OutputIterator,
          typename ObjectSizeFunctor,
-         typename ObjectValueFunctor = utils::ReturnSomethingFunctor<int,1>>
+         typename ObjectValueFunctor = utils::return_something_functor<int,1>>
              std::pair<detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>,
          detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>>
              knapsack(ObjectsIter oBegin,
@@ -193,7 +193,7 @@ template <typename ObjectsIter,
                      ObjectSizeFunctor size,
                      ObjectValueFunctor value = ObjectValueFunctor()) {
             return detail::knapsack_check_integrality(oBegin, oEnd, capacity, out, size, value,
-                    detail::NoZeroOneTag(), detail::RetrieveSolutionTag());
+                    detail::no_zero_one_tag(), detail::retrieve_solution_tag());
         }
 
 }//paal

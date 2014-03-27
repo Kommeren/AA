@@ -39,7 +39,7 @@ namespace splay_tree {
   }
 
   /**
-   * Node of a SplayTree.
+   * Node of a splay_tree.
    *
    * Left/right relaxation should be understood as follows.
    * Meaning of left/right field changes iff xor of all bits on the path to the
@@ -239,7 +239,7 @@ namespace splay_tree {
 
 
     private:
-      static const bool kDefLeft = 0;
+      static const bool k_def_left = 0;
       node_type *left_ = NULL, *right_ = NULL;
       node_type *parent_;
       bool reversed_;
@@ -247,7 +247,7 @@ namespace splay_tree {
   };
 
   /** @brief splay policy */
-  enum SplayImplEnum {
+  enum splay_impl_enum {
     /** splaying goes from root, resulting tree is less balanced */
     kTopDownUnbalanced,
     /** splaying goes from root */
@@ -257,20 +257,20 @@ namespace splay_tree {
   };
 
 
-  template <typename T, SplayImplEnum s> class SplayTree;
+  template <typename T, splay_impl_enum s> class splay_tree;
 
   /**
-   * SplayTree elements iterator.
+   * splay_tree elements iterator.
    *
    * Traversing order is determined by template argument.
    **/
-  template<typename V, SplayImplEnum splay_impl = kTopDownUnbalanced, bool IsForward = true> class Iterator
+  template<typename V, splay_impl_enum splay_impl = kTopDownUnbalanced, bool IsForward = true> class Iterator
     : public boost::iterator_facade <
     Iterator<V, splay_impl, IsForward>,
     Node<V>*,
     boost::bidirectional_traversal_tag,
       V& > {
-      typedef SplayTree<V, splay_impl> ST;
+      typedef splay_tree<V, splay_impl> ST;
     public:
       typedef V value_type;
       typedef Node<value_type> node_type;
@@ -297,14 +297,14 @@ namespace splay_tree {
 
     private:
       friend class boost::iterator_core_access;
-      friend class SplayTree<V, kTopDownUnbalanced>;
-      friend class SplayTree<V, kTopDown>;
-      friend class SplayTree<V, kBottomUp>;
+      friend class splay_tree<V, kTopDownUnbalanced>;
+      friend class splay_tree<V, kTopDown>;
+      friend class splay_tree<V, kBottomUp>;
 
       void normalize() {
-        if(rotation_cnt_ != splay_->getRotationCnt()) {
+        if(rotation_cnt_ != splay_->get_rotation_cnt()) {
             current_->normalize_root_path();
-            rotation_cnt_ = splay_->getRotationCnt();
+            rotation_cnt_ = splay_->get_rotation_cnt();
         }
       }
 
@@ -355,8 +355,8 @@ namespace splay_tree {
    * Note that lookups are also amortized logarithmic in size of tree. Order of
    * elements is induced from infix ordering of nodes storing these elements.
    **/
-  template<typename T, enum SplayImplEnum SplayImpl = kTopDownUnbalanced>
-  class SplayTree {
+  template<typename T, enum splay_impl_enum SplayImpl = kTopDownUnbalanced>
+  class splay_tree {
     public:
       typedef T value_type;
       typedef Node<value_type> node_type;
@@ -365,45 +365,45 @@ namespace splay_tree {
       typedef Iterator<value_type, SplayImpl, false> reverse_iterator;
       typedef const Iterator<value_type, SplayImpl, false> const_reverse_iterator;
 
-      SplayTree() = default;
+      splay_tree() = default;
 
       /**
        * @brief constructs tree from elements between two iterators
        * @param b iterator to first element
        * @param e iterator to element after last
        **/
-      template<typename I> SplayTree(const I b, const I e) {
+      template<typename I> splay_tree(const I b, const I e) {
         root_ = build_tree(b, e);
       }
 
       ///constructor
-      SplayTree(SplayTree && splay)  {
+      splay_tree(splay_tree && splay)  {
           *this = std::move(splay);
       }
 
       ///operator=
-      SplayTree& operator=(SplayTree && splay) {
+      splay_tree& operator=(splay_tree && splay) {
         rotation_cnt_ = splay.rotation_cnt_;
         root_         = splay.root_;
-        tTonode_      = std::move(splay.tTonode_);
+        t_tonode_      = std::move(splay.t_tonode_);
         splay.root_   = NULL;
         splay.rotation_cnt_ = 0;
         return *this;
       }
 
       ///operator=
-      SplayTree& operator=(SplayTree & splay) {
-          SplayTree sp(splay);
+      splay_tree& operator=(splay_tree & splay) {
+          splay_tree sp(splay);
           *this = std::move(sp);
           return *this;
       }
 
       ///constructor
-      SplayTree(const SplayTree & splay) : root_(copy_node(splay.root_)) {
+      splay_tree(const splay_tree & splay) : root_(copy_node(splay.root_)) {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
-              tTonode_.insert(std::make_pair(*i, i.current_));
+              t_tonode_.insert(std::make_pair(*i, i.current_));
           }
       }
 
@@ -411,11 +411,11 @@ namespace splay_tree {
        * @brief creates tree from elements in std::vector
        * @param array vector container
        **/
-      template<typename A> explicit SplayTree(const A &array) {
+      template<typename A> explicit splay_tree(const A &array) {
         root_ = build_tree(std::begin(array), std::end(array));
       }
 
-      ~SplayTree() {
+      ~splay_tree() {
         dispose_tree(root_);
       }
 
@@ -456,8 +456,8 @@ namespace splay_tree {
       }
 
       /** @param t referenced element */
-      std::size_t getIdx(const T & t) const {
-        node_type *node = tTonode_.at(t);
+      std::size_t get_idx(const T & t) const {
+        node_type *node = t_tonode_.at(t);
         if(node == NULL) {
             return -1;
         }
@@ -480,7 +480,7 @@ namespace splay_tree {
        *
        * @return
        */
-      std::size_t getRotationCnt() const {
+      std::size_t get_rotation_cnt() const {
           return rotation_cnt_;
       }
 
@@ -505,14 +505,14 @@ namespace splay_tree {
        * @param i index of last element of this after modification
        * @returns tree containing elements {i+1, ...}
        **/
-      SplayTree<value_type, SplayImpl> split_higher(std::size_t i) {
+      splay_tree<value_type, SplayImpl> split_higher(std::size_t i) {
         splay(i);
         node_type *new_root = root_->right();
         if (new_root != NULL) {
           new_root->make_root();
           root_->set_right(NULL);
         }
-        return SplayTree<value_type, SplayImpl>(new_root);
+        return splay_tree<value_type, SplayImpl>(new_root);
       }
 
       /**
@@ -520,22 +520,22 @@ namespace splay_tree {
        * @param i index of first element of this after modification
        * @returns tree containing elements {0, ..., i-1}
        **/
-      SplayTree<value_type, SplayImpl> split_lower(std::size_t i) {
+      splay_tree<value_type, SplayImpl> split_lower(std::size_t i) {
         splay(i);
         node_type *new_root = root_->left();
         if (new_root != NULL) {
           new_root->make_root();
           root_->set_left(NULL);
         }
-        return SplayTree<value_type, SplayImpl>(new_root);
+        return splay_tree<value_type, SplayImpl>(new_root);
       }
 
       /**
        * @brief merges given tree to the right of the biggest element of this
        * @param other tree to be merged
        **/
-      template<enum SplayImplEnum S>
-      void merge_right(SplayTree<value_type, S> &other) {
+      template<enum splay_impl_enum S>
+      void merge_right(splay_tree<value_type, S> &other) {
         if (other.root_ == NULL) {
           return;
         }
@@ -549,8 +549,8 @@ namespace splay_tree {
        * @brief merges given tree to the left of the smallest element of this
        * @param other tree to be merged
        **/
-      template<enum SplayImplEnum S>
-      void merge_left(SplayTree<value_type, S> &other) {
+      template<enum splay_impl_enum S>
+      void merge_left(splay_tree<value_type, S> &other) {
         if (other.root_ == NULL) {
           return;
         }
@@ -568,9 +568,9 @@ namespace splay_tree {
       void reverse(std::size_t i, std::size_t j) {
         assert(i <= j);
         // split lower
-        SplayTree<value_type, SplayImpl> ltree = split_lower(i);
+        splay_tree<value_type, SplayImpl> ltree = split_lower(i);
         // split higher
-        SplayTree<value_type, SplayImpl> rtree = split_higher(j - i);
+        splay_tree<value_type, SplayImpl> rtree = split_higher(j - i);
         // reverse
         root_->subtree_reverse();
         // merge
@@ -580,7 +580,7 @@ namespace splay_tree {
 
     private:
       /** @brief creates tree with given node as a root */
-      explicit SplayTree(node_type *root) : root_(root) {}
+      explicit splay_tree(node_type *root) : root_(root) {}
 
       /**
        * @brief splays given node to tree root
@@ -741,7 +741,7 @@ namespace splay_tree {
         }
         std::size_t m = (e - b) / 2;
         node_type *node = new node_type(*(b + m));
-        bool ret = tTonode_.insert(std::make_pair(*(b + m), node)).second;
+        bool ret = t_tonode_.insert(std::make_pair(*(b + m), node)).second;
         assert(ret);
         node->set_left(build_tree(b, b + m));
         node->set_right(build_tree(b + m + 1, e));
@@ -786,12 +786,12 @@ namespace splay_tree {
       }
 
       /**
-       * @brief SplayTree stream output operator
+       * @brief splay_tree stream output operator
        * @param stream output stream
        * @param tree splay tree
        **/
-/*      template<typename S, typename V, enum SplayImplEnum I>
-      friend S& operator<<(S &stream, SplayTree<V, I> &tree) {
+/*      template<typename S, typename V, enum splay_impl_enum I>
+      friend S& operator<<(S &stream, splay_tree<V, I> &tree) {
         tree.root_->print_tree(stream);
         return stream;
       }*/
@@ -799,7 +799,7 @@ namespace splay_tree {
       /** root node of a tree */
       std::size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
       mutable node_type *root_ = NULL;
-      std::unordered_map<T, node_type *> tTonode_;
+      std::unordered_map<T, node_type *> t_tonode_;
   };
 }
 }

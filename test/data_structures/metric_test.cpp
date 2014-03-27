@@ -10,35 +10,35 @@
 #include "utils/sample_graph.hpp"
 
 BOOST_AUTO_TEST_CASE(MetricTest) {
-    typedef  SampleGraphsMetrics SGM;
-    auto gm = SGM::getGraphMetricSmall();
+    typedef  sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
 
     BOOST_CHECK(gm(SGM::A,SGM::B) == 2);
     BOOST_CHECK(gm(SGM::C,SGM::B) == 3);
 }
 
 
-BOOST_AUTO_TEST_CASE(CopyRectangleArrayMetric) {
-    paal::data_structures::RectangleArrayMetric<int> m(1,2);
+BOOST_AUTO_TEST_CASE(Copyrectangle_array_metric) {
+    paal::data_structures::rectangle_array_metric<int> m(1,2);
     m(0,0) = 1;
     m(0,1) = 2;
 
 
     auto r1 = boost::irange(0,1);
     auto r2 = boost::irange(0,2);
-    paal::data_structures::RectangleArrayMetric<int> copy(
+    paal::data_structures::rectangle_array_metric<int> copy(
             m, boost::begin(r1), boost::end(r1), boost::begin(r2), boost::end(r2));
 
     BOOST_CHECK(copy(0, 0) == 1);
     BOOST_CHECK(copy(0, 1) == 2);
 }
 
-BOOST_AUTO_TEST_CASE(CopyArrayMetric) {
-    paal::data_structures::ArrayMetric<int> m(1);
+BOOST_AUTO_TEST_CASE(Copyarray_metric) {
+    paal::data_structures::array_metric<int> m(1);
     m(0,0) = 13;
 
     auto r1 = boost::irange(0,1);
-    paal::data_structures::ArrayMetric<int> copy(
+    paal::data_structures::array_metric<int> copy(
             m, boost::begin(r1), boost::end(r1));
 
     BOOST_CHECK(copy(0, 0) == 13);

@@ -33,7 +33,7 @@ int restrictions(int i, int j) {
     return 2;
 }
 
-void printResult(const ResultNetwork & resultNetwork) {
+void print_result(const ResultNetwork & resultNetwork) {
     LOGLN("Edges in steiner network");
     ON_LOG(for(auto const e : resultNetwork) {
         LOGLN("Edge " << e);
@@ -58,7 +58,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     steiner_network_iterative_rounding(
         g, restrictions, std::back_inserter(resultNetwork));
 
-    printResult(resultNetwork);
+    print_result(resultNetwork);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
@@ -84,16 +84,16 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
         steiner_network_iterative_rounding(g, restrictions,
             boost::weight_map(cost), std::back_inserter(resultNetwork));
 
-        printResult(resultNetwork);
+        print_result(resultNetwork);
     }
     {
         ResultNetwork resultNetwork;
-        auto steinerNetwork(make_SteinerNetwork(g, restrictions,
+        auto steinerNetwork(make_steiner_network(g, restrictions,
                     boost::weight_map(cost),
                     std::back_inserter(resultNetwork)));
-        solve_iterative_rounding(steinerNetwork, SteinerNetworkIRComponents<>());
+        solve_iterative_rounding(steinerNetwork, steiner_networkIRcomponents<>());
 
-        printResult(resultNetwork);
+        print_result(resultNetwork);
     }
 }
 
@@ -108,9 +108,9 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     assert(b);
 
     //solve it
-    auto steinerNetwork(make_SteinerNetwork(g, restrictions,
+    auto steinerNetwork(make_steiner_network(g, restrictions,
                                     std::back_inserter(resultNetwork)));
-    auto invalid = steinerNetwork.checkInputValidity();
+    auto invalid = steinerNetwork.check_input_validity();
 
     BOOST_CHECK(invalid);
     LOGLN(*invalid);

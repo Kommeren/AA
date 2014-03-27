@@ -24,10 +24,10 @@ namespace local_search {
      * @tparam Args
      */
     template <typename... Args>
-    using NQueensLocalSearchComponents =  data_structures::Components<
-            data_structures::NameWithDefault<GetMoves, NQueensGetMoves>,
-            data_structures::NameWithDefault<Gain, NQueensGain>,
-            data_structures::NameWithDefault<Commit, NQueensCommit>
+    using n_queens_local_search_components =  data_structures::components<
+            data_structures::NameWithDefault<get_moves, n_queensget_moves>,
+            data_structures::NameWithDefault<Gain, n_queens_gain>,
+            data_structures::NameWithDefault<Commit, n_queens_commit>
                 >::type<Args...>;
 
     /**
@@ -37,11 +37,11 @@ namespace local_search {
      * @tparam PostSearchAction
      * @tparam GlobalStopCondition
      * @tparam NQueensPositionsVector
-     * @tparam Components
+     * @tparam components
      * @param pos
      * @param psa
      * @param gsc
-     * @param nQueensComponents
+     * @param nQueenscomponents
      *
      * @return
      */
@@ -49,33 +49,33 @@ namespace local_search {
              typename PostSearchAction,
              typename GlobalStopCondition,
              typename NQueensPositionsVector,
-             typename... Components>
-                 bool nQueensSolutionLocalSearch(
+             typename... components>
+                 bool n_queens_solution_local_search(
                          NQueensPositionsVector & pos,
                          SearchStrategy searchStrategy,
                          PostSearchAction psa,
                          GlobalStopCondition gsc,
-                         Components... nQueensComponents) {
-                     NQueensSolutionAdapter<NQueensPositionsVector> nqueens(pos);
+                         components... nQueenscomponents) {
+                     n_queens_solution_adapter<NQueensPositionsVector> nqueens(pos);
                      return local_search(nqueens, std::move(searchStrategy), std::move(psa),
-                                std::move(gsc), std::move(nQueensComponents)...);
+                                std::move(gsc), std::move(nQueenscomponents)...);
                  }
 
     /**
      * @brief n queen local search (simple version)
      *
      * @tparam NQueensPositionsVector
-     * @tparam Components
+     * @tparam components
      * @param pos
-     * @param nQueensComponents
+     * @param nQueenscomponents
      */
-    template <typename NQueensPositionsVector, typename... Components>
-        void nQueensSolutionLocalSearchSimple(NQueensPositionsVector & pos, Components... nQueensComponents) {
-            nQueensSolutionLocalSearch(pos,
-                                       ChooseFirstBetterStrategy{},
-                                       utils::SkipFunctor{},
-                                       utils::ReturnFalseFunctor{},
-                                       std::move(nQueensComponents)...);
+    template <typename NQueensPositionsVector, typename... components>
+        void n_queens_solution_local_search_simple(NQueensPositionsVector & pos, components... nQueenscomponents) {
+            n_queens_solution_local_search(pos,
+                                       choose_first_better_strategy{},
+                                       utils::skip_functor{},
+                                       utils::return_false_functor{},
+                                       std::move(nQueenscomponents)...);
         }
 
 } //!local_search

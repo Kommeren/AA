@@ -39,13 +39,13 @@ namespace ds = paal::data_structures;
 
 
 template <typename... Args>
-using Comps = typename  ds::Components<
+using Comps = typename  ds::components<
         names::A, names::B, names::C>::type<Args...> ;
 
 
 BOOST_AUTO_TEST_SUITE(components)
 
-BOOST_AUTO_TEST_CASE(ComponentsTest) {
+BOOST_AUTO_TEST_CASE(componentsTest) {
     //default arguments
     Comps<int, double, int> comps;
     BOOST_CHECK_EQUAL(comps.get<names::A>(), 0); //we guarantee that POD's are value initialized
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
 
 
     Comps<int, double, int> comps2(5,4,3);
-    static_assert(ds::detail::HasTemplateGet<Comps<int, double,int>, names::A>::value, "HasGet doesn't work");
+    static_assert(ds::detail::has_template_get<Comps<int, double,int>, names::A>::value, "HasGet doesn't work");
     BOOST_CHECK_EQUAL(comps2.get<names::A>(), 5);
     BOOST_CHECK_EQUAL(comps2.get<names::B>(), 4);
     BOOST_CHECK_EQUAL(comps2.get<names::C>(), 3);
@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     BOOST_CHECK_EQUAL(comps5.call<names::A>(2), 2);
     BOOST_CHECK_EQUAL(constAlias5.call<names::A>(2), 2);
 
-    typedef ds::ReplacedType<names::A, std::pair<int, int>, CompsF>::type Replaced;
+    typedef ds::replaced_type<names::A, std::pair<int, int>, CompsF>::type Replaced;
 
     //This was not true when using mpl::vector
     typedef Comps<std::pair<int, int>, double, int> ReplacedCheck;
@@ -130,10 +130,10 @@ BOOST_AUTO_TEST_CASE(ComponentsTest) {
     };
 
 template <typename... Args>
-using CompsWithDefaults = typename  ds::Components<
+using CompsWithDefaults = typename  ds::components<
         names::A, names::B, ds::NameWithDefault<names::C, X>>::type<Args...> ;
 
-BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
+BOOST_AUTO_TEST_CASE(componentsTestDefaultParameters) {
     CompsWithDefaults<int, double, int> comps;
     CompsWithDefaults<int, double> comps2(1, 2, 3);
     BOOST_CHECK_EQUAL(comps2.get<names::C>(), X(3));
@@ -143,11 +143,11 @@ BOOST_AUTO_TEST_CASE(ComponentsTestDefaultParameters) {
 }
 
 template <typename... Args>
-using CompsToReplace = typename  ds::Components<
+using CompsToReplace = typename  ds::components<
         names::A, names::B>::type<Args...> ;
 
 
-BOOST_AUTO_TEST_CASE(ComponentsReplaceNotDefConstructible) {
+BOOST_AUTO_TEST_CASE(componentsReplaceNotDefConstructible) {
     X x(1);
     Y y(2);
     Z z(3);
@@ -161,7 +161,7 @@ BOOST_AUTO_TEST_CASE(ComponentsReplaceNotDefConstructible) {
     BOOST_CHECK_EQUAL(s2.get<names::B>().z, 3);
 }
 
-BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
+BOOST_AUTO_TEST_CASE(componentsConstructFromDifferentTuple) {
     typedef Comps<int, double, float> SomeComps;
     SomeComps someComps = SomeComps::make<names::A, names::C>(1,2);
     BOOST_CHECK_EQUAL(someComps.get<names::A>(), 1);
@@ -175,12 +175,12 @@ BOOST_AUTO_TEST_CASE(ComponentsConstructFromDifferentTuple) {
     BOOST_CHECK_EQUAL(someComps3.get<names::C>(), 1);
     BOOST_CHECK_EQUAL(someComps3.get<names::B>(), 2);
 
-    SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::CopyTag());
+    SomeComps someComps4(CompsToReplace<int, int>(1,2), ds::copy_tag());
     BOOST_CHECK_EQUAL(someComps4.get<names::A>(), 1);
     BOOST_CHECK_EQUAL(someComps4.get<names::B>(), 2);
 }
 
-BOOST_AUTO_TEST_CASE(ComponentsReferences) {
+BOOST_AUTO_TEST_CASE(componentsReferences) {
     int a(3);
     Comps<int &, const int &, int &> compsWithRefs(a, a, a);
     BOOST_CHECK_EQUAL(compsWithRefs.get<names::A>(), 3);
@@ -194,6 +194,6 @@ BOOST_AUTO_TEST_SUITE_END()
 
 //this shouldn't compile
 //template <typename... Args>
-//using CompsWithDefaultsIncorrect = typename  ds::Components<
+//using CompsWithDefaultsIncorrect = typename  ds::components<
 //        names::A, ds::NameWithDefault<names::B, X>, names::C>::type<Args...> ;
 

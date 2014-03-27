@@ -52,7 +52,7 @@ int main() {
     }
 //! [Generalised Assignment Example]
 
-    paal::lp::GLP::freeEnv();
+    paal::lp::GLP::free_env();
 
     return 0;
 }

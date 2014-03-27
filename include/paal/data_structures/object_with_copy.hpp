@@ -11,15 +11,15 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @class ObjectWithCopy
+ * @class object_with_copy
  * @brief keeps object and its copy. Invoke all the member functions on both: object and its copy.
- *        If you want to invoke member function on both objects, you run the  ObjectWithCopy::invoke.
- *        If you want to run member function only on the copy you run ObjectWithCopy::invokeOnCopy.
+ *        If you want to invoke member function on both objects, you run the  object_with_copy::invoke.
+ *        If you want to run member function only on the copy you run object_with_copy::invoke_on_copy.
  *
  * @tparam T type of the contain object
  */
 template <typename T>
-class ObjectWithCopy {
+class object_with_copy {
 public:
     typedef T ObjectType;
 
@@ -28,7 +28,7 @@ public:
      *
      * @param t
      */
-    ObjectWithCopy(T t) : m_obj(std::move(t)), m_copy(m_obj) {}
+    object_with_copy(T t) : m_obj(std::move(t)), m_copy(m_obj) {}
 
     /**
      * @brief invokes member function on object and copy
@@ -44,7 +44,7 @@ public:
     // if you use *. in decltype instead of -> you get
     // "sorry, unimplemented: mangling dotstar_expr" :)
     template <typename F, typename... Args>
-    typename utils::ReturnType<T, F, Args...>::type
+    typename utils::return_type<T, F, Args...>::type
     //typename std::result_of<F>::type //TODO investigate
     invoke(F f, Args... args) {
         (m_copy.*(f))(args...);
@@ -63,8 +63,8 @@ public:
      * @return the same as f
      */
     template <typename F, typename... Args>
-    typename utils::ReturnType<T, F, Args...>::type
-    invokeOnCopy(F f, Args... args) const {
+    typename utils::return_type<T, F, Args...>::type
+    invoke_on_copy(F f, Args... args) const {
         return (m_copy.*(f))(args...);
     }
 
@@ -82,7 +82,7 @@ public:
      *
      * @return member object
      */
-    T & getObj() {
+    T & get_obj() {
         return m_obj;
     }
 
@@ -91,7 +91,7 @@ public:
      *
      * @return member object
      */
-    const T & getObj() const {
+    const T & get_obj() const {
         return m_obj;
     }
 

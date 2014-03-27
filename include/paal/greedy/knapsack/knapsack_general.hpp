@@ -47,7 +47,7 @@ template <typename OutputIterator,
                  //removing to big elements
                  objects.erase(
                          std::remove_if(objects.begin(), objects.end(),
-                             utils::make_NotFunctor(make_RightSize(size, capacity))),
+                             utils::make_not_functor(make_right_size(size, capacity))),
                          objects.end());
 
                  if(objects.empty()) {
@@ -55,17 +55,17 @@ template <typename OutputIterator,
                  }
 
                  //finding the element with the greatest density
-                 auto greedyFill = getGreedyFill(objects.begin(), objects.end(), capacity, value, size, is_0_1_Tag);
+                 auto greedyFill = get_greedy_fill(objects.begin(), objects.end(), capacity, value, size, is_0_1_Tag);
 
                  //finding the biggest set elements with the greatest density
                  //this is actually small optimization compare to original algorithm
-                 auto largest = std::max_element(objects.begin(), objects.end(), utils::make_FunctorToComparator(starValue));
+                 auto largest = std::max_element(objects.begin(), objects.end(), utils::make_functor_to_comparator(starValue));
 
                  if(value(**largest) > std::get<0>(greedyFill)) {
                      *out = **largest;
                      return std::make_pair(value(**largest), size(**largest));
                  } else {
-                     greedyToOutput(std::get<2>(greedyFill), out, is_0_1_Tag);
+                     greedy_to_output(std::get<2>(greedyFill), out, is_0_1_Tag);
                      return std::make_pair(std::get<0>(greedyFill), std::get<1>(greedyFill));
                  }
              }

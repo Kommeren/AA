@@ -25,7 +25,7 @@ namespace local_search {
      * @tparam NQueensPositionsVector
      */
     template <typename NQueensPositionsVector>
-    struct NQueensSolutionAdapter {
+    struct n_queens_solution_adapter {
         typedef typename boost::counting_iterator<int> QueensIterator;
 
         /**
@@ -33,11 +33,11 @@ namespace local_search {
          *
          * @param pos
          */
-        NQueensSolutionAdapter(NQueensPositionsVector & pos) :
-            m_queenPosition(pos),
-            m_numeberAttacingDiagonalNegative(boost::distance(pos), 0),
-            m_numeberAttacingDiagonalNonnegative(boost::distance(pos), 0),
-            m_numeberAttacingCounterDiagonal(2 * boost::distance(pos), 0)
+        n_queens_solution_adapter(NQueensPositionsVector & pos) :
+            m_queen_position(pos),
+            m_numeber_attacing_diagonal_negative(boost::distance(pos), 0),
+            m_numeber_attacing_diagonal_nonnegative(boost::distance(pos), 0),
+            m_numeber_attacing_counter_diagonal(2 * boost::distance(pos), 0)
         {
             for(auto q : boost::irange(0, int(boost::distance(pos)))) {
                 increase(q);
@@ -59,7 +59,7 @@ namespace local_search {
          * @return
          */
         QueensIterator end() const {
-            return QueensIterator(m_queenPosition.size());
+            return QueensIterator(m_queen_position.size());
         }
 
         /**
@@ -68,10 +68,10 @@ namespace local_search {
          * @param xLeft
          * @param xRight
          */
-        void swapQueens(int xLeft, int xRight) {
-            int leftPosition = m_queenPosition[xLeft];
-            putQueen(xLeft, m_queenPosition[xRight]);
-            putQueen(xRight, leftPosition);
+        void swap_queens(int xLeft, int xRight) {
+            int leftPosition = m_queen_position[xLeft];
+            put_queen(xLeft, m_queen_position[xRight]);
+            put_queen(xRight, leftPosition);
         }
 
         /**
@@ -82,8 +82,8 @@ namespace local_search {
          *
          * @return
          */
-        int getNumAttacing(int x, int y) const {
-            return m_numeberAttacingCounterDiagonal[x + y] + getDiagonal(x, y);
+        int get_num_attacing(int x, int y) const {
+            return m_numeber_attacing_counter_diagonal[x + y] + get_diagonal(x, y);
         }
 
         /**
@@ -93,8 +93,8 @@ namespace local_search {
          *
          * @return
          */
-        int getY(int x) const {
-            return m_queenPosition[x];
+        int get_y(int x) const {
+            return m_queen_position[x];
         }
 
         /**
@@ -102,13 +102,13 @@ namespace local_search {
          *
          * @return
          */
-        int objFun() const {
+        int obj_fun() const {
             auto attacingNr = [](int sum, int n) {
                 return sum + n * (n-1) / 2;
             };
-            int sum = boost::accumulate(m_numeberAttacingCounterDiagonal, 0, attacingNr);
-                sum = boost::accumulate(m_numeberAttacingDiagonalNegative, sum, attacingNr);
-            return    boost::accumulate(m_numeberAttacingDiagonalNonnegative, sum, attacingNr);
+            int sum = boost::accumulate(m_numeber_attacing_counter_diagonal, 0, attacingNr);
+                sum = boost::accumulate(m_numeber_attacing_diagonal_negative, sum, attacingNr);
+            return    boost::accumulate(m_numeber_attacing_diagonal_nonnegative, sum, attacingNr);
         }
 
     private:
@@ -119,9 +119,9 @@ namespace local_search {
          * @param x
          * @param y
          */
-        void putQueen(int x, int y) {
+        void put_queen(int x, int y) {
             decrease(x);
-            m_queenPosition[x] = y;
+            m_queen_position[x] = y;
             increase(x);
         }
 
@@ -133,8 +133,8 @@ namespace local_search {
          *
          * @return
          */
-        int & getDiagonal(int x) {
-            return getDiagonal(x, m_queenPosition[x]);
+        int & get_diagonal(int x) {
+            return get_diagonal(x, m_queen_position[x]);
         }
 
         /**
@@ -145,27 +145,27 @@ namespace local_search {
          *
          * @return
          */
-        int & getDiagonal(int x, int y) {
+        int & get_diagonal(int x, int y) {
             if(x >= y) {
-                return m_numeberAttacingDiagonalNegative[x - y];
+                return m_numeber_attacing_diagonal_negative[x - y];
             } else {
-                return m_numeberAttacingDiagonalNonnegative[y - x];
+                return m_numeber_attacing_diagonal_nonnegative[y - x];
             }
         }
 
         /**
-         * @brief const version of getDiagonal(x,y)
+         * @brief const version of get_diagonal(x,y)
          *
          * @param x
          * @param y
          *
          * @return
          */
-        int getDiagonal(int x, int y) const {
+        int get_diagonal(int x, int y) const {
             if(x >= y) {
-                return m_numeberAttacingDiagonalNegative[x - y];
+                return m_numeber_attacing_diagonal_negative[x - y];
             } else {
-                return m_numeberAttacingDiagonalNonnegative[y - x];
+                return m_numeber_attacing_diagonal_nonnegative[y - x];
             }
         }
 
@@ -175,8 +175,8 @@ namespace local_search {
          * @param x
          */
         void decrease(int x) {
-            --m_numeberAttacingCounterDiagonal[x + m_queenPosition[x]];
-            --getDiagonal(x);
+            --m_numeber_attacing_counter_diagonal[x + m_queen_position[x]];
+            --get_diagonal(x);
         }
 
         /**
@@ -185,14 +185,14 @@ namespace local_search {
          * @param x
          */
         void increase(int x) {
-            ++m_numeberAttacingCounterDiagonal[x + m_queenPosition[x]];
-            ++getDiagonal(x);
+            ++m_numeber_attacing_counter_diagonal[x + m_queen_position[x]];
+            ++get_diagonal(x);
         }
 
-        NQueensPositionsVector & m_queenPosition;
-        std::vector<int> m_numeberAttacingDiagonalNegative;
-        std::vector<int> m_numeberAttacingDiagonalNonnegative;
-        std::vector<int> m_numeberAttacingCounterDiagonal;
+        NQueensPositionsVector & m_queen_position;
+        std::vector<int> m_numeber_attacing_diagonal_negative;
+        std::vector<int> m_numeber_attacing_diagonal_nonnegative;
+        std::vector<int> m_numeber_attacing_counter_diagonal;
     };
 
 } //!local_search

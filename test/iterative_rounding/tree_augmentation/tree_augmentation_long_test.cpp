@@ -57,7 +57,7 @@ typedef property_map<Graph, edge_color_t>::type TreeMap;
 // 2       4       2       0       1
 // 2       5       3       0       1
 // 4       5       4       0       1
-void readTreeAugFromStream(std::ifstream & is,
+void readtree_aug_from_stream(std::ifstream & is,
         Graph & g, Cost & cost, TreeMap & treeMap) {
     std::string s;
     std::unordered_map<std::string, Vertex> nodes;
@@ -93,13 +93,13 @@ void readTreeAugFromStream(std::ifstream & is,
 
 template <typename TA>
 //the copy is intended
-double getLowerBound(TA ta) {
-    TreeAugmentationIRComponents<> comps;
-    lp::GLPBase lp;
+double get_lower_bound(TA ta) {
+    tree_augmentationIRcomponents<> comps;
+    lp::glp_base lp;
     comps.call<Init>(ta, lp);
     auto probType = comps.call<SolveLPToExtremePoint>(ta, lp);
     BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
-    return lp.getObjValue();
+    return lp.get_obj_value();
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
@@ -118,20 +118,20 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         Cost cost       = get(edge_weight, g);
         TreeMap treeMap = get(edge_color, g);
 
-        readTreeAugFromStream(ifs, g, cost, treeMap);
+        readtree_aug_from_stream(ifs, g, cost, treeMap);
 
         std::vector<Edge> solution;
-        auto treeaug(make_TreeAug(g, std::back_inserter(solution)));
+        auto treeaug(make_tree_aug(g, std::back_inserter(solution)));
 
-        auto invalid = treeaug.checkInputValidity();
+        auto invalid = treeaug.check_input_validity();
         BOOST_ASSERT_MSG(!invalid, invalid->c_str());
         LOGLN("Input validation " << filename << " ends.");
 
-        double lplowerbd = getLowerBound(treeaug);
-        auto result = solve_iterative_rounding(treeaug, TreeAugmentationIRComponents<>());
+        double lplowerbd = get_lower_bound(treeaug);
+        auto result = solve_iterative_rounding(treeaug, tree_augmentationIRcomponents<>());
         BOOST_CHECK_EQUAL(result.first, lp::OPTIMAL);
 
-        double solval = treeaug.getSolutionCost();
+        double solval = treeaug.get_solution_cost();
         BOOST_CHECK_EQUAL(solval, *(result.second));
         check_result_compare_to_bound(solval,lplowerbd,2);
     });

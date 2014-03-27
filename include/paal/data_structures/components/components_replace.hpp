@@ -18,13 +18,13 @@ namespace data_structures {
  *
  * @tparam Name
  * @tparam NewType
- * @tparam Components
+ * @tparam components
  */
-template <typename Name, typename NewType, typename Components> class ReplacedType;
+template <typename Name, typename NewType, typename components> class replaced_type;
 
 /**
  * @class ReplaceType
- * @brief Returns type of  Components<Names, Types>, with Type for Name change to NewType
+ * @brief Returns type of  components<Names, Types>, with Type for Name change to NewType
  *
  * @tparam Name name of the changed type
  * @tparam NewType new type for Name
@@ -32,11 +32,11 @@ template <typename Name, typename NewType, typename Components> class ReplacedTy
  * @tparam Types old types list
  */
 template <typename Name, typename NewType, typename Names, typename Types>
-class ReplacedType<Name, NewType, detail::Components<Names, Types>> {
+class replaced_type<Name, NewType, detail::components<Names, Types>> {
     static const int p =  pos<Name, Names>::value; // position to insert
     typedef typename replace_at_pos<p, NewType, Types>::type TypesReplace;
 public:
-    typedef detail::Components<Names, TypesReplace> type;
+    typedef detail::components<Names, TypesReplace> type;
 };
 
 namespace detail {
@@ -51,20 +51,20 @@ namespace detail {
 
     /**
      * @class get_types
-     * @brief gets types list for Components class
+     * @brief gets types list for components class
      *
      * @tparam Names
      * @tparam Types
      */
     template <typename Names, typename Types>
-        struct get_types<Components<Names, Types>> {
+        struct get_types<components<Names, Types>> {
             typedef Types type;
         };
 
 
         /**
-         * @class TempReplaceComponents
-         * @brief This class behavies like partial Components<Names, Types>,
+         * @class TempReplacecomponents
+         * @brief This class behavies like partial components<Names, Types>,
          *        with type for Name chanche to Type
          *
          * @tparam Name changed name
@@ -73,28 +73,28 @@ namespace detail {
          * @tparam Types aol types
          */
         template <typename Name, typename NewType, typename Names, typename Types>
-        class TempReplacedComponents {
-            typedef detail::Components<Names, Types> Comps;
-            typedef typename ReplacedType<Name, NewType, Comps>::type Replaced;
+        class temp_replaced_components {
+            typedef detail::components<Names, Types> Comps;
+            typedef typename replaced_type<Name, NewType, Comps>::type Replaced;
             typedef typename detail::get_types<Replaced>::type NewTypes;
 
         public:
-            TempReplacedComponents(const Comps & comps, const NewType & comp) :
+            temp_replaced_components(const Comps & comps, const NewType & comp) :
                 m_comps(comps), m_comp(comp) {}
 
             template <typename ComponentName>
-            const typename detail::TypeForName<ComponentName, Names, NewTypes>::type & get() const {
-                return get(detail::WrapToConstructable<ComponentName>());
+            const typename detail::type_for_name<ComponentName, Names, NewTypes>::type & get() const {
+                return get(detail::wrap_to_constructable<ComponentName>());
             }
         private:
 
             template <typename ComponentName>
-            auto get(detail::WrapToConstructable<ComponentName>) const ->
+            auto get(detail::wrap_to_constructable<ComponentName>) const ->
             decltype(std::declval<const Comps>().template get<ComponentName>()) {
                 return m_comps.template get<ComponentName>();
             }
 
-            const NewType & get(detail::WrapToConstructable<Name>) const {
+            const NewType & get(detail::wrap_to_constructable<Name>) const {
                 return m_comp;
             }
 
@@ -105,11 +105,11 @@ namespace detail {
 
 
 /**
- * @brief This function, for a specific Name, replaces compoonent in the Components class.
+ * @brief This function, for a specific Name, replaces compoonent in the components class.
  *        The comonent should have deifferent type than prevoius component for this Name
- *        (If the type is the same, set member function from Components class chould be used).
- *        The function returns Components class fo type ReplaceType<Name, NewType, OldComponents >::type.
- *        The function creates temporary object wich behaves like result Components
+ *        (If the type is the same, set member function from components class chould be used).
+ *        The function returns components class fo type ReplaceType<Name, NewType, Oldcomponents >::type.
+ *        The function creates temporary object wich behaves like result components
  *        and creates final object calling special Copy constructor.
  *
  * @tparam Name
@@ -122,14 +122,14 @@ namespace detail {
  * @return
  */
 template <typename Name, typename NewType, typename Names, typename Types>
-typename ReplacedType<Name, NewType, detail::Components<Names, Types> >::type
-replace(NewType comp, detail::Components<Names, Types> components){
-    typedef detail::Components<Names, Types> Comps;
-    typedef typename ReplacedType<Name, NewType, Comps>::type Replaced;
+typename replaced_type<Name, NewType, detail::components<Names, Types> >::type
+replace(NewType comp, detail::components<Names, Types> components){
+    typedef detail::components<Names, Types> Comps;
+    typedef typename replaced_type<Name, NewType, Comps>::type Replaced;
 
     return Replaced(
-              detail::TempReplacedComponents<Name, NewType, Names, Types>
-                      (components, comp), CopyTag());
+              detail::temp_replaced_components<Name, NewType, Names, Types>
+                      (components, comp), copy_tag());
 }
 
 } //data_structures

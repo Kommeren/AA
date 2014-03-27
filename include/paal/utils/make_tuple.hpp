@@ -12,7 +12,7 @@ namespace paal {
 /**
  * @brief function object  for std::make_tuple
  */
-struct MakeTuple {
+struct make_tuple {
     /**
      * @brief operator()
      *

@@ -21,12 +21,12 @@ namespace detail {
 }//!detail
 
 
-template <typename X, typename Solution, typename SearchComponents>
-class  ConceptsBase {
+template <typename X, typename Solution, typename search_components>
+class  concepts_base {
     protected:
         X x;
         Solution s;
-        typedef typename MoveType<SearchComponents, Solution>::value_type Move;
+        typedef typename move_type<search_components, Solution>::value_type Move;
         Move u;
 };
 
@@ -34,22 +34,22 @@ class  ConceptsBase {
 template <typename T>
 int use(const T & t);
 
-template <typename X, typename Solution, typename SearchComponents>
-class  GetMoves : protected ConceptsBase<X, Solution, SearchComponents> {
+template <typename X, typename Solution, typename search_components>
+class  get_moves : protected concepts_base<X, Solution, search_components> {
     public:
-        BOOST_CONCEPT_USAGE(GetMoves) {
+        BOOST_CONCEPT_USAGE(get_moves) {
             auto i = this->x(this->s);
             auto b = std::begin(i);
             auto e = std::end(i);
             for(auto x = b; x != e; ++x) {
-                const typename ConceptsBase<X,Solution,SearchComponents>::Move & u = *x;
+                const typename concepts_base<X,Solution,search_components>::Move & u = *x;
                 use(u);
             }
         }
 };
 
-template <typename X, typename Solution, typename SearchComponents>
-class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
+template <typename X, typename Solution, typename search_components>
+class Gain : protected concepts_base<X, Solution, search_components> {
     public:
         BOOST_CONCEPT_USAGE(Gain) {
             use(this->x(this->s, this->u) > 0);
@@ -57,8 +57,8 @@ class Gain : protected ConceptsBase<X, Solution, SearchComponents> {
 };
 
 
-template <typename X, typename Solution, typename SearchComponents>
-class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
+template <typename X, typename Solution, typename search_components>
+class Commit : protected concepts_base<X, Solution, search_components>{
     public:
         BOOST_CONCEPT_USAGE(Commit) {
             bool b = this->x(this->s, this->u);
@@ -67,13 +67,13 @@ class Commit : protected ConceptsBase<X, Solution, SearchComponents>{
 };
 
 template <typename X, typename Solution>
-class SearchComponents {
-    typedef SearchComponentsTraits<X> Traits;
-    typedef typename Traits::GetMovesT NG;
+class search_components {
+    typedef search_components_traits<X> Traits;
+    typedef typename Traits::get_movesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
 public:
-    BOOST_CONCEPT_ASSERT((GetMoves<NG, Solution, X>));
+    BOOST_CONCEPT_ASSERT((get_moves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((Gain<IC, Solution, X>));
     BOOST_CONCEPT_ASSERT((Commit<SU, Solution, X>));
 };

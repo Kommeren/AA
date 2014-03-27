@@ -18,9 +18,9 @@
 namespace ds = paal::data_structures;
 
 
-struct TagA{};
-struct TagB{};
-struct TagC{};
+struct Tag_a{};
+struct Tag_b{};
+struct Tag_c{};
 
 struct Sum {
     template <typename Number, typename AccumulatorFun, typename AccumulatorData, typename Callback>
@@ -31,7 +31,7 @@ struct Sum {
     }
 };
 
-struct StrangeWeightedSum {
+struct strange_weighted_sum {
 
     template <typename AccumulatorFun, typename AccumulatorData, typename Callback>
     auto  operator()(int n, AccumulatorFun aFun, AccumulatorData aData, Callback call) const ->
@@ -75,12 +75,12 @@ struct Find10 {
 BOOST_AUTO_TEST_CASE(polymorfic_fold) {
     boost::fusion::vector<int, float, long long> v(12, 5.5f, 1ll);
 
-    ds::PolymorficFold fold{};
-    paal::utils::IdentityFunctor id{};
+    ds::polymorfic_fold fold{};
+    paal::utils::identity_functor id{};
     BOOST_CHECK_EQUAL(12 + 5.5f+ 1ll,
             fold(Sum{}, id, 0, v));
     BOOST_CHECK_EQUAL(12+ 5.5f/2 + 1ll/3,
-            fold(StrangeWeightedSum{}, id, 0, v));
+            fold(strange_weighted_sum{}, id, 0, v));
 
     ds::Satisfy satisfy{};
     BOOST_CHECK( satisfy(Find12{}, v));

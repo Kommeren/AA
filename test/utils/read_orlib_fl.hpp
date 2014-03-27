@@ -29,7 +29,7 @@ namespace cap {
 
 template <typename IsCapacitated, typename IStream>
 typename std::enable_if<std::is_same<IsCapacitated, cap::uncapacitated>::value, int>::type
-readDemand(IStream & i){
+read_demand(IStream & i){
     int a;
     i >> a;
     return 1;
@@ -37,7 +37,7 @@ readDemand(IStream & i){
 
 template <typename IsCapacitated, typename IStream>
 typename std::enable_if<std::is_same<IsCapacitated, cap::capacitated>::value, int>::type
-readDemand(IStream & ist){
+read_demand(IStream & ist){
     int a;
     ist >> a;
     return a;
@@ -45,7 +45,7 @@ readDemand(IStream & ist){
 
 
 template <typename IsCapacitated>
-data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::vector<long long> & facCosts, std::vector<int> & facCap,
+data_structures::array_metric<long long> read_orlib_FL(std::istream & ist, std::vector<long long> & facCosts, std::vector<int> & facCap,
                        std::vector<int> & demands,
                        boost::integer_range<int> & fac,
                        boost::integer_range<int> & clients ) {
@@ -55,7 +55,7 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
     fac =     boost::irange(0, F);
     clients = boost::irange(F, N + F);
 
-    data_structures::ArrayMetric<long long> m(N + F);
+    data_structures::array_metric<long long> m(N + F);
     demands.resize(N);
     facCosts.resize(F);
     facCap.resize(F);
@@ -68,7 +68,7 @@ data_structures::ArrayMetric<long long> readORLIB_FL(std::istream & ist, std::ve
 
     for(int i : boost::irange(0,N)) {
 
-        demands[i] = readDemand<IsCapacitated>(ist);
+        demands[i] = read_demand<IsCapacitated>(ist);
         for(int j : boost::irange(0,F)) {
             ist >> l;
             l /= double(demands[i]);

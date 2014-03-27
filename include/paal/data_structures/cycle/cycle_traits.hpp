@@ -20,10 +20,10 @@ namespace data_structures {
      * @tparam Cycle
      */
 template <typename Cycle>
-struct CycleTraits {
+struct cycle_traits {
     ///Vertex iterator type
-    typedef decltype(std::declval<Cycle>().vbegin()) VertexIterator;
-    typedef typename std::iterator_traits<VertexIterator>::value_type CycleElem;
+    typedef decltype(std::declval<Cycle>().vbegin()) vertex_iterator;
+    typedef typename std::iterator_traits<vertex_iterator>::value_type CycleElem;
 };
 
 }

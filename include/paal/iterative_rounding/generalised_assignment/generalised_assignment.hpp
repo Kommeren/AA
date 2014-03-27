@@ -17,19 +17,19 @@ namespace ir {
 /**
  * Relax Condition of the IR Generalised Assignment algorithm.
  */
-struct GARelaxCondition {
+struct ga_relax_condition {
     /**
      * Checks if a given row of the LP corresponds to a machine and can be relaxed.
      */
     template <typename Problem, typename LP>
-    bool operator()(Problem & problem, const LP & lp, lp::RowId row) {
-        auto & machineRows = problem.getMachineRows();
+    bool operator()(Problem & problem, const LP & lp, lp::row_id row) {
+        auto & machineRows = problem.get_machine_rows();
         return machineRows.find(row) != machineRows.end() &&
             (
-             lp.getRowDegree(row) <= 1 ||
+             lp.get_row_degree(row) <= 1 ||
              (
-              lp.getRowDegree(row) == 2 &&
-              problem.getCompare().ge(lp.getRowSum(row), 1)
+              lp.get_row_degree(row) == 2 &&
+              problem.get_compare().ge(lp.get_row_sum(row), 1)
              )
             );
     }
@@ -38,21 +38,21 @@ struct GARelaxCondition {
 /**
  * Set Solution component of the IR Generalised Assignment algorithm.
  */
-struct GASetSolution {
+struct ga_set_solution {
     /**
      * Creates the result assignment form the LP (all edges with value 1).
      */
     template <typename Problem, typename Solution>
     void operator()(Problem & problem, const Solution & solution) {
-        auto jbegin = problem.getJobs().first;
-        auto mbegin = problem.getMachines().first;
-        auto & colIdx = problem.getColIdx();
-        auto jobToMachine = problem.getJobToMachines();
+        auto jbegin = problem.get_jobs().first;
+        auto mbegin = problem.get_machines().first;
+        auto & colIdx = problem.getcol_idx();
+        auto jobToMachine = problem.get_job_to_machines();
 
         for(int idx : boost::irange(0, int(colIdx.size()))) {
-            if(problem.getCompare().e(solution(colIdx[idx]), 1)) {
-                *jobToMachine = std::make_pair(*(jbegin + problem.getJIdx(idx)),
-                                                  *(mbegin + problem.getMIdx(idx)));
+            if(problem.get_compare().e(solution(colIdx[idx]), 1)) {
+                *jobToMachine = std::make_pair(*(jbegin + problem.get_j_idx(idx)),
+                                                  *(mbegin + problem.get_m_idx(idx)));
                 ++jobToMachine;
             }
         }
@@ -62,20 +62,20 @@ struct GASetSolution {
 /**
  * Initialization of the IR Generalised Assignment algorithm.
  */
-class GAInit {
+class ga_init {
     public:
         /**
          * Initializes the LP: variables for edges, constraints for jobs and machines.
          */
         template <typename Problem, typename LP>
         void operator()(Problem & problem, LP & lp) {
-            lp.setLPName("generalized assignment problem");
-            lp.setMinObjFun();
+            lp.set_lp_name("generalized assignment problem");
+            lp.set_min_obj_fun();
 
-            addVariables(problem, lp);
-            addConstraintsForJobs(problem, lp);
-            addConstraintsForMachines(problem, lp);
-            lp.loadMatrix();
+            add_variables(problem, lp);
+            add_constraints_for_jobs(problem, lp);
+            add_constraints_for_machines(problem, lp);
+            lp.load_matrix();
         }
 
     private:
@@ -85,16 +85,16 @@ class GAInit {
          * LP columns to the (machine, job) pairs.
          */
         template <typename Problem, typename LP>
-        void addVariables(Problem & problem, LP & lp) {
-            auto & colIdx = problem.getColIdx();
-            colIdx.reserve(problem.getMachinesCnt() * problem.getJobsCnt());
-            for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
-                for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
-                    if (problem.getProceedingTime()(j, m) <= problem.getMachineAvailableTime()(m)) {
-                        colIdx.push_back(lp.addColumn(problem.getCost()(j,m)));
+        void add_variables(Problem & problem, LP & lp) {
+            auto & colIdx = problem.getcol_idx();
+            colIdx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
+            for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
+                for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
+                    if (problem.get_proceeding_time()(j, m) <= problem.get_machine_available_time()(m)) {
+                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m)));
                     }
                     else {
-                        colIdx.push_back(lp.addColumn(problem.getCost()(j,m), lp::FX, 0, 0));
+                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m), lp::FX, 0, 0));
                     }
                 }
             }
@@ -102,12 +102,12 @@ class GAInit {
 
         //constraints for job
         template <typename Problem, typename LP>
-        void addConstraintsForJobs(Problem & problem, LP & lp) {
-            auto & colIdx = problem.getColIdx();
-            for(int jIdx : boost::irange(0, problem.getJobsCnt())) {
-                lp::RowId rowIdx = lp.addRow(lp::FX, 1.0, 1.0);
-                for(int mIdx : boost::irange(0, problem.getMachinesCnt())) {
-                    lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx,mIdx)]);
+        void add_constraints_for_jobs(Problem & problem, LP & lp) {
+            auto & colIdx = problem.getcol_idx();
+            for(int jIdx : boost::irange(0, problem.get_jobs_cnt())) {
+                lp::row_id rowIdx = lp.add_row(lp::FX, 1.0, 1.0);
+                for(int mIdx : boost::irange(0, problem.get_machines_cnt())) {
+                    lp.add_constraint_coef(rowIdx, colIdx[problem.idx(jIdx,mIdx)]);
                     ++mIdx;
                 }
             }
@@ -115,18 +115,18 @@ class GAInit {
 
         //constraints for machines
         template <typename Problem, typename LP>
-        void addConstraintsForMachines(Problem & problem, LP & lp)  {
-            auto & colIdx = problem.getColIdx();
+        void add_constraints_for_machines(Problem & problem, LP & lp)  {
+            auto & colIdx = problem.getcol_idx();
             int mIdx(0);
-            for(typename Problem::MachineRef m : boost::make_iterator_range(problem.getMachines())) {
-                auto T = problem.getMachineAvailableTime()(m);
-                lp::RowId rowIdx = lp.addRow(lp::UP, 0.0, T);
-                problem.getMachineRows().insert(rowIdx);
+            for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
+                auto T = problem.get_machine_available_time()(m);
+                lp::row_id rowIdx = lp.add_row(lp::UP, 0.0, T);
+                problem.get_machine_rows().insert(rowIdx);
                 int jIdx(0);
 
-                for(typename Problem::JobRef j : boost::make_iterator_range(problem.getJobs())) {
-                    auto t = problem.getProceedingTime()(j, m);
-                    lp.addConstraintCoef(rowIdx, colIdx[problem.idx(jIdx, mIdx)], t);
+                for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
+                    auto t = problem.get_proceeding_time()(j, m);
+                    lp.add_constraint_coef(rowIdx, colIdx[problem.idx(jIdx, mIdx)], t);
                     ++jIdx;
                 }
                 ++mIdx;
@@ -134,18 +134,18 @@ class GAInit {
         }
 };
 
-template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
-         typename ResolveLPToExtremePoint = DefaultResolveLPToExtremePoint,
-         typename RoundCondition = DefaultRoundCondition,
-         typename RelaxContition = GARelaxCondition,
-         typename Init = GAInit,
-         typename SetSolution = GASetSolution>
-             using GAIRComponents = IRComponents<SolveLPToExtremePoint,
-                ResolveLPToExtremePoint, RoundCondition, RelaxContition, Init, SetSolution>;
+template <typename SolveLPToExtremePoint = default_solve_lp_to_extreme_point,
+         typename Resolve_lp_to_extreme_point = default_resolve_lp_to_extreme_point,
+         typename RoundCondition = default_round_condition,
+         typename RelaxContition = ga_relax_condition,
+         typename Init = ga_init,
+         typename SetSolution = ga_set_solution>
+             using GAIRcomponents = IRcomponents<SolveLPToExtremePoint,
+                Resolve_lp_to_extreme_point, RoundCondition, RelaxContition, Init, SetSolution>;
 
 
 /**
- * @class GeneralisedAssignment
+ * @class generalised_assignment
  * @brief The class for solving the Generalised Assignment problem using Iterative Rounding.
  *
  * @tparam MachineIter
@@ -158,7 +158,7 @@ template <typename SolveLPToExtremePoint = DefaultSolveLPToExtremePoint,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator>
-class GeneralisedAssignment {
+class generalised_assignment {
     public:
         typedef typename std::iterator_traits<JobIter>::value_type Job;
         typedef typename std::iterator_traits<MachineIter>::value_type Machine;
@@ -166,26 +166,26 @@ class GeneralisedAssignment {
         typedef typename std::iterator_traits<JobIter>::reference JobRef;
         typedef typename std::iterator_traits<MachineIter>::reference MachineRef;
         typedef utils::Compare<double> Compare;
-        typedef std::set<lp::RowId> MachineRows;
-        typedef std::vector<lp::ColId> ColIdx;
+        typedef std::set<lp::row_id> MachineRows;
+        typedef std::vector<lp::col_id> col_idx;
 
         /**
          * Constructor.
          */
-        GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
+        generalised_assignment(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const MachineAvailableTime & T,
                 JobsToMachinesOutputIterator jobToMachines) :
-            m_mCnt(std::distance(mbegin, mend)), m_jCnt(std::distance(jbegin, jend)),
+            m_m_cnt(std::distance(mbegin, mend)), m_j_cnt(std::distance(jbegin, jend)),
             m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
-            m_c(c), m_t(t), m_T(T), m_jobToMachine(jobToMachines) {}
+            m_c(c), m_t(t), m_T(T), m_job_to_machine(jobToMachines) {}
 
         typedef boost::optional<std::string> ErrorMessage;
 
         /**
          * Checks if input is valid.
          */
-        ErrorMessage checkInputValidity() {
+        ErrorMessage check_input_validity() {
             return ErrorMessage();
         }
 
@@ -193,84 +193,84 @@ class GeneralisedAssignment {
          * Returns the index of the edge between a given job and a given machine.
          */
         int idx(int jIdx, int mIdx) {
-            return jIdx * m_mCnt + mIdx;
+            return jIdx * m_m_cnt + mIdx;
         }
 
         /**
          * Returns the index of a job given the index of the edge between the job and a machine.
          */
-        int getJIdx(int idx) {
-            return idx / m_mCnt;
+        int get_j_idx(int idx) {
+            return idx / m_m_cnt;
         }
 
         /**
          * Returns the index of a machine given the index of the edge between a job and the machine.
          */
-        int getMIdx(int idx) {
-            return idx % m_mCnt;
+        int get_m_idx(int idx) {
+            return idx % m_m_cnt;
         }
 
         /**
          * Returns the LP rows corresponding to the machines.
          */
-        MachineRows & getMachineRows() {
-            return m_machineRows;
+        MachineRows & get_machine_rows() {
+            return m_machine_rows;
         }
 
         /**
          * Returns the double comparison object.
          */
-        Compare getCompare() {
+        Compare get_compare() {
             return m_compare;
         }
 
         /**
          * Returns the number of machines in the problem.
          */
-        int getMachinesCnt() const {
-            return m_mCnt;
+        int get_machines_cnt() const {
+            return m_m_cnt;
         }
 
         /**
          * Returns the number of jobs in the problem.
          */
-        int getJobsCnt() const {
-            return m_jCnt;
+        int get_jobs_cnt() const {
+            return m_j_cnt;
         }
 
         /**
          * Returns the machines iterator range.
          */
-        std::pair<MachineIter, MachineIter> getMachines() {
+        std::pair<MachineIter, MachineIter> get_machines() {
             return std::make_pair(m_mbegin, m_mend);
         }
 
         /**
          * Returns the jobs iterator range.
          */
-        std::pair<JobIter, JobIter> getJobs() {
+        std::pair<JobIter, JobIter> get_jobs() {
             return std::make_pair(m_jbegin, m_jend);
         }
 
         /**
          * Returns the vector of LP column IDs.
          */
-        ColIdx & getColIdx() {
-            return m_colIdx;
+        col_idx & getcol_idx() {
+            return m_col_idx;
         }
 
         /**
          * Returns the result output iterator.
          */
-        JobsToMachinesOutputIterator getJobToMachines() {
-            return m_jobToMachine;
+        JobsToMachinesOutputIterator get_job_to_machines() {
+            return m_job_to_machine;
         }
 
         /**
          * Returns the proceeding time function (function from (job, machine)
          * pairs into the proceeding time of the job on the machine).
          */
-        const ProceedingTime & getProceedingTime() {
+        const ProceedingTime & get_proceeding_time() {
             return m_t;
         }
 
@@ -278,7 +278,7 @@ class GeneralisedAssignment {
          * Returns the machine available time function (function returning
          * the time available on a given machine).
          */
-        const MachineAvailableTime & getMachineAvailableTime() {
+        const MachineAvailableTime & get_machine_available_time() {
             return m_T;
         }
 
@@ -286,14 +286,14 @@ class GeneralisedAssignment {
          * Returns the cost function (function from (job, machine)
          * pairs into the cost of executing the job on the machine).
          */
-        const Cost & getCost() const {
+        const Cost & get_cost() const {
             return m_c;
         }
 
     private:
 
-        const int m_mCnt;
-        const int m_jCnt;
+        const int m_m_cnt;
+        const int m_j_cnt;
         JobIter m_jbegin;
         JobIter m_jend;
         MachineIter m_mbegin;
@@ -301,14 +301,14 @@ class GeneralisedAssignment {
         const Cost & m_c;
         const ProceedingTime & m_t;
         const MachineAvailableTime & m_T;
-        JobsToMachinesOutputIterator m_jobToMachine;
+        JobsToMachinesOutputIterator m_job_to_machine;
         const Compare m_compare;
-        ColIdx m_colIdx;
-        std::set<lp::RowId> m_machineRows;
+        col_idx m_col_idx;
+        std::set<lp::row_id> m_machine_rows;
 };
 
 /**
- * @brief Creates a GeneralisedAssignment object.
+ * @brief Creates a generalised_assignment object.
  *
  * @tparam MachineIter
  * @tparam JobIter
@@ -325,18 +325,18 @@ class GeneralisedAssignment {
  * @param T times available for the machines
  * @param jobsToMachines found assignment
  *
- * @return GeneralisedAssignment object
+ * @return generalised_assignment object
  */
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator>
-GeneralisedAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+generalised_assignment<MachineIter, JobIter, Cost, ProceedingTime,
                   MachineAvailableTime, JobsToMachinesOutputIterator>
-make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
+make_generalised_assignment(MachineIter mbegin, MachineIter mend,
             JobIter jbegin, JobIter jend,
             const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T,
             JobsToMachinesOutputIterator jobsToMachines) {
-    return GeneralisedAssignment<MachineIter, JobIter, Cost, ProceedingTime,
+    return generalised_assignment<MachineIter, JobIter, Cost, ProceedingTime,
                         MachineAvailableTime, JobsToMachinesOutputIterator>(
             mbegin, mend, jbegin, jend, c, t, T, jobsToMachines);
 }
@@ -350,7 +350,7 @@ make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
  * @tparam ProceedingTime
  * @tparam MachineAvailableTime
  * @tparam JobsToMachinesOutputIterator
- * @tparam Components
+ * @tparam components
  * @tparam Visitor
  * @param mbegin begin machines iterator
  * @param mend end machines iterator
@@ -368,17 +368,17 @@ make_GeneralisedAssignment(MachineIter mbegin, MachineIter mend,
 template <typename MachineIter, typename JobIter, typename Cost,
           typename ProceedingTime, typename MachineAvailableTime,
           typename JobsToMachinesOutputIterator,
-          typename Components = GAIRComponents<>,
-          typename Visitor = TrivialVisitor>
+          typename components = GAIRcomponents<>,
+          typename Visitor = trivial_visitor>
 IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
                 JobsToMachinesOutputIterator jobToMachines,
-                Components components = Components(), Visitor visitor = Visitor()) {
-    auto gaSolution = make_GeneralisedAssignment(
+                components comps = components(), Visitor visitor = Visitor()) {
+    auto gaSolution = make_generalised_assignment(
             mbegin, mend, jbegin, jend,
             c, t, T, jobToMachines);
-    return solve_iterative_rounding(gaSolution, std::move(components), std::move(visitor));
+    return solve_iterative_rounding(gaSolution, std::move(comps), std::move(visitor));
 }
 
 

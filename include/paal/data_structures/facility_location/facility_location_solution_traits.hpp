@@ -10,8 +10,8 @@
 namespace paal {
 namespace data_structures {
 
-template <typename FacilityLocationSolution>
-class FacilityLocationSolutionTraits {
+template <typename facility_location_solution>
+class facility_location_solution_traits {
 };
 
 

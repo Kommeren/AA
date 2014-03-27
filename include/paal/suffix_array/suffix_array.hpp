@@ -28,7 +28,7 @@ namespace suffix_arrays{
  * and false otherwise
  * @tparam Letter
  */
-//class suffixArray{
+//class suffix_array{
 template<typename Letter>
 inline bool leq(Letter a1, int a2,   Letter b1, int b2) { // lexic. order for pairs
     return(a1 < b1 ||( a1 == b1 && a2 <= b2));
@@ -50,7 +50,7 @@ inline bool leq(Letter a1, Letter a2, int a3,   Letter b1, Letter b2, int b3) {
 }
 // stably sort sortFrom[0..n-1] to sortTo[0..n-1] with keys in 0..K from r
 template <typename Iterator>
-static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo, Iterator r, int n, int maxLetter)
+static void radix_pass(std::vector<int>const& sortFrom, std::vector<int>& sortTo, Iterator r, int n, int maxLetter)
 { // count occurrences
     std::vector<int> c(maxLetter+1);
     for (auto i : boost::irange(0, n)){
@@ -71,16 +71,16 @@ static void radixPass(std::vector<int>const& sortFrom, std::vector<int>& sortTo,
  *
  * @brief
  * require text[n]=text[n+1]=text[n+2]=0, n>=2
- * fill suffixArray
- * suffixArray[i] contains the starting position of the i-1'th smallest suffix in Word
+ * fill suffix_array
+ * suffix_array[i] contains the starting position of the i-1'th smallest suffix in Word
  * @tparam Letter
  * @param vector<Letter> text - text
- * @param vector<int> place for suffixArray
+ * @param vector<int> place for suffix_array
  * @param Letter max_letter optional parameter max_letter in alphabet
  */
 // find the suffix array SA of text[0..n-1] in {1..maxLetter}^n
 template<typename Letter>
-void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLetter=0) {
+void _suffix_array(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLetter=0) {
     int n=text.size()-3;
     int n0=(n+2)/3, n1=(n+1)/3, n2=n/3, n02=n0+n2;
     text.resize(text.size()+3);
@@ -105,9 +105,9 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
     SA12.resize(n02+3);
     text12.resize(n02+3);
     // lsb radix sort the mod 1 and mod 2 triples
-    radixPass(text12 , SA12,text.begin()+2, n02, maxLetter);
-    radixPass(SA12, text12 ,text.begin()+1, n02, maxLetter);
-    radixPass(text12 , SA12,text.begin()  , n02, maxLetter);
+    radix_pass(text12 , SA12,text.begin()+2, n02, maxLetter);
+    radix_pass(SA12, text12 ,text.begin()+1, n02, maxLetter);
+    radix_pass(text12 , SA12,text.begin()  , n02, maxLetter);
 
     // find lexicographic names of triples
     int name = 0;
@@ -129,7 +129,7 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
 
     // recurse if names are not yet unique
     if (name < n02) {
-        _suffixArray<int>(text12, SA12/*, n02*/, name);//parametrized by int intentionally
+        _suffix_array<int>(text12, SA12/*, n02*/, name);//parametrized by int intentionally
         // store unique names in s12 using the suffix array
         for (auto i : boost::irange(0,n02)){
             text12[SA12[i]] = i + 1;
@@ -147,7 +147,7 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
             text0.push_back(3*SA12[i]);
         }
     }
-    radixPass(text0, SA0,text.begin(),  n0, maxLetter);
+    radix_pass(text0, SA0,text.begin(),  n0, maxLetter);
     auto GetI=[&](int t)->int {
         return SA12[t] < n0 ? SA12[t] * 3 + 1 : (SA12[t] - n0) * 3 + 2;
     };
@@ -186,18 +186,18 @@ void _suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLette
  *
  * @brief
  * require text.size()>=2
- * fill suffixArray
- * suffixArray[i] contains the starting position of the i-1'th smallest suffix in Word
+ * fill suffix_array
+ * suffix_array[i] contains the starting position of the i-1'th smallest suffix in Word
  * @tparam Letter
  * @param vector<Letter> text - text
- * @param vector<int> place for suffixArray
+ * @param vector<int> place for suffix_array
  * @param Letter max_letter optional parameter max_letter in alphabet
  */
 // find the suffix array SA of text[0..n-1] in {1..maxLetter}^n
 template<typename Letter>
-void suffixArray(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLetter=0) {
+void suffix_array(std::vector<Letter>& text,std::vector<int>& SA,Letter maxLetter=0) {
     text.resize(text.size()+3);
-    _suffixArray<Letter>(text,SA,maxLetter);
+    _suffix_array<Letter>(text,SA,maxLetter);
     text.resize(text.size()-3);
 };
 

@@ -3,15 +3,15 @@
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 
-struct SampleGraphsMetrics {
+struct sample_graphs_metrics {
     typedef boost::adjacency_list <boost::vecS, boost::vecS,
                 boost::undirectedS,boost::property<boost::vertex_color_t, int>,
                     boost::property < boost::edge_weight_t, int> > graph_t;
     typedef std::pair<int, int> Edge;
-    typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
+    typedef paal::data_structures::graph_metric<graph_t, int> GraphMT;
     enum nodes { A, B, C, D, E, F, G, H };
 
-    static graph_t getGraphSmall() {
+    static graph_t get_graph_small() {
         const int num_nodes = 5;
         Edge edge_array[] = { Edge(A, C), Edge(B, B), Edge(B, D), Edge(B, E),
             Edge(C, B), Edge(C, D), Edge(D, E), Edge(E, A), Edge(E, B)
@@ -24,11 +24,11 @@ struct SampleGraphsMetrics {
         return g;
     }
 
-    static GraphMT getGraphMetricSmall() {
-        return GraphMT(getGraphSmall());
+    static GraphMT get_graph_metric_small() {
+        return GraphMT(get_graph_small());
     }
 
-    static graph_t getGraphSteiner() {
+    static graph_t get_graph_steiner() {
         const int num_nodes = 5;
         Edge edge_array[] = { Edge(A, B), Edge(B, C), Edge(C, D), Edge(D, A),
                               Edge(A, E), Edge(B, E), Edge(C, E), Edge(D, E)
@@ -47,11 +47,11 @@ struct SampleGraphsMetrics {
         return g;
     }
 
-    static GraphMT getGraphMetricSteiner() {
-        return GraphMT(getGraphSteiner());
+    static GraphMT get_graph_metric_steiner() {
+        return GraphMT(get_graph_steiner());
     }
 
-    static GraphMT getGraphMetricMedium() {
+    static GraphMT get_graph_metric_medium() {
         const int num_nodes = 8;
         Edge edge_array[] = { Edge(A, C), Edge(A, F), Edge(B, E), Edge(B, G),
                               Edge(B, H), Edge(C, E), Edge(C, G), Edge(C, H),

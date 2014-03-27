@@ -18,7 +18,7 @@ typedef std::pair<Time, char> Job;
 typedef int Machine;
 
 template <class Result>
-void printResult(const Result& result) {
+void print_result(const Result& result) {
    std::unordered_map<Machine, Time> machineTime;
    for (const auto& machineJobpair: result) {
       Machine machine = *machineJobpair.first;
@@ -26,11 +26,11 @@ void printResult(const Result& result) {
       machineTime[machine] += job.first / machine;
       std::cout << "On machine: " << machine << " do job: " << job.second << std::endl;
    }
-   Time maxTime = 0;
+   Time max_time = 0;
    for (const auto& it : machineTime) {
-      maxTime = std::max(maxTime, it.second);
+      max_time = std::max(max_time, it.second);
    }
-   std::cout << "Solution: " << maxTime << std::endl;
+   std::cout << "Solution: " << max_time << std::endl;
 }
 
 int main() {
@@ -44,16 +44,16 @@ int main() {
       deterministicResult, randomizedResult;
 
    std::cout << "Deterministic schedule:" << std::endl;
-   paal::greedy::scheduleDeterministic(machines.begin(), machines.end(),
+   paal::greedy::schedule_deterministic(machines.begin(), machines.end(),
       jobs.begin(), jobs.end(), back_inserter(deterministicResult),
-      paal::utils::IdentityFunctor(), returnJobLoadFunctor);
-   printResult(deterministicResult);
+      paal::utils::identity_functor(), returnJobLoadFunctor);
+   print_result(deterministicResult);
 
    std::cout << "Randomized schedule:" << std::endl;
-   paal::greedy::scheduleRandomized(machines.begin(), machines.end(),
+   paal::greedy::schedule_randomized(machines.begin(), machines.end(),
       jobs.begin(), jobs.end(), back_inserter(randomizedResult),
-      paal::utils::IdentityFunctor(), returnJobLoadFunctor);
-   printResult(randomizedResult);
+      paal::utils::identity_functor(), returnJobLoadFunctor);
+   print_result(randomizedResult);
 
    return 0;
 }

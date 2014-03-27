@@ -26,15 +26,15 @@ int main() {
     std::vector<int> bounds {3,2,2,2,2,2};
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 6);
-    auto degreeBounds = paal::utils::make_ArrayToFunctor(bounds);
+    auto degreeBounds = paal::utils::make_array_to_functor(bounds);
 
     typedef std::vector<Edge> ResultTree;
     ResultTree resultTree;
 
     // optional input validity checking
-    auto bdmst = paal::ir::make_BoundedDegreeMST(
+    auto bdmst = paal::ir::make_bounded_degree_mst(
                     g, degreeBounds, std::back_inserter(resultTree));
-    auto error = bdmst.checkInputValidity();
+    auto error = bdmst.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
         std::cerr << *error << std::endl;
@@ -56,7 +56,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-    paal::lp::GLP::freeEnv();
+    paal::lp::GLP::free_env();
 //! [Bounded-Degree Minimum Spanning Tree Example]
     return 0;
 }

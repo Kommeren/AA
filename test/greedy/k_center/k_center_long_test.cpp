@@ -33,6 +33,6 @@ BOOST_AUTO_TEST_CASE(KCenter) {
     //solution
     int radius=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
     BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
-    check_result(radius,P1,APPROXIMATION_RATIO,paal::utils::LessEqual(),0,"lower bound ","upper bound for approximation ratio ");
-    paal::inBalls(items,centers,metric,radius);
+    check_result(radius,P1,APPROXIMATION_RATIO,paal::utils::less_equal(),0,"lower bound ","upper bound for approximation ratio ");
+    paal::in_balls(items,centers,metric,radius);
 }

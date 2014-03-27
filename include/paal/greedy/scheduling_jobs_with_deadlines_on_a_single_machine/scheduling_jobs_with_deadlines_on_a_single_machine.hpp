@@ -53,13 +53,13 @@ auto schedulingJobsWithDeadlinesOnASingleMachine(
           boost::make_counting_iterator(last),
           std::back_inserter(jobs));
 
-    auto getDueDateFromIterator=utils::make_LiftIteratorFunctor(getDueDate);
-    auto dueDateCompatator=utils::make_FunctorToComparator(getDueDateFromIterator,utils::Greater());
+    auto getDueDateFromIterator=utils::make_lift_iterator_functor(getDueDate);
+    auto dueDateCompatator=utils::make_functor_to_comparator(getDueDateFromIterator,utils::Greater());
     typedef std::priority_queue<InputIterator,std::vector<InputIterator>,decltype (dueDateCompatator)> QueueType;
     QueueType activeJobsIters(dueDateCompatator);
 
-    auto getReleaseDateFromIterator=utils::make_LiftIteratorFunctor(getReleaseDate);
-    std::sort(jobs.begin(),jobs.end(),utils::make_FunctorToComparator(getReleaseDateFromIterator));
+    auto getReleaseDateFromIterator=utils::make_lift_iterator_functor(getReleaseDate);
+    std::sort(jobs.begin(),jobs.end(),utils::make_functor_to_comparator(getReleaseDateFromIterator));
     Time startIdle=Time();
     Time longestDelay=Time();
     auto doJob=[&](){

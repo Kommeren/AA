@@ -9,9 +9,9 @@
 #define READ_GEN_ASS_HPP
 namespace paal {
 
-typedef data_structures::RectangleArrayMetric<int> M;
+typedef data_structures::rectangle_array_metric<int> M;
 
-void readGEN_ASS(std::istream & is, M & costs, M & times,
+void read_gen_ASS(std::istream & is, M & costs, M & times,
                  std::vector<int> & machinesBounds,
                  boost::integer_range<int> & machines,
                  boost::integer_range<int> & jobs) {

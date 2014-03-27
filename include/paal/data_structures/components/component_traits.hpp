@@ -11,13 +11,13 @@
 namespace paal {
 namespace data_structures {
 
-template <typename Components>
-struct ComponentTraits;
+template <typename components>
+struct component_traits;
 
 template <typename Names, typename Types>
-struct ComponentTraits<detail::Components<Names, Types>> {
+struct component_traits<detail::components<Names, Types>> {
     template <typename Name>
-    using type = detail::TypeForName<Name, Names, Types>;
+    using type = detail::type_for_name<Name, Names, Types>;
 };
 
 }

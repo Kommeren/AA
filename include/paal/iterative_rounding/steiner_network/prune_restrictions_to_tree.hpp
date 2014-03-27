@@ -28,7 +28,7 @@ typedef std::vector<std::pair<unsigned, unsigned>> RestrictionsVector;
  * @return A minimum set of restrictions needed to be checked by the oracle.
  */
 template <typename Restrictions>
-    RestrictionsVector pruneRestrictionsToTree(Restrictions res, int N) {
+    RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
         typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
         typedef boost::property < boost::edge_weight_t, Dist> EdgeProp;
         typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
@@ -44,9 +44,9 @@ template <typename Restrictions>
             }
         }
 
-        auto addEdge = [&](Edge e){resVec.push_back(std::make_pair(source(e, g), target(e,g)));};
+        auto add_edge_to_graph = [&](Edge e){resVec.push_back(std::make_pair(source(e, g), target(e,g)));};
         boost::kruskal_minimum_spanning_tree(g,
-                boost::make_function_output_iterator(utils::make_AssignableFunctor(addEdge)));
+                boost::make_function_output_iterator(utils::make_assignable_functor(add_edge_to_graph)));
         return resVec;
     }
 

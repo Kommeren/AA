@@ -19,17 +19,17 @@
 
 BOOST_AUTO_TEST_CASE(n_queens_test) {
     namespace ls = paal::local_search;
-    typedef ls::NQueensSolutionAdapter<std::vector<int>> Adapter;
+    typedef ls::n_queens_solution_adapter<std::vector<int>> Adapter;
     for(int i : {4, 5, 6 ,7, 8, 9, 10, 100, 500}) {
         std::vector<int> queens(i);
         boost::iota(queens, 0);
         boost::random_shuffle(queens);
 
-        LOGLN("n = "<< i << " start obj fun val = " << Adapter(queens).objFun());
+        LOGLN("n = "<< i << " start obj fun val = " << Adapter(queens).obj_fun());
 
-        ls::NQueensLocalSearchComponents<> comps;
-        ls::nQueensSolutionLocalSearchSimple(queens, comps);
-        LOGLN("end obj fun val = " << Adapter(queens).objFun());
+        ls::n_queens_local_search_components<> comps;
+        ls::n_queens_solution_local_search_simple(queens, comps);
+        LOGLN("end obj fun val = " << Adapter(queens).obj_fun());
     }
 }
 

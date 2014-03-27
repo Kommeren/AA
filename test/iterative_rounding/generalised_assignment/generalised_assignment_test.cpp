@@ -17,15 +17,15 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-struct LogVisitor : public TrivialVisitor {
+struct log_visitor : public trivial_visitor {
 
     template <typename Problem, typename LP>
-    void roundCol(const Problem &, LP & lp, lp::ColId col, double val) {
+    void round_col(const Problem &, LP & lp, lp::col_id col, double val) {
         LOGLN("Column "<< col.get() << " rounded to " << val);
     }
 
     template <typename Problem, typename LP>
-    void relaxRow(const Problem &, LP & lp, lp::RowId row) {
+    void relax_row(const Problem &, LP & lp, lp::row_id row) {
         LOGLN("Relax row " << row.get());
     }
 };
@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
         costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
-        paal::ir::GAIRComponents<>(), LogVisitor());
+        paal::ir::GAIRcomponents<>(), log_visitor());
 
     ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
         LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);

@@ -27,18 +27,18 @@ namespace simple_algo {
      * @return
      */
     template <typename Metric, typename FCosts, typename FLSolution>
-       typename data_structures::MetricTraits<Metric>::DistanceType
-getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
-    auto const & ch      = fls.getChosenFacilities();
+       typename data_structures::metric_traits<Metric>::DistanceType
+get_cfl_cost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
+    auto const & ch      = fls.get_chosen_facilities();
 
-    typedef data_structures::MetricTraits<Metric> MT;
+    typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::DistanceType Dist;
     typedef typename MT::VertexType VertexType;
 
     Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
 
     for(VertexType f : ch) {
-        for(std::pair<VertexType, Dist> v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
+        for(std::pair<VertexType, Dist> v : boost::make_iterator_range(fls.get_clients_for_facility(f))) {
             d += m(v.first, f) * v.second;
         }
     }
@@ -59,18 +59,18 @@ getCFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
  * @return
  */
 template <typename Metric, typename FCosts, typename FLSolution>
-       typename data_structures::MetricTraits<Metric>::DistanceType
-getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
-    auto const & ch      = fls.getChosenFacilities();
+       typename data_structures::metric_traits<Metric>::DistanceType
+get_fl_cost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
+    auto const & ch      = fls.get_chosen_facilities();
 
-    typedef data_structures::MetricTraits<Metric> MT;
+    typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::DistanceType Dist;
     typedef typename MT::VertexType VertexType;
 
     Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0), [&](Dist d, VertexType f){return d+fcosts(f);});
 
     for(VertexType f : ch) {
-        for(VertexType v : boost::make_iterator_range(fls.getClientsForFacility(f))) {
+        for(VertexType v : boost::make_iterator_range(fls.get_clients_for_facility(f))) {
             d += m(v, f);
         }
     }
@@ -89,10 +89,10 @@ getFLCost(const Metric & m, const FCosts & fcosts, const FLSolution & fls) {
  * @return
  */
 template <typename Metric, typename FLSolution>
-        typename data_structures::MetricTraits<Metric>::DistanceType
-getKMCost(const Metric & m, const FLSolution & fls){
-    utils::ReturnZeroFunctor m_zeroFunc;
-    return paal::simple_algo::getFLCost(std::move(m), m_zeroFunc, std::move(fls));
+        typename data_structures::metric_traits<Metric>::DistanceType
+get_km_cost(const Metric & m, const FLSolution & fls){
+    utils::return_zero_functor m_zero_func;
+    return paal::simple_algo::get_fl_cost(std::move(m), m_zero_func, std::move(fls));
 }
 
 }//simple_algo

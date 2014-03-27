@@ -17,7 +17,7 @@ template <typename ObjectsIter,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor,
           typename Is_0_1_Tag,
-          typename RetrieveSolution = RetrieveSolutionTag>
+          typename RetrieveSolution = retrieve_solution_tag>
     FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
 knapsack_check_integrality(ObjectsIter oBegin,
         ObjectsIter oEnd,
@@ -26,13 +26,13 @@ knapsack_check_integrality(ObjectsIter oBegin,
         ObjectSizeFunctor size,
         ObjectValueFunctor value,
         Is_0_1_Tag is_0_1_Tag,
-        RetrieveSolution retrieveSolutionTag = RetrieveSolution()) {
+        RetrieveSolution retrieve_solutionTag = RetrieveSolution()) {
 
     typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
     typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     return knapsack(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag,
                 detail::GetIntegralTag<SizeType, ValueType>(),
-                retrieveSolutionTag);
+                retrieve_solutionTag);
 }
 
 
@@ -42,7 +42,7 @@ template <typename ObjectsIter,
           typename OutputIterator,
           typename ObjectSizeFunctor,
           typename ObjectValueFunctor,
-          typename IntegralTag, //always equals NonIntegralValueAndSizeTag
+          typename IntegralTag, //always equals non_integral_value_and_size_tag
           typename RetrieveSolution,
           typename Is_0_1_Tag
           >
@@ -54,10 +54,10 @@ knapsack(ObjectsIter oBegin,
         ObjectSizeFunctor size,
         ObjectValueFunctor value,
         Is_0_1_Tag is_0_1_Tag,
-        NonIntegralValueAndSizeTag,
-        RetrieveSolution retrieveSolution) {
+        non_integral_value_and_size_tag,
+        RetrieveSolution retrieve_solution) {
     //trick to avoid checking assert on template definition parse
-    static_assert(std::is_same<IntegralTag, NonIntegralValueAndSizeTag>::value,
+    static_assert(std::is_same<IntegralTag, non_integral_value_and_size_tag>::value,
             "At least one of the value or size must return integral value");
 }
 
@@ -79,12 +79,12 @@ knapsack(ObjectsIter oBegin,
         ObjectSizeFunctor size,
         ObjectValueFunctor value,
         Is_0_1_Tag is_0_1_Tag,
-        IntegralValueAndSizeTag,
-        RetrieveSolution retrieveSolutionTag) {
-    if(getValueUpperBound(oBegin, oEnd, capacity, value, size, is_0_1_Tag) > capacity) {
-        return knapsack(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, IntegralSizeTag(), retrieveSolutionTag);
+        integral_value_and_size_tag,
+        RetrieveSolution retrieve_solutionTag) {
+    if(get_value_upper_bound(oBegin, oEnd, capacity, value, size, is_0_1_Tag) > capacity) {
+        return knapsack(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, integral_size_tag(), retrieve_solutionTag);
     } else {
-        return knapsack(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, IntegralValueTag(), retrieveSolutionTag);
+        return knapsack(oBegin, oEnd, capacity, out, size, value, is_0_1_Tag, integral_value_tag(), retrieve_solutionTag);
     }
 }
 

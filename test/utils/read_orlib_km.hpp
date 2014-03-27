@@ -21,9 +21,9 @@ namespace paal {
 
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, boost::property < boost::edge_weight_t, int > > graph_t;
 typedef std::pair<int,int> Edge;
-typedef paal::data_structures::GraphMetric<graph_t, int> GraphMT;
+typedef paal::data_structures::graph_metric<graph_t, int> GraphMT;
 
-GraphMT readORLIB_KM(std::istream & ist,
+GraphMT read_orlib_KM(std::istream & ist,
                        boost::integer_range<int> & fac,
                        boost::integer_range<int> & clients ) {
     int V, nE, K;
@@ -32,7 +32,7 @@ GraphMT readORLIB_KM(std::istream & ist,
     fac =     boost::irange(0, K);
     clients = boost::irange(K, V);
 
-    data_structures::ArrayMetric<long long> m(V);
+    data_structures::array_metric<long long> m(V);
 
     int a,b;
     int l;
@@ -57,7 +57,7 @@ GraphMT readORLIB_KM(std::istream & ist,
         }
     }
     graph_t g(edges.begin(), edges.end(), weight.begin(), V);
-    return data_structures::GraphMetric<graph_t, int>(std::move(g));
+    return data_structures::graph_metric<graph_t, int>(std::move(g));
 }
 
 }

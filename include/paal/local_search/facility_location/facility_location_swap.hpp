@@ -45,7 +45,7 @@ public:
      *
      * @return
      */
-    T getFrom() const {
+    T get_from() const {
         return m_from;
     }
 
@@ -54,7 +54,7 @@ public:
      *
      * @return
      */
-    T getTo() const {
+    T get_to() const {
         return m_to;
     }
 
@@ -63,7 +63,7 @@ public:
      *
      * @param from
      */
-    void setFrom(T from) {
+    void set_from(T from) {
         m_from = from;
     }
 
@@ -72,7 +72,7 @@ public:
      *
      * @param to
      */
-    void setTo(T to) {
+    void set_to(T to) {
         m_to = to;
     }
 
@@ -82,7 +82,7 @@ private:
 };
 
 ///operator() creates Swap  from (from, to)
-struct MakeSwap {
+struct make_swap {
     ///operator()
     template <typename T>
     Swap<T>
@@ -97,7 +97,7 @@ struct MakeSwap {
  * @tparam VertexType
  */
 template <typename VertexType>
-struct FacilityLocationGainSwap {
+struct facility_location_gain_swap {
     /**
      * @brief operator()
      *
@@ -110,14 +110,14 @@ struct FacilityLocationGainSwap {
         template <class Solution>
     auto operator()(Solution & sol,
             const Swap<VertexType> & s) ->
-                typename data_structures::FacilityLocationSolutionTraits<puretype(sol.getFacilityLocationSolution())>::Dist {
+                typename data_structures::facility_location_solution_traits<puretype(sol.getfacility_location_solution())>::Dist {
 
-        typename data_structures::FacilityLocationSolutionTraits<puretype(sol.getFacilityLocationSolution())>::Dist ret, back;
+        typename data_structures::facility_location_solution_traits<puretype(sol.getfacility_location_solution())>::Dist ret, back;
 
-        ret   = sol.addFacilityTentative(s.getTo());
-        ret  += sol.removeFacilityTentative(s.getFrom());
-        back  = sol.addFacilityTentative(s.getFrom());
-        back += sol.removeFacilityTentative(s.getTo());
+        ret   = sol.add_facility_tentative(s.get_to());
+        ret  += sol.remove_facility_tentative(s.get_from());
+        back  = sol.add_facility_tentative(s.get_from());
+        back += sol.remove_facility_tentative(s.get_to());
         assert(ret == -back);
         return -ret;
     }
@@ -130,7 +130,7 @@ struct FacilityLocationGainSwap {
  * @tparam VertexType
  */
 template <typename VertexType>
-struct FacilityLocationCommitSwap {
+struct facility_location_commit_swap {
     /**
      * @brief operator()
      *
@@ -141,8 +141,8 @@ struct FacilityLocationCommitSwap {
     template <typename Solution>
     bool operator()(Solution & sol,
             const Swap<VertexType> & s) {
-        sol.addFacility(s.getTo());
-        sol.removeFacility(s.getFrom());
+        sol.add_facility(s.get_to());
+        sol.remove_facility(s.get_from());
         return true;
     }
 };
@@ -153,25 +153,25 @@ struct FacilityLocationCommitSwap {
  * @tparam VertexType
  */
 template <typename VertexType>
-struct FacilityLocationGetMovesSwap {
+struct facility_locationget_moves_swap {
 
     ///operator()
     template <typename Solution>
     auto operator()(const Solution &s) ->
-        boost::iterator_range<data_structures::CombineIterator<MakeSwap
+        boost::iterator_range<data_structures::combine_iterator<make_swap
                     , puretype(s.getChosenCopy())
                     , puretype(s.getUnchosenCopy())>>
 
         //this does NOT work on clang-3.4!!!
     /*    std::pair<
-        decltype(data_structures::make_CombineIterator(MakeSwap{}
+        decltype(data_structures::make_combine_iterator(make_swap{}
                 , s.getUnchosenCopy()
                 , s.getChosenCopy())),
-        decltype(data_structures::make_CombineIterator(MakeSwap{}
+        decltype(data_structures::make_combine_iterator(make_swap{}
                 , s.getUnchosenCopy()
                 , s.getChosenCopy()))>*/
     {
-        auto begin = data_structures::make_CombineIterator(MakeSwap{}
+        auto begin = data_structures::make_combine_iterator(make_swap{}
                 , s.getChosenCopy()
                 , s.getUnchosenCopy()
                 );
