@@ -7,7 +7,7 @@ set(EXAMPLE_DIR ${PROJECT_DIR}/examples)
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
-    
+
 if(${USE_CLANG_AND_DIST})
     SET (CMAKE_CXX_COMPILER  "/usr/lib/distcc/clang++")
     set(USE_CLANG 1)

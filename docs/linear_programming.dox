@@ -25,11 +25,11 @@ Although the simplex method is not guaranteed to work in polynomial time,
 it usually works equally fast or faster then polynomial algorithms.
 
 example:
-   \snippet glp_example.cpp GLP Example
+   \snippet lp_example.cpp LP Example
 
-complete usage example can be found in file glp_example.cpp
+complete usage example can be found in file lp_example.cpp
 
-\section rowgen  Row generation
+\section rowgen Row generation
 
 Some of the LP formulations used in different algorithms have an
 exponential number of rows. To solve such instances we use a technique

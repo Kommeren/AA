@@ -12,7 +12,6 @@
 #include <boost/graph/adjacency_list.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/lp/bound_type.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -66,7 +65,7 @@ private:
 struct vertex_cover_init {
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
-        lp.set_min_obj_fun();
+        lp.set_optimization_type(paal::lp::MINIMIZE);
 
         // variables for vertices
         for (auto v : boost::make_iterator_range(vertices(problem.get_graph()))) {
@@ -75,12 +74,10 @@ struct vertex_cover_init {
 
         // x_u + x_v >= 1 for each edge e=(u,v)
         for (auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
-            auto row = lp.add_row(paal::lp::LO, 1);
-            lp.add_constraint_coef(row, problem.vertex_to_column(source(e, problem.get_graph())));
-            lp.add_constraint_coef(row, problem.vertex_to_column(target(e, problem.get_graph())));
+            auto x_u = problem.vertex_to_column(source(e, problem.get_graph()));
+            auto x_v = problem.vertex_to_column(target(e, problem.get_graph()));
+            lp.add_row(x_u + x_v >= 1);
         }
-
-        lp.load_matrix();
     }
 };
 
@@ -138,7 +135,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-    paal::lp::GLP::free_env();
+    paal::lp::glp::free_env();
 //! [Iterative Rounding Example]
     return 0;
 }

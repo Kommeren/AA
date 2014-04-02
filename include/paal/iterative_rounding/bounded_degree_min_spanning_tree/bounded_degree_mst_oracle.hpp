@@ -69,17 +69,16 @@ public:
         }
 
         const auto & g = problem.get_graph();
-        lp.add_row(lp::UP, 0, m_min_cut.source_set_size() - 2);
 
+        lp::linear_expression expr;
         for (auto const & e : problem.get_edge_map().right) {
             auto u = source(e.second, g);
             auto v = target(e.second, g);
             if (m_min_cut.is_in_source_set(u) && m_min_cut.is_in_source_set(v)) {
-                lp.add_new_row_coef(e.first);
+                expr += e.first;
             }
         }
-
-        lp.load_new_row();
+        lp.add_row(std::move(expr) <= m_min_cut.source_set_size() - 2);
     }
 
 private:
@@ -97,7 +96,7 @@ private:
 
         for (auto const & e : problem.get_edge_map().right) {
             lp::col_id colIdx = e.first;
-            double colVal = lp.get_col_prim(colIdx) / 2;
+            double colVal = lp.get_col_value(colIdx) / 2;
 
             if (!problem.get_compare().e(colVal, 0)) {
                 auto u = source(e.second, g);
@@ -142,7 +141,7 @@ private:
         for (auto e : boost::make_iterator_range(adjEdges)) {
             auto colId = problem.edge_to_col(e);
             if (colId) {
-                res += lp.get_col_prim(*colId);
+                res += lp.get_col_value(*colId);
             }
         }
         return res;

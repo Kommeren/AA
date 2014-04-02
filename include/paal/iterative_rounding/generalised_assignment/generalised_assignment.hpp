@@ -49,7 +49,7 @@ struct ga_set_solution {
     void operator()(Problem & problem, const GetSolution & solution) {
         auto jbegin = problem.get_jobs().first;
         auto mbegin = problem.get_machines().first;
-        auto & colIdx = problem.getcol_idx();
+        auto & colIdx = problem.get_col_idx();
         auto jobToMachine = problem.get_job_to_machines();
 
         for(int idx : boost::irange(0, int(colIdx.size()))) {
@@ -73,12 +73,11 @@ class ga_init {
         template <typename Problem, typename LP>
         void operator()(Problem & problem, LP & lp) {
             lp.set_lp_name("generalized assignment problem");
-            lp.set_min_obj_fun();
+            lp.set_optimization_type(lp::MINIMIZE);
 
             add_variables(problem, lp);
             add_constraints_for_jobs(problem, lp);
             add_constraints_for_machines(problem, lp);
-            lp.load_matrix();
         }
 
     private:
@@ -89,7 +88,7 @@ class ga_init {
          */
         template <typename Problem, typename LP>
         void add_variables(Problem & problem, LP & lp) {
-            auto & colIdx = problem.getcol_idx();
+            auto & colIdx = problem.get_col_idx();
             colIdx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
             for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
                 for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
@@ -97,7 +96,7 @@ class ga_init {
                         colIdx.push_back(lp.add_column(problem.get_cost()(j,m)));
                     }
                     else {
-                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m), lp::FX, 0, 0));
+                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m), 0, 0));
                     }
                 }
             }
@@ -106,32 +105,35 @@ class ga_init {
         //constraints for job
         template <typename Problem, typename LP>
         void add_constraints_for_jobs(Problem & problem, LP & lp) {
-            auto & colIdx = problem.getcol_idx();
-            for(int jIdx : boost::irange(0, problem.get_jobs_cnt())) {
-                lp::row_id rowIdx = lp.add_row(lp::FX, 1.0, 1.0);
-                for(int mIdx : boost::irange(0, problem.get_machines_cnt())) {
-                    lp.add_constraint_coef(rowIdx, colIdx[problem.idx(jIdx,mIdx)]);
+            auto & colIdx = problem.get_col_idx();
+            for (int jIdx : boost::irange(0, problem.get_jobs_cnt())) {
+                lp::linear_expression expr;
+                for (int mIdx : boost::irange(0, problem.get_machines_cnt())) {
+                    expr += colIdx[problem.idx(jIdx,mIdx)];
                     ++mIdx;
                 }
+                lp.add_row(std::move(expr) == 1.0);
             }
         }
 
         //constraints for machines
         template <typename Problem, typename LP>
         void add_constraints_for_machines(Problem & problem, LP & lp)  {
-            auto & colIdx = problem.getcol_idx();
+            auto & colIdx = problem.get_col_idx();
             int mIdx(0);
             for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
                 auto T = problem.get_machine_available_time()(m);
-                lp::row_id rowIdx = lp.add_row(lp::UP, 0.0, T);
-                problem.get_machine_rows().insert(rowIdx);
                 int jIdx(0);
+                lp::linear_expression expr;
 
                 for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
                     auto t = problem.get_proceeding_time()(j, m);
-                    lp.add_constraint_coef(rowIdx, colIdx[problem.idx(jIdx, mIdx)], t);
+                    auto x = colIdx[problem.idx(jIdx, mIdx)];
+                    expr += x * t;
                     ++jIdx;
                 }
+                auto row = lp.add_row(std::move(expr) <= T);
+                problem.get_machine_rows().insert(row);
                 ++mIdx;
             }
         }
@@ -255,7 +257,7 @@ class generalised_assignment {
         /**
          * Returns the vector of LP column IDs.
          */
-        ColIdx & getcol_idx() {
+        ColIdx & get_col_idx() {
             return m_col_idx;
         }
 

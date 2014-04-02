@@ -183,9 +183,8 @@ public:
         lp.clear();
         lp.set_lp_name("steiner tree");
         problem.gen_components();
-        lp.set_min_obj_fun();
+        lp.set_optimization_type(lp::MINIMIZE);
         add_variables(problem, lp);
-        lp.load_matrix();
     }
 private:
     /**
@@ -194,7 +193,7 @@ private:
     template <typename Problem, typename LP>
     void add_variables(Problem& problem, LP & lp) {
         for (int i = 0; i < problem.get_components().size(); ++i) {
-            lp::col_id col = lp.add_column(problem.get_components().find(i).get_cost(), lp::DB, 0, 1);
+            lp::col_id col = lp.add_column(problem.get_components().find(i).get_cost(), 0, 1);
             problem.add_column_lp(i, col);
         }
     }
@@ -216,7 +215,7 @@ public:
         weights.reserve(problem.get_components().size());
         for (int i = 0; i < problem.get_components().size(); ++i) {
             lp::col_id cId = problem.find_column_lp(i);
-            weights.push_back(lp.get_col_prim(cId));
+            weights.push_back(lp.get_col_value(cId));
         }
         int selected = paal::utils::random_select(weights.begin(), weights.end()) - weights.begin();
         const auto & comp = problem.get_components().find(selected);

@@ -54,7 +54,7 @@ int main() {
     else {
         std::cout << "The instance is infeasible" << std::endl;
     }
-    paal::lp::GLP::free_env();
+    paal::lp::glp::free_env();
 //! [Tree Augmentation Example]
     return 0;
 }

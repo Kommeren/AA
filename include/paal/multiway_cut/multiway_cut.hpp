@@ -44,13 +44,10 @@ namespace detail{
             void init(Graph & graph, LP & lp,int k) {
 
                 lp.set_lp_name("Multiway Cut");
-                lp.set_min_obj_fun();
+                lp.set_optimization_type(lp::MINIMIZE);
 
                 add_variables(graph, lp, k);
-
                 add_constraints(graph, lp, k);
-
-                lp.load_matrix();
             }
         private:
             //adding variables
@@ -81,11 +78,10 @@ namespace detail{
                     auto targ=target(edge,graph);
                     for(auto i: boost::irange(0,k)){
                         for(auto j:boost::irange(0,2)){
-                            auto rowIdx = lp.add_row(lp::LO, 0);
-                            lp.add_constraint_coef(rowIdx,edges_column[vertices_column_index(dbIndex,k,i)]);
-                            lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(sour,k,i)],j*2-1);
-                            lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(targ,k,i)],1-2*j);
-
+                            auto x_e = edges_column[vertices_column_index(dbIndex,k,i)];
+                            auto x_src = vertices_column[vertices_column_index(sour,k,i)];
+                            auto x_trg = vertices_column[vertices_column_index(targ,k,i)];
+                            lp.add_row(x_e + (j*2-1) * x_src + (1-2*j) * x_trg >= 0);
                         }
                     }
                     ++dbIndex;
@@ -94,13 +90,14 @@ namespace detail{
                 for(auto vertex : boost::make_iterator_range(vertices(graph))){
                     auto col=get(boost::vertex_color,graph,vertex);
                     if(col!=0){
-                        auto rowIdx = lp.add_row(lp::FX, 1);
-                        lp.add_constraint_coef(rowIdx, vertices_column[vertices_column_index(dbIndex,k,col-1)]);
+                        auto x_col = vertices_column[vertices_column_index(dbIndex,k,col-1)];
+                        lp.add_row(x_col == 1);
                     }
-                    auto rowIdx = lp.add_row(lp::FX, 1);
+                    lp::linear_expression expr;
                     for(auto i: boost::irange(0,k)){
-                        lp.add_constraint_coef(rowIdx,vertices_column[vertices_column_index(dbIndex,k,i)]);
+                        expr += vertices_column[vertices_column_index(dbIndex,k,i)];
                     }
+                    lp.add_row(std::move(expr) == 1);
                     ++dbIndex;
                 }
             }
@@ -119,7 +116,7 @@ public:
     multiway_cut(const Graph & g,LP & lp,int k) :
                 m_g(g),m_k(k){
                     m_multiway_cut_lp.init(g,lp,m_k);
-                    lp.solve_to_extreme_point_dual();
+                    lp.solve_simplex(lp::DUAL);
                 };
 
      private:
@@ -140,7 +137,7 @@ auto makeCut(const Graph & graph,int k,Dist &dist,Rand && random_engine,Lp &lp,m
     }
     vertexToPart.resize(num_vertices(graph));
     auto index= get(boost::vertex_index, graph);
-    auto get_column = [&] (int vertex,int dimension)->double {return lp.get_col_prim(mcLp.vertices_column[vertices_column_index(vertex,k,dimension)]);};
+    auto get_column = [&] (int vertex,int dimension)->double {return lp.get_col_value(mcLp.vertices_column[vertices_column_index(vertex,k,dimension)]);};
     for(auto vertex:boost::make_iterator_range(vertices(graph))){
         for(int dimension=0;dimension<k;++dimension)
             if(1.0-get_column(index(vertex),dimension)<randomRadiuses[dimension] || dimension==k-1){
@@ -163,7 +160,7 @@ auto makeCut(const Graph & graph,int k,Dist &dist,Rand && random_engine,Lp &lp,m
 
 template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
-         ,typename LP=lp::GLP
+         ,typename LP=lp::glp
          ,typename Graph
          ,typename OutputIterator
          ,typename VertexIndexMap
@@ -207,7 +204,7 @@ auto multiway_cut_dispatch(Graph &graph,
 
 template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
-         ,typename LP=lp::GLP
+         ,typename LP=lp::glp
          ,typename Graph
          ,typename OutputIterator
          ,typename VertexIndexMap
@@ -250,7 +247,7 @@ auto multiway_cut_dispatch(Graph &graph,
  */
 template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
-         ,typename LP=lp::GLP
+         ,typename LP=lp::glp
          ,typename Graph
          ,typename OutputIterator
          ,typename P
@@ -286,7 +283,7 @@ auto multiway_cut(const Graph &g, OutputIterator out,
  */
 template <typename Rand=std::default_random_engine
          ,typename Distribution=std::uniform_real_distribution<double>
-         ,typename LP=lp::GLP
+         ,typename LP=lp::glp
          ,typename Graph
          ,class OutputIterator>
 auto multiway_cut(Graph graph, OutputIterator result,Rand random_engine=std::default_random_engine(5426u))->

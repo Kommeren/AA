@@ -56,7 +56,7 @@ struct trivial_visitor {
  * @tparam Visitor
  * @tparam LP
  */
-template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::GLP>
+template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 class iterative_rounding  {
     typedef std::unordered_map<lp::col_id, std::pair<double, double>> RoundedCols;
 
@@ -66,7 +66,7 @@ class iterative_rounding  {
     double get_val(lp::col_id col) const {
         auto i = m_rounded.find(col);
         if(i == m_rounded.end()) {
-            return m_lp.get_col_prim(col);
+            return m_lp.get_col_value(col);
         } else {
             return i->second.first;
         }
@@ -111,7 +111,7 @@ public:
     double get_solution_cost() {
         double solCost(0);
         for(auto col : boost::make_iterator_range(m_lp.get_columns())) {
-            solCost += m_lp.get_col_prim(col) * m_lp.get_col_coef(col);
+            solCost += m_lp.get_col_value(col) * m_lp.get_col_coef(col);
         }
         for (auto roundedCol : m_rounded) {
             solCost += roundedCol.second.first * roundedCol.second.second;
@@ -225,11 +225,11 @@ private:
         double coef;
         for (auto const & c : boost::make_iterator_range(column)) {
             boost::tie(row, coef) = c;
-            double currUb = m_lp.get_row_ub(row);
-            double currLb = m_lp.get_row_lb(row);
-            lp::bound_type currType = m_lp.get_rowbound_type(row);
+            double ub = m_lp.get_row_upper_bound(row);
+            double lb = m_lp.get_row_lower_bound(row);
             double diff = coef * value;
-            m_lp.set_row_bounds(row, currType, currLb - diff, currUb - diff);
+            m_lp.set_row_upper_bound(row, ub - diff);
+            m_lp.set_row_lower_bound(row, lb - diff);
         }
         return m_lp.delete_col(colIter);
     };
@@ -259,7 +259,7 @@ using IRResult = std::pair<lp::problem_type, IRSolutionCost>;
  * @param components IR problem components
  * @param visitor visitor object used for logging progress of the algoithm
  */
-template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::GLP>
+template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Visitor visitor = Visitor()) {
     iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
 
@@ -293,7 +293,7 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
  * @param components IR problem components
  * @param visitor visitor object used for logging progress of the algoithm
  */
-template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::GLP>
+template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents components, Visitor visitor = Visitor()) {
     iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
 

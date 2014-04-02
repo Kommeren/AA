@@ -36,7 +36,7 @@ the above formulation.
 \mbox{minimize:} & \sum_{e\in E} \ c_e x_e & \\
 \mbox{subject to:} & & \\
 & x(\delta_E(t))\ge 1 & \mbox{ for every } t\in T\\
-& x_e \ge 0 & \mbox{ for every }e\in E\\
+& 0 \le x_e & \mbox{ for every }e\in E\\
 \f}
 
 example:

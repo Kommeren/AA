@@ -54,7 +54,7 @@ void check_result(IRResult result, const Machines & machines,
     LOGLN(std::setprecision(10) << "APPROXIMATION RATIO: " << approximationRatio << " cost / opt = " << double(c) / double(opt));
 }
 
-BOOST_AUTO_TEST_CASE(generalised_assignmentLong) {
+BOOST_AUTO_TEST_CASE(generalised_assignment_long) {
     std::string testDir = "test/data/GENERALISED_ASSIGNMENT/";
     parse(testDir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         int opt;

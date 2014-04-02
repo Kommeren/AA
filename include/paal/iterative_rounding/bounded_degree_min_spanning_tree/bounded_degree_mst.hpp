@@ -383,24 +383,14 @@ struct bdmst_init {
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
         lp.set_lp_name("bounded degree minimum spanning tree");
-        lp.set_min_obj_fun();
+        lp.set_optimization_type(lp::MINIMIZE);
 
         add_variables(problem, lp);
         add_degree_bound_constraints(problem, lp);
         add_all_set_equality(problem, lp);
-
-        lp.load_matrix();
     }
 
 private:
-    std::string get_edge_name(int eIdx) const {
-        return std::to_string(eIdx);
-    }
-
-    std::string get_degree_bound_name(int vIdx) const {
-        return "degBound" + std::to_string(vIdx);
-    }
-
     /**
      * Adds a variable to the LP for each edge in the input graph.
      * Binds the LP columns to edges.
@@ -408,7 +398,7 @@ private:
     template <typename Problem, typename LP>
     void add_variables(Problem & problem, LP & lp) {
         for(auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
-            lp::col_id col = lp.add_column(problem.get_cost(e), lp::DB, 0, 1);
+            auto col = lp.add_column(problem.get_cost(e), 0, 1);
             problem.bind_edge_to_col(e, col);
         }
     }
@@ -420,19 +410,17 @@ private:
     template <typename Problem, typename LP>
     void add_degree_bound_constraints(Problem & problem, LP & lp) {
         auto const & g = problem.get_graph();
-        int vIdx(0);
 
-        for(auto v : boost::make_iterator_range(vertices(g))) {
-            lp::row_id rowIdx = lp.add_row(lp::UP, 0, problem.get_degree_bound(v), get_degree_bound_name(vIdx));
-            problem.bind_vertex_to_row(v, rowIdx);
+        for (auto v : boost::make_iterator_range(vertices(g))) {
             auto adjEdges = out_edges(v, g);
+            lp::linear_expression expr;
 
-            for(auto e : boost::make_iterator_range(adjEdges)) {
-                auto colId = problem.edge_to_col(e);
-                assert(colId);
-                lp.add_constraint_coef(rowIdx, *colId);
+            for (auto e : boost::make_iterator_range(adjEdges)) {
+                expr += *(problem.edge_to_col(e));
             }
-            ++vIdx;
+
+            auto row = lp.add_row(std::move(expr) <= problem.get_degree_bound(v));
+            problem.bind_vertex_to_row(v, row);
         }
     }
 
@@ -441,13 +429,11 @@ private:
      */
     template <typename Problem, typename LP>
     void add_all_set_equality(Problem & problem, LP & lp) {
-        auto const & g = problem.get_graph();
-        int vCnt = num_vertices(g);
-        lp::row_id rowIdx = lp.add_row(lp::FX, vCnt-1, vCnt-1);
-
-        for (lp::col_id colIdx : boost::make_iterator_range(lp.get_columns())) {
-            lp.add_constraint_coef(rowIdx, colIdx);
+        lp::linear_expression expr;
+        for (auto col : boost::make_iterator_range(lp.get_columns())) {
+            expr += col;
         }
+        lp.add_row(std::move(expr) == num_vertices(problem.get_graph())-1);
     }
 };
 

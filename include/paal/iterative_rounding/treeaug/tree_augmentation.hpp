@@ -148,13 +148,10 @@ public:
     void operator()(Problem & problem, LP & lp) {
         problem.init();
         lp.set_lp_name("Tree augmentation");
-        lp.set_min_obj_fun();
+        lp.set_optimization_type(lp::MINIMIZE);
 
         add_variables(problem, lp);
-
         add_cut_constraints(problem, lp);
-
-        lp.load_matrix();
     }
 
 private:
@@ -164,13 +161,9 @@ private:
      */
     template <typename Problem, typename LP>
     void add_variables(Problem & problem, LP & lp) {
-        int eIdx{0};
-
         for (auto e : boost::make_iterator_range(edges(problem.get_links_graph()))) {
-            std::string colName = get_edge_name(eIdx);
-            lp::col_id colIdx = lp.add_column(problem.get_cost(e), lp::LO, 0, -1, colName);
+            lp::col_id colIdx = lp.add_column(problem.get_cost(e), 0);
             problem.bind_edge_to_col(e, colIdx);
-            ++eIdx;
         }
     }
 
@@ -180,29 +173,15 @@ private:
      */
     template <typename Problem, typename LP>
     void add_cut_constraints(Problem & problem, LP & lp) {
-        int dbIndex = 0;
-
         for (auto e : boost::make_iterator_range(edges(problem.get_tree_graph()))) {
-            lp::row_id rowIdx = lp.add_row(lp::LO, 1, -1, get_row_name(dbIndex));
-            problem.bind_edge_to_row(e, rowIdx);
-
+            lp::linear_expression expr;
             for (auto pe : problem.get_covered_by(e)) {
-                lp.add_constraint_coef(rowIdx, problem.edge_to_col(pe));
+                expr += problem.edge_to_col(pe);
             }
-            ++dbIndex;
+
+            lp::row_id rowIdx = lp.add_row(std::move(expr) >= 1);
+            problem.bind_edge_to_row(e, rowIdx);
         }
-    }
-
-    std::string get_edge_name(int eIdx) const {
-        return std::to_string(eIdx);
-    }
-
-    std::string get_cut_constr_prefix() const {
-        return "cutConstraint";
-    }
-
-    std::string get_row_name(int dbIdx) const {
-        return get_cut_constr_prefix() + std::to_string(dbIdx);
     }
 };
 

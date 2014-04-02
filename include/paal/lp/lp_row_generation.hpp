@@ -8,10 +8,8 @@
 #ifndef LP_ROW_GENERATION_HPP
 #define LP_ROW_GENERATION_HPP
 
-
 #include "paal/lp/problem_type.hpp"
-
-
+#include "paal/lp/lp_base.hpp"
 
 namespace paal {
 namespace lp {
@@ -35,7 +33,7 @@ public:
         auto & oracle = problem.get_oracle();
         while (probType == OPTIMAL && !oracle.feasible_solution(problem, lp)) {
             oracle.add_violated_constraint(problem, lp);
-            probType = lp.resolve_to_extreme_point_dual();
+            probType = lp.resolve_simplex(DUAL);
         }
         return probType;
     }
@@ -53,7 +51,7 @@ public:
      */
     template <typename Problem, typename LP>
     problem_type operator()(Problem & problem, LP & lp) {
-        return m_row_generation(problem, lp, lp.solve_to_extreme_point_primal());
+        return m_row_generation(problem, lp, lp.solve_simplex(PRIMAL));
     }
 
 private:
@@ -72,7 +70,7 @@ public:
      */
     template <typename Problem, typename LP>
     problem_type operator()(Problem & problem, LP & lp) {
-        return m_row_generation(problem, lp, lp.resolve_to_extreme_point_primal());
+        return m_row_generation(problem, lp, lp.resolve_simplex(PRIMAL));
     }
 
 private:

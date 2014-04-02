@@ -258,9 +258,9 @@ void run_test_case(const std::vector<int> & verticesNum, const std::vector<int> 
 
 } //namespace
 
-BOOST_AUTO_TEST_SUITE(steiner_network)
+BOOST_AUTO_TEST_SUITE(steiner_network_long)
 
-BOOST_AUTO_TEST_CASE(steiner_network_long) {
+BOOST_AUTO_TEST_CASE(steiner_network_long_sparse) {
     std::vector<int> verticesNum     = { 6, 10, 10,  10,  15,  20,  40,  50,  75};
     std::vector<int> minEdgeNum      = {30, 50, 80, 200, 200, 250, 400, 350, 500};
     std::vector<int> specialVertices = { 4,  4,  6,   5,   5,  10,  15,  15,  20};

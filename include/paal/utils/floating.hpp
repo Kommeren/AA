@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2013-09-01
  */
-#ifndef UTILS_RANDOM_HPP
-#define UTILS_RANDOM_HPP
+#ifndef UTILS_FLOATING_HPP
+#define UTILS_FLOATING_HPP
 
 #include <iterator>
 #include <numeric>
@@ -119,4 +119,4 @@ private:
 } //utils
 } //paal
 
-#endif // UTILS_RANDOM_HPP
+#endif // UTILS_FLOATING_HPP

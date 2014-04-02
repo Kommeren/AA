@@ -96,15 +96,14 @@ public:
             }
         }
 
-        lp.add_row(lp::LO, restriction);
-
+        lp::linear_expression expr;
         for (auto const & e : problem.get_edge_map()) {
             if (is_edge_in_violating_cut(e.second, g)) {
-                lp.add_new_row_coef(e.first);
+                expr += e.first;
             }
         }
 
-        lp.load_new_row();
+        lp.add_row(std::move(expr) >= restriction);
     }
 
 private:
@@ -129,7 +128,7 @@ private:
 
         for (auto const & e : problem.get_edge_map()) {
             lp::col_id colIdx = e.first;
-            double colVal = lp.get_col_prim(colIdx);
+            double colVal = lp.get_col_value(colIdx);
 
             if (problem.get_compare().g(colVal, 0)) {
                 auto u = source(e.second, g);

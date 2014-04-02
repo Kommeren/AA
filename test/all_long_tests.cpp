@@ -20,7 +20,7 @@ struct Config {
     Config() {
         std::cout << std::setprecision(20);
     }
-    ~Config()  {paal::lp::GLP::free_env(); }
+    ~Config()  { paal::lp::glp::free_env(); }
 };
 }
 

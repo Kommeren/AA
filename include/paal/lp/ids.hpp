@@ -9,6 +9,8 @@
 #ifndef IDS_HPP
 #define IDS_HPP
 
+#include <functional>
+
 namespace paal {
 namespace lp {
 

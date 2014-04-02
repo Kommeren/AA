@@ -96,7 +96,7 @@ template <typename TA>
 //the copy is intended
 double get_lower_bound(TA ta) {
     tree_augmentation_ir_components<> comps;
-    lp::glp_base lp;
+    lp::glp lp;
     comps.call<Init>(ta, lp);
     auto probType = comps.call<SolveLP>(ta, lp);
     BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);

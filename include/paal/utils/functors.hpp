@@ -14,6 +14,7 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
+#include <algorithm>
 
 
 
@@ -618,6 +619,56 @@ scale_functor<Functor, ScaleType, return_type>
 make_scale_functor(Functor f, ScaleType s) {
     return scale_functor<Functor, ScaleType, return_type>(f, s);
 }
+
+//****************************** This is a set of functors representing standard arithmetic
+// operations that is +, -, etc. These are equivalent to standard std:: structs but are not templated
+///plus
+struct plus {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     */
+    template <typename T>
+    auto operator()(const T & left, const T & right) const ->
+    decltype(left + right) {
+        return left + right;
+    }
+};
+
+///minus
+struct minus {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     */
+    template <typename T>
+    auto operator()(const T & left, const T & right) const ->
+    decltype(left - right) {
+        return left - right;
+    }
+};
+
+///max
+struct max {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     */
+    template <typename T>
+    auto operator()(const T & left, const T & right) const ->
+    decltype(std::max(left, right)) {
+        return std::max(left, right);
+    }
+};
 
 //****************************** This is set of functors representing standard boolean operation
 //that is !, &&, ||. These are equivalent to standard std:: structs but are not templated

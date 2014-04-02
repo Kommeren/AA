@@ -14,6 +14,7 @@
 #include "paal/utils/functors.hpp"
 
 #include <boost/graph/adjacency_matrix.hpp>
+#include <boost/iterator/transform_iterator.hpp>
 
 
 namespace paal {

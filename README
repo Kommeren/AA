@@ -1,9 +1,9 @@
 To build tests please provide the const.cmake file containing paths to libraries.
 const.cmake.example can be used as example. Than in the build directory run 'cmake <name of paal root directory>' and than run 'make'.
-For more detals see:
+For more details see:
 http://www.cmake.org/
-The project was teseted with cmake version 2.8.9.
-The minimal version of g++ is 4.7.2.
+The project was teseted with cmake version 2.8.2.
+The minimal version of g++ is 4.8.1.
 The minimal version of clang++ is 3.4.
 The minimal version of boost is 1.55.
 
@@ -13,7 +13,10 @@ The minimal doxygen version is 1.8.3.
 
 Library does NOT compile on Visual Studio 2013. Last check 09.09.13 - template aliasing missing.
 
-In order to run automatic test run
+In order to run automatic test run from paal root directory
 
-./test/run_tests.sh
-./test/run_tests_long.sh
+./<build directory>/test/all_small_tests
+./<build directory>/test/all_long_tests
+./test/run_compilation_error_tests.sh <build directory>
+
+Before running the compilation error test script, you first have to run cmake with option -DCOMPILATION_ERROR_TESTS=1 in the <build directory>.

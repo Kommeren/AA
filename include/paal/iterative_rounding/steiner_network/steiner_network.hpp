@@ -291,17 +291,16 @@ public:
     template <typename Problem, typename LP>
     void operator()(Problem & problem, LP & lp) {
         lp.set_lp_name("steiner network");
-        lp.set_min_obj_fun();
+        lp.set_optimization_type(lp::MINIMIZE);
         add_variables(problem, lp);
-        lp.load_matrix();
     }
 
 private:
     //adding variables
     template <typename Problem, typename LP>
     void add_variables(Problem & problem, LP & lp) {
-        for(auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
-            lp::col_id col = lp.add_column(problem.get_cost(e), lp::DB, 0, 1);
+        for (auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
+            lp::col_id col = lp.add_column(problem.get_cost(e), 0, 1);
             problem.bind_edge_to_col(e, col);
         }
     }

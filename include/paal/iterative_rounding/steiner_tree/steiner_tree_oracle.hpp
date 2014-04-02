@@ -86,17 +86,16 @@ public:
         }
 
         const auto & components = problem.get_components();
-        lp.add_row(lp::LO, 1);
+        lp::linear_expression expr;
         for (int i = 0; i < components.size(); ++i) {
             auto u = m_artif_vertices[i];
             int ver = components.find_version(i);
             auto v = components.find(i).get_sink(ver);
             if (m_min_cut.is_in_source_set(u) && !m_min_cut.is_in_source_set(v)) {
-                lp::col_id colIdx = problem.find_column_lp(i);
-                lp.add_new_row_coef(colIdx);
+                expr += problem.find_column_lp(i);
             }
         }
-        lp.load_new_row();
+        lp.add_row(std::move(expr) >= 1);
     }
 
 private:
@@ -125,7 +124,7 @@ private:
                     m_min_cut.add_edge_to_graph(w, newV, INF);
                 } else {
                     lp::col_id x = problem.find_column_lp(i);
-                    double colVal = lp.get_col_prim(x);
+                    double colVal = lp.get_col_value(x);
                     m_min_cut.add_edge_to_graph(newV, sink, colVal);
                 }
             }
@@ -143,7 +142,7 @@ private:
             int ver = components.find_version(i);
             auto sink = components.find(i).get_sink(ver);
             lp::col_id x = problem.find_column_lp(i);
-            double colVal = lp.get_col_prim(x);
+            double colVal = lp.get_col_value(x);
             m_min_cut.add_edge_to_graph(componentV, sink, colVal);
         }
     }

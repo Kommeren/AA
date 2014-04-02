@@ -1,0 +1,73 @@
+/**
+ * @file lp_example.cpp
+ * @brief
+ * @author Piotr Godlewski
+ * @version 1.0
+ * @date 2014-03-31
+ */
+
+#include "paal/lp/glp.hpp"
+
+#include <boost/range/iterator_range.hpp>
+
+#include <iostream>
+
+//! [LP Example]
+using LP = paal::lp::glp;
+
+void print_solution(paal::lp::problem_type status, const LP & lp_instance) {
+    if (status == paal::lp::OPTIMAL) {
+        std::cout << "Optimal solution cost: " << lp_instance.get_obj_value() << std::endl;
+        for (auto column : boost::make_iterator_range(lp_instance.get_columns())) {
+            std::cout << lp_instance.get_col_name(column) << " = "
+                        << lp_instance.get_col_value(column) << std::endl;
+        }
+    }
+    else {
+        std::cout << "Optimal solution not found" << std::endl;
+    }
+}
+
+int main() {
+    // sample problem
+    LP lp_instance;
+
+    lp_instance.set_optimization_type(paal::lp::MAXIMIZE);
+        // add_column(column_cost, lower_bound, upper_bound, symbolic_name)
+    auto X = lp_instance.add_column(500, 0, std::numeric_limits<double>::max(), "x");
+    auto Y = lp_instance.add_column(300, 0, std::numeric_limits<double>::max(), "y");
+
+    auto expr = X + Y;
+    lp_instance.add_row(expr >= 7);
+    auto row = lp_instance.add_row(expr <= 10);
+    lp_instance.add_row(15 <= 200 * X + 100 * Y <= 1200);
+
+    // solve the LP
+    auto status = lp_instance.solve_simplex();
+    print_solution(status, lp_instance);
+
+    // add new row
+    expr += Y;
+    lp_instance.add_row(expr == 12);
+    // modify row bound
+    lp_instance.set_row_upper_bound(row, 20);
+    // modify column bound
+    lp_instance.set_col_lower_bound(X, -50);
+    // modify row expression
+    lp_instance.set_row_expression(row, X + Y * 1.01);
+
+    // resolve the LP
+    status = lp_instance.resolve_simplex(paal::lp::DUAL);
+    print_solution(status, lp_instance);
+
+    // delete row
+    lp_instance.delete_row(row);
+
+    // resolve the LP
+    status = lp_instance.resolve_simplex();
+    print_solution(status, lp_instance);
+
+    return 0;
+}
+//! [LP Example]
+

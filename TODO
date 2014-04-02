@@ -6,7 +6,8 @@
 * make better traits, maybe it supposed to look like std::iterator traits
 
 * ITERATIVE ROUNDING
-** error checfking for generalized assignment
+** error checking for generalized assignment
+** move and copy constructor in glp class
 ** LP formulation in separate dir
 ** improve row generation ?
 ** resolving solution by moving a point ?

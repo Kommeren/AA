@@ -13,7 +13,7 @@
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/components/components.hpp"
 #include "paal/lp/ids.hpp"
-#include "paal/lp/bound_type.hpp"
+#include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
 
 #include <boost/optional.hpp>
@@ -40,7 +40,7 @@ public:
      */
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::col_id col) {
-        double x = lp.get_col_prim(col);
+        double x = lp.get_col_value(col);
         double r = std::round(x);
         if(m_compare.e(x,r)) {
             return r;
@@ -79,7 +79,7 @@ public:
     /// Rounds a column if its value is equal to one of the template parameter values.
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::col_id col) {
-        return get(lp, lp.get_col_prim(col));
+        return get(lp, lp.get_col_value(col));
     }
 
 protected:
@@ -136,7 +136,7 @@ public:
     /// Rounds a column if its value satisfies a fixed condition.
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::col_id col) {
-        double x = lp.get_col_prim(col);
+        double x = lp.get_col_value(col);
         if(m_cond(x)) {
             return m_f(x);
         }
@@ -192,7 +192,7 @@ struct default_solve_lp_to_extreme_point {
     /// Finds an extreme point solution to the LP.
     template <typename Problem, typename LP>
     lp::problem_type operator()(Problem &, LP & lp) {
-        return lp.solve_to_extreme_point_primal();
+        return lp.solve_simplex(lp::PRIMAL);
     };
 };
 
@@ -203,7 +203,7 @@ struct default_resolve_lp_to_extreme_point {
     /// Finds an extreme point solution to the LP.
     template <typename Problem, typename LP>
     lp::problem_type operator()(Problem &, LP & lp) {
-        return lp.resolve_to_extreme_point_primal();
+        return lp.resolve_simplex(lp::PRIMAL);
     };
 };
 
@@ -223,7 +223,7 @@ public:
     template <typename Problem, typename LP>
     bool operator()(Problem &, const LP & lp) {
         for (lp::col_id col : boost::make_iterator_range(lp.get_columns())) {
-            double colVal = lp.get_col_prim(col);
+            double colVal = lp.get_col_value(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;
             }
