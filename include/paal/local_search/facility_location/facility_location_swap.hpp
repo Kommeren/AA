@@ -96,7 +96,6 @@ struct make_swap {
  *
  * @tparam VertexType
  */
-template <typename VertexType>
 struct facility_location_gain_swap {
     /**
      * @brief operator()
@@ -107,7 +106,7 @@ struct facility_location_gain_swap {
      *
      * @return
      */
-        template <class Solution>
+        template <class Solution, class VertexType>
     auto operator()(Solution & sol,
             const Swap<VertexType> & s) ->
                 typename data_structures::facility_location_solution_traits<puretype(sol.getfacility_location_solution())>::Dist {
@@ -126,10 +125,7 @@ struct facility_location_gain_swap {
 
 /**
  * @brief commit functor for facility location problem
- *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct facility_location_commit_swap {
     /**
      * @brief operator()
@@ -138,7 +134,7 @@ struct facility_location_commit_swap {
      * @param sol
      * @param s
      */
-    template <typename Solution>
+    template <typename Solution, typename VertexType>
     bool operator()(Solution & sol,
             const Swap<VertexType> & s) {
         sol.add_facility(s.get_to());
@@ -149,10 +145,7 @@ struct facility_location_commit_swap {
 
 /**
  * @brief get moves functor for facility location problem
- *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct facility_locationget_moves_swap {
 
     ///operator()

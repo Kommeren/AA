@@ -27,11 +27,8 @@ namespace facility_location {
 /**
  * @brief gain functor for facility location
  *
- * @tparam VertexType
  */
-template <typename VertexType>
-class facility_location_gain_remove {
-public:
+struct facility_location_gain_remove {
     /**
      * @brief operator()
      *
@@ -59,11 +56,8 @@ public:
 /**
  * @brief commit functor for facility location
  *
- * @tparam VertexType
  */
-template <typename VertexType>
-class facility_location_commit_remove {
-public:
+struct facility_location_commit_remove {
     /**
      * @brief operator()
      *
@@ -83,9 +77,7 @@ public:
 /**
  * @brief get moves functor for facility location remove
  *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct facility_locationget_moves_remove {
     /**
      * @brief operator()

@@ -36,9 +36,9 @@ int main() {
     Sol sol(std::move(voronoi), USet{SGM::A, SGM::B}, paal::utils::make_array_to_functor(fcosts));
 
     //create facility location local search components
-    default_remove_fl_components<int>::type rem;
-    default_add_fl_components<int>::type    add;
-    default_swap_fl_components<int>::type   swap;
+    default_remove_fl_components::type rem;
+    default_add_fl_components::type    add;
+    default_swap_fl_components::type   swap;
 
     //search
     facility_location_local_search_simple(sol, rem, add, swap);

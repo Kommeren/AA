@@ -53,9 +53,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         VorType voronoi( FSet{},  FSet(clients.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), FSet(fac.begin(), fac.end()), cost);
 
-        default_remove_fl_components<int>::type rem;
-        default_add_fl_components<int>::type    add;
-        default_swap_fl_components<int>::type   swap;
+        default_remove_fl_components::type rem;
+        default_add_fl_components   ::type add;
+        default_swap_fl_components  ::type swap;
         utils::return_false_functor nop;
 
         facility_location_local_search(sol, paal::local_search::choose_first_better_strategy{},

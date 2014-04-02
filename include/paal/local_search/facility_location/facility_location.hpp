@@ -21,41 +21,33 @@ namespace facility_location {
 /**
  * @class default_remove_fl_components
  * @brief Model of Multisearch_components with default multi search components for facility location.
- *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct default_remove_fl_components {
     typedef Multisearch_components<
-                facility_locationget_moves_remove<VertexType>,
-                facility_location_gain_remove        <VertexType>,
-                facility_location_commit_remove        <VertexType>> type;
+                facility_locationget_moves_remove,
+                facility_location_gain_remove    ,
+                facility_location_commit_remove  > type;
 };
 
 /**
  * @brief add components for facility location
- *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct default_add_fl_components {
     typedef Multisearch_components<
-                facility_locationget_moves_add<VertexType>,
-                facility_location_gain_add        <VertexType>,
-                facility_location_commit_add        <VertexType>> type;
+                facility_locationget_moves_add,
+                facility_location_gain_add,
+                facility_location_commit_add> type;
 };
 
 /**
  * @brief Swap components for facility location
  *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct default_swap_fl_components {
     typedef Multisearch_components<
-                facility_locationget_moves_swap<VertexType>,
-                facility_location_gain_swap        <VertexType>,
-                facility_location_commit_swap        <VertexType>> type;
+                facility_locationget_moves_swap,
+                facility_location_gain_swap    ,
+                facility_location_commit_swap  > type;
 };
 
 /**

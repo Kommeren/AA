@@ -28,14 +28,16 @@ Let us write the pseudo code for this operation:  <br><br>
 <pre>
  local_search() 
  {
-     x -> random_solution(X)  
-     for_each(Move u in N(x)) 
-     { 
-         if(gain(apply u on x) > 0) 
-         {
-             x -> apply u on x 
+     x <- random_solution(X) 
+     do {
+         for_each(Move m in Neighborhood(x)) 
+         { 
+             if(gain(apply m on x) > 0) 
+             {
+                 x <- apply m on x 
+             }
          }
-     }
+     while (success)
      return x
  }
 </pre>

@@ -26,12 +26,8 @@ namespace facility_location {
 
 /**
  * @brief commit functor for add moves in facility location problem
- *
- * @tparam VertexType
  */
-template <typename VertexType>
-class facility_location_commit_add {
-public:
+struct facility_location_commit_add {
     /**
      * @brief operator ()
      *
@@ -52,10 +48,7 @@ public:
 
 /**
  * @brief gain functor for add moves in facility location problem
- *
- * @tparam VertexType
  */
-template <typename VertexType>
 struct facility_locationget_moves_add {
 
     /**
@@ -77,12 +70,8 @@ struct facility_locationget_moves_add {
 
 /**
  * @brief gain functor for add moves in facility location problem
- *
- * @tparam VertexType
  */
-template <typename VertexType>
-class facility_location_gain_add {
-public:
+struct facility_location_gain_add {
     /**
      * @brief operator()
      *

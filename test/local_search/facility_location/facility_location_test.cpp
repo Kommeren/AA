@@ -21,9 +21,9 @@ BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     typedef typename VorType::GeneratorsSet FSet;
     VorType voronoi(FSet{}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
     Sol sol(std::move(voronoi),FSet{SGM::A, SGM::B}, cost );
-    default_remove_fl_components<int>::type rem;
-    default_add_fl_components<int>::type    add;
-    default_swap_fl_components<int>::type   swap;
+    default_remove_fl_components::type rem;
+    default_add_fl_components::type    add;
+    default_swap_fl_components::type   swap;
     paal::utils::skip_functor nop;
     //this search can and in one or 2 rounds depending on
     //implementation of unordered_set in facility_location_solution

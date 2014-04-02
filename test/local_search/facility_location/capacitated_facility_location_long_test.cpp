@@ -110,8 +110,8 @@ void run_tests(const std::string & fname, Solve solve) {
 }
 
 struct solve_add_remove {
-    default_remove_fl_components<int>::type rem;
-    default_add_fl_components<int>::type    add;
+    default_remove_fl_components::type rem;
+    default_add_fl_components::type    add;
     utils::return_false_functor nop;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
@@ -125,7 +125,7 @@ struct solve_add_remove {
 };
 
 struct solve_add_remove_swap : public solve_add_remove {
-    default_swap_fl_components<int>::type   swap;
+    default_swap_fl_components::type   swap;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {

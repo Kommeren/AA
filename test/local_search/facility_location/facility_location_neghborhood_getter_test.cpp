@@ -25,21 +25,21 @@ BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     facility_location_solution_adapter<Sol> sa(sol);
 
     {
-        facility_locationget_moves_remove<int> ng;
+        facility_locationget_moves_remove ng;
         auto r = ng(sa);
         auto b = std::begin(r);
         auto e = std::end(r);
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
-        facility_locationget_moves_add<int> ng;
+        facility_locationget_moves_add ng;
         auto r = ng(sa);
         auto b = std::begin(r);
         auto e = std::end(r);
         BOOST_CHECK_EQUAL(std::distance(b, e), 1);
     }
     {
-        facility_locationget_moves_swap<int> ng;
+        facility_locationget_moves_swap ng;
         auto r = ng(sa);
         auto b = std::begin(r);
         auto e = std::end(r);

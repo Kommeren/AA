@@ -1,8 +1,6 @@
 *.swp
 *.tmp
-build
-build_debug
-build_clang
+build*
 html
 latex
 const.cmake

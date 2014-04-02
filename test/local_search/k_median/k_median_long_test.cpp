@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         typedef typename Sol::UnchosenFacilitiesSet USet;
         VorType voronoi( GSet{fac.begin(), fac.end()},  VSet(fac.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),fac.size());
-        paal::local_search::k_median::default_k_median_components<int>::type swap;
+        paal::local_search::k_median::default_k_median_components::type swap;
 
         facility_location_local_search_simple(sol, swap);
 
