@@ -17,6 +17,8 @@
 int main() {
     //! [Local Search Example]
     namespace ls =  paal::local_search;
+    using Solution = int;
+    using Move = int;
 
     auto f = [](int x) {
         return -x*x + 12 * x -27;
@@ -93,7 +95,7 @@ int main() {
     currentSolution = 0;
     best = 0;
     auto gainTabu =  ls::make_tabu_gain_adaptor(
-                        paal::data_structures::tabu_list_remember_solution_and_move<int, int>(20), gain);
+                        paal::data_structures::tabu_list_remember_solution_and_move<Move, Solution>(20), gain);
 
 
     ls::local_search

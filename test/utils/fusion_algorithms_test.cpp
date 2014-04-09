@@ -1,5 +1,5 @@
 /**
- * @file fusion_alogrithms.cpp
+ * @file fusion_alogrithms_test.cpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
@@ -8,19 +8,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <vector>
+#include <boost/fusion/include/vector.hpp>
 
 #include "paal/utils/fusion_algorithms.hpp"
 #include "paal/utils/functors.hpp"
 
-#include <boost/fusion/include/vector.hpp>
 
 namespace ds = paal::data_structures;
-
-
-struct Tag_a{};
-struct Tag_b{};
-struct Tag_c{};
 
 struct Sum {
     template <typename Number, typename AccumulatorFun, typename AccumulatorData, typename Callback>

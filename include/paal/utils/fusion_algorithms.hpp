@@ -42,7 +42,7 @@ class polymorfic_fold {
                  typename AccumulatorFunctor,
                  typename AccumulatorData,
                  ///this dummy condition is needed because on the lookup phase
-                 ///some compilers on some instances (clang-3.4) try to instanciate this template
+                 ///some compilers on some instances (clang-3.4) try to instantiate this template
                  ///which causes infinite loop
                  typename Dummy = typename  std::enable_if<!std::is_same<IterEnd, IterBegin>::value>::type>
                      auto  operator()(
