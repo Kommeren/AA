@@ -25,7 +25,7 @@ namespace local_search {
      */
     template <typename... Args>
     using n_queens_local_search_components =  data_structures::components<
-            data_structures::NameWithDefault<get_moves, n_queensget_moves>,
+            data_structures::NameWithDefault<GetMoves, n_queensget_moves>,
             data_structures::NameWithDefault<Gain, n_queens_gain>,
             data_structures::NameWithDefault<Commit, n_queens_commit>
                 >::type<Args...>;

@@ -27,20 +27,20 @@ public:
     }
 };
 
-struct Gain {
+struct gain {
     int operator()(int s, int u) const {
         return f(s + u) - f(s);
     }
 };
 
-struct Commit {
+struct commit {
     bool operator()(int & s, int u) {
         s = s + u;
         return true;
     }
 };
 
-typedef  paal::local_search::search_components<get_moves, Gain, Commit> search_comps;
+typedef  paal::local_search::search_components<get_moves, gain, commit> search_comps;
 } //anonymous namespace
 
 #endif /* SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP */

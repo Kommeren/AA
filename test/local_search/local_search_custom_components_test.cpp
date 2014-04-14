@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE( local_search_custom_components )
 namespace ls = paal::local_search;
 using namespace paal;
 
-    BOOST_AUTO_TEST_CASE(conditional_gain_adaptorTest) {
+    BOOST_AUTO_TEST_CASE(conditional_gain_adaptor_test) {
         int solution(0);
 
         auto condGain =  ls::make_conditional_gain_adaptor(search_comps().get<ls::Gain>(),
@@ -32,7 +32,7 @@ using namespace paal;
         LOGLN("solution " << solution);
     }
 
-    BOOST_AUTO_TEST_CASE(tabu_gain_adaptorTest) {
+    BOOST_AUTO_TEST_CASE(tabu_gain_adaptor_test) {
         int currentSolution(0);
         int best(0);
 
@@ -44,10 +44,11 @@ using namespace paal;
         auto recordSolutionCommit =
                 ls::make_record_solution_commit_adapter(
                         best,
-                        Commit(),
+                        commit(),
                         paal::utils::make_functor_to_comparator(f));
 
-        ls::local_search_simple(currentSolution, ls::make_search_components(get_moves(), condGain, recordSolutionCommit));
+        ls::local_search_simple(currentSolution,
+                ls::make_search_components(get_moves(), condGain, recordSolutionCommit));
 
         BOOST_CHECK_EQUAL(best, 3);
         LOGLN("solution " << best);

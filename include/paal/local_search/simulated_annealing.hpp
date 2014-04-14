@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include "paal/utils/fast_exp.hpp"
+#include "paal/local_search/search_traits.hpp"
 
 namespace paal {
 namespace local_search {
@@ -98,7 +99,8 @@ struct exponential_cooling_schema_dependant_on_iteration {
      * @param multiplier
      * @param numberOFRoundsWithSameTemperature
      */
-    exponential_cooling_schema_dependant_on_iteration(double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) :
+    exponential_cooling_schema_dependant_on_iteration(
+            double startTemperature, double multiplier, double numberOFRoundsWithSameTemperature = 1) :
         m_temperature(startTemperature),
         m_multiplier(multiplier),
         m_number_of_rounds_with_same_temperature(numberOFRoundsWithSameTemperature) {}
@@ -123,6 +125,96 @@ private:
     int    m_number_of_rounds_with_same_temperature;
     int    m_cnt_from_last_multiply = 0;
 };
+
+
+/**
+ * @brief This function takes gain functor which is assumed to be probabilistic
+ * and dependent on one nonnegative double called temperature.
+ * It calculates starting temperature for Simmulated Annealing. Using binary search it looks for temperature that percent of accepted moves is as close to acceptance_rate as possible.
+ * This function manipulates temperature using SetTemperature.
+ * The gain is assumed to be monotonic in temperature. The 0 temperature means no bad moves are accepted.
+ *
+ * @tparam Solution
+ * @tparam ProbabilisticGain
+ * @tparam GetMoves
+ * @tparam SetTemperature
+ * @param solution
+ * @param gain
+ * @param get_moves
+ * @param set_temperature functor, takes temperature, no return
+ * @param acceptance_rate acceptance rate to achive
+ * @param repeats_number denotes number of iterations needed to compute success rate for given temperature
+ * @param epsilon used to compare doubles.
+ *
+ * @return
+ */
+template <typename Solution, typename ProbabilisticGain, typename GetMoves, typename SetTemperature>
+double start_temperature(
+        Solution & solution,
+        ProbabilisticGain gain,
+        GetMoves get_moves,
+        SetTemperature set_temperature,
+        double acceptance_rate = 0.4,
+        int repeats_number = 1000,
+        double epsilon = 0.0001) {
+    assert(acceptance_rate >= 0. && acceptance_rate <= 1.);
+    using MoveRef = typename move_type_from_get_moves<GetMoves, Solution>::reference;
+
+    auto get_success_rate = [&](int t) {
+        set_temperature(t);
+        int number_of_success = 0;
+        int total = 0;
+        for(int i = 0; i < repeats_number; ++i) {
+            for(MoveRef move : get_moves(solution)) {
+                ++total;
+                if(gain(solution, move) > 0) {
+                    ++number_of_success;
+                }
+            }
+        }
+        return double(number_of_success) / total;
+    };
+
+    //compute lower and upper bound
+    double t = 1.;
+    double success_rate = get_success_rate(t);
+    double t_lower_bound{t}, t_upper_bound{t};
+    if(success_rate > acceptance_rate) {
+        do{
+            t /= 2;
+            success_rate = get_success_rate(t);
+            if(t < epsilon) {
+                return 0.;
+            }
+        } while(success_rate > acceptance_rate);
+        t_lower_bound = t;
+        t_upper_bound = 2 * t;
+    } else if(success_rate < acceptance_rate) {
+        do{
+            t *= 2;
+            success_rate = get_success_rate(t);
+        } while(success_rate < acceptance_rate);
+        t_lower_bound = t / 2;
+        t_upper_bound = t;
+    } else {
+        return t;
+    }
+
+    //binary search to find appropriate temperature
+    while(t_upper_bound - t_lower_bound > epsilon ) {
+        t = (t_upper_bound + t_lower_bound) / 2;
+        success_rate = get_success_rate(t);
+        if(success_rate > acceptance_rate) {
+            t_upper_bound = t;
+        } else if(success_rate < acceptance_rate) {
+            t_lower_bound = t;
+        } else {
+            return t;
+        }
+    }
+
+    return (t_upper_bound + t_lower_bound) / 2;
+}
 
 
 /**
@@ -168,7 +260,7 @@ struct simulated_annealing_gain_adaptor {
         }
 
         /**
-         * @brief creates is_chosen fo Move which is not chosen
+         * @brief creates is_chosen for Move which is not chosen
          *
          * @param d
          *
@@ -189,7 +281,7 @@ struct simulated_annealing_gain_adaptor {
             m_delta(std::numeric_limits<Delta>::max()) {assert(i == 0);}
 
         /**
-         * @brief operator<. Chosen move is allways biger then unchosen
+         * @brief operator<. Chosen move is always bigger then unchosen
          *
          * @param other
          *
@@ -197,10 +289,71 @@ struct simulated_annealing_gain_adaptor {
          */
         bool operator<(is_chosen other) const {
             if(m_is_chosen != other.m_is_chosen) {
-                return m_is_chosen < other.isChosen;
+                return m_is_chosen < other.m_is_chosen;
             } else {
                 return m_delta < other.m_delta;
             }
+        }
+
+        /**
+         * @brief operator>
+         *
+         * @param other
+         *
+         * @return
+         */
+        bool operator>(is_chosen other) const {
+            if(m_is_chosen != other.m_is_chosen) {
+                return m_is_chosen > other.m_is_chosen;
+            } else {
+                return m_delta > other.m_delta;
+            }
+        }
+
+        /**
+         * @brief operator< (int)
+         *
+         * @param i
+         *
+         * @return
+         */
+        bool operator<(int i) const {
+            return *this < is_chosen(i);
+        }
+
+        /**
+         * @brief operator>(int)
+         *
+         * @param i
+         *
+         * @return
+         */
+        bool operator>(int i) const {
+            return *this > is_chosen(i);
+        }
+
+        /**
+         * @brief operator>(int, is_chosen)
+         *
+         * @param i
+         * @param ich
+         *
+         * @return
+         */
+        friend bool operator>(int i, is_chosen ich) {
+            return ich < i;
+        }
+
+        /**
+         * @brief operator<(int, is_chosen)
+         *
+         * @param i
+         * @param ich
+         *
+         * @return
+         */
+        friend bool operator<(int i, is_chosen ich) {
+            return ich > i;
         }
 
         /**
@@ -242,7 +395,7 @@ struct simulated_annealing_gain_adaptor {
             if(delta > 0) {
                 return is_chosen<Delta>::make_chosen(delta);
             } else {
-                if( m_distribution(m_rand) >  fast_exp(double(delta) / m_get_temperature())) {
+                if( m_distribution(m_rand) < fast_exp(double(delta) / m_get_temperature())) {
                     return is_chosen<Delta>::make_chosen(delta);
                 } else {
                     return is_chosen<Delta>::make_unchosen(delta);

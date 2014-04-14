@@ -43,9 +43,11 @@ struct find_positive_predicate {
         auto & comps = compsAndSol.first;
 
         using MoveRef = typename move_type<puretype(comps), puretype(solution)>::reference;
+//        using Delta = typename fitness<puretype(comps), puretype(solution)>::type;
+//        TODO use above in comparison
 
-        decltype(comps.template call<get_moves>(solution))
-            adjustmentSet = comps.template call<get_moves>(solution);
+        decltype(comps.template call<GetMoves>(solution))
+            adjustmentSet = comps.template call<GetMoves>(solution);
 
         for(MoveRef move : boost::make_iterator_range(adjustmentSet)) {
             if(comps.template call<Gain>(solution, move) > 0) {
@@ -118,8 +120,8 @@ struct max_functor {
         using Move = typename move_type<puretype(comps), puretype(solution)>::value_type;
         using MoveRef = typename move_type<puretype(comps), puretype(solution)>::reference;
 
-        decltype(comps.template call<get_moves>(solution))
-            adjustmentSet = comps.template call<get_moves>(solution);
+        decltype(comps.template call<GetMoves>(solution))
+            adjustmentSet = comps.template call<GetMoves>(solution);
 
         if(boost::empty(adjustmentSet)) {
             return continuation(accumulatorFunctor, accumulatorData);

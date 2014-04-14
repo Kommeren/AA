@@ -18,7 +18,7 @@ namespace local_search {
     /**
      * @brief name for the get_moves component
      */
-    struct get_moves;
+    struct GetMoves;
     /**
      * @brief name for the Gain component
      */
@@ -33,7 +33,7 @@ namespace local_search {
      * usually this class is not directly used, see search_components.
      */
     typedef data_structures::components<
-                get_moves,
+                GetMoves,
                 Gain,
                 Commit
                     > components;

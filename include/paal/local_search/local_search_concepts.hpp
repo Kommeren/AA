@@ -69,7 +69,7 @@ class Commit : protected concepts_base<X, Solution, search_components>{
 template <typename X, typename Solution>
 class search_components {
     typedef search_components_traits<X> Traits;
-    typedef typename Traits::get_movesT NG;
+    typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
 public:

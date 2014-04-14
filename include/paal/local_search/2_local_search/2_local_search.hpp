@@ -41,7 +41,7 @@ namespace two_local_search {
 template <typename... Args>
 using TwoLocalcomponents = data_structures::components<
             Gain,
-            data_structures::NameWithDefault<get_moves, two_local_searchget_moves>,
+            data_structures::NameWithDefault<GetMoves, two_local_searchget_moves>,
             data_structures::NameWithDefault<Commit, two_local_search_commit>
                 >::type<Args...>;
 
@@ -57,13 +57,13 @@ using TwoLocalcomponents = data_structures::components<
  * @return
  */
 template <typename Gain,
-          typename get_moves = two_local_searchget_moves>
-TwoLocalcomponents<Gain, get_moves>
+          typename GetMoves = two_local_searchget_moves>
+TwoLocalcomponents<Gain, GetMoves>
 
     make_two_local_search_components(Gain ch,
-            get_moves ng = get_moves()) {
+            GetMoves gm = GetMoves{}) {
 
-    return TwoLocalcomponents<Gain, get_moves>(std::move(ch), std::move(ng));
+    return TwoLocalcomponents<Gain, GetMoves>(std::move(ch), std::move(gm));
 }
 
 

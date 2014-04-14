@@ -8,10 +8,14 @@
 
 #define BOOST_TEST_MODULE all_long_tests
 #include <boost/test/unit_test.hpp>
+#include <iomanip>
 #include "paal/lp/glp.hpp"
 
 namespace {
 struct Config {
+    Config() {
+        std::cout << std::setprecision(20);
+    }
     ~Config()  {paal::lp::GLP::free_env(); }
 };
 }
