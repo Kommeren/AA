@@ -51,7 +51,7 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
 
 \section gr General rules
     <ul>
-    <li> Use naming consistent with the rest of library. (camel classes and variables, _ names for files and namespaces).
+    <li> Use naming consistent with the rest of library.
     <li> Never use \<TAB\>, only spaces are legal!
     <li> Don't write macros.
     <li> Code is header only
@@ -60,9 +60,16 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
     </ul>
 \section Workflow
 <ul>
-<li> Each developer works on his own branch. 
-<li> Before pushing to master code goes through code review process.
-<li> Each developer is responsible for his own branch. If you to move your current branch with the newest changes from master use 
+<li> The code review is divided into four parts. Each part is reviewed separately. Parts:
+<ul>
+<li> Interface and Problem Description - this phase  includes the public interface and main functions from private interface, the algorithm should be designed. The documentation consists of problem description (this helps understanding the interface). 
+All declarations must compile, templates should be instantiated in test or example.
+<li> Tests - both unit tests (short test) and efficiency test (long tests). Test should fail (use BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES).
+<li> Implementation
+<li> Documentation in the standard form.
+</ul>
+
+<li> In order to update your working copy type 
 <pre>
 git fetch
 git rebase origin/master
