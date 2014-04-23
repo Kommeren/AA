@@ -80,7 +80,7 @@ int main() {
             ls::make_record_solution_commit_adapter(
                     best, //the reference to the best found solution which is going to be updated during the search
                     commit,
-                    paal::utils::make_functor_to_comparator(f, paal::utils::Greater()));// recordSolutionCommit must know how to compare solutions
+                    paal::utils::make_functor_to_comparator(f));// recordSolutionCommit must know how to compare solutions
 
     //random walk
     ls::local_search(currentSolution, ls::choose_first_better_strategy{}, postSearchAtion, stop_condition,

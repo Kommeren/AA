@@ -326,9 +326,9 @@ make_tabu_gain_adaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria
  *
  * @tparam Commit
  * @tparam Solution
- * @tparam Condition
+ * @tparam Comparator
  */
-template <typename Commit, typename Solution, typename Condition>
+template <typename Commit, typename Solution, typename Comparator = utils::Less>
 struct record_solution_commit_adapter {
 
     /**
@@ -336,13 +336,13 @@ struct record_solution_commit_adapter {
      *
      * @param solution
      * @param commit
-     * @param cond
+     * @param comparator
      */
     record_solution_commit_adapter(Solution & solution,
-                                Commit commit = Commit(),
-                                Condition cond = Condition()) :
+                                Commit commit = Commit{},
+                                Comparator comparator = Comparator{}) :
         m_solution(&solution), m_commit(std::move(commit)),
-        m_condition(std::move(cond)) {
+        m_comparator(std::move(comparator)) {
         }
 
     /**
@@ -355,7 +355,7 @@ struct record_solution_commit_adapter {
     template <typename Move>
     bool operator()(Solution & sol, const Move & move) {
         auto ret = m_commit(sol, move);
-        if(m_condition(sol, *m_solution)) {
+        if(m_comparator(*m_solution, sol)) {
             *m_solution = sol;
         }
         return ret;
@@ -382,7 +382,7 @@ struct record_solution_commit_adapter {
 private:
     Solution * m_solution;
     Commit m_commit;
-    Condition m_condition;
+    Comparator m_comparator;
 };
 
 /**

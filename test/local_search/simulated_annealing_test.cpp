@@ -31,7 +31,7 @@ using namespace paal;
                 ls::make_record_solution_commit_adapter(
                         best,
                         Commit(),
-                        paal::utils::make_functor_to_comparator(f, utils::Greater()));
+                        paal::utils::make_functor_to_comparator(f));
 
         ls::local_search_simple(currentSolution, ls::make_search_components(get_moves(), saGain, recordSolutionCommit));
         BOOST_CHECK_EQUAL(best, 6);
