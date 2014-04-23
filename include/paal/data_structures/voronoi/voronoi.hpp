@@ -194,7 +194,7 @@ class voronoi {
          *
          * @return
          */
-        template <typename Filter = utils::return_true_functor>
+        template <typename Filter = utils::always_true>
         Dist adjust_vertex(VertexType v, Filter filter = Filter()) {
             bool init = true;
             Dist d = Dist();

@@ -20,8 +20,8 @@ void functors_example() {
     assert(id(7) == 7);
 
     //return something
-    return_true_functor retTrue;
-    return_false_functor retFalse;
+    always_true retTrue;
+    always_false retFalse;
     return_zero_functor retZero;
 
     assert(retTrue(2, 2.3, "abc"));
@@ -116,8 +116,8 @@ void lift_operator_functor() {
 }
 
 void boolean_functors_on_functors() {
-    return_true_functor retTrue;
-    return_false_functor retFalse;
+    always_true retTrue;
+    always_false retFalse;
 
     {
         auto trueFunctor = make_not_functor(retFalse);

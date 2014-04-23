@@ -71,8 +71,8 @@ public:
  * @brief local search function for objective function case.
  *
  * @tparam SearchStrategy
- * @tparam PostSearchAction
- * @tparam GlobalStopCondition
+ * @tparam ContinueOnSuccess
+ * @tparam ContinueOnFail
  * @tparam Solution
  * @tparam components
  * @param solution
@@ -83,15 +83,15 @@ public:
  * @return
  */
 template <typename SearchStrategy,
-          typename PostSearchAction,
-          typename GlobalStopCondition,
+          typename ContinueOnSuccess,
+          typename ContinueOnFail,
           typename Solution,
           typename SearchObjFunctioncomponents>
 bool local_search_obj_fun(
             Solution & solution,
             SearchStrategy searchStrategy,
-            PostSearchAction psa,
-            GlobalStopCondition gsc,
+            ContinueOnSuccess on_success,
+            ContinueOnFail on_fail,
             SearchObjFunctioncomponents components) {
     typedef detail::search_obj_function_components_tosearch_components<
         SearchObjFunctioncomponents, Solution> Convert;
@@ -105,7 +105,8 @@ bool local_search_obj_fun(
                     std::move(components.template get<Commit>())};
 
 
-    return local_search(solution, searchStrategy, psa, gsc, searchcomponents);
+    return local_search(solution, searchStrategy,
+              std::move(on_success), std::move(on_fail), std::move(searchcomponents));
 }
 
 /**
@@ -124,7 +125,7 @@ template <typename SearchStrategy,
           typename components>
 bool local_search_obj_fun_simple(Solution & solution, components comps) {
     return local_search<SearchStrategy>(solution, choose_first_better_strategy{},
-                utils::skip_functor(), utils::return_false_functor(), std::move(comps));
+                utils::always_true{}, utils::always_false{}, std::move(comps));
 }
 
 

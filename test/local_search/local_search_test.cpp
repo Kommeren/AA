@@ -23,6 +23,7 @@ ON_LOG(
 
 auto log_action = [&](int s) {
    LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
+   return true;
 };
 
 } //anonymous namespace
@@ -32,7 +33,7 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
    //printing
    int solution(0);
    LOGLN("f("<< solution <<") \t" << f(solution));
-   utils::return_false_functor nop;
+   utils::always_false nop;
 
    //search
    BOOST_CHECK(ls::local_search(solution, ls::choose_first_better_strategy{}, log_action, nop, search_comps()));
@@ -45,7 +46,7 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
    int s(0);
    LOGLN("f("<< s <<") \t" << f(s));
    ON_LOG(i = 0);
-   utils::return_false_functor nop;
+   utils::always_false nop;
 
    //search
    BOOST_CHECK(ls::local_search(s, ls::steepest_slope_strategy{},

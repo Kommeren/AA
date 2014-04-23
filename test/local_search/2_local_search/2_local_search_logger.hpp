@@ -24,10 +24,11 @@ public:
     two_ls_logger(const two_ls_logger &) = default;
 
     template <typename Cycle>
-    void operator()(const Cycle & cycle) {
+    bool operator()(const Cycle & cycle) {
         if(m_cnt++ % m_action_per_log == 0) {
             LOGLN("Length after\t" << m_cnt << ": " << simple_algo::get_length(m_mtx, cycle.get_cycle()));
         }
+        return true;
     }
 private:
     const Matrix & m_mtx;

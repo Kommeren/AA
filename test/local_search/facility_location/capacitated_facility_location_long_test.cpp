@@ -35,12 +35,14 @@ fl_logger(const Metric & m, const Cost & c) :
             m_metric(m), m_cost(c) {}
 
 template <typename Sol>
-void operator()(Sol & sol) {
+bool operator()(Sol & sol) {
            ON_LOG(auto const & ch =  sol.getfacility_location_solution().get_chosen_facilities());
            LOG_COPY_RANGE_DEL(ch, ",");
            ON_LOG(auto c = sol.getfacility_location_solution().get_voronoi().get_cost());
-           LOGLN("current cost " << simple_algo::get_cfl_cost(m_metric, m_cost, sol.getfacility_location_solution()) << " (dist to full assign " <<  c.get_dist_to_full_assignment()<< ")");
-        };
+           LOGLN("current cost " << simple_algo::get_cfl_cost(m_metric, m_cost, sol.getfacility_location_solution())
+                   << " (dist to full assign " <<  c.get_dist_to_full_assignment()<< ")");
+           return true;
+        }
 
 private:
     const Metric & m_metric;
@@ -112,7 +114,7 @@ void run_tests(const std::string & fname, Solve solve) {
 struct solve_add_remove {
     default_remove_fl_components::type rem;
     default_add_fl_components::type    add;
-    utils::return_false_functor nop;
+    utils::always_false nop;
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {

@@ -59,10 +59,11 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     auto logger =  [&](int s) {
         //printing
         LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
+        return true;
         };
 
     //search
     ls::local_search_obj_fun(s, ls::choose_first_better_strategy{},
-                logger, utils::return_false_functor(), search_comps());
+                logger, utils::always_false(), search_comps());
     BOOST_CHECK_EQUAL(s, 6);
 }

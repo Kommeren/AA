@@ -21,7 +21,7 @@ namespace local_search {
      * @tparam Gain
      * @tparam Condition
      */
-template <typename Gain = utils::return_one_functor, typename Condition = utils::return_true_functor>
+template <typename Gain = utils::return_one_functor, typename Condition = utils::always_true>
 struct conditional_gain_adaptor {
 
     /**
@@ -64,7 +64,7 @@ private:
  *
  * @return
  */
-template <typename Gain = utils::return_one_functor, typename Condition = utils::return_true_functor>
+template <typename Gain = utils::return_one_functor, typename Condition = utils::always_true>
 conditional_gain_adaptor<Gain, Condition>
 make_conditional_gain_adaptor(Gain gain = Gain(), Condition cond = Condition()) {
     return conditional_gain_adaptor<Gain, Condition>(std::move(gain), std::move(cond));
@@ -259,7 +259,7 @@ private:
  */
 template <typename TabuList,
           typename Gain = utils::return_one_functor,
-          typename AspirationCriteria = utils::return_true_functor>
+          typename AspirationCriteria = utils::always_true>
 struct tabu_gain_adaptor {
 
     /**
@@ -312,8 +312,8 @@ private:
  * @return
  */
 template <typename TabuList,
-          typename Gain = utils::return_true_functor,
-          typename AspirationCriteria = utils::return_true_functor>
+          typename Gain = utils::always_true,
+          typename AspirationCriteria = utils::always_true>
 tabu_gain_adaptor<TabuList, Gain, AspirationCriteria>
 make_tabu_gain_adaptor(TabuList tabuList, Gain gain = Gain(), AspirationCriteria aspirationCriteria = AspirationCriteria()) {
     return tabu_gain_adaptor<TabuList, Gain, AspirationCriteria>(std::move(tabuList), std::move(gain), std::move(aspirationCriteria));

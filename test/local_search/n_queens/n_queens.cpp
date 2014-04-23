@@ -39,7 +39,7 @@ int main(int argc, char ** argv) {
     if(strategy == "FirstBetter") {
         ls::n_queens_solution_local_search_simple(queens, countingComps);
     } else {
-        paal::utils::return_false_functor nop;
+        paal::utils::always_false nop;
         ls::n_queens_solution_local_search(queens, ls::steepest_slope_strategy{}, nop, nop, countingComps);
     }
     std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;

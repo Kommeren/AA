@@ -72,19 +72,20 @@ struct default_swap_fl_components {
  * @tparam Multisearch_components
  */
 template <typename SearchStrategy,
-          typename PostSearchAction,
-          typename GlobalStopCondition,
+          typename ContinueOnSuccess,
+          typename ContinueOnFail,
           typename facility_location_solution,
           typename... components>
 bool facility_location_local_search(
             facility_location_solution & fls,
             SearchStrategy searchStrategy,
-            PostSearchAction psa,
-            GlobalStopCondition gsc,
+            ContinueOnSuccess on_success,
+            ContinueOnFail on_fail,
             components... comps) {
     typedef facility_location_solution_adapter<facility_location_solution> FLSA;
     FLSA flsa(fls);
-    return local_search(flsa, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(comps)...);
+    return local_search(flsa, std::move(searchStrategy),
+                std::move(on_success), std::move(on_fail), std::move(comps)...);
 }
 
 /**
@@ -102,8 +103,8 @@ template <typename facility_location_solution,
           typename... components>
 bool facility_location_local_search_simple(facility_location_solution & fls, components... comps) {
     return facility_location_local_search(fls, choose_first_better_strategy{},
-            utils::skip_functor{},
-            utils::return_false_functor{},
+            utils::always_true{},
+            utils::always_false{},
             std::move(comps)...);
 }
 

@@ -127,14 +127,14 @@ struct identity_functor {
 /**
  * @brief functor return false
  */
-struct return_false_functor :
+struct always_false :
     public return_something_functor<bool, false> {};
 
 
 /**
  * @brief functor return true
  */
-struct return_true_functor :
+struct always_true :
     public return_something_functor<bool, true> {};
 
 

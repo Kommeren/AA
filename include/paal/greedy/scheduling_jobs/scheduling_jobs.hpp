@@ -189,7 +189,7 @@ template<class MachineIterator,
 void schedule_deterministic(const MachineIterator mFirst, const MachineIterator mLast,
    const JobIterator jFirst, const JobIterator jLast,
    OutputIterator result, GetSpeed getSpeed, GetLoad getLoad) {
-   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, utils::return_true_functor());
+   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, utils::always_true());
 }
 
 /*

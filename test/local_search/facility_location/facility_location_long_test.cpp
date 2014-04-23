@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         default_remove_fl_components::type rem;
         default_add_fl_components   ::type add;
         default_swap_fl_components  ::type swap;
-        utils::return_false_functor nop;
+        utils::always_false nop;
 
         facility_location_local_search(sol, paal::local_search::choose_first_better_strategy{},
                     nop, nop, rem, add, swap);

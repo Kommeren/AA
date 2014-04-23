@@ -348,7 +348,7 @@ template <
          typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
          typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
          typename RoundCondition = steiner_network_round_condition,
-         typename RelaxContition = utils::return_false_functor,
+         typename RelaxContition = utils::always_false,
          typename Init = steiner_network_init,
          typename SetSolution = utils::skip_functor>
              using  steiner_networkIRcomponents = IRcomponents<SolveLPToExtremePoint,

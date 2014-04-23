@@ -83,8 +83,8 @@ get_default_two_local_components(const Metric & m) {
  * @brief local search for two - opt in tsp adapts tsp to local_search_multi_solution
  *
  * @tparam SearchStrategy
- * @tparam PostSearchAction
- * @tparam GlobalStopCondition
+ * @tparam ContinueOnSuccess
+ * @tparam ContinueOnFail
  * @tparam Cycle
  * @tparam components
  * @param cycle
@@ -95,20 +95,21 @@ get_default_two_local_components(const Metric & m) {
  * @return
  */
 template <typename SearchStrategy,
-          typename PostSearchAction,
-          typename GlobalStopCondition,
+          typename ContinueOnSuccess,
+          typename ContinueOnFail,
           typename Cycle,
           typename... components>
 bool two_local_search(
             Cycle & cycle,
             SearchStrategy searchStrategy,
-            PostSearchAction psa,
-            GlobalStopCondition gsc,
+            ContinueOnSuccess on_success,
+            ContinueOnFail on_fail,
             components... comps) {
     typedef data_structures::cycle_start_from_last_change<Cycle> CSFLCh;
     CSFLCh cycleSFLCh(cycle);
     local_search::two_local_search::two_local_search_adapter<CSFLCh> cycleAdapted(cycleSFLCh);
-    return local_search(cycleAdapted, std::move(searchStrategy), std::move(psa), std::move(gsc), std::move(comps)...);
+    return local_search(cycleAdapted, std::move(searchStrategy),
+             std::move(on_success), std::move(on_fail), std::move(comps)...);
 }
 
 /**
@@ -126,8 +127,8 @@ template <typename Cycle,
           typename... components>
 bool two_local_search_simple(Cycle & cycle, components... comps) {
     return two_local_search(cycle, choose_first_better_strategy{},
-                utils::skip_functor{},
-                utils::return_false_functor{},
+                utils::always_true{},
+                utils::always_false{},
                 std::move(comps)...);
 }
 

@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         auto logger = utils::make_two_ls_logger(mtx, 100);
 
         //search
-        two_local_search(cycle, paal::local_search::choose_first_better_strategy{}, logger, utils::return_false_functor(), lsc);
+        two_local_search(cycle, paal::local_search::choose_first_better_strategy{}, logger, utils::always_false(), lsc);
         check_result(float(simple_algo::get_length(mtx, cycle)),opt,4*sqrt(size));
     }
 }
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
             epsilon /= 2;
             LOGLN("epsilon = " << epsilon);
             cutLsc.get<local_search::Gain>().set_epsilon(epsilon);
-            two_local_search(cycle, logger, utils::return_false_functor(), cutLsc);
+            two_local_search(cycle, logger, utils::always_false(), cutLsc);
         }
 
         LOGLN("Normal search at the end");
-        two_local_search(cycle, logger, utils::return_false_functor(), lsc);
+        two_local_search(cycle, logger, utils::always_false(), lsc);
     }
 }*/
 

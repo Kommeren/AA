@@ -165,7 +165,7 @@ struct steepest_slope_strategy {
     template <typename SearchJoin>
     bool operator()(SearchJoin & join) const {
         return m_fold(m_fun
-                , utils::return_false_functor{}
+                , utils::always_false{}
                 , 0
                 , join
                 );
@@ -210,36 +210,34 @@ struct local_search_consepts<Solution>{
  * @return true if the solution is improved
  */
 template <typename SearchStrategy,
-          typename PostSearchAction,
-          typename GlobalStopCondition,
+          typename ContinueOnSuccess,
+          typename ContinueOnFail,
           typename Solution,
           typename... components>
 bool local_search(
             Solution & solution
           , SearchStrategy searchStrategy
-          , PostSearchAction psa
-          , GlobalStopCondition gsc
+          , ContinueOnSuccess succ
+          , ContinueOnFail fail
           , components... comps) {
     detail::local_search_consepts<Solution, components...> concepts;
     concepts.use();
 
 
-    using search_componentsVector = boost::fusion::vector<std::pair<components, Solution &>...>;
+    using search_components_v = boost::fusion::vector<std::pair<components, Solution &>...>;
 
-    search_componentsVector searchcomponentsVector(
+    search_components_v search_comps(
             std::pair<components, Solution &>(std::move(comps), solution)...);
 
-    if(!searchStrategy(searchcomponentsVector)) {
-        return false;
-    }
+    bool success{false}, ret{false};
 
-    if(!gsc(solution)) {
-        psa(solution);
-        while(searchStrategy(searchcomponentsVector) && !gsc(solution)) {
-            psa(solution);
+    while((success = searchStrategy(search_comps)) || fail(solution)) {
+        ret |= success;
+        if(success && !succ(solution)) {
+            break;
         }
     }
-    return true;
+    return success | ret;
 }
 
 /**
@@ -254,7 +252,7 @@ template <typename Solution,
           typename... components>
 bool local_search_simple(Solution & solution, components... comps) {
     return local_search(solution, choose_first_better_strategy{},
-            utils::skip_functor(), utils::return_false_functor(), std::move(comps)...);
+            utils::always_true{}, utils::always_false{}, std::move(comps)...);
 }
 
 

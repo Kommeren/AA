@@ -249,7 +249,7 @@ template <
          typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
          typename Resolve_lp_to_extreme_point = lp::row_generation_resolve_lp,
          typename RoundCondition = steiner_tree_round_condition,
-         typename RelaxCondition = utils::return_false_functor,
+         typename RelaxCondition = utils::always_false,
          typename StopCondition = steiner_tree_stop_condition,
          typename Init = steiner_tree_init,
          typename SetSolution = utils::skip_functor>

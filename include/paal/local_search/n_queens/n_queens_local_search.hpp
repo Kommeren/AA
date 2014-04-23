@@ -34,8 +34,8 @@ namespace local_search {
      * @brief n queen local search
      *
      * @tparam SearchStrategy
-     * @tparam PostSearchAction
-     * @tparam GlobalStopCondition
+     * @tparam ContinueOnSuccess
+     * @tparam ContinueOnFail
      * @tparam NQueensPositionsVector
      * @tparam components
      * @param pos
@@ -46,19 +46,19 @@ namespace local_search {
      * @return
      */
     template <typename SearchStrategy,
-             typename PostSearchAction,
-             typename GlobalStopCondition,
+             typename ContinueOnSuccess ,
+             typename ContinueOnFail,
              typename NQueensPositionsVector,
              typename... components>
                  bool n_queens_solution_local_search(
                          NQueensPositionsVector & pos,
                          SearchStrategy searchStrategy,
-                         PostSearchAction psa,
-                         GlobalStopCondition gsc,
+                         ContinueOnSuccess on_success,
+                         ContinueOnFail on_fail,
                          components... nQueenscomponents) {
                      n_queens_solution_adapter<NQueensPositionsVector> nqueens(pos);
-                     return local_search(nqueens, std::move(searchStrategy), std::move(psa),
-                                std::move(gsc), std::move(nQueenscomponents)...);
+                     return local_search(nqueens, std::move(searchStrategy), std::move(on_success),
+                                std::move(on_fail), std::move(nQueenscomponents)...);
                  }
 
     /**
@@ -73,8 +73,8 @@ namespace local_search {
         void n_queens_solution_local_search_simple(NQueensPositionsVector & pos, components... nQueenscomponents) {
             n_queens_solution_local_search(pos,
                                        choose_first_better_strategy{},
-                                       utils::skip_functor{},
-                                       utils::return_false_functor{},
+                                       utils::always_true{},
+                                       utils::always_false{},
                                        std::move(nQueenscomponents)...);
         }
 

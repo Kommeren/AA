@@ -38,7 +38,7 @@ using namespace paal;
 
         auto condGain =  ls::make_tabu_gain_adaptor(
                 data_structures::tabu_list_remember_solution_and_move<int, int>(20),
-                utils::return_true_functor(),
+                utils::always_true(),
                 [](int s, int m){ return s + m <= 3. && s + m >= 0.;});
 
         auto recordSolutionCommit =

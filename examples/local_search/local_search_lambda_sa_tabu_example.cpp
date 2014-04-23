@@ -72,7 +72,7 @@ int main() {
     };
 
     ls::stop_condition_count_limit stop_condition(1000);
-    paal::utils::skip_functor postSearchAtion;
+    paal::utils::always_false on_fail;
 
     //this commit remembers the best solution
     //in many cases it should be also used in simulated annealing
@@ -83,7 +83,7 @@ int main() {
                     paal::utils::make_functor_to_comparator(f));// recordSolutionCommit must know how to compare solutions
 
     //random walk
-    ls::local_search(currentSolution, ls::choose_first_better_strategy{}, postSearchAtion, stop_condition,
+    ls::local_search(currentSolution, ls::choose_first_better_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail,
             ls::make_search_components(getMovesRandom, paal::utils::return_one_functor(), recordSolutionCommit));
 
     //print
@@ -99,7 +99,7 @@ int main() {
 
 
     ls::local_search
-        (currentSolution, ls::steepest_slope_strategy{}, postSearchAtion, stop_condition, ls::make_search_components(getMoves, gainTabu, recordSolutionCommit));
+        (currentSolution, ls::steepest_slope_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail, ls::make_search_components(getMoves, gainTabu, recordSolutionCommit));
 
     //print
     std::cout << "Tabu solution: " << best << std::endl;

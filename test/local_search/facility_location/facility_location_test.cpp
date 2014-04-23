@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(FacilityLocationTest) {
     default_remove_fl_components::type rem;
     default_add_fl_components::type    add;
     default_swap_fl_components::type   swap;
-    paal::utils::skip_functor nop;
+    paal::utils::always_true nop;
     //this search can and in one or 2 rounds depending on
     //implementation of unordered_set in facility_location_solution
     //if the first facility to add is A, then the search will be finished

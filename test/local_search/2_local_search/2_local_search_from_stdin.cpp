@@ -52,7 +52,7 @@ void test() {
 
     //search
     two_local_search(cycle, paal::local_search::choose_first_better_strategy{},
-            logger, utils::return_false_functor(), get_default_two_local_components(mtx));
+            logger, utils::always_false(), get_default_two_local_components(mtx));
 }
 
 BOOST_AUTO_TEST_CASE(TSPLIB_simple) {
@@ -102,10 +102,10 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
         LOGLN("epsilon = " << epsilon);
         cutLsc.get<local_search::Gain>().set_epsilon(epsilon);
         two_local_search(cycle, strategy,
-                logger, utils::return_false_functor(), cutLsc);
+                logger, utils::always_false(), cutLsc);
     }
 
     LOGLN("Normal search at the end");
-    two_local_search(cycle, strategy, logger, utils::return_false_functor(), lsc);
+    two_local_search(cycle, strategy, logger, utils::always_false(), lsc);
 }
 
