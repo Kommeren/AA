@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
         costf, timef, Tf, std::back_inserter(jobsToMachines));
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
-    BOOST_ASSERT(!result.second);
+    BOOST_CHECK(!result.second);
 }
 BOOST_AUTO_TEST_SUITE_END()
 

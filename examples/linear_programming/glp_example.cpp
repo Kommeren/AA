@@ -6,6 +6,7 @@
  * @date 2013-12-05
  */
 
+#include <iostream>
 #include "paal/lp/glp.hpp"
 
 int main() {

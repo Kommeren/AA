@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         auto treeaug(make_tree_aug(g, std::back_inserter(solution)));
 
         auto invalid = treeaug.check_input_validity();
-        BOOST_ASSERT_MSG(!invalid, invalid->c_str());
+        BOOST_CHECK(!invalid);
         LOGLN("Input validation " << filename << " ends.");
 
         double lplowerbd = get_lower_bound(treeaug);

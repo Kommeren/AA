@@ -1,10 +1,9 @@
 #include <boost/test/unit_test.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/uniform_int_distribution.hpp>
 #include <climits>
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <random>
 
 #include "paal/data_structures/splay_tree.hpp"
 
@@ -168,13 +167,13 @@ class splay_tree_performance {
     static const int k_n = 104729, k_m = 26669;
     static const uint32_t seed = 331u;
 
-    boost::random::mt19937 gen;
-    boost::random::uniform_int_distribution<int> dist;
+    std::mt19937 gen;
+    std::uniform_int_distribution<int> dist;
     int input[k_n];
     splay_tree<int, splay_impl> tree;
 
     splay_tree_performance() :
-      dist(boost::random::uniform_int_distribution<int>(0, k_n - 1)){
+      dist(std::uniform_int_distribution<int>(0, k_n - 1)){
     }
 
     void test() {

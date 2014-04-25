@@ -6,6 +6,7 @@
  * @date 2013-02-04
  */
 
+#include <iostream>
 #include <boost/fusion/include/vector.hpp>
 
 #include "paal/utils/fusion_algorithms.hpp"

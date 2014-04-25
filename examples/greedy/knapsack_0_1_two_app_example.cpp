@@ -7,6 +7,7 @@
  */
 
 #include <vector>
+#include <iostream>
 #include <boost/range/irange.hpp>
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 
