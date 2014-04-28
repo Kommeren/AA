@@ -21,7 +21,7 @@
   \section get_repo Download
     In order to download repository please run the following command:
 
-    <B>    git clone http://siekiera.mimuw.edu.pl:8082/paal </B>
+    <B>    git clone --recurse http://siekiera.mimuw.edu.pl:8082/paal </B>
 
   \section Contents
     The library consists of several sublibraries

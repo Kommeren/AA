@@ -8,6 +8,7 @@
 
 #define BOOST_TEST_MODULE all_long_tests
 #include <boost/test/unit_test.hpp>
+#include <iostream>
 #include <iomanip>
 #include "paal/lp/glp.hpp"
 
