@@ -1,5 +1,5 @@
 /*! \page repo Using git resitory in paal
-  
+
 
 \section gerrit Working with gerrit
 
@@ -15,11 +15,11 @@ http://siekiera.mimuw.edu.pl:8082/
 <pre>
 ssh-keygen -t rsa
 </pre>
-   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address. 
+   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address.
 
 <li> Clone write access version of the repository
 <pre>
-git clone --recurse ssh://\<login\>\@siekiera.mimuw.edu.pl:29418/paal
+git clone --recursive ssh://\<login\>\@siekiera.mimuw.edu.pl:29418/paal
 </pre>
 
 <li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit.
@@ -32,13 +32,13 @@ scp -p -P 29418 \<login\>\@siekiera.mimuw.edu.pl:hooks/commit-msg \<projectDir\>
 git push origin HEAD:refs/for/master
 </pre>
 
-<li> If you want to update your commit (e.g. reviewers requested some changes) do: 
+<li> If you want to update your commit (e.g. reviewers requested some changes) do:
 <pre>
 git commit -a --amend
 git push origin HEAD:refs/for/master
 </pre>
 
-<li> When commit is accepted, and you have the privileges to push to master, do: 
+<li> When commit is accepted, and you have the privileges to push to master, do:
 <pre>
 git push origin HEAD:master
 </pre>
@@ -62,14 +62,14 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
 <ul>
 <li> The code review is divided into four parts. Each part is reviewed separately. Parts:
 <ul>
-<li> Interface and Problem Description - this phase  includes the public interface and main functions from private interface, the algorithm should be designed. The documentation consists of problem description (this helps understanding the interface). 
+<li> Interface and Problem Description - this phase  includes the public interface and main functions from private interface, the algorithm should be designed. The documentation consists of problem description (this helps understanding the interface).
 All declarations must compile, templates should be instantiated in test or example.
 <li> Tests - both unit tests (short test) and efficiency test (long tests). Test should fail (use BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES).
 <li> Implementation
 <li> Documentation in the standard form.
 </ul>
 
-<li> In order to update your working copy type 
+<li> In order to update your working copy type
 <pre>
 git fetch
 git rebase origin/master
