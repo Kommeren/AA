@@ -35,7 +35,7 @@ int main() {
         return true;
     };
 
-    ls::local_search_simple(solution,
+    ls::first_improving(solution,
             ls::make_search_components(getMoves, gain, commit));
 
     std::cout << "Local search solution: " <<  solution << std::endl;

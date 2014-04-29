@@ -70,9 +70,9 @@ namespace local_search {
      * @param nQueenscomponents
      */
     template <typename NQueensPositionsVector, typename... components>
-        void n_queens_solution_local_search_simple(NQueensPositionsVector & pos, components... nQueenscomponents) {
+        void n_queens_solution_first_improving(NQueensPositionsVector & pos, components... nQueenscomponents) {
             n_queens_solution_local_search(pos,
-                                       choose_first_better_strategy{},
+                                       first_improving_strategy{},
                                        utils::always_true{},
                                        utils::always_false{},
                                        std::move(nQueenscomponents)...);

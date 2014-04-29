@@ -113,7 +113,7 @@ auto logger = [&](const Solution & s) {
 } //anonymous namespace
 
 
-BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
+BOOST_AUTO_TEST_CASE(local_search_first_improving_test) {
     //creating local search
     Solution sol(DIM, 0);
     fill_rand(sol);
@@ -125,12 +125,12 @@ BOOST_AUTO_TEST_CASE(local_search_choose_first_better_test) {
     ON_LOG(i = 0);
 
     //search
-    local_search::local_search(sol, local_search::choose_first_better_strategy{}, logger, utils::always_false(), search_comps());
+    local_search::local_search(sol, local_search::first_improving_strategy{}, logger, utils::always_false(), search_comps());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }
 
 
-BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
+BOOST_AUTO_TEST_CASE(local_search_best_improving_test) {
     //creating local search
     Solution sol(DIM, 0);
     fill_rand(sol);
@@ -143,7 +143,7 @@ BOOST_AUTO_TEST_CASE(local_search_steepest_slope_test) {
 
     //search
     local_search::local_search
-        (sol, local_search::steepest_slope_strategy{},
+        (sol, local_search::best_improving_strategy{},
             logger, utils::always_false(), search_comps());
     BOOST_CHECK_EQUAL(f(sol), 1.);
 }

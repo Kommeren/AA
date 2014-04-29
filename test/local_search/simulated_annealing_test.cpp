@@ -32,7 +32,7 @@ using namespace paal;
                         commit(),
                         paal::utils::make_functor_to_comparator(f));
 
-        ls::local_search_simple(currentSolution,
+        ls::first_improving(currentSolution,
                 ls::make_search_components(get_moves{}, sa_gain, record_solution_commit));
         BOOST_CHECK_EQUAL(best, 6);
         LOGLN("solution " << best);

@@ -27,7 +27,7 @@ using namespace paal;
         auto condGain =  ls::make_conditional_gain_adaptor(search_comps().get<ls::Gain>(),
                 [](int sol, int move){return sol + move <= 3;});
 
-        ls::local_search_simple(solution, paal::data_structures::replace<ls::Gain>(condGain, search_comps()));
+        ls::first_improving(solution, paal::data_structures::replace<ls::Gain>(condGain, search_comps()));
         BOOST_CHECK_EQUAL(solution, 3);
         LOGLN("solution " << solution);
     }
@@ -47,7 +47,7 @@ using namespace paal;
                         commit(),
                         paal::utils::make_functor_to_comparator(f));
 
-        ls::local_search_simple(currentSolution,
+        ls::first_improving(currentSolution,
                 ls::make_search_components(get_moves(), condGain, recordSolutionCommit));
 
         BOOST_CHECK_EQUAL(best, 3);

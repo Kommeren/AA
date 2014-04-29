@@ -43,7 +43,7 @@ int main() {
     };
 
     //search
-    ls::local_search_simple(solution, ls::make_search_components(getMoves, gain, commit));
+    ls::first_improving(solution, ls::make_search_components(getMoves, gain, commit));
 
     //print
     std::cout << "Local search solution: " <<  solution << std::endl;
@@ -55,7 +55,7 @@ int main() {
     solution = 0;
     auto cooling = ls::exponential_cooling_schema_dependant_on_iteration(1000, 0.999); //this is just a functor returning double
     auto gainSA = ls::make_simulated_annealing_gain_adaptor(gain, cooling); // we create new gain by adopting the old one
-    ls::local_search_simple(solution, ls::make_search_components(getMoves, gainSA, commit));// we run local search
+    ls::first_improving(solution, ls::make_search_components(getMoves, gainSA, commit));// we run local search
 
     //print
     std::cout << "Simulated annealing solution: " <<  solution << std::endl;
@@ -83,7 +83,7 @@ int main() {
                     paal::utils::make_functor_to_comparator(f));// recordSolutionCommit must know how to compare solutions
 
     //random walk
-    ls::local_search(currentSolution, ls::choose_first_better_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail,
+    ls::local_search(currentSolution, ls::first_improving_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail,
             ls::make_search_components(getMovesRandom, paal::utils::return_one_functor(), recordSolutionCommit));
 
     //print
@@ -99,7 +99,7 @@ int main() {
 
 
     ls::local_search
-        (currentSolution, ls::steepest_slope_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail, ls::make_search_components(getMoves, gainTabu, recordSolutionCommit));
+        (currentSolution, ls::best_improving_strategy{}, paal::utils::make_not_functor(stop_condition), on_fail, ls::make_search_components(getMoves, gainTabu, recordSolutionCommit));
 
     //print
     std::cout << "Tabu solution: " << best << std::endl;

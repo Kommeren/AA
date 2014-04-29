@@ -125,8 +125,8 @@ bool two_local_search(
  */
 template <typename Cycle,
           typename... components>
-bool two_local_search_simple(Cycle & cycle, components... comps) {
-    return two_local_search(cycle, choose_first_better_strategy{},
+bool tsp_first_improving(Cycle & cycle, components... comps) {
+    return two_local_search(cycle, first_improving_strategy{},
                 utils::always_true{},
                 utils::always_false{},
                 std::move(comps)...);

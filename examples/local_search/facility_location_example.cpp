@@ -41,7 +41,7 @@ int main() {
     default_swap_fl_components::type   swap;
 
     //search
-    facility_location_local_search_simple(sol, rem, add, swap);
+    facility_location_first_improving(sol, rem, add, swap);
 
     //print result
     auto const & ch = sol.get_chosen_facilities();

@@ -35,7 +35,7 @@ using namespace  paal;
         }
     };
 
-BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
+BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     typedef  double SolutionElement;
     typedef std::vector<SolutionElement> Solution;
     typedef  SolutionElement Move;
@@ -81,14 +81,14 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
 
     auto ls = [=](Solution & x) {
         x = {0.3,0.3,0.3};
-        local_search_simple(x,
+        first_improving(x,
             local_search::make_search_components(getMoves, gain, commit));
     };
 
     //components for G.
     std::vector<double> neighbCutG(neighb.size());
     std::vector<double> x(DIM, 0);
-    local_search_simple(x,
+    first_improving(x,
                 local_search::make_search_components(getMoves, gain, commit));
     double best = f(x);
 
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_choose_first_better_test) {
         return true;
     };
 
-    local_search_simple(G, local_search::make_search_components(getMovesG, gainG, commitG));
+    first_improving(G, local_search::make_search_components(getMovesG, gainG, commitG));
 
     ls(x);
 

@@ -114,7 +114,7 @@ public:
         find_save(lsSolution);
         local_search::local_search(
                 lsSolution,
-                local_search::steepest_slope_strategy{},
+                local_search::best_improving_strategy{},
                 [=](AMatrix & a){this->find_save(a); return true;},
                 utils::always_false(),
                 sc);

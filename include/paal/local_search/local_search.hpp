@@ -18,6 +18,7 @@
 
 #include "local_search_concepts.hpp"
 #include "paal/utils/fusion_algorithms.hpp"
+#include "paal/utils/infinity.hpp"
 #include "paal/data_structures/components/component_traits.hpp"
 
 namespace paal {
@@ -66,7 +67,7 @@ struct find_positive_predicate {
 /**
  * @brief This strategy uses find_positive_predicate as stop condition
  */
-struct choose_first_better_strategy {
+struct first_improving_strategy {
     /**
      * @brief operator()
      *
@@ -151,9 +152,9 @@ struct max_functor {
 };
 
 /**
- * @brief This strategy chooses the best possible move and applies it to the solution
+ * @brief This strategy chooses the best possible move and if it is improving applies it to the solution
  */
-struct steepest_slope_strategy {
+struct best_improving_strategy {
     /**
      * @brief operator()
      *
@@ -175,27 +176,47 @@ private:
     data_structures::polymorfic_fold m_fold;
 };
 
+/**
+ * @brief This strategy chooses the best possible move and applies it to the solution.
+ *        Note that this strategy might commit non-improving moves
+ */
+struct best_strategy {
+    /**
+     * @brief operator()
+     *
+     * @tparam SearchJoin
+     * @param join
+     *
+     * @return
+     */
+    template <typename SearchJoin>
+    bool operator()(SearchJoin & join) const {
+        return m_fold(m_fun
+                , utils::always_false{}
+                , minus_infinity{}
+                , join
+                );
+    }
+private:
+    max_functor m_fun;
+    data_structures::polymorfic_fold m_fold;
+};
+
 namespace detail {
 
 template <typename Solution,
-          typename... search_componentsPack>
-struct local_search_consepts;
+          typename... SearchComponentsPack>
+struct local_search_concepts;
 
 template <typename Solution,
-          typename search_components, typename... search_componentsPack>
-struct local_search_consepts<Solution, search_components, search_componentsPack...> :
-    public local_search_consepts<Solution, search_componentsPack...>{
-    BOOST_CONCEPT_ASSERT((concepts::search_components<search_components, Solution>));
+          typename SearchComponents, typename... SearchComponentsPack>
+struct local_search_concepts<Solution, SearchComponents, SearchComponentsPack...> :
+    public local_search_concepts<Solution, SearchComponentsPack...>{
+    BOOST_CONCEPT_ASSERT((concepts::search_components<SearchComponents, Solution>));
 };
 
 template <typename Solution>
-struct local_search_consepts<Solution>{
-
-    /**
-     * @brief dummy member to avoid warnings
-     */
-    void use() const {}
-    };
+struct local_search_concepts<Solution>{};
 
 } //!detail
 
@@ -203,8 +224,8 @@ struct local_search_consepts<Solution>{
  * @brief local search simple solution
  *
  * @param solution the initial solution which going to be possibly improved by local_search
- * @param psa post search action
- * @param gsc global stop condition
+ * @param succ post search action
+ * @param fail global stop condition
  * @param components
  *
  * @return true if the solution is improved
@@ -220,9 +241,8 @@ bool local_search(
           , ContinueOnSuccess succ
           , ContinueOnFail fail
           , components... comps) {
-    detail::local_search_consepts<Solution, components...> concepts;
-    concepts.use();
-
+    detail::local_search_concepts<Solution, components...> concepts;
+    boost::ignore_unused_variable_warning(concepts);
 
     using search_components_v = boost::fusion::vector<std::pair<components, Solution &>...>;
 
@@ -250,11 +270,47 @@ bool local_search(
  */
 template <typename Solution,
           typename... components>
-bool local_search_simple(Solution & solution, components... comps) {
-    return local_search(solution, choose_first_better_strategy{},
+bool first_improving(Solution & solution, components... comps) {
+    return local_search(solution, first_improving_strategy{},
             utils::always_true{}, utils::always_false{}, std::move(comps)...);
 }
 
+/**
+ * @brief This local search chooses the best possible move and if the move is improving applies it to the solution.
+ *
+ * @tparam Solution
+ * @tparam components
+ * @param solution
+ * @param comps
+ *
+ * @return
+ */
+template <typename Solution,
+          typename... components>
+bool best_improving(Solution & solution, components... comps) {
+    return local_search(solution, best_improving_strategy{},
+            utils::always_true{}, utils::always_false{}, std::move(comps)...);
+}
+
+
+/**
+ * @brief This local search chooses the best possible move and applies it to the solution.
+ *        Note that this strategy might commit non-improving moves
+ *
+ * @tparam Solution
+ * @tparam components
+ * @param solution
+ * @param comps
+ *
+ * @return
+ */
+template <typename Solution,
+          typename ContinueOnSuccess,
+          typename... components>
+bool best(Solution & solution, ContinueOnSuccess on_success, components... comps) {
+    return local_search(solution, best_strategy{},
+            std::move(on_success), utils::always_false{}, std::move(comps)...);
+}
 
 
 

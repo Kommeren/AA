@@ -101,8 +101,8 @@ bool facility_location_local_search(
  */
 template <typename facility_location_solution,
           typename... components>
-bool facility_location_local_search_simple(facility_location_solution & fls, components... comps) {
-    return facility_location_local_search(fls, choose_first_better_strategy{},
+bool facility_location_first_improving(facility_location_solution & fls, components... comps) {
+    return facility_location_local_search(fls, first_improving_strategy{},
             utils::always_true{},
             utils::always_false{},
             std::move(comps)...);

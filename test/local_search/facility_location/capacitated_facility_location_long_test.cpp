@@ -131,7 +131,7 @@ struct solve_add_remove_swap : public solve_add_remove {
 
     template <typename VorType, typename Cost, typename Solution, typename Action, typename Metric>
     void operator()(Solution & sol, const Metric & metric, Cost cost, double opt, Action a) {
-        paal::local_search::choose_first_better_strategy strategy;
+        paal::local_search::first_improving_strategy strategy;
         facility_location_local_search(sol, strategy, a, nop, rem);
         facility_location_local_search(sol, strategy, a, nop, rem, add);
         facility_location_local_search(sol, strategy, a, nop, rem, add, swap);

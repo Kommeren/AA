@@ -36,7 +36,7 @@ int main() {
     paal::local_search::k_median::default_k_median_components::type swap;
 
     //search
-    paal::local_search::facility_location::facility_location_local_search_simple(sol, swap);
+    paal::local_search::facility_location::facility_location_first_improving(sol, swap);
 
     //print result
     auto const & ch = sol.get_chosen_facilities();

@@ -34,7 +34,7 @@ int main() {
     std::cout << "Length \t" << simple_algo::get_length(gm, cycle) << std::endl;
 
     //search
-    two_local_search_simple(cycle, get_default_two_local_components(gm));
+    tsp_first_improving(cycle, get_default_two_local_components(gm));
 
     //printing
     std::cout << "Length \t" << simple_algo::get_length(gm, cycle) << std::endl;

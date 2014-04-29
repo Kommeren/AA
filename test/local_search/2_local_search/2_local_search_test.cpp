@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
     auto logger = utils::make_two_ls_logger(gm, 100);
 
     //search
-    two_local_search(cycle, local_search::choose_first_better_strategy{},
+    two_local_search(cycle, local_search::first_improving_strategy{},
                 logger, utils::always_false(), lsc);
     //! [Two Local Search Example]
 }

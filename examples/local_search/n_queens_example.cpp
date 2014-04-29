@@ -37,7 +37,7 @@ int main() {
 
     //local search
     ls::n_queens_local_search_components<> comps;
-    ls::n_queens_solution_local_search_simple(queens, comps);
+    ls::n_queens_solution_first_improving(queens, comps);
 
     //print after
     std::cout << "final configuration" << std::endl;;

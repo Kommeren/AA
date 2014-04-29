@@ -63,7 +63,15 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
         };
 
     //search
-    ls::local_search_obj_fun(s, ls::choose_first_better_strategy{},
-                logger, utils::always_false(), search_comps());
+    ls::local_search_obj_fun(s, ls::first_improving_strategy{},
+                logger, utils::always_false{}, search_comps{});
+    BOOST_CHECK_EQUAL(s, 6);
+
+    s= 0;
+    ls::obj_fun_first_improving(s,  search_comps{});
+    BOOST_CHECK_EQUAL(s, 6);
+
+    s= 0;
+    ls::obj_fun_best_improving(s,  search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 }

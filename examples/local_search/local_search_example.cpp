@@ -54,7 +54,7 @@ int main() {
     int solution(0);
 
     //search
-    local_search_simple(solution, search_comps());
+    first_improving(solution, search_comps());
 
     //print
     std::cout << "Local search solution: " <<  solution << std::endl;

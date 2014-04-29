@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
         Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),fac.size());
         paal::local_search::k_median::default_k_median_components::type swap;
 
-        facility_location_local_search_simple(sol, swap);
+        facility_location_first_improving(sol, swap);
 
         double c = simple_algo::get_km_cost(metric, sol);
         LOGLN("chosen ("<< (sol.get_chosen_facilities()).size()<<"):");

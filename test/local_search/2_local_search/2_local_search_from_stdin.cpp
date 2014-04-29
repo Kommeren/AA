@@ -51,7 +51,7 @@ void test() {
     auto logger = utils::make_two_ls_logger(mtx);
 
     //search
-    two_local_search(cycle, paal::local_search::choose_first_better_strategy{},
+    two_local_search(cycle, paal::local_search::first_improving_strategy{},
             logger, utils::always_false(), get_default_two_local_components(mtx));
 }
 
@@ -94,7 +94,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
 
     //printing
     LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
-    paal::local_search::choose_first_better_strategy strategy{};
+    paal::local_search::first_improving_strategy strategy{};
 
     //search
     for(int j = 0; j < 20; ++j) {

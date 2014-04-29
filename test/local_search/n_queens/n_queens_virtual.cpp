@@ -72,10 +72,10 @@ int main(int argc, char ** argv) {
     auto countingComps = paal::local_search::make_search_components(getMoves, countingGain, commit);
 
     if(strategy == "FirstBetter") {
-        ls::n_queens_solution_local_search_simple(queens, countingComps);
+        ls::n_queens_solution_first_improving(queens, countingComps);
     } else {
         paal::utils::always_false nop;
-        ls::n_queens_solution_local_search(queens, ls::steepest_slope_strategy{}, nop, nop, countingComps);
+        ls::n_queens_solution_local_search(queens, ls::best_improving_strategy{}, nop, nop, countingComps);
     }
     std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
 

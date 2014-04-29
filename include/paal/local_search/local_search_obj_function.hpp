@@ -120,11 +120,27 @@ bool local_search_obj_fun(
  *
  * @return
  */
-template <typename SearchStrategy,
-          typename Solution,
-          typename components>
-bool local_search_obj_fun_simple(Solution & solution, components comps) {
-    return local_search<SearchStrategy>(solution, choose_first_better_strategy{},
+template <typename Solution,
+          typename Components>
+bool obj_fun_first_improving(Solution & solution, Components comps) {
+    return local_search_obj_fun(solution, first_improving_strategy{},
+                utils::always_true{}, utils::always_false{}, std::move(comps));
+}
+
+/**
+ * @brief simple version of local_search_obj_fun
+ *
+ * @tparam Solution
+ * @tparam Components
+ * @param solution
+ * @param comps
+ *
+ * @return
+ */
+template <typename Solution,
+          typename Components>
+bool obj_fun_best_improving(Solution & solution, Components comps) {
+    return local_search_obj_fun(solution, best_improving_strategy{},
                 utils::always_true{}, utils::always_false{}, std::move(comps));
 }
 

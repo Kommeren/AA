@@ -10,15 +10,9 @@
 #include <boost/fusion/include/vector.hpp>
 
 #include "paal/utils/fusion_algorithms.hpp"
+#include "paal/utils/infinity.hpp"
 
 
-
-struct minus_infinity {
-    template <typename T>
-    bool operator<( const T &) const {
-        return true;
-    }
-};
 
 struct F {
 template <class Num, class AccumulatorFunctor, class AccumulatorData, class Continuation>
@@ -38,7 +32,7 @@ int main() {
     boost::fusion::vector<int, float, long long> v(12, 5.5f, 2ll);
 
     paal::data_structures::polymorfic_fold fold{};
-    fold(F{}, [](minus_infinity){std::cout << "Empty Collection" << std::endl;}, minus_infinity{}, v);
+    fold(F{}, [](paal::minus_infinity){std::cout << "Empty Collection" << std::endl;}, paal::minus_infinity{}, v);
 
 }
 

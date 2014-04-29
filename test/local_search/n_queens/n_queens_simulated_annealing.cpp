@@ -95,7 +95,7 @@ int main(int argc, char ** argv) {
     auto comps = ls::make_search_components(getMoves, saGain, commit);
 
     Adapter adaptor(queens);
-    ls::local_search_simple(adaptor, comps);
+    ls::first_improving(adaptor, comps);
     std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
 
     return 0;

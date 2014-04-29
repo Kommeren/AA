@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(n_queens_test) {
         LOGLN("n = "<< i << " start obj fun val = " << Adapter(queens).obj_fun());
 
         ls::n_queens_local_search_components<> comps;
-        ls::n_queens_solution_local_search_simple(queens, comps);
+        ls::n_queens_solution_first_improving(queens, comps);
         LOGLN("end obj fun val = " << Adapter(queens).obj_fun());
     }
 }
