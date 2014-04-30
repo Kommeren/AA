@@ -14,6 +14,9 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
+
+
+
 #include <cassert>
 #include <utility>
 

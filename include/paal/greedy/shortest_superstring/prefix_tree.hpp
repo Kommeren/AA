@@ -8,6 +8,9 @@
 #ifndef PREFIX_TREE_HPP
 #define PREFIX_TREE_HPP
 
+
+
+
 #include <vector>
 namespace paal{
 namespace greedy{

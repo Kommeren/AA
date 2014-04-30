@@ -5,11 +5,13 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include <iostream>
+#include "test/utils/sample_graph.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
-#include "test/utils/sample_graph.hpp"
+
+
+#include <iostream>
 
 using namespace paal::local_search::facility_location;
 

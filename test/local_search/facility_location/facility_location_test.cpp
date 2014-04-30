@@ -1,9 +1,12 @@
-#include <boost/test/unit_test.hpp>
+#include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
+
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/local_search/custom_components.hpp"
 #include "paal/utils/functors.hpp"
-#include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 using namespace paal::local_search::facility_location;
 

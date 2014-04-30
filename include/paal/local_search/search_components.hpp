@@ -8,8 +8,11 @@
 #ifndef SEARCH_COMPONENTS_HPP
 #define SEARCH_COMPONENTS_HPP
 
+
 #include "paal/data_structures/components/components.hpp"
 #include "paal/utils/functors.hpp"
+
+
 
 namespace paal {
 namespace local_search {

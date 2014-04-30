@@ -6,12 +6,15 @@
  * @date 2013-09-06
  */
 
-#include <vector>
-#include <boost/test/unit_test.hpp>
-#include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 #include "utils/logger.hpp"
 #include "utils/scheduling.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+#include <vector>
 
 BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines) {
     // sample data

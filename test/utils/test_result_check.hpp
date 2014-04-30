@@ -7,11 +7,13 @@
  */
 #ifndef TEST_RESULT_CHECK_HPP
 #define TEST_RESULT_CHECK_HPP
-
-#include <iomanip>
+#include <boost/test/unit_test.hpp>
 
 #include "utils/logger.hpp"
+
 #include "paal/utils/functors.hpp"
+
+#include <iomanip>
 
 template<typename T,typename T2,typename Comparator=paal::utils::less_equal>
 void check_result(T result,T optimal,T2 aproximation_ratio,Comparator comp = Comparator(),

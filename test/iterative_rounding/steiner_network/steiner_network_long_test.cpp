@@ -6,6 +6,18 @@
  * @date 2013-07-10
  */
 
+#include "utils/logger.hpp"
+#include "utils/read_bounded_deg_mst.hpp"
+#include "utils/parse_file.hpp"
+
+#include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
+
+#include <boost/range/irange.hpp>
+#include <boost/range/join.hpp>
+#include <boost/test/unit_test.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+
 #include <iterator>
 #include <iostream>
 #include <fstream>
@@ -14,18 +26,6 @@
 #include <utility>
 #include <map>
 #include <cstdlib>
-
-#include <boost/range/irange.hpp>
-#include <boost/range/join.hpp>
-#include <boost/test/unit_test.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
-
-#include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
-
-#include "utils/logger.hpp"
-#include "utils/read_bounded_deg_mst.hpp"
-#include "utils/parse_file.hpp"
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                         boost::property<boost::vertex_index_t, int>,

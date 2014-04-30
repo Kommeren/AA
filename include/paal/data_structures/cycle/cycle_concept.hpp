@@ -8,8 +8,11 @@
 #ifndef CYCLE_CONCEPT_HPP
 #define CYCLE_CONCEPT_HPP
 
-#include <boost/concept_check.hpp>
+
 #include "paal/data_structures/cycle/cycle_traits.hpp"
+
+#include <boost/concept_check.hpp>
+
 
 
 namespace paal {

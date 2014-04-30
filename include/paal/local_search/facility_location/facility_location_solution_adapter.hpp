@@ -11,17 +11,18 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <unordered_map>
-#include <unordered_set>
-
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/range/distance.hpp>
-#include  <boost/range/algorithm/find.hpp>
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/collection_starts_from_last_change.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
+
+#include <boost/range/algorithm/copy.hpp>
+#include <boost/range/distance.hpp>
+#include  <boost/range/algorithm/find.hpp>
+
+#include <unordered_map>
+#include <unordered_set>
 
 namespace paal {
 namespace local_search {

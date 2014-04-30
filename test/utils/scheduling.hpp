@@ -8,16 +8,18 @@
 #ifndef SCHEDULING_UTILS
 #define SCHEDULING_UTILS
 
-#include <unordered_map>
-#include <utility>
-#include <vector>
-
 #include "utils/logger.hpp"
+
 #include "paal/utils/type_functions.hpp"
+
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/functional/hash.hpp>
+
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 template <class Machines, class Time, class GetSpeed>
 std::vector<long long> generate_job_loads(Machines machines,

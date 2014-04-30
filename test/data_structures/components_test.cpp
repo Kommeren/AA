@@ -5,12 +5,13 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#include <boost/test/unit_test.hpp>
-
-#include <type_traits>
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+#include <type_traits>
 
 namespace names {
     struct A;

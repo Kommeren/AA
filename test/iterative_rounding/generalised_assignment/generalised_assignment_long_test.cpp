@@ -6,21 +6,21 @@
  * @date 2013-02-15
  */
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
+#include "utils/logger.hpp"
+#include "utils/read_gen_ass.hpp"
+#include "utils/parse_file.hpp"
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_gen_ass.hpp"
-#include "utils/parse_file.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <iterator>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 using namespace paal::ir;
 using namespace paal;

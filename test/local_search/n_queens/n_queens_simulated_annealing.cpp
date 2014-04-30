@@ -8,17 +8,17 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <iostream>
+#include "utils/logger.hpp"
+
+#include "paal/local_search/n_queens/n_queens_local_search.hpp"
+#include "paal/local_search/simulated_annealing.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
+#include "paal/local_search/local_search.hpp"
 
 #include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/iterator/function_input_iterator.hpp>
 
-#include "paal/local_search/n_queens/n_queens_local_search.hpp"
-#include "paal/local_search/simulated_annealing.hpp"
-
-#include "paal/data_structures/components/components_replace.hpp"
-#include "paal/local_search/local_search.hpp"
-#include "utils/logger.hpp"
+#include <iostream>
 
 
 

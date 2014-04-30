@@ -12,6 +12,9 @@
  */
 #ifndef TYPES_VECTOR_HPP
 #define TYPES_VECTOR_HPP
+
+#include <type_traits>
+
 namespace paal {
 namespace data_structures {
 

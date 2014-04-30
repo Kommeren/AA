@@ -8,13 +8,14 @@
 #ifndef KNAPSACK_FPTAS_HPP
 #define KNAPSACK_FPTAS_HPP
 
-#include <boost/function_output_iterator.hpp>
 
 #include "paal/dynamic/knapsack.hpp"
 #include "paal/dynamic/knapsack/get_lower_bound.hpp"
 #include "paal/dynamic/knapsack/knapsack_fptas_common.hpp"
-
 #include "paal/greedy/knapsack_two_app.hpp"
+
+#include <boost/function_output_iterator.hpp>
+
 
 namespace paal {
 

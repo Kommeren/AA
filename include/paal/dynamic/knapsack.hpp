@@ -8,10 +8,6 @@
 #ifndef KNAPSACK_HPP
 #define KNAPSACK_HPP
 
-#include <vector>
-
-#include <boost/range/adaptor/reversed.hpp>
-#include <boost/optional.hpp>
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -21,6 +17,12 @@
 #include "paal/dynamic/knapsack/get_upper_bound.hpp"
 #include "paal/dynamic/knapsack/knapsack_common.hpp"
 #include "paal/greedy/knapsack_two_app.hpp"
+
+#include <boost/range/adaptor/reversed.hpp>
+#include <boost/optional.hpp>
+#include <boost/range/irange.hpp>
+
+#include <vector>
 
 namespace paal {
 

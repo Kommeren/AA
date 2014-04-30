@@ -6,10 +6,12 @@
  * @date 2013-02-04
  */
 
+#include "iterative_rounding/steiner_tree/sample_graph.hpp"
+
+#include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
+
 #include <boost/test/unit_test.hpp>
 
-#include "iterative_rounding/steiner_tree/sample_graph.hpp"
-#include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
 
 typedef int Vertex;
 typedef int Dist;

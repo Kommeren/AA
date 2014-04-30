@@ -8,8 +8,11 @@
 #ifndef CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 #define CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 
-#include <boost/graph/adjacency_matrix.hpp>
+
 #include "paal/utils/type_functions.hpp"
+
+#include <boost/graph/adjacency_matrix.hpp>
+
 
 namespace paal {
 namespace utils {

@@ -6,10 +6,12 @@
  * @date 2013-11-13
  */
 
-#include <boost/graph/adjacency_list.hpp>
 
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/multiway_cut/multiway_cut.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+
 
 int main(){
 //! [Multiway Cut Example]

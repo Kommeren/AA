@@ -8,11 +8,13 @@
 #ifndef STEINER_TREE_ORACLE_HPP
 #define STEINER_TREE_ORACLE_HPP
 
+
 #include "paal/iterative_rounding/min_cut.hpp"
+
+#include <boost/optional.hpp>
 
 #include <unordered_map>
 #include <vector>
-#include <boost/optional.hpp>
 
 namespace paal {
 namespace ir {

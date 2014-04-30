@@ -8,7 +8,10 @@
 #ifndef READ_BOUNDED_DEG_MST_HPP
 #define READ_BOUNDED_DEG_MST_HPP
 
+#include <boost/graph/graph_traits.hpp>
+
 #include <string>
+#include <cassert>
 
 namespace paal {
 

@@ -8,10 +8,13 @@
 #ifndef PRUNE_RESTRICTIONS_TO_TREE_HPP
 #define PRUNE_RESTRICTIONS_TO_TREE_HPP
 
-#include <boost/range/irange.hpp>
-#include <boost/function_output_iterator.hpp>
 
 #include "paal/utils/functors.hpp"
+
+#include <boost/range/irange.hpp>
+#include <boost/function_output_iterator.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 
 namespace paal {
 

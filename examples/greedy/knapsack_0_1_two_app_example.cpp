@@ -6,10 +6,13 @@
  * @date 2013-09-20
  */
 
+
+#include "paal/greedy/knapsack_0_1_two_app.hpp"
+
+#include <boost/range/irange.hpp>
+
 #include <vector>
 #include <iostream>
-#include <boost/range/irange.hpp>
-#include "paal/greedy/knapsack_0_1_two_app.hpp"
 
 int main() {
 //! [Knapsack Example]

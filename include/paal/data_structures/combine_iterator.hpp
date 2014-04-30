@@ -6,12 +6,14 @@
  * @date 2013-02-01
  */
 
+
+#include "paal/utils/type_functions.hpp"
+
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/range/empty.hpp>
 
-#include "paal/utils/type_functions.hpp"
 
 #ifndef COMBINE_ITERATOR_HPP
 #define COMBINE_ITERATOR_HPP

@@ -5,14 +5,16 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#include <vector>
-#include <algorithm>
-#include <numeric>
+#include "utils/logger.hpp"
+
+#include "paal/data_structures/bimap.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
-#include "paal/data_structures/bimap.hpp"
-#include "utils/logger.hpp"
+
+#include <vector>
+#include <algorithm>
+#include <numeric>
 
 static const int s  = 10000000;
 static const int nr = 10000000;

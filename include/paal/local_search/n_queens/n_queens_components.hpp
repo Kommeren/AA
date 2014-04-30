@@ -9,9 +9,12 @@
 #define N_QUEENS_COMPONENETS_HPP
 
 
+
 #include "paal/data_structures/subset_iterator.hpp"
+
 #include <boost/iterator/function_input_iterator.hpp>
 #include <boost/range/adaptor/transformed.hpp>
+
 
 namespace paal {
 namespace local_search {

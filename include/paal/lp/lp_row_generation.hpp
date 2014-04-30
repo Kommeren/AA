@@ -8,7 +8,10 @@
 #ifndef LP_ROW_GENERATION_HPP
 #define LP_ROW_GENERATION_HPP
 
+
 #include "paal/lp/problem_type.hpp"
+
+
 
 namespace paal {
 namespace lp {

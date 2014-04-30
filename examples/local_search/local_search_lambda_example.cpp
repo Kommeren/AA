@@ -6,10 +6,12 @@
  * @date 2014-02-04
  */
 
-#include <vector>
-#include <iostream>
 
 #include "paal/local_search/local_search.hpp"
+
+
+#include <vector>
+#include <iostream>
 
 int main() {
     //! [Local Search Example]

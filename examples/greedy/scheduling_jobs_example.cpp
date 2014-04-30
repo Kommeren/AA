@@ -5,12 +5,14 @@
  * @version 1.0
  * @date 2013-11-19
  */
-#include <iostream>
-#include <unordered_map>
-#include <utility>
 
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
 #include "paal/utils/functors.hpp"
+
+
+#include <iostream>
+#include <unordered_map>
+#include <utility>
 
 //! [Scheduling Jobs Example]
 typedef double Time;

@@ -8,11 +8,8 @@
 
 #ifndef MULTIWAY_CUT_HPP
 #define MULTIWAY_CUT_HPP
-#include <fstream>
-#include <tuple>
 
-#include <utility>                   // for std::pair
-#include <vector>
+#include "paal/lp/glp.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -24,7 +21,10 @@
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/graph/named_function_params.hpp>
 
-#include "paal/lp/glp.hpp"
+#include <fstream>
+#include <tuple>
+#include <utility>                   // for std::pair
+#include <vector>
 
 
 namespace paal{

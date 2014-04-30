@@ -6,10 +6,12 @@
  * @date 2013-06-20
  */
 
-#include <boost/test/unit_test.hpp>
 
 #include "paal/utils/iterator_with_stop_condition.hpp"
 #include "paal/local_search/custom_components.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_CASE(iterator_with_stop_conditionTest) {
     std::vector<int> v{1,2,3,4,5,6,7,8};

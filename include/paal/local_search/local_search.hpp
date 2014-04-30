@@ -9,17 +9,18 @@
 #ifndef LOCAL_SEARCH_SINGLE_SOLUTION_HPP
 #define LOCAL_SEARCH_SINGLE_SOLUTION_HPP
 
-#include <utility>
-#include <algorithm>
-#include <functional>
+#include "local_search_concepts.hpp"
+
+#include "paal/utils/fusion_algorithms.hpp"
+#include "paal/utils/infinity.hpp"
+#include "paal/data_structures/components/component_traits.hpp"
 
 #include <boost/fusion/include/vector.hpp>
 #include <boost/range/algorithm/max_element.hpp>
 
-#include "local_search_concepts.hpp"
-#include "paal/utils/fusion_algorithms.hpp"
-#include "paal/utils/infinity.hpp"
-#include "paal/data_structures/components/component_traits.hpp"
+#include <utility>
+#include <algorithm>
+#include <functional>
 
 namespace paal {
 namespace local_search {

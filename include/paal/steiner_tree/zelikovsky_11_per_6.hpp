@@ -5,25 +5,10 @@
  * @version 1.0
  * @date 2013-07-24
  */
-#include <unordered_map>
-#include <stack>
-
-#define BOOST_RESULT_OF_USE_DECLTYPE
 
 //hack for clang compilation (hash for boost tuple, boost::1_55)
 #include <boost/config.hpp>
 #undef BOOST_NO_CXX11_HDR_TUPLE
-
-#include <boost/range/join.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
-#include <boost/graph/subgraph.hpp>
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
-#include <boost/range/irange.hpp>
-#include <boost/range/algorithm/copy.hpp>
-#include <boost/iterator/zip_iterator.hpp>
-#include <boost/iterator/transform_iterator.hpp>
-#include <boost/functional/hash.hpp>
 
 #include "paal/utils/contract_bgl_adjacency_matrix.hpp"
 #include "paal/data_structures/subset_iterator.hpp"
@@ -33,6 +18,23 @@
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search.hpp"
 #include "paal/utils/functors.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+#include <boost/graph/subgraph.hpp>
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+
+#include <boost/range/join.hpp>
+#include <boost/range/irange.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
+#include <boost/functional/hash.hpp>
+
+#include <unordered_map>
+#include <stack>
 
 namespace paal {
 namespace steiner_tree {

@@ -7,13 +7,14 @@
  */
 
 
-#include <boost/test/unit_test.hpp>
-
-#include "paal/greedy/steiner_tree_greedy.hpp"
-
 #include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/greedy/steiner_tree_greedy.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_SUITE(steiner_treeGreedy)
 static const int OPTIMAL=4;

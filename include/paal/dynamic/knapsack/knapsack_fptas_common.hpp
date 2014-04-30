@@ -8,7 +8,10 @@
 #ifndef KNAPSACK_FPTAS_COMMON_HPP
 #define KNAPSACK_FPTAS_COMMON_HPP
 
+
 #include "paal/dynamic/knapsack/get_lower_bound.hpp"
+
+
 
 namespace paal {
 namespace detail {

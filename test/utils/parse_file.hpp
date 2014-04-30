@@ -9,6 +9,8 @@
 #define PARSE_FILE_HPP
 
 #include <fstream>
+#include <cassert>
+#include <limits>
 
 namespace paal {
     template <typename Functor>

@@ -9,19 +9,19 @@
 #define VORONOI_HPP
 
 
+#include "voronoi_traits.hpp"
+
+#include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/utils/functors.hpp"
+
+#include <boost/range/adaptor/map.hpp>
+#include <boost/functional/hash.hpp>
+
 #include <unordered_set>
 #include <unordered_map>
 #include <map>
 #include <cassert>
 #include <climits>
-
-
-#include <boost/range/adaptor/map.hpp>
-#include <boost/functional/hash.hpp>
-
-#include "paal/data_structures/metric/metric_traits.hpp"
-#include "paal/utils/functors.hpp"
-#include "voronoi_traits.hpp"
 
 namespace paal {
 namespace data_structures {

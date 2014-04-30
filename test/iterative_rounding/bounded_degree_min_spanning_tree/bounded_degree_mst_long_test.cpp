@@ -6,23 +6,23 @@
  * @date 2013-06-10
  */
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
+#include "utils/logger.hpp"
+#include "utils/read_bounded_deg_mst.hpp"
+#include "utils/parse_file.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 #include "paal/utils/functors.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_bounded_deg_mst.hpp"
-#include "utils/parse_file.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+
+#include <iterator>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                         boost::property<boost::vertex_index_t, int>,

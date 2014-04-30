@@ -5,12 +5,15 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#include <vector>
+#include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
+
+#include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
+
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
-#include "utils/logger.hpp"
-#include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
-#include "utils/test_result_check.hpp"
+
+#include <vector>
 
 BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     // sample data

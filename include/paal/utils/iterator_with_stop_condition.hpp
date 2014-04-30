@@ -8,7 +8,10 @@
 #ifndef ITERATOR_WITH_STOP_CONDITION_HPP
 #define ITERATOR_WITH_STOP_CONDITION_HPP
 
+
+
 #include <boost/iterator/iterator_facade.hpp>
+
 
 namespace paal {
 

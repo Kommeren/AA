@@ -7,12 +7,14 @@
  */
 
 
-#include <type_traits>
-#include <functional>
-#include <cassert>
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
+
+
+#include <type_traits>
+#include <functional>
+#include <cassert>
 
 
 //this are names for components used in all of the examples

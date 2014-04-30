@@ -8,8 +8,11 @@
 #ifndef TWO_LOCAL_SEARCH_LOGLNGER_HPP
 #define TWO_LOCAL_SEARCH_LOGLNGER_HPP
 
-#include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "utils/logger.hpp"
+
+#include "paal/data_structures/cycle/cycle_algo.hpp"
+
+
 
 namespace paal {
 namespace utils {

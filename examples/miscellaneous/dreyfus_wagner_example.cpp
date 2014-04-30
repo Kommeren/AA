@@ -5,9 +5,12 @@
  * @version 1.0
  * @date 2013-08-01
  */
-#include <iostream>
-#include "paal/steiner_tree/dreyfus_wagner.hpp"
 #include "test/utils/sample_graph.hpp"
+
+#include "paal/steiner_tree/dreyfus_wagner.hpp"
+
+
+#include <iostream>
 
 int main() {
 //! [Dreyfus Wagner Example]

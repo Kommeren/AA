@@ -5,10 +5,12 @@
  * @version 1.0
  * @date 2013-08-04
  */
-#include <boost/test/unit_test.hpp>
+#include "utils/sample_graph.hpp"
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
-#include "utils/sample_graph.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 using namespace paal;
 using namespace paal::steiner_tree;

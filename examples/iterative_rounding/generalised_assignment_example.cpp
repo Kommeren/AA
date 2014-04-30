@@ -6,9 +6,11 @@
  * @date 2013-02-04
  */
 
-#include <vector>
 
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
+
+
+#include <vector>
 
 int main() {
 //! [Generalised Assignment Example]

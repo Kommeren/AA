@@ -8,6 +8,11 @@
 #ifndef UTILS_RANDOM_HPP
 #define UTILS_RANDOM_HPP
 
+#include <iterator>
+#include <numeric>
+#include <limits>
+#include <cmath>
+
 namespace paal {
 namespace utils {
 
@@ -17,7 +22,7 @@ namespace utils {
 template <bool FailIfEmpty = true, typename InputIterator>
 static InputIterator random_select(InputIterator iBegin, InputIterator iEnd) {
     typedef typename std::iterator_traits<InputIterator>::value_type Dist;
-    Dist total = std::accumulate(iBegin, iEnd, Dist());
+    Dist total = std::accumulate(iBegin, iEnd, Dist{});
     Dist r = total * (rand() / (double(RAND_MAX) + 1));
     total = Dist();
     InputIterator selected = iBegin;

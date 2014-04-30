@@ -8,10 +8,13 @@
 #ifndef BASIC_METRICS_HPP
 #define BASIC_METRICS_HPP
 
-#include <array>
+#include "metric_traits.hpp"
+
+
 #include <boost/multi_array.hpp>
 #include <boost/range/iterator_range.hpp>
-#include "metric_traits.hpp"
+
+#include <array>
 
 
 namespace paal {

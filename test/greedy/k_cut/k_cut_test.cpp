@@ -6,13 +6,15 @@
  * @date 2013-08-20
  */
 
+#include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
+
+#include "paal/greedy/k_cut/k_cut.hpp"
+
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "paal/greedy/k_cut/k_cut.hpp"
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
 
 BOOST_AUTO_TEST_CASE(KCut) {
     std::vector<std::pair<int,int> > edgesP{{1,2},{1,5},{2,3},{2,5},{2,6},{3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};

@@ -8,10 +8,12 @@
 #ifndef TABU_LIST_HPP
 #define TABU_LIST_HPP
 
-#include <unordered_set>
-#include <queue>
+
 
 #include <boost/functional/hash.hpp>
+
+#include <unordered_set>
+#include <queue>
 
 namespace paal {
 namespace data_structures {

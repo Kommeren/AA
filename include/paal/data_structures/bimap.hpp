@@ -8,7 +8,8 @@
 #ifndef BIMAP_HPP
 #define BIMAP_HPP
 
-#include <unordered_map>
+
+#include "paal/data_structures/bimap_traits.hpp"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/random_access_index.hpp>
@@ -16,7 +17,7 @@
 #include <boost/range/irange.hpp>
 #include <boost/functional/hash.hpp>
 
-#include "paal/data_structures/bimap_traits.hpp"
+#include <unordered_map>
 
 namespace paal {
 namespace data_structures {

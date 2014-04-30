@@ -11,8 +11,11 @@
 #ifndef KNAPSACK_GENERAL_HPP
 #define KNAPSACK_GENERAL_HPP
 
-#include <boost/iterator/counting_iterator.hpp>
+
 #include "paal/utils/knapsack_utils.hpp"
+
+#include <boost/iterator/counting_iterator.hpp>
+
 
 namespace paal {
 namespace detail {

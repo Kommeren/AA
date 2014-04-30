@@ -6,12 +6,15 @@
  * @date 2013-09-06
  */
 
-#include <vector>
-#include <boost/test/unit_test.hpp>
-#include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 #include "utils/logger.hpp"
 #include "../utils/scheduling.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+#include <vector>
 const long long max_time=1000000000;
 const long min_machines=10;
 const long max_machines=1000000;

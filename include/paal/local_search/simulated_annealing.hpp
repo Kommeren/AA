@@ -8,9 +8,12 @@
 #ifndef SIMULATED_ANNEALING_HPP
 #define SIMULATED_ANNEALING_HPP
 
-#include <chrono>
+
 #include "paal/utils/fast_exp.hpp"
 #include "paal/local_search/search_traits.hpp"
+
+
+#include <chrono>
 
 namespace paal {
 namespace local_search {

@@ -8,7 +8,10 @@
 #ifndef SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
 #define SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
 
+
 #include "paal/local_search/local_search.hpp"
+
+
 
 namespace {
 int f(int x) {

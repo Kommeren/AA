@@ -10,6 +10,9 @@
 
 #include "utils/parse_file.hpp"
 
+#include <cassert>
+#include <vector>
+
 inline void read(const std::string & testDir,
           int testId,
           int & capacity,

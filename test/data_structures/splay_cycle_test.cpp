@@ -6,11 +6,13 @@
  * @date 2013-02-04
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include "paal/data_structures/cycle/splay_cycle.hpp"
 #include "utils/logger.hpp"
 #include "cycle.hpp"
+
+#include "paal/data_structures/cycle/splay_cycle.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 
 BOOST_AUTO_TEST_CASE(splay_cycle_test) {

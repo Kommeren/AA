@@ -8,14 +8,16 @@
 #ifndef BOUNDED_DEGREE_MST_HPP
 #define BOUNDED_DEGREE_MST_HPP
 
-#include <boost/bimap.hpp>
-#include <boost/graph/connected_components.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle.hpp"
 #include "paal/lp/separation_oracles.hpp"
+
+#include <boost/bimap.hpp>
+#include <boost/graph/connected_components.hpp>
+
 
 
 namespace paal {

@@ -6,13 +6,15 @@
  * @date 2014-02-04
  */
 
-#include <vector>
-#include <iostream>
 
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/simulated_annealing.hpp"
 #include "paal/data_structures/tabu_list/tabu_list.hpp"
 #include "paal/local_search/custom_components.hpp"
+
+
+#include <vector>
+#include <iostream>
 
 int main() {
     //! [Local Search Example]

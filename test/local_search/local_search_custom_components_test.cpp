@@ -6,15 +6,15 @@
  * @date 2014-02-04
  */
 
-#include <boost/test/unit_test.hpp>
-
+#include "utils/simple_single_local_search_components.hpp"
+#include "utils/logger.hpp"
 
 #include "paal/local_search/custom_components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/data_structures/tabu_list/tabu_list.hpp"
 
-#include "utils/simple_single_local_search_components.hpp"
-#include "utils/logger.hpp"
+#include <boost/test/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_SUITE( local_search_custom_components )
 

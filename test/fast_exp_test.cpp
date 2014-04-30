@@ -5,13 +5,14 @@
  * @version 1.0
  * @date 2013-06-20
  */
-
 #include <boost/test/unit_test.hpp>
+
+#include "utils/logger.hpp"
+
+#include "paal/utils/fast_exp.hpp"
 
 #include <boost/range/irange.hpp>
 
-#include "paal/utils/fast_exp.hpp"
-#include "utils/logger.hpp"
 
 BOOST_AUTO_TEST_CASE(FastExpTest) {
     double biggestErr = 0;

@@ -6,13 +6,14 @@
  * @date 2013-02-04
  */
 
+#include "utils/logger.hpp"
+#include "utils/simple_single_local_search_components.hpp"
+
+#include "paal/local_search/custom_components.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
-
-#include "paal/local_search/custom_components.hpp"
-#include "utils/logger.hpp"
-#include "utils/simple_single_local_search_components.hpp"
 
 namespace ls = paal::local_search;
 using namespace  paal;

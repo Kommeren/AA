@@ -12,11 +12,14 @@
 #ifndef READ_ORLIB_KM_HPP
 #define READ_ORLIB_KM_HPP
 
-#include <type_traits>
-#include <unordered_map>
+#include <boost/test/unit_test.hpp>
+
+#include "utils/logger.hpp"
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
-#include "utils/logger.hpp"
+
+#include <type_traits>
+#include <unordered_map>
 namespace paal {
 
 typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS, boost::no_property, boost::property < boost::edge_weight_t, int > > graph_t;

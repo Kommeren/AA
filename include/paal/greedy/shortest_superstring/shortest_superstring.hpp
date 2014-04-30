@@ -8,12 +8,6 @@
 #ifndef SHORTEST_SUPERSTRING_HPP
 #define SHORTEST_SUPERSTRING_HPP
 
-#include<vector>
-#include<algorithm>
-#include <utility>
-#include <type_traits>
-
-#include <boost/range/adaptors.hpp>
 #include "boost/range/irange.hpp"
 
 #include "paal/suffix_array/lcp.hpp"
@@ -21,6 +15,14 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/shortest_superstring/prefix_tree.hpp"
 #include "paal/data_structures/bimap.hpp"
+
+#include <boost/range/adaptors.hpp>
+#include "boost/range/irange.hpp"
+
+#include<vector>
+#include<algorithm>
+#include <utility>
+#include <type_traits>
 
 
 namespace paal{

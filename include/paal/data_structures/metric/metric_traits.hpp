@@ -7,9 +7,11 @@
  */
 #ifndef METRIC_TRAITS_HPP
 #define METRIC_TRAITS_HPP
-#include <type_traits>
 
 #include "paal/utils/type_functions.hpp"
+
+
+#include <type_traits>
 
 namespace paal {
 namespace data_structures {

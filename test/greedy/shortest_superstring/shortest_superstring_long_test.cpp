@@ -6,20 +6,21 @@
  * @date 2013-08-20
  */
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
-
-#include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
-#include "paal/utils/floating.hpp"
 #include "utils/logger.hpp"
 #include "utils/read_ss.hpp"
 #include "utils/parse_file.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
+#include "paal/utils/floating.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <iterator>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 using namespace paal;
 

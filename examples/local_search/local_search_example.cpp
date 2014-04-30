@@ -6,10 +6,12 @@
  * @date 2013-02-04
  */
 
-#include <vector>
-#include <iostream>
 
 #include "paal/local_search/local_search.hpp"
+
+
+#include <vector>
+#include <iostream>
 
 //! [Local Search components Example]
 namespace ls =  paal::local_search;

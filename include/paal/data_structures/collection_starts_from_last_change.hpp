@@ -10,6 +10,8 @@
 
 #include <boost/range/join.hpp>
 
+#include <unordered_map>
+
 namespace paal {
 namespace data_structures {
 

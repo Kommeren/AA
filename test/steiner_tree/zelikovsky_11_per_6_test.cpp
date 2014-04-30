@@ -5,16 +5,16 @@
  * @version 1.0
  * @date 2013-02-04
  */
-
 #include <boost/test/unit_test.hpp>
 
-#include <iosfwd>
-
+//this include must be here! //hack for clang
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 
 #include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/euclidean_metric.hpp"
+
+#include <iosfwd>
 
 namespace std {
     std::ostream & operator<<(std::ostream & o, const std::pair<int, int> & p) {

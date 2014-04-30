@@ -8,7 +8,10 @@
 #ifndef VERTEX_TO_EDGE_ITERATOR_HPP
 #define VERTEX_TO_EDGE_ITERATOR_HPP
 
+
 #include "paal/utils/type_functions.hpp"
+
+
 
 namespace paal {
 namespace data_structures {

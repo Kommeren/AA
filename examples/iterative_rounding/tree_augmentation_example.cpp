@@ -5,10 +5,12 @@
  * @version 1.0
  * @date 2013-10-17
  */
-#include <iostream>
-#include <vector>
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
+
+
+#include <iostream>
+#include <vector>
 
 int main() {
 //! [Tree Augmentation Example]

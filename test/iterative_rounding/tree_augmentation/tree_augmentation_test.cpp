@@ -6,11 +6,13 @@
  * @date 2013-07-10
  */
 
+#include "utils/logger.hpp"
+
+#include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
+
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "utils/logger.hpp"
-#include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;

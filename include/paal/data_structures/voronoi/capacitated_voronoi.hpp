@@ -8,7 +8,8 @@
 #ifndef CAPACITATED_VORONOI_HPP
 #define CAPACITATED_VORONOI_HPP
 
-#include <unordered_map>
+
+#include "paal/data_structures/metric/metric_traits.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/irange.hpp>
@@ -16,7 +17,7 @@
 #include <boost/graph/successive_shortest_path_nonnegative_weights.hpp>
 #include <boost/graph/find_flow_cost.hpp>
 
-#include "paal/data_structures/metric/metric_traits.hpp"
+#include <unordered_map>
 
 
 namespace paal {

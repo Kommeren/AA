@@ -1,18 +1,18 @@
-#include <boost/test/unit_test.hpp>
-
-#include <vector>
-#include <string>
-#include <iomanip>
-#include <cmath>
+#include "utils/read_tsplib.hpp"
+#include "2_local_search_logger.hpp"
+#include "utils/test_result_check.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/local_search/custom_components.hpp"
 
-#include "utils/read_tsplib.hpp"
-#include "2_local_search_logger.hpp"
-#include "utils/test_result_check.hpp"
+#include <boost/test/unit_test.hpp>
+
+#include <vector>
+#include <string>
+#include <iomanip>
+#include <cmath>
 
 using std::string;
 using std::vector;

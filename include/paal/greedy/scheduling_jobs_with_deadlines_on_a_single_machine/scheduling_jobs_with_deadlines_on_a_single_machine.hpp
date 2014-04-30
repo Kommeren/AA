@@ -9,14 +9,16 @@
 #define SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE
 
 
+
+#include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
+
+#include <boost/iterator/counting_iterator.hpp>
+
 #include <queue>
 #include <vector>
 #include <algorithm>
 #include <utility>
-
-#include <boost/iterator/counting_iterator.hpp>
-#include "paal/utils/functors.hpp"
-#include "paal/utils/type_functions.hpp"
 
 namespace paal{
 namespace greedy{

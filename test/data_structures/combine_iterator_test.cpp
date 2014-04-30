@@ -6,11 +6,13 @@
  * @date 2013-02-04
  */
 
-#include <boost/test/unit_test.hpp>
-#define LOGGER_ON
 #include "utils/logger.hpp"
+
 #include "paal/data_structures/combine_iterator.hpp"
 #include "paal/utils/make_tuple.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 template <typename CombinedEngine>
 void check_move(CombinedEngine & combined, int i, int j) {

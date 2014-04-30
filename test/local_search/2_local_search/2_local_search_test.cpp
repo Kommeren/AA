@@ -5,17 +5,17 @@
  * @version 1.0
  * @date 2013-09-20
  */
+#include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
+#include "2_local_search_logger.hpp"
+
+#include "paal/local_search/2_local_search/2_local_search.hpp"
+#include "paal/data_structures/cycle/simple_cycle.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
 #include <string>
-
-#include "paal/local_search/2_local_search/2_local_search.hpp"
-#include "paal/data_structures/cycle/simple_cycle.hpp"
-#include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
-
-#include "2_local_search_logger.hpp"
 
 using std::string;
 using std::vector;

@@ -5,12 +5,13 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include <functional>
+#include "type_functions.hpp"
+#include "functors.hpp"
+
 
 #include <boost/iterator/filter_iterator.hpp>
 
-#include "type_functions.hpp"
-#include "functors.hpp"
+#include <functional>
 
 #ifndef ITERATOR_HELPERS_HPP
 #define ITERATOR_HELPERS_HPP

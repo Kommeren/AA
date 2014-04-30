@@ -11,8 +11,10 @@
 #include <boost/utility.hpp>
 #include <boost/iterator.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+
 #include <algorithm>
 #include <unordered_map>
+#include <cassert>
 
 namespace paal {
 namespace data_structures {

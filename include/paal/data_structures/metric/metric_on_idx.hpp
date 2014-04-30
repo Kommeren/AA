@@ -9,7 +9,10 @@
 #define METRIC_ON_IDX_HPP
 
 
+
 #include "paal/data_structures/bimap_traits.hpp"
+
+
 
 namespace paal {
 namespace data_structures {

@@ -8,19 +8,19 @@
 #ifndef IR_COMPONENTS_HPP
 #define IR_COMPONENTS_HPP
 
-#include <cmath>
+
+#include "paal/utils/floating.hpp"
+#include "paal/utils/functors.hpp"
+#include "paal/data_structures/components/components.hpp"
+#include "paal/lp/ids.hpp"
+#include "paal/lp/bound_type.hpp"
+#include "paal/lp/problem_type.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#include "paal/utils/floating.hpp"
-#include "paal/utils/functors.hpp"
-
-#include "paal/data_structures/components/components.hpp"
-#include "paal/lp/ids.hpp"
-#include "paal/lp/bound_type.hpp"
-#include "paal/lp/problem_type.hpp"
+#include <cmath>
 
 namespace paal {
 namespace ir {

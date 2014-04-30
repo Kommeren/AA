@@ -8,16 +8,17 @@
 #ifndef FACILITY_LOCATION_REMOVE_HPP
 #define FACILITY_LOCATION_REMOVE_HPP
 
-#include <cassert>
-#include <vector>
-#include <numeric>
-#include <cstdlib>
+
+#include "paal/utils/type_functions.hpp"
+#include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 
 #include <boost/iterator/iterator_adaptor.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 
-#include "paal/utils/type_functions.hpp"
-#include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
+#include <cassert>
+#include <vector>
+#include <numeric>
+#include <cstdlib>
 
 
 namespace paal {

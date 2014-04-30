@@ -6,9 +6,12 @@
  * @date 2013-08-29
  */
 
+
+#include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
+
+
 #include <iostream>
 #include <string>
-#include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
 
 
 /**

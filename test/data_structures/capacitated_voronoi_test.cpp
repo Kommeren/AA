@@ -1,10 +1,13 @@
 
-#include <boost/test/unit_test.hpp>
+#include "utils/sample_graph.hpp"
+#include "utils/logger.hpp"
+
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
 #include "paal/data_structures/object_with_copy.hpp"
 #include "paal/data_structures/voronoi/voronoi_traits.hpp"
-#include "utils/sample_graph.hpp"
-#include "utils/logger.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 using namespace paal::data_structures;
 

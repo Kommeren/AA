@@ -6,11 +6,14 @@
  * @date 2014-01-28
  */
 
-#include <iostream>
-#include <vector>
-#include <boost/range/irange.hpp>
+
 #include "paal/greedy/k_center/k_center.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
+
+#include <boost/range/irange.hpp>
+
+#include <iostream>
+#include <vector>
 
 int main(){
 //! [K Center Example]

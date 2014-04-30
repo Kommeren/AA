@@ -8,10 +8,12 @@
 #ifndef COMPONENTS_HPP
 #define COMPONENTS_HPP
 
+#include "types_vector.hpp"
+
+
+
 #include <utility>
 #include <iostream>
-
-#include "types_vector.hpp"
 
 
 namespace paal {

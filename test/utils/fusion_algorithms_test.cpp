@@ -6,12 +6,13 @@
  * @date 2013-02-04
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include <boost/fusion/include/vector.hpp>
 
 #include "paal/utils/fusion_algorithms.hpp"
 #include "paal/utils/functors.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/fusion/include/vector.hpp>
+
 
 
 namespace ds = paal::data_structures;

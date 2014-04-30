@@ -7,10 +7,13 @@
  */
 
 #define BOOST_TEST_MODULE all_small_tests
+
+#include "paal/lp/glp.hpp"
+
 #include <boost/test/unit_test.hpp>
+
 #include <iostream>
 #include <iomanip>
-#include "paal/lp/glp.hpp"
 
 namespace {
 struct Config {

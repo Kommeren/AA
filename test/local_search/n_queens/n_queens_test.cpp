@@ -6,15 +6,16 @@
  * @date 2014-01-04
  */
 
-#include <boost/test/unit_test.hpp>
+#include "utils/logger.hpp"
 
-#include <boost/range/algorithm_ext/iota.hpp>
-#include <boost/range/algorithm/random_shuffle.hpp>
 #include "paal/local_search/n_queens/n_queens_local_search.hpp"
-
 #include "paal/local_search/local_search.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
-#include "utils/logger.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/range/algorithm_ext/iota.hpp>
+#include <boost/range/algorithm/random_shuffle.hpp>
+
 
 
 BOOST_AUTO_TEST_CASE(n_queens_test) {

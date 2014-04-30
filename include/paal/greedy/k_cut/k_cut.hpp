@@ -8,8 +8,9 @@
 #ifndef K_CUT
 #define K_CUT
 
-#include <queue>
 
+#include "paal/utils/type_functions.hpp"
+#include "paal/utils/functors.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/stoer_wagner_min_cut.hpp>
@@ -17,8 +18,8 @@
 #include <boost/graph/subgraph.hpp>
 #include <boost/graph/iteration_macros.hpp>
 #include <boost/graph/copy.hpp>
-#include "paal/utils/type_functions.hpp"
-#include "paal/utils/functors.hpp"
+
+#include <queue>
 
 namespace paal{
 namespace greedy{

@@ -8,11 +8,14 @@
 #ifndef KNAPSACK_UTILS_HPP
 #define KNAPSACK_UTILS_HPP
 
+
+#include "paal/utils/type_functions.hpp"
+#include "paal/utils/less_pointees.hpp"
+#include "paal/utils/functors.hpp"
+
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/optional.hpp>
 
-#include "paal/utils/type_functions.hpp"
-#include "paal/utils/functors.hpp"
 
 namespace paal {
 

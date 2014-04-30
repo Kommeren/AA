@@ -6,13 +6,15 @@
  * @date 2013-08-20
  */
 
+#include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
+
+#include "paal/greedy/k_cut/k_cut.hpp"
+
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/graph/adjacency_list.hpp>
 
-#include "paal/greedy/k_cut/k_cut.hpp"
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
 
 const int nu_vertices=500;
 const int nu_edges=1000*100;

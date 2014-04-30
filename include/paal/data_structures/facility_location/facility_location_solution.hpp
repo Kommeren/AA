@@ -11,13 +11,14 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <unordered_set>
-#include <cassert>
-#include <type_traits>
+#include "facility_location_solution_traits.hpp"
 
 #include "paal/data_structures/voronoi/voronoi.hpp"
 
-#include "facility_location_solution_traits.hpp"
+
+#include <unordered_set>
+#include <cassert>
+#include <type_traits>
 
 namespace paal {
 namespace data_structures {

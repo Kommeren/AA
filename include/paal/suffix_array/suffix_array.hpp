@@ -9,6 +9,10 @@
 #define SUFFIX_ARRAY_HPP
 #include "boost/range/irange.hpp"
 
+
+#include "boost/range/irange.hpp"
+
+
 /*
  * algorithm from:
  *

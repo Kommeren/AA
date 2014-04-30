@@ -6,14 +6,16 @@
  * @date 2013-06-04
  */
 
+#include "utils/logger.hpp"
+
+#include "paal/utils/functors.hpp"
+#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
+
 #include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/counting_range.hpp>
 #include <boost/property_map/property_map.hpp>
 
-#include "utils/logger.hpp"
-#include "paal/utils/functors.hpp"
-#include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 
 using namespace  paal;
 using namespace  paal::ir;

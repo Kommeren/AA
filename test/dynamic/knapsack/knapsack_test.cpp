@@ -6,11 +6,8 @@
  * @date 2013-09-20
  */
 
-#include <fstream>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
-#include <boost/fusion/include/for_each.hpp>
+#include "utils/logger.hpp"
+#include "utils/knapsack_tags_utils.hpp"
 
 #include "paal/dynamic/knapsack.hpp"
 #include "paal/dynamic/knapsack_0_1.hpp"
@@ -18,8 +15,11 @@
 #include "paal/dynamic/knapsack_0_1_fptas.hpp"
 #include "paal/utils/floating.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/knapsack_tags_utils.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+#include <boost/fusion/include/for_each.hpp>
+
+#include <fstream>
 
 using namespace paal;
 

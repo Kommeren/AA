@@ -8,8 +8,11 @@
 #ifndef K_MEDIAN_SOLUTION_HPP
 #define K_MEDIAN_SOLUTION_HPP
 
+
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
+
+
 
 namespace paal {
 namespace data_structures {

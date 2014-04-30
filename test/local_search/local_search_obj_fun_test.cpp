@@ -6,13 +6,14 @@
  * @date 2013-02-11
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include <vector>
+#include "utils/logger.hpp"
 
 #include "paal/local_search/search_obj_func_components.hpp"
 #include "paal/local_search/local_search_obj_function.hpp"
-#include "utils/logger.hpp"
+
+#include <boost/test/unit_test.hpp>
+
+#include <vector>
 
 
 using std::string;

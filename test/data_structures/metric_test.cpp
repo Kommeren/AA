@@ -6,8 +6,11 @@
  * @date 2013-02-04
  */
 
-#include <boost/test/unit_test.hpp>
 #include "utils/sample_graph.hpp"
+
+
+#include <boost/test/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_CASE(MetricTest) {
     typedef  sample_graphs_metrics SGM;

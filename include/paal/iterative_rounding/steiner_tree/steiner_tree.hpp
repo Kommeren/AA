@@ -10,7 +10,6 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <boost/range/join.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -22,6 +21,9 @@
 #include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_strategy.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
+
+#include <boost/range/join.hpp>
+
 
 namespace paal {
 namespace ir {

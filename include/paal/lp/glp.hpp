@@ -7,17 +7,18 @@
  */
 #ifndef LPBASE_HPP
 #define LPBASE_HPP
-#include <numeric>
-#include <unordered_set>
-#include <glpk.h>
-
-#include <boost/iterator/zip_iterator.hpp>
-#include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/lp/ids.hpp"
 #include "paal/lp/bound_type.hpp"
 #include "paal/lp/problem_type.hpp"
+
+#include <boost/iterator/zip_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
+#include <numeric>
+#include <unordered_set>
+#include <glpk.h>
 
 namespace paal {
 namespace lp {

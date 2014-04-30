@@ -6,10 +6,13 @@
  * @date 2013-09-20
  */
 
+
+#include "paal/dynamic/knapsack_0_1.hpp"
+
+#include <boost/range/irange.hpp>
+
 #include <vector>
 #include <iostream>
-#include <boost/range/irange.hpp>
-#include "paal/dynamic/knapsack_0_1.hpp"
 
 int main() {
 //! [Knapsack Example]

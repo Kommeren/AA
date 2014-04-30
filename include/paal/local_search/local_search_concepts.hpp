@@ -5,11 +5,13 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include <boost/concept_check.hpp>
-#include <type_traits>
 
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/search_traits.hpp"
+
+#include <boost/concept_check.hpp>
+
+#include <type_traits>
 
 namespace paal {
 namespace local_search {

@@ -6,16 +6,17 @@
  * @date 2013-02-04
  */
 
-#include <vector>
-#include <string>
-#include <cstdlib>
+#include "utils/logger.hpp"
+
+#include "paal/local_search/local_search.hpp"
+#include "paal/data_structures/combine_iterator.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 
-#include "paal/local_search/local_search.hpp"
-#include "paal/data_structures/combine_iterator.hpp"
-#include "utils/logger.hpp"
+#include <vector>
+#include <string>
+#include <cstdlib>
 
 using std::string;
 using std::vector;

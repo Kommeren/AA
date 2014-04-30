@@ -2,6 +2,10 @@
 #ifndef tsp_TSPLIB_h
 #define tsp_TSPLIB_h
 
+
+#include "paal/data_structures/metric/basic_metrics.hpp"
+
+
 #include <cassert>
 #include <cmath>
 #include <istream>
@@ -11,8 +15,6 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include "paal/data_structures/metric/basic_metrics.hpp"
 
 template<typename T> inline T sqr(T a){ return a*a; }
 

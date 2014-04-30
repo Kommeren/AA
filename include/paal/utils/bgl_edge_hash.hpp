@@ -8,7 +8,11 @@
 #ifndef BGL_EDGE_HASH_HPP
 #define BGL_EDGE_HASH_HPP
 
+
+
 #include <boost/functional/hash.hpp>
+#include <boost/graph/graph_traits.hpp>
+
 
 namespace paal {
 

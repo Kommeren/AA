@@ -8,8 +8,10 @@
 #ifndef TREE_AUG_HPP
 #define TREE_AUG_HPP
 
-#include <utility>                   // for std::pair
-#include <algorithm>                 // for std::for_each
+
+#include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/iterative_rounding/ir_components.hpp"
+#include "paal/utils/bgl_edge_hash.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -22,9 +24,8 @@
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/range/distance.hpp>
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/iterative_rounding/ir_components.hpp"
-#include "paal/utils/bgl_edge_hash.hpp"
+#include <utility>                   // for std::pair
+#include <algorithm>                 // for std::for_each
 
 namespace paal {
 namespace ir {

@@ -5,10 +5,13 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#include "test/utils/sample_graph.hpp"
+
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
 #include "paal/utils/functors.hpp"
-#include "test/utils/sample_graph.hpp"
+
+
 
 using namespace paal::local_search::facility_location;
 

@@ -8,10 +8,13 @@
 #ifndef CYCLE_HPP
 #define CYCLE_HPP
 
+
+#include "paal/data_structures/cycle/simple_cycle.hpp"
+
 #include <boost/test/unit_test.hpp>
+
 #include <vector>
 #include <string>
-#include "paal/data_structures/cycle/simple_cycle.hpp"
 
 template <typename I1, typename I2> bool vec_equals(I1 b1, I1 e1, I2 b2, I2 e2) {
     if(std::distance(b1, e1) != std::distance(b2, e2)) {

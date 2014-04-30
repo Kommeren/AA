@@ -7,12 +7,14 @@
  */
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <boost/graph/adjacency_matrix.hpp>
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/metric_on_idx.hpp"
 #include "paal/utils/functors.hpp"
+
+#include <boost/graph/adjacency_matrix.hpp>
+
 
 namespace paal {
 namespace data_structures {

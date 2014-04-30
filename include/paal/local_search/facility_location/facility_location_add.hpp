@@ -8,16 +8,17 @@
 #ifndef FACILITY_LOCATION_ADD_HPP
 #define FACILITY_LOCATION_ADD_HPP
 
-#include <vector>
-#include <numeric>
-#include <cstdlib>
-#include <cassert>
-
-#include <boost/iterator/iterator_adaptor.hpp>
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/utils/type_functions.hpp"
+
+#include <boost/iterator/iterator_adaptor.hpp>
+
+#include <vector>
+#include <numeric>
+#include <cstdlib>
+#include <cassert>
 
 
 namespace paal {

@@ -8,7 +8,10 @@
 #ifndef TWO_LOCAL_SEARCH_SOLUTION_ADAPTER_HPP
 #define TWO_LOCAL_SEARCH_SOLUTION_ADAPTER_HPP
 
+
 #include "paal/data_structures/vertex_to_edge_iterator.hpp"
+
+
 
 namespace paal {
 namespace local_search {

@@ -6,13 +6,15 @@
  * @date 2013-02-01
  */
 
-#include "paal/data_structures/facility_location/facility_location_solution.hpp"
-#include "paal/local_search/local_search.hpp"
-
 #include "facility_location_solution_adapter.hpp"
 #include "facility_location_add.hpp"
 #include "facility_location_remove.hpp"
 #include "facility_location_swap.hpp"
+
+#include "paal/data_structures/facility_location/facility_location_solution.hpp"
+#include "paal/local_search/local_search.hpp"
+
+
 
 namespace paal {
 namespace local_search {

@@ -6,12 +6,13 @@
  * @date 2013-06-24
  */
 
-#include <vector>
-
-#include <boost/graph/adjacency_list.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+
+#include <vector>
 
 
 //! [Steiner Network Example]

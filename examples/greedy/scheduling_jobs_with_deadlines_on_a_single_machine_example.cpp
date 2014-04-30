@@ -5,15 +5,14 @@
  * @version 1.0
  * @date 2013-09-17
  */
-#include <iostream>
-#include <utility>
 
+#include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
+#include "paal/utils/functors.hpp"
 
 #include <boost/range/irange.hpp>
 
-#include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
-
-#include "paal/utils/functors.hpp"
+#include <iostream>
+#include <utility>
 
 using namespace paal::greedy::scheduling_jobs_with_deadlines_on_a_single_machine;
 using namespace std;

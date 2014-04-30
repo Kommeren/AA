@@ -11,7 +11,10 @@
 #include "local_search.hpp"
 #include "trivial_solution_commit.hpp"
 #include "search_obj_func_components.hpp"
+
 #include "paal/data_structures/components/component_traits.hpp"
+
+
 
 namespace paal {
 namespace local_search {

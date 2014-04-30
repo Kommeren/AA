@@ -1,11 +1,13 @@
+
+#include "paal/data_structures/splay_tree.hpp"
+
 #include <boost/test/unit_test.hpp>
+
 #include <climits>
 #include <algorithm>
 #include <utility>
 #include <vector>
 #include <random>
-
-#include "paal/data_structures/splay_tree.hpp"
 
 using paal::data_structures::splay_tree::splay_tree;
 using paal::data_structures::splay_tree::splay_impl_enum;

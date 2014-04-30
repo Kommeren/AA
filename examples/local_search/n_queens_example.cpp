@@ -6,9 +6,12 @@
  * @version 1.0
  * @date 2014-01-02
  */
+
+#include "paal/local_search/n_queens/n_queens_local_search.hpp"
+
 #include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/range/algorithm/random_shuffle.hpp>
-#include "paal/local_search/n_queens/n_queens_local_search.hpp"
+
 
 void print(const std::vector<int> & queens) {
     for(int q: queens) {

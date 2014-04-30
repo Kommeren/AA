@@ -6,12 +6,13 @@
  * @date 2013-02-04
  */
 
+
+#include "paal/data_structures/subset_iterator.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
 #include <string>
-
-#include "paal/data_structures/subset_iterator.hpp"
 
 using std::vector;
 

@@ -8,12 +8,14 @@
 #ifndef STEINER_COMPONENT_HPP
 #define STEINER_COMPONENT_HPP
 
-#include <set>
-#include <iosfwd>
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
+
+
+#include <set>
+#include <iosfwd>
 
 namespace paal {
 namespace ir {

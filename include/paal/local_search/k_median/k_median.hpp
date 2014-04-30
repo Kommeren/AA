@@ -8,11 +8,13 @@
 #ifndef K_MEDIAN_HPP
 #define K_MEDIAN_HPP
 
+
 #include "paal/local_search/facility_location/facility_location_swap.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
 #include "paal/local_search/facility_location/facility_location.hpp"
-
 #include "paal/data_structures/facility_location/k_median_solution.hpp"
+
+
 
 namespace paal {
 namespace local_search {

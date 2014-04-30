@@ -9,11 +9,13 @@
 #define N_QUEENS_LOCAL_SEARCH_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
+
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_components.hpp"
-
 #include "paal/local_search/n_queens/n_queens_solution.hpp"
 #include "paal/local_search/n_queens/n_queens_components.hpp"
+
+
 
 namespace paal {
 namespace local_search {

@@ -7,15 +7,15 @@
  */
 
 
-#include <vector>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/graph/adjacency_list.hpp>
+#include "utils/logger.hpp"
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
-#include "utils/logger.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
+#include <vector>
 
 using namespace  paal;
 using namespace  paal::ir;

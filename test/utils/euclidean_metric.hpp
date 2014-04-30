@@ -8,6 +8,9 @@
 #ifndef EUCLIDEAN_METRIC_HPP
 #define EUCLIDEAN_METRIC_HPP
 
+
+
+
 #include <cmath>
 
 namespace paal {

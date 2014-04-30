@@ -10,11 +10,13 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
-#include <boost/range/join.hpp>
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
+
+#include <boost/graph/prim_minimum_spanning_tree.hpp>
+#include <boost/range/join.hpp>
+
 
 namespace paal {
 namespace ir {

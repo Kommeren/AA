@@ -9,10 +9,12 @@
 #ifndef GET_LOWER_BOUND_HPP
 #define GET_LOWER_BOUND_HPP
 
-#include <boost/function_output_iterator.hpp>
 
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/greedy/knapsack/knapsack_general.hpp"
+
+#include <boost/function_output_iterator.hpp>
+
 
 
 namespace paal {

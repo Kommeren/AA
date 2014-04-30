@@ -1,8 +1,10 @@
-#include <boost/test/unit_test.hpp>
-
-#include "paal/local_search/k_median/k_median.hpp"
 #include "utils/sample_graph.hpp"
 #include "utils/logger.hpp"
+
+#include "paal/local_search/k_median/k_median.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 
 BOOST_AUTO_TEST_CASE(kmedian_test) {

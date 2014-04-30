@@ -8,16 +8,17 @@
 #ifndef ITERATIVE_ROUNDING_HPP
 #define ITERATIVE_ROUNDING_HPP
 
-#include <cstdlib>
-#include <unordered_map>
-
-#include <boost/range/irange.hpp>
-#include <boost/optional.hpp>
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/lp/glp.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
+
+#include <boost/range/irange.hpp>
+#include <boost/optional.hpp>
+
+#include <cstdlib>
+#include <unordered_map>
 
 
 namespace paal {

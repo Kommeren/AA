@@ -5,9 +5,11 @@
  * @version 1.0
  * @date 2013-02-04
  */
-#include <iostream>
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
+
 #include "test/utils/sample_graph.hpp"
+
+#include <iostream>
 
 int main() {
 //! [Steiner Tree Example]

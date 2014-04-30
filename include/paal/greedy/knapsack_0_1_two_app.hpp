@@ -8,16 +8,17 @@
 #ifndef KNAPSACK_0_1_TWO_APP_HPP
 #define KNAPSACK_0_1_TWO_APP_HPP
 
-#include <type_traits>
-#include <utility>
-
-#include <boost/iterator/counting_iterator.hpp>
-#include <boost/iterator/filter_iterator.hpp>
 
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/knapsack/knapsack_general.hpp"
+
+#include <boost/iterator/counting_iterator.hpp>
+#include <boost/iterator/filter_iterator.hpp>
+
+#include <type_traits>
+#include <utility>
 
 namespace paal {
 

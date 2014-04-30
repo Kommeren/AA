@@ -8,8 +8,11 @@
 #ifndef CYCLE_ITERATOR_HPP
 #define CYCLE_ITERATOR_HPP
 
-#include <boost/iterator/iterator_facade.hpp>
+
 #include "paal/utils/type_functions.hpp"
+
+#include <boost/iterator/iterator_facade.hpp>
+
 
 namespace paal {
 namespace data_structures {

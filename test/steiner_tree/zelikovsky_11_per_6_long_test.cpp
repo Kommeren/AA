@@ -8,15 +8,17 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <vector>
+//this include must be here! //hack for clang
+#include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 
 #include "utils/logger.hpp"
-
-#include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
-#include "paal/data_structures/bimap.hpp"
-
 #include "utils/read_steinlib.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/data_structures/bimap.hpp"
+
+
+#include <vector>
 
 BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
     std::vector<paal::steiner_tree_test> data;

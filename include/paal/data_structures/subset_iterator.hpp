@@ -6,11 +6,13 @@
  * @date 2013-02-01
  */
 
-#include <boost/iterator/filter_iterator.hpp>
-#include <boost/iterator/transform_iterator.hpp>
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/make_tuple.hpp"
+
+#include <boost/iterator/filter_iterator.hpp>
+#include <boost/iterator/transform_iterator.hpp>
+
 
 #ifndef SUBSET_ITERATOR_HPP
 #define SUBSET_ITERATOR_HPP

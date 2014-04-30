@@ -7,6 +7,11 @@
  */
 #ifndef READ_GEN_ASS_HPP
 #define READ_GEN_ASS_HPP
+
+#include "paal/data_structures/metric/basic_metrics.hpp"
+
+#include <boost/range/irange.hpp>
+
 namespace paal {
 
 typedef data_structures::rectangle_array_metric<int> M;

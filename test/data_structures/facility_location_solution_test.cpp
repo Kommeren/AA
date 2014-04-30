@@ -6,10 +6,13 @@
  * @date 2013-06-20
  */
 
-#include <boost/test/unit_test.hpp>
+#include "utils/sample_graph.hpp"
+
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
 #include "paal/data_structures/voronoi/voronoi.hpp"
-#include "utils/sample_graph.hpp"
+
+#include <boost/test/unit_test.hpp>
+
 
 BOOST_AUTO_TEST_CASE(facility_location_solutionTest) {
     typedef sample_graphs_metrics SGM;

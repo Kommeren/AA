@@ -10,13 +10,7 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <algorithm>
-#include <cassert>
-#include <iterator>
-#include <numeric>
-#include <random>
-#include <utility>
-#include <vector>
+
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/copy.hpp>
@@ -25,6 +19,14 @@
 #include <boost/range/irange.hpp>
 #include <boost/range/counting_range.hpp>
 #include <boost/range/iterator_range.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <iterator>
+#include <numeric>
+#include <random>
+#include <utility>
+#include <vector>
 #include <paal/data_structures/fraction.hpp>
 #include <paal/utils/functors.hpp>
 #include <paal/utils/type_functions.hpp>

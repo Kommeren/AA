@@ -8,9 +8,11 @@
 #ifndef STATIC_LAZY_JOIN_HPP
 #define STATIC_LAZY_JOIN_HPP
 
+
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/fusion/include/begin.hpp>
+
 
 namespace paal {
 namespace data_structures {

@@ -6,12 +6,15 @@
  * @date 2013-01-29
  */
 
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
-#include "paal/data_structures/metric/basic_metrics.hpp"
-#include "paal/greedy/k_center/k_center.hpp"
 #include "utils/test_result_check.hpp"
 #include "greedy/k_center/in_balls.hpp"
+
+#include "paal/data_structures/metric/basic_metrics.hpp"
+#include "paal/greedy/k_center/k_center.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
 
 BOOST_AUTO_TEST_CASE(KCenter) {
     //performance test

@@ -8,12 +8,14 @@
 #ifndef N_QUEENS_SOLUTION_HPP
 #define N_QUEENS_SOLUTION_HPP
 
-#include <vector>
+
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/range/numeric.hpp>
+
+#include <vector>
 
 namespace paal {
 namespace local_search {

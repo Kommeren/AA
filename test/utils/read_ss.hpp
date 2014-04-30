@@ -8,9 +8,11 @@
 
 #ifndef READ_SS_HPP
 #define READ_SS_HPP
-#include <vector>
-
 #include "utils/logger.hpp"
+
+#include <vector>
+#include <string>
+#include <istream>
 
 namespace paal {
 namespace{

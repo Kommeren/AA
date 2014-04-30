@@ -6,11 +6,12 @@
  * @date 2013-09-20
  */
 
-#include <iostream>
+#include "test/utils/sample_graph.hpp"
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
 
-#include "test/utils/sample_graph.hpp"
+
+#include <iostream>
 
 int main() {
 //! [steiner tree greedy Example]

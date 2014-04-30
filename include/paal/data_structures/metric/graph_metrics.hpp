@@ -8,11 +8,13 @@
 #ifndef GRAPH_METRICS_HPP
 #define GRAPH_METRICS_HPP
 
+#include "basic_metrics.hpp"
+
+
 #include <boost/graph/johnson_all_pairs_shortest.hpp>
 #include <boost/graph/floyd_warshall_shortest.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 
-#include "basic_metrics.hpp"
 
 namespace paal {
 namespace data_structures {

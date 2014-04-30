@@ -7,10 +7,8 @@
  */
 #define BOOST_TEST_MODULE two_local_search_stdin
 
-#include <boost/test/unit_test.hpp>
-
-#include <vector>
-#include <string>
+#include "utils/read_tsplib.hpp"
+#include "2_local_search_logger.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
@@ -18,8 +16,10 @@
 #include "paal/local_search/custom_components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 
-#include "utils/read_tsplib.hpp"
-#include "2_local_search_logger.hpp"
+#include <boost/test/unit_test.hpp>
+
+#include <vector>
+#include <string>
 
 using std::vector;
 using namespace paal::local_search::two_local_search;

@@ -8,7 +8,7 @@
 #ifndef STEINER_TREE_GREEDY_HPP
 #define STEINER_TREE_GREEDY_HPP
 
-#include <algorithm>
+
 
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/properties.hpp>
@@ -24,6 +24,8 @@
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/copy.hpp>
+
+#include <algorithm>
 
 namespace paal {
 

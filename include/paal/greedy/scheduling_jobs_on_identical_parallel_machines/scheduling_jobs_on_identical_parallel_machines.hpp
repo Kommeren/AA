@@ -8,11 +8,14 @@
 #ifndef SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
 #define SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
 
+
+
+#include <boost/range/irange.hpp>
+
 #include <queue>
 #include <vector>
 #include <algorithm>
 #include <utility>
-#include <boost/range/irange.hpp>
 #include <paal/utils/functors.hpp>
 #include <paal/utils/type_functions.hpp>
 

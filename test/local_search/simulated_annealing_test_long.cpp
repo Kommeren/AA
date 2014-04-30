@@ -6,19 +6,17 @@
  * @date 2014-02-04
  */
 
-#include <boost/test/unit_test.hpp>
-
-#include <thread>
-
-#include <boost/range/irange.hpp>
-
+#include "utils/simple_single_local_search_components.hpp"
+#include "utils/logger.hpp"
 
 #include "paal/local_search/simulated_annealing.hpp"
 #include "paal/local_search/custom_components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
 
-#include "utils/simple_single_local_search_components.hpp"
-#include "utils/logger.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <thread>
 
 BOOST_AUTO_TEST_SUITE( simulated_annealing )
 

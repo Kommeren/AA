@@ -8,10 +8,13 @@
 #ifndef TYPE_FUNCTIONS_HPP
 #define TYPE_FUNCTIONS_HPP
 
+
+
+#include <boost/range.hpp>
+
 #include <type_traits>
 #include <utility>
 #include <tuple>
-#include <boost/range.hpp>
 
 
 namespace paal {

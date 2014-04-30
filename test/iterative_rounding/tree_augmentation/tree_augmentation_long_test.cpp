@@ -7,15 +7,16 @@
  */
 
 
-#include <fstream>
-#include <boost/test/unit_test.hpp>
-#include <boost/graph/adjacency_list.hpp>
-
-#include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
-
 #include "utils/parse_file.hpp"
 #include "utils/logger.hpp"
 #include "utils/test_result_check.hpp"
+
+#include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
+#include <fstream>
 
 using namespace  paal;
 using namespace  paal::ir;

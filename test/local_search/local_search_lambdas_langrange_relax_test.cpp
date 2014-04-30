@@ -6,18 +6,19 @@
  * @date 2013-02-04
  */
 
-#include <vector>
-#include <string>
-#include <cstdlib>
-#include <iomanip>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
+#include "utils/logger.hpp"
 
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/data_structures/combine_iterator.hpp"
-#include "utils/logger.hpp"
+
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <vector>
+#include <string>
+#include <cstdlib>
+#include <iomanip>
 
 using namespace  paal;
 

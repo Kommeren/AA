@@ -9,11 +9,14 @@
 #ifndef CYCLE_ALGO
 #define CYCLE_ALGO
 
+
+#include "paal/data_structures/cycle/cycle_traits.hpp"
+#include "paal/data_structures/vertex_to_edge_iterator.hpp"
+
+
 #include <algorithm>
 #include <numeric>
 #include <string>
-#include "paal/data_structures/cycle/cycle_traits.hpp"
-#include "paal/data_structures/vertex_to_edge_iterator.hpp"
 
 namespace paal {
 namespace simple_algo {

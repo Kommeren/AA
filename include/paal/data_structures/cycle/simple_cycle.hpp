@@ -9,11 +9,13 @@
 #ifndef SIMPLE_CYCLE_HPP
 #define SIMPLE_CYCLE_HPP
 
+
+#include "paal/data_structures/bimap.hpp"
+
+
 #include <cassert>
 #include <vector>
 #include <iterator>
-
-#include "paal/data_structures/bimap.hpp"
 
 namespace paal {
 namespace data_structures {

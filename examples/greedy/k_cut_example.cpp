@@ -6,10 +6,12 @@
  * @date 2013-08-30
  */
 
-#include <iostream>
-#include <boost/graph/adjacency_list.hpp>
 
 #include "paal/greedy/k_cut/k_cut.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+
+#include <iostream>
 
 int main(){
 //! [K Cut Example]

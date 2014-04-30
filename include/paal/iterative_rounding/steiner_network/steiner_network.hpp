@@ -8,8 +8,6 @@
 #ifndef STEINER_NETWORK_HPP
 #define STEINER_NETWORK_HPP
 
-#include <boost/graph/kruskal_min_spanning_tree.hpp>
-#include <boost/graph/named_function_params.hpp>
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -17,6 +15,10 @@
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network_oracle.hpp"
 #include "paal/lp/separation_oracles.hpp"
+
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/graph/named_function_params.hpp>
+
 
 
 namespace paal {

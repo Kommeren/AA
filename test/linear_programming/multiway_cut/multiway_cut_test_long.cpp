@@ -6,17 +6,18 @@
  * @date 2014-01-17
  */
 
-
-#include <vector>
-
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
-#include <boost/graph/adjacency_list.hpp>
+
+#include "utils/logger.hpp"
+#include "utils/test_result_check.hpp"
 
 #include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/multiway_cut/multiway_cut.hpp"
-#include "utils/logger.hpp"
-#include "utils/test_result_check.hpp"
+
+#include <boost/range/irange.hpp>
+#include <boost/graph/adjacency_list.hpp>
+
+#include <vector>
 
 namespace{
 template <typename Graph>

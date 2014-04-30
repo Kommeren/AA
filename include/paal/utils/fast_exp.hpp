@@ -8,6 +8,9 @@
 
 #ifndef FAST_EXP_HPP
 #define FAST_EXP_HPP
+
+#include <cstdint>
+
 namespace paal {
 
 /**

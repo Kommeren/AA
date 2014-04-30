@@ -8,11 +8,13 @@
 #ifndef DREYFUS_WAGNER_HPP
 #define DREYFUS_WAGNER_HPP
 
-#include <unordered_map>
-#include <bitset>
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
+
+
+#include <unordered_map>
+#include <bitset>
 
 namespace paal {
 namespace steiner_tree {

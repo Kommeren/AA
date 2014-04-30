@@ -8,9 +8,12 @@
 #ifndef READ_ORLIB_FC_HPP
 #define READ_ORLIB_FC_HPP
 
-#include <fstream>
-#include "paal/data_structures/metric/graph_metrics.hpp"
 #include "utils/logger.hpp"
+
+#include "paal/data_structures/metric/graph_metrics.hpp"
+
+
+#include <fstream>
 
 namespace paal {
 

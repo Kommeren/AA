@@ -6,19 +6,19 @@
  * @date 2013-09-20
  */
 
-#include <fstream>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
+#include "utils/logger.hpp"
+#include "utils/read_knapsack.hpp"
+#include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_two_app.hpp"
 #include "paal/utils/floating.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_knapsack.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <fstream>
 
 using namespace paal;
 using namespace paal::utils;

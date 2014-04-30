@@ -8,9 +8,12 @@
 #ifndef CUSTOM_COMPONENTS_HPP
 #define CUSTOM_COMPONENTS_HPP
 
+
+#include "paal/utils/functors.hpp"
+
+
 #include <chrono>
 #include <random>
-#include "paal/utils/functors.hpp"
 
 namespace paal {
 namespace local_search {

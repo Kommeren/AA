@@ -8,8 +8,11 @@
 #ifndef GENERALISED_ASSIGNMENT_HPP
 #define GENERALISED_ASSIGNMENT_HPP
 
+
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
+
+
 
 namespace paal {
 namespace ir {

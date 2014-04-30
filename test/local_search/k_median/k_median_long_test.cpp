@@ -6,23 +6,23 @@
  * @date 2013-08-01
  */
 
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
-
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
+#include "utils/logger.hpp"
+#include "utils/read_orlib_km.hpp"
+#include "utils/parse_file.hpp"
+#include "utils/test_result_check.hpp"
 
 #include "paal/local_search/k_median/k_median.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 
-#include "utils/logger.hpp"
-#include "utils/read_orlib_km.hpp"
-#include "utils/parse_file.hpp"
-#include "utils/test_result_check.hpp"
+#include <boost/test/unit_test.hpp>
+#include <boost/range/irange.hpp>
+
+#include <iterator>
+#include <iostream>
+#include <fstream>
+#include <iomanip>
 
 using namespace paal::local_search::facility_location;
 using namespace paal;

@@ -8,6 +8,9 @@
 #ifndef COMPONENT_TRAITS_HPP
 #define COMPONENT_TRAITS_HPP
 #include "components.hpp"
+
+
+
 namespace paal {
 namespace data_structures {
 

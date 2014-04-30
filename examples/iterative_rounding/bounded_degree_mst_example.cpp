@@ -6,13 +6,14 @@
  * @date 2013-11-21
  */
 
-#include <vector>
-
-#include <boost/graph/adjacency_list.hpp>
 
 #include "paal/utils/functors.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+
+#include <vector>
 
 int main() {
 //! [Bounded-Degree Minimum Spanning Tree Example]

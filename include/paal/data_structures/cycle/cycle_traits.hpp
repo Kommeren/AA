@@ -8,7 +8,10 @@
 #ifndef CYCLE_TRAITS_HPP
 #define CYCLE_TRAITS_HPP
 
+
 #include "paal/utils/type_functions.hpp"
+
+
 
 namespace paal {
 namespace data_structures {

@@ -5,10 +5,13 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#include <iostream>
+#include "test/utils/sample_graph.hpp"
+
 #include "paal/local_search/k_median/k_median.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
-#include "test/utils/sample_graph.hpp"
+
+
+#include <iostream>
 
 
 int main() {
