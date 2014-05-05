@@ -1,10 +1,3 @@
-#additional boost includes
-set(BOOST_TEST_SUBS test numeric_conversion timer predef container io)
-foreach(dir ${BOOST_TEST_SUBS})
-    include_directories("${PROJECT_DIR}/boost/${dir}/include/")
-endforeach()
-
-
 #adding unit_test boost library
 set(UNIT_TEST_FNAMES compiler_log_formatter debug exception_safety
                      execution_monitor framework interaction_based
@@ -22,7 +15,7 @@ endforeach()
 ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1) 
 add_library(unit_test SHARED ${unit_test_bins})
 
-#tests now
+#adding tests
 file(GLOB_RECURSE test_bins "${TEST_DIR}/*.cpp")
 link_directories(${TEST_DIR})
 

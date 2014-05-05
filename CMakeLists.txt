@@ -30,15 +30,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread -Wall -fno-strict-al
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe")
 
-set(BOOST_SUBS config functional type_traits detail static_assert utility move
-               tuple iterator preprocessor fusion mpl unordered range graph
-               assert concept_check integer smart_ptr multi_index exception
-               property_map foreach serialization math optional bind typeof
-               parameter bimap multi_array conversion array tti function_types
-               regex disjoint_sets)
+file(GLOB BOOST_SUBS "${PROJECT_DIR}/boost/*")
 
 foreach(dir ${BOOST_SUBS})
-    include_directories("boost/${dir}/include/")
+    include_directories("${dir}/include/")
 endforeach()
 
 include_directories (${SOURCE_DIR})

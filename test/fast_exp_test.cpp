@@ -1,5 +1,5 @@
 /**
- * @file fast_exp.cpp
+ * @file fast_exp_test.cpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
