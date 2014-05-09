@@ -20,3 +20,6 @@
 ** max coverage (AA)
 ** steiner forest (conjecture)
 
+*LOCAL_SEARCH
+** maybe 0 shouldnt be hardcoded
+

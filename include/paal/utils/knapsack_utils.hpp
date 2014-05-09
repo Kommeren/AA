@@ -331,10 +331,10 @@ struct no_retrieve_solution_tag{};
 
 template <typename SizeType, typename ValueType>
 using GetIntegralTag =
-        typename boost::mpl::if_c<std::is_integral<SizeType>::value &&
+        typename std::conditional<std::is_integral<SizeType>::value &&
                        std::is_integral<ValueType>::value, integral_value_and_size_tag,
-                            typename boost::mpl::if_c<std::is_integral<SizeType>::value, integral_size_tag,
-                                typename boost::mpl::if_c<std::is_integral<ValueType>::value,
+                            typename std::conditional<std::is_integral<SizeType>::value, integral_size_tag,
+                                typename std::conditional<std::is_integral<ValueType>::value,
                                                           integral_value_tag,
                                                           non_integral_value_and_size_tag
                                                          >::type
@@ -344,7 +344,7 @@ using GetIntegralTag =
 
 template <typename SizeType>
 using Getarithmetic_size_tag =
-        typename boost::mpl::if_c<std::is_arithmetic<SizeType>::value,
+        typename std::conditional<std::is_arithmetic<SizeType>::value,
                                  arithmetic_size_tag,
                                  Nonarithmetic_size_tag>::type;
 

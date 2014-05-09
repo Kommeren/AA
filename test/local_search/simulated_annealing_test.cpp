@@ -39,6 +39,28 @@ using namespace paal;
         LOGLN("solution " << best);
     }
 
+    BOOST_AUTO_TEST_CASE(simulated_annealing_commit_adaptor_test) {
+        int currentSolution(0);
+        int best(0);
+        auto sa_commit = ls::make_simulated_annealing_commit_adaptor(commit{}, gain{},
+                            ls::exponential_cooling_schema_dependant_on_iteration(1000, 0.999));
+
+        auto record_solution_commit =
+                ls::make_record_solution_commit_adapter(
+                        best,
+                        std::move(sa_commit),
+                        paal::utils::make_functor_to_comparator(f));
+
+        ls::stop_condition_count_limit stop_cond_count(10);
+        auto stop_cond = [&](int){return !stop_cond_count();};
+
+        ls::local_search(currentSolution, ls::best_strategy{}, stop_cond, stop_cond,
+                ls::make_search_components(get_moves{}, gain{}, std::move(record_solution_commit)));
+        BOOST_CHECK_EQUAL(best, 6);
+        LOGLN("solution " << best);
+    }
+
+
     BOOST_AUTO_TEST_CASE(start_temperature_test) {
         double t;
 

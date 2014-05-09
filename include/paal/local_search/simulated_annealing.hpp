@@ -437,6 +437,68 @@ make_simulated_annealing_gain_adaptor(
                     std::move(gain), std::move(getTemperature), std::move(rand));
 }
 
+/**
+ * @brief This adaptor takes Cammit  functor and adopts it to simulated annealing.
+ *        If the input move has positive gain it is chosen otherwise the move is chosen
+ *        wit probability e^(movesGain/Temperature). Temperature is given by getTemperature functor.
+ *
+ * @tparam Commit
+ * @tparam Gain
+ * @tparam GetTemperature
+ * @tparam random_generator
+ */
+template <typename Commit, typename Gain, typename GetTemperature, typename random_generator = std::default_random_engine>
+struct simulated_annealing_commit_adaptor {
+    simulated_annealing_commit_adaptor(Commit commit, Gain gain,
+            GetTemperature get_temperature,
+            random_generator rand = random_generator()) :
+        m_commit(commit),
+        m_gain(make_simulated_annealing_gain_adaptor(
+                    std::move(gain), std::move(get_temperature), std::move(rand))) {}
+
+    /**
+     * @brief operator()
+     *
+     * @tparam Args
+     * @param args
+     *
+     * @return
+     */
+    template <typename... Args>
+    bool operator()(Args&&... args) {
+        if(m_gain(args...) > 0) {
+            return m_commit(std::forward<Args>(args)...);
+        } else {
+            return false;
+        }
+    }
+
+private:
+    Commit m_commit;
+    simulated_annealing_gain_adaptor<Gain, GetTemperature, random_generator> m_gain;
+};
+
+
+
+/**
+ * @brief make for simulated_annealing_commit_adaptor
+ *
+ * @tparam Commit
+ * @tparam Gain
+ * @tparam GetTemperature
+ * @tparam random_generator
+ */
+template <typename Commit, typename Gain, typename GetTemperature, typename random_generator = std::default_random_engine>
+simulated_annealing_commit_adaptor<Commit, Gain, GetTemperature, random_generator>
+make_simulated_annealing_commit_adaptor(
+         Commit commit,
+         Gain gain,
+         GetTemperature getTemperature,
+         random_generator rand = random_generator{}) {
+     return simulated_annealing_commit_adaptor
+                <Commit, Gain, GetTemperature, random_generator>(std::move(commit),
+                    std::move(gain), std::move(getTemperature), std::move(rand));
+}
 
 
 } //!local_search
