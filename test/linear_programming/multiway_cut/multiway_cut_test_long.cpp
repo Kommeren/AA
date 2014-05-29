@@ -11,7 +11,6 @@
 #include "utils/logger.hpp"
 #include "utils/test_result_check.hpp"
 
-#include "paal/greedy/k_cut/k_cut.hpp"
 #include "paal/multiway_cut/multiway_cut.hpp"
 
 #include <boost/range/irange.hpp>

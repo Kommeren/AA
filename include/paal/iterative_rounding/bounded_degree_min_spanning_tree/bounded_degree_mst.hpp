@@ -19,10 +19,8 @@
 #include <boost/graph/connected_components.hpp>
 
 
-
 namespace paal {
 namespace ir {
-
 
 
 namespace {
@@ -45,33 +43,35 @@ using bdmst_oracle = OracleStrategy<bdmst_violation_checker>;
  * @tparam Graph input graph
  * @tparam DegreeBounds map from Graph vertices to degree bounds
  * @tparam CostMap map from Graph edges to costs
+ * @tparam VertexIndex map from Graph vertices to indices
  * @tparam SpanningTreeOutputIterator
  * @tparam Oracle separation oracle
  */
-template <typename Graph, typename DegreeBounds, typename CostMap,
+template <typename Graph, typename DegreeBounds, typename CostMap, typename VertexIndex,
           typename SpanningTreeOutputIterator, typename Oracle = bdmst_oracle<>>
 class bounded_degree_mst {
 public:
     /**
      * Constructor.
      */
-    bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds, CostMap costMap,
-                     SpanningTreeOutputIterator resultSpanningTree, Oracle oracle = Oracle()) :
-              m_g(g), m_cost_map(costMap), m_deg_bounds(degBounds),
+    bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds,
+                    CostMap costMap, VertexIndex index,
+                    SpanningTreeOutputIterator resultSpanningTree, Oracle oracle = Oracle()) :
+              m_g(g), m_cost_map(costMap), m_index(index), m_deg_bounds(degBounds),
               m_result_spanning_tree(resultSpanningTree),
               m_compare(bounded_degree_mst_compare_traits::EPSILON),
               m_oracle(oracle)
     {}
 
     using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
-    using Vertex =  typename boost::graph_traits<Graph>::vertex_descriptor;
+    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
 
-    using EdgeMap =  boost::bimap<Edge, lp::col_id>;
-    using VertexMap =  std::unordered_map<lp::row_id, Vertex>;
+    using EdgeMap = boost::bimap<Edge, lp::col_id>;
+    using VertexMap = std::unordered_map<lp::row_id, Vertex>;
 
-    using EdgeMapOriginal =  std::vector<std::pair<lp::col_id, Edge>>;
+    using EdgeMapOriginal = std::vector<std::pair<lp::col_id, Edge>>;
 
-    using ErrorMessage =  boost::optional<std::string>;
+    using ErrorMessage = boost::optional<std::string>;
 
     /**
      * Checks if the input graph is connected.
@@ -103,6 +103,13 @@ public:
     }
 
     /**
+     * Returns the vertex index.
+     */
+    const VertexIndex & get_index() const {
+        return m_index;
+    }
+
+    /**
      * Removes an LP column and the graph edge corresponding to it.
      */
     void remove_column(lp::col_id colId) {
@@ -129,9 +136,9 @@ public:
     /**
      * Returns the degree bound of a vertex.
      */
-    decltype(std::declval<DegreeBounds>()(std::declval<Vertex>()))
+    decltype(std::declval<DegreeBounds>()(get(std::declval<VertexIndex>(), std::declval<Vertex>())))
     get_degree_bound(Vertex v) {
-        return m_deg_bounds(v);
+        return m_deg_bounds(get(m_index, v));
     }
 
     /**
@@ -214,6 +221,7 @@ private:
 
     const Graph & m_g;
     CostMap m_cost_map;
+    VertexIndex m_index;
     const DegreeBounds & m_deg_bounds;
     SpanningTreeOutputIterator m_result_spanning_tree;
 
@@ -236,23 +244,28 @@ namespace detail {
  * @tparam Graph
  * @tparam DegreeBounds
  * @tparam CostMap
+ * @tparam VertexIndex
  * @tparam SpanningTreeOutputIterator
  * @param g
  * @param degBoundMap
  * @param costMap
+ * @param vertexIndex
  * @param resultSpanningTree
  * @param oracle
  *
  * @return bounded_degree_mst object
  */
 template <typename Oracle = bdmst_oracle<>, typename Graph,
-          typename DegreeBounds, typename CostMap, typename SpanningTreeOutputIterator>
-bounded_degree_mst<Graph, DegreeBounds, CostMap, SpanningTreeOutputIterator, Oracle>
+          typename DegreeBounds, typename CostMap, typename VertexIndex,
+          typename SpanningTreeOutputIterator>
+bounded_degree_mst<Graph, DegreeBounds, CostMap, VertexIndex, SpanningTreeOutputIterator, Oracle>
 make_bounded_degree_mst(const Graph & g, const DegreeBounds & degBounds,
-                      CostMap costMap, SpanningTreeOutputIterator resultSpanningTree,
+                      CostMap costMap, VertexIndex vertexIndex,
+                      SpanningTreeOutputIterator resultSpanningTree,
                       Oracle oracle = Oracle()) {
-    return bounded_degree_mst<Graph, DegreeBounds, CostMap,
-                SpanningTreeOutputIterator, Oracle>(g, degBounds, costMap, resultSpanningTree, oracle);
+    return bounded_degree_mst<Graph, DegreeBounds, CostMap, VertexIndex,
+                SpanningTreeOutputIterator, Oracle>(g, degBounds, costMap, vertexIndex,
+                    resultSpanningTree, oracle);
 }
 } // detail
 
@@ -287,10 +300,12 @@ make_bounded_degree_mst(const Graph & g,
                       Oracle oracle = Oracle())
         -> bounded_degree_mst<Graph, DegreeBounds,
                 decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
+                decltype(choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index)),
                 SpanningTreeOutputIterator, Oracle> {
 
     return detail::make_bounded_degree_mst(g, degBounds,
                 choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index),
                 resultSpanningTree, oracle);
 }
 
@@ -483,12 +498,14 @@ namespace detail {
  * @tparam Graph
  * @tparam DegreeBounds
  * @tparam CostMap
+ * @tparam VertexIndex
  * @tparam SpanningTreeOutputIterator
  * @tparam IRcomponents
  * @tparam Visitor
  * @param g
  * @param degBoundMap
  * @param costMap
+ * @param vertexIndex
  * @param resultSpanningTree
  * @param components
  * @param oracle
@@ -497,7 +514,10 @@ namespace detail {
  * @return solution status
  */
 template <typename Oracle = bdmst_oracle<>,
-          typename Graph, typename DegreeBounds, typename CostMap,
+          typename Graph,
+          typename DegreeBounds,
+          typename CostMap,
+          typename VertexIndex,
           typename SpanningTreeOutputIterator,
           typename IRcomponents = bdmst_ir_components<>,
           typename Visitor = trivial_visitor>
@@ -505,12 +525,13 @@ IRResult bounded_degree_mst_iterative_rounding(
         const Graph & g,
         const DegreeBounds & degBounds,
         CostMap costMap,
+        VertexIndex vertexIndex,
         SpanningTreeOutputIterator resultSpanningTree,
         IRcomponents components = IRcomponents(),
         Oracle oracle = Oracle(),
         Visitor visitor = Visitor()) {
 
-    auto bdmst = make_bounded_degree_mst(g, degBounds, costMap, resultSpanningTree, oracle);
+    auto bdmst = make_bounded_degree_mst(g, degBounds, costMap, vertexIndex, resultSpanningTree, oracle);
     return solve_iterative_rounding(bdmst, std::move(components), std::move(visitor));
 }
 } // detail
@@ -555,6 +576,7 @@ IRResult bounded_degree_mst_iterative_rounding(
 
         return detail::bounded_degree_mst_iterative_rounding(g, degBounds,
                     choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+                    choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index),
                     std::move(resultSpanningTree), std::move(components),
                     std::move(oracle), std::move(visitor));
 }

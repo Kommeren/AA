@@ -6,7 +6,6 @@
  * @date 2013-06-24
  */
 
-
 #include "utils/logger.hpp"
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
@@ -20,14 +19,16 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-typedef boost::property<boost::edge_index_t, std::size_t,
-            boost::property <boost::edge_weight_t, int>> EdgeProp;
+template <typename VertexList, typename EdgeProp>
+using Graph = boost::adjacency_list<boost::vecS, VertexList, boost::undirectedS,
+                boost::property<boost::vertex_index_t, int>, EdgeProp>;
 
-typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS,
-                    boost::no_property, EdgeProp> Graph;
+using EdgeProp = boost::property<boost::edge_index_t, std::size_t,
+            boost::property<boost::edge_weight_t, int>>;
+using VectorGraph = Graph<boost::vecS, EdgeProp>;
 
-typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-typedef std::vector<Edge> ResultNetwork;
+using Edge = boost::graph_traits<VectorGraph>::edge_descriptor;
+using ResultNetwork = std::vector<Edge>;
 
 int restrictions(int i, int j) {
     return 2;
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_SUITE(steiner_network)
 BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
     LOGLN("Sample problem:");
-    Graph g(3);
+    VectorGraph g(3);
     ResultNetwork resultNetwork;
     bool b;
     b  = add_edge(0, 1, EdgeProp(0, 1), g).second;
@@ -59,12 +60,35 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
         g, restrictions, std::back_inserter(resultNetwork));
 
     print_result(resultNetwork);
+    BOOST_CHECK_EQUAL(resultNetwork.size(), 4);
+}
+
+BOOST_AUTO_TEST_CASE(steiner_network_list) {
+    // boost::listS instead of boost::vecS for vertex storage
+    using ListGraph = Graph<boost::listS, boost::property<boost::edge_weight_t, int>>;
+    using EdgeT = boost::graph_traits<ListGraph>::edge_descriptor;
+
+    std::vector<std::pair<int, int>> edges = {{0,1},{0,1},{1,2},{1,2},{2,0}};
+    std::vector<int> costs {1,1,1,1,7};
+    ListGraph g(edges.begin(), edges.end(), costs.begin(), 3);
+
+    auto index = get(boost::vertex_index, g);
+    int idx = 0;
+    for (auto v : boost::make_iterator_range(vertices(g))) {
+        put(index, v, idx);
+        ++idx;
+    }
+
+    std::vector<EdgeT> resultNetwork;
+    steiner_network_iterative_rounding(
+        g, restrictions, std::back_inserter(resultNetwork));
+    BOOST_CHECK_EQUAL(resultNetwork.size(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
     //sample problem
     LOGLN("Sample problem:");
-    Graph g(3);
+    VectorGraph g(3);
 
     bool b;
     b  = add_edge(0, 1, 0, g).second;
@@ -100,7 +124,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
 BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     // invalid problem (restrictions cannot be satisfied)
     LOGLN("Invalid problem (restrictions cannot be satisfied):");
-    Graph g(3);
+    VectorGraph g(3);
     ResultNetwork resultNetwork;
     bool b;
     b  = add_edge(0, 1, EdgeProp(0, 1), g).second;

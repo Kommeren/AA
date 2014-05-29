@@ -14,9 +14,9 @@
 #include <boost/graph/adjacency_list.hpp>
 
 
-using namespace  paal;
-using namespace  paal::ir;
-using namespace  boost;
+using namespace paal;
+using namespace paal::ir;
+using namespace boost;
 
 struct log_visitor : public trivial_visitor {
 
@@ -31,39 +31,39 @@ struct log_visitor : public trivial_visitor {
     }
 };
 
-// create a typedef for the Graph type
-typedef adjacency_list<vecS, vecS, undirectedS,
-            property < vertex_index_t, int >,
-            property < edge_index_t, std::size_t,
-                property < edge_weight_t, double,
-                    property < edge_color_t, bool> > > > Graph;
+template <typename VertexList, typename EdgeProp>
+using Graph = adjacency_list<vecS, VertexList, undirectedS,
+                property<vertex_index_t, int>, EdgeProp>;
 
-typedef adjacency_list_traits < vecS, vecS, undirectedS > Traits;
-typedef graph_traits < Graph >::edge_descriptor Edge;
+using EdgeProp = property<edge_index_t, std::size_t,
+                    property<edge_weight_t, double,
+                        property<edge_color_t, bool>>>;
+using VectorGraph = Graph<vecS, EdgeProp>;
+using Edge = graph_traits<VectorGraph>::edge_descriptor;
 
 template <typename Graph, typename TreeMap, typename Cost>
-Edge add_edge_to_graph(Graph & g,  int u, int v,
+Edge add_edge_to_graph(Graph & g, int u, int v,
         TreeMap tree, bool inT,
         Cost & cost, double c) {
     bool b;
-    Traits::edge_descriptor e;
+    Edge e;
     std::tie(e, b) = add_edge(u, v, g);
     assert(b);
-    tree[e]=inT;
+    tree[e] = inT;
     cost[e] = c;
     return e;
 }
 
-typedef property_map < Graph, edge_weight_t >::type Cost;
-typedef property_map < Graph, edge_color_t >::type TreeMap;
-typedef std::set<Edge> SolutionTree;
+using Cost = property_map<VectorGraph, edge_weight_t>::type;
+using TreeMap = property_map<VectorGraph, edge_color_t>::type;
+using SolutionTree = std::set<Edge>;
 
 BOOST_AUTO_TEST_SUITE(tree_augmentation)
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     // sample problem
     LOGLN("Sample problem:");
-    Graph g(6);
+    VectorGraph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
@@ -85,10 +85,36 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     BOOST_CHECK(!solutionTree.empty());
 }
 
+BOOST_AUTO_TEST_CASE(tree_augmentation_list) {
+    // boost::listS instead of boost::vecS for vertex storage
+    using EdgeProp = property<edge_weight_t, double,
+                        property<edge_color_t, bool>>;
+    using ListGraph = Graph<listS, EdgeProp>;
+    using EdgeT = graph_traits<ListGraph>::edge_descriptor;
+
+    std::vector<std::pair<int, int>> edges = {{0,1},{1,2},{1,3},{3,4},{3,5},{0,3},
+            {0,2},{2,4},{2,5},{4,5}};
+    std::vector<EdgeProp> edge_properties {EdgeProp(0,1), EdgeProp(0,1),
+        EdgeProp(0,1), EdgeProp(0,1), EdgeProp(0,1), EdgeProp(1,0),
+        EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0)};
+    ListGraph g(edges.begin(), edges.end(), edge_properties.begin(), 6);
+
+    auto index = get(boost::vertex_index, g);
+    int idx = 0;
+    for (auto v : boost::make_iterator_range(vertices(g))) {
+        put(index, v, idx);
+        ++idx;
+    }
+
+    std::vector<EdgeT> solutionTree;
+    tree_augmentation_iterative_rounding(g, std::inserter(solutionTree, solutionTree.begin()));
+    BOOST_CHECK(!solutionTree.empty());
+}
+
 BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     // sample problem
     LOGLN("Sample problem:");
-    Graph g(6);
+    VectorGraph g(6);
     TreeMap treeMap = get(edge_color, g);
 
     treeMap[add_edge(0, 1, 0, g).first] = true;
@@ -122,7 +148,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     }
 }
 
-void run_invalid_test(const Graph & g){
+void run_invalid_test(const VectorGraph & g){
     SolutionTree solutionTree;
     auto treeaug(make_tree_aug(g, std::back_inserter(solutionTree)));
     auto invalid = treeaug.check_input_validity();
@@ -134,7 +160,7 @@ void run_invalid_test(const Graph & g){
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     // invalid problem (wrong number of spanning tree edges)
     LOGLN("Invalid problem (wrong number of spanning tree edges):");
-    Graph g(6);
+    VectorGraph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
@@ -150,7 +176,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     // invalid problem (spanning tree not connected)
     LOGLN("Invalid problem (spanning tree not connected):");
-    Graph g(6);
+    VectorGraph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 
@@ -169,7 +195,7 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
 BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     // invalid problem (graph not 2-edge-connected)
     LOGLN("Invalid problem (graph not 2-edge-connected):");
-    Graph g(6);
+    VectorGraph g(6);
     Cost cost = get(edge_weight, g);
     TreeMap treeMap = get(edge_color, g);
 

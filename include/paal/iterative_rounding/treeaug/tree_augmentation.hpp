@@ -81,19 +81,33 @@ class const_int_map
     : public boost::put_get_helper<int, const_int_map<KeyType, num>>
 {
 public:
-    typedef boost::readable_property_map_tag category;
-    typedef int value_type;
-    typedef int reference;
-    typedef KeyType key_type;
+    using category = boost::readable_property_map_tag;
+    using value_type = int;
+    using reference = int;
+    using key_type = KeyType;
     reference operator[](KeyType e) const { return num; }
 };
 
 } // namespace detail
 
+namespace {
+struct ta_compare_traits {
+    static const double EPSILON;
+};
+
+const double ta_compare_traits::EPSILON = 1e-10;
+}
+
 /**
  * Round Condition of the IR Tree Augmentation algorithm.
  */
 struct ta_round_condition {
+    /**
+     * Constructor. Takes epsilon used in double comparison.
+     */
+    ta_round_condition(double epsilon = ta_compare_traits::EPSILON) :
+        m_round_half(epsilon) {}
+
     /**
      * Rounds a column up if it is at least half in the
      * current solution. If the column is rounded, the
@@ -134,6 +148,35 @@ struct ta_relax_condition {
         }
         return false;
     }
+};
+
+/**
+ * Set Solution component of the IR Tree Augmentation algorithm.
+ */
+struct ta_set_solution {
+    /**
+     * Constructor. Takes epsilon used in double comparison.
+     */
+    ta_set_solution(double epsilon = ta_compare_traits::EPSILON)
+        : m_compare(epsilon) {}
+
+    /**
+     * Creates the result form the LP (all edges corresponding to columns with value 1).
+     */
+    template <typename Problem, typename GetSolution>
+    void operator()(Problem & problem, const GetSolution & solution) {
+        for (auto e : boost::make_iterator_range(edges(problem.get_links_graph()))) {
+            if (!problem.is_in_solution(e)) {
+                auto col = problem.edge_to_col(e);
+                if (m_compare.e(solution(col), 1)) {
+                    problem.add_to_solution(col);
+                }
+            }
+        }
+    }
+
+private:
+    const utils::Compare<double> m_compare;
 };
 
 /**
@@ -188,8 +231,10 @@ private:
 template <
     typename Init = ta_init,
     typename RoundCondition = ta_round_condition,
-    typename RelaxContition = ta_relax_condition>
-        using tree_augmentation_ir_components = IRcomponents<Init, RoundCondition, RelaxContition>;
+    typename RelaxContition = ta_relax_condition,
+    typename SetSolution = ta_set_solution>
+        using tree_augmentation_ir_components = IRcomponents<Init, RoundCondition,
+                        RelaxContition, SetSolution>;
 
 /**
  * @brief This is Jain's iterative rounding
@@ -206,12 +251,12 @@ template <
  * @tparam Graph the graph type used
  * @tparam TreeMap it is assumed to be a bool map on the edges of a graph of type Graph. It is used for designating a spanning tree in the graph.
  * @tparam CostMap type for the costs of the links.
+ * @tparam VertexIndex type for the vertex index map.
  * @tparam EdgeSetOutputIterator type for the result edge set.
  */
-template <typename Graph, typename TreeMap, typename CostMap, class EdgeSetOutputIterator>
+template <typename Graph, typename TreeMap, typename CostMap, typename VertexIndex, typename EdgeSetOutputIterator>
 class tree_aug {
 public:
-
     using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
     using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
     using CostValue = double;
@@ -234,10 +279,12 @@ public:
      * @param g  the graph to work with
      * @param treeMap designate a spanning tree in \c g
      * @param costMap costs of the links (=non-tree edges). The costs assigned to tree edges are not used.
+     * @param vertexIndex vertex index map
      * @param solution result set of edges output iterator
      */
-    tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIterator solution) :
-        m_g(g), m_tree_map(treeMap), m_cost_map(costMap),
+    tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap,
+            VertexIndex vertexIndex, EdgeSetOutputIterator solution) :
+        m_g(g), m_tree_map(treeMap), m_cost_map(costMap), m_index(vertexIndex),
         m_solution(solution),
         m_tree(m_g, detail::bool_map_to_tree_filter<TreeMap>(m_tree_map)),
         m_ntree(m_g, detail::bool_map_to_non_tree_filter<TreeMap>(m_tree_map)),
@@ -332,19 +379,23 @@ public:
         //contains the list of links covering \c t.
 
         std::vector<Edge> pred(num_vertices(m_g));
+        auto pred_map = boost::make_iterator_property_map(pred.begin(), m_index);
         std::set<Vertex> seen;
         for (auto u : boost::make_iterator_range(vertices(m_g))) {
             auto tmp = seen.insert(u);
             assert(tmp.second);
             boost::breadth_first_search(m_tree, u,
-                                 visitor(make_bfs_visitor(record_edge_predecessors(&pred[0], boost::on_tree_edge()))));
+                boost::visitor(
+                    boost::make_bfs_visitor(
+                        boost::record_edge_predecessors(pred_map, boost::on_tree_edge())
+                    )));
 
             for (auto e : boost::make_iterator_range(out_edges(u, m_ntree))) {
                 auto node = target(e, m_ntree);
                 if (!seen.count(node)) {
                     while (node != u) {
-                        m_covered_by[pred[node]].push_back(e);
-                        node = source(pred[node], m_tree);
+                        m_covered_by[get(pred_map, node)].push_back(e);
+                        node = source(get(pred_map, node), m_tree);
                     }
                 }
             }
@@ -394,6 +445,8 @@ private:
     TreeMap m_tree_map;
     /// Input edge cost map
     CostMap m_cost_map;
+    /// Vertex index map
+    VertexIndex m_index;
 
     /// Which links are chosen in the solution
     EdgeSetOutputIterator m_solution;
@@ -420,18 +473,23 @@ namespace detail {
  * @tparam Graph
  * @tparam TreeMap
  * @tparam CostMap
+ * @tparam VertexIndex
  * @tparam EdgeSetOutputIterator
  * @param g
  * @param treeMap
  * @param costMap
+ * @param vertexIndex
  * @param solution
  *
  * @return tree_aug object
  */
-template <typename Graph, typename TreeMap, typename CostMap, typename EdgeSetOutputIterator>
-tree_aug<Graph, TreeMap, CostMap, EdgeSetOutputIterator>
-make_tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIterator solution) {
-    return paal::ir::tree_aug<Graph, TreeMap, CostMap, EdgeSetOutputIterator>(g, treeMap, costMap, solution);
+template <typename Graph, typename TreeMap, typename CostMap,
+            typename VertexIndex, typename EdgeSetOutputIterator>
+tree_aug<Graph, TreeMap, CostMap, VertexIndex, EdgeSetOutputIterator>
+make_tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap,
+                VertexIndex vertexIndex, EdgeSetOutputIterator solution) {
+    return paal::ir::tree_aug<Graph, TreeMap, CostMap,
+            VertexIndex, EdgeSetOutputIterator>(g, treeMap, costMap, vertexIndex, solution);
 }
 
 /**
@@ -440,12 +498,14 @@ make_tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIt
  * @tparam Graph
  * @tparam TreeMap
  * @tparam CostMap
+ * @tparam VertexIndex
  * @tparam EdgeSetOutputIterator
  * @tparam IRcomponents
  * @tparam Visitor
  * @param g
  * @param treeMap
  * @param costMap
+ * @param vertexIndex
  * @param solution
  * @param components
  * @param visitor
@@ -453,17 +513,19 @@ make_tree_aug(const Graph & g, TreeMap treeMap, CostMap costMap, EdgeSetOutputIt
  * @return solution status
  */
 template <typename Graph, typename TreeMap,
-          typename CostMap, typename EdgeSetOutputIterator,
+          typename CostMap, typename VertexIndex,
+          typename EdgeSetOutputIterator,
           typename IRcomponents = tree_augmentation_ir_components<>,
           typename Visitor = trivial_visitor>
 IRResult tree_augmentation_iterative_rounding(
         const Graph & g,
         TreeMap treeMap,
         CostMap costMap,
+        VertexIndex vertexIndex,
         EdgeSetOutputIterator solution,
         IRcomponents components = IRcomponents(),
         Visitor visitor = Visitor()) {
-    auto treeaug = make_tree_aug(g, treeMap, costMap, solution);
+    auto treeaug = make_tree_aug(g, treeMap, costMap, vertexIndex, solution);
     return solve_iterative_rounding(treeaug, std::move(components), std::move(visitor));
 }
 } // detail
@@ -490,10 +552,12 @@ make_tree_aug(const Graph & g, const boost::bgl_named_params<P, T, R> & params, 
         tree_aug<Graph,
                 decltype(choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color)),
                 decltype(choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight)),
+                decltype(choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index)),
                 EdgeSetOutputIterator> {
     return detail::make_tree_aug(g,
             choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color),
             choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+            choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index),
             solution);
 }
 
@@ -547,6 +611,7 @@ IRResult tree_augmentation_iterative_rounding(
     return detail::tree_augmentation_iterative_rounding(g,
             choose_const_pmap(get_param(params, boost::edge_color), g, boost::edge_color),
             choose_const_pmap(get_param(params, boost::edge_weight), g, boost::edge_weight),
+            choose_const_pmap(get_param(params, boost::vertex_index), g, boost::vertex_index),
             std::move(solution), std::move(components), std::move(visitor));
 }
 

@@ -35,11 +35,12 @@ public:
     template <typename Problem>
     bool check_if_solution_exists(Problem & problem) {
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
         for (auto e : boost::make_iterator_range(edges(g))) {
-            auto u = source(e, g);
-            auto v = target(e, g);
+            auto u = get(index, source(e, g));
+            auto v = get(index, target(e, g));
             m_min_cut.add_edge_to_graph(u, v, 1, 1);
         }
 
@@ -88,17 +89,18 @@ public:
         }
 
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
         auto restriction = problem.get_max_restriction(violation.first, violation.second);
 
         for (auto const & e : problem.get_edges_in_solution()) {
-            if (is_edge_in_violating_cut(e, g)) {
+            if (is_edge_in_violating_cut(e, g, index)) {
                 --restriction;
             }
         }
 
         lp::linear_expression expr;
         for (auto const & e : problem.get_edge_map()) {
-            if (is_edge_in_violating_cut(e.second, g)) {
+            if (is_edge_in_violating_cut(e.second, g, index)) {
                 expr += e.first;
             }
         }
@@ -111,10 +113,10 @@ private:
     /**
      * Checks if a given edge belongs to the cut given by the current violating set.
      */
-    template <typename Edge, typename Graph>
-    bool is_edge_in_violating_cut(Edge edge, const Graph & g) {
-        auto u = source(edge, g);
-        auto v = target(edge, g);
+    template <typename Edge, typename Graph, typename Index>
+    bool is_edge_in_violating_cut(Edge edge, const Graph & g, const Index & index) {
+        auto u = get(index, source(edge, g));
+        auto v = get(index, target(edge, g));
         return m_min_cut.is_in_source_set(u) != m_min_cut.is_in_source_set(v);
     }
 
@@ -124,6 +126,7 @@ private:
     template <typename Problem, typename LP>
     void fill_auxiliary_digraph(Problem & problem, const LP & lp) {
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
         for (auto const & e : problem.get_edge_map()) {
@@ -131,15 +134,15 @@ private:
             double col_val = lp.get_col_value(col_idx);
 
             if (problem.get_compare().g(col_val, 0)) {
-                auto u = source(e.second, g);
-                auto v = target(e.second, g);
+                auto u = get(index, source(e.second, g));
+                auto v = get(index, target(e.second, g));
                 m_min_cut.add_edge_to_graph(u, v, col_val, col_val);
             }
         }
 
         for (auto const & e : problem.get_edges_in_solution()) {
-            auto u = source(e, g);
-            auto v = target(e, g);
+            auto u = get(index, source(e, g));
+            auto v = get(index, target(e, g));
             m_min_cut.add_edge_to_graph(u, v, 1, 1);
         }
     }

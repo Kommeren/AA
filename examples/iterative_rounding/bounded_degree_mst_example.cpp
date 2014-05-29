@@ -17,9 +17,9 @@
 
 int main() {
 //! [Bounded-Degree Minimum Spanning Tree Example]
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
-    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::no_property, boost::property<boost::edge_weight_t, int>>;
+    using Edge = boost::graph_traits<Graph>::edge_descriptor;
 
     // sample problem
     std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},{1,5},{5,0},{3,4}};

@@ -15,11 +15,11 @@
 
 int main() {
 //! [Tree Augmentation Example]
-    typedef boost::property<boost::edge_weight_t, double,
-                boost::property<boost::edge_color_t, bool>> EdgeProp;
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                boost::no_property, EdgeProp> Graph;
-    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    using EdgeProp = boost::property<boost::edge_weight_t, double,
+                boost::property<boost::edge_color_t, bool>>;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                boost::no_property, EdgeProp>;
+    using Edge = boost::graph_traits<Graph>::edge_descriptor;
 
     // sample problem
     std::vector<std::pair<int, int>> edges {{0,1},{1,2},{1,3},{3,4},{3,5},{0,3},{0,3},{2,4},{2,5},{4,5}};

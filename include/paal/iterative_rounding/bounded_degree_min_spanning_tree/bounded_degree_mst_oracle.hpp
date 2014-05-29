@@ -28,7 +28,7 @@ class bdmst_violation_checker {
     using AuxEdge = min_cut_finder::Edge;
     using AuxVertex = min_cut_finder::Vertex;
     using AuxEdgeList = std::vector<AuxEdge>;
-    using Violation =  boost::optional<double>;
+    using Violation = boost::optional<double>;
 
 public:
     using Candidate = std::pair<AuxVertex, AuxVertex>;
@@ -69,11 +69,12 @@ public:
         }
 
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
 
         lp::linear_expression expr;
         for (auto const & e : problem.get_edge_map().right) {
-            auto u = source(e.second, g);
-            auto v = target(e.second, g);
+            auto u = get(index, source(e.second, g));
+            auto v = get(index, target(e.second, g));
             if (m_min_cut.is_in_source_set(u) && m_min_cut.is_in_source_set(v)) {
                 expr += e.first;
             }
@@ -89,6 +90,7 @@ private:
     template <typename Problem, typename LP>
     void fill_auxiliary_digraph(const Problem & problem, const LP & lp) {
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
         m_vertices_num = num_vertices(g);
         m_min_cut.init(m_vertices_num);
         m_src_to_v.resize(m_vertices_num);
@@ -99,8 +101,8 @@ private:
             double col_val = lp.get_col_value(col_idx) / 2;
 
             if (!problem.get_compare().e(col_val, 0)) {
-                auto u = source(e.second, g);
-                auto v = target(e.second, g);
+                auto u = get(index, source(e.second, g));
+                auto v = get(index, target(e.second, g));
                 m_min_cut.add_edge_to_graph(u, v, col_val, col_val);
             }
         }
@@ -109,8 +111,9 @@ private:
         m_trg = m_min_cut.add_vertex_to_graph();
 
         for (auto v : boost::make_iterator_range(vertices(g))) {
-            m_src_to_v[v] = m_min_cut.add_edge_to_graph(m_src, v, degree_of(problem, v, lp) / 2).first;
-            m_v_to_trg[v] = m_min_cut.add_edge_to_graph(v, m_trg, 1).first;
+            auto aux_v = get(index, v);
+            m_src_to_v[aux_v] = m_min_cut.add_edge_to_graph(m_src, aux_v, degree_of(problem, v, lp) / 2).first;
+            m_v_to_trg[aux_v] = m_min_cut.add_edge_to_graph(aux_v, m_trg, 1).first;
         }
     }
 
@@ -120,12 +123,15 @@ private:
     template <typename Problem>
     void initialize_candidates(const Problem & problem) {
         const auto & g = problem.get_graph();
+        const auto & index = problem.get_index();
         auto src = *(std::next(vertices(g).first, rand() % m_vertices_num));
+        auto aux_src = get(index, src);
         m_candidate_list.clear();
         for (auto v : boost::make_iterator_range(vertices(g))) {
             if (v != src) {
-                m_candidate_list.push_back(std::make_pair(src, v));
-                m_candidate_list.push_back(std::make_pair(v, src));
+                auto aux_v = get(index, v);
+                m_candidate_list.push_back(std::make_pair(aux_src, aux_v));
+                m_candidate_list.push_back(std::make_pair(aux_v, aux_src));
             }
         }
     }

@@ -16,9 +16,9 @@
 
 int main() {
 //! [Steiner Network Example]
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::property<boost::edge_weight_t, int>> Graph;
-    typedef boost::graph_traits<Graph>::edge_descriptor Edge;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::no_property, boost::property<boost::edge_weight_t, int>>;
+    using Edge = boost::graph_traits<Graph>::edge_descriptor;
     auto restrictions = [](int i, int j) {return 2;};
 
     // sample problem
