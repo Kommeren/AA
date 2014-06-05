@@ -13,14 +13,13 @@
 ** improve row generation ?
 ** resolving solution by moving a point ?
 ** cplex support ???
-** steiner tree doxygen warnings
 
 *lp
-** (glpk) in the resolve we don't allways want to call 
+** (glpk) in the resolve we don't allways want to call
    glp_adv_basis, but run it only when glp_simplex fails.
-   This is not done beacause of the bug in the glpk. 
+   This is not done beacause of the bug in the glpk.
    It should be done when the bug is fixed.
-  
+
 
 * GREEDY
 ** set cover (AA)

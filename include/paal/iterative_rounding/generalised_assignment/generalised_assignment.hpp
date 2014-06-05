@@ -1,7 +1,7 @@
 /**
  * @file generalised_assignment.hpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-05-06
  */
@@ -11,7 +11,6 @@
 
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
-
 
 
 namespace paal {
@@ -51,14 +50,14 @@ struct ga_set_solution {
     void operator()(Problem & problem, const GetSolution & solution) {
         auto jbegin = problem.get_jobs().first;
         auto mbegin = problem.get_machines().first;
-        auto & colIdx = problem.get_col_idx();
-        auto jobToMachine = problem.get_job_to_machines();
+        auto & col_idx = problem.get_col_idx();
+        auto job_to_machine = problem.get_job_to_machines();
 
-        for(int idx : boost::irange(0, int(colIdx.size()))) {
-            if(problem.get_compare().e(solution(colIdx[idx]), 1)) {
-                *jobToMachine = std::make_pair(*(jbegin + problem.get_j_idx(idx)),
+        for (int idx : boost::irange(0, int(col_idx.size()))) {
+            if (problem.get_compare().e(solution(col_idx[idx]), 1)) {
+                *job_to_machine = std::make_pair(*(jbegin + problem.get_j_idx(idx)),
                                                   *(mbegin + problem.get_m_idx(idx)));
-                ++jobToMachine;
+                ++job_to_machine;
             }
         }
     }
@@ -90,15 +89,15 @@ class ga_init {
          */
         template <typename Problem, typename LP>
         void add_variables(Problem & problem, LP & lp) {
-            auto & colIdx = problem.get_col_idx();
-            colIdx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
-            for(auto && j : boost::make_iterator_range(problem.get_jobs())) {
-                for(auto && m : boost::make_iterator_range(problem.get_machines())) {
+            auto & col_idx = problem.get_col_idx();
+            col_idx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
+            for (auto && j : boost::make_iterator_range(problem.get_jobs())) {
+                for (auto && m : boost::make_iterator_range(problem.get_machines())) {
                     if (problem.get_proceeding_time()(j, m) <= problem.get_machine_available_time()(m)) {
-                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m)));
+                        col_idx.push_back(lp.add_column(problem.get_cost()(j,m)));
                     }
                     else {
-                        colIdx.push_back(lp.add_column(problem.get_cost()(j,m), 0, 0));
+                        col_idx.push_back(lp.add_column(problem.get_cost()(j,m), 0, 0));
                     }
                 }
             }
@@ -107,12 +106,12 @@ class ga_init {
         //constraints for job
         template <typename Problem, typename LP>
         void add_constraints_for_jobs(Problem & problem, LP & lp) {
-            auto & colIdx = problem.get_col_idx();
-            for (int jIdx : boost::irange(0, problem.get_jobs_cnt())) {
+            auto & col_idx = problem.get_col_idx();
+            for (int j_idx : boost::irange(0, problem.get_jobs_cnt())) {
                 lp::linear_expression expr;
-                for (int mIdx : boost::irange(0, problem.get_machines_cnt())) {
-                    expr += colIdx[problem.idx(jIdx,mIdx)];
-                    ++mIdx;
+                for (int m_idx : boost::irange(0, problem.get_machines_cnt())) {
+                    expr += col_idx[problem.idx(j_idx,m_idx)];
+                    ++m_idx;
                 }
                 lp.add_row(std::move(expr) == 1.0);
             }
@@ -121,22 +120,22 @@ class ga_init {
         //constraints for machines
         template <typename Problem, typename LP>
         void add_constraints_for_machines(Problem & problem, LP & lp)  {
-            auto & colIdx = problem.get_col_idx();
-            int mIdx(0);
-            for(auto && m : boost::make_iterator_range(problem.get_machines())) {
+            auto & col_idx = problem.get_col_idx();
+            int m_idx(0);
+            for (auto && m : boost::make_iterator_range(problem.get_machines())) {
                 auto T = problem.get_machine_available_time()(m);
-                int jIdx(0);
+                int j_idx(0);
                 lp::linear_expression expr;
 
-                for(auto && j : boost::make_iterator_range(problem.get_jobs())) {
+                for (auto && j : boost::make_iterator_range(problem.get_jobs())) {
                     auto t = problem.get_proceeding_time()(j, m);
-                    auto x = colIdx[problem.idx(jIdx, mIdx)];
+                    auto x = col_idx[problem.idx(j_idx, m_idx)];
                     expr += x * t;
-                    ++jIdx;
+                    ++j_idx;
                 }
                 auto row = lp.add_row(std::move(expr) <= T);
                 problem.get_machine_rows().insert(row);
-                ++mIdx;
+                ++m_idx;
             }
         }
 };
@@ -167,9 +166,11 @@ class generalised_assignment {
         using Job = typename std::iterator_traits<JobIter>::value_type;
         using Machine = typename std::iterator_traits<MachineIter>::value_type;
 
-        using Compare = utils::Compare<double>;
+        using Compare = utils::compare<double>;
         using MachineRows = std::unordered_set<lp::row_id>;
         using ColIdx = std::vector<lp::col_id>;
+
+        using ErrorMessage = boost::optional<std::string>;
 
         /**
          * Constructor.
@@ -177,12 +178,10 @@ class generalised_assignment {
         generalised_assignment(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const MachineAvailableTime & T,
-                JobsToMachinesOutputIterator jobToMachines) :
+                JobsToMachinesOutputIterator job_to_machines) :
             m_m_cnt(std::distance(mbegin, mend)), m_j_cnt(std::distance(jbegin, jend)),
             m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
-            m_c(c), m_t(t), m_T(T), m_job_to_machine(jobToMachines) {}
-
-        using ErrorMessage = boost::optional<std::string>;
+            m_c(c), m_t(t), m_T(T), m_job_to_machine(job_to_machines) {}
 
         /**
          * Checks if input is valid.
@@ -194,8 +193,8 @@ class generalised_assignment {
         /**
          * Returns the index of the edge between a given job and a given machine.
          */
-        int idx(int jIdx, int mIdx) {
-            return jIdx * m_m_cnt + mIdx;
+        int idx(int j_idx, int m_idx) {
+            return j_idx * m_m_cnt + m_idx;
         }
 
         /**
@@ -325,7 +324,7 @@ class generalised_assignment {
  * @param c costs of assignments
  * @param t jobs proceeding times
  * @param T times available for the machines
- * @param jobsToMachines found assignment
+ * @param jobs_to_machines found assignment
  *
  * @return generalised_assignment object
  */
@@ -337,10 +336,10 @@ generalised_assignment<MachineIter, JobIter, Cost, ProceedingTime,
 make_generalised_assignment(MachineIter mbegin, MachineIter mend,
             JobIter jbegin, JobIter jend,
             const Cost & c, const  ProceedingTime & t, const  MachineAvailableTime & T,
-            JobsToMachinesOutputIterator jobsToMachines) {
+            JobsToMachinesOutputIterator jobs_to_machines) {
     return generalised_assignment<MachineIter, JobIter, Cost, ProceedingTime,
                         MachineAvailableTime, JobsToMachinesOutputIterator>(
-            mbegin, mend, jbegin, jend, c, t, T, jobsToMachines);
+            mbegin, mend, jbegin, jend, c, t, T, jobs_to_machines);
 }
 
 /**
@@ -361,7 +360,7 @@ make_generalised_assignment(MachineIter mbegin, MachineIter mend,
  * @param c costs of assignments
  * @param t jobs proceeding times
  * @param T times available for the machines
- * @param jobsToMachines found assignment
+ * @param jobs_to_machines found assignment
  * @param components IR components
  * @param visitor
  *
@@ -375,12 +374,12 @@ template <typename MachineIter, typename JobIter, typename Cost,
 IRResult generalised_assignment_iterative_rounding(MachineIter mbegin, MachineIter mend,
                 JobIter jbegin, JobIter jend,
                 const Cost & c, const ProceedingTime & t, const  MachineAvailableTime & T,
-                JobsToMachinesOutputIterator jobsToMachines,
+                JobsToMachinesOutputIterator jobs_to_machines,
                 Components components = Components(), Visitor visitor = Visitor()) {
-    auto gaSolution = make_generalised_assignment(
+    auto ga_solution = make_generalised_assignment(
             mbegin, mend, jbegin, jend,
-            c, t, T, jobsToMachines);
-    return solve_iterative_rounding(gaSolution, std::move(components), std::move(visitor));
+            c, t, T, jobs_to_machines);
+    return solve_iterative_rounding(ga_solution, std::move(components), std::move(visitor));
 }
 
 

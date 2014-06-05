@@ -22,7 +22,7 @@ namespace paal {
      */
     inline std::string pretty_to_string(double x, double epsilon = 1e-9) {
         int r = std::round(x);
-        if(utils::Compare<double>{epsilon}.e(x,r)) {
+        if(utils::compare<double>{epsilon}.e(x,r)) {
             return std::to_string(r);
         } else {
             return std::to_string(x);

@@ -16,33 +16,35 @@
 int main(){
 //! [K Cut Example]
     // sample data
-    std::vector<std::pair<int,int>> edgesP{{1,2},{1,5},{2,3},{2,5},{2,6},{3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
+    std::vector<std::pair<int,int>> edges_p {{1,2},{1,5},{2,3},{2,5},{2,6},
+        {3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
     std::vector<int> costs{2,3,3,2,2,4,2,2,2,3,1,3};
     boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                     boost::no_property,
                     boost::property<boost::edge_index_t, std::size_t>
                     > graph(8);
-    for (std::size_t i = 0; i < edgesP.size(); ++i) {
-        add_edge(edgesP[i].first, edgesP[i].second, i, graph);
+    for (std::size_t i = 0; i < edges_p.size(); ++i) {
+        add_edge(edges_p[i].first, edges_p[i].second, i, graph);
     }
     const int parts = 3;
 
-    auto edgeId = get(boost::edge_index, graph);
-    auto weight = make_iterator_property_map(costs.begin(), edgeId);
+    auto edge_id = get(boost::edge_index, graph);
+    auto weight = make_iterator_property_map(costs.begin(), edge_id);
 
     // solve
-    int costCut;
-    std::vector<std::pair<int,int>> verticesParts;
-    costCut = paal::greedy::kCut(graph, parts, back_inserter(verticesParts), boost::weight_map(weight));
+    int cost_cut;
+    std::vector<std::pair<int,int>> vertices_parts;
+    cost_cut = paal::greedy::k_cut(graph, parts, back_inserter(vertices_parts),
+            boost::weight_map(weight));
 
     // alternative form
-    // costCut = paal::greedy::kCut(graph, parts, back_inserter(verticesParts));
+    // cost_cut = paal::greedy::k_cut(graph, parts, back_inserter(vertices_parts));
     // this works if the graph has and internal edge weight property map
 
     // print result
-    std::cout << "cost cut:" << costCut << std::endl;
-    std::vector<int> verticesToParts;
-    for(auto i: verticesParts){
+    std::cout << "cost cut:" << cost_cut << std::endl;
+    std::vector<int> vertices_to_parts;
+    for (auto i: vertices_parts) {
         std::cout << i.first << "(" << i.second << "), ";
     }
     std::cout << std::endl;

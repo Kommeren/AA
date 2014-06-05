@@ -6,13 +6,13 @@
  * @date 2014-03-31
  */
 
+//! [LP Example]
 #include "paal/lp/glp.hpp"
 
 #include <boost/range/iterator_range.hpp>
 
 #include <iostream>
 
-//! [LP Example]
 using LP = paal::lp::glp;
 
 void print_solution(paal::lp::problem_type status, const LP & lp_instance) {
@@ -27,16 +27,13 @@ void print_solution(paal::lp::problem_type status, const LP & lp_instance) {
 }
 
 int main() {
-
-
-
     // sample problem
     LP lp_instance;
 
     lp_instance.set_optimization_type(paal::lp::MAXIMIZE);
-        // add_column(column_cost, lower_bound, upper_bound, symbolic_name)
-    auto X = lp_instance.add_column(500, 0, std::numeric_limits<double>::max(), "x");
-    auto Y = lp_instance.add_column(300, 0, std::numeric_limits<double>::max(), "y");
+    // add_column(column_cost, lower_bound, upper_bound, symbolic_name)
+    auto X = lp_instance.add_column(500, 0, paal::lp::lp_traits::PLUS_INF, "x");
+    auto Y = lp_instance.add_column(300, 0, paal::lp::lp_traits::PLUS_INF, "y");
 
     auto expr = X + Y;
     std::cout << expr << std::endl;

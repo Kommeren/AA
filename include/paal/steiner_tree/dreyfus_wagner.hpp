@@ -267,6 +267,13 @@ private:
     std::unordered_map<State, StateBM, state_hash> m_best_split; // stores result of wagner method for given state
 };
 
+/**
+ * @brief Creates a dreyfus_wagner object.
+ * @tparam TerminalsLimit
+ * @tparam Metric
+ * @tparam Terminals
+ * @tparam NonTerminals
+ */
 template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals, typename NonTerminals>
 dreyfus_wagner<Metric, Terminals, NonTerminals, TerminalsLimit>
 make_dreyfus_wagner(const Metric& metric, const Terminals& terminals, const NonTerminals& nonTerminals) {

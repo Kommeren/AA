@@ -36,7 +36,7 @@ static const double OPT_CAP = 6;
 static const double EPSILON = 1./4.;
 static const double VALUE_MULTIPLIER = 1. - EPSILON;
 static const double SIZE_MULTIPLIER = 1. + EPSILON;
-static const utils::Compare<double> compare(0.001);
+static const utils::compare<double> compare(0.001);
 
 
 template <typename MaxValue>

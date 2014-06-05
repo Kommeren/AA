@@ -76,9 +76,9 @@ Here <i>LP</i> is the linear programming instance type.<br>
 <i>Oracle</i> is the Separation Oracle concept class. It is responsible for checking if the current LP solution is a feasible solution to the given Problem and if not, adding some violated constraint to the LP. It must implement the following interface:
 <pre>
  OracleArchetype {
-    bool feasibleSolution(const Problem & problem, const LP & lp);
+    bool feasible_solution(const Problem & problem, const LP & lp);
 
-    void addViolatedConstraint(const Problem & problem, LP & lp);
+    void add_violated_constraint(const Problem & problem, LP & lp);
  }
 </pre>
 

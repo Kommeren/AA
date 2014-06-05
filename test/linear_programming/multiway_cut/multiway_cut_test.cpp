@@ -11,14 +11,14 @@
 
 #include "paal/multiway_cut/multiway_cut.hpp"
 
-#include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/range/irange.hpp>
+#include <boost/test/unit_test.hpp>
 
 
 template <typename Graph>
 std::pair<Graph, int> create_instance() {
-    std::vector<std::pair<int,int> > edgesP{{0,3},{1,3},
+    std::vector<std::pair<int,int> > edges_p{{0,3},{1,3},
                                             {0,4},{2,4},
                                             {1,5},{2,5},
                                             {3,6},{4,6},
@@ -27,9 +27,9 @@ std::pair<Graph, int> create_instance() {
                                             {6,7},{6,8},{7,8}
     };
     const int nu_vertices = 9;
-    std::vector<int> costEdges{100,100,100,100,100,100,10,10,10,10,10,10,1,1,1};
+    std::vector<int> cost_edges{100,100,100,100,100,100,10,10,10,10,10,10,1,1,1};
 
-    Graph graph(edgesP.begin(), edgesP.end(), costEdges.begin(), nu_vertices);
+    Graph graph(edges_p.begin(), edges_p.end(), cost_edges.begin(), nu_vertices);
 
     const int terminals_num = 3;
     int i = 0;
@@ -50,25 +50,25 @@ void run_test(const Graph & graph, int optimal) {
     using VT = typename boost::graph_traits<Graph>::vertex_descriptor;
     auto index = get(boost::vertex_index, graph);
     auto weight = boost::get(boost::edge_weight, graph);
-    std::vector<std::pair<VT, int>> verticesParts;
+    std::vector<std::pair<VT, int>> vertices_parts;
 
-    auto costCut = paal::multiway_cut(graph, back_inserter(verticesParts));
-    LOGLN("cost cut: " << costCut);
-    std::vector<int> verticesToParts(verticesParts.size());
-    for (auto i: verticesParts) {
+    auto cost_cut = paal::multiway_cut(graph, back_inserter(vertices_parts));
+    LOGLN("cost cut: " << cost_cut);
+    std::vector<int> vertices_to_parts(vertices_parts.size());
+    for (auto i: vertices_parts) {
         LOG(i.first << "(" << i.second << "), ");
-        verticesToParts[get(index, i.first)] = i.second;
+        vertices_to_parts[get(index, i.first)] = i.second;
     }
     LOGLN("");
-    int costCutVerification = 0;
+    int cost_cut_verification = 0;
     for (auto e : boost::make_iterator_range(edges(graph))){
-        if (verticesToParts[get(index, source(e, graph))] != verticesToParts[get(index, target(e, graph))])
-            costCutVerification += get(weight, e);
+        if (vertices_to_parts[get(index, source(e, graph))] != vertices_to_parts[get(index, target(e, graph))])
+            cost_cut_verification += get(weight, e);
     }
 
-    check_result(costCut, optimal, 2);
-    LOGLN("Cost Cut Verification: " << costCutVerification);
-    BOOST_CHECK_EQUAL(costCut, costCutVerification);
+    check_result(cost_cut, optimal, 2);
+    LOGLN("Cost Cut Verification: " << cost_cut_verification);
+    BOOST_CHECK_EQUAL(cost_cut, cost_cut_verification);
 }
 
 template <typename VertexList>

@@ -13,9 +13,9 @@ in a fractional solution: the sampled component is contracted and the LP is upda
 We iterate this process until all terminals are connected.
 
 Example:
- \snippet ir_steiner_tree_example.cpp IR Steiner Tree Example
+ \snippet steiner_tree_ir_example.cpp IR Steiner Tree Example
 
-  complete example is steiner_tree_example.cpp
+  complete example is in steiner_tree_ir_example.cpp
 
 \subsection apps_st2 Approximation Ratio
 The approximation ratio for this algorithm equals 1.39

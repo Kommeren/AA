@@ -14,24 +14,24 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <vector>
 #include <fstream>
+#include <vector>
 
 using namespace paal;
 using namespace paal::ir;
 
-typedef int Vertex;
-typedef int Dist;
-typedef std::vector<int> Terminals;
-typedef GraphMT Metric;
+using Vertex = int;
+using Dist = int;
+using Terminals = std::vector<int>;
+using Metric = GraphMT;
 
 template <template <typename> class OracleStrategy>
 void run_test(const steiner_tree_test & test) {
-    paal::ir::random_generator strategyRand(50, 5);
+    paal::ir::random_generator strategy_rand(50, 5);
     std::vector<int> result;
     paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
             test.metric, test.terminals, test.steiner_points,
-            std::back_inserter(result), strategyRand);
+            std::back_inserter(result), strategy_rand);
         ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
 
         LOG("RES " << res << "\n");

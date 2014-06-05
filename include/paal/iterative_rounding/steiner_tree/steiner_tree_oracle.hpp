@@ -8,7 +8,6 @@
 #ifndef STEINER_TREE_ORACLE_HPP
 #define STEINER_TREE_ORACLE_HPP
 
-
 #include "paal/iterative_rounding/min_cut.hpp"
 
 #include <boost/optional.hpp>

@@ -1,7 +1,7 @@
 /**
  * @file generalised_assignment_example.cpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-02-04
  */
@@ -15,8 +15,8 @@
 int main() {
 //! [Generalised Assignment Example]
     // sample problem
-    auto machines = boost::irange(0,2);
-    auto jobs = boost::irange(0,2);
+    std::vector<int> machines = {0,1};
+    std::vector<int> jobs = {0,1};
 
     std::vector<std::vector<int>> cost(2, std::vector<int>(2));
     cost[0][0] = 2;
@@ -44,8 +44,9 @@ int main() {
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
-        for (auto const & jm : jobs_to_machines) {
-            std::cout << "Job " << jm.first << " assigned to Machine " << jm.second << std::endl;
+        for (auto jm : jobs_to_machines) {
+            std::cout << "Job " << jm.first << " assigned to Machine "
+                << jm.second << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
     }

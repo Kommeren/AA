@@ -7,8 +7,8 @@
  */
 
 
-#include "paal/utils/functors.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
+#include "paal/utils/functors.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -17,12 +17,14 @@
 
 int main() {
 //! [Bounded-Degree Minimum Spanning Tree Example]
-    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::property<boost::edge_weight_t, int>>;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
+        boost::undirectedS, boost::no_property,
+        boost::property<boost::edge_weight_t, int>>;
     using Edge = boost::graph_traits<Graph>::edge_descriptor;
 
     // sample problem
-    std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},{1,5},{5,0},{3,4}};
+    std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},
+        {1,5},{5,0},{3,4}};
     std::vector<int> costs {1,2,1,2,1,1,1,5};
     std::vector<int> bounds {3,2,2,2,2,2};
 

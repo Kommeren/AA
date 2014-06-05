@@ -26,10 +26,10 @@ namespace lp {
 
 namespace {
 struct linear_expression_traits {
-    static const utils::Compare<double> CMP;
+    static const utils::compare<double> CMP;
 };
 
-const utils::Compare<double> linear_expression_traits::CMP = utils::Compare<double>();
+const utils::compare<double> linear_expression_traits::CMP = utils::compare<double>();
 }
 
 /**

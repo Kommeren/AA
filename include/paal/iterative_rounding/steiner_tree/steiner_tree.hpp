@@ -1,7 +1,7 @@
 /**
  * @file steiner_tree.hpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Godlewski
  * @version 1.0
  * @date 2013-08-01
  */
@@ -11,16 +11,16 @@
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
+#include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
+#include "paal/iterative_rounding/steiner_tree/steiner_strategy.hpp"
+#include "paal/iterative_rounding/steiner_tree/steiner_tree_oracle.hpp"
+#include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/lp/separation_oracles.hpp"
 #include "paal/utils/floating.hpp"
-#include "paal/data_structures/metric/basic_metrics.hpp"
-#include "paal/iterative_rounding/steiner_tree/steiner_tree_oracle.hpp"
-#include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
-#include "paal/iterative_rounding/steiner_tree/steiner_strategy.hpp"
-#include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
 
 #include <boost/range/join.hpp>
 
@@ -43,28 +43,35 @@ using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
 
 /**
  * @class steiner_tree
+ * @brief The class for solving the Steiner Tree problem using Iterative Rounding.
+ *
+ * @tparam OrigMetric
+ * @tparam Terminals
+ * @tparam Result
+ * @tparam Strategy
+ * @tparam Oracle separation oracle
  */
 template<typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy=all_generator,
+    typename Strategy = all_generator,
     typename Oracle = steiner_tree_oracle<>>
 class steiner_tree {
 public:
-    typedef data_structures::metric_traits<OrigMetric> MT;
-    typedef typename MT::VertexType Vertex;
-    typedef typename MT::DistanceType Dist;
-    typedef typename std::pair<Vertex, Vertex> Edge;
-    typedef utils::Compare<double> Compare;
-    typedef data_structures::array_metric<Dist> Metric;
+    using MT = data_structures::metric_traits<OrigMetric>;
+    using Vertex = typename MT::VertexType;
+    using Dist = typename MT::DistanceType;
+    using Edge = typename std::pair<Vertex, Vertex>;
+    using Compare = utils::compare<double>;
+    using Metric = data_structures::array_metric<Dist>;
 
     /**
      * Constructor.
      */
     steiner_tree(const OrigMetric& metric, const Terminals& terminals,
-            const Terminals& steinerVertices, Result result,
+            const Terminals& steiner_vertices, Result result,
             const Strategy& strategy = Strategy(), Oracle oracle = Oracle()) :
-        m_cost_map(metric, boost::begin(boost::range::join(terminals, steinerVertices)),
-                boost::end(boost::range::join(terminals, steinerVertices))),
-        m_terminals(terminals), m_steiner_vertices(steinerVertices),
+        m_cost_map(metric, boost::begin(boost::range::join(terminals, steiner_vertices)),
+                boost::end(boost::range::join(terminals, steiner_vertices))),
+        m_terminals(terminals), m_steiner_vertices(steiner_vertices),
         m_strategy(strategy), m_result_iterator(result),
         m_compare(steiner_tree_compare_traits::EPSILON), m_oracle(oracle) {
     }
@@ -118,17 +125,20 @@ public:
         return m_elements_map.at(id);
     }
 
-    void add_to_solution(const std::vector<Vertex>& steinerElements) {
-        std::copy(steinerElements.begin(), steinerElements.end(), m_result_iterator);
+    /**
+     * Adds elements to solution.
+     */
+    void add_to_solution(const std::vector<Vertex>& steiner_elements) {
+        std::copy(steiner_elements.begin(), steiner_elements.end(), m_result_iterator);
     }
 
     /**
      * Recalculates distances after two vertices were merged.
      */
     void merge_vertices(Vertex u, Vertex w) {
-        auto allElements = boost::range::join(m_terminals, m_steiner_vertices);
-        for (Vertex i: allElements) {
-            for (Vertex j: allElements) {
+        auto all_elements = boost::range::join(m_terminals, m_steiner_vertices);
+        for (Vertex i: all_elements) {
+            for (Vertex j: all_elements) {
                 Dist x = m_cost_map(i, u) + m_cost_map(w, j);
                 m_cost_map(i, j) = std::min(m_cost_map(i, j), x);
             }
@@ -140,8 +150,8 @@ public:
      */
     void update_graph(const steiner_component<Vertex, Dist>& selected) {
         const std::vector<Vertex>& v = selected.get_elements();
-        auto allElementsExceptFirst = boost::make_iterator_range(++v.begin(), v.end());
-        for (auto e : allElementsExceptFirst) {
+        auto all_elements_except_first = boost::make_iterator_range(++v.begin(), v.end());
+        for (auto e : all_elements_except_first) {
             merge_vertices(v[0], e);
             auto ii = std::find(m_terminals.begin(), m_terminals.end(), e);
             assert(ii != m_terminals.end());
@@ -155,7 +165,7 @@ public:
     /**
      * Gets comparison method.
      */
-    utils::Compare<double> get_compare() const {
+    utils::compare<double> get_compare() const {
         return m_compare;
     }
 
@@ -173,6 +183,9 @@ private:
 };
 
 
+/**
+ * Initialization of the IR Steiner Tree algorithm.
+ */
 class steiner_tree_init {
 public:
     /**
@@ -225,8 +238,14 @@ public:
     }
 };
 
+/**
+ * Stop Condition: step of iterative-randomized rounding algorithm.
+ */
 class steiner_tree_stop_condition {
 public:
+    /**
+     * Checks if the IR algorithm should terminate.
+     */
     template<typename Problem, typename LP>
     bool operator()(Problem& problem, LP &) {
         return problem.get_terminals().size() < 2;
@@ -240,10 +259,10 @@ template<typename Oracle = steiner_tree_oracle<>,
         typename OrigMetric, typename Terminals, typename Result, typename Strategy>
 steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
         const OrigMetric& metric, const Terminals& terminals,
-        const Terminals& steinerVertices, Result result, const Strategy& strategy,
+        const Terminals& steiner_vertices, Result result, const Strategy& strategy,
         Oracle oracle = Oracle()) {
     return steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle>(metric,
-            terminals, steinerVertices, result, strategy, oracle);
+            terminals, steiner_vertices, result, strategy, oracle);
 }
 
 template <
@@ -270,7 +289,7 @@ template <
  * @tparam Visitor
  * @param metric
  * @param terminals
- * @param steinerVertices
+ * @param steiner_vertices
  * @param result
  * @param strategy
  * @param comps
@@ -280,11 +299,11 @@ template <
 template <typename Oracle = steiner_tree_oracle<>, typename Strategy = all_generator,
     typename OrigMetric, typename Terminals, typename Result,
     typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
-void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steinerVertices,
+void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steiner_vertices,
         Result result, Strategy strategy, IRcomponents comps = IRcomponents(),
         Oracle oracle = Oracle(), Visitor visitor = Visitor()) {
 
-    auto steiner = paal::ir::make_steiner_tree(metric, terminals, steinerVertices, result, strategy, oracle);
+    auto steiner = paal::ir::make_steiner_tree(metric, terminals, steiner_vertices, result, strategy, oracle);
     paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));
 }
 

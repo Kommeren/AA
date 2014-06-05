@@ -30,8 +30,7 @@ class separation_oracle {
 public:
     /// Constructor.
     separation_oracle(ViolationChecker checker = ViolationChecker())
-        : m_violations_checker(checker)
-    { }
+        : m_violations_checker(checker) { }
 
     /**
      * Adds a violated constraint to the LP.
@@ -50,56 +49,52 @@ protected:
 
 /**
  * @class most_violated_separation_oracle
- * @brief Separation oracle for the row generation, using the most violated strategy.
- *
+ * @brief Separation oracle for the row generation,
+ *   using the most violated strategy.
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
 class most_violated_separation_oracle : public separation_oracle<ViolationChecker> {
-    typedef separation_oracle<ViolationChecker> base;
+    using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
 public:
     /// Constructor.
     most_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
-        : separation_oracle<ViolationChecker>(checker)
-    { }
+        : separation_oracle<ViolationChecker>(checker) { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
     bool feasible_solution(const Problem & problem, const LP & lp) {
-        double maximumViolation = 0;
-
+        double maximum_violation = 0;
         for (auto candidate : m_violations_checker.get_violation_candidates(problem, lp)) {
             auto violation = m_violations_checker.check_violation(candidate, problem);
-            if (violation && *violation > maximumViolation) {
-                maximumViolation = *violation;
+            if (violation && *violation > maximum_violation) {
+                maximum_violation = *violation;
                 m_violated_constraint = candidate;
             }
         }
-
-        return !problem.get_compare().g(maximumViolation, 0);
+        return !problem.get_compare().g(maximum_violation, 0);
     }
 };
 
 /**
  * @class first_violated_separation_oracle
- * @brief Separation oracle for the row generation, using the first violated strategy.
- *
+ * @brief Separation oracle for the row generation,
+ *   using the first violated strategy.
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
 class first_violated_separation_oracle : public separation_oracle<ViolationChecker> {
-    typedef separation_oracle<ViolationChecker> base;
+    using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
 public:
     /// Constructor.
     first_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
-        : separation_oracle<ViolationChecker>(checker)
-    { }
+        : separation_oracle<ViolationChecker>(checker) { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
@@ -113,27 +108,25 @@ public:
                 return false;
             }
         }
-
         return true;
     }
 };
 
 /**
  * @class random_violated_separation_oracle
- * @brief Separation oracle for the row generation, using the random violated strategy.
- *
+ * @brief Separation oracle for the row generation,
+ *   using the random violated strategy.
  * @tparam ViolationChecker
  */
 template <typename ViolationChecker>
 class random_violated_separation_oracle : public separation_oracle<ViolationChecker> {
-    typedef separation_oracle<ViolationChecker> base;
+    using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
 public:
     /// Constructor.
     random_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
-        : separation_oracle<ViolationChecker>(checker)
-    { }
+        : separation_oracle<ViolationChecker>(checker) { }
 
     /**
      * Checks if the current LP solution is a feasible solution of the problem.
@@ -141,22 +134,20 @@ public:
     template <typename Problem, typename LP>
     bool feasible_solution(const Problem & problem, const LP & lp) {
         auto const & range = m_violations_checker.get_violation_candidates(problem, lp);
-        auto rangeSize = boost::distance(range);
-        if (rangeSize == 0) {
+        auto range_size = boost::distance(range);
+        if (range_size == 0) {
             return true;
         }
-        auto middle = std::next(range.begin(), rand() % rangeSize);
-
+        auto middle = std::next(range.begin(), rand() % range_size);
         for (auto candidate : boost::join(
-                                boost::make_iterator_range(middle, range.end()),
-                                boost::make_iterator_range(range.begin(), middle))) {
+                        boost::make_iterator_range(middle, range.end()),
+                        boost::make_iterator_range(range.begin(), middle))) {
             auto violation = m_violations_checker.check_violation(candidate, problem);
             if (violation) {
                 m_violated_constraint = candidate;
                 return false;
             }
         }
-
         return true;
     }
 };

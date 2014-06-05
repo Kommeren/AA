@@ -26,7 +26,7 @@ the graph \f$(V,T-t)\f$. Also, let \f$x(A) = \sum_{e\in A} x_e\f$.
 
 \section Solution
 
-The Tree Augmentation problem is a special case of the Generalised
+The Tree Augmentation problem is a special case of the
 Steiner Network Problem. The solution presented here is the iterative
 rounding 2-approximation algorithm by Jain \cite jain2001factor.  The main
 characteristic of this special case is that the LP relaxation that we

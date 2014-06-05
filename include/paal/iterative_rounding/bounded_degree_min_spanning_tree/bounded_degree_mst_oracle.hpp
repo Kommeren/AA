@@ -10,6 +10,7 @@
 
 
 #include "paal/iterative_rounding/min_cut.hpp"
+#include "paal/lp/lp_base.hpp"
 
 #include <boost/optional.hpp>
 
@@ -163,7 +164,7 @@ private:
         double orig_cap = m_min_cut.get_capacity(m_src_to_v[src]);
 
         m_min_cut.set_capacity(m_src_to_v[src], m_vertices_num);
-        // capacity of srcToV[trg] does not change
+        // capacity of m_src_to_v[trg] does not change
         m_min_cut.set_capacity(m_v_to_trg[src], 0);
         m_min_cut.set_capacity(m_v_to_trg[trg], m_vertices_num);
 
@@ -172,7 +173,7 @@ private:
 
         // reset the original values for the capacities
         m_min_cut.set_capacity(m_src_to_v[src], orig_cap);
-        // capacity of srcToV[trg] does not change
+        // capacity of m_src_to_v[trg] does not change
         m_min_cut.set_capacity(m_v_to_trg[src], 1);
         m_min_cut.set_capacity(m_v_to_trg[trg], 1);
 

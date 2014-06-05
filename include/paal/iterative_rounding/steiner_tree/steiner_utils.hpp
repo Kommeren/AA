@@ -21,27 +21,30 @@
 namespace paal {
 namespace ir {
 
+/**
+ * Utilities class. Responsible for calculating the cost of given edges.
+ */
 class steiner_utils {
 public:
     /**
-     * Calculates a total cost of given edges.
+     * Calculates total cost of given edges.
      */
     template<typename Metric, typename Terminals, typename Result>
     static typename data_structures::metric_traits<Metric>::DistanceType
-    count_cost(const Result& steinerVertices, const Terminals& terminals, const Metric& costMap) {
+    count_cost(const Result& steiner_vertices, const Terminals& terminals, const Metric& cost_map) {
+        using Vertex = typename data_structures::metric_traits<Metric>::VertexType;
+        using Dist = typename data_structures::metric_traits<Metric>::DistanceType;
 
-        typedef typename data_structures::metric_traits<Metric>::VertexType Vertex;
-        typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
-        auto allElements = boost::range::join(terminals, steinerVertices);
+        auto all_elements = boost::range::join(terminals, steiner_vertices);
         paal::data_structures::bimap<Vertex> idx;
-        auto g = paal::data_structures::metric_to_bgl_with_index(costMap,
-                boost::begin(allElements), boost::end(allElements), idx);
-        std::vector<Vertex> pm(allElements.size());
+        auto g = paal::data_structures::metric_to_bgl_with_index(cost_map,
+                boost::begin(all_elements), boost::end(all_elements), idx);
+        std::vector<Vertex> pm(all_elements.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
-        auto idxM = paal::data_structures::make_metric_on_idx(costMap, idx);
+        auto idx_m = paal::data_structures::make_metric_on_idx(cost_map, idx);
         Dist cost = 0;
-        for(int i : boost::irange(0, int(pm.size()))) {
-            cost += idxM(i, pm[i]);
+        for (int i : boost::irange(0, int(pm.size()))) {
+            cost += idx_m(i, pm[i]);
         }
         return cost;
     }

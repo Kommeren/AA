@@ -89,7 +89,7 @@ Those components are grouped together into one class: <i>paal::ir::IRcomponents<
 
 Out of the listed components only the first one (<i>Init</i>) does not have a default value and has to be provided by the user.<br>
 Also, at least one of the next 3 components (<i>RoundCondition</i>, <i>RelaxCondition</i>, <i>SetSolution</i>) should be provided by the user in order to construct the solution to the problem.
-Depending on the problem, the solution can be most easily construced either during the execution of the algorithm (during the round/relax steps: <i>RoundCondition</i>, <i>RelaxCondition</i>) or in the end (in the <i>SetSolution</i> step).<br>
+Depending on the problem, the solution can be most easily constructed either during the execution of the algorithm (during the round/relax steps: <i>RoundCondition</i>, <i>RelaxCondition</i>) or in the end (in the <i>SetSolution</i> step).<br>
 
 Components:
 <ol>
@@ -126,7 +126,7 @@ Components:
         bool operator()(Problem & problem, const LP & lp, paal::lp::row_id row);
     }
     </pre>
-    Default component: paal::utils::return_false_functor (no relaxations).
+    Default component: paal::utils::always_false (no relaxations).
     </li>
 
     <li>\anchor SetSolution <i>SetSolution</i> is a concept class responsible for constructing the solution of the original problem, based on the values of the final LP solution and the values of columns fixed (rounded) in previous iterations. The solution is passed as a function from column identifier to column value.
@@ -170,10 +170,10 @@ Components:
     <li>\anchor RelaxationsLimit <i>RelaxationsLimit</i> is a concept class responsible for checking if the limit of relaxations number per IR iteration was reached.
     <pre>
     RelaxationsLimitArchetype {
-        bool operator()(int numberOfRelaxedConditions);
+        bool operator()(int number_of_relaxed_constraints);
     }
     </pre>
-    Default component: paal::utils::return_false_functor (no limit on relaxations number).
+    Default component: paal::utils::always_false (no limit on relaxations number).
     </li>
 </ol>
 

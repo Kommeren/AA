@@ -8,10 +8,7 @@
 #ifndef STEINER_COMPONENTS_HPP
 #define STEINER_COMPONENTS_HPP
 
-
 #include "paal/iterative_rounding/steiner_tree/steiner_component.hpp"
-
-
 
 namespace paal {
 namespace ir {

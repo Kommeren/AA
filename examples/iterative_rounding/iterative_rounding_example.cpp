@@ -6,14 +6,15 @@
  * @date 2014-03-24
  */
 
-#include <iostream>
-#include <unordered_map>
-#include <boost/range/iterator_range.hpp>
-#include <boost/graph/adjacency_list.hpp>
-
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/range/iterator_range.hpp>
+
+#include <iostream>
+#include <unordered_map>
 
 /*
  * This is an example implementation of an algorithm within the Iterative Rounding framework.
@@ -26,11 +27,11 @@ namespace ir = paal::ir;
 template <typename Graph, typename CostMap, typename OutputIter>
 class vertex_cover {
 public:
-    vertex_cover(const Graph & g, CostMap costMap, OutputIter cover) :
-        m_g(g), m_cost_map(costMap), m_cover(cover) {}
+    vertex_cover(const Graph & g, CostMap cost_map, OutputIter cover) :
+        m_g(g), m_cost_map(cost_map), m_cover(cover) {}
 
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    typedef std::unordered_map<Vertex, paal::lp::col_id> VertexMap;
+    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
+    using VertexMap = std::unordered_map<Vertex, paal::lp::col_id>;
 
     const Graph & get_graph() const {
         return m_g;
@@ -93,7 +94,7 @@ struct vertex_cover_set_solution {
     }
 
 private:
-    const paal::utils::Compare<double> m_compare;
+    const paal::utils::compare<double> m_compare;
 };
 
 using vertex_cover_ir_components =
@@ -105,9 +106,9 @@ using vertex_cover_ir_components =
 
 int main() {
 //! [Iterative Rounding Example]
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::no_property> Graph;
-    typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+        boost::no_property, boost::no_property>;
+    using Vertex = boost::graph_traits<Graph>::vertex_descriptor;
 
     // sample problem
     std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},{1,5},{5,0},{3,4}};

@@ -24,7 +24,7 @@ An LP relaxation of the problem is as follows. We introduce a binary variable
 
 \section Solution
 
-We solve the problem using the Shmoys and Tardos 2-approximation iterative
+We solve the problem using the Shmoys and Tardos approximation iterative
 rounding algorithm (using the above LP formulation).
 
 example:
@@ -47,7 +47,7 @@ where \f$LP_{mem}(col, row)\f$ is the memory complexity of solving the LP with
 \f$O(col)\f$ columns and \f$O(row)\f$ rows.
 
 \subsection References
-The iterative rounding 2-approximation by Shmoys and Tardos is described in
+The iterative rounding approximation by Shmoys and Tardos is described in
 \cite ShmoysTardosGAP.
 
 */

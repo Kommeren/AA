@@ -43,7 +43,7 @@ void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
     int non_zero_cost_coefs = 0;
     for (auto c : cost_coefs) {
         lp.set_col_cost(col_ids[c.first], c.second);
-        if (!paal::utils::Compare<double>().e(c.second, 0.)) {
+        if (!paal::utils::compare<double>().e(c.second, 0.)) {
             ++non_zero_cost_coefs;
         }
     }

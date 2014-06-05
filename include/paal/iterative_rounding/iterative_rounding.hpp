@@ -1,7 +1,7 @@
 /**
  * @file iterative_rounding.hpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-05-06
  */
@@ -9,13 +9,13 @@
 #define ITERATIVE_ROUNDING_HPP
 
 
-#include "paal/utils/type_functions.hpp"
-#include "paal/utils/floating.hpp"
-#include "paal/lp/glp.hpp"
 #include "paal/iterative_rounding/ir_components.hpp"
+#include "paal/lp/glp.hpp"
+#include "paal/utils/floating.hpp"
+#include "paal/utils/type_functions.hpp"
 
-#include <boost/range/irange.hpp>
 #include <boost/optional.hpp>
+#include <boost/range/irange.hpp>
 
 #include <cstdlib>
 #include <unordered_map>
@@ -48,6 +48,8 @@ struct trivial_visitor {
     void relax_row(Problem & problem, LP & lp, lp::row_id row) {}
 };
 
+namespace detail {
+
 /**
  * @brief This class solves an iterative rounding problem.
  *
@@ -58,7 +60,7 @@ struct trivial_visitor {
  */
 template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 class iterative_rounding  {
-    typedef std::unordered_map<lp::col_id, std::pair<double, double>> RoundedCols;
+    using RoundedCols = std::unordered_map<lp::col_id, std::pair<double, double>>;
 
     /**
      * @brief Returns the current value of the LP column.
@@ -87,10 +89,10 @@ public:
      * @return LP solution status
      */
     lp::problem_type solve_lp() {
-        auto probType = call<SolveLP>(m_problem, m_lp);
-        assert(probType != lp::UNDEFINED);
+        auto prob_type = call<SolveLP>(m_problem, m_lp);
+        assert(prob_type != lp::UNDEFINED);
         m_visitor.solve_lp(m_problem, m_lp);
-        return probType;
+        return prob_type;
     }
 
     /**
@@ -99,24 +101,24 @@ public:
      * @return LP solution status
      */
     lp::problem_type resolve_lp() {
-        auto probType = call<ResolveLP>(m_problem, m_lp);
-        assert(probType != lp::UNDEFINED);
+        auto prob_type = call<ResolveLP>(m_problem, m_lp);
+        assert(prob_type != lp::UNDEFINED);
         m_visitor.solve_lp(m_problem, m_lp);
-        return probType;
+        return prob_type;
     }
 
     /**
      * @brief Returns the solution cost based on the LP values.
      */
     double get_solution_cost() {
-        double solCost(0);
-        for(auto col : m_lp.get_columns()) {
-            solCost += m_lp.get_col_value(col) * m_lp.get_col_coef(col);
+        double sol_cost(0);
+        for (auto col : m_lp.get_columns()) {
+            sol_cost += m_lp.get_col_value(col) * m_lp.get_col_coef(col);
         }
-        for (auto roundedCol : m_rounded) {
-            solCost += roundedCol.second.first * roundedCol.second.second;
+        for (auto rounded_col : m_rounded) {
+            sol_cost += rounded_col.second.first * rounded_col.second.second;
         }
-        return solCost;
+        return sol_cost;
     }
 
     /**
@@ -132,13 +134,13 @@ public:
 
         while (cbegin != cend) {
             lp::col_id col = *cbegin;
-            auto doRound = call<RoundCondition>(m_problem, m_lp, col);
-            if (doRound) {
+            auto do_round = call<RoundCondition>(m_problem, m_lp, col);
+            if (do_round) {
                 ++deleted;
                 m_rounded.insert(std::make_pair(col,
-                    std::make_pair(*doRound, m_lp.get_col_coef(col))));
-                m_visitor.round_col(m_problem, m_lp, col, *doRound);
-                cbegin = delete_column(cbegin, *doRound);
+                    std::make_pair(*do_round, m_lp.get_col_coef(col))));
+                m_visitor.round_col(m_problem, m_lp, col, *do_round);
+                cbegin = delete_column(cbegin, *do_round);
             }
             else {
                 ++cbegin;
@@ -223,8 +225,8 @@ private:
 
     /// Deletes a column from the LP and adjusts the row bounds.
     typename LP::ColIter
-    delete_column(typename LP::ColIter colIter, double value) {
-        auto column = m_lp.get_rows_in_column(*colIter);
+    delete_column(typename LP::ColIter col_iter, double value) {
+        auto column = m_lp.get_rows_in_column(*col_iter);
         lp::row_id row;
         double coef;
         for (auto const & c : boost::make_iterator_range(column)) {
@@ -235,17 +237,18 @@ private:
             m_lp.set_row_upper_bound(row, ub - diff);
             m_lp.set_row_lower_bound(row, lb - diff);
         }
-        return m_lp.delete_col(colIter);
+        return m_lp.delete_col(col_iter);
     };
 
     LP m_lp;
     IRcomponents m_ir_components;
     Visitor m_visitor;
-    utils::Compare<double> m_compare;
+    utils::compare<double> m_compare;
     RoundedCols m_rounded;
     Problem & m_problem;
 };
 
+} //detail
 
 /// Iterative Rounding solution cost type. Solution cost only makes sense if the LP has been solved to optimal value.
 using IRSolutionCost = boost::optional<double>;
@@ -265,11 +268,11 @@ using IRResult = std::pair<lp::problem_type, IRSolutionCost>;
  */
 template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Visitor visitor = Visitor()) {
-    iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
+    detail::iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
 
-    auto probType = ir.solve_lp();
-    if (probType != lp::OPTIMAL) {
-        return IRResult(probType, IRSolutionCost{});
+    auto prob_type = ir.solve_lp();
+    if (prob_type != lp::OPTIMAL) {
+        return IRResult(prob_type, IRSolutionCost{});
     }
 
     while (!ir.stop_condition()) {
@@ -277,9 +280,9 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
         bool relaxed{ir.relax()};
         assert(rounded || relaxed);
 
-        probType = ir.resolve_lp();
-        if (probType != lp::OPTIMAL) {
-            return IRResult(probType, IRSolutionCost{});
+        prob_type = ir.resolve_lp();
+        if (prob_type != lp::OPTIMAL) {
+            return IRResult(prob_type, IRSolutionCost{});
         }
     }
     ir.set_solution();
@@ -299,20 +302,20 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
  */
 template <typename Problem, typename IRcomponents, typename Visitor = trivial_visitor, typename LP = lp::glp>
 IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents components, Visitor visitor = Visitor()) {
-    iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
+    detail::iterative_rounding<Problem, IRcomponents, Visitor, LP> ir(problem, std::move(components), std::move(visitor));
 
-    auto probType = ir.solve_lp();
-    if (probType != lp::OPTIMAL) {
-        return IRResult(probType, IRSolutionCost{});
+    auto prob_type = ir.solve_lp();
+    if (prob_type != lp::OPTIMAL) {
+        return IRResult(prob_type, IRSolutionCost{});
     }
 
     while (!ir.stop_condition()) {
         ir.dependent_round();
         ir.relax();
 
-        probType = ir.resolve_lp();
-        if (probType != lp::OPTIMAL) {
-            return IRResult(probType, IRSolutionCost{});
+        prob_type = ir.resolve_lp();
+        if (prob_type != lp::OPTIMAL) {
+            return IRResult(prob_type, IRSolutionCost{});
         }
     }
     ir.set_solution();

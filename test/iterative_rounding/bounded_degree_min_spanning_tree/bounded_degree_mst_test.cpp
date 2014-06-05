@@ -9,17 +9,17 @@
 #include "utils/logger.hpp"
 #include "iterative_rounding/log_visitor.hpp"
 
-#include "paal/utils/functors.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
+#include "paal/utils/functors.hpp"
 
-#include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/range/counting_range.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/range/counting_range.hpp>
+#include <boost/test/unit_test.hpp>
 
 
-using namespace  paal;
-using namespace  paal::ir;
+using namespace paal;
+using namespace paal::ir;
 
 
 template <typename VertexList, typename EdgeProp>
@@ -50,37 +50,37 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
     VectorGraph g;
     auto costs = get(boost::edge_weight, g);
 
-    ResultTree correctBdmst;
-    ResultTree resultTree;
+    ResultTree correct_bdmst;
+    ResultTree result_tree;
 
-    correctBdmst.insert(add_edge_to_graph(g, costs, 1, 0, 173));
-    correctBdmst.insert(add_edge_to_graph(g, costs, 4, 2, 176));
-                        add_edge_to_graph(g, costs, 2, 3, 176);
-                        add_edge_to_graph(g, costs, 4, 3, 190);
-    correctBdmst.insert(add_edge_to_graph(g, costs, 3, 1, 37));
-                        add_edge_to_graph(g, costs, 4, 1, 260);
-    correctBdmst.insert(add_edge_to_graph(g, costs, 5, 3, 105));
-    correctBdmst.insert(add_edge_to_graph(g, costs, 2, 1, 84));
-                        add_edge_to_graph(g, costs, 5, 4, 243);
-                        add_edge_to_graph(g, costs, 4, 0, 259);
+    correct_bdmst.insert(add_edge_to_graph(g, costs, 1, 0, 173));
+    correct_bdmst.insert(add_edge_to_graph(g, costs, 4, 2, 176));
+                         add_edge_to_graph(g, costs, 2, 3, 176);
+                         add_edge_to_graph(g, costs, 4, 3, 190);
+    correct_bdmst.insert(add_edge_to_graph(g, costs, 3, 1, 37));
+                         add_edge_to_graph(g, costs, 4, 1, 260);
+    correct_bdmst.insert(add_edge_to_graph(g, costs, 5, 3, 105));
+    correct_bdmst.insert(add_edge_to_graph(g, costs, 2, 1, 84));
+                         add_edge_to_graph(g, costs, 5, 4, 243);
+                         add_edge_to_graph(g, costs, 4, 0, 259);
 
     ON_LOG(auto indices = get(boost::vertex_index, g));
 
-    std::vector<int> degBounds = {1, 3, 2, 2, 1, 1};
-    auto bounds = paal::utils::make_array_to_functor(degBounds);
+    std::vector<int> deg_bounds = {1, 3, 2, 2, 1, 1};
+    auto bounds = paal::utils::make_array_to_functor(deg_bounds);
 
     bounded_degree_mst_iterative_rounding(g, bounds,
-                    std::inserter(resultTree, resultTree.begin()),
+                    std::inserter(result_tree, result_tree.begin()),
                     bdmst_ir_components<>{}, bdmst_oracle<>{},
                     log_visitor{});
 
-    ON_LOG(for (auto const & e : resultTree) {
+    ON_LOG(for (auto const & e : result_tree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
               << ") " << "in tree");
     })
 
-    BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
-    BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
+    BOOST_CHECK_EQUAL(correct_bdmst.size(),result_tree.size());
+    BOOST_CHECK(std::equal(correct_bdmst.begin(), correct_bdmst.end(), result_tree.begin()));
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
@@ -88,34 +88,34 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
     LOGLN("Sample problem:");
     VectorGraph g;
 
-    ResultTree correctBdmst;
+    ResultTree correct_bdmst;
 
-    correctBdmst.insert(add_edge(1, 0, 0, g).first);
-                        add_edge(2, 1, 1, g);
-    correctBdmst.insert(add_edge(0, 2, 2, g).first);
+    correct_bdmst.insert(add_edge(1, 0, 0, g).first);
+                         add_edge(2, 1, 1, g);
+    correct_bdmst.insert(add_edge(0, 2, 2, g).first);
 
     std::vector<double> costs = {173, 176, 37};
     auto cost = boost::make_iterator_property_map(costs.begin(), get(boost::edge_index, g));
 
     auto bounds = [&](int){return 2;};
     {
-        ResultTree resultTree;
+        ResultTree result_tree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
-                    std::inserter(resultTree, resultTree.begin()),
+                    std::inserter(result_tree, result_tree.begin()),
                     bdmst_ir_components<>{}, bdmst_oracle<>{},
                     log_visitor{});
 
-        BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
-        BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
+        BOOST_CHECK_EQUAL(correct_bdmst.size(),result_tree.size());
+        BOOST_CHECK(std::equal(correct_bdmst.begin(), correct_bdmst.end(), result_tree.begin()));
     }
     {
-        ResultTree resultTree;
+        ResultTree result_tree;
         auto bdmst(make_bounded_degree_mst(g, bounds, boost::weight_map(cost),
-                    std::inserter(resultTree, resultTree.begin())));
+                    std::inserter(result_tree, result_tree.begin())));
         solve_iterative_rounding(bdmst, bdmst_ir_components<>{}, log_visitor{});
 
-        BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
-        BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
+        BOOST_CHECK_EQUAL(correct_bdmst.size(),result_tree.size());
+        BOOST_CHECK(std::equal(correct_bdmst.begin(), correct_bdmst.end(), result_tree.begin()));
     }
 }
 
@@ -136,13 +136,13 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_list) {
         ++idx;
     }
 
-    std::vector<int> degBounds = {1, 3, 2, 2, 1, 1};
-    auto bounds = paal::utils::make_array_to_functor(degBounds);
+    std::vector<int> deg_bounds = {1, 3, 2, 2, 1, 1};
+    auto bounds = paal::utils::make_array_to_functor(deg_bounds);
 
-    std::vector<EdgeT> resultTree;
+    std::vector<EdgeT> result_tree;
     bounded_degree_mst_iterative_rounding(g, bounds,
-                    std::inserter(resultTree, resultTree.begin()));
-    BOOST_CHECK_EQUAL(resultTree.size(), 5);
+                    std::inserter(result_tree, result_tree.begin()));
+    BOOST_CHECK_EQUAL(result_tree.size(), 5);
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
@@ -151,7 +151,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
     VectorGraph g;
     auto costs = get(boost::edge_weight, g);
 
-    std::vector<Edge> resultTree;
+    std::vector<Edge> result_tree;
 
     add_edge_to_graph(g, costs, 0, 1, 1);
     add_edge_to_graph(g, costs, 0, 2, 16);
@@ -164,7 +164,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
 
     auto bounds = [&](int){return 6;};
 
-    auto bdmst(make_bounded_degree_mst(g, bounds, std::back_inserter(resultTree)));
+    auto bdmst(make_bounded_degree_mst(g, bounds, std::back_inserter(result_tree)));
     auto invalid = bdmst.check_input_validity();
 
     BOOST_CHECK(invalid);
@@ -177,7 +177,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     VectorGraph g;
     auto costs = get(boost::edge_weight, g);
 
-    std::vector<Edge> resultTree;
+    std::vector<Edge> result_tree;
 
     add_edge_to_graph(g, costs, 0, 3, 5);
     add_edge_to_graph(g, costs, 3, 5, 15);
@@ -189,10 +189,10 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     add_edge_to_graph(g, costs, 9, 7, 6);
     add_edge_to_graph(g, costs, 5, 6, 1);
 
-    std::vector<int> degBounds = {1, 2, 1, 2, 1, 3, 1, 1, 1, 3};
-    auto bounds = paal::utils::make_array_to_functor(degBounds);
+    std::vector<int> deg_bounds = {1, 2, 1, 2, 1, 3, 1, 1, 1, 3};
+    auto bounds = paal::utils::make_array_to_functor(deg_bounds);
 
-    auto bdmst(make_bounded_degree_mst(g, bounds, std::back_inserter(resultTree)));
+    auto bdmst(make_bounded_degree_mst(g, bounds, std::back_inserter(result_tree)));
     auto invalid = bdmst.check_input_validity();
 
     BOOST_CHECK(!invalid);

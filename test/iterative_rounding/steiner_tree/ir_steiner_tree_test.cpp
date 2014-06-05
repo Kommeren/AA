@@ -1,7 +1,7 @@
 /**
  * @file ir_steiner_tree_test.cpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Godlewski
  * @version 1.0
  * @date 2013-02-04
  */
@@ -14,27 +14,27 @@
 #include <boost/test/unit_test.hpp>
 
 
-typedef int Vertex;
-typedef int Dist;
-typedef typename paal::data_structures::graph_metric<Graph, Dist> UserMetric;
-typedef std::vector<int> Terminals;
+using Vertex = int;
+using Dist = int;
+using UserMetric = typename paal::data_structures::graph_metric<Graph, Dist>;
+using Terminals = std::vector<int>;
 
-BOOST_AUTO_TEST_CASE(testall_generator) {
-    paal::ir::all_generator strategyAll(5);
+BOOST_AUTO_TEST_CASE(test_all_generator) {
+    paal::ir::all_generator strategy_all(5);
 
-    Terminals terminals, steinerVertices;
+    Terminals terminals, steiner_vertices;
     std::vector<Vertex> result;
     // small graph
     UserMetric metrics(create_small_graph());
-    boost::tie(terminals, steinerVertices) = get_small_graph_vertices();
-    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
-            std::back_inserter(result), strategyAll);
+    boost::tie(terminals, steiner_vertices) = get_small_graph_vertices();
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
+            std::back_inserter(result), strategy_all);
     int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
     BOOST_CHECK(cost == 4);
 
     // check if algorithm doesn't modify supplied data
     BOOST_CHECK(terminals.size() == get_small_graph_vertices().first.size());
-    BOOST_CHECK(steinerVertices.size() == get_small_graph_vertices().second.size());
+    BOOST_CHECK(steiner_vertices.size() == get_small_graph_vertices().second.size());
     UserMetric m2(create_small_graph());
     int n = m2.size();
     for (int i = 0; i < n; i++) {
@@ -46,42 +46,42 @@ BOOST_AUTO_TEST_CASE(testall_generator) {
     // bigger graph
     result.clear();
     metrics = UserMetric(create_bigger_graph());
-    boost::tie(terminals, steinerVertices) = get_bigger_graph_vertices();
-    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
-            std::back_inserter(result), strategyAll);
+    boost::tie(terminals, steiner_vertices) = get_bigger_graph_vertices();
+    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
+            std::back_inserter(result), strategy_all);
     cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
     BOOST_CHECK(cost == 15);
 }
 
-BOOST_AUTO_TEST_CASE(testRandGenerator) {
+BOOST_AUTO_TEST_CASE(test_rand_generator) {
     srand(0);
-    paal::ir::random_generator strategyRand(10, 5);
+    paal::ir::random_generator strategy_rand(10, 5);
 
-    Terminals terminals, steinerVertices;
+    Terminals terminals, steiner_vertices;
     std::vector<Vertex> result;
 
     // small graph
     UserMetric metrics(create_small_graph());
-    boost::tie(terminals, steinerVertices) = get_small_graph_vertices();
+    boost::tie(terminals, steiner_vertices) = get_small_graph_vertices();
     for (int i : boost::irange(0, 5)) {
         srand(i);
         LOGLN("small graph, seed " << i);
         result.clear();
-        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
-                std::back_inserter(result), strategyRand);
+        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
+                std::back_inserter(result), strategy_rand);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
         BOOST_CHECK(cost == 4);
     }
 
     // bigger graph
     metrics = UserMetric(create_bigger_graph());
-    boost::tie(terminals, steinerVertices) = get_bigger_graph_vertices();
+    boost::tie(terminals, steiner_vertices) = get_bigger_graph_vertices();
     for (int i : boost::irange(0, 5)) {
         LOGLN("big graph, seed " << i);
         srand(i);
         result.clear();
-        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steinerVertices,
-                std::back_inserter(result), strategyRand);
+        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
+                std::back_inserter(result), strategy_rand);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
         BOOST_CHECK(cost == 15);
     }

@@ -25,28 +25,28 @@ void add_edge_to_graph(Graph & g, Cost & cost, int u, int v, double c) {
 }
 
 template <typename Graph, typename Cost, typename Bounds>
-inline void read_bdmst(std::istream & is, int verticesNum, int edgesNum,
-                Graph & g, Cost & costs, Bounds & degBounds, double & bestCost) {
+inline void read_bdmst(std::istream & is, int vertices_num, int edges_num,
+                Graph & g, Cost & costs, Bounds & deg_bounds, double & best_cost) {
     std::string s;
     int u, v, b;
     double c;
 
     is >> s; is >> s; is >> s;
 
-    for (int i = 0; i < verticesNum; i++) {
+    for (int i = 0; i < vertices_num; i++) {
         is >> u >> b;
-        degBounds[u] = b;
+        deg_bounds[u] = b;
     }
 
     is >> s; is >> s; is >> s;
 
-    for (int i = 0; i < edgesNum; i++) {
+    for (int i = 0; i < edges_num; i++) {
         is >> u >> v >> b >> c;
         add_edge_to_graph(g, costs, u, v, c);
     }
 
     is >> s; is >> s;
-    is >> bestCost;
+    is >> best_cost;
 }
 
 }

@@ -10,8 +10,8 @@
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
-#include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/test/unit_test.hpp>
 
 
 using namespace paal;
@@ -30,13 +30,13 @@ using Edge = graph_traits<VectorGraph>::edge_descriptor;
 
 template <typename Graph, typename TreeMap, typename Cost>
 Edge add_edge_to_graph(Graph & g, int u, int v,
-        TreeMap tree, bool inT,
+        TreeMap tree, bool in_t,
         Cost & cost, double c) {
     bool b;
     Edge e;
     std::tie(e, b) = add_edge(u, v, g);
     assert(b);
-    tree[e] = inT;
+    tree[e] = in_t;
     cost[e] = c;
     return e;
 }
@@ -52,24 +52,24 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_test) {
     LOGLN("Sample problem:");
     VectorGraph g(6);
     Cost cost = get(edge_weight, g);
-    TreeMap treeMap = get(edge_color, g);
+    TreeMap tree_map = get(edge_color, g);
 
-    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 3, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 0, 3, treeMap, false, cost, 1);
-    add_edge_to_graph(g, 0, 2, treeMap, false, cost, 1);
-    add_edge_to_graph(g, 2, 4, treeMap, false, cost, 1);
-    add_edge_to_graph(g, 2, 5, treeMap, false, cost, 1);
-    add_edge_to_graph(g, 4, 5, treeMap, false, cost, 1);
+    add_edge_to_graph(g, 0, 1, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 3, 4, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 0, 3, tree_map, false, cost, 1);
+    add_edge_to_graph(g, 0, 2, tree_map, false, cost, 1);
+    add_edge_to_graph(g, 2, 4, tree_map, false, cost, 1);
+    add_edge_to_graph(g, 2, 5, tree_map, false, cost, 1);
+    add_edge_to_graph(g, 4, 5, tree_map, false, cost, 1);
 
-    SolutionTree solutionTree;
+    SolutionTree solution_tree;
 
-    auto treeaug(make_tree_aug(g, std::inserter(solutionTree, solutionTree.begin())));
+    auto treeaug(make_tree_aug(g, std::inserter(solution_tree, solution_tree.begin())));
     solve_iterative_rounding(treeaug, tree_augmentation_ir_components<>());
-    BOOST_CHECK(!solutionTree.empty());
+    BOOST_CHECK(!solution_tree.empty());
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_list) {
@@ -93,51 +93,51 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_list) {
         ++idx;
     }
 
-    std::vector<EdgeT> solutionTree;
-    tree_augmentation_iterative_rounding(g, std::inserter(solutionTree, solutionTree.begin()));
-    BOOST_CHECK(!solutionTree.empty());
+    std::vector<EdgeT> solution_tree;
+    tree_augmentation_iterative_rounding(g, std::inserter(solution_tree, solution_tree.begin()));
+    BOOST_CHECK(!solution_tree.empty());
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_test_parameters) {
     // sample problem
     LOGLN("Sample problem:");
     VectorGraph g(6);
-    TreeMap treeMap = get(edge_color, g);
+    TreeMap tree_map = get(edge_color, g);
 
-    treeMap[add_edge(0, 1, 0, g).first] = true;
-    treeMap[add_edge(1, 2, 1, g).first] = true;
-    treeMap[add_edge(1, 3, 2, g).first] = true;
-    treeMap[add_edge(3, 4, 3, g).first] = true;
-    treeMap[add_edge(3, 5, 4, g).first] = true;
-    treeMap[add_edge(0, 3, 5, g).first] = false;
-    treeMap[add_edge(0, 2, 6, g).first] = false;
-    treeMap[add_edge(2, 4, 7, g).first] = false;
-    treeMap[add_edge(2, 5, 8, g).first] = false;
-    treeMap[add_edge(4, 5, 9, g).first] = false;
+    tree_map[add_edge(0, 1, 0, g).first] = true;
+    tree_map[add_edge(1, 2, 1, g).first] = true;
+    tree_map[add_edge(1, 3, 2, g).first] = true;
+    tree_map[add_edge(3, 4, 3, g).first] = true;
+    tree_map[add_edge(3, 5, 4, g).first] = true;
+    tree_map[add_edge(0, 3, 5, g).first] = false;
+    tree_map[add_edge(0, 2, 6, g).first] = false;
+    tree_map[add_edge(2, 4, 7, g).first] = false;
+    tree_map[add_edge(2, 5, 8, g).first] = false;
+    tree_map[add_edge(4, 5, 9, g).first] = false;
 
-    auto edgeId = get(boost::edge_index, g);
+    auto edge_id = get(boost::edge_index, g);
     std::vector<double> costs = {0, 0, 0, 0, 0, 1, 1, 1, 1, 1};
-    auto cost = boost::make_iterator_property_map(costs.begin(), edgeId);
+    auto cost = boost::make_iterator_property_map(costs.begin(), edge_id);
 
     {
-        SolutionTree solutionTree;
-        auto treeaug(make_tree_aug(g, boost::edge_color_map(treeMap).weight_map(cost),
-                std::inserter(solutionTree, solutionTree.begin())));
+        SolutionTree solution_tree;
+        auto treeaug(make_tree_aug(g, boost::edge_color_map(tree_map).weight_map(cost),
+                std::inserter(solution_tree, solution_tree.begin())));
         solve_iterative_rounding(treeaug, tree_augmentation_ir_components<>());
-        BOOST_CHECK(!solutionTree.empty());
+        BOOST_CHECK(!solution_tree.empty());
     }
     {
-        SolutionTree solutionTree;
+        SolutionTree solution_tree;
         tree_augmentation_iterative_rounding(
                 g, boost::weight_map(cost),
-                std::inserter(solutionTree, solutionTree.begin()));
-        BOOST_CHECK(!solutionTree.empty());
+                std::inserter(solution_tree, solution_tree.begin()));
+        BOOST_CHECK(!solution_tree.empty());
     }
 }
 
 void run_invalid_test(const VectorGraph & g){
-    SolutionTree solutionTree;
-    auto treeaug(make_tree_aug(g, std::back_inserter(solutionTree)));
+    SolutionTree solution_tree;
+    auto treeaug(make_tree_aug(g, std::back_inserter(solution_tree)));
     auto invalid = treeaug.check_input_validity();
 
     BOOST_CHECK(invalid);
@@ -149,13 +149,13 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_1) {
     LOGLN("Invalid problem (wrong number of spanning tree edges):");
     VectorGraph g(6);
     Cost cost = get(edge_weight, g);
-    TreeMap treeMap = get(edge_color, g);
+    TreeMap tree_map = get(edge_color, g);
 
-    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 3, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 3, 4, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 3, 5, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 3, 4, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 3, 5, tree_map, false, cost, 0);
 
     run_invalid_test(g);
 }
@@ -165,16 +165,16 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_2) {
     LOGLN("Invalid problem (spanning tree not connected):");
     VectorGraph g(6);
     Cost cost = get(edge_weight, g);
-    TreeMap treeMap = get(edge_color, g);
+    TreeMap tree_map = get(edge_color, g);
 
-    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 3, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 4, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 5, 4, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 2, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 3, 4, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 4, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 5, 4, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 2, 3, tree_map, false, cost, 0);
 
     run_invalid_test(g);
 }
@@ -184,16 +184,16 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_invalid_test_3) {
     LOGLN("Invalid problem (graph not 2-edge-connected):");
     VectorGraph g(6);
     Cost cost = get(edge_weight, g);
-    TreeMap treeMap = get(edge_color, g);
+    TreeMap tree_map = get(edge_color, g);
 
-    add_edge_to_graph(g, 0, 1, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 2, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 3, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 3, 4, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 3, 5, treeMap, true, cost, 0);
-    add_edge_to_graph(g, 1, 4, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 5, 4, treeMap, false, cost, 0);
-    add_edge_to_graph(g, 2, 3, treeMap, false, cost, 0);
+    add_edge_to_graph(g, 0, 1, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 2, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 3, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 3, 4, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 3, 5, tree_map, true, cost, 0);
+    add_edge_to_graph(g, 1, 4, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 5, 4, tree_map, false, cost, 0);
+    add_edge_to_graph(g, 2, 3, tree_map, false, cost, 0);
 
     run_invalid_test(g);
 }

@@ -1,7 +1,7 @@
 /**
  * @file ir_components.hpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-05-10
  */
@@ -9,16 +9,16 @@
 #define IR_COMPONENTS_HPP
 
 
-#include "paal/utils/floating.hpp"
-#include "paal/utils/functors.hpp"
 #include "paal/data_structures/components/components.hpp"
 #include "paal/lp/ids.hpp"
 #include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
+#include "paal/utils/floating.hpp"
+#include "paal/utils/functors.hpp"
 
 #include <boost/optional.hpp>
-#include <boost/tuple/tuple.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include <cmath>
 
@@ -33,7 +33,7 @@ public:
     /**
      * @brief constructor takes epsilon used in double comparison.
      */
-    default_round_condition(double epsilon = utils::Compare<double>::default_epsilon()): m_compare(epsilon) { }
+    default_round_condition(double epsilon = utils::compare<double>::default_epsilon()): m_compare(epsilon) { }
 
     /**
      * @brief Rounds the column if its value is integral.
@@ -42,7 +42,7 @@ public:
     boost::optional<double> operator()(Problem &, const LP & lp, lp::col_id col) {
         double x = lp.get_col_value(col);
         double r = std::round(x);
-        if(m_compare.e(x,r)) {
+        if (m_compare.e(x,r)) {
             return r;
         }
         return boost::none;
@@ -50,7 +50,7 @@ public:
 
 protected:
     /// Double comparison object.
-    const utils::Compare<double> m_compare;
+    const utils::compare<double> m_compare;
 };
 
 
@@ -74,7 +74,7 @@ public:
     /**
      * @brief constructor takes epsilon used in double comparison.
      */
-    round_condition_equals(double epsilon = utils::Compare<double>::default_epsilon()): round_condition_equals<args...>(epsilon) { }
+    round_condition_equals(double epsilon = utils::compare<double>::default_epsilon()): round_condition_equals<args...>(epsilon) { }
 
     /// Rounds a column if its value is equal to one of the template parameter values.
     template <typename Problem, typename LP>
@@ -86,7 +86,7 @@ protected:
     /// Checks if the value can be rounded to the first template parameter.
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
-        if(this->m_compare.e(x, arg)) {
+        if (this->m_compare.e(x, arg)) {
             return double(arg);
         } else {
             return round_condition_equals<args...>::get(lp, x);
@@ -105,7 +105,7 @@ public:
     /**
      * @brief constructor takes epsilon used in double comparison.
      */
-    round_condition_equals(double epsilon = utils::Compare<double>::default_epsilon()): m_compare(epsilon) { }
+    round_condition_equals(double epsilon = utils::compare<double>::default_epsilon()): m_compare(epsilon) { }
 
 protected:
     /// Edge case: return false.
@@ -115,7 +115,7 @@ protected:
     }
 
     /// Double comparison object.
-    const utils::Compare<double> m_compare;
+    const utils::compare<double> m_compare;
 };
 
 
@@ -137,7 +137,7 @@ public:
     template <typename Problem, typename LP>
     boost::optional<double> operator()(Problem &, const LP & lp, lp::col_id col) {
         double x = lp.get_col_value(col);
-        if(m_cond(x)) {
+        if (m_cond(x)) {
             return m_f(x);
         }
         return boost::none;
@@ -157,7 +157,7 @@ public:
     /**
      * @brief constructor takes epsilon used in double comparison.
      */
-    cond_bigger_equal_than(double b, double epsilon = utils::Compare<double>::default_epsilon())
+    cond_bigger_equal_than(double b, double epsilon = utils::compare<double>::default_epsilon())
         : m_bound(b), m_compare(epsilon) {}
 
     /// Checks if a variable is greater or equal than a fixed bound.
@@ -167,7 +167,7 @@ public:
 
 private:
     double m_bound;
-    const utils::Compare<double> m_compare;
+    const utils::compare<double> m_compare;
 };
 
 
@@ -180,7 +180,7 @@ struct round_condition_greater_than_half  :
         /**
          * @brief constructor takes epsilon used in double comparison.
          */
-        round_condition_greater_than_half(double epsilon = utils::Compare<double>::default_epsilon()) :
+        round_condition_greater_than_half(double epsilon = utils::compare<double>::default_epsilon()) :
             round_condition_to_fun(cond_bigger_equal_than(0.5, epsilon)) {}
 };
 
@@ -215,7 +215,7 @@ public:
     /**
      * @brief Constructor. Takes epsilon used in double comparison.
      */
-    default_stop_condition(double epsilon = utils::Compare<double>::default_epsilon()): m_compare(epsilon) { }
+    default_stop_condition(double epsilon = utils::compare<double>::default_epsilon()): m_compare(epsilon) { }
 
     /**
      * @brief Checks if the current LP solution has got only integer values.
@@ -223,8 +223,8 @@ public:
     template <typename Problem, typename LP>
     bool operator()(Problem &, const LP & lp) {
         for (lp::col_id col : lp.get_columns()) {
-            double colVal = lp.get_col_value(col);
-            if (!m_compare.e(colVal, std::round(colVal))) {
+            double col_val = lp.get_col_value(col);
+            if (!m_compare.e(col_val, std::round(col_val))) {
                 return false;
             }
         }
@@ -234,7 +234,7 @@ public:
 
 protected:
     /// Double comparison object.
-    const utils::Compare<double> m_compare;
+    const utils::compare<double> m_compare;
 };
 
 /**
@@ -265,21 +265,21 @@ class ResolveLP;
 class StopCondition;
 class RelaxationsLimit;
 
-typedef data_structures::components<
-        Init,
-        data_structures::NameWithDefault<RoundCondition, default_round_condition>,
-        data_structures::NameWithDefault<RelaxCondition, utils::always_false>,
-        data_structures::NameWithDefault<SetSolution, utils::skip_functor>,
-        data_structures::NameWithDefault<SolveLP, default_solve_lp_to_extreme_point>,
-        data_structures::NameWithDefault<ResolveLP, default_resolve_lp_to_extreme_point>,
-        data_structures::NameWithDefault<StopCondition, default_stop_condition>,
-        data_structures::NameWithDefault<RelaxationsLimit, utils::always_false>> components;
+using components = data_structures::components<
+    Init,
+    data_structures::NameWithDefault<RoundCondition, default_round_condition>,
+    data_structures::NameWithDefault<RelaxCondition, utils::always_false>,
+    data_structures::NameWithDefault<SetSolution, utils::skip_functor>,
+    data_structures::NameWithDefault<SolveLP, default_solve_lp_to_extreme_point>,
+    data_structures::NameWithDefault<ResolveLP, default_resolve_lp_to_extreme_point>,
+    data_structures::NameWithDefault<StopCondition, default_stop_condition>,
+    data_structures::NameWithDefault<RelaxationsLimit, utils::always_false>>;
 
 /**
  * @brief Iterative rounding components.
  */
 template <typename... Args>
-    using IRcomponents = typename components::type<Args...> ;
+using IRcomponents = typename components::type<Args...>;
 
 /**
  * @brief Returns iterative rounding components.

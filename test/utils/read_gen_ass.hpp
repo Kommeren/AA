@@ -14,19 +14,19 @@
 
 namespace paal {
 
-typedef data_structures::rectangle_array_metric<int> M;
+using M = data_structures::rectangle_array_metric<int>;
 
-void read_gen_ASS(std::istream & is, M & costs, M & times,
-                 std::vector<int> & machinesBounds,
+void read_gen_ass(std::istream & is, M & costs, M & times,
+                 std::vector<int> & machines_bounds,
                  boost::integer_range<int> & machines,
                  boost::integer_range<int> & jobs) {
-    int machinesCnt, jobsCnt;
-    is >> machinesCnt >> jobsCnt;
-    machines = boost::irange(0, machinesCnt);
-    jobs    = boost::irange(0, jobsCnt);
-    costs = M(jobsCnt, machinesCnt);
-    times = M(jobsCnt, machinesCnt);
-    machinesBounds.resize(machinesCnt);
+    int machines_cnt, jobs_cnt;
+    is >> machines_cnt >> jobs_cnt;
+    machines = boost::irange(0, machines_cnt);
+    jobs    = boost::irange(0, jobs_cnt);
+    costs = M(jobs_cnt, machines_cnt);
+    times = M(jobs_cnt, machines_cnt);
+    machines_bounds.resize(machines_cnt);
 
     for(int m : machines) {
         for(int j : jobs) {
@@ -41,7 +41,7 @@ void read_gen_ASS(std::istream & is, M & costs, M & times,
     }
 
     for(int m : machines) {
-        is >> machinesBounds[m];
+        is >> machines_bounds[m];
     }
 }
 

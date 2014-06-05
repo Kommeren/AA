@@ -7,35 +7,34 @@
  */
 
 
-#include "utils/parse_file.hpp"
 #include "utils/logger.hpp"
+#include "utils/parse_file.hpp"
 #include "utils/test_result_check.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
-#include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <fstream>
 
-using namespace  paal;
-using namespace  paal::ir;
-using namespace  boost;
+using namespace paal;
+using namespace paal::ir;
+using namespace boost;
 
 
-// create a typedef for the Graph type
-typedef adjacency_list<vecS, vecS, undirectedS,
+using Graph = adjacency_list<vecS, vecS, undirectedS,
         no_property,
         property<edge_weight_t, double,
-        property<edge_color_t, bool>>> Graph;
+        property<edge_color_t, bool>>>;
 
-typedef adjacency_list_traits<vecS, vecS, undirectedS> Traits;
-typedef graph_traits<Graph>::vertex_descriptor Vertex;
-typedef graph_traits<Graph>::edge_descriptor Edge;
+using Traits = adjacency_list_traits<vecS, vecS, undirectedS>;
+using Vertex = graph_traits<Graph>::vertex_descriptor;
+using Edge = graph_traits<Graph>::edge_descriptor;
 
-typedef property_map<Graph, vertex_index_t>::type Index;
-typedef property_map<Graph, edge_weight_t>::type Cost;
-typedef property_map<Graph, edge_color_t>::type TreeMap;
+using Index = property_map<Graph, vertex_index_t>::type;
+using Cost = property_map<Graph, edge_weight_t>::type;
+using TreeMap = property_map<Graph, edge_color_t>::type;
 
 //Read instance in format
 // @nodes 6
@@ -58,14 +57,14 @@ typedef property_map<Graph, edge_color_t>::type TreeMap;
 // 2       4       2       0       1
 // 2       5       3       0       1
 // 4       5       4       0       1
-void readtree_aug_from_stream(std::ifstream & is,
-        Graph & g, Cost & cost, TreeMap & treeMap) {
+void read_tree_aug(std::ifstream & is,
+        Graph & g, Cost & cost, TreeMap & tree_map) {
     std::string s;
     std::unordered_map<std::string, Vertex> nodes;
-    int verticesNum, edgesNum;
-    is >> s; is >> verticesNum; is >> s;
+    int vertices_num, edges_num;
+    is >> s; is >> vertices_num; is >> s;
 
-    for (int i = 0; i < verticesNum; i++) {
+    for (int i = 0; i < vertices_num; i++) {
         std::string nlabel;
         is >> nlabel;
         nodes[nlabel] = add_vertex(g);
@@ -73,22 +72,22 @@ void readtree_aug_from_stream(std::ifstream & is,
 
     LOGLN(num_vertices(g));
 
-    is >> s; is >> edgesNum; is >> s; is >> s; is >> s;
+    is >> s; is >> edges_num; is >> s; is >> s; is >> s;
 
-    for (int i = 0; i < edgesNum; i++) {
+    for (int i = 0; i < edges_num; i++) {
         // read from the file
         std::string u, v;
         double c;
         int dummy;
-        bool inT;
-        is >> u >> v >> dummy >> inT >> c;
+        bool in_t;
+        is >> u >> v >> dummy >> in_t >> c;
 
         bool b;
         Traits::edge_descriptor e;
         std::tie(e, b) = add_edge(nodes[u], nodes[v], g);
         assert(b);
         put(cost, e, c);
-        put(treeMap, e, inT);
+        put(tree_map, e, in_t);
     }
 }
 
@@ -98,16 +97,16 @@ double get_lower_bound(TA ta) {
     tree_augmentation_ir_components<> comps;
     lp::glp lp;
     comps.call<Init>(ta, lp);
-    auto probType = comps.call<SolveLP>(ta, lp);
-    BOOST_CHECK_EQUAL(probType, lp::OPTIMAL);
+    auto prob_type = comps.call<SolveLP>(ta, lp);
+    BOOST_CHECK_EQUAL(prob_type, lp::OPTIMAL);
     return lp.get_obj_value();
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
-    std::string testDir = "test/data/TREEAUG/";
-    parse(testDir + "tree_aug.txt", [&](const std::string & fname, std::istream &) {
+    std::string test_dir = "test/data/TREEAUG/";
+    parse(test_dir + "tree_aug.txt", [&](const std::string & fname, std::istream &) {
         LOGLN(fname);
-        std::string filename = testDir + "cases/" + fname + ".lgf";
+        std::string filename = test_dir + "cases/" + fname + ".lgf";
         std::ifstream ifs(filename);
 
         if (!ifs) {
@@ -116,10 +115,10 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         }
 
         Graph g;
-        Cost cost       = get(edge_weight, g);
-        TreeMap treeMap = get(edge_color, g);
+        Cost cost = get(edge_weight, g);
+        TreeMap tree_map = get(edge_color, g);
 
-        readtree_aug_from_stream(ifs, g, cost, treeMap);
+        read_tree_aug(ifs, g, cost, tree_map);
 
         std::vector<Edge> solution;
         auto treeaug(make_tree_aug(g, std::back_inserter(solution)));

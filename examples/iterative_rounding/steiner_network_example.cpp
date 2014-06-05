@@ -1,7 +1,7 @@
 /**
  * @file steiner_network_example.cpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-06-24
  */
@@ -16,14 +16,15 @@
 
 int main() {
 //! [Steiner Network Example]
-    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-        boost::no_property, boost::property<boost::edge_weight_t, int>>;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
+        boost::undirectedS, boost::no_property,
+        boost::property<boost::edge_weight_t, int>>;
     using Edge = boost::graph_traits<Graph>::edge_descriptor;
-    auto restrictions = [](int i, int j) {return 2;};
 
     // sample problem
     std::vector<std::pair<int, int>> edges {{0,1},{0,1},{1,2},{1,2},{2,0}};
     std::vector<int> costs {1,1,1,1,7};
+    auto restrictions = [](int i, int j) {return 2;};
 
     Graph g(edges.begin(), edges.end(), costs.begin(), 3);
 
@@ -46,7 +47,7 @@ int main() {
     // print result
     if (result.first == paal::lp::OPTIMAL) {
         std::cout << "Edges in steiner network" << std::endl;
-        for (auto const  & e : result_network) {
+        for (auto e : result_network) {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;

@@ -10,16 +10,16 @@ Minimum  K-Cut problem is solved by greedy algorithm.
 We start from graph G.
 and in each step we remove lightest cut to increase number components by 1
 
-  example: 
+  example:
 \snippet k_cut_example.cpp K Cut Example
- 
+
   complete example is k_cut_example.cpp
-  
+
 \subsection parameters_kcut Parameters
 
 IN: const Graph& g
 
-IN: unsigned int numberOfParts
+IN: unsigned int number_of_parts
 
 OUT: OutputIterator result
 The pair of vertex descriptor and id of part will be output to the result output iterator
@@ -27,18 +27,18 @@ The iterator type must be a model of Output Iterator
 
 \subsection named_parameters_kcut Named Parameters
 
-IN: vertex_index_map(VertexIndexMap indexMap)
+IN: vertex_index_map(VertexIndexMap index_map)
 
-IN: weight_map(EdgeWeightMap weightMap)
-map contains weights of edges 
+IN: weight_map(EdgeWeightMap weight_map)
+map contains weights of edges
 
 \subsection app_kcut Approximation Ratio equals 2-2/k.
 
 \subsection com_kcut The complexity
-Complexity of the algorithm is \f$O(|K|*|V|*|E|*log(|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges 
+Complexity of the algorithm is \f$O(|K|*|V|*|E|*log(|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges
 
 \subsection mem_kcut The memory
-Memory complexity of the algorithm is \f$O(|K|*(|V|+|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges 
+Memory complexity of the algorithm is \f$O(|K|*(|V|+|E|)|)\f$ where \a K is number from the input,  \a V is number of vertices and \a E is number of edges
 
 
 \subsection References

@@ -8,11 +8,8 @@
 #ifndef MIN_CUT_HPP
 #define MIN_CUT_HPP
 
-
-
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
-
 
 namespace paal {
 namespace ir {
@@ -23,10 +20,10 @@ namespace ir {
  *  and finding directed minimum cuts between given vertices.
  */
 class min_cut_finder {
-    typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS> Traits;
+    using Traits = boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::directedS>;
 public:
-    typedef Traits::edge_descriptor Edge;
-    typedef Traits::vertex_descriptor Vertex;
+    using Edge = Traits::edge_descriptor;
+    using Vertex = Traits::vertex_descriptor;
 
     /// Constructor.
     min_cut_finder() :
@@ -39,9 +36,9 @@ public:
     /**
      * (Re)Initializes the graph.
      */
-    void init(int verticesNum) {
+    void init(int vertices_num) {
         m_graph.clear();
-        for (int i = 0; i < verticesNum; ++i) {
+        for (int i = 0; i < vertices_num; ++i) {
             add_vertex_to_graph();
         }
         m_cap = get(boost::edge_capacity, m_graph);
@@ -60,28 +57,28 @@ public:
      * @param src source vertex of for the added edge
      * @param trg target vertex of for the added edge
      * @param cap capacity of the added edge
-     * @param revCap capacity of the reverse edge
+     * @param rev_cap capacity of the reverse edge
      *
      * @return created edge of the graph and the created reverse edge
      */
     std::pair<Edge, Edge>
-    add_edge_to_graph(Vertex src, Vertex trg, double cap, double revCap = 0.) {
-        bool b, bRev;
-        Edge e, eRev;
+    add_edge_to_graph(Vertex src, Vertex trg, double cap, double rev_cap = 0.) {
+        bool b, b_rev;
+        Edge e, e_rev;
 
         std::tie(e, b) = add_edge(src, trg, m_graph);
-        std::tie(eRev, bRev) = add_edge(trg, src, m_graph);
-        assert(b && bRev);
+        std::tie(e_rev, b_rev) = add_edge(trg, src, m_graph);
+        assert(b && b_rev);
 
         cap = std::max(0., cap);
-        revCap = std::max(0., revCap);
+        rev_cap = std::max(0., rev_cap);
         put(m_cap, e, cap);
-        put(m_cap, eRev, revCap);
+        put(m_cap, e_rev, rev_cap);
 
-        put(m_rev, e, eRev);
-        put(m_rev, eRev, e);
+        put(m_rev, e, e_rev);
+        put(m_rev, e_rev, e);
 
-        return std::make_pair(e, eRev);
+        return std::make_pair(e, e_rev);
     }
 
     /**
@@ -94,12 +91,12 @@ public:
      */
     double find_min_cut(Vertex src, Vertex trg) {
         assert(src != trg);
-        double minCutVal = boost::boykov_kolmogorov_max_flow(m_graph, src, trg);
+        double min_cut_val = boost::boykov_kolmogorov_max_flow(m_graph, src, trg);
         m_colors = get(boost::vertex_color, m_graph);
         m_src_color = get(m_colors, src);
         m_last_cut = std::make_pair(src, trg);
         assert(!is_in_source_set(trg));
-        return minCutVal;
+        return min_cut_val;
     }
 
     /**
@@ -141,17 +138,16 @@ public:
     }
 
 private:
-    typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
-                                  boost::property<boost::vertex_color_t, boost::default_color_type,
-                                      boost::property<boost::vertex_distance_t, long,
-                                          boost::property<boost::vertex_predecessor_t, Edge>>>,
-                                  boost::property<boost::edge_capacity_t, double,
-                                      boost::property<boost::edge_residual_capacity_t, double,
-                                          boost::property<boost::edge_reverse_t, Edge>>>
-                                 > Graph;
-    typedef boost::property_map<Graph, boost::edge_capacity_t>::type EdgeCapacity;
-    typedef boost::property_map<Graph, boost::edge_reverse_t>::type  EdgeReverse;
-    typedef boost::property_map<Graph, boost::vertex_color_t>::type  VertexColors;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS,
+              boost::property<boost::vertex_color_t, boost::default_color_type,
+                  boost::property<boost::vertex_distance_t, long,
+                      boost::property<boost::vertex_predecessor_t, Edge>>>,
+              boost::property<boost::edge_capacity_t, double,
+                  boost::property<boost::edge_residual_capacity_t, double,
+                      boost::property<boost::edge_reverse_t, Edge>>>>;
+    using EdgeCapacity = boost::property_map<Graph, boost::edge_capacity_t>::type;
+    using EdgeReverse = boost::property_map<Graph, boost::edge_reverse_t>::type;
+    using VertexColors = boost::property_map<Graph, boost::vertex_color_t>::type;
 
     Graph m_graph;
 

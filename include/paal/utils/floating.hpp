@@ -40,10 +40,10 @@ static InputIterator random_select(InputIterator iBegin, InputIterator iEnd) {
 
 ///Class for comparing floating point
 template <typename T>
-class Compare {
+class compare {
 public:
     ///constructor
-    Compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
+    compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
 
     /**
      * @brief equals

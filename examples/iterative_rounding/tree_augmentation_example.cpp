@@ -17,15 +17,17 @@ int main() {
 //! [Tree Augmentation Example]
     using EdgeProp = boost::property<boost::edge_weight_t, double,
                 boost::property<boost::edge_color_t, bool>>;
-    using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                boost::no_property, EdgeProp>;
+    using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
+                boost::undirectedS, boost::no_property, EdgeProp>;
     using Edge = boost::graph_traits<Graph>::edge_descriptor;
 
     // sample problem
-    std::vector<std::pair<int, int>> edges {{0,1},{1,2},{1,3},{3,4},{3,5},{0,3},{0,3},{2,4},{2,5},{4,5}};
-    std::vector<EdgeProp> edge_properties {EdgeProp(0,1), EdgeProp(0,1),
-        EdgeProp(0,1), EdgeProp(0,1), EdgeProp(0,1), EdgeProp(1,0),
-        EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0), EdgeProp(1,0)};
+    std::vector<std::pair<int, int>> edges {{0,1},{1,2},{1,3},{3,4},{3,5},
+            {0,3},{0,3},{2,4},{2,5},{4,5}};
+    std::vector<EdgeProp> edge_properties {EdgeProp(0, true),
+        EdgeProp(0, true), EdgeProp(0, true), EdgeProp(0, true),
+        EdgeProp(0, true), EdgeProp(1, false), EdgeProp(1, false),
+        EdgeProp(1, false), EdgeProp(1, false), EdgeProp(1,false)};
 
     Graph g(edges.begin(), edges.end(), edge_properties.begin(), 6);
 
@@ -44,9 +46,11 @@ int main() {
     auto result = paal::ir::tree_augmentation_iterative_rounding(
                     g, std::back_inserter(solution));
 
+    // print result
     if (result.first == paal::lp::OPTIMAL) {
-        std::cout << "The solution contains the following nontree edges:" << std::endl;
-        for (auto const & e : solution) {
+        std::cout << "The solution contains the following nontree edges:"
+            << std::endl;
+        for (auto e : solution) {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;

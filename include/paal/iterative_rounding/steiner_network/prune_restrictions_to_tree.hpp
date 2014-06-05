@@ -11,14 +11,14 @@
 
 #include "paal/utils/functors.hpp"
 
-#include <boost/range/irange.hpp>
 #include <boost/function_output_iterator.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
+#include <boost/range/irange.hpp>
 
 namespace paal {
 
-typedef std::vector<std::pair<unsigned, unsigned>> RestrictionsVector;
+using RestrictionsVector = std::vector<std::pair<unsigned, unsigned>>;
 
 /**
  * @brief Returns a list of restrictions, made of the edges of a maximum spanning tree
@@ -32,13 +32,13 @@ typedef std::vector<std::pair<unsigned, unsigned>> RestrictionsVector;
  */
 template <typename Restrictions>
     RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
-        typedef decltype(std::declval<Restrictions>()(0,0)) Dist;
-        typedef boost::property < boost::edge_weight_t, Dist> EdgeProp;
-        typedef boost::adjacency_list < boost::vecS, boost::vecS, boost::undirectedS,
-                boost::no_property, EdgeProp> TGraph;
-        typedef typename boost::graph_traits<TGraph>::edge_descriptor Edge;
+        using Dist = decltype(std::declval<Restrictions>()(0,0));
+        using EdgeProp = boost::property<boost::edge_weight_t, Dist>;
+        using TGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                boost::no_property, EdgeProp>;
+        using Edge = typename boost::graph_traits<TGraph>::edge_descriptor;
 
-        RestrictionsVector resVec;
+        RestrictionsVector res_vec;
         TGraph g(N);
         for (int i : boost::irange(0, N)) {
             for (int j : boost::irange(i + 1, N)) {
@@ -47,10 +47,10 @@ template <typename Restrictions>
             }
         }
 
-        auto add_edge_to_graph = [&](Edge e){resVec.push_back(std::make_pair(source(e, g), target(e,g)));};
+        auto add_edge_to_graph = [&](Edge e){res_vec.push_back(std::make_pair(source(e, g), target(e, g)));};
         boost::kruskal_minimum_spanning_tree(g,
                 boost::make_function_output_iterator(utils::make_assignable_functor(add_edge_to_graph)));
-        return resVec;
+        return res_vec;
     }
 
 }

@@ -9,13 +9,12 @@
 #define STEINER_COMPONENT_HPP
 
 
-#include "paal/steiner_tree/dreyfus_wagner.hpp"
-#include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
+#include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/steiner_tree/dreyfus_wagner.hpp"
 
-
-#include <set>
 #include <iosfwd>
+#include <set>
 
 namespace paal {
 namespace ir {
@@ -28,14 +27,14 @@ namespace ir {
 template <typename Vertex, typename Dist>
 class steiner_component {
 public:
-    typedef typename std::pair<Vertex, Vertex> Edge;
+    using Edge = typename std::pair<Vertex, Vertex>;
 
     ///constuctor
     template<typename Metric, typename Terminals>
-    steiner_component(std::vector<Vertex> & el, const Metric & costMap,
-            const Terminals & term, const Terminals& steinerVertices) :
+    steiner_component(std::vector<Vertex> & el, const Metric & cost_map,
+            const Terminals & term, const Terminals& steiner_vertices) :
         m_elements(el), m_size(el.size()) {
-        auto dw = paal::steiner_tree::make_dreyfus_wagner(costMap, m_elements, steinerVertices);
+        auto dw = paal::steiner_tree::make_dreyfus_wagner(cost_map, m_elements, steiner_vertices);
         dw.solve();
         m_cost = dw.get_cost();
         auto & steiner = dw.steiner_tree_zelikovsky11per6approximation();

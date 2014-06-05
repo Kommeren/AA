@@ -1,22 +1,22 @@
 /**
  * @file k_cut.hpp
  * @brief
- * @author Piotr Smulewicz
+ * @author Piotr Smulewicz, Piotr Godlewski
  * @version 1.0
  * @date 2013-09-25
  */
 #ifndef K_CUT_HPP
 #define K_CUT_HPP
 
-#include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/stoer_wagner_min_cut.hpp>
-#include <boost/graph/one_bit_color_map.hpp>
-#include <boost/graph/subgraph.hpp>
-#include <boost/graph/iteration_macros.hpp>
 #include <boost/graph/copy.hpp>
+#include <boost/graph/iteration_macros.hpp>
+#include <boost/graph/one_bit_color_map.hpp>
+#include <boost/graph/stoer_wagner_min_cut.hpp>
+#include <boost/graph/subgraph.hpp>
 
 #include <queue>
 
@@ -41,8 +41,8 @@ namespace greedy{
  * @tparam EdgeWeightMap
  */
 template<typename InGraph, class OutputIterator, typename VertexIndexMap, typename EdgeWeightMap>
-auto kCut(const InGraph& graph, unsigned int numberOfParts,OutputIterator result,
-            VertexIndexMap indexMap, EdgeWeightMap weightMap) ->
+auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator result,
+            VertexIndexMap index_map, EdgeWeightMap weight_map) ->
             typename boost::property_traits<EdgeWeightMap>::value_type{
     using cost_t = typename boost::property_traits<EdgeWeightMap>::value_type;
     using Vertex = typename boost::graph_traits<InGraph>::vertex_descriptor;
@@ -53,14 +53,14 @@ auto kCut(const InGraph& graph, unsigned int numberOfParts,OutputIterator result
             boost::property<boost::edge_weight_t, cost_t,
                 boost::property<boost::edge_index_t, int>>>;
 
-    assert(num_vertices(graph) >= numberOfParts);
+    assert(num_vertices(graph) >= number_of_parts);
 
-    std::vector<int> vertexToPart(num_vertices(graph));
+    std::vector<int> vertex_to_part(num_vertices(graph));
     using VertexIndexToVertex = typename std::vector<Vertex>;
     using VertexIndexToVertexIndex = std::vector<int>;
-    VertexIndexToVertex vertexInSubgraphToVertex(num_vertices(graph));
-    VertexIndexToVertexIndex vertexToVertexInSubgraph(num_vertices(graph));
-    int vertexInPart;
+    VertexIndexToVertex vertex_in_subgraph_to_vertex(num_vertices(graph));
+    VertexIndexToVertexIndex vertex_to_vertex_in_subgraph(num_vertices(graph));
+    int vertex_in_part;
     int parts = 1;
     //cuts contain pair(x,y)
     // x is the cost of the cut
@@ -70,74 +70,74 @@ auto kCut(const InGraph& graph, unsigned int numberOfParts,OutputIterator result
             std::vector<std::pair<cost_t, int>>,
             utils::Greater> cuts;
 
-    int idPart = 0;
+    int id_part = 0;
 
     //get part id and compute minimum cost of cut of that part and add it to queue
-    auto makeCut = [&](int id) {
-        vertexInPart=0;
+    auto make_cut = [&](int id) {
+        vertex_in_part=0;
         for (auto v: boost::make_iterator_range(vertices(graph))) {
-            if (vertexToPart[get(indexMap, v)] == id) {
-                vertexInSubgraphToVertex[vertexInPart] = v;
-                vertexToVertexInSubgraph[get(indexMap, v)] = vertexInPart;
-                ++vertexInPart;
+            if (vertex_to_part[get(index_map, v)] == id) {
+                vertex_in_subgraph_to_vertex[vertex_in_part] = v;
+                vertex_to_vertex_in_subgraph[get(index_map, v)] = vertex_in_part;
+                ++vertex_in_part;
             }
         }
-        Graph part(vertexInPart);
+        Graph part(vertex_in_part);
         for (auto edge : boost::make_iterator_range(edges(graph))) {
-            auto sour = get(indexMap, source(edge,graph));
-            auto targ = get(indexMap, target(edge,graph));
-            if (vertexToPart[sour] == id &&
-                    vertexToPart[targ] == id &&
+            auto sour = get(index_map, source(edge,graph));
+            auto targ = get(index_map, target(edge,graph));
+            if (vertex_to_part[sour] == id &&
+                    vertex_to_part[targ] == id &&
                     sour != targ) {
-                add_edge(vertexToVertexInSubgraph[sour],
-                         vertexToVertexInSubgraph[targ],
-                         get(weightMap, edge),
+                add_edge(vertex_to_vertex_in_subgraph[sour],
+                         vertex_to_vertex_in_subgraph[targ],
+                         get(weight_map, edge),
                          part);
             }
         }
-        if (vertexInPart < 2) {
-            ++idPart;
-            *result = std::make_pair(vertexInSubgraphToVertex[0], idPart);
+        if (vertex_in_part < 2) {
+            ++id_part;
+            *result = std::make_pair(vertex_in_subgraph_to_vertex[0], id_part);
             ++result;
             return;
         }
         auto parities = boost::make_one_bit_color_map(num_vertices(part),
-                                                    get(boost::vertex_index, part));
-        auto cutCost = boost::stoer_wagner_min_cut(part,
+                                            get(boost::vertex_index, part));
+        auto cut_cost = boost::stoer_wagner_min_cut(part,
                                           get(boost::edge_weight, part),
                                           boost::parity_map(parities));
 
         for (auto i : boost::irange(0, int(num_vertices(part)))) {
-            vertexToPart[get(indexMap, vertexInSubgraphToVertex[i])] =
+            vertex_to_part[get(index_map, vertex_in_subgraph_to_vertex[i])] =
                     parts + get(parities, i); //return value convertable to 0/1
         }
-        cuts.push(std::make_pair(cutCost, parts));
+        cuts.push(std::make_pair(cut_cost, parts));
         parts += 2;
     };
 
-    makeCut(0);
-    cost_t kCutCost = cost_t();
-    while (--numberOfParts) {
+    make_cut(0);
+    cost_t k_cut_cost = cost_t();
+    while (--number_of_parts) {
         auto cut = cuts.top();
         cuts.pop();
-        kCutCost += cut.first;
-        makeCut(cut.second);
-        makeCut(cut.second + 1);
+        k_cut_cost += cut.first;
+        make_cut(cut.second);
+        make_cut(cut.second + 1);
     }
 
     while (!cuts.empty()) {
         auto cut = cuts.top();
         cuts.pop();
-        ++idPart;
+        ++id_part;
         for (auto v: boost::make_iterator_range(vertices(graph))) {
-            if (vertexToPart[get(indexMap, v)] == cut.second ||
-                    vertexToPart[get(indexMap, v)] == cut.second + 1) {
-                *result = std::make_pair(v, idPart);
+            if (vertex_to_part[get(index_map, v)] == cut.second ||
+                    vertex_to_part[get(index_map, v)] == cut.second + 1) {
+                *result = std::make_pair(v, id_part);
                 ++result;
             }
         }
     }
-    return kCutCost;
+    return k_cut_cost;
 }
 
 /**
@@ -148,10 +148,10 @@ auto kCut(const InGraph& graph, unsigned int numberOfParts,OutputIterator result
  *
  * complete example is k_cut_example.cpp
  * @param Graph graph
- * @param int numberOfParts
+ * @param int number_of_parts
  * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
  * @param params
- * @param EdgeWeightMap weightMap
+ * @param EdgeWeightMap weight_map
  * @tparam InGraph
  * @tparam OutputIterator
  * @tparam T
@@ -163,11 +163,12 @@ template<typename InGraph
         ,typename T
         ,typename P
         ,typename R>
-auto kCut(const InGraph& graph, unsigned int numberOfParts, OutputIterator result, const boost::bgl_named_params<P, T, R>& params) ->
+auto k_cut(const InGraph& graph, unsigned int number_of_parts,
+    OutputIterator result, const boost::bgl_named_params<P, T, R>& params) ->
         typename boost::property_traits<
             puretype(boost::choose_const_pmap(get_param(params, boost::edge_weight), graph, boost::edge_weight))
             >::value_type {
-    return kCut(graph, numberOfParts, result,
+    return k_cut(graph, number_of_parts, result,
         boost::choose_const_pmap(get_param(params, boost::vertex_index), graph,boost::vertex_index),
         boost::choose_const_pmap(get_param(params, boost::edge_weight), graph,boost::edge_weight)
     );
@@ -181,15 +182,15 @@ auto kCut(const InGraph& graph, unsigned int numberOfParts, OutputIterator resul
  *
  * complete example is k_cut_example.cpp
  * @param Graph graph
- * @param int numberOfParts
+ * @param int number_of_parts
  * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
  * @tparam InGraph
  * @tparam OutputIterator
  */
 template<typename InGraph, class OutputIterator>
-auto kCut(const InGraph& graph, unsigned int numberOfParts, OutputIterator result) ->
+auto k_cut(const InGraph& graph, unsigned int number_of_parts, OutputIterator result) ->
         typename boost::property_traits<puretype(get(boost::edge_weight,graph))>::value_type{
-    return kCut(graph, numberOfParts, result, boost::no_named_parameters());
+    return k_cut(graph, number_of_parts, result, boost::no_named_parameters());
 }
 
 }//!greedy

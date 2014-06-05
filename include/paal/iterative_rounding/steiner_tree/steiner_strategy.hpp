@@ -13,7 +13,6 @@
 #include "paal/utils/floating.hpp"
 
 
-
 namespace paal {
 namespace ir {
 
@@ -23,37 +22,39 @@ namespace ir {
  */
 class all_generator {
 public:
+    /// Constructor.
     all_generator(int K = 4) : m_component_max_size(K) {}
 
+    /// Generates all possible components.
     template<typename Metric, typename Terminals>
-    void gen_components(const Metric& costMap, const Terminals& terminals,
-            const Terminals& steinerVertices,
+    void gen_components(const Metric& cost_map, const Terminals& terminals,
+            const Terminals& steiner_vertices,
             steiner_components<
                 typename data_structures::metric_traits<Metric>::VertexType,
                 typename data_structures::metric_traits<Metric>::DistanceType>& components) {
 
-        typedef typename data_structures::metric_traits<Metric>::VertexType Vertex;
-        typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
+        using Vertex = typename data_structures::metric_traits<Metric>::VertexType;
+        using Dist = typename data_structures::metric_traits<Metric>::DistanceType;
         std::vector<Vertex> tmp;
         gen_all_components<Vertex, Dist>(components, 0, terminals.size(), tmp,
-                costMap, terminals, steinerVertices);
+                cost_map, terminals, steiner_vertices);
     }
 private:
     template<typename Vertex, typename Dist, typename Metric, typename Terminals>
     void gen_all_components(steiner_components<Vertex, Dist>& components,
-            int firstAvail, int last, std::vector<Vertex>& curr,
-            const Metric& costMap, const Terminals& terminals,
-            const Terminals& steinerVertices) {
+            int first_avail, int last, std::vector<Vertex>& curr,
+            const Metric& cost_map, const Terminals& terminals,
+            const Terminals& steiner_vertices) {
 
         if (curr.size() > 1) {
-            steiner_component<Vertex, Dist> c(curr, costMap, terminals, steinerVertices);
+            steiner_component<Vertex, Dist> c(curr, cost_map, terminals, steiner_vertices);
             components.add(std::move(c));
         }
         if ((int) curr.size() >= m_component_max_size)
             return;
-        for (int i = firstAvail; i < last; ++i) {
+        for (int i = first_avail; i < last; ++i) {
             curr.push_back(terminals[i]);
-            gen_all_components(components, i + 1, last, curr, costMap, terminals, steinerVertices);
+            gen_all_components(components, i + 1, last, curr, cost_map, terminals, steiner_vertices);
             curr.pop_back();
         }
     }
@@ -66,19 +67,21 @@ private:
  */
 class random_generator {
 public:
+    /// Constructor.
     random_generator(int N = 100, int K = 3) :
             m_iterations(N), m_component_max_size(K) {
     }
 
+    /// Generates a specified number of components by selecting random elements.
     template<typename Metric, typename Terminals>
-    void gen_components(const Metric& costMap, const Terminals & terminals,
-            const Terminals& steinerVertices,
+    void gen_components(const Metric& cost_map, const Terminals & terminals,
+            const Terminals& steiner_vertices,
             steiner_components<
                 typename data_structures::metric_traits<Metric>::VertexType,
                 typename data_structures::metric_traits<Metric>::DistanceType>& components) {
 
-        typedef typename data_structures::metric_traits<Metric>::VertexType Vertex;
-        typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
+        using Vertex = typename data_structures::metric_traits<Metric>::VertexType;
+        using Dist = typename data_structures::metric_traits<Metric>::DistanceType;
         if (terminals.size() < 2) {
             return;
         }
@@ -95,7 +98,7 @@ public:
                 curr.insert(terminals[r]);
             }
             std::vector<Vertex> elements(curr.begin(), curr.end());
-            steiner_component<Vertex, Dist> c(elements, costMap, terminals, steinerVertices);
+            steiner_component<Vertex, Dist> c(elements, cost_map, terminals, steiner_vertices);
             components.add(std::move(c));
         }
     }
@@ -110,19 +113,21 @@ private:
  */
 class smart_generator {
 public:
+    /// Constructor.
     smart_generator(int N = 100, int K = 3) :
             m_iterations(N), m_component_max_size(K) {
     }
 
+    /// Generates components.
     template<typename Metric, typename Terminals>
-    void gen_components(const Metric& costMap, const Terminals& terminals,
-            const Terminals& steinerVertices,
+    void gen_components(const Metric& cost_map, const Terminals& terminals,
+            const Terminals& steiner_vertices,
             steiner_components<
                     typename data_structures::metric_traits<Metric>::VertexType,
                     typename data_structures::metric_traits<Metric>::DistanceType>& components) {
 
-        typedef typename data_structures::metric_traits<Metric>::VertexType Vertex;
-        typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
+        using Vertex = typename data_structures::metric_traits<Metric>::VertexType;
+        using Dist = typename data_structures::metric_traits<Metric>::DistanceType;
         std::vector<Vertex> elements;
         std::vector<double> prob;
         for (Vertex start : terminals) {
@@ -138,7 +143,7 @@ public:
                                 prob[k] = 0;
                                 break;
                             }
-                            int cost = costMap(e, elements[k]);
+                            int cost = cost_map(e, elements[k]);
                             assert(cost > 0);
                             prob[k] = std::max(prob[k], 1.0 / cost);
                         }
@@ -148,7 +153,7 @@ public:
                         break;
                     elements.push_back(terminals[selected]);
                 }
-                steiner_component<Vertex, Dist> c(elements, costMap, terminals, steinerVertices);
+                steiner_component<Vertex, Dist> c(elements, cost_map, terminals, steiner_vertices);
                 components.add(std::move(c));
             }
         }

@@ -1,18 +1,14 @@
 /**
  * @file steiner_network_oracle.hpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Godlewski
  * @version 1.0
  * @date 2013-06-24
  */
 #ifndef STEINER_NETWORK_ORACLE_HPP
 #define STEINER_NETWORK_ORACLE_HPP
 
-
 #include "paal/iterative_rounding/min_cut.hpp"
-
-
-
 
 namespace paal {
 namespace ir {

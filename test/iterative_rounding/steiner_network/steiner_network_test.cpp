@@ -11,8 +11,8 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
-#include <boost/test/unit_test.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/test/unit_test.hpp>
 
 #include <vector>
 
@@ -34,9 +34,9 @@ int restrictions(int i, int j) {
     return 2;
 }
 
-void print_result(const ResultNetwork & resultNetwork) {
+void print_result(const ResultNetwork & result_network) {
     LOGLN("Edges in steiner network");
-    ON_LOG(for(auto const e : resultNetwork) {
+    ON_LOG(for(auto const e : result_network) {
         LOGLN("Edge " << e);
     })
 }
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
     //sample problem
     LOGLN("Sample problem:");
     VectorGraph g(3);
-    ResultNetwork resultNetwork;
+    ResultNetwork result_network;
     bool b;
     b  = add_edge(0, 1, EdgeProp(0, 1), g).second;
     b &= add_edge(0, 1, EdgeProp(1, 1), g).second;
@@ -57,10 +57,10 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
 
     //solve it
     steiner_network_iterative_rounding(
-        g, restrictions, std::back_inserter(resultNetwork));
+        g, restrictions, std::back_inserter(result_network));
 
-    print_result(resultNetwork);
-    BOOST_CHECK_EQUAL(resultNetwork.size(), 4);
+    print_result(result_network);
+    BOOST_CHECK_EQUAL(result_network.size(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_list) {
@@ -79,10 +79,10 @@ BOOST_AUTO_TEST_CASE(steiner_network_list) {
         ++idx;
     }
 
-    std::vector<EdgeT> resultNetwork;
+    std::vector<EdgeT> result_network;
     steiner_network_iterative_rounding(
-        g, restrictions, std::back_inserter(resultNetwork));
-    BOOST_CHECK_EQUAL(resultNetwork.size(), 4);
+        g, restrictions, std::back_inserter(result_network));
+    BOOST_CHECK_EQUAL(result_network.size(), 4);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
@@ -98,26 +98,26 @@ BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {
     b &= add_edge(2, 0, 4, g).second;
     assert(b);
 
-    auto edgeId = get(boost::edge_index, g);
+    auto edge_id = get(boost::edge_index, g);
     std::vector<double> costs = {1, 1, 1, 1, 7};
-    auto cost = boost::make_iterator_property_map(costs.begin(), edgeId);
+    auto cost = boost::make_iterator_property_map(costs.begin(), edge_id);
 
     //solve it
     {
-        ResultNetwork resultNetwork;
+        ResultNetwork result_network;
         steiner_network_iterative_rounding(g, restrictions,
-            boost::weight_map(cost), std::back_inserter(resultNetwork));
+            boost::weight_map(cost), std::back_inserter(result_network));
 
-        print_result(resultNetwork);
+        print_result(result_network);
     }
     {
-        ResultNetwork resultNetwork;
-        auto steinerNetwork(make_steiner_network(g, restrictions,
+        ResultNetwork result_network;
+        auto steiner_network(make_steiner_network(g, restrictions,
                     boost::weight_map(cost),
-                    std::back_inserter(resultNetwork)));
-        solve_iterative_rounding(steinerNetwork, steiner_network_ir_components<>());
+                    std::back_inserter(result_network)));
+        solve_iterative_rounding(steiner_network, steiner_network_ir_components<>());
 
-        print_result(resultNetwork);
+        print_result(result_network);
     }
 }
 
@@ -125,16 +125,16 @@ BOOST_AUTO_TEST_CASE(steiner_network_invalid_test) {
     // invalid problem (restrictions cannot be satisfied)
     LOGLN("Invalid problem (restrictions cannot be satisfied):");
     VectorGraph g(3);
-    ResultNetwork resultNetwork;
+    ResultNetwork result_network;
     bool b;
     b  = add_edge(0, 1, EdgeProp(0, 1), g).second;
     b &= add_edge(1, 2, EdgeProp(1, 1), g).second;
     assert(b);
 
     //solve it
-    auto steinerNetwork(make_steiner_network(g, restrictions,
-                                    std::back_inserter(resultNetwork)));
-    auto invalid = steinerNetwork.check_input_validity();
+    auto steiner_network(make_steiner_network(g, restrictions,
+                                    std::back_inserter(result_network)));
+    auto invalid = steiner_network.check_input_validity();
 
     BOOST_CHECK(invalid);
     LOGLN(*invalid);
