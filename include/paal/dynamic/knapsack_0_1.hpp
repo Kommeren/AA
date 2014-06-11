@@ -54,15 +54,15 @@ namespace detail {
               typename ObjectValueFunctor,
               typename Comparator>
     class Knapsack_0_1  {
-        typedef knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-        typedef typename base::SizeType   SizeType;
-        typedef typename base::ValueType  ValueType;
-        typedef typename base::ObjectType ObjectType;
-        typedef typename base::ObjectRef  ObjectRef;
-        typedef typename base::return_type  return_type;
-        typedef boost::optional<ValueType> ValueOrNull;
+        using base = knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>;
+        using SizeType    = typename base::SizeType;
+        using ValueType   = typename base::ValueType;
+        using ObjectType  = typename base::ObjectType;
+        using ObjectRef   = typename base::ObjectRef;
+        using ReturnType  = typename base::return_type;
+        using ValueOrNull = boost::optional<ValueType>;
         static_assert(std::is_integral<SizeType>::value, "Size type must be integral");
-        typedef std::vector<ValueOrNull> ValueOrNullVector;
+        using ValueOrNullVector = std::vector<ValueOrNull>;
 
     public:
 
@@ -79,15 +79,15 @@ namespace detail {
          * @returns the optimal value
          */
         template <typename GetBestElement>
-        return_type solve(ObjectsIter oBegin, ObjectsIter oEnd, SizeType capacity, GetBestElement getBest) {
+        ReturnType solve(ObjectsIter oBegin, ObjectsIter oEnd, SizeType capacity, GetBestElement getBest) {
             m_object_on_size.resize(capacity + 1);
             fill_table(m_object_on_size, oBegin, oEnd, capacity);
             auto maxValue = getBest(m_object_on_size.begin(), m_object_on_size.end(), m_comparator);
 
             if(maxValue != m_object_on_size.end()) {
-                return return_type(**maxValue, maxValue - m_object_on_size.begin());
+                return ReturnType(**maxValue, maxValue - m_object_on_size.begin());
             } else {
-                return return_type(ValueType(), SizeType());
+                return ReturnType(ValueType(), SizeType());
             }
         }
 
@@ -149,7 +149,7 @@ namespace detail {
             fill_knapsack_dynamic_table(values.begin(), values.begin() + capacity + 1, oBegin, oEnd,  m_size,
                     [&](ValueOrNull val, ObjectsIter obj) { return *val + m_value(*obj);},
                     [&](ValueOrNull left, ValueOrNull right) { return m_comparator(*left, *right);},
-                    [](ValueOrNull & val) {val = ValueType();},
+                    [](ValueOrNull & val) {val = ValueType{};},
                     Knapsack_0_1_get_position_range());
         }
 

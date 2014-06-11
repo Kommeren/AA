@@ -63,15 +63,15 @@ public:
               m_oracle(oracle)
     {}
 
-    typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
+    using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
+    using Vertex =  typename boost::graph_traits<Graph>::vertex_descriptor;
 
-    typedef boost::bimap<Edge, lp::col_id> EdgeMap;
-    typedef std::unordered_map<lp::row_id, Vertex> VertexMap;
+    using EdgeMap =  boost::bimap<Edge, lp::col_id>;
+    using VertexMap =  std::unordered_map<lp::row_id, Vertex>;
 
-    typedef std::vector<std::pair<lp::col_id, Edge>> EdgeMapOriginal;
+    using EdgeMapOriginal =  std::vector<std::pair<lp::col_id, Edge>>;
 
-    typedef boost::optional<std::string> ErrorMessage;
+    using ErrorMessage =  boost::optional<std::string>;
 
     /**
      * Checks if the input graph is connected.
@@ -82,10 +82,10 @@ public:
         int num = boost::connected_components(m_g, &components[0]);
 
         if (num > 1) {
-            return ErrorMessage("The graph is not connected.");
+            return ErrorMessage{"The graph is not connected."};
         }
 
-        return ErrorMessage();
+        return ErrorMessage{};
     }
 
     /**
@@ -140,10 +140,10 @@ public:
     boost::optional<lp::col_id> edge_to_col(Edge e) const {
         auto i = m_edge_map.left.find(e);
         if (i != m_edge_map.left.end()) {
-            return boost::optional<lp::col_id>(i->second);
+            return i->second;
         }
         else {
-            return boost::optional<lp::col_id>();
+            return boost::none;
         }
     }
 
@@ -198,10 +198,10 @@ public:
     boost::optional<Vertex> row_to_vertex(lp::row_id row) {
         auto i = m_vertex_map.find(row);
         if (i != m_vertex_map.end()) {
-            return boost::optional<Vertex>(i->second);
+            return i->second;
         }
         else {
-            return boost::optional<Vertex>();
+            return boost::none;
         }
     }
 

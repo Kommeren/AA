@@ -52,11 +52,11 @@ namespace detail {
             ObjectValueFunctor value,
             GetBestElement getBest ,
             ValuesComparator compareValues) {
-        typedef knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-        typedef typename base::ObjectRef  ObjectRef;
-        typedef typename base::SizeType   SizeType;
-        typedef typename base::ValueType  ValueType;
-        typedef boost::optional<std::pair<ObjectsIter, ValueType>> ObjIterWithValueOrNull;
+        using base =  knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>;
+        using ObjectRef = typename base::ObjectRef ;
+        using SizeType  = typename base::SizeType  ;
+        using ValueType = typename base::ValueType ;
+        using ObjIterWithValueOrNull = boost::optional<std::pair<ObjectsIter, ValueType>>;
 
         std::vector<ObjIterWithValueOrNull>  objectOnSize(maxSize + 1);
 
@@ -123,19 +123,19 @@ knapsack(ObjectsIter oBegin,
         no_zero_one_tag,
         integral_value_tag,
         retrieve_solution_tag) {
-    typedef detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor> base;
-    typedef typename base::ValueType ValueType;
-    typedef typename base::SizeType   SizeType;
-    typedef typename base::return_type return_type;
-    typedef boost::optional<std::pair<ObjectsIter, ValueType>> TableElementType;
+    using base = detail::knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>;
+    using ValueType  = typename base::ValueType;
+    using SizeType   = typename base::SizeType;
+    using ReturnType = typename base::return_type;
+    using TableElementType = boost::optional<std::pair<ObjectsIter, ValueType>>;
     if(oBegin == oEnd) {
-        return return_type();
+        return ReturnType{};
     }
     auto maxSize = get_value_upper_bound(oBegin, oEnd, capacity, value, size, no_zero_one_tag());
     auto ret = knapsack_dynamic(oBegin, oEnd, maxSize, out, value, size,
             get_max_element_on_value_indexed_collection<TableElementType, SizeType>(
                 TableElementType(std::make_pair(ObjectsIter(), capacity + 1))),
-            utils::Greater());
+            utils::Greater{});
     return std::make_pair(ret.second, ret.first);
 }
 
@@ -165,7 +165,7 @@ knapsack(ObjectsIter oBegin,
         retrieve_solution_tag) {
     typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
     return knapsack_dynamic(oBegin, oEnd, capacity, out, size, value,
-            detail::get_max_element_on_capacity_indexed_collection<ValueType>(), std::less<ValueType>());
+            detail::get_max_element_on_capacity_indexed_collection<ValueType>(), utils::Less{});
 }
 
 } //detail

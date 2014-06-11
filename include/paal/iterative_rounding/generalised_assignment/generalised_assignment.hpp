@@ -160,14 +160,14 @@ template <typename MachineIter, typename JobIter, typename Cost,
           typename JobsToMachinesOutputIterator>
 class generalised_assignment {
     public:
-        typedef typename std::iterator_traits<JobIter>::value_type Job;
-        typedef typename std::iterator_traits<MachineIter>::value_type Machine;
+        using Job = typename std::iterator_traits<JobIter>::value_type;
+        using Machine = typename std::iterator_traits<MachineIter>::value_type;
 
-        typedef typename std::iterator_traits<JobIter>::reference JobRef;
-        typedef typename std::iterator_traits<MachineIter>::reference MachineRef;
-        typedef utils::Compare<double> Compare;
-        typedef std::set<lp::row_id> MachineRows;
-        typedef std::vector<lp::col_id> col_idx;
+        using JobRef = typename std::iterator_traits<JobIter>::reference;
+        using MachineRef = typename std::iterator_traits<MachineIter>::reference;
+        using Compare = utils::Compare<double>;
+        using MachineRows = std::set<lp::row_id>;
+        using ColIdx = std::vector<lp::col_id>;
 
         /**
          * Constructor.
@@ -180,13 +180,13 @@ class generalised_assignment {
             m_jbegin(jbegin), m_jend(jend), m_mbegin(mbegin), m_mend(mend),
             m_c(c), m_t(t), m_T(T), m_job_to_machine(jobToMachines) {}
 
-        typedef boost::optional<std::string> ErrorMessage;
+        using ErrorMessage = boost::optional<std::string>;
 
         /**
          * Checks if input is valid.
          */
         ErrorMessage check_input_validity() {
-            return ErrorMessage();
+            return ErrorMessage{};
         }
 
         /**
@@ -255,7 +255,7 @@ class generalised_assignment {
         /**
          * Returns the vector of LP column IDs.
          */
-        col_idx & getcol_idx() {
+        ColIdx & getcol_idx() {
             return m_col_idx;
         }
 
@@ -303,7 +303,7 @@ class generalised_assignment {
         const MachineAvailableTime & m_T;
         JobsToMachinesOutputIterator m_job_to_machine;
         const Compare m_compare;
-        col_idx m_col_idx;
+        ColIdx m_col_idx;
         std::set<lp::row_id> m_machine_rows;
 };
 

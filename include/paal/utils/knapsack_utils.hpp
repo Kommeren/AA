@@ -371,7 +371,7 @@ boost::optional<double> get_multiplier(ObjectsIter oBegin, ObjectsIter oEnd,
     auto ret =  n / (epsilon * lowerBound);
     static const double SMALLEST_MULTIPLIER = 1.;
     if(ret > SMALLEST_MULTIPLIER )
-        return boost::optional<double>();
+        return boost::none;
     return  ret;
 }
 
@@ -399,7 +399,7 @@ boost::optional<double> get_multiplier(ObjectsIter oBegin, ObjectsIter oEnd,
     auto ret =  n / (epsilon * lowerBound);
     static const double SMALLEST_MULTIPLIER = 1.;
     if(ret > SMALLEST_MULTIPLIER )
-        return boost::optional<double>();
+        return boost::none;
     return  ret;
 }
 

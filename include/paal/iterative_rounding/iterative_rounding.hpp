@@ -244,9 +244,9 @@ private:
 
 
 /// Iterative Rounding solution cost type. Solution cost only makes sense if the LP has been solved to optimal value.
-typedef boost::optional<double> IRSolutionCost;
+using IRSolutionCost = boost::optional<double>;
 /// Iterative Rounding result type: Pair consisting of LP problem type and IR solution cost.
-typedef std::pair<lp::problem_type, IRSolutionCost> IRResult;
+using IRResult = std::pair<lp::problem_type, IRSolutionCost>;
 
 /**
  * @brief Solves an Iterative Rounding problem.
@@ -265,7 +265,7 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
 
     auto probType = ir.solve_lp();
     if (probType != lp::OPTIMAL) {
-        return IRResult(probType, IRSolutionCost());
+        return IRResult(probType, IRSolutionCost{});
     }
 
     while (!ir.stop_condition()) {
@@ -275,7 +275,7 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
 
         probType = ir.resolve_lp();
         if (probType != lp::OPTIMAL) {
-            return IRResult(probType, IRSolutionCost());
+            return IRResult(probType, IRSolutionCost{});
         }
     }
     ir.set_solution();
@@ -299,7 +299,7 @@ IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents comp
 
     auto probType = ir.solve_lp();
     if (probType != lp::OPTIMAL) {
-        return IRResult(probType, IRSolutionCost());
+        return IRResult(probType, IRSolutionCost{});
     }
 
     while (!ir.stop_condition()) {
@@ -308,7 +308,7 @@ IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents comp
 
         probType = ir.resolve_lp();
         if (probType != lp::OPTIMAL) {
-            return IRResult(probType, IRSolutionCost());
+            return IRResult(probType, IRSolutionCost{});
         }
     }
     ir.set_solution();

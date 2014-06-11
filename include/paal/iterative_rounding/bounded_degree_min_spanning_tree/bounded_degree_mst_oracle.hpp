@@ -25,14 +25,14 @@ namespace ir {
  *      in the bounded degree minimum spanning tree problem.
  */
 class bdmst_violation_checker {
-    typedef min_cut_finder::Edge AuxEdge;
-    typedef min_cut_finder::Vertex AuxVertex;
-    typedef std::vector<AuxEdge> AuxEdgeList;
-    typedef boost::optional<double> Violation;
+    using AuxEdge = min_cut_finder::Edge;
+    using AuxVertex = min_cut_finder::Vertex;
+    using AuxEdgeList = std::vector<AuxEdge>;
+    using Violation =  boost::optional<double>;
 
 public:
-    typedef std::pair<AuxVertex, AuxVertex> Candidate;
-    typedef std::vector<Candidate> CandidateList;
+    using Candidate = std::pair<AuxVertex, AuxVertex>;
+    using CandidateList = std::vector<Candidate>;
 
     /**
      * Returns an iterator range of violated constraint candidates.
@@ -52,10 +52,10 @@ public:
     Violation check_violation(Candidate candidate, const Problem & problem) {
         double violation = check_min_cut(candidate.first, candidate.second);
         if (problem.get_compare().g(violation, 0)) {
-            return Violation(violation);
+            return violation;
         }
         else {
-            return Violation();
+            return Violation{};
         }
     }
 

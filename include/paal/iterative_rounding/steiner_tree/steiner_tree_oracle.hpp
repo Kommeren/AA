@@ -25,13 +25,13 @@ namespace ir {
  *      in the steiner tree problem.
  */
 class steiner_tree_violation_checker {
-    typedef min_cut_finder::Edge AuxEdge;
-    typedef min_cut_finder::Vertex AuxVertex;
-    typedef std::vector<AuxEdge> AuxEdgeList;
-    typedef boost::optional<double> Violation;
+    using AuxEdge     = min_cut_finder::Edge;
+    using AuxVertex   = min_cut_finder::Vertex;
+    using AuxEdgeList = std::vector<AuxEdge>;
+    using Violation   = boost::optional<double>;
 
 public:
-    typedef AuxVertex Candidate;
+    using Candidate = AuxVertex;
 
     steiner_tree_violation_checker() :
         m_current_graph_size(-1) {}
@@ -62,15 +62,15 @@ public:
     template <typename Problem>
     Violation check_violation(Candidate candidate, const Problem & problem) {
         if (candidate == m_root) {
-            return Violation();
+            return Violation{};
         }
 
         double violation = check_min_cut(candidate);
         if (problem.get_compare().g(violation, 0)) {
-            return Violation(violation);
+            return violation;
         }
         else {
-            return Violation();
+            return Violation{};
         }
     }
 

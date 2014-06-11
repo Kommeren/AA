@@ -45,7 +45,7 @@ public:
         if(m_compare.e(x,r)) {
             return r;
         }
-        return boost::optional<double>();
+        return boost::none;
     };
 
 protected:
@@ -111,7 +111,7 @@ protected:
     /// Edge case: return false.
     template <typename LP>
     boost::optional<double> get(const LP & lp, double x) {
-        return boost::optional<double>();
+        return boost::none;
     }
 
     /// Double comparison object.
@@ -140,7 +140,7 @@ public:
         if(m_cond(x)) {
             return m_f(x);
         }
-        return boost::optional<double>();
+        return boost::none;
     }
 
 private:

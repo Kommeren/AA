@@ -233,21 +233,21 @@ template <typename Graph, typename TreeMap, typename CostMap, class EdgeSetOutpu
 class tree_aug {
 public:
 
-    typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
-    typedef double CostValue;
+    using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
+    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
+    using CostValue = double;
 
-    typedef boost::filtered_graph<Graph, detail::bool_map_to_tree_filter<TreeMap>> TreeGraph;
-    typedef boost::filtered_graph<Graph, detail::bool_map_to_non_tree_filter<TreeMap>> NonTreeGraph;
+    using TreeGraph = boost::filtered_graph<Graph, detail::bool_map_to_tree_filter<TreeMap>>;
+    using NonTreeGraph = boost::filtered_graph<Graph, detail::bool_map_to_non_tree_filter<TreeMap>>;
 
-    typedef std::vector<Edge> EdgeList;
-    typedef std::unordered_map<Edge, EdgeList, edge_hash<Graph>> CoverMap;
+    using EdgeList = std::vector<Edge>;
+    using CoverMap = std::unordered_map<Edge, EdgeList, edge_hash<Graph>>;
 
     //cross reference between links and columns
-    typedef boost::bimap<Edge, lp::col_id> EdgeToColId;
-    typedef std::unordered_map<lp::row_id, Edge> RowIdToEdge;
+    using EdgeToColId = boost::bimap<Edge, lp::col_id>;
+    using RowIdToEdge = std::unordered_map<lp::row_id, Edge>;
 
-    typedef boost::optional<std::string> ErrorMessage;
+    using ErrorMessage = boost::optional<std::string>;
 
     /**
      * Constructor.
@@ -272,11 +272,9 @@ public:
         int nE = filtered_num_edges(m_tree);
 
         if (nE != nV - 1) {
-            return ErrorMessage(
-                        "Incorrect number of edges in the spanning tree. "
+            return "Incorrect number of edges in the spanning tree. "
                         + std::string("Should be ") + std::to_string(nV - 1)
-                        + ", but it is " + std::to_string(nE) + "."
-                    );
+                        + ", but it is " + std::to_string(nE) + ".";
         }
 
         // Is the tree connected?
@@ -284,9 +282,7 @@ public:
         int num = boost::connected_components(m_tree, &component[0]);
 
         if (num > 1) {
-            return ErrorMessage(
-                        "The spanning tree is not connected."
-                    );
+            return  ErrorMessage{"The spanning tree is not connected."};
         }
 
         // Is the graph 2-edge-connected?
@@ -294,12 +290,10 @@ public:
         // TODO This stoer-wagner algorithm is unnecessarily slow for some reason
         int minCut = boost::stoer_wagner_min_cut(m_g, const1EdgeMap);
         if (minCut < 2) {
-            return ErrorMessage(
-                        "The graph is not 2-edge-connected."
-                    );
+            return ErrorMessage{"The graph is not 2-edge-connected."};
         }
 
-        return ErrorMessage();
+        return ErrorMessage{};
     }
 
     /**

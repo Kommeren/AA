@@ -23,11 +23,11 @@ namespace ir {
  *      in the steiner network problem.
  */
 class steiner_network_violation_checker {
-    typedef min_cut_finder::Vertex AuxVertex;
-    typedef boost::optional<double> Violation;
+    using AuxVertex = min_cut_finder::Vertex;
+    using Violation = boost::optional<double>;
 
 public:
-    typedef std::pair<AuxVertex, AuxVertex> Candidate;
+    using Candidate = std::pair<AuxVertex, AuxVertex>;
 
     /**
      * Checks if any solution to the problem exists.
@@ -71,10 +71,10 @@ public:
     Violation check_violation(Candidate candidate, const Problem & problem) {
         double violation = check_min_cut(candidate.first, candidate.second, problem);
         if (problem.get_compare().g(violation, 0)) {
-            return Violation(violation);
+            return violation;
         }
         else {
-            return Violation();
+            return Violation{};
         }
     }
 

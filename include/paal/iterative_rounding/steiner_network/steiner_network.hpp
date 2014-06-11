@@ -62,16 +62,16 @@ public:
             m_restrictions_vec(prune_restrictions_to_tree(m_restrictions, num_vertices(m_g))),
             m_compare(steiner_network_compare_traits::EPSILON), m_oracle(oracle) {}
 
-    typedef typename boost::graph_traits<Graph>::edge_descriptor Edge;
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
+    using Edge   = typename boost::graph_traits<Graph>::edge_descriptor;
+    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
 
-    typedef std::unordered_map<lp::col_id, Edge> EdgeMap;
-    typedef std::vector<Edge> EdgeList;
-    typedef std::vector<Vertex> VertexList;
+    using EdgeMap    = std::unordered_map<lp::col_id, Edge>;
+    using EdgeList   = std::vector<Edge>;
+    using VertexList = std::vector<Vertex>;
 
-    typedef utils::Compare<double> Compare;
+    using Compare = utils::Compare<double>;
 
-    typedef boost::optional<std::string> ErrorMessage;
+    using ErrorMessage = boost::optional<std::string>;
 
     /**
      * Checks if the connectivity restrictions can be fulfilled.
@@ -79,10 +79,10 @@ public:
     ErrorMessage check_input_validity() {
         steiner_network_violation_checker checker;
         if (!checker.check_if_solution_exists(*this)) {
-            return ErrorMessage("A Steiner network satisfying the restrictions does not exist.");
+            return ErrorMessage{"A Steiner network satisfying the restrictions does not exist."};
         }
         else {
-            return ErrorMessage();
+            return ErrorMessage{};
         }
     }
 
