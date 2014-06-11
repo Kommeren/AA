@@ -10,15 +10,16 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
+#include "paal/data_structures/fraction.hpp"
+#include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
 
-
-#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/copy.hpp>
-#include <boost/range/algorithm/lower_bound.hpp>
 #include <boost/range/algorithm/sort.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/counting_range.hpp>
+#include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/range/numeric.hpp>
 
 #include <algorithm>
 #include <cassert>
@@ -27,10 +28,6 @@
 #include <random>
 #include <utility>
 #include <vector>
-#include <paal/data_structures/fraction.hpp>
-#include <paal/utils/functors.hpp>
-#include <paal/utils/type_functions.hpp>
-
 
 namespace paal {
 namespace greedy {
@@ -39,52 +36,53 @@ namespace detail {
 
    template<class MachineIterator, class JobIterator,
             class GetSpeed, class GetLoad>
-   struct Types {
-      typedef typename std::iterator_traits<MachineIterator>::reference MachineReference;
-      typedef typename std::iterator_traits<JobIterator>::reference JobReference;
-      typedef typename utils::pure_result_of<GetSpeed(MachineReference)>::type Speed;
-      typedef typename utils::pure_result_of<GetLoad(JobReference)>::type Load;
-      typedef data_structures::Fraction<Load, Speed> Frac;
+   struct sched_traits {
+      typedef typename std::iterator_traits<MachineIterator>::reference machine_reference;
+      typedef typename std::iterator_traits<JobIterator>::reference job_reference;
+      typedef typename utils::pure_result_of<GetSpeed(machine_reference)>::type speed_t;
+      typedef typename utils::pure_result_of<GetLoad(job_reference)>::type load_t;
+      typedef data_structures::Fraction<load_t, speed_t> frac_t;
    };
 
    template<class MachineIterator,
             class JobIterator,
             class GetSpeed,
-            class GetLoad>
-   typename Types<MachineIterator, JobIterator, GetSpeed, GetLoad>::Frac
-   calculate_bound(const MachineIterator mFirst, const MachineIterator mLast,
-                  const JobIterator jFirst, const JobIterator jLast,
-                  GetSpeed getSpeed, GetLoad getLoad) {
-      typedef Types<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
-      typedef typename Traits::Speed Speed;
-      typedef typename Traits::Load Load;
-      typedef typename Traits::Frac Frac;
+            class GetLoad,
+            class Traits = sched_traits<MachineIterator, JobIterator, GetSpeed, GetLoad>>
+   typename Traits::frac_t
+   calculate_bound(const MachineIterator mfirst, const MachineIterator mlast,
+                  const JobIterator jfirst, const JobIterator jlast,
+                  GetSpeed get_speed, GetLoad get_load) {
+      typedef typename Traits::speed_t Speed;
+      typedef typename Traits::load_t Load;
+      typedef typename Traits::frac_t Frac;
 
-      std::vector<Speed> speedSum;
-      std::transform(mFirst, mLast, std::back_inserter(speedSum), getSpeed);
-      std::partial_sum(speedSum.begin(), speedSum.end(), speedSum.begin());
+      auto jobs_num = jlast - jfirst;
+      auto machines_num = mlast - mfirst;
 
-      std::vector<Load> loadSum;
-      std::transform(jFirst, jLast, std::back_inserter(loadSum), getLoad);
-      std::partial_sum(loadSum.begin(), loadSum.end(), loadSum.begin());
+      std::vector<Speed> speed_sum(machines_num);
+      std::transform(mfirst, mlast, speed_sum.begin(), get_speed);
+      boost::partial_sum(speed_sum, speed_sum.begin());
 
-      auto jobsNum = jLast - jFirst;
-      auto machinesNum = mLast - mFirst;
-      typedef decltype(machinesNum) MachinesNumType;
-      assert(jobsNum > 0 && machinesNum > 0);
-      Frac result(getLoad(*jFirst), getSpeed(*mFirst));
-      for (auto jobID: boost::irange(static_cast<decltype(jobsNum)>(0), jobsNum)) {
-         Load load = getLoad(jFirst[jobID]);
-         auto getSingle = [=] (MachinesNumType i) { return Frac(load, getSpeed(mFirst[i])); };
-         auto getSummed = [&] (MachinesNumType i) { return Frac(loadSum[jobID], speedSum[i]); };
-         auto condition = [=] (MachinesNumType i) { return getSummed(i) < getSingle(i); };
-         auto machinesIDs = boost::counting_range(static_cast<MachinesNumType>(0), machinesNum);
-         auto it = boost::lower_bound(
-            machinesIDs | boost::adaptors::transformed(utils::make_assignable_functor(condition)),
-            true
-         ).base();
-         MachinesNumType machineID = (it != machinesIDs.end()) ? *it : machinesNum - 1;
-         auto getMax = [=] (MachinesNumType i) { return std::max(getSingle(i), getSummed(i)); };
+      std::vector<Load> load_sum(jobs_num);
+      std::transform(jfirst, jlast, load_sum.begin(), get_load);
+      boost::partial_sum(load_sum, load_sum.begin());
+
+      typedef decltype(machines_num) MachinesNumType;
+      assert(jobs_num > 0 && machines_num > 0);
+      Frac result(get_load(*jfirst), get_speed(*mfirst));
+      for (auto jobID: boost::irange(static_cast<decltype(jobs_num)>(0), jobs_num)) {
+         Load load = get_load(jfirst[jobID]);
+         auto get_single = [=] (MachinesNumType i) { return Frac(load, get_speed(mfirst[i])); };
+         auto get_summed = [&] (MachinesNumType i) { return Frac(load_sum[jobID], speed_sum[i]); };
+         auto condition = [=] (MachinesNumType i) { return get_summed(i) >= get_single(i); };
+         auto machines_ids = boost::counting_range(static_cast<MachinesNumType>(0), machines_num);
+         //current range based version in boost is broken
+         //should be replaced when released
+         //https://github.com/boostorg/algorithm/pull/4
+         auto it = std::partition_point(machines_ids.begin(), machines_ids.end(), condition);
+         MachinesNumType machineID = (it != machines_ids.end()) ? *it : machines_num - 1;
+         auto getMax = [=] (MachinesNumType i) { return std::max(get_single(i), get_summed(i)); };
          Frac candidate = getMax(machineID);
          if (machineID != 0) {
             candidate = std::min(candidate, getMax(machineID - 1));
@@ -100,67 +98,65 @@ namespace detail {
             class GetSpeed,
             class GetLoad,
             class RoundFun>
-   void schedule(MachineIterator mFirst, MachineIterator mLast,
-         JobIterator jFirst, JobIterator jLast,
-         OutputIterator result, GetSpeed getSpeed, GetLoad getLoad, RoundFun round) {
-      typedef Types<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
-      typedef typename Traits::MachineReference MachineReference;
-      typedef typename Traits::JobReference JobReference;
-      typedef typename Traits::Speed Speed;
-      typedef typename Traits::Load Load;
+   void schedule(MachineIterator mfirst, MachineIterator mlast,
+         JobIterator jfirst, JobIterator jlast,
+         OutputIterator result, GetSpeed get_speed, GetLoad get_load, RoundFun round) {
+      typedef sched_traits<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
+      typedef typename Traits::speed_t Speed;
+      typedef typename Traits::load_t Load;
 
-      if (mFirst == mLast || jFirst == jLast) {
+      if (mfirst == mlast || jfirst == jlast) {
          return;
       }
 
       std::vector<MachineIterator> machines;
-      boost::copy(boost::counting_range(mFirst, mLast), std::back_inserter(machines));
-      auto getSpeedFromIterator = utils::make_lift_iterator_functor(getSpeed);
-      boost::sort(machines, utils::make_functor_to_comparator(getSpeedFromIterator, utils::Greater()));
+      boost::copy(boost::counting_range(mfirst, mlast), std::back_inserter(machines));
+      auto get_speed_from_iterator = utils::make_lift_iterator_functor(get_speed);
+      boost::sort(machines, utils::make_functor_to_comparator(get_speed_from_iterator, utils::Greater{}));
 
       std::vector<JobIterator> jobs;
-      boost::copy(boost::counting_range(jFirst, jLast), std::back_inserter(jobs));
-      auto getLoadFromIterator = utils::make_lift_iterator_functor(getLoad);
-      boost::sort(jobs, utils::make_functor_to_comparator(getLoadFromIterator, utils::Greater()));
+      boost::copy(boost::counting_range(jfirst, jlast), std::back_inserter(jobs));
+      auto get_load_from_iterator = utils::make_lift_iterator_functor(get_load);
+      boost::sort(jobs, utils::make_functor_to_comparator(get_load_from_iterator, utils::Greater{}));
 
       auto bound = detail::calculate_bound(machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-         getSpeedFromIterator, getLoadFromIterator);
-      Load boundLoad = bound.num;
-      Speed boundSpeed = bound.den;
-      Load currentLoad = 0;
-      auto emit = [&result] (MachineIterator mIter, JobIterator jIter) {
-         *result = std::make_pair(mIter, jIter);
+         get_speed_from_iterator, get_load_from_iterator);
+      Load bound_load = bound.num;
+      Speed bound_speed = bound.den;
+      Load current_load{};
+      auto emit = [&result] (MachineIterator miter, JobIterator jiter) {
+         *result = std::make_pair(miter, jiter);
          ++result;
       };
-      auto jobIter = jobs.begin();
-      for (auto machineIter = machines.begin(); machineIter != machines.end(); ++machineIter) {
-         MachineReference machine = *(*machineIter);
-         Speed speed = getSpeed(machine);
-         while (jobIter != jobs.end()) {
-            JobReference job = *(*jobIter);
-            Load jobLoad = getLoad(job) * boundSpeed,
-               newLoad = currentLoad + jobLoad;
-            assert(newLoad <= boundLoad * (2 * speed));
-            if (boundLoad * speed < newLoad) {
-               Load fracLoad = boundLoad * speed - currentLoad;
-               if (round(fracLoad, jobLoad)) {
-                  emit(*machineIter, *jobIter);
+      auto job_iter = jobs.begin();
+      for (auto machine_iter = machines.begin(); machine_iter != machines.end(); ++machine_iter) {
+         auto && machine = *(*machine_iter);
+         Speed speed = get_speed(machine);
+         while (job_iter != jobs.end()) {
+            auto && job = *(*job_iter);
+            Load job_load = get_load(job) * bound_speed,
+               new_load = current_load + job_load;
+            assert(new_load <= bound_load * (2 * speed));
+            if (bound_load * speed < new_load) {
+               Load frac_load = bound_load * speed - current_load;
+               if (round(frac_load, job_load)) {
+                  emit(*machine_iter, *job_iter);
                }
                else {
-                  auto nextMachineIter = std::next(machineIter);
-                  assert(nextMachineIter != machines.end());
-                  emit(*nextMachineIter, *jobIter);
+                  auto next_machine_iter = std::next(machine_iter);
+                  assert(next_machine_iter != machines.end());
+                  emit(*next_machine_iter, *job_iter);
                }
-               ++jobIter;
-               currentLoad = jobLoad - fracLoad;
+               ++job_iter;
+               current_load = job_load - frac_load;
                break;
             }
-            emit(*machineIter, *jobIter);
-            ++jobIter;
-            currentLoad = newLoad;
+            emit(*machine_iter, *job_iter);
+            ++job_iter;
+            current_load = new_load;
          }
       }
-      assert(jobIter == jobs.end());
+      assert(job_iter == jobs.end());
    }
 } //!detail
 
@@ -170,13 +166,13 @@ namespace detail {
  *  \snippet scheduling_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_example.cpp
- * @param MachineIterator mFirst
- * @param MachineIterator mLast
- * @param JobIterator jFirst
- * @param JobIterator jLast
+ * @param MachineIterator mfirst
+ * @param MachineIterator mlast
+ * @param JobIterator jfirst
+ * @param JobIterator jlast
  * @param OutputIterator result
- * @param GetSpeed getSpeed
- * @param GetLoad getLoad
+ * @param GetSpeed get_speed
+ * @param GetLoad get_load
  * @tparam MachineIterator
  * @tparam JobIterator
  * @tparam OutputIterator
@@ -188,10 +184,10 @@ template<class MachineIterator,
    class OutputIterator,
    class GetSpeed,
    class GetLoad>
-void schedule_deterministic(const MachineIterator mFirst, const MachineIterator mLast,
-   const JobIterator jFirst, const JobIterator jLast,
-   OutputIterator result, GetSpeed getSpeed, GetLoad getLoad) {
-   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, utils::always_true());
+void schedule_deterministic(const MachineIterator mfirst, const MachineIterator mlast,
+   const JobIterator jfirst, const JobIterator jlast,
+   OutputIterator result, GetSpeed get_speed, GetLoad get_load) {
+   detail::schedule(mfirst, mlast, jfirst, jlast, result, get_speed, get_load, utils::always_true{});
 }
 
 /*
@@ -200,13 +196,13 @@ void schedule_deterministic(const MachineIterator mFirst, const MachineIterator 
  *  \snippet scheduling_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_example.cpp
- * @param MachineIterator mFirst
- * @param MachineIterator mLast
- * @param JobIterator jFirst
- * @param JobIterator jLast
+ * @param MachineIterator mfirst
+ * @param MachineIterator mlast
+ * @param JobIterator jfirst
+ * @param JobIterator jlast
  * @param OutputIterator result
- * @param GetSpeed getSpeed
- * @param GetLoad getLoad
+ * @param GetSpeed get_speed
+ * @param GetLoad get_load
  * @param RandomNumberGenerator gen
  * @tparam MachineIterator
  * @tparam JobIterator
@@ -220,49 +216,19 @@ template<class MachineIterator,
    class OutputIterator,
    class GetSpeed,
    class GetLoad,
-   class RandomNumberGenerator>
-void schedule_randomized(const MachineIterator mFirst, const MachineIterator mLast,
-      const JobIterator jFirst, const JobIterator jLast,
-      OutputIterator result, GetSpeed getSpeed, GetLoad getLoad, RandomNumberGenerator&& gen) {
-   typedef typename detail::Types<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
+   class RandomNumberGenerator = std::default_random_engine>
+void schedule_randomized(const MachineIterator mfirst, const MachineIterator mlast,
+      const JobIterator jfirst, const JobIterator jlast,
+      OutputIterator result, GetSpeed get_speed, GetLoad get_load,
+      RandomNumberGenerator&& gen = std::default_random_engine(97345631u)) {
+   typedef typename detail::sched_traits<MachineIterator, JobIterator, GetSpeed, GetLoad> Traits;
    double alpha = std::uniform_real_distribution<double>()(gen);
-   auto round = [alpha](typename Traits::Load fractionalLoad, typename Traits::Load totalLoad) {
-      return totalLoad * alpha < fractionalLoad;
+   auto round = [alpha](typename Traits::load_t fractional_load, typename Traits::load_t total_load) {
+      return total_load * alpha < fractional_load;
    };
-   detail::schedule(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, round);
+   detail::schedule(mfirst, mlast, jfirst, jlast, result, get_speed, get_load, round);
 }
 
-/*
- * @brief this is randomized (with default random engine) solve scheduling jobs
- * on machines with different speeds problem and return schedule example:
- *  \snippet scheduling_example.cpp Scheduling Jobs Example
- *
- * complete example is scheduling_jobs_example.cpp
- * @param MachineIterator mFirst
- * @param MachineIterator mLast
- * @param JobIterator jFirst
- * @param JobIterator jLast
- * @param OutputIterator result
- * @param GetSpeed getSpeed
- * @param GetLoad getLoad
- * @param RandomNumberGenerator gen
- * @tparam MachineIterator
- * @tparam JobIterator
- * @tparam OutputIterator
- * @tparam GetSpeed
- * @tparam GetLoad
- * @tparam RandomNumberGenerator
- */
-template<class MachineIterator,
-   class JobIterator,
-   class OutputIterator,
-   class GetSpeed,
-   class GetLoad>
-void schedule_randomized(const MachineIterator mFirst, const MachineIterator mLast,
-      const JobIterator jFirst, const JobIterator jLast,
-      OutputIterator result, GetSpeed getSpeed, GetLoad getLoad) {
-   schedule_randomized(mFirst, mLast, jFirst, jLast, result, getSpeed, getLoad, std::default_random_engine(97345631u));
-}
 
 }//!greedy
 }//!paal

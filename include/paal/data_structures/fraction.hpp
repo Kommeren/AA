@@ -35,6 +35,51 @@ namespace data_structures {
       return f1.num * f2.den < f2.num * f1.den;
    }
 
+   /**
+    * @brief operator>
+    *
+    * @tparam A
+    * @tparam B
+    * @param f1
+    * @param f2
+    *
+    * @return
+    */
+   template<class A, class B>
+   bool operator>(const Fraction<A, B>& f1, const Fraction<A, B>& f2) {
+      return f2 < f1;
+   }
+
+   /**
+    * @brief operator<=
+    *
+    * @tparam A
+    * @tparam B
+    * @param f1
+    * @param f2
+    *
+    * @return
+    */
+   template<class A, class B>
+   bool operator<=(const Fraction<A, B>& f1, const Fraction<A, B>& f2) {
+      return !(f2 < f1);
+   }
+
+   /**
+    * @brief operator>=
+    *
+    * @tparam A
+    * @tparam B
+    * @param f1
+    * @param f2
+    *
+    * @return
+    */
+   template<class A, class B>
+   bool operator>=(const Fraction<A, B>& f1, const Fraction<A, B>& f2) {
+      return !(f1 < f2);
+   }
+
 }//!data_structures
 }//!paal
 
