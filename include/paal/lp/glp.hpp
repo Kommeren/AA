@@ -11,8 +11,8 @@
 #include "paal/data_structures/bimap.hpp"
 #include "paal/lp/constraints.hpp"
 #include "paal/lp/ids.hpp"
-#include "paal/lp/problem_type.hpp"
 #include "paal/lp/lp_base.hpp"
+#include "paal/lp/problem_type.hpp"
 
 #include <glpk.h>
 
@@ -219,8 +219,6 @@ public:
         m_row_idx.erase(row.get());
         glp_del_rows(m_lp, 1, arr);
     }
-
-
 
 
     /**

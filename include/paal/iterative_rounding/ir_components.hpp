@@ -222,7 +222,7 @@ public:
      */
     template <typename Problem, typename LP>
     bool operator()(Problem &, const LP & lp) {
-        for (lp::col_id col : boost::make_iterator_range(lp.get_columns())) {
+        for (lp::col_id col : lp.get_columns()) {
             double colVal = lp.get_col_value(col);
             if (!m_compare.e(colVal, std::round(colVal))) {
                 return false;

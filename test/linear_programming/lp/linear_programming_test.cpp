@@ -13,10 +13,9 @@
 
 #include <boost/mpl/list.hpp>
 #include <boost/range/irange.hpp>
-#include <boost/test/unit_test.hpp>
 #include <boost/test/test_case_template.hpp>
+#include <boost/test/unit_test.hpp>
 
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
@@ -28,10 +27,10 @@ template <typename LP>
 void log_solution(lp::problem_type status, const LP & lp_instance) {
     if (status == lp::OPTIMAL) {
         LOGLN("Optimal solution cost: " << lp_instance.get_obj_value());
-        auto columns = lp_instance.get_columns();
-        for (auto column = columns.first; column != columns.second; ++column) {
-            LOGLN(lp_instance.get_col_name(*column) << " = "
-                        << lp_instance.get_col_value(*column));
+        for (auto column : lp_instance.get_columns() ) {
+            boost::ignore_unused_variable_warning(column);
+            LOGLN(lp_instance.get_col_name(column) << " = "
+                        << lp_instance.get_col_value(column));
         }
     }
     else {
@@ -212,7 +211,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
 
     BOOST_CHECK_EQUAL(lp.columns_number(), 2);
     std::unordered_map<lp::col_id, std::string> columns({{X, "x"}, {Y, "y"}});
-    for (auto col : boost::make_iterator_range(lp.get_columns())) {
+    for (auto col : lp.get_columns()) {
         BOOST_CHECK(columns.find(col) != columns.end());
         BOOST_CHECK_EQUAL(lp.get_col_name(col), columns.find(col)->second);
         BOOST_CHECK_EQUAL(lp.get_col_degree(col), 4);
@@ -221,7 +220,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
 
     BOOST_CHECK_EQUAL(lp.rows_number(), 4);
     std::unordered_map<lp::row_id, std::string> rows({{row1, "row1"}, {row2, "row2"}, {row3, "row3"}, {row4, "row4"}});
-    for (auto row : boost::make_iterator_range(lp.get_rows())) {
+    for (auto row : lp.get_rows()) {
         BOOST_CHECK(rows.find(row) != rows.end());
         BOOST_CHECK_EQUAL(lp.get_row_name(row), rows.find(row)->second);
         BOOST_CHECK_EQUAL(lp.get_row_degree(row), 2);
@@ -239,7 +238,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     BOOST_CHECK_EQUAL(lp.rows_number(), 2);
 
     columns = std::unordered_map<lp::col_id, std::string>({{Y, "y"}});
-    for (auto col : boost::make_iterator_range(lp.get_columns())) {
+    for (auto col : lp.get_columns()) {
         BOOST_CHECK(columns.find(col) != columns.end());
         BOOST_CHECK_EQUAL(lp.get_col_name(col), columns.find(col)->second);
         BOOST_CHECK_EQUAL(lp.get_col_degree(col), 2);
@@ -247,7 +246,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     }
 
     rows = std::unordered_map<lp::row_id, std::string>({{row1, "row1"}, {row4, "row4"}});
-    for (auto row : boost::make_iterator_range(lp.get_rows())) {
+    for (auto row : lp.get_rows()) {
         BOOST_CHECK(rows.find(row) != rows.end());
         BOOST_CHECK_EQUAL(lp.get_row_name(row), rows.find(row)->second);
         BOOST_CHECK_EQUAL(lp.get_row_degree(row), 1);
@@ -277,8 +276,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     BOOST_CHECK_SMALL(lp.get_obj_value() - 340, std::numeric_limits<double>::epsilon());
     BOOST_CHECK_SMALL(lp.get_row_sum(row1) - 10, std::numeric_limits<double>::epsilon());
     BOOST_CHECK_SMALL(lp.get_row_sum(row4) - 12, std::numeric_limits<double>::epsilon());
-
-    std::cout << lp;
 }
 
 

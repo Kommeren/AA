@@ -12,7 +12,10 @@
 #include "paal/lp/ids.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/print_collection.hpp"
+#include "paal/utils/pretty_stream.hpp"
 
+#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <functional>
@@ -92,6 +95,8 @@ public:
             [](std::pair<col_id, double> x) { return !linear_expression_traits::CMP.e(x.second, 0); });
     }
 
+
+
 private:
     template <typename Operation>
     void join_expression(const linear_expression & expr, Operation op) {
@@ -110,7 +115,28 @@ private:
     Elements m_coefs;
 };
 
+namespace detail {
+    inline std::string col_id_to_string(col_id col) {
+        return " x_" + std::to_string(col.get());
+    }
 
+    template <typename Stream, typename PrintCol>
+    void print_expression(Stream & o, const linear_expression & expr, PrintCol print_col) {
+        print_collection(o, expr.get_elements() | boost::adaptors::transformed(
+            [&](std::pair<col_id, double> col_and_val){
+                return  pretty_to_string(col_and_val.second) + print_col(col_and_val.first);
+            })
+            , " + ");
+    }
+};
+
+
+///operator<< : printing expression
+template <typename Stream>
+Stream & operator<<(Stream & o, const linear_expression & expr) {
+    detail::print_expression(o, expr, detail::col_id_to_string);
+    return o;
+}
 
 /// linear_expression + linear_expression operator.
 inline linear_expression operator+(linear_expression expr_left, const linear_expression & expr_right) {

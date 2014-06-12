@@ -10,6 +10,7 @@
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -38,29 +39,26 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
      auto machines = boost::irange(0,2);
      auto jobs = boost::irange(0,2);
 
-     std::vector<std::vector<int>> cost(2, std::vector<int>(2));
-     cost[0][0] = 2;
-     cost[0][1] = 3;
-     cost[1][0] = 1;
-     cost[1][1] = 3;
-     auto  costf = [&](int i, int j){return cost[i][j];};
+     paal::data_structures::array_metric<int> cost{2};
+     cost(0, 0) = 2;
+     cost(0, 1) = 3;
+     cost(1, 0) = 1;
+     cost(1, 1) = 3;
 
-     std::vector<std::vector<int>> time(2, std::vector<int>(2));
-     time[0][0] = 2;
-     time[0][1] = 2;
-     time[1][0] = 1;
-     time[1][1] = 1;
-     auto  timef = [&](int i, int j){return time[i][j];};
+     paal::data_structures::array_metric<int> time{2};
+     time(0, 0) = 2;
+     time(0, 1) = 2;
+     time(1, 0) = 1;
+     time(1, 1) = 1;
 
-     std::vector<int> T = {2, 2};
-     auto  Tf = [&](int i){return T[i];};
+     auto  T = [&](int i){return 2;};
 
      std::unordered_map<int, int> jobsToMachines;
 
      paal::ir::generalised_assignment_iterative_rounding(
          machines.begin(), machines.end(),
          jobs.begin(), jobs.end(),
-         costf, timef, Tf, std::inserter(jobsToMachines, jobsToMachines.begin()),
+         cost, time, T, std::inserter(jobsToMachines, jobsToMachines.begin()),
          paal::ir::ga_ir_components<>(), log_visitor());
 
      ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
@@ -79,7 +77,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
          paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(),
             jobs.begin(), jobs.end(),
-            costf, timef, Tf, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
+            cost, time, T, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
     }
 }
 
@@ -89,29 +87,26 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
     auto machines = boost::irange(0,2);
     auto jobs = boost::irange(0,2);
 
-    std::vector<std::vector<int>> cost(2, std::vector<int>(2));
-    cost[0][0] = 2;
-    cost[0][1] = 3;
-    cost[1][0] = 1;
-    cost[1][1] = 3;
-    auto  costf = [&](int i, int j){return cost[i][j];};
+     paal::data_structures::array_metric<int> cost{2};
+     cost(0, 0) = 2;
+     cost(0, 1) = 3;
+     cost(1, 0) = 1;
+     cost(1, 1) = 3;
 
-    std::vector<std::vector<int>> time(2, std::vector<int>(2));
-    time[0][0] = 2;
-    time[0][1] = 4;
-    time[1][0] = 3;
-    time[1][1] = 3;
-    auto  timef = [&](int i, int j){return time[i][j];};
+     paal::data_structures::array_metric<int> time{2};
+     time(0, 0) = 2;
+     time(0, 1) = 4;
+     time(1, 0) = 3;
+     time(1, 1) = 3;
 
-    std::vector<int> T = {2, 2};
-    auto  Tf = [&](int i){return T[i];};
+    auto  T = [&](int i){return 2;};
 
     std::vector<std::pair<int, int>> jobsToMachines;
 
     auto result = paal::ir::generalised_assignment_iterative_rounding(
         machines.begin(), machines.end(),
         jobs.begin(), jobs.end(),
-        costf, timef, Tf, std::back_inserter(jobsToMachines));
+        cost, time, T, std::back_inserter(jobsToMachines));
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
     BOOST_CHECK(!result.second);

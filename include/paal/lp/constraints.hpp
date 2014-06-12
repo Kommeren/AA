@@ -69,6 +69,7 @@ public:
         return m_ub;
     }
 
+
 private:
     static_assert(std::is_same<BoundDirectionTag, LeftBoundTag>::value ||
                   std::is_same<BoundDirectionTag, RightBoundTag>::value,
@@ -84,6 +85,20 @@ private:
     double m_ub;
     linear_expression m_expr;
 };
+
+///operator<< for Lower Bound
+template <typename Stream, typename BoundDirection>
+Stream & operator<<(Stream & o, const single_bounded_expression<LowerBoundTag, BoundDirection> & expr) {
+    o << expr.get_lower_bound() << " <= " << expr.get_expression();
+    return o;
+}
+
+///operator<< for Upper Bound
+template <typename Stream, typename BoundDirection>
+Stream & operator<<(Stream & o, const single_bounded_expression<UpperBoundTag, BoundDirection> & expr) {
+    o << expr.get_expression() << " <= " << expr.get_upper_bound();
+    return o;
+}
 
 /**
  * Double bounded expression class.
@@ -144,6 +159,21 @@ private:
     linear_expression m_expr;
 };
 
+namespace detail {
+template <typename Stream, typename PrintCol>
+void print_double_bounded_expression(Stream & o, const double_bounded_expression & expr, PrintCol print_col) {
+    o << expr.get_lower_bound() << " <= ";
+    print_expression(o, expr.get_expression(), print_col);
+    o  << " <= " << expr.get_upper_bound();
+}
+}//!detail
+
+///operator<< for double_bounded_expression
+template <typename Stream>
+Stream & operator<<(Stream & o, const double_bounded_expression & expr) {
+    detail::print_double_bounded_expression(o, expr, detail::col_id_to_string);
+    return o;
+}
 
 
 /// double <= linear_expression operator.

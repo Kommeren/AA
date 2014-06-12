@@ -8,6 +8,7 @@
 * ITERATIVE ROUNDING
 ** error checking for generalized assignment
 ** move and copy constructor in glp class
+** glp.get_columns() zwraca kolumny w odwrotnej kolejnosci
 ** LP formulation in separate dir
 ** improve row generation ?
 ** resolving solution by moving a point ?

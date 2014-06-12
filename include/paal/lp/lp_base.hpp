@@ -1,7 +1,7 @@
 /**
  * @file lp_base.hpp
  * @brief
- * @author Piotr Godlewski
+ * @author Piotr Godlewski, Piotr Wygocki
  * @version 1.0
  * @date 2014-04-02
  */
@@ -157,7 +157,8 @@ public:
     void delete_col(col_id col) {
         LP::delete_col(col);
         m_col_names.erase(col);
-        m_col_ids.erase(col);
+        std::size_t nr = m_col_ids.erase(col);
+        assert(nr == 1);
     }
 
     /**
@@ -181,38 +182,39 @@ public:
     void delete_row(row_id row) {
         LP::delete_row(row);
         m_row_names.erase(row);
-        m_row_ids.erase(row);
+        std::size_t nr = m_row_ids.erase(row);
+        assert(nr == 1);
     }
 
     /**
      * Clears the LP instance.
      */
     void clear() {
-        auto rows = get_rows();
-        while (rows.first != rows.second) {
-            rows.first = delete_row(rows.first);
+        for(auto && row : m_row_ids){
+            LP::delete_row(row);
         }
-        auto cols = get_columns();
-        while (cols.first != cols.second) {
-            cols.first = delete_col(cols.first);
+        m_row_names.clear();
+        m_row_ids.clear();
+
+        for(auto && col : m_col_ids){
+            LP::delete_col(col);
         }
+        m_col_names.clear();
+        m_col_ids.clear();
     }
-
-
-
 
     /**
      * Returns all columns (as an iterator range).
      */
-    std::pair<ColIter, ColIter> get_columns() const {
-        return std::make_pair(m_col_ids.begin(), m_col_ids.end());
+    const ColSet & get_columns() const {
+        return m_col_ids;
     }
 
     /**
      * Returns all rows (as an iterator range).
      */
-    std::pair<RowIter, RowIter> get_rows() const {
-        return std::make_pair(m_row_ids.begin(), m_row_ids.end());
+    const RowSet & get_rows() const {
+        return m_row_ids;
     }
 
     /**
@@ -246,36 +248,42 @@ public:
     template <typename ostream>
     friend ostream & operator<<(ostream & o, const lp_base<LP> & lp) {
         o << "Problem name: " << lp.m_problem_name << std::endl;
+        auto get_name = [&](col_id col) {
+            auto name = " " +  lp.get_col_name(col);
+            if(name == " ") {
+                name = detail::col_id_to_string(col);
+            }
+            return name;
+        };
+        o << std::endl << "Objective function:" << std::endl;
+        print_collection(o, lp.get_columns() | boost::adaptors::transformed(
+                    [&](col_id col){
+                        return pretty_to_string(lp.get_col_coef(col)) + get_name(col);
+                    }), " + ");
 
-        o << std::endl << "Columns:" << std::endl;
-        for (auto col : boost::make_iterator_range(lp.get_columns())) {
-            o << "col = " << col.get() << ", name = " << lp.get_col_name(col);
-            o << ", cost = " << lp.get_col_coef(col);
-            o << ", lb = " << lp.get_col_lower_bound(col);
-            o << ", ub = " << lp.get_col_upper_bound(col) << std::endl;
+        o << std::endl << std::endl << "Columns:" << std::endl;
+        for (auto col : lp.get_columns()) {
+            o << lp.get_col_lower_bound(col) << " <= "
+              << get_name(col)
+              << " <= " << lp.get_col_upper_bound(col)
+              << std::endl;
         }
         o << std::endl << "Rows:" << std::endl;
 
-        for (auto row : boost::make_iterator_range(lp.get_rows())) {
+        for (auto row : lp.get_rows()) {
             auto cols = lp.get_row_expression(row);
             if (cols.non_zeros() == 0) {
                 continue;
             }
             o << "Row " << lp.get_row_name(row) << std::endl;
-            o << "Bounds: " << " lb = " << lp.get_row_lower_bound(row);
-            o << ", ub = " << lp.get_row_upper_bound(row) << std::endl;
-            for (auto colAndVal : boost::make_iterator_range(cols.get_elements())) {
-                col_id col = colAndVal.first;
-                double val = colAndVal.second;
-                o << "(col = " << col.get() << ", name = ";
-                o << lp.get_col_name(col) << ", coef = " << val << ") - ";
-            }
-            o << std::endl;
+            print_double_bounded_expression(o, double_bounded_expression(std::move(cols)
+                                                , lp.get_row_lower_bound(row)
+                                                , lp.get_row_upper_bound(row)), get_name);
+            o << std::endl<< std::endl;
         }
         o << std::endl << "Current solution: "<< std::endl;
-        for(auto col : boost::make_iterator_range(lp.get_columns())) {
-            o  << lp.get_col_name(col) << " = " << lp.get_col_value(col) << ", ";
-        }
+        print_collection(o, lp.get_columns() | boost::adaptors::transformed([&](col_id col) {
+            return  get_name(col) + " = " + pretty_to_string(lp.get_col_value(col));}), ", ");
         o << std::endl;
 
         return o;

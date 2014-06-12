@@ -430,7 +430,7 @@ private:
     template <typename Problem, typename LP>
     void add_all_set_equality(Problem & problem, LP & lp) {
         lp::linear_expression expr;
-        for (auto col : boost::make_iterator_range(lp.get_columns())) {
+        for (auto col : lp.get_columns()) {
             expr += col;
         }
         lp.add_row(std::move(expr) == num_vertices(problem.get_graph())-1);

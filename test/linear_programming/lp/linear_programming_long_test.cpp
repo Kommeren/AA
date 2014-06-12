@@ -13,6 +13,7 @@
 
 #include <boost/mpl/list.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <boost/range/numeric.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/test/test_case_template.hpp>
 
@@ -63,8 +64,7 @@ void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
 
     BOOST_CHECK_EQUAL(rows_num, lp.rows_number() + 1);
     BOOST_CHECK_EQUAL(cols_num, lp.columns_number());
-    auto rows = lp.get_rows();
-    auto lp_non_zeros = std::accumulate(rows.first, rows.second, 0,
+    auto lp_non_zeros = boost::accumulate(lp.get_rows(), 0,
         [&](int sum, paal::lp::row_id row) {
             return sum + lp.get_row_degree(row);
         });

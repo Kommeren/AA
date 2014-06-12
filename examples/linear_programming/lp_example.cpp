@@ -16,19 +16,20 @@
 using LP = paal::lp::glp;
 
 void print_solution(paal::lp::problem_type status, const LP & lp_instance) {
+    std::cout << "-----------------------------------------" << std::endl;
     if (status == paal::lp::OPTIMAL) {
         std::cout << "Optimal solution cost: " << lp_instance.get_obj_value() << std::endl;
-        for (auto column : boost::make_iterator_range(lp_instance.get_columns())) {
-            std::cout << lp_instance.get_col_name(column) << " = "
-                        << lp_instance.get_col_value(column) << std::endl;
-        }
     }
     else {
         std::cout << "Optimal solution not found" << std::endl;
     }
+    std::cout << lp_instance << std::endl;
 }
 
 int main() {
+
+
+
     // sample problem
     LP lp_instance;
 
@@ -38,6 +39,8 @@ int main() {
     auto Y = lp_instance.add_column(300, 0, std::numeric_limits<double>::max(), "y");
 
     auto expr = X + Y;
+    std::cout << expr << std::endl;
+    std::cout << (expr >= 7) << std::endl;
     lp_instance.add_row(expr >= 7);
     auto row = lp_instance.add_row(expr <= 10);
     lp_instance.add_row(15 <= 200 * X + 100 * Y <= 1200);

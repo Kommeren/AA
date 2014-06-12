@@ -110,7 +110,7 @@ public:
      */
     double get_solution_cost() {
         double solCost(0);
-        for(auto col : boost::make_iterator_range(m_lp.get_columns())) {
+        for(auto col : m_lp.get_columns()) {
             solCost += m_lp.get_col_value(col) * m_lp.get_col_coef(col);
         }
         for (auto roundedCol : m_rounded) {
@@ -126,20 +126,22 @@ public:
      */
     bool round() {
         int deleted(0);
-        auto cols = m_lp.get_columns();
+        auto && cols = m_lp.get_columns();
+        auto cbegin = std::begin(cols);
+        auto cend = std::end(cols);
 
-        while (cols.first != cols.second) {
-            lp::col_id col = *cols.first;
+        while (cbegin != cend) {
+            lp::col_id col = *cbegin;
             auto doRound = call<RoundCondition>(m_problem, m_lp, col);
             if (doRound) {
                 ++deleted;
                 m_rounded.insert(std::make_pair(col,
                     std::make_pair(*doRound, m_lp.get_col_coef(col))));
                 m_visitor.round_col(m_problem, m_lp, col, *doRound);
-                cols.first = delete_column(cols.first, *doRound);
+                cbegin = delete_column(cbegin, *doRound);
             }
             else {
-                ++cols.first;
+                ++cbegin;
             }
         }
 
@@ -153,20 +155,22 @@ public:
      */
     bool relax() {
         int deleted(0);
-        auto rows = m_lp.get_rows();
+        auto && rows = m_lp.get_rows();
+        auto rbegin = std::begin(rows);
+        auto rend = std::end(rows);
 
-        while (rows.first != rows.second) {
-            lp::row_id row = *rows.first;
+        while (rbegin != rend) {
+            lp::row_id row = *rbegin;
             if (call<RelaxCondition>(m_problem, m_lp, row)) {
                 ++deleted;
                 m_visitor.relax_row(m_problem, m_lp, row);
-                rows.first = m_lp.delete_row(rows.first);
+                rbegin = m_lp.delete_row(rbegin);
                 if (call<RelaxationsLimit>(deleted)) {
                     break;
                 }
             }
             else {
-                ++rows.first;
+                ++rbegin;
             }
         }
 
