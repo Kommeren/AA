@@ -449,6 +449,8 @@ make_simulated_annealing_gain_adaptor(
  */
 template <typename Commit, typename Gain, typename GetTemperature, typename random_generator = std::default_random_engine>
 struct simulated_annealing_commit_adaptor {
+
+    ///contructor
     simulated_annealing_commit_adaptor(Commit commit, Gain gain,
             GetTemperature get_temperature,
             random_generator rand = random_generator()) :

@@ -13,20 +13,27 @@
 #include <boost/iterator/iterator_facade.hpp>
 
 #include <algorithm>
-#include <unordered_map>
 #include <cassert>
+#include <cstddef>
+#include <memory>
+#include <unordered_map>
 
 namespace paal {
 namespace data_structures {
 namespace splay_tree {
 
+template <typename T> class splay_tree;
+
+namespace detail {
   /**
    * @param node root of a subtree
    * @returns size of subtree
    **/
-  template<typename N> inline std::size_t node_size(N node) {
-    return (node == NULL) ? 0 : node->size();
+  template<typename NPtr> std::size_t node_size( const NPtr & node) {
+    return !node ? 0 : node->size();
   }
+
+  template<typename V> class Node;
 
   /**
    * @brief copy node pointer
@@ -36,9 +43,22 @@ namespace splay_tree {
    *
    * @return
    */
-  template<typename N> inline N * copy_node(N * node) {
-    return (node == NULL) ? NULL : new N(*node);
+  template<typename V> std::unique_ptr<Node<V>> copy_node(std::unique_ptr<Node<V>> const & node) {
+    //TODO on c++14 change to make_unique
+    return (!node) ? nullptr : std::unique_ptr<Node<V>>(new Node<V>(*node));
   }
+
+  class forward_tag {};
+  class reversed_tag{};
+
+  inline reversed_tag other(forward_tag) {
+      return reversed_tag{};
+  }
+
+  inline forward_tag other(reversed_tag) {
+      return forward_tag{};
+  }
+
 
   /**
    * Node of a splay_tree.
@@ -50,17 +70,18 @@ namespace splay_tree {
    * the real left/right. */
   template<typename V> class Node {
     public:
-      typedef V value_type;
-      typedef Node<value_type> node_type;
+      using value_type = V;
+      using node_type = Node<value_type>;
+      using node_ptr = std::unique_ptr<node_type>;
 
       /** @param val stored value */
-      explicit Node(const value_type &val) : val_(val), left_(NULL),
-        right_(NULL), parent_(NULL), reversed_(false), size_(1) {
+      explicit Node(const value_type &val) : val_(val)
+        , parent_(nullptr), reversed_(false), size_(1) {
       }
 
       ///constructor
       Node(const Node & n) : val_(n.val_), left_(copy_node(n.left_)),
-        right_(copy_node(n.right_)), parent_(NULL), reversed_(n.reversed_),
+        right_(copy_node(n.right_)), parent_(nullptr), reversed_(n.reversed_),
         size_(n.size_) {
             if(right_) {
                 right_->parent_ = this;
@@ -71,136 +92,123 @@ namespace splay_tree {
       }
 
       /** @returns parent node */
-      node_type *parent() {
+      node_type * parent() {
         return parent_;
+      }
+
+      void set_parent(node_type * p) {
+        parent_ = p;
       }
 
       /** @brief detaches this node from parent */
       void make_root() {
-        parent_ = NULL;
+        parent_ = nullptr;
       }
 
-      /** @returns true left child pointer */
-      node_type *left() {
+      /** @returns left child pointer */
+      node_ptr & left() {
         normalize();
         return left_;
       }
 
       /**
-       * @brief sets true left child pointer
+       * @brief sets left child pointer
        * @param node new child
        **/
-      void set_left(node_type *node) {
-        normalize();
-        set_left_internal(node);
-        update_size();
-      }
-
-      /**
-       * @brief sets left child pointer (no relaxation)
-       * @param node new child
-       **/
-      void set_left_internal(node_type *node) {
-        left_ = node;
-        if (node != NULL) {
-          node->parent_ = this;
-        }
+      void set_left(node_ptr node) {
+        set(std::move(node), reversed_tag{});
       }
 
       /** @returns true right child pointer */
-      node_type *right() {
+      node_ptr & right() {
         normalize();
         return right_;
       }
 
+      void set_right(node_ptr node) {
+          set(std::move(node), forward_tag{});
+      }
+
       /**
-       * @brief sets true right child pointer
+       * @brief sets child pointer
        * @param node new child
        **/
-      void set_right(node_type *node) {
+      template <typename Direction>
+      void set(node_ptr node, Direction dir_tag) {
         normalize();
-        set_right_internal(node);
+        set_internal(std::move(node), dir_tag);
         update_size();
       }
 
       /**
-       * @brief sets right child pointer (no relaxation)
+       * @brief sets child pointer (no relaxation)
        * @param node new child
        **/
-      void set_right_internal(node_type *node) {
-        right_ = node;
-        if (node != NULL) {
+      template <typename Direction>
+      void set_internal(node_ptr node, Direction dir_tag) {
+        if (node != nullptr) {
           node->parent_ = this;
         }
+        child(dir_tag) = std::move(node);
       }
 
       /** @brief recomputes subtree size from sizes of children's subtrees */
       void update_size() {
-        size_ = 1 + ((left_ != NULL) ? left_->size_ : 0)
-                + ((right_ != NULL) ? right_->size_ : 0);
+        size_ = 1 + node_size(left_) + node_size(right_);
       }
+
+      node_ptr & child(reversed_tag) {
+          return left();
+      }
+
+      node_ptr & child(forward_tag) {
+          return right();
+      }
+
+      template <typename Direction>
+      node_type * extreme(Direction dir_tag) {
+        node_type *node = this;
+        normalize();
+        while (node->child(dir_tag).get() != nullptr) {
+          node = node->child(dir_tag).get();
+          node->normalize();
+        }
+        return node;
+      }
+
+
+      /** @returns next in same tree according to infix order
+       * WARNING, we assume that path from root to the this node is normalized*/
+      template <typename Direction>
+      node_type * advance(Direction dir_tag) {
+        node_type *node = child(dir_tag).get();
+        if (node != nullptr) {
+          return node->extreme(other(dir_tag));
+        } else {
+          node_type *last = nullptr;
+          node = this;
+          while (true) {
+            last = node;
+            node = node->parent();
+            if (node == nullptr) {
+              return nullptr;
+            } else if (node->child(other(dir_tag)).get() == last) {
+              return node;
+            }
+          }
+        }
+      }
+
 
       /** @returns next in same tree according to infix order
        * WARNING, we assume that path from root to the this node is normalized*/
       node_type *next() {
-        node_type *node = right();
-        if (node != NULL) {
-          return node->subtree_min();
-        } else {
-          node_type *last = NULL;
-          node = this;
-          for (;;) {
-            last = node;
-            node = node->parent();
-            if (node == NULL) {
-              return NULL;
-            } else if (node->left() == last) {
-              return node;
-            }
-          }
-        }
+          return advance(forward_tag{});
       }
 
       /** @returns previous in same tree according to infix order */
       node_type *prev() {
-        node_type *node = left();
-        if (node != NULL) {
-          return node->subtree_max();
-        } else {
-          node_type *last = NULL;
-          node = this;
-          for (;;) {
-            last = node;
-            node = node->parent();
-            if (node == NULL) {
-              return NULL;
-            } else if (node->right() == last) {
-              return node;
-            }
-          }
-        }
-      }
-
-      /** @returns first node in subtree according to infix order */
-      node_type *subtree_min() {
-        node_type *node = this;
-        normalize();
-        while (node->left() != NULL) {
-          node = node->left();
-          node->normalize();
-        }
-        return node;
-      }
-
-      /** @returns last node in subtree according to infix order */
-      node_type *subtree_max() {
-        node_type *node = this;
-        normalize();
-        while (node->right() != NULL) {
-          node = node->right();
-          node->normalize();
-        }
-        return node;
+          return advance(reversed_tag{});
       }
 
       /** @returns size of subtree */
@@ -217,10 +225,10 @@ namespace splay_tree {
       void normalize() {
         if (reversed_) {
           std::swap(left_, right_);
-          if (left_ != NULL) {
+          if (left_ != nullptr) {
             left_->subtree_reverse();
           }
-          if (right_ != NULL) {
+          if (right_ != nullptr) {
             right_->subtree_reverse();
           }
           reversed_ = false;
@@ -230,7 +238,7 @@ namespace splay_tree {
       /** @brief relaxes all nodes on path from root to this */
       void normalize_root_path() {
         node_type *node = parent();
-        if (node != NULL) {
+        if (node != nullptr) {
           node->normalize_root_path();
         }
         normalize();
@@ -242,43 +250,34 @@ namespace splay_tree {
 
     private:
       static const bool k_def_left = 0;
-      node_type *left_ = NULL, *right_ = NULL;
+      node_ptr left_, right_;
       node_type *parent_;
       bool reversed_;
       std::size_t size_;
   };
 
-  /** @brief splay policy */
-  enum splay_impl_enum {
-    /** splaying goes from root, resulting tree is less balanced */
-    kTopDownUnbalanced,
-    /** splaying goes from root */
-    kTopDown,
-    /** splaying goes from node to become root */
-    kBottomUp
-  };
 
-
-  template <typename T, splay_impl_enum s> class splay_tree;
 
   /**
    * splay_tree elements iterator.
    *
    * Traversing order is determined by template argument.
    **/
-  template<typename V, splay_impl_enum splay_impl = kTopDownUnbalanced, bool IsForward = true> class Iterator
+  template<typename V, typename direction_tag = forward_tag> class Iterator
     : public boost::iterator_facade <
-    Iterator<V, splay_impl, IsForward>,
+    Iterator<V, direction_tag>,
     Node<V>*,
     boost::bidirectional_traversal_tag,
       V& > {
-      typedef splay_tree<V, splay_impl> ST;
+      using ST = splay_tree<V>;
+      using node_ptr = Node<V> *;
+
     public:
-      typedef V value_type;
-      typedef Node<value_type> node_type;
+      using value_type = V;
+      using node_type = Node<value_type>;
 
       /** @brief iterator after last element */
-      Iterator() : current_(NULL), rotation_cnt_(0), splay_(NULL) {
+      Iterator() : current_(nullptr), rotation_cnt_(0), splay_(nullptr) {
       }
 
       /**
@@ -286,8 +285,8 @@ namespace splay_tree {
        * @param node node storing element pointed by iterator
        * @param splay pointer to the splay tree
        **/
-      explicit Iterator(node_type *node, const ST * splay) : current_(node), rotation_cnt_(0), splay_(splay) {
-      }
+      explicit Iterator(node_ptr node, const ST * splay) :
+          current_(node), rotation_cnt_(0), splay_(splay) {}
 
       /**
        * @brief copy constructor
@@ -299,9 +298,7 @@ namespace splay_tree {
 
     private:
       friend class boost::iterator_core_access;
-      friend class splay_tree<V, kTopDownUnbalanced>;
-      friend class splay_tree<V, kTopDown>;
-      friend class splay_tree<V, kBottomUp>;
+      friend class splay_tree<V>;
 
       void normalize() {
         if(rotation_cnt_ != splay_->get_rotation_cnt()) {
@@ -313,21 +310,13 @@ namespace splay_tree {
       /** @brief increments iterator */
       void increment() {
         normalize();
-        if (IsForward) {
-          current_ = current_->next();
-        } else {
-          current_ = current_->prev();
-        }
+        current_ = current_->advance(direction_tag{});
       }
 
       /** @brief decrements iterator */
       void decrement() {
         normalize();
-        if (IsForward) {
-          current_ = current_->prev();
-        } else {
-          current_ = current_->next();
-        }
+        current_ = current_->advance(other(direction_tag{}));
       }
 
       /**
@@ -335,7 +324,7 @@ namespace splay_tree {
        * @returns true iff iterators point to the same node
        **/
       bool equal(const Iterator &other) const {
-        return this->current_ == other.current_;
+          return this->current_ == other.current_;
       }
 
       /** @returns reference to pointed element */
@@ -344,10 +333,12 @@ namespace splay_tree {
       }
 
       /** pointed node */
-      node_type* current_;
+      node_ptr current_;
       std::size_t rotation_cnt_;
       const ST * splay_;
   };
+
+}//!detail
 
   /**
    * Splay trees with logarithmic reversing of any subsequence.
@@ -357,15 +348,18 @@ namespace splay_tree {
    * Note that lookups are also amortized logarithmic in size of tree. Order of
    * elements is induced from infix ordering of nodes storing these elements.
    **/
-  template<typename T, enum splay_impl_enum SplayImpl = kTopDownUnbalanced>
+  template<typename T>
   class splay_tree {
+      detail::forward_tag forward_tag;
+      detail::reversed_tag reversed_tag;
     public:
-      typedef T value_type;
-      typedef Node<value_type> node_type;
-      typedef Iterator<value_type, SplayImpl, true> iterator;
-      typedef const Iterator<value_type, SplayImpl, true> const_iterator;
-      typedef Iterator<value_type, SplayImpl, false> reverse_iterator;
-      typedef const Iterator<value_type, SplayImpl, false> const_reverse_iterator;
+      using value_type = T;
+      using node_type = detail::Node<value_type>;
+      using node_ptr = typename node_type::node_ptr;
+      using iterator = detail::Iterator<value_type, detail::forward_tag>;
+      using const_iterator = const iterator;
+      using reverse_iterator =  detail::Iterator<value_type, detail::reversed_tag>;
+      using const_reverse_iterator = const reverse_iterator;
 
       splay_tree() = default;
 
@@ -379,22 +373,15 @@ namespace splay_tree {
       }
 
       ///constructor
-      splay_tree(splay_tree && splay)  {
-          *this = std::move(splay);
-      }
+      splay_tree(splay_tree && splay) = default;
 
       ///operator=
-      splay_tree& operator=(splay_tree && splay) {
-        rotation_cnt_ = splay.rotation_cnt_;
-        root_         = splay.root_;
-        t_tonode_      = std::move(splay.t_tonode_);
-        splay.root_   = NULL;
-        splay.rotation_cnt_ = 0;
-        return *this;
-      }
+      splay_tree& operator=(splay_tree && splay) = default;
+      //splay.rotation_cnt_ is not  0 after this move but it doesn't matter;
 
       ///operator=
       splay_tree& operator=(splay_tree & splay) {
+          if(&splay == this) return *this;
           splay_tree sp(splay);
           *this = std::move(sp);
           return *this;
@@ -405,7 +392,7 @@ namespace splay_tree {
           auto i = begin();
           auto e = end();
           for(;i != e; ++i) {
-              t_tonode_.insert(std::make_pair(*i, i.current_));
+              t_to_node_.insert(std::make_pair(*i, i.current_));
           }
       }
 
@@ -417,13 +404,9 @@ namespace splay_tree {
         root_ = build_tree(std::begin(array), std::end(array));
       }
 
-      ~splay_tree() {
-        dispose_tree(root_);
-      }
-
       /** @returns forward iterator to first element in container */
       iterator begin() const {
-        return (root_ == NULL) ? end() : iterator(root_->subtree_min(), this);
+        return (root_ == nullptr) ? end() : iterator(root_->extreme(reversed_tag), this);
       }
 
       /** @returns forward iterator to element after last in container */
@@ -433,8 +416,8 @@ namespace splay_tree {
 
       /** @returns reverse iterator to last element in container */
       reverse_iterator rbegin() {
-        return (root_ == NULL) ? rend()
-               : reverse_iterator(root_->subtree_max(), this);
+        return (root_ == nullptr) ? rend()
+               : reverse_iterator(root_->extreme(forward_tag), this);
       }
 
       /** @returns reverse iterator to element before first in container */
@@ -444,12 +427,12 @@ namespace splay_tree {
 
       /** @returns number of elements in tree */
       std::size_t size() const {
-        return (root_ == NULL) ? 0 : root_->size();
+        return (root_ == nullptr) ? 0 : root_->size();
       }
 
       /** @returns true iff tree contains no elements */
       bool empty() {
-        return (root_ == NULL);
+        return (root_ == nullptr);
       }
 
       /** @param i index of referenced element */
@@ -459,15 +442,15 @@ namespace splay_tree {
 
       /** @param t referenced element */
       std::size_t get_idx(const T & t) const {
-        node_type *node = t_tonode_.at(t);
-        if(node == NULL) {
+        node_type *node = t_to_node_.at(t);
+        if(node == nullptr) {
             return -1;
         }
         node->normalize_root_path();
 
         std::size_t i = node_size(node->left());
-        while(node != root_) {
-            if(node->parent()->left() == node) {
+        while(node != root_.get()) {
+            if(node->parent()->left().get() == node) {
                 node = node->parent();
             } else {
                 node = node->parent();
@@ -490,16 +473,9 @@ namespace splay_tree {
        * @brief splays tree according to splay policy
        * @param i index of element to become root
        **/
-      node_type *splay(std::size_t i) const {
-        switch (SplayImpl) {
-          case kTopDownUnbalanced:
-          case kTopDown:
-            root_ = splay_down(i);
-            return root_;
-          case kBottomUp:
-            splay_internal(find(i));
-            return root_;
-        }
+      iterator splay(std::size_t i) const {
+         splay_internal(find(i));
+         return iterator(root_.get(), this);
       }
 
       /**
@@ -507,14 +483,8 @@ namespace splay_tree {
        * @param i index of last element of this after modification
        * @returns tree containing elements {i+1, ...}
        **/
-      splay_tree<value_type, SplayImpl> split_higher(std::size_t i) {
-        splay(i);
-        node_type *new_root = root_->right();
-        if (new_root != NULL) {
-          new_root->make_root();
-          root_->set_right(NULL);
-        }
-        return splay_tree<value_type, SplayImpl>(new_root);
+      splay_tree split_higher(std::size_t i) {
+        return split(i, forward_tag);
       }
 
       /**
@@ -522,44 +492,24 @@ namespace splay_tree {
        * @param i index of first element of this after modification
        * @returns tree containing elements {0, ..., i-1}
        **/
-      splay_tree<value_type, SplayImpl> split_lower(std::size_t i) {
-        splay(i);
-        node_type *new_root = root_->left();
-        if (new_root != NULL) {
-          new_root->make_root();
-          root_->set_left(NULL);
-        }
-        return splay_tree<value_type, SplayImpl>(new_root);
+      splay_tree split_lower(std::size_t i) {
+        return split(i, reversed_tag);
       }
 
       /**
        * @brief merges given tree to the right of the biggest element of this
        * @param other tree to be merged
        **/
-      template<enum splay_impl_enum S>
-      void merge_right(splay_tree<value_type, S> &other) {
-        if (other.root_ == NULL) {
-          return;
-        }
-        splay(root_->size() - 1);
-        assert(root_->right() == NULL);
-        root_->set_right(other.root_);
-        other.root_ = NULL;
+      void merge_right(splay_tree other) {
+          merge(std::move(other), forward_tag);
       }
 
       /**
        * @brief merges given tree to the left of the smallest element of this
        * @param other tree to be merged
        **/
-      template<enum splay_impl_enum S>
-      void merge_left(splay_tree<value_type, S> &other) {
-        if (other.root_ == NULL) {
-          return;
-        }
-        splay(0);
-        assert(root_->left() == NULL);
-        root_->set_left(other.root_);
-        other.root_ = NULL;
+      void merge_left(splay_tree other) {
+        merge(std::move(other), reversed_tag);
       }
 
       /**
@@ -570,166 +520,120 @@ namespace splay_tree {
       void reverse(std::size_t i, std::size_t j) {
         assert(i <= j);
         // split lower
-        splay_tree<value_type, SplayImpl> ltree = split_lower(i);
+        splay_tree<value_type> ltree = split_lower(i);
         // split higher
-        splay_tree<value_type, SplayImpl> rtree = split_higher(j - i);
+        splay_tree<value_type> rtree = split_higher(j - i);
         // reverse
         root_->subtree_reverse();
         // merge
-        merge_left(ltree);
-        merge_right(rtree);
+        merge_left(std::move(ltree));
+        merge_right(std::move(rtree));
       }
 
     private:
       /** @brief creates tree with given node as a root */
-      explicit splay_tree(node_type *root) : root_(root) {}
+      explicit splay_tree(node_ptr root) : root_(std::move(root)) {}
+
+      template <typename Direction>
+      splay_tree split(std::size_t i, Direction dir_tag) {
+        splay(i);
+        node_ptr new_root = std::move(root_->child(dir_tag));
+        if (new_root != nullptr) {
+          new_root->make_root();
+        }
+        if(root_ != nullptr) {
+            root_->update_size();
+        }
+
+        return splay_tree<value_type>(std::move(new_root));
+      }
+
+      iterator splay(detail::forward_tag) const {
+          return splay(root_->size() - 1);
+      }
+
+      iterator splay(detail::reversed_tag) const {
+          return splay(0);
+      }
+
+      template <typename Direction>
+      void merge(splay_tree other, Direction dir_tag) {
+        if (other.root_ == nullptr) {
+          return;
+        }
+        splay(dir_tag);
+        assert(root_->child(dir_tag) == nullptr);
+        root_->set(std::move(other.root_), dir_tag);
+      }
+
+
+      node_ptr & get_parent(node_ptr & node) const {
+        assert(node);
+        node_type * parent = node->parent();
+        assert(parent != nullptr);
+        node_type * granpa = parent->parent();
+        if(granpa == nullptr) {
+            return root_;
+        } else {
+            if(granpa->left().get() == parent) {
+                return granpa->left();
+            } else {
+                assert(granpa->right().get() == parent);
+                return granpa->right();
+            }
+        }
+      }
 
       /**
        * @brief splays given node to tree root
        * @param node node of a tree to be moved to root
        **/
-      void splay_internal(node_type *const node) const {
-        node_type *const parent = node->parent();
+      void splay_internal(node_ptr & node) const {
+        assert(node);
         if (node == root_) {
           return;
-        } else if (parent == root_) {
+        }
+        node_ptr & parent = get_parent(node);
+        if (parent == root_) {
           if (node == parent->left()) {
-            rotate_right(parent);
+            rotate(root_, forward_tag);
           } else {
-            rotate_left(parent);
+            assert (node == parent->right());
+            rotate(root_, reversed_tag);
           }
         } else {
-          node_type *const grand = parent->parent();
+          node_ptr & grand = get_parent(parent);
           if (node == parent->left() && parent == grand->left()) {
-            rotate_right(grand);
-            rotate_right(parent);
+            rotate(grand, forward_tag);
+            rotate(grand, forward_tag);
           } else if (node == parent->right() && parent == grand->right()) {
-            rotate_left(grand);
-            rotate_left(parent);
+            rotate(grand, reversed_tag);
+            rotate(grand, reversed_tag);
           } else if (node == parent->right() && parent == grand->left()) {
-            rotate_left(parent);
-            rotate_right(grand);
+            rotate(parent, reversed_tag);
+            rotate(grand, forward_tag);
           } else if (node == parent->left() && parent == grand->right()) {
-            rotate_right(parent);
-            rotate_left(grand);
+            rotate(parent, forward_tag);
+            rotate(grand, reversed_tag);
           }
+          splay_internal(grand);
         }
-        splay_internal(node);
       }
 
       /**
-       * @brief splays node with given index to tree root
-       * @param i index of a node to become root
-       **/
-      node_type *splay_down(std::size_t i) const {
-        node_type *parent = root_;
-        node_type second_tree(T{});
-        node_type *l = &second_tree, *r = &second_tree;
-
-        for (;;) {
-          std::size_t left_size = node_size(parent->left());
-          if (left_size == i) {
-            break;
-          } else if (left_size > i) {
-            if (SplayImpl != kTopDownUnbalanced) {
-              if (node_size(parent->left()->left()) > i) {
-                node_type *node = parent->left();
-                parent->set_left(node->right());
-                node->set_right_internal(parent);
-                node->make_root();
-                parent = node;
-              }
-            }
-            node_type *node = parent->left();
-            node->make_root();
-            r->set_left_internal(parent);
-            r = parent;
-
-            parent = node;
-          } else {
-            if (SplayImpl != kTopDownUnbalanced) {
-              if (left_size + 1 + node_size(parent->right()->left()) < i) {
-                node_type *node = parent->right();
-                parent->set_right(node->left());
-                node->set_left_internal(parent);
-                node->make_root();
-                left_size = parent->size();
-                parent = node;
-              }
-            }
-            node_type *node = parent->right();
-            node->make_root();
-            l->set_right_internal(parent);
-            l = parent;
-
-            parent = node;
-            i -= left_size + 1;
-          }
-        }
-
-        r->set_left_internal(parent->right());
-        l->set_right_internal(parent->left());
-
-        parent->set_left_internal(second_tree.right());
-        parent->set_right_internal(second_tree.left());
-
-        parent->make_root();
-
-        while (r != NULL) {
-          r->update_size();
-          r = r->parent();
-        }
-        while (l != NULL) {
-          l->update_size();
-          l = l->parent();
-        }
-
-        return parent;
-      }
-
-      /**
-       * @brief rotates tree right over given node
+       * @brief rotates tree over given node
        * @param parent pivot of rotation
        **/
-      void rotate_right(node_type *parent) const {
-        node_type *const node = parent->left(),
-                         *const grand = parent->parent();
-        parent->set_left(node->right());
-        if (grand != NULL) {
-          if (parent == grand->right()) {
-            grand->set_right(node);
-          } else {
-            grand->set_left(node);
-          }
-        }
-        node->set_right(parent);
-        if (parent == root_) {
-          root_ = node;
-          node->make_root();
-        }
+      template <typename Direction>
+      void rotate(node_ptr & parent, Direction dir_tag) const {
+        auto other_tag = other(dir_tag);
+        node_ptr node = std::move(parent->child(other_tag));
+        node.swap(parent);
+        parent->set_parent(node->parent());
+        node->set(std::move(parent->child(dir_tag)), other_tag);//node size is updated here
+        parent->set(std::move(node), dir_tag);//node size is updated here
       }
 
-      /**
-       * @brief rotates tree left over given node
-       * @param parent pivot of rotation
-       **/
-      void rotate_left(node_type *parent) const {
-        node_type *const node = parent->right(),
-                         *const grand = parent->parent();
-        parent->set_right(node->left());
-        if (grand != NULL) {
-          if (parent == grand->left()) {
-            grand->set_left(node);
-          } else {
-            grand->set_right(node);
-          }
-        }
-        node->set_left(parent);
-        if (parent == root_) {
-          root_ = node;
-          node->make_root();
-        }
-      }
 
       /**
        * @brief recursively creates balanced tree from a structure described
@@ -737,71 +641,48 @@ namespace splay_tree {
        * @param b iterator to first element
        * @param e iterator to element after last
        **/
-      template<typename I> node_type *build_tree(const I b, const I e) {
+      template<typename I> node_ptr build_tree(const I b, const I e) {
         if (b >= e) {
-          return NULL;
+          return nullptr;
         }
         std::size_t m = (e - b) / 2;
-        node_type *node = new node_type(*(b + m));
-        bool ret = t_tonode_.insert(std::make_pair(*(b + m), node)).second;
+        node_ptr node{new node_type(*(b + m))};
+        bool ret = t_to_node_.insert(std::make_pair(*(b + m), node.get())).second;
         assert(ret);
         node->set_left(build_tree(b, b + m));
         node->set_right(build_tree(b + m + 1, e));
         return node;
       }
 
-      /**
-       * @brief recursively removes subtree
-       * @param node pointer to subtree to be removed
-       **/
-      void dispose_tree(node_type *node) {
-        if (node == NULL) {
-          return;
-        }
-        dispose_tree(node->left());
-        dispose_tree(node->right());
-        delete node;
-      }
 
       /**
        * @brief find n-th element in tree (counting from zero)
        * @param i number of elements smaller than element to be returned
-       * @returns pointer to found node or NULL if doesn't exist
+       * @returns pointer to found node or nullptr if doesn't exist
        **/
-      node_type *find(std::size_t i) const {
-        node_type *node = root_;
-        for (;;) {
-          if (node == NULL) {
-            return NULL;
+      node_ptr & find(std::size_t i) const {
+        node_ptr *node = &root_;
+        while (true) {
+          if (!*node) {
+            return *node;
           }
-          node_type *left = node->left();
-          std::size_t left_size = (left == NULL) ? 0 : left->size();
+          node_ptr *left = &((*node)->left());
+          std::size_t left_size = node_size(*left);
           if (left_size == i) {
-            return node;
+            return *node;
           } else if (left_size > i) {
             node = left;
           } else {
             i -= left_size + 1;
-            node = node->right();
+            node = &(*node)->right();
           }
         }
       }
 
-      /**
-       * @brief splay_tree stream output operator
-       * @param stream output stream
-       * @param tree splay tree
-       **/
-/*      template<typename S, typename V, enum splay_impl_enum I>
-      friend S& operator<<(S &stream, splay_tree<V, I> &tree) {
-        tree.root_->print_tree(stream);
-        return stream;
-      }*/
-
       /** root node of a tree */
       std::size_t rotation_cnt_ = 0; // to keep iterators consistent with tree
-      mutable node_type *root_ = NULL;
-      std::unordered_map<T, node_type *> t_tonode_;
+      mutable node_ptr root_;
+      std::unordered_map<T, node_type *> t_to_node_;
   };
 }
 }

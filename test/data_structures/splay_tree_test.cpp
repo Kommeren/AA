@@ -9,8 +9,9 @@
 #include <vector>
 #include <random>
 
+
+
 using paal::data_structures::splay_tree::splay_tree;
-using paal::data_structures::splay_tree::splay_impl_enum;
 
 template<typename T, typename I> bool check_content(T &t, I begin, I end) {
   if (!std::equal(begin, end, t.begin())) {
@@ -34,7 +35,7 @@ template<typename T, typename I> bool check_random_splay(T &t, I begin,
   const std::size_t k_n = end - begin;
   for (std::size_t i = 0; i < k_m; i++) {
     int el = rand() % k_n; // NOLINT
-    if (*(begin + el) != t.splay(el)->val_) {
+    if (*(begin + el) != *(t.splay(el))) {
       return false;
     }
   }
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(splay_tree_Find) {
   }
 }
 
-BOOST_AUTO_TEST_CASE(splay_tree_Splay) {
+BOOST_AUTO_TEST_CASE(splay_tree_splay) {
   srand(123433);
   const int k_n = 131, k_m = 1701;
   int input[k_n];
@@ -93,7 +94,7 @@ BOOST_AUTO_TEST_CASE(splay_tree_Splay) {
   BOOST_CHECK(check_random_splay(t, input, input + k_n, k_m));
 }
 
-BOOST_AUTO_TEST_CASE(splay_tree_SplitHigher) {
+BOOST_AUTO_TEST_CASE(splay_tree_split_higher) {
   srand(123433);
   const int k_n = 10435, kL = 47;
   int input[k_n];
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE(splay_tree_SplitHigher) {
   BOOST_CHECK(check_random_splay(t3, input + k3 + 1, input + k2 + 1, kL));
 }
 
-BOOST_AUTO_TEST_CASE(splay_tree_SplitLower) {
+BOOST_AUTO_TEST_CASE(splay_tree_split_lower) {
   srand(123433);
   const int k_n = 10435, kL = 47;
   int input[k_n];
@@ -164,15 +165,13 @@ BOOST_AUTO_TEST_CASE(splay_tree_Reverse) {
 
 class splay_tree_performance {
   public:
-    static const enum splay_impl_enum splay_impl = paal::data_structures::splay_tree::kTopDownUnbalanced;
-
     static const int k_n = 104729, k_m = 26669;
     static const uint32_t seed = 331u;
 
     std::mt19937 gen;
     std::uniform_int_distribution<int> dist;
     int input[k_n];
-    splay_tree<int, splay_impl> tree;
+    splay_tree<int> tree;
 
     splay_tree_performance() :
       dist(std::uniform_int_distribution<int>(0, k_n - 1)){
@@ -197,7 +196,7 @@ class splay_tree_performance {
       gen.seed(seed);
       auto end = input + k_n;
       fill_range(input, end);
-      tree = splay_tree<int, splay_impl>(input, end);
+      tree = splay_tree<int>(input, end);
     }
 };
 
@@ -210,7 +209,7 @@ const uint32_t splay_tree_performance::seed;
   }
 }*/
 
-BOOST_AUTO_TEST_CASE(splay_tree_performance_ReverseSplay) {
+BOOST_AUTO_TEST_CASE(splay_tree_performance_reverse_splay) {
     splay_tree_performance().test();
 }
 
