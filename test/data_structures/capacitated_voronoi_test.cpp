@@ -12,10 +12,10 @@
 using namespace paal::data_structures;
 
 std::vector<long long> fcapv{7, 7, 3, 1, 2, 2, 2, 1};
-auto fcap = [&](int i){ return fcapv[i];};
+int fcap(int i){ return fcapv[i];}
 
 std::vector<long long> cdemv{2, 2, 1, 3, 3, 1, 1, 2};
-auto cdem = [&](int i){ return cdemv[i];};
+int cdem(int i){ return cdemv[i];}
 
 
 BOOST_AUTO_TEST_SUITE( capacitated_voronoi_test_suite )

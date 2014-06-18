@@ -18,12 +18,13 @@
 namespace ls = paal::local_search;
 using namespace  paal;
 
+
 namespace {
 ON_LOG(
     int i = 0;
 )
 
-auto log_action = [&](int s) {
+bool log_action(int s) {
    LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
    return true;
 };

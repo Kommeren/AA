@@ -104,13 +104,14 @@ ON_LOG(
 int i;
 )
 
-auto logger = [&](const Solution & s) {
+bool logger(const Solution & s) {
     //printing
     LOGLN("f(");
     LOG_COPY_RANGE_DEL(s, ",");
     LOGLN(") \t" << f(s) << " after " << i++ );
     return true;
-};
+}
+
 } //anonymous namespace
 
 
