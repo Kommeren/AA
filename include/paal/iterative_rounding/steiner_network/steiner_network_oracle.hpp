@@ -22,16 +22,16 @@ class steiner_network_violation_checker {
     using AuxVertex = min_cut_finder::Vertex;
     using Violation = boost::optional<double>;
 
-public:
+  public:
     using Candidate = std::pair<AuxVertex, AuxVertex>;
 
     /**
      * Checks if any solution to the problem exists.
      */
     template <typename Problem>
-    bool check_if_solution_exists(Problem & problem) {
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
+    bool check_if_solution_exists(Problem &problem) {
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
         for (auto e : boost::make_iterator_range(edges(g))) {
@@ -53,8 +53,8 @@ public:
      * Returns an iterator range of violated constraint candidates.
      */
     template <typename Problem, typename LP>
-    auto get_violation_candidates(const Problem & problem, const LP & lp) ->
-            decltype(problem.get_restrictions_vec()) {
+    auto get_violation_candidates(const Problem &problem, const LP &lp)
+        ->decltype(problem.get_restrictions_vec()) {
 
         fill_auxiliary_digraph(problem, lp);
         return problem.get_restrictions_vec();
@@ -65,12 +65,12 @@ public:
      * returns the violation value and violated constraint ID.
      */
     template <typename Problem>
-    Violation check_violation(Candidate candidate, const Problem & problem) {
-        double violation = find_violation(candidate.first, candidate.second, problem);
+    Violation check_violation(Candidate candidate, const Problem &problem) {
+        double violation =
+            find_violation(candidate.first, candidate.second, problem);
         if (problem.get_compare().g(violation, 0)) {
             return violation;
-        }
-        else {
+        } else {
             return Violation{};
         }
     }
@@ -79,23 +79,25 @@ public:
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void add_violated_constraint(Candidate violation, const Problem & problem, LP & lp) {
+    void add_violated_constraint(Candidate violation, const Problem &problem,
+                                 LP &lp) {
         if (violation != m_min_cut.get_last_cut()) {
             find_violation(violation.first, violation.second, problem);
         }
 
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
-        auto restriction = problem.get_max_restriction(violation.first, violation.second);
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
+        auto restriction =
+            problem.get_max_restriction(violation.first, violation.second);
 
-        for (auto const & e : problem.get_edges_in_solution()) {
+        for (auto const &e : problem.get_edges_in_solution()) {
             if (is_edge_in_violating_cut(e, g, index)) {
                 --restriction;
             }
         }
 
         lp::linear_expression expr;
-        for (auto const & e : problem.get_edge_map()) {
+        for (auto const &e : problem.get_edge_map()) {
             if (is_edge_in_violating_cut(e.second, g, index)) {
                 expr += e.first;
             }
@@ -104,13 +106,15 @@ public:
         lp.add_row(std::move(expr) >= restriction);
     }
 
-private:
+  private:
 
     /**
-     * Checks if a given edge belongs to the cut given by the current violating set.
+     * Checks if a given edge belongs to the cut given by the current violating
+     * set.
      */
     template <typename Edge, typename Graph, typename Index>
-    bool is_edge_in_violating_cut(Edge edge, const Graph & g, const Index & index) {
+    bool is_edge_in_violating_cut(Edge edge, const Graph &g,
+                                  const Index &index) {
         auto u = get(index, source(edge, g));
         auto v = get(index, target(edge, g));
         return m_min_cut.is_in_source_set(u) != m_min_cut.is_in_source_set(v);
@@ -120,12 +124,12 @@ private:
      * Creates the auxiliary directed graph used for feasibility testing.
      */
     template <typename Problem, typename LP>
-    void fill_auxiliary_digraph(Problem & problem, const LP & lp) {
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
+    void fill_auxiliary_digraph(Problem &problem, const LP &lp) {
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
-        for (auto const & e : problem.get_edge_map()) {
+        for (auto const &e : problem.get_edge_map()) {
             lp::col_id col_idx = e.first;
             double col_val = lp.get_col_value(col_idx);
 
@@ -136,7 +140,7 @@ private:
             }
         }
 
-        for (auto const & e : problem.get_edges_in_solution()) {
+        for (auto const &e : problem.get_edges_in_solution()) {
             auto u = get(index, source(e, g));
             auto v = get(index, target(e, g));
             m_min_cut.add_edge_to_graph(u, v, 1, 1);
@@ -144,14 +148,16 @@ private:
     }
 
     /**
-     * Finds the most violated set of vertices containing \c src and not containing \c trg and returns its violation value.
+     * Finds the most violated set of vertices containing \c src and not
+     * containing \c trg and returns its violation value.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @param problem problem object
      * @return violation of the found set
      */
     template <typename Problem>
-    double find_violation(AuxVertex src, AuxVertex trg, const Problem & problem) {
+    double find_violation(AuxVertex src, AuxVertex trg,
+                          const Problem &problem) {
         double min_cut_weight = m_min_cut.find_min_cut(src, trg);
         double restriction = problem.get_max_restriction(src, trg);
         return restriction - min_cut_weight;
@@ -160,6 +166,6 @@ private:
     min_cut_finder m_min_cut;
 };
 
-} //ir
-} //paal
+} //! ir
+} //! paal
 #endif /* STEINER_NETWORK_ORACLE_HPP */

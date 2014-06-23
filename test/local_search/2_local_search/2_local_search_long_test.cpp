@@ -19,16 +19,14 @@ using std::vector;
 using namespace paal::local_search::two_local_search;
 using namespace paal;
 
-
 std::string path = "test/data/TSPLIB/symmetrical/";
-
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
     read_tsplib::TSPLIB_Directory dir(path);
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;
-    while(dir.get_graph(fname ,opt))  {
+    while (dir.get_graph(fname, opt)) {
         std::ifstream is(fname);
         read_tsplib::TSPLIB_Directory::Graph g(is);
         g.load(mtx);
@@ -36,29 +34,30 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         std::vector<int> v(size);
         std::iota(v.begin(), v.end(), 0);
 
-        //create random solution
+        // create random solution
         std::random_shuffle(v.begin(), v.end());
         data_structures::simple_cycle<int> cycle(v.begin(), v.end());
 
-        //creating local search
+        // creating local search
         auto lsc = get_default_two_local_components(mtx);
 
-        //printing
+        // printing
         LOGLN("Graph:\t" << fname);
         LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
 
-
-        //setting logger
+        // setting logger
         auto logger = utils::make_two_ls_logger(mtx, 100);
 
-        //search
-        two_local_search(cycle, paal::local_search::first_improving_strategy{}, logger, utils::always_false(), lsc);
-        check_result(float(simple_algo::get_length(mtx, cycle)),opt,4*sqrt(size));
+        // search
+        two_local_search(cycle, paal::local_search::first_improving_strategy{},
+                         logger, utils::always_false(), lsc);
+        check_result(float(simple_algo::get_length(mtx, cycle)), opt,
+                     4 * sqrt(size));
     }
 }
 
-//currently this is too long !
-//hope that in the future stronger algorithms'll handle these cases
+// currently this is too long !
+// hope that in the future stronger algorithms'll handle these cases
 //
 //
 
@@ -85,11 +84,13 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
 
         //creating local search
         auto lsc = get_default_two_local_components(mtx);
-        typedef local_search::search_components_traits<puretype(lsc)>::GainT GainT;
+        typedef local_search::search_components_traits<puretype(lsc)>::GainT
+GainT;
         typedef paal::local_search::gain_cut_small_improves<GainT, int> CIC;
         double epsilon = 0.001;
         CIC  cut(lsc.get<local_search::Gain>(), startLen, epsilon);
-        auto cutLsc = data_structures::replace<local_search::Gain>(std::move(cut), lsc);
+        auto cutLsc =
+data_structures::replace<local_search::Gain>(std::move(cut), lsc);
 
         //setting logger
         auto logger = utils::make_two_ls_logger(mtx, 100);
@@ -110,4 +111,3 @@ BOOST_AUTO_TEST_CASE(TSPLIB_long) {
         two_local_search(cycle, logger, utils::always_false(), lsc);
     }
 }*/
-

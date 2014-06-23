@@ -19,36 +19,34 @@
 
 using std::string;
 using std::vector;
-using namespace  paal::local_search::two_local_search;
-using namespace  paal;
-
+using namespace paal::local_search::two_local_search;
+using namespace paal;
 
 BOOST_AUTO_TEST_CASE(two_local_search_test) {
     //! [Two Local Search Example]
-    //sample data
-    typedef  sample_graphs_metrics SGM;
+    // sample data
+    typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
     const int size = gm.size();
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution
+    // create random solution
     std::random_shuffle(v.begin(), v.end());
     typedef data_structures::simple_cycle<int> Cycle;
     Cycle cycle(v.begin(), v.end());
 
-    //creating local search components
+    // creating local search components
     auto lsc = get_default_two_local_components(gm);
 
-    //printing
+    // printing
     LOGLN("Length \t" << simple_algo::get_length(gm, cycle));
 
-    //setting logger
+    // setting logger
     auto logger = utils::make_two_ls_logger(gm, 100);
 
-    //search
-    two_local_search(cycle, local_search::first_improving_strategy{},
-                logger, utils::always_false(), lsc);
+    // search
+    two_local_search(cycle, local_search::first_improving_strategy{}, logger,
+                     utils::always_false(), lsc);
     //! [Two Local Search Example]
 }
-

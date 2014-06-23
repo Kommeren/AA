@@ -6,15 +6,14 @@
  * @date 2013-08-30
  */
 
-
 #include "paal/greedy/k_cut/k_cut.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
 #include <iostream>
 
-int main(){
-//! [K Cut Example]
+int main() {
+    //! [K Cut Example]
     // sample data
     std::vector<std::pair<int,int>> edges_p {{1,2},{1,5},{2,3},{2,5},{2,6},
         {3,4},{3,7},{4,7},{4,0},{5,6},{6,7},{7,0}};
@@ -48,5 +47,5 @@ int main(){
         std::cout << i.first << "(" << i.second << "), ";
     }
     std::cout << std::endl;
-//! [K Cut Example]
+    //! [K Cut Example]
 }

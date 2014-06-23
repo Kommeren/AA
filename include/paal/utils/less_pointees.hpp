@@ -9,23 +9,23 @@
 #define LESS_POINTEES_HPP
 namespace paal {
 
-//TODO add to boost
+// TODO add to boost
 /**
  * @brief compare pointee using comparator
  *
  * @tparam Comparator
  */
-template<class Comparator>
-struct less_pointees_t {
-    ///constructor
+template <class Comparator> struct less_pointees_t {
+    /// constructor
     less_pointees_t(Comparator compare) : m_compare(compare) {}
 
-    ///compare operator()
+    /// compare operator()
     template <typename OptionalPointee>
-    bool operator() ( OptionalPointee const& x, OptionalPointee const& y ) const {
-       return !y ? false : ( !x ? true : m_compare(*x, *y) ) ;
+    bool operator()(OptionalPointee const &x, OptionalPointee const &y) const {
+        return !y ? false : (!x ? true : m_compare(*x, *y));
     }
-private:
+
+  private:
     Comparator m_compare;
 };
 
@@ -37,12 +37,10 @@ private:
  *
  * @return
  */
-template<class Comparator>
-less_pointees_t<Comparator>
-make_less_pointees_t(Comparator compare) {
+template <class Comparator>
+less_pointees_t<Comparator> make_less_pointees_t(Comparator compare) {
     return less_pointees_t<Comparator>(compare);
 }
 
-
-} //paal
+} //! paal
 #endif /* LESS_POINTEES_HPP */

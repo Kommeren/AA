@@ -8,11 +8,9 @@
 #ifndef CYCLE_ITERATOR_HPP
 #define CYCLE_ITERATOR_HPP
 
-
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/iterator/iterator_facade.hpp>
-
 
 namespace paal {
 namespace data_structures {
@@ -22,11 +20,14 @@ namespace data_structures {
 
 /**
  * @class cycle_iterator
- * @brief For given collection (begin -> end) and start iterator pointing to an element inside
- *        collection (begin -> ... -> start -> ... ->end), returns new collection created by shifting the old collection to start.
+ * @brief For given collection (begin -> end) and start iterator pointing to an
+ * element inside
+ *        collection (begin -> ... -> start -> ... ->end), returns new
+ * collection created by shifting the old collection to start.
  *
  *        example:
- *        WE are given collection of 5 elemeents and start points to the third one:
+ *        WE are given collection of 5 elemeents and start points to the third
+ * one:
  *        1 -> 2 -> 3 (start) -> 4 -> 5 -> end
  *
  *        The collection
@@ -37,19 +38,16 @@ namespace data_structures {
  * @tparam Iter type of iterator
  */
 template <typename Iter>
-class cycle_iterator :
-    public boost::iterator_facade<
-        cycle_iterator<Iter>,
-        typename std::iterator_traits<Iter>::value_type,
-        typename boost::forward_traversal_tag,
-        typename std::iterator_traits<Iter>::reference,
-        typename std::iterator_traits<Iter>::difference_type
-        > {
+class cycle_iterator : public boost::iterator_facade<
+    cycle_iterator<Iter>, typename std::iterator_traits<Iter>::value_type,
+    typename boost::forward_traversal_tag,
+    typename std::iterator_traits<Iter>::reference,
+    typename std::iterator_traits<Iter>::difference_type> {
 
     typedef std::iterator_traits<Iter> IT;
     typedef typename IT::reference ref;
 
-public:
+  public:
 
     /**
      * @brief constructing of cycle_iterator
@@ -58,15 +56,16 @@ public:
      * @param begin old start
      * @param end   old end
      */
-    cycle_iterator(Iter start, Iter begin, Iter end) :
-        m_curr(start), m_start(start), m_begin(begin), m_end(end), m_is_end(false) {}
+    cycle_iterator(Iter start, Iter begin, Iter end)
+        : m_curr(start), m_start(start), m_begin(begin), m_end(end),
+          m_is_end(false) {}
 
     /**
      * @brief Points to end of the collection
      */
     cycle_iterator() : m_is_end(true) {}
 
-private:
+  private:
     friend class boost::iterator_core_access;
     /**
      *  Standard iterator facade implementation:
@@ -75,11 +74,11 @@ private:
     void increment() {
         ++m_curr;
 
-        if(m_curr == m_end) {
+        if (m_curr == m_end) {
             m_curr = m_begin;
         }
 
-        if(m_curr == m_start) {
+        if (m_curr == m_start) {
             m_is_end = true;
             m_curr = m_end;
         }
@@ -89,9 +88,7 @@ private:
         return (m_is_end && ei.m_is_end) || m_curr == ei.m_curr;
     }
 
-    ref dereference() const {
-        return *m_curr;
-    }
+    ref dereference() const { return *m_curr; }
 
     Iter m_curr;
     Iter m_start;
@@ -99,7 +96,6 @@ private:
     Iter m_end;
     bool m_is_end = false;
 };
-
 }
 }
 #endif /* CYCLE_ITERATOR_HPP */

@@ -8,21 +8,17 @@
 #ifndef TWO_LOCAL_SEARCH_COMPONENTS_HPP
 #define TWO_LOCAL_SEARCH_COMPONENTS_HPP
 
-
 #include "paal/data_structures/subset_iterator.hpp"
-
-
 
 namespace paal {
 namespace local_search {
 
-    /**
-     * @brief Swap
-     *
-     * @tparam Element
-     */
-template <typename Element>
-struct Swap {
+/**
+ * @brief Swap
+ *
+ * @tparam Element
+ */
+template <typename Element> struct Swap {
     /**
      * @brief constructor
      *
@@ -36,19 +32,16 @@ struct Swap {
      *
      * @return
      */
-    Element get_from() const {
-        return m_from;
-    }
+    Element get_from() const { return m_from; }
 
     /**
      * @brief getter for m_to
      *
      * @return
      */
-    Element get_to() const {
-        return m_to;
-    }
-private:
+    Element get_to() const { return m_to; }
+
+  private:
     Element m_from;
     Element m_to;
 };
@@ -66,8 +59,7 @@ struct make_swap {
      * @return
      */
     template <typename Element>
-    Swap<Element> operator()(Element from,
-                    Element to) const {
+    Swap<Element> operator()(Element from, Element to) const {
         return Swap<Element>(from, to);
     }
 };
@@ -77,41 +69,41 @@ struct make_swap {
  *
  * @tparam Metric
  */
-template <typename Metric>
-    class gain_two_opt {
-    public:
-        /**
-         * @brief
-         *
-         * @param m fulfills \ref metric concept.
-        */
-        gain_two_opt(const Metric & m) : m_metric(m) {}
+template <typename Metric> class gain_two_opt {
+  public:
+    /**
+     * @brief
+     *
+     * @param m fulfills \ref metric concept.
+    */
+    gain_two_opt(const Metric &m) : m_metric(m) {}
 
-        /**
-         * @brief returns gain for given adjustment
-         *
-         * @tparam Solution
-         * @tparam SolutionElement
-         * @param swap
-         *
-         * @return
-         */
-        template <typename Solution, typename SolutionElement>
-        int operator()(const Solution &, const Swap<SolutionElement> & swap) {
-            auto from = swap.get_from();
-            auto to = swap.get_to();
-            return m_metric(from.first, from.second) + m_metric(to.first, to.second) -
-               m_metric(from.first, to.first) - m_metric(from.second, to.second);
-        }
+    /**
+     * @brief returns gain for given adjustment
+     *
+     * @tparam Solution
+     * @tparam SolutionElement
+     * @param swap
+     *
+     * @return
+     */
+    template <typename Solution, typename SolutionElement>
+    int operator()(const Solution &, const Swap<SolutionElement> &swap) {
+        auto from = swap.get_from();
+        auto to = swap.get_to();
+        return m_metric(from.first, from.second) +
+               m_metric(to.first, to.second) - m_metric(from.first, to.first) -
+               m_metric(from.second, to.second);
+    }
 
-    private:
-        const Metric & m_metric;
+  private:
+    const Metric &m_metric;
 };
 
 /**
  * @brief Commit class for local_search
  */
-struct two_local_search_commit  {
+struct two_local_search_commit {
     /**
      * @brief flips appropriate segment in the solution
      *
@@ -121,7 +113,7 @@ struct two_local_search_commit  {
      * @param swap
      */
     template <typename SolutionElement, typename Solution>
-    bool operator()(Solution & s, const Swap<SolutionElement> & swap) {
+    bool operator()(Solution &s, const Swap<SolutionElement> &swap) {
         s.get_cycle().flip(swap.get_from().second, swap.get_to().first);
         return true;
     }
@@ -130,21 +122,21 @@ struct two_local_search_commit  {
 /**
  * @brief Commit class for local_search
  */
-class two_local_searchget_moves  {
+class two_local_searchget_moves {
 
     /**
      * @brief Functor needed for type computation
      *
      * @tparam Solution
      */
-    template <typename Solution>
-    struct types_eval {
+    template <typename Solution> struct types_eval {
         using SolutionIter = decltype(std::declval<Solution>().begin());
-        using Subset = data_structures::subsets_iterator<2, SolutionIter, make_swap>;
+        using Subset =
+            data_structures::subsets_iterator<2, SolutionIter, make_swap>;
         using Range = boost::iterator_range<Subset>;
     };
 
-public:
+  public:
     /**
      * @brief return all pairs of elements from solution
      *
@@ -152,15 +144,15 @@ public:
      * @param solution
      */
     template <typename Solution>
-    auto operator()(Solution & solution) const ->
-        typename types_eval<Solution>::Range
-    {
-        return boost::make_iterator_range(data_structures::make_subsets_iterator_range<2>
-                        (solution.begin(), solution.end(), make_swap{}));
+    auto operator()(
+        Solution &solution) const->typename types_eval<Solution>::Range {
+        return boost::make_iterator_range(
+            data_structures::make_subsets_iterator_range<2>(
+                solution.begin(), solution.end(), make_swap{}));
     }
 };
 
-}//!local_search
-}//!paal
+} //!local_search
+} //!paal
 
 #endif /* TWO_LOCAL_SEARCH_COMPONENTS_HPP */

@@ -9,9 +9,7 @@
 #ifndef SIMPLE_CYCLE_HPP
 #define SIMPLE_CYCLE_HPP
 
-
 #include "paal/data_structures/bimap.hpp"
-
 
 #include <cassert>
 #include <vector>
@@ -20,16 +18,16 @@
 namespace paal {
 namespace data_structures {
 
-
 /**
  * @class simple_cycle
- * @brief This is the simplest implementation of the \ref cycle concept based on the list.
+ * @brief This is the simplest implementation of the \ref cycle concept based on
+ * the list.
  *
  * @tparam CycleEl
  * @tparam IdxT
  */
-template <typename CycleEl, typename IdxT = int> class  simple_cycle {
-public:
+template <typename CycleEl, typename IdxT = int> class simple_cycle {
+  public:
     typedef std::pair<CycleEl, CycleEl> CycleElPair;
     typedef CycleEl CycleElement;
 
@@ -41,7 +39,7 @@ public:
      * @param end
      */
     template <typename Iter> simple_cycle(Iter begin, Iter end) {
-        if(begin == end) {
+        if (begin == end) {
             return;
         }
 
@@ -52,16 +50,17 @@ public:
 
         IdxT prev_idx = add(*(begin++));
         IdxT firstIdx = prev_idx;
-        for(;begin != end;++begin) {
-            IdxT lastIdx =  add(*begin);
+        for (; begin != end; ++begin) {
+            IdxT lastIdx = add(*begin);
             link(prev_idx, lastIdx);
             prev_idx = lastIdx;
         }
         link(prev_idx, firstIdx);
     }
 
-    ///after flip the order will be reversed, ie it will be from 'end'  to 'begin'
-    void flip(const CycleEl & begin, const CycleEl & end) {
+    /// after flip the order will be reversed, ie it will be from 'end'  to
+    /// 'begin'
+    void flip(const CycleEl &begin, const CycleEl &end) {
         IdxT e1 = to_idx(begin);
         IdxT b1 = prev_idx(e1);
         IdxT b2 = to_idx(end);
@@ -77,9 +76,7 @@ public:
      *
      * @return
      */
-    std::size_t size() const {
-        return  m_predecessor_map.size();
-    }
+    std::size_t size() const { return m_predecessor_map.size(); }
 
     /**
      * @brief next element in the cycle
@@ -88,114 +85,105 @@ public:
      *
      * @return
      */
-    CycleEl next(const CycleEl & ce) const {
+    CycleEl next(const CycleEl &ce) const {
         return from_idx(next_idx(to_idx(ce)));
     }
 
-    //TODO use iterator_fascade
+    // TODO use iterator_fascade
     /**
      * @brief iterator over vertices of the cycle
      */
-    class vertex_iterator : public std::iterator<std::forward_iterator_tag, CycleEl,
-                                ptrdiff_t, CycleEl *, const CycleEl &> {
-        public:
+    class vertex_iterator
+        : public std::iterator<std::forward_iterator_tag, CycleEl, ptrdiff_t,
+                               CycleEl *, const CycleEl &> {
+      public:
 
-            /**
-             * @brief constructor
-             *
-             * @param cm
-             * @param ce
-             */
-            vertex_iterator(const simple_cycle & cm, CycleEl ce ) :
-                m_cycle(&cm), m_idx(m_cycle->to_idx(ce)), m_first(m_idx) {}
+        /**
+         * @brief constructor
+         *
+         * @param cm
+         * @param ce
+         */
+        vertex_iterator(const simple_cycle &cm, CycleEl ce)
+            : m_cycle(&cm), m_idx(m_cycle->to_idx(ce)), m_first(m_idx) {}
 
-            /**
-             * @brief default constructor
-             */
-            vertex_iterator() : m_cycle(NULL) ,m_idx(-1) {}
+        /**
+         * @brief default constructor
+         */
+        vertex_iterator() : m_cycle(NULL), m_idx(-1) {}
 
-            /**
-             * @brief operator++()
-             *
-             * @return
-             */
-            vertex_iterator & operator++(){
-                m_idx = next_idx(m_idx);
+        /**
+         * @brief operator++()
+         *
+         * @return
+         */
+        vertex_iterator &operator++() {
+            m_idx = next_idx(m_idx);
 
-                if(m_idx == m_first) {
-                    m_idx = -1;
-                }
-
-                return *this;
+            if (m_idx == m_first) {
+                m_idx = -1;
             }
 
-            /**
-             * @brief operator++(int)
-             *
-             * @return
-             */
-            vertex_iterator operator++(int){
-                vertex_iterator i(*this);
-                operator++();
-                return i;
-            }
+            return *this;
+        }
 
-            /**
-             * @brief operator!=
-             *
-             * @param ei
-             *
-             * @return
-             */
-            bool operator!=(vertex_iterator ei) const {
-                return !operator==(ei);
-            }
+        /**
+         * @brief operator++(int)
+         *
+         * @return
+         */
+        vertex_iterator operator++(int) {
+            vertex_iterator i(*this);
+            operator++();
+            return i;
+        }
 
-            /**
-             * @brief operator==
-             *
-             * @param ei
-             *
-             * @return
-             */
-            bool operator==(vertex_iterator ei) const {
-                return m_idx == ei.m_idx;
-            }
+        /**
+         * @brief operator!=
+         *
+         * @param ei
+         *
+         * @return
+         */
+        bool operator!=(vertex_iterator ei) const { return !operator==(ei); }
 
-            /**
-             * @brief operator->()
-             *
-             * @return
-             */
-            const CycleEl * const operator->() const {
-               return &operator*();
-            }
+        /**
+         * @brief operator==
+         *
+         * @param ei
+         *
+         * @return
+         */
+        bool operator==(vertex_iterator ei) const { return m_idx == ei.m_idx; }
 
-            /**
-             * @brief operator*()
-             *
-             * @return
-             */
-            const CycleEl & operator*() const {
-               return m_cycle->from_idx(m_idx);
-            }
+        /**
+         * @brief operator->()
+         *
+         * @return
+         */
+        const CycleEl *const operator->() const { return &operator*(); }
 
-        private:
+        /**
+         * @brief operator*()
+         *
+         * @return
+         */
+        const CycleEl &operator*() const { return m_cycle->from_idx(m_idx); }
 
-            /**
-             * @brief next element in the cycle
-             *
-             * @param i index of the element
-             *
-             * @return
-             */
-            IdxT next_idx(IdxT i) const {
-                return m_cycle->next_idx(i);
-            }
+      private:
 
-            const simple_cycle * m_cycle;
-            IdxT m_idx;
-            IdxT m_first;
+        /**
+         * @brief next element in the cycle
+         *
+         * @param i index of the element
+         *
+         * @return
+         */
+        IdxT next_idx(IdxT i) const { return m_cycle->next_idx(i); }
+
+        const simple_cycle *m_cycle;
+        IdxT m_idx;
+        IdxT m_first;
     };
 
     typedef std::pair<vertex_iterator, vertex_iterator> vertex_iteratorRange;
@@ -207,7 +195,7 @@ public:
      *
      * @return
      */
-    vertex_iterator vbegin(const CycleEl & el) const {
+    vertex_iterator vbegin(const CycleEl &el) const {
         return vertex_iterator(*this, el);
     }
 
@@ -216,18 +204,14 @@ public:
      *
      * @return
      */
-    vertex_iterator vbegin() const {
-        return vbegin(from_idx(0));
-    }
+    vertex_iterator vbegin() const { return vbegin(from_idx(0)); }
 
     /**
      * @brief end of the vertices range
      *
      * @return
      */
-    vertex_iterator vend() const {
-        return vertex_iterator();
-    }
+    vertex_iterator vend() const { return vertex_iterator(); }
 
     /**
      * @brief returns range of vertices starting at el
@@ -236,7 +220,7 @@ public:
      *
      * @return
      */
-    vertex_iteratorRange get_vertices_range(const CycleEl & el) const {
+    vertex_iteratorRange get_vertices_range(const CycleEl &el) const {
         return vertex_iteratorRange(vbegin(el), vend());
     }
 
@@ -249,121 +233,112 @@ public:
         return get_vertices_range(from_idx(0));
     }
 
-    //TODO use iterator_fascade
+    // TODO use iterator_fascade
     /**
      * @brief Iterator on cycle edges
      */
-    class edge_iterator : public std::iterator<std::forward_iterator_tag, CycleElPair,
-                                ptrdiff_t, CycleElPair *, const CycleElPair &> {
-        public:
-            /**
-             * @brief constructor
-             *
-             * @param cm
-             * @param ce
-             */
-            edge_iterator(const simple_cycle & cm, CycleEl ce ) :
-                m_cycle(&cm), m_idx(m_cycle->to_idx(ce)), m_first(m_idx) {
+    class edge_iterator
+        : public std::iterator<std::forward_iterator_tag, CycleElPair,
+                               ptrdiff_t, CycleElPair *, const CycleElPair &> {
+      public:
+        /**
+         * @brief constructor
+         *
+         * @param cm
+         * @param ce
+         */
+        edge_iterator(const simple_cycle &cm, CycleEl ce)
+            : m_cycle(&cm), m_idx(m_cycle->to_idx(ce)), m_first(m_idx) {
 
-                move_curr();
+            move_curr();
+        }
+
+        /**
+         * @brief default constructor
+         */
+        edge_iterator() : m_cycle(NULL), m_idx(-1) {}
+
+        /**
+         * @brief operator++()
+         *
+         * @return
+         */
+        edge_iterator &operator++() {
+            m_idx = next_idx(m_idx);
+            move_curr();
+
+            if (m_idx == m_first) {
+                m_idx = -1;
             }
 
-            /**
-             * @brief default constructor
-             */
-            edge_iterator() : m_cycle(NULL) ,m_idx(-1) {}
+            return *this;
+        }
 
-            /**
-             * @brief operator++()
-             *
-             * @return
-             */
-            edge_iterator & operator++(){
-                m_idx = next_idx(m_idx);
-                move_curr();
+        /**
+         * @brief operator++(int)
+         *
+         * @return
+         */
+        edge_iterator operator++(int) {
+            edge_iterator i(*this);
+            operator++();
+            return i;
+        }
 
-                if(m_idx == m_first) {
-                    m_idx = -1;
-                }
+        /**
+         * @brief operator!=
+         *
+         * @param ei
+         *
+         * @return
+         */
+        bool operator!=(edge_iterator ei) const { return !operator==(ei); }
 
-                return *this;
-            }
+        /**
+         * @brief operator==
+         *
+         * @param ei
+         *
+         * @return
+         */
+        bool operator==(edge_iterator ei) const { return m_idx == ei.m_idx; }
 
-            /**
-             * @brief operator++(int)
-             *
-             * @return
-             */
-            edge_iterator operator++(int){
-                edge_iterator i(*this);
-                operator++();
-                return i;
-            }
+        /**
+         * @brief operator->
+         *
+         * @return
+         */
+        const CycleElPair *const operator->() const { return &m_curr; }
 
-            /**
-             * @brief operator!=
-             *
-             * @param ei
-             *
-             * @return
-             */
-            bool operator!=(edge_iterator ei) const {
-                return !operator==(ei);
-            }
+        /**
+         * @brief operator*()
+         *
+         * @return
+         */
+        const CycleElPair &operator*() const { return m_curr; }
 
-            /**
-             * @brief operator==
-             *
-             * @param ei
-             *
-             * @return
-             */
-            bool operator==(edge_iterator ei) const {
-                return m_idx == ei.m_idx;
-            }
+      private:
+        /**
+         * @brief move to the next edge
+         */
+        void move_curr() {
+            m_curr.first = m_cycle->from_idx(m_idx);
+            m_curr.second = m_cycle->from_idx(next_idx(m_idx));
+        }
 
-            /**
-             * @brief operator->
-             *
-             * @return
-             */
-            const CycleElPair * const operator->() const {
-                return &m_curr;
-            }
+        /**
+         * @brief gets next id in the cycle
+         *
+         * @param i
+         *
+         * @return
+         */
+        IdxT next_idx(IdxT i) const { return m_cycle->next_idx(i); }
 
-            /**
-             * @brief operator*()
-             *
-             * @return
-             */
-            const CycleElPair & operator*() const {
-                return m_curr;
-            }
-
-        private:
-            /**
-             * @brief move to the next edge
-             */
-            void move_curr() {
-                m_curr.first = m_cycle->from_idx(m_idx);
-                m_curr.second = m_cycle->from_idx(next_idx(m_idx));
-            }
-
-            /**
-             * @brief gets next id in the cycle
-             *
-             * @param i
-             *
-             * @return
-             */
-            IdxT next_idx(IdxT i) const {
-                return m_cycle->next_idx(i);
-            }
-
-            const simple_cycle * m_cycle;
-            IdxT m_idx;
-            IdxT m_first;
-            CycleElPair m_curr;
+        const simple_cycle *m_cycle;
+        IdxT m_idx;
+        IdxT m_first;
+        CycleElPair m_curr;
     };
 
     typedef std::pair<edge_iterator, edge_iterator> edge_iteratorRange;
@@ -375,7 +350,7 @@ public:
      *
      * @return
      */
-    edge_iteratorRange get_edge_range(const CycleEl & el) const {
+    edge_iteratorRange get_edge_range(const CycleEl &el) const {
         return edge_iteratorRange(edge_iterator(*this, el), edge_iterator());
     }
 
@@ -388,7 +363,7 @@ public:
         return get_edge_range(from_idx(0));
     }
 
-protected:
+  protected:
     /**
      * @brief connects two vertices represented by ids
      *
@@ -401,23 +376,22 @@ protected:
     }
 
     /**
-     * @brief after this operation links from x to y are connected i reverse order
-     *        after this function call cycle is in inconsistent state
+     * @brief after this operation links from x to y are connected i reverse
+     * order, after this function call cycle is in inconsistent state
      *
      * @param x
      * @param y
      */
     void partial_reverse(IdxT x, IdxT y) {
-        if(x == y)
-            return;
+        if (x == y) return;
         IdxT t_next = prev_idx(x);
         IdxT t;
         do {
             t = t_next;
             t_next = prev_idx(t);
-            link(x,t);
+            link(x, t);
             x = t;
-        } while(t != y);
+        } while (t != y);
     }
 
     /**
@@ -427,9 +401,7 @@ protected:
      *
      * @return
      */
-    IdxT to_idx(const CycleEl & ce) const {
-        return m_cycle_idx.get_idx(ce);
-    }
+    IdxT to_idx(const CycleEl &ce) const { return m_cycle_idx.get_idx(ce); }
 
     /**
      * @brief returns next idx in the cycle
@@ -438,9 +410,7 @@ protected:
      *
      * @return
      */
-    IdxT next_idx(IdxT i) const {
-        return m_successor_map[i];
-    }
+    IdxT next_idx(IdxT i) const { return m_successor_map[i]; }
 
     /**
      * @brief returns previous idx
@@ -449,9 +419,7 @@ protected:
      *
      * @return
      */
-    IdxT prev_idx(IdxT i) const {
-        return m_predecessor_map[i];
-    }
+    IdxT prev_idx(IdxT i) const { return m_predecessor_map[i]; }
 
     /**
      * @brief idx to vertex
@@ -460,9 +428,7 @@ protected:
      *
      * @return
      */
-    const CycleEl & from_idx(IdxT i) const {
-        return m_cycle_idx.get_val(i);
-    }
+    const CycleEl &from_idx(IdxT i) const { return m_cycle_idx.get_val(i); }
 
     /**
      * @brief ads new element to cycle data structures
@@ -471,20 +437,20 @@ protected:
      *
      * @return
      */
-    IdxT add(const CycleEl & el) {
+    IdxT add(const CycleEl &el) {
         m_predecessor_map.push_back(-1);
         m_successor_map.push_back(-1);
         return m_cycle_idx.add(el);
     }
 
-    ///mapping from elements to indexes
+    /// mapping from elements to indexes
     bimap<CycleEl, IdxT> m_cycle_idx;
 
     typedef std::vector<IdxT> SorsMap;
 
-    ///predecessors
+    /// predecessors
     SorsMap m_predecessor_map;
-    ///successors
+    /// successors
     SorsMap m_successor_map;
 };
 
@@ -495,9 +461,10 @@ protected:
  * @tparam IdxT
  */
 template <typename CycleEl, typename IdxT = int>
-class  Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
+class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
     typedef simple_cycle<CycleEl, IdxT> base;
-public:
+
+  public:
     /**
      * @brief constructor
      *
@@ -506,8 +473,8 @@ public:
      * @param e
      */
     template <typename Iter>
-    Simplecycle_start_from_last_change(Iter b, Iter e) :
-        base(b,e), m_last_id(0) {}
+    Simplecycle_start_from_last_change(Iter b, Iter e)
+        : base(b, e), m_last_id(0) {}
 
     /**
      * @brief flip remembers last changed position
@@ -515,7 +482,7 @@ public:
      * @param begin
      * @param end
      */
-    void flip(const CycleEl & begin, const CycleEl & end) {
+    void flip(const CycleEl &begin, const CycleEl &end) {
         IdxT e1 = to_idx(begin);
         m_last_id = prev_idx(e1);
         base::flip(begin, end);
@@ -530,13 +497,11 @@ public:
         return base::vbegin(from_idx(m_last_id));
     }
 
-private:
+  private:
     IdxT m_last_id;
 };
 
-
-
-} //data_structures
-} //paal
+} // data_structures
+} // paal
 
 #endif /* SIMPLE_CYCLE_HPP */

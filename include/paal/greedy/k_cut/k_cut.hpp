@@ -20,8 +20,8 @@
 
 #include <queue>
 
-namespace paal{
-namespace greedy{
+namespace paal {
+namespace greedy {
 
 /**
  * @brief this is solve k_cut problem
@@ -32,7 +32,8 @@ namespace greedy{
  * complete example is k_cut_example.cpp
  * @param Graph graph
  * @param int numberOfParts
- * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
+ * @param OutputIterator result pairs of vertex_descriptor and number form (1,2,
+* ... ,k) id of part
  * @param VertexIndexMap indexMap
  * @param EdgeWeightMap weightMap
  * @tparam InGraph
@@ -48,10 +49,9 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
     using Vertex = typename boost::graph_traits<InGraph>::vertex_descriptor;
 
     using Graph = boost::adjacency_list<
-            boost::vecS, boost::vecS, boost::undirectedS,
-            boost::no_property,
-            boost::property<boost::edge_weight_t, cost_t,
-                boost::property<boost::edge_index_t, int>>>;
+        boost::vecS, boost::vecS, boost::undirectedS, boost::no_property,
+        boost::property<boost::edge_weight_t, cost_t,
+                        boost::property<boost::edge_index_t, int>>>;
 
     assert(num_vertices(graph) >= number_of_parts);
 
@@ -62,13 +62,12 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
     VertexIndexToVertexIndex vertex_to_vertex_in_subgraph(num_vertices(graph));
     int vertex_in_part;
     int parts = 1;
-    //cuts contain pair(x,y)
+    // cuts contain pair(x,y)
     // x is the cost of the cut
     // y and y+1 are index parts of graph after make a cut
-    std::priority_queue<
-            std::pair<cost_t, int>,
-            std::vector<std::pair<cost_t, int>>,
-            utils::Greater> cuts;
+    std::priority_queue<std::pair<cost_t, int>,
+                        std::vector<std::pair<cost_t, int>>, utils::Greater>
+        cuts;
 
     int id_part = 0;
 
@@ -193,7 +192,7 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts, OutputIterator re
     return k_cut(graph, number_of_parts, result, boost::no_named_parameters());
 }
 
-}//!greedy
-}//!paal
+} //!greedy
+} //!paal
 
 #endif /* K_CUT_HPP */

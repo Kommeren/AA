@@ -11,7 +11,7 @@
 #include "paal/lp/glp.hpp"
 
 #ifdef _COMPILATION_ERROR_TEST_
-    #define BOOST_TEST_MODULE compilation_error_tests
+#define BOOST_TEST_MODULE compilation_error_tests
 #endif
 #include <boost/test/unit_test.hpp>
 
@@ -31,4 +31,3 @@ struct compilation_error_setup {
 }
 
 #endif /* COMPILATION_ERROR_SETUP_HPP */
-

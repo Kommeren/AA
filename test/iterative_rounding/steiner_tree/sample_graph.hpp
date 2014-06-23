@@ -6,8 +6,6 @@
  * @date 2013-08-04
  */
 
-
-
 #include <boost/graph/adjacency_list.hpp>
 
 
@@ -69,7 +67,8 @@ Graph create_bigger_graph(int p = 3, int q = 2) {
     return g;
 }
 
-std::pair<Terminals, Terminals> get_bigger_graph_vertices(int p = 3, int q = 2) {
+std::pair<Terminals, Terminals> get_bigger_graph_vertices(int p = 3,
+                                                          int q = 2) {
     int n = p + p * q;
     Terminals terminals, non_terminals;
     for (int i = 0; i < n; i++) {

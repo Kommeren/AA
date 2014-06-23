@@ -8,8 +8,6 @@
 #ifndef TABU_LIST_HPP
 #define TABU_LIST_HPP
 
-
-
 #include <boost/functional/hash.hpp>
 
 #include <unordered_set>
@@ -23,17 +21,15 @@ namespace data_structures {
  *
  * @tparam Move
  */
-template <typename Move>
-struct tabu_list_remember_move {
+template <typename Move> struct tabu_list_remember_move {
 
     /**
      * @brief tabu_list_remember_move constructor
      *
      * @param size
      */
-    tabu_list_remember_move(unsigned size) :
-        m_size(size), m_forbiden_moves_set(size) {
-        }
+    tabu_list_remember_move(unsigned size)
+        : m_size(size), m_forbiden_moves_set(size) {}
 
     /**
      * @brief is tabu member function
@@ -54,18 +50,17 @@ struct tabu_list_remember_move {
      * @tparam Solution
      * @param move
      */
-    template <typename Solution>
-    void accept(const Solution &, Move move) {
+    template <typename Solution> void accept(const Solution &, Move move) {
         assert(!is_tabu(move));
         m_forbiden_moves_set.insert(move);
-        if(m_forbiden_moves_fifo.size() == m_size) {
+        if (m_forbiden_moves_fifo.size() == m_size) {
             m_forbiden_moves_set.erase(m_forbiden_moves_fifo.front());
             m_forbiden_moves_fifo.pop_front();
         }
         m_forbiden_moves_fifo.push_back(std::move(move));
     }
 
-private:
+  private:
     /**
      * @brief is tabu does not depend on Solution here
      *
@@ -73,7 +68,7 @@ private:
      *
      * @return
      */
-    bool is_tabu(const Move & move) const {
+    bool is_tabu(const Move &move) const {
         return m_forbiden_moves_set.find(move) != m_forbiden_moves_set.end();
     }
 
@@ -84,15 +79,18 @@ private:
 
 /**
  * @brief This Tabu list remember both current solution and move
- *        It is implemented as tabu_list_remember_move<pair<Solution, Move>> with nullptr passed as dummy solution
+ *        It is implemented as tabu_list_remember_move<pair<Solution, Move>>
+ * with nullptr passed as dummy solution
  *
  * @tparam Solution
  * @tparam Move
  */
 template <typename Solution, typename Move>
-class tabu_list_remember_solution_and_move : tabu_list_remember_move<std::pair<Solution, Move>> {
+class tabu_list_remember_solution_and_move
+    : tabu_list_remember_move<std::pair<Solution, Move>> {
     typedef tabu_list_remember_move<std::pair<Solution, Move>> base;
-public:
+
+  public:
     /**
      * @brief constructor
      *
@@ -109,7 +107,8 @@ public:
      * @return
      */
     bool is_tabu(Solution s, Move move) const {
-        return base::is_tabu(nullptr, std::make_pair(std::move(s), std::move(move)));
+        return base::is_tabu(nullptr,
+                             std::make_pair(std::move(s), std::move(move)));
     }
 
     /**
@@ -118,13 +117,12 @@ public:
      * @param s
      * @param move
      */
-    void accept(Solution & s, const Move & move) {
+    void accept(Solution &s, const Move &move) {
         base::accept(nullptr, std::make_pair(std::move(s), std::move(move)));
     }
 };
 
 } //!data_structures
 } //!paal
-
 
 #endif /* TABU_LIST_HPP */

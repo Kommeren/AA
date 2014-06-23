@@ -14,29 +14,28 @@
 
 namespace paal {
 
-    /**
-     * @brief prints collection with delimiters without trailing delimiter
-     *
-     * @tparam Range
-     * @tparam Stream
-     * @param o
-     * @param r
-     * @param del
-     */
+/**
+ * @brief prints collection with delimiters without trailing delimiter
+ *
+ * @tparam Range
+ * @tparam Stream
+ * @param o
+ * @param r
+ * @param del
+ */
 template <typename Range, typename Stream>
-void print_collection(Stream & o, Range && r, const std::string & del) {
-   if(boost::empty(r)) {
-       return;
-   }
-   auto b = std::begin(r);
-   auto e = std::end(r);
-   o << *b;
-   for(auto && x : boost::make_iterator_range(++b, e) ) {
-       o << del << x;
-   }
+void print_collection(Stream &o, Range &&r, const std::string &del) {
+    if (boost::empty(r)) {
+        return;
+    }
+    auto b = std::begin(r);
+    auto e = std::end(r);
+    o << *b;
+    for (auto &&x : boost::make_iterator_range(++b, e)) {
+        o << del << x;
+    }
 }
 
-}//!paal
-
+} //!paal
 
 #endif /* PRINT_COLLECTION_HPP */

@@ -8,12 +8,9 @@
 #ifndef SEARCH_OCJ_FUNC_COMPONENTS_HPP
 #define SEARCH_OCJ_FUNC_COMPONENTS_HPP
 
-
 #include "paal/data_structures/components/components.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/utils/functors.hpp"
-
-
 
 namespace paal {
 namespace local_search {
@@ -33,13 +30,11 @@ struct Commit;
 
 /**
  * @brief components for objective function local search.
- *        This usually this class is not used. See search_componentsObjFun class.
+ *        This usually this class is not used. See search_componentsObjFun
+ * class.
  */
-typedef data_structures::components<
-            get_moves,
-            ObjFunction,
-            Commit
-                > componentsObjFun;
+typedef data_structures::components<get_moves, ObjFunction, Commit>
+    componentsObjFun;
 
 /**
  * @brief search_componentsObjFun alias to components.
@@ -47,7 +42,7 @@ typedef data_structures::components<
  * @tparam Args
  */
 template <typename... Args>
-    using search_componentsObjFun = typename componentsObjFun::type<Args...> ;
+using search_componentsObjFun = typename componentsObjFun::type<Args...>;
 
 /**
  * @brief make function for search_componentsObjFun
@@ -58,10 +53,11 @@ template <typename... Args>
  * @return
  */
 template <typename... Args>
-auto make_search_componentsObjFun(Args&&... args) -> decltype(componentsObjFun::make_components(std::forward<Args>(args)...)) {
-      return componentsObjFun::make_components(std::forward<Args>(args)...);
+auto make_search_componentsObjFun(Args &&... args)
+    ->decltype(componentsObjFun::make_components(std::forward<Args>(args)...)) {
+    return componentsObjFun::make_components(std::forward<Args>(args)...);
 }
 
-} //local_search
-} //paal
+} //! local_search
+} //! paal
 #endif /* SEARCH_OCJ_FUNC_COMPONENTS_HPP */

@@ -15,64 +15,60 @@
 
 #include <vector>
 
-
 using std::string;
 using std::vector;
 namespace ls = paal::local_search;
-using namespace  paal;
+using namespace paal;
 
 struct F {
-    int operator()(int x) {
-        return -x*x + 12 * x -27;
-    }
+    int operator()(int x) { return -x * x + 12 * x - 27; }
 };
 
 class NG {
     typedef const std::vector<int> Neighb;
     Neighb neighb;
-public:
 
-    NG() : neighb{10, -10, 1, -1} {}
+  public:
 
-    Neighb & operator()(int x) const {
-        return neighb;
-    }
+    NG() : neighb{ 10, -10, 1, -1 } {}
+
+    Neighb &operator()(int x) const { return neighb; }
 };
 
 struct SU {
-    bool operator()(int & s, int u) const {
+    bool operator()(int &s, int u) const {
         s = s + u;
         return true;
     }
 };
 
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
-    //creating local search
-    typedef  ls::search_componentsObjFun<NG, F, SU> search_comps;
+    // creating local search
+    typedef ls::search_componentsObjFun<NG, F, SU> search_comps;
     ON_LOG(F f);
 
-    //printing
+    // printing
     int s(0);
-    LOGLN("f("<< s <<") \t" << f(s));
+    LOGLN("f(" << s << ") \t" << f(s));
     ON_LOG(int i = 0);
 
-    //setting logger
-    auto logger =  [&](int s) {
-        //printing
-        LOGLN("f("<< s <<") \t" << f(s)  << " after " << ++i);
+    // setting logger
+    auto logger = [&](int s) {
+        // printing
+        LOGLN("f(" << s << ") \t" << f(s) << " after " << ++i);
         return true;
-        };
+    };
 
-    //search
-    ls::local_search_obj_fun(s, ls::first_improving_strategy{},
-                logger, utils::always_false{}, search_comps{});
+    // search
+    ls::local_search_obj_fun(s, ls::first_improving_strategy{}, logger,
+                             utils::always_false{}, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 
-    s= 0;
-    ls::obj_fun_first_improving(s,  search_comps{});
+    s = 0;
+    ls::obj_fun_first_improving(s, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 
-    s= 0;
-    ls::obj_fun_best_improving(s,  search_comps{});
+    s = 0;
+    ls::obj_fun_best_improving(s, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 }

@@ -31,14 +31,14 @@ class glp_impl {
     using IdsVals = std::vector<std::pair<row_id, double>>;
     using RowsInColumnIterator = IdsVals::const_iterator;
 
-public:
+  public:
     /**
      * Constructor.
      */
-    glp_impl() : m_lp(glp_create_prob()), m_total_col_nr(0), m_total_row_nr(0),
-            m_idx_cols_tmp(1), m_idx_rows_tmp(1),
-            m_val_cols_tmp(1), m_val_rows_tmp(1),
-            m_rows_tmp(1) {
+    glp_impl()
+        : m_lp(glp_create_prob()), m_total_col_nr(0), m_total_row_nr(0),
+          m_idx_cols_tmp(1), m_idx_rows_tmp(1), m_val_cols_tmp(1),
+          m_val_rows_tmp(1), m_rows_tmp(1) {
         glp_term_out(GLP_OFF);
         glp_init_smcp(&m_glpk_control);
         glp_load_matrix(m_lp, 0, NULL, NULL, NULL);
@@ -48,29 +48,25 @@ public:
     /**
      * Destructor.
      */
-    ~glp_impl() {
-        glp_delete_prob(m_lp);
-    }
+    ~glp_impl() { glp_delete_prob(m_lp); }
 
     /**
      * Frees GLPK resources, common for all LP instances.
      * Should be called after all LP instances are destructed.
      */
-    static void free_env() {
-        glp_free_env();
-    }
+    static void free_env() { glp_free_env(); }
 
     /**
      * Sets the problem optimization type (min/max).
      */
     void set_optimization_type(optimization_type opt_type) {
         switch (opt_type) {
-            case MINIMIZE:
-                glp_set_obj_dir(m_lp, GLP_MIN);
-                break;
-            case MAXIMIZE:
-                glp_set_obj_dir(m_lp, GLP_MAX);
-                break;
+        case MINIMIZE:
+            glp_set_obj_dir(m_lp, GLP_MIN);
+            break;
+        case MAXIMIZE:
+            glp_set_obj_dir(m_lp, GLP_MAX);
+            break;
         }
     }
 
@@ -103,7 +99,7 @@ public:
      *
      * @return row identifier
      */
-    row_id add_row(const double_bounded_expression & constraint) {
+    row_id add_row(const double_bounded_expression &constraint) {
         int rowNr = glp_add_rows(m_lp, 1);
         auto lb = constraint.get_lower_bound();
         auto ub = constraint.get_upper_bound();
@@ -127,7 +123,8 @@ public:
      */
     void set_col_lower_bound(col_id col, double lb) {
         auto ub = get_col_upper_bound(col);
-        glp_set_col_bnds(m_lp, get_col(col), bounds_to_glp_type(lb, ub), lb, ub);
+        glp_set_col_bnds(m_lp, get_col(col), bounds_to_glp_type(lb, ub), lb,
+                         ub);
     }
 
     /**
@@ -138,7 +135,8 @@ public:
      */
     void set_col_upper_bound(col_id col, double ub) {
         auto lb = get_col_lower_bound(col);
-        glp_set_col_bnds(m_lp, get_col(col), bounds_to_glp_type(lb, ub), lb, ub);
+        glp_set_col_bnds(m_lp, get_col(col), bounds_to_glp_type(lb, ub), lb,
+                         ub);
     }
 
     /**
@@ -159,7 +157,8 @@ public:
      */
     void set_row_lower_bound(row_id row, double lb) {
         auto ub = get_row_upper_bound(row);
-        glp_set_row_bnds(m_lp, get_row(row), bounds_to_glp_type(lb, ub), lb, ub);
+        glp_set_row_bnds(m_lp, get_row(row), bounds_to_glp_type(lb, ub), lb,
+                         ub);
     }
 
     /**
@@ -170,7 +169,8 @@ public:
      */
     void set_row_upper_bound(row_id row, double ub) {
         auto lb = get_row_lower_bound(row);
-        glp_set_row_bnds(m_lp, get_row(row), bounds_to_glp_type(lb, ub), lb, ub);
+        glp_set_row_bnds(m_lp, get_row(row), bounds_to_glp_type(lb, ub), lb,
+                         ub);
     }
 
     /**
@@ -179,7 +179,7 @@ public:
      * @param row row identifier
      * @param expr new expression
      */
-    void set_row_expression(row_id row, const linear_expression & expr) {
+    void set_row_expression(row_id row, const linear_expression &expr) {
         auto elems = expr.get_elements();
         int expr_size = boost::distance(elems);
 
@@ -190,11 +190,9 @@ public:
             ++index;
         }
 
-        glp_set_mat_row(m_lp, get_row(row), expr_size, &m_idx_cols_tmp[0], &m_val_cols_tmp[0]);
+        glp_set_mat_row(m_lp, get_row(row), expr_size, &m_idx_cols_tmp[0],
+                        &m_val_cols_tmp[0]);
     }
-
-
-
 
     /**
      * Removes a column form the LP.
@@ -219,7 +217,6 @@ public:
         m_row_idx.erase(row.get());
         glp_del_rows(m_lp, 1, arr);
     }
-
 
     /**
      * Solves the LP using the primal simplex method.
@@ -249,9 +246,7 @@ public:
      * Should be called only after the LP has been solved and if it
      * wasn't modified afterwards.
      */
-    double get_obj_value() const {
-        return glp_get_obj_val(m_lp);
-    }
+    double get_obj_value() const { return glp_get_obj_val(m_lp); }
 
     /**
      * Returns column primal value.
@@ -261,9 +256,6 @@ public:
     double get_col_value(col_id col) const {
         return glp_get_col_prim(m_lp, get_col(col));
     }
-
-
-
 
     /**
      * Returns the column cost function coefficient.
@@ -305,7 +297,8 @@ public:
      */
     linear_expression get_row_expression(row_id row) const {
         linear_expression exp;
-        int size = glp_get_mat_row(m_lp, get_row(row), &m_idx_cols_tmp[0], &m_val_cols_tmp[0]);
+        int size = glp_get_mat_row(m_lp, get_row(row), &m_idx_cols_tmp[0],
+                                   &m_val_cols_tmp[0]);
         for (auto i : boost::irange(1, size + 1)) {
             exp += m_val_cols_tmp[i] * get_col_id(m_idx_cols_tmp[i]);
         }
@@ -317,17 +310,18 @@ public:
      * which constraint matrix coefficient is non-zero (as an iterator range).
      */
     std::pair<RowsInColumnIterator, RowsInColumnIterator>
-            get_rows_in_column(col_id col) const {
-        int size = glp_get_mat_col(m_lp, get_col(col), &m_idx_rows_tmp[0], &m_val_rows_tmp[0]);
+    get_rows_in_column(col_id col) const {
+        int size = glp_get_mat_col(m_lp, get_col(col), &m_idx_rows_tmp[0],
+                                   &m_val_rows_tmp[0]);
         for (auto i : boost::irange(1, size + 1)) {
             m_rows_tmp[i].first = get_row_id(m_idx_rows_tmp[i]);
             m_rows_tmp[i].second = m_val_rows_tmp[i];
         }
-        return std::make_pair(m_rows_tmp.begin() + 1, m_rows_tmp.begin() + size + 1);
+        return std::make_pair(m_rows_tmp.begin() + 1,
+                              m_rows_tmp.begin() + size + 1);
     }
 
-
-private:
+  private:
     glp_impl(glp_impl &&) {}
     glp_impl(const glp_impl &) {}
 
@@ -337,43 +331,41 @@ private:
     static int bounds_to_glp_type(double lb, double ub) {
         if (lb == ub) {
             return GLP_FX;
-        }
-        else if (lb == lp_traits::MINUS_INF) {
+        } else if (lb == lp_traits::MINUS_INF) {
             if (ub == lp_traits::PLUS_INF) {
                 return GLP_FR;
-            }
-            else {
+            } else {
                 return GLP_UP;
             }
-        }
-        else {
+        } else {
             if (ub == lp_traits::PLUS_INF) {
                 return GLP_LO;
-            }
-            else {
+            } else {
                 return GLP_DB;
             }
         }
     }
 
     /**
-     * Determines the lower and upper bound values based on the GLPK bound type and GLPK returned values.
+     * Determines the lower and upper bound values based on the GLPK bound type
+     * and GLPK returned values.
      */
-    static std::pair<double, double> glp_type_to_bounds(double lb, double ub, int type) {
+    static std::pair<double, double> glp_type_to_bounds(double lb, double ub,
+                                                        int type) {
         switch (type) {
-            case GLP_FX:
-                return {lb, lb};
-            case GLP_FR:
-                return {lp_traits::MINUS_INF, lp_traits::PLUS_INF};
-            case GLP_UP:
-                return {lp_traits::MINUS_INF, ub};
-            case GLP_LO:
-                return {lb, lp_traits::PLUS_INF};
-            case GLP_DB:
-                return {lb, ub};
-            default:
-                assert(false);
-                return {0, 0};
+        case GLP_FX:
+            return { lb, lb };
+        case GLP_FR:
+            return { lp_traits::MINUS_INF, lp_traits::PLUS_INF };
+        case GLP_UP:
+            return { lp_traits::MINUS_INF, ub };
+        case GLP_LO:
+            return { lb, lp_traits::PLUS_INF };
+        case GLP_DB:
+            return { lb, ub };
+        default:
+            assert(false);
+            return { 0, 0 };
         }
     }
 
@@ -382,13 +374,13 @@ private:
      */
     static int simplex_type_to_glp(simplex_type type) {
         switch (type) {
-            case PRIMAL:
-                return GLP_PRIMAL;
-            case DUAL:
-                return GLP_DUAL;
-            default:
-                assert(false);
-                return GLP_PRIMAL;
+        case PRIMAL:
+            return GLP_PRIMAL;
+        case DUAL:
+            return GLP_DUAL;
+        default:
+            assert(false);
+            return GLP_PRIMAL;
         }
     }
 
@@ -397,10 +389,9 @@ private:
      */
     std::pair<double, double> get_col_bounds(col_id col) const {
         auto column = get_col(col);
-        return glp_type_to_bounds(
-                glp_get_col_lb(m_lp, column),
-                glp_get_col_ub(m_lp, column),
-                glp_get_col_type(m_lp, column));
+        return glp_type_to_bounds(glp_get_col_lb(m_lp, column),
+                                  glp_get_col_ub(m_lp, column),
+                                  glp_get_col_type(m_lp, column));
     }
 
     /**
@@ -408,26 +399,20 @@ private:
      */
     std::pair<double, double> get_row_bounds(row_id row) const {
         auto row_num = get_row(row);
-        return glp_type_to_bounds(
-                glp_get_row_lb(m_lp, row_num),
-                glp_get_row_ub(m_lp, row_num),
-                glp_get_row_type(m_lp, row_num));
+        return glp_type_to_bounds(glp_get_row_lb(m_lp, row_num),
+                                  glp_get_row_ub(m_lp, row_num),
+                                  glp_get_row_type(m_lp, row_num));
     }
-
 
     /**
      * Converts column identifier to the GLPK column index.
      */
-    int get_col(col_id col) const {
-        return m_col_idx.get_idx(col.get()) + 1;
-    }
+    int get_col(col_id col) const { return m_col_idx.get_idx(col.get()) + 1; }
 
     /**
      * Converts row identifier to the GLPK row index.
      */
-    int get_row(row_id row) const {
-        return m_row_idx.get_idx(row.get()) + 1;
-    }
+    int get_row(row_id row) const { return m_row_idx.get_idx(row.get()) + 1; }
 
     /**
      * Converts GLPK column index to the column identifier.
@@ -442,8 +427,6 @@ private:
     row_id get_row_id(int row) const {
         return row_id(m_row_idx.get_val(row - 1));
     }
-
-
 
     /**
      * Optimizes the LP using the simplex method.
@@ -478,24 +461,22 @@ private:
         }
 
         switch (glp_get_prim_stat(m_lp)) {
-            case GLP_UNDEF:
+        case GLP_UNDEF:
+            return UNDEFINED;
+        case GLP_NOFEAS:
+            return INFEASIBLE;
+        case GLP_FEAS:
+        case GLP_INFEAS:
+            if (glp_get_dual_stat(m_lp) == GLP_NOFEAS) {
+                return UNBOUNDED;
+            } else {
                 return UNDEFINED;
-            case GLP_NOFEAS:
-                return INFEASIBLE;
-            case GLP_FEAS:
-            case GLP_INFEAS:
-                if (glp_get_dual_stat(m_lp) == GLP_NOFEAS) {
-                    return UNBOUNDED;
-                }
-                else {
-                    return UNDEFINED;
-                }
-            default:
-                assert(false);
-                return UNDEFINED;
+            }
+        default:
+            assert(false);
+            return UNDEFINED;
         }
     }
-
 
     void resize_col_tmp() {
         m_idx_cols_tmp.push_back(0);
@@ -505,13 +486,11 @@ private:
     void resize_row_tmp() {
         m_idx_rows_tmp.push_back(0);
         m_val_rows_tmp.push_back(0);
-        m_rows_tmp.push_back({row_id(0),0});
+        m_rows_tmp.push_back({ row_id(0), 0 });
     }
 
-
-
     /// GLPK problem object
-    glp_prob * m_lp;
+    glp_prob *m_lp;
     glp_smcp m_glpk_control;
 
     /// mapping between GLPK column numbers and column IDs
@@ -528,12 +507,11 @@ private:
     mutable Vals m_val_rows_tmp;
     mutable IdsVals m_rows_tmp;
 };
-} //detail
+} // detail
 
 using glp = detail::lp_base<detail::glp_impl>;
 
-
-} //lp
-} //paal
+} // lp
+} // paal
 
 #endif /* GLP_HPP */

@@ -15,13 +15,13 @@
 
 #include <iostream>
 
-
-int main(int argc, char ** argv) {
+int main(int argc, char **argv) {
     std::string strategy = "FirstBetter";
-    if(argc != 2 && argc != 3) {
-        std::cout << argv[0] <<  " " << "number_of_queens strategy=FirstBetter"  << std::endl;
+    if (argc != 2 && argc != 3) {
+        std::cout << argv[0] << " "
+                  << "number_of_queens strategy=FirstBetter" << std::endl;
         return 1;
-    } else if(argc == 3) {
+    } else if (argc == 3) {
         strategy = argv[2];
         assert(strategy == "FirstBetter" || strategy == "SteepestSlope");
     }
@@ -34,19 +34,20 @@ int main(int argc, char ** argv) {
 
     ls::n_queens_local_search_components<> comps;
     int nr_of_iterations(0);
-    auto countingGain = paal::utils::make_counting_functor_adaptor(comps.get<ls::Gain>(), nr_of_iterations);
-    auto countingComps = paal::data_structures::replace<ls::Gain>(countingGain, comps);
+    auto countingGain = paal::utils::make_counting_functor_adaptor(
+        comps.get<ls::Gain>(), nr_of_iterations);
+    auto countingComps =
+        paal::data_structures::replace<ls::Gain>(countingGain, comps);
 
-    if(strategy == "FirstBetter") {
+    if (strategy == "FirstBetter") {
         ls::n_queens_solution_first_improving(queens, countingComps);
     } else {
         paal::utils::always_false nop;
-        ls::n_queens_solution_local_search(queens, ls::best_improving_strategy{}, nop, nop, countingComps);
+        ls::n_queens_solution_local_search(
+            queens, ls::best_improving_strategy{}, nop, nop, countingComps);
     }
-    std::cout <<  Adapter(queens).obj_fun() << " " << nr_of_iterations << std::endl;
+    std::cout << Adapter(queens).obj_fun() << " " << nr_of_iterations
+              << std::endl;
 
     return 0;
 }
-
-
-

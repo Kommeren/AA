@@ -17,11 +17,9 @@
 
 namespace {
 struct Config {
-    Config() {
-        std::cout << std::setprecision(20);
-    }
-    ~Config()  { paal::lp::glp::free_env(); }
+    Config() { std::cout << std::setprecision(20); }
+    ~Config() { paal::lp::glp::free_env(); }
 };
 }
 
-BOOST_GLOBAL_FIXTURE( Config );
+BOOST_GLOBAL_FIXTURE(Config);

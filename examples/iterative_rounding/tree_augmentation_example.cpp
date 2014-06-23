@@ -44,7 +44,7 @@ int main() {
 
     // solve it
     auto result = paal::ir::tree_augmentation_iterative_rounding(
-                    g, std::back_inserter(solution));
+        g, std::back_inserter(solution));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
@@ -54,12 +54,10 @@ int main() {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
-    }
-    else {
+    } else {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Tree Augmentation Example]
+    //! [Tree Augmentation Example]
     return 0;
 }
-

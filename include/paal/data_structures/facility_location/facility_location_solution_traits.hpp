@@ -11,10 +11,7 @@ namespace paal {
 namespace data_structures {
 
 template <typename facility_location_solution>
-class facility_location_solution_traits {
-};
-
-
+class facility_location_solution_traits {};
 }
 }
 #endif /* FACILITY_LOCATION_SOLUTION_TRAITS_HPP */

@@ -26,7 +26,7 @@ using namespace paal::utils;
 BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
     std::string testDir = "test/data/KNAPSACK/";
 
-    parse(testDir + "cases.txt", [&](const std::string & line, std::istream &){
+    parse(testDir + "cases.txt", [&](const std::string & line, std::istream &) {
         int testId = std::stoi(line);
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
 
@@ -43,37 +43,40 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         LOG_COPY_RANGE_DEL(values, " ");
         LOGLN("");
         auto objects = boost::irange(std::size_t(0), values.size());
-        //KNAPSACK 0/1
+        // KNAPSACK 0/1
         {
             std::vector<int> result;
             LOGLN("Knapsack 0/1");
-            auto maxValue = knapsack_0_1_two_app(std::begin(objects), std::end(objects),
-                   capacity,
-                   std::back_inserter(result),
-                   make_array_to_functor(values),
-                   make_array_to_functor(sizes));
+            auto maxValue = knapsack_0_1_two_app(
+                std::begin(objects), std::end(objects), capacity,
+                std::back_inserter(result), make_array_to_functor(values),
+                make_array_to_functor(sizes));
 
-            LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
+            LOGLN("Max value " << maxValue.first << ", Total size "
+                               << maxValue.second);
             LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
-            auto opt = std::accumulate(optimal.begin(), optimal.end(), 0, [&](int sum, int i){return sum + values[i];});
+            auto opt = std::accumulate(optimal.begin(), optimal.end(), 0,
+                                       [&](int sum, int i) {
+                return sum + values[i];
+            });
             LOGLN("OPT");
             LOG_COPY_RANGE_DEL(optimal, " ");
             LOGLN("");
-            check_result(maxValue.first,opt,0.5,paal::utils::GreaterEqual());
+            check_result(maxValue.first, opt, 0.5, paal::utils::GreaterEqual());
         }
 
-        //KNAPSACK
+        // KNAPSACK
         {
             std::vector<int> result;
             LOGLN("Knapsack");
-            ON_LOG(auto maxValue = )knapsack_two_app(std::begin(objects), std::end(objects),
-                   capacity,
-                   std::back_inserter(result),
-                   make_array_to_functor(values),
-                   make_array_to_functor(sizes));
+            ON_LOG(auto maxValue = ) knapsack_two_app(
+                std::begin(objects), std::end(objects), capacity,
+                std::back_inserter(result), make_array_to_functor(values),
+                make_array_to_functor(sizes));
 
-            LOGLN("Max value " << maxValue.first << ", Total size "  << maxValue.second);
+            LOGLN("Max value " << maxValue.first << ", Total size "
+                               << maxValue.second);
             LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
         }

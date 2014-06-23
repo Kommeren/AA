@@ -15,12 +15,12 @@
 
 using LP = paal::lp::glp;
 
-void print_solution(paal::lp::problem_type status, const LP & lp_instance) {
+void print_solution(paal::lp::problem_type status, const LP &lp_instance) {
     std::cout << "-----------------------------------------" << std::endl;
     if (status == paal::lp::OPTIMAL) {
-        std::cout << "Optimal solution cost: " << lp_instance.get_obj_value() << std::endl;
-    }
-    else {
+        std::cout << "Optimal solution cost: " << lp_instance.get_obj_value()
+                  << std::endl;
+    } else {
         std::cout << "Optimal solution not found" << std::endl;
     }
     std::cout << lp_instance << std::endl;
@@ -70,4 +70,3 @@ int main() {
     return 0;
 }
 //! [LP Example]
-

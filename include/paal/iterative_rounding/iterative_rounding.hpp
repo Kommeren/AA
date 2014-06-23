@@ -20,7 +20,6 @@
 #include <cstdlib>
 #include <unordered_map>
 
-
 namespace paal {
 /// Iterative Rounding namespace.
 namespace ir {
@@ -33,19 +32,19 @@ struct trivial_visitor {
      * @brief Method called after (re)solving the LP.
      */
     template <typename Problem, typename LP>
-    void solve_lp(Problem & problem, LP & lp) {}
+    void solve_lp(Problem &problem, LP &lp) {}
 
     /**
      * @brief Method called after rounding a column of the LP.
      */
     template <typename Problem, typename LP>
-    void round_col(Problem & problem, LP & lp, lp::col_id col, double val) {}
+    void round_col(Problem &problem, LP &lp, lp::col_id col, double val) {}
 
     /**
      * @brief Method called after relaxing a row of the LP.
      */
     template <typename Problem, typename LP>
-    void relax_row(Problem & problem, LP & lp, lp::row_id row) {}
+    void relax_row(Problem &problem, LP &lp, lp::row_id row) {}
 };
 
 namespace detail {
@@ -67,19 +66,21 @@ class iterative_rounding  {
      */
     double get_val(lp::col_id col) const {
         auto i = m_rounded.find(col);
-        if(i == m_rounded.end()) {
+        if (i == m_rounded.end()) {
             return m_lp.get_col_value(col);
         } else {
             return i->second.first;
         }
     }
 
-public:
+  public:
     /**
      * @brief Constructor.
      */
-    iterative_rounding(Problem & problem, IRcomponents e, Visitor vis = Visitor())
-        : m_ir_components(std::move(e)), m_visitor(std::move(vis)), m_problem(problem) {
+    iterative_rounding(Problem &problem, IRcomponents e,
+                       Visitor vis = Visitor())
+        : m_ir_components(std::move(e)), m_visitor(std::move(vis)),
+          m_problem(problem) {
         call<Init>(m_problem, m_lp);
     }
 
@@ -122,13 +123,14 @@ public:
     }
 
     /**
-     * @brief Rounds the LP columns (independently) using the RoundCondition component.
+     * @brief Rounds the LP columns (independently) using the RoundCondition
+    * component.
      *
      * @return true iff at least one column was rounded
      */
     bool round() {
         int deleted(0);
-        auto && cols = m_lp.get_columns();
+        auto &&cols = m_lp.get_columns();
         auto cbegin = std::begin(cols);
         auto cend = std::end(cols);
 
@@ -157,7 +159,7 @@ public:
      */
     bool relax() {
         int deleted(0);
-        auto && rows = m_lp.get_rows();
+        auto &&rows = m_lp.get_rows();
         auto rbegin = std::begin(rows);
         auto rend = std::end(rows);
 
@@ -170,8 +172,7 @@ public:
                 if (call<RelaxationsLimit>(deleted)) {
                     break;
                 }
-            }
-            else {
+            } else {
                 ++rbegin;
             }
         }
@@ -182,45 +183,41 @@ public:
     /**
      * @brief Returns the LP object used to solve the IR.
      */
-    LP & get_lp() {
-        return m_lp;
-    }
+    LP &get_lp() { return m_lp; }
 
     /**
      * @brief Returns the IR components.
      */
-    IRcomponents & get_ir_components() {
-        return m_ir_components;
-    }
+    IRcomponents &get_ir_components() { return m_ir_components; }
 
     /**
      * @brief Sets the solution to the problem using SetSolution component.
      */
     void set_solution() {
-        call<SetSolution>(m_problem, std::bind(&iterative_rounding::get_val, this, std::placeholders::_1));
+        call<SetSolution>(m_problem, std::bind(&iterative_rounding::get_val,
+                                               this, std::placeholders::_1));
     }
 
     /**
      * @brief Rounds the LP using the RoundCondition component.
      */
-    void dependent_round() {
-         call<RoundCondition>(m_problem, m_lp);
-    }
+    void dependent_round() { call<RoundCondition>(m_problem, m_lp); }
 
     /**
-     * @brief Checks if the IR problem has been solved, using the StopCondition component.
+     * @brief Checks if the IR problem has been solved, using the StopCondition
+    * component.
      *
      * @return true iff the problem has been solved
      */
-    bool stop_condition() {
-        return call<StopCondition>(m_problem, m_lp);
-    }
+    bool stop_condition() { return call<StopCondition>(m_problem, m_lp); }
 
-private:
+  private:
     template <typename Action, typename... Args>
-    auto call(Args&&... args) ->
-    decltype(std::declval<IRcomponents>().template call<Action>(std::forward<Args>(args)...)){
-        return m_ir_components.template call<Action>(std::forward<Args>(args)...);
+    auto call(Args &&... args)
+        ->decltype(std::declval<IRcomponents>().template call<Action>(
+              std::forward<Args>(args)...)) {
+        return m_ir_components.template call<Action>(
+            std::forward<Args>(args)...);
     }
 
     /// Deletes a column from the LP and adjusts the row bounds.
@@ -229,7 +226,7 @@ private:
         auto column = m_lp.get_rows_in_column(*col_iter);
         lp::row_id row;
         double coef;
-        for (auto const & c : boost::make_iterator_range(column)) {
+        for (auto const &c : boost::make_iterator_range(column)) {
             boost::tie(row, coef) = c;
             double ub = m_lp.get_row_upper_bound(row);
             double lb = m_lp.get_row_lower_bound(row);
@@ -245,14 +242,15 @@ private:
     Visitor m_visitor;
     utils::compare<double> m_compare;
     RoundedCols m_rounded;
-    Problem & m_problem;
+    Problem &m_problem;
 };
 
 } //detail
 
 /// Iterative Rounding solution cost type. Solution cost only makes sense if the LP has been solved to optimal value.
 using IRSolutionCost = boost::optional<double>;
-/// Iterative Rounding result type: Pair consisting of LP problem type and IR solution cost.
+/// Iterative Rounding result type: Pair consisting of LP problem type and IR
+/// solution cost.
 using IRResult = std::pair<lp::problem_type, IRSolutionCost>;
 
 /**
@@ -276,8 +274,8 @@ IRResult solve_iterative_rounding(Problem & problem, IRcomponents components, Vi
     }
 
     while (!ir.stop_condition()) {
-        bool rounded{ir.round()};
-        bool relaxed{ir.relax()};
+        bool rounded{ ir.round() };
+        bool relaxed{ ir.relax() };
         assert(rounded || relaxed);
 
         prob_type = ir.resolve_lp();
@@ -322,8 +320,7 @@ IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents comp
     return IRResult(lp::OPTIMAL, IRSolutionCost(ir.get_solution_cost()));
 }
 
-} //ir
-} //paal
+} // ir
+} // paal
 
-
-#endif //ITERATIVE_ROUNDING_HPP
+#endif // ITERATIVE_ROUNDING_HPP

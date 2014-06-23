@@ -25,9 +25,11 @@
 #include <iterator>
 
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                        boost::property<boost::vertex_index_t, int>,
-                        boost::property<boost::edge_weight_t, double>> Graph;
-typedef boost::adjacency_list_traits<boost::vecS, boost::vecS, boost::undirectedS> Traits;
+                              boost::property<boost::vertex_index_t, int>,
+                              boost::property<boost::edge_weight_t, double>>
+    Graph;
+typedef boost::adjacency_list_traits<boost::vecS, boost::vecS,
+                                     boost::undirectedS> Traits;
 typedef boost::graph_traits<Graph>::edge_descriptor Edge;
 typedef boost::graph_traits<Graph>::vertex_descriptor Vertex;
 

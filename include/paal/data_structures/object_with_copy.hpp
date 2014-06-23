@@ -6,21 +6,22 @@
  * @date 2013-02-01
  */
 
-
 namespace paal {
 namespace data_structures {
 
 /**
  * @class object_with_copy
- * @brief keeps object and its copy. Invoke all the member functions on both: object and its copy.
- *        If you want to invoke member function on both objects, you run the  object_with_copy::invoke.
- *        If you want to run member function only on the copy you run object_with_copy::invoke_on_copy.
+ * @brief keeps object and its copy. Invoke all the member functions on both:
+ * object and its copy.
+ *        If you want to invoke member function on both objects, you run the
+ * object_with_copy::invoke.
+ *        If you want to run member function only on the copy you run
+ * object_with_copy::invoke_on_copy.
  *
  * @tparam T type of the contain object
  */
-template <typename T>
-class object_with_copy {
-public:
+template <typename T> class object_with_copy {
+  public:
     typedef T ObjectType;
 
     /**
@@ -45,8 +46,8 @@ public:
     // "sorry, unimplemented: mangling dotstar_expr" :)
     template <typename F, typename... Args>
     typename utils::return_type<T, F, Args...>::type
-    //typename std::result_of<F>::type //TODO investigate
-    invoke(F f, Args... args) {
+        // typename std::result_of<F>::type //TODO investigate
+        invoke(F f, Args... args) {
         (m_copy.*(f))(args...);
         return (m_obj.*(f))(args...);
     }
@@ -73,29 +74,23 @@ public:
      *
      * @return T*
      */
-    const T * operator->() const {
-        return &m_obj;
-    }
+    const T *operator->() const { return &m_obj; }
 
     /**
      * @brief getter for inner object
      *
      * @return member object
      */
-    T & get_obj() {
-        return m_obj;
-    }
+    T &get_obj() { return m_obj; }
 
     /**
      * @brief getter for inner object
      *
      * @return member object
      */
-    const T & get_obj() const {
-        return m_obj;
-    }
+    const T &get_obj() const { return m_obj; }
 
-private:
+  private:
     /**
      * @brief Object
      */
@@ -104,9 +99,7 @@ private:
      * @brief Copy of the object
      */
     mutable T m_copy;
-
 };
 
-} //data_structures
-} //paal
-
+} // data_structures
+} // paal

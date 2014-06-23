@@ -18,7 +18,7 @@ namespace local_search {
 namespace concepts {
 
 template <typename X, typename Solution, typename SearchComponents>
-struct  concepts_base {
+struct concepts_base {
     X x;
     Solution s;
     typedef typename move_type<SearchComponents, Solution>::value_type Move;
@@ -26,13 +26,14 @@ struct  concepts_base {
 };
 
 template <typename X, typename Solution, typename SearchComponents>
-struct  get_moves : concepts_base<X, Solution, SearchComponents> {
+struct get_moves : concepts_base<X, Solution, SearchComponents> {
     BOOST_CONCEPT_USAGE(get_moves) {
         auto i = this->x(this->s);
         auto b = std::begin(i);
         auto e = std::end(i);
-        for(auto x = b; x != e; ++x) {
-            const typename concepts_base<X,Solution,SearchComponents>::Move & u = *x;
+        for (auto x = b; x != e; ++x) {
+            const typename concepts_base<X, Solution, SearchComponents>::Move &
+                u = *x;
             boost::ignore_unused_variable_warning(u);
         }
     }
@@ -45,22 +46,21 @@ struct gain : concepts_base<X, Solution, SearchComponents> {
     }
 };
 
-
 template <typename X, typename Solution, typename SearchComponents>
-struct commit : concepts_base<X, Solution, SearchComponents>{
+struct commit : concepts_base<X, Solution, SearchComponents> {
     BOOST_CONCEPT_USAGE(commit) {
         bool b = this->x(this->s, this->u);
         boost::ignore_unused_variable_warning(b);
     }
 };
 
-template <typename X, typename Solution>
-class search_components {
+template <typename X, typename Solution> class search_components {
     typedef search_components_traits<X> Traits;
     typedef typename Traits::GetMovesT NG;
     typedef typename Traits::GainT IC;
     typedef typename Traits::CommitT SU;
-public:
+
+  public:
     BOOST_CONCEPT_ASSERT((get_moves<NG, Solution, X>));
     BOOST_CONCEPT_ASSERT((gain<IC, Solution, X>));
     BOOST_CONCEPT_ASSERT((commit<SU, Solution, X>));
@@ -68,8 +68,4 @@ public:
 
 } // concepts
 } // local_search
-} //paal
-
-
-
-
+} // paal

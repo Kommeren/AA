@@ -34,15 +34,15 @@ void run_test(const steiner_tree_test & test) {
             std::back_inserter(result), strategy_rand);
         ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
 
-        LOG("RES " << res << "\n");
-        LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
+    LOG("RES " << res << "\n");
+    LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
 }
 
 BOOST_AUTO_TEST_CASE(steiner_long_test) {
     std::vector<steiner_tree_test> data;
     read_steinlib_tests(data);
     int k = 0;
-    for (const steiner_tree_test& test : data) {
+    for (const steiner_tree_test &test : data) {
         LOG("TEST " << test.test_name << "\n");
         LOG("OPT " << test.optimal << "\n");
 

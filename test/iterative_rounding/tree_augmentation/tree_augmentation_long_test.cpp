@@ -36,7 +36,7 @@ using Index = property_map<Graph, vertex_index_t>::type;
 using Cost = property_map<Graph, edge_weight_t>::type;
 using TreeMap = property_map<Graph, edge_color_t>::type;
 
-//Read instance in format
+// Read instance in format
 // @nodes 6
 // label
 // 0
@@ -92,8 +92,8 @@ void read_tree_aug(std::ifstream & is,
 }
 
 template <typename TA>
-//the copy is intended
-double get_lower_bound(TA ta) {
+// the copy is intended
+    double get_lower_bound(TA ta) {
     tree_augmentation_ir_components<> comps;
     lp::glp lp;
     comps.call<Init>(ta, lp);
@@ -110,7 +110,8 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         std::ifstream ifs(filename);
 
         if (!ifs) {
-            std::cerr << "File " << filename << " could not be opened." << std::endl;
+            std::cerr << "File " << filename << " could not be opened."
+                      << std::endl;
             return;
         }
 
@@ -128,11 +129,12 @@ BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
         LOGLN("Input validation " << filename << " ends.");
 
         double lplowerbd = get_lower_bound(treeaug);
-        auto result = solve_iterative_rounding(treeaug, tree_augmentation_ir_components<>());
+        auto result = solve_iterative_rounding(
+            treeaug, tree_augmentation_ir_components<>());
         BOOST_CHECK_EQUAL(result.first, lp::OPTIMAL);
 
         double solval = treeaug.get_solution_cost();
         BOOST_CHECK_EQUAL(solval, *(result.second));
-        check_result_compare_to_bound(solval,lplowerbd,2);
+        check_result_compare_to_bound(solval, lplowerbd, 2);
     });
 }

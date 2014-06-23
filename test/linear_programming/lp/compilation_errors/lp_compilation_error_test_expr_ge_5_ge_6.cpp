@@ -11,4 +11,3 @@ BOOST_AUTO_TEST_CASE(lp_compilation_error_expr_ge_5_ge_6) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

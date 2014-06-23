@@ -12,14 +12,13 @@
 #include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/range/algorithm/random_shuffle.hpp>
 
-
-void print(const std::vector<int> & queens) {
-    for(int q: queens) {
-        for(int i = 0; i < q; ++i) {
+void print(const std::vector<int> &queens) {
+    for (int q : queens) {
+        for (int i = 0; i < q; ++i) {
             std::cout << "-";
         }
         std::cout << "x";
-        for(int i = 0; i < int(queens.size()) -  q - 1; ++i) {
+        for (int i = 0; i < int(queens.size()) - q - 1; ++i) {
             std::cout << "-";
         }
         std::cout << std::endl;
@@ -29,20 +28,20 @@ void print(const std::vector<int> & queens) {
 int main() {
     namespace ls = paal::local_search;
 
-    //creating initial solution
+    // creating initial solution
     std::vector<int> queens(9);
     boost::iota(queens, 0);
     boost::random_shuffle(queens);
 
-    //print before
-    std::cout << "start configuration" << std::endl;;
+    // print before
+    std::cout << "start configuration" << std::endl;
     print(queens);
 
-    //local search
+    // local search
     ls::n_queens_local_search_components<> comps;
     ls::n_queens_solution_first_improving(queens, comps);
 
-    //print after
-    std::cout << "final configuration" << std::endl;;
+    // print after
+    std::cout << "final configuration" << std::endl;
     print(queens);
 }

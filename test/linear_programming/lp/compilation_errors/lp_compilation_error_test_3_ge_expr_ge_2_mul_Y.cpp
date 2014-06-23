@@ -12,4 +12,3 @@ BOOST_AUTO_TEST_CASE(lp_compilation_error_3_ge_expr_ge_2_mul_Y) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

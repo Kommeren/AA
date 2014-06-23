@@ -20,7 +20,7 @@ namespace lp {
  * @brief Finds an extreme point solution to the LP using row generation.
  */
 class lp_row_generation {
-public:
+  public:
     /**
      * Finds an extreme point solution to the LP using row genereation:
      * solves the initial LP and then ask the separation oracle if the found
@@ -46,39 +46,41 @@ public:
  * @brief Finds an extreme point solution to the LP using row generation.
  */
 class row_generation_solve_lp {
-public:
+  public:
     /**
      * Finds an extreme point solution to the LP using row genereation.
      */
     template <typename Problem, typename LP>
-    problem_type operator()(Problem & problem, LP & lp) {
+    problem_type operator()(Problem &problem, LP &lp) {
         return m_row_generation(problem, lp, lp.solve_simplex(PRIMAL));
     }
 
-private:
+  private:
     lp_row_generation m_row_generation;
 };
 
 /**
  * @class row_generation_resolve_lp
  *
- * @brief Finds an extreme point solution to the LP using the row generation technique.
+ * @brief Finds an extreme point solution to the LP using the row generation
+* technique.
  */
 class row_generation_resolve_lp {
-public:
+  public:
     /**
-     * Finds an extreme point solution to the LP using the row genereation technique.
+     * Finds an extreme point solution to the LP using the row genereation
+     * technique.
      */
     template <typename Problem, typename LP>
-    problem_type operator()(Problem & problem, LP & lp) {
+    problem_type operator()(Problem &problem, LP &lp) {
         return m_row_generation(problem, lp, lp.resolve_simplex(PRIMAL));
     }
 
-private:
+  private:
     lp_row_generation m_row_generation;
 };
 
-} //lp
-} //paal
+} // lp
+} // paal
 
 #endif /* LP_ROW_GENERATION_HPP */

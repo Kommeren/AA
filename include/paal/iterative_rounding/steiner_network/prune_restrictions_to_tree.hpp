@@ -8,7 +8,6 @@
 #ifndef PRUNE_RESTRICTIONS_TO_TREE_HPP
 #define PRUNE_RESTRICTIONS_TO_TREE_HPP
 
-
 #include "paal/utils/functors.hpp"
 
 #include <boost/function_output_iterator.hpp>
@@ -21,7 +20,8 @@ namespace paal {
 using RestrictionsVector = std::vector<std::pair<unsigned, unsigned>>;
 
 /**
- * @brief Returns a list of restrictions, made of the edges of a maximum spanning tree
+ * @brief Returns a list of restrictions, made of the edges of a maximum
+* spanning tree
  * in a clique with edge weights equal to restriction values between the edges.
  *
  * @tparam Restrictions
@@ -31,28 +31,31 @@ using RestrictionsVector = std::vector<std::pair<unsigned, unsigned>>;
  * @return A minimum set of restrictions needed to be checked by the oracle.
  */
 template <typename Restrictions>
-    RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
-        using Dist = decltype(std::declval<Restrictions>()(0,0));
-        using EdgeProp = boost::property<boost::edge_weight_t, Dist>;
-        using TGraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                boost::no_property, EdgeProp>;
-        using Edge = typename boost::graph_traits<TGraph>::edge_descriptor;
+RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
+    using Dist = decltype(std::declval<Restrictions>()(0, 0));
+    using EdgeProp = boost::property<boost::edge_weight_t, Dist>;
+    using TGraph =
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                              boost::no_property, EdgeProp>;
+    using Edge = typename boost::graph_traits<TGraph>::edge_descriptor;
 
-        RestrictionsVector res_vec;
-        TGraph g(N);
-        for (int i : boost::irange(0, N)) {
-            for (int j : boost::irange(i + 1, N)) {
-                add_edge(i, j,
-                        EdgeProp(-std::max(res(i, j), res(j, i))),  g);
-            }
+    RestrictionsVector res_vec;
+    TGraph g(N);
+    for (int i : boost::irange(0, N)) {
+        for (int j : boost::irange(i + 1, N)) {
+            add_edge(i, j, EdgeProp(-std::max(res(i, j), res(j, i))), g);
         }
-
-        auto add_edge_to_graph = [&](Edge e){res_vec.push_back(std::make_pair(source(e, g), target(e, g)));};
-        boost::kruskal_minimum_spanning_tree(g,
-                boost::make_function_output_iterator(utils::make_assignable_functor(add_edge_to_graph)));
-        return res_vec;
     }
 
+    auto add_edge_to_graph = [&](Edge e) {
+        res_vec.push_back(std::make_pair(source(e, g), target(e, g)));
+    };
+
+    boost::kruskal_minimum_spanning_tree(
+        g, boost::make_function_output_iterator(
+               utils::make_assignable_functor(add_edge_to_graph)));
+    return res_vec;
 }
+} //! paal
 
 #endif /* PRUNE_RESTRICTIONS_TO_TREE_HPP */

@@ -35,7 +35,7 @@ int main() {
 
     // optional input validity checking
     auto bdmst = paal::ir::make_bounded_degree_mst(
-                    g, degree_bounds, std::back_inserter(result_tree));
+        g, degree_bounds, std::back_inserter(result_tree));
     auto error = bdmst.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -45,7 +45,7 @@ int main() {
 
     // solve it
     auto result = paal::ir::bounded_degree_mst_iterative_rounding(
-                    g, degree_bounds, std::back_inserter(result_tree));
+        g, degree_bounds, std::back_inserter(result_tree));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
@@ -54,12 +54,10 @@ int main() {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
-    }
-    else {
+    } else {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Bounded-Degree Minimum Spanning Tree Example]
+    //! [Bounded-Degree Minimum Spanning Tree Example]
     return 0;
 }
-

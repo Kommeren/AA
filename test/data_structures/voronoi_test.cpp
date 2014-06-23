@@ -5,9 +5,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-
 using namespace paal::data_structures;
-
 
 BOOST_AUTO_TEST_CASE(GeneratorLocationvoronoiutionWithClientAssignmentsTest) {
     LOGLN("Test 0");
@@ -16,15 +14,13 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationvoronoiutionWithClientAssignmentsTest) {
 
     typedef voronoi<decltype(gm)> voronoi;
     typedef typename voronoi::GeneratorsSet FSet;
-    voronoi vor(FSet{},
-            FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    voronoi vor(FSet{}, FSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
 
     vor.add_generator(SGM::A);
     auto ab_min_a = vor.add_generator(SGM::B);
     auto b_min_ab = vor.rem_generator(SGM::A);
-    BOOST_CHECK_EQUAL(vor.add_generator(SGM::A), -b_min_ab );
+    BOOST_CHECK_EQUAL(vor.add_generator(SGM::A), -b_min_ab);
     BOOST_CHECK_EQUAL(vor.rem_generator(SGM::B), -ab_min_a);
-
 }
 
 BOOST_AUTO_TEST_CASE(test_1) {
@@ -36,7 +32,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    voronoi vor(GSet{SGM::A, SGM::B}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    voronoi vor(GSet{ SGM::A, SGM::B },
+                VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
 
     vor.add_generator(SGM::C);
     vor.rem_generator(SGM::A);
@@ -46,8 +43,7 @@ BOOST_AUTO_TEST_CASE(test_1) {
     vor.rem_generator(SGM::A);
 }
 
-template <typename voronoi>
-void rem_add(voronoi & v, int g) {
+template <typename voronoi> void rem_add(voronoi &v, int g) {
     auto back = v.rem_generator(g);
     auto ret = v.add_generator(g);
     assert(-back == ret);
@@ -62,7 +58,8 @@ BOOST_AUTO_TEST_CASE(test_2) {
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
     typedef typename VT::GeneratorsSet GSet;
     typedef typename VT::VerticesSet VSet;
-    voronoi vor(GSet{SGM::A, SGM::B, SGM::C, SGM::D, SGM::E}, VSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E}, gm);
+    voronoi vor(GSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E },
+                VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
     rem_add(vor, SGM::A);
     rem_add(vor, SGM::B);
     rem_add(vor, SGM::C);

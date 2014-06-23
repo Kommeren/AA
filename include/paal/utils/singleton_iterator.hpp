@@ -8,84 +8,78 @@
 #ifndef SINGLETON_ITERATOR_HPP
 #define SINGLETON_ITERATOR_HPP
 
-
-
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional/optional.hpp>
-
 
 namespace paal {
 namespace utils {
 
-   /**
-    * @brief Iterator to range containing single element.
-    * @tparam Elem
-    */
-   template <typename Elem>
-      class singleton_iterator
-      : public boost::iterator_facade<
-        singleton_iterator<Elem>,
-        typename std::decay<Elem>::type,
-        boost::forward_traversal_tag,
-        Elem
-        >
-   {
-      template<typename E> friend singleton_iterator<E> make_singleton_iterator_begin(E);
-      template<typename E> friend singleton_iterator<E> make_singleton_iterator_end();
-
-      /**
-       * @brief private constructor. Use make_singleton_iterator_begin,
-       *              make_singleton_iterator_end.
-       *
-       * @param elem
-       */
-      singleton_iterator() {}
-
-      /**
-       * @brief private constructor. Use make_singleton_iterator_begin,
-       *              make_singleton_iterator_end.
-       *
-       * @param elem
-       */
-      singleton_iterator(Elem elem) : m_elem(elem) {}
-
-      friend class boost::iterator_core_access;
-
-      void increment() { m_elem = boost::none; }
-
-      bool equal(const singleton_iterator& other) const {
-         return m_elem == other.m_elem;
-      }
-
-      Elem dereference() const { return m_elem.get(); }
-
-      boost::optional<Elem> m_elem;
-   };
+/**
+ * @brief Iterator to range containing single element.
+ * @tparam Elem
+ */
+template <typename Elem>
+class singleton_iterator : public boost::iterator_facade<
+    singleton_iterator<Elem>, typename std::decay<Elem>::type,
+    boost::forward_traversal_tag, Elem> {
+    template <typename E>
+    friend singleton_iterator<E> make_singleton_iterator_begin(E);
+    template <typename E>
+    friend singleton_iterator<E> make_singleton_iterator_end();
 
     /**
-     * @brief function to create begin of singleton_iterator
+     * @brief private constructor. Use make_singleton_iterator_begin,
+     *              make_singleton_iterator_end.
      *
-     * @tparam Elem
      * @param elem
-     *
-     * @return
      */
-   template <typename Elem>
-      singleton_iterator<Elem> make_singleton_iterator_begin(Elem elem) {
-         return singleton_iterator<Elem>(elem);
-      }
+    singleton_iterator() {}
 
     /**
-     * @brief function to create end of singleton_iterator
+     * @brief private constructor. Use make_singleton_iterator_begin,
+     *              make_singleton_iterator_end.
      *
-     * @tparam Elem
-     *
-     * @return
+     * @param elem
      */
-   template <typename Elem>
-      singleton_iterator<Elem> make_singleton_iterator_end() {
-         return singleton_iterator<Elem>();
-      }
+    singleton_iterator(Elem elem) : m_elem(elem) {}
+
+    friend class boost::iterator_core_access;
+
+    void increment() { m_elem = boost::none; }
+
+    bool equal(const singleton_iterator &other) const {
+        return m_elem == other.m_elem;
+    }
+
+    Elem dereference() const { return m_elem.get(); }
+
+    boost::optional<Elem> m_elem;
+};
+
+/**
+ * @brief function to create begin of singleton_iterator
+ *
+ * @tparam Elem
+ * @param elem
+ *
+ * @return
+ */
+template <typename Elem>
+singleton_iterator<Elem> make_singleton_iterator_begin(Elem elem) {
+    return singleton_iterator<Elem>(elem);
+}
+
+/**
+ * @brief function to create end of singleton_iterator
+ *
+ * @tparam Elem
+ *
+ * @return
+ */
+template <typename Elem>
+singleton_iterator<Elem> make_singleton_iterator_end() {
+    return singleton_iterator<Elem>();
+}
 
 } //!utils
 } //!paal

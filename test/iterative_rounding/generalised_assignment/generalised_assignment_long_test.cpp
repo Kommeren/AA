@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_long) {
         assert(num == number_of_cases);
         for(int i = 0; i < number_of_cases; ++i) {
             is_test_cases >> opt;
-            LOGLN("case " << i << " opt "<< opt);
+            LOGLN("case " << i << " opt " << opt);
 
             paal::M costs;
             paal::M times;
@@ -91,8 +91,9 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_long) {
                 LOGLN("Relaxations limit = 1/iter");
                 std::unordered_map<int, int> jobs_to_machines;
                 ir::ga_ir_components<> comps;
-                auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
-                                    ir::relaxations_limit_condition(), comps);
+                auto components =
+                    paal::data_structures::replace<ir::RelaxationsLimit>(
+                        ir::relaxations_limit_condition(), comps);
                 auto result = generalised_assignment_iterative_rounding(
                     machines.begin(), machines.end(),
                     jobs.begin(), jobs.end(),

@@ -12,18 +12,20 @@
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 
-
 #include <fstream>
 
 namespace paal {
 
-typedef boost::adjacency_list <boost::vecS, boost::vecS, boost::undirectedS,
-          boost::property<boost::vertex_color_t, int>, boost::property < boost::edge_weight_t, int > > Graph;
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                              boost::property<boost::vertex_color_t, int>,
+                              boost::property<boost::edge_weight_t, int>> Graph;
 typedef paal::data_structures::graph_metric<Graph, int> GraphMT;
 
 struct steiner_tree_test {
-    steiner_tree_test(std::string name, int opt, std::vector<int> term, std::vector<int> steiner, Graph g):
-        test_name(name), optimal(opt), terminals(term), steiner_points(steiner), graph(g), metric(g) {}
+    steiner_tree_test(std::string name, int opt, std::vector<int> term,
+                      std::vector<int> steiner, Graph g)
+        : test_name(name), optimal(opt), terminals(term),
+          steiner_points(steiner), graph(g), metric(g) {}
 
     std::string test_name;
     int optimal;
@@ -33,21 +35,21 @@ struct steiner_tree_test {
     GraphMT metric;
 };
 
-inline std::istream & go_to(std::istream & is, const std::string & s){
+inline std::istream &go_to(std::istream &is, const std::string &s) {
     static const int MAX_LINE_SIZE = 1024;
     char line[MAX_LINE_SIZE];
     memset(line, 0, MAX_LINE_SIZE);
-    while(s != line) {
+    while (s != line) {
         is.getline(line, MAX_LINE_SIZE);
     }
     return is;
 }
 
-inline std::istream & go_to_section(std::istream & is, const std::string & s){
+inline std::istream &go_to_section(std::istream &is, const std::string &s) {
     return go_to(is, "SECTION " + s);
 }
 
-inline int read_int(std::istream & is, const std::string & token){
+inline int read_int(std::istream &is, const std::string &token) {
     std::string s;
     int i;
     is >> s >> i;
@@ -55,7 +57,8 @@ inline int read_int(std::istream & is, const std::string & token){
     return i;
 }
 
-inline Graph read_steinlib(std::istream & is, std::vector<int> & terminals, std::vector<int> & steiner_points) {
+inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
+                           std::vector<int> &steiner_points) {
     typedef std::pair<int, int> Edge;
 
     go_to_section(is, "Graph");
@@ -70,7 +73,7 @@ inline Graph read_steinlib(std::istream & is, std::vector<int> & terminals, std:
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
 
-    for(int i : boost::irange(0,E)) {
+    for (int i : boost::irange(0, E)) {
         Edge e;
         std::string s;
         is >> s >> e.first >> e.second >> weights[i];
@@ -82,21 +85,21 @@ inline Graph read_steinlib(std::istream & is, std::vector<int> & terminals, std:
     T = read_int(is, "Terminals");
     terminals.resize(T);
     auto color = get(boost::vertex_color, g);
-    for(int i : boost::irange(0,T)) {
+    for (int i : boost::irange(0, T)) {
         terminals[i] = read_int(is, "T");
         put(color, terminals[i], 1);
     }
     return g;
 }
 
-inline void read_line(std::istream & is, std::string & fname, int & OPT) {
+inline void read_line(std::istream &is, std::string &fname, int &OPT) {
     int dummy;
     std::string dummys;
     is >> fname >> dummy >> dummy >> dummy >> dummys >> OPT;
     fname += ".stp";
 }
 
-inline void read_steinlib_tests(std::vector<steiner_tree_test>& data) {
+inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
     std::string testDir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(testDir + "/index");
     assert(is_test_cases.good());
@@ -104,8 +107,7 @@ inline void read_steinlib_tests(std::vector<steiner_tree_test>& data) {
         std::string fname;
         int opt;
         read_line(is_test_cases, fname, opt);
-        if (fname == ".stp")
-            return;
+        if (fname == ".stp") return;
         std::ifstream ifs(testDir + "/I080/" + fname);
         assert(ifs.good());
         assert(ifs.good());
@@ -116,6 +118,5 @@ inline void read_steinlib_tests(std::vector<steiner_tree_test>& data) {
         data.push_back(test);
     }
 }
-
 }
 #endif /* READ_ORLIB_FC_HPP */

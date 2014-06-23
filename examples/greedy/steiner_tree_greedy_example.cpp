@@ -10,12 +10,11 @@
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
 
-
 #include <iostream>
 
 int main() {
-//! [steiner tree greedy Example]
-    typedef  sample_graphs_metrics SGM;
+    //! [steiner tree greedy Example]
+    typedef sample_graphs_metrics SGM;
     auto g = SGM::get_graph_steiner();
     auto index = get(boost::vertex_index, g);
     typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
@@ -30,14 +29,15 @@ int main() {
         put(c, SGM::E, paal::Terminals::NONTERMINAL);
     }
 
-    paal::steiner_tree_greedy(g, std::inserter(steinerEdges, steinerEdges.begin()),
-            boost::vertex_color_map(boost::make_iterator_property_map(color.begin(), index)));
+    paal::steiner_tree_greedy(
+        g, std::inserter(steinerEdges, steinerEdges.begin()),
+        boost::vertex_color_map(
+            boost::make_iterator_property_map(color.begin(), index)));
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
-    for(auto e: steinerEdges) {
+    for (auto e : steinerEdges) {
         sum += get(weight, e);
     }
     std::cout << "result " << sum << std::endl;
-//! [steiner tree greedy Example]
+    //! [steiner tree greedy Example]
 }
-

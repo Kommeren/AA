@@ -8,13 +8,9 @@
 #ifndef SEPARATION_ORACLES_HPP
 #define SEPARATION_ORACLES_HPP
 
-
-
 #include <boost/range/distance.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/join.hpp>
-
-
 
 namespace paal {
 namespace lp {
@@ -25,9 +21,8 @@ namespace lp {
  *
  * @tparam ViolationChecker
  */
-template <typename ViolationChecker>
-class separation_oracle {
-public:
+template <typename ViolationChecker> class separation_oracle {
+  public:
     /// Constructor.
     separation_oracle(ViolationChecker checker = ViolationChecker())
         : m_violations_checker(checker) { }
@@ -36,11 +31,12 @@ public:
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void add_violated_constraint(const Problem & problem, LP & lp) {
-        m_violations_checker.add_violated_constraint(m_violated_constraint, problem, lp);
+    void add_violated_constraint(const Problem &problem, LP &lp) {
+        m_violations_checker.add_violated_constraint(m_violated_constraint,
+                                                     problem, lp);
     }
 
-protected:
+  protected:
     /// violations checker
     ViolationChecker m_violations_checker;
     /// violated constraint ID
@@ -58,7 +54,8 @@ class most_violated_separation_oracle : public separation_oracle<ViolationChecke
     using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
-public:
+
+  public:
     /// Constructor.
     most_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
         : separation_oracle<ViolationChecker>(checker) { }
@@ -91,7 +88,8 @@ class first_violated_separation_oracle : public separation_oracle<ViolationCheck
     using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
-public:
+
+  public:
     /// Constructor.
     first_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
         : separation_oracle<ViolationChecker>(checker) { }
@@ -100,9 +98,11 @@ public:
      * Checks if the current LP solution is a feasible solution of the problem.
      */
     template <typename Problem, typename LP>
-    bool feasible_solution(const Problem & problem, const LP & lp) {
-        for (auto candidate : m_violations_checker.get_violation_candidates(problem, lp)) {
-            auto violation = m_violations_checker.check_violation(candidate, problem);
+    bool feasible_solution(const Problem &problem, const LP &lp) {
+        for (auto candidate :
+             m_violations_checker.get_violation_candidates(problem, lp)) {
+            auto violation =
+                m_violations_checker.check_violation(candidate, problem);
             if (violation) {
                 m_violated_constraint = candidate;
                 return false;
@@ -123,7 +123,8 @@ class random_violated_separation_oracle : public separation_oracle<ViolationChec
     using base = separation_oracle<ViolationChecker>;
     using base::m_violations_checker;
     using base::m_violated_constraint;
-public:
+
+  public:
     /// Constructor.
     random_violated_separation_oracle(ViolationChecker checker = ViolationChecker())
         : separation_oracle<ViolationChecker>(checker) { }
@@ -152,6 +153,6 @@ public:
     }
 };
 
-} //lp
-} //paal
+} //! lp
+} //! paal
 #endif /* SEPARATION_ORACLES_HPP */

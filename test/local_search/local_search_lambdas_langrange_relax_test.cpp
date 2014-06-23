@@ -20,50 +20,49 @@
 #include <cstdlib>
 #include <iomanip>
 
-using namespace  paal;
+using namespace paal;
 
+struct value_diff {
+    value_diff(double &value, double diff) : m_value(value), m_diff(diff) {}
+    double &m_value;
+    double m_diff;
+};
 
-    struct value_diff {
-        value_diff(double & value, double diff) :
-            m_value(value), m_diff(diff) {}
-        double & m_value;
-        double m_diff;
-    };
-
-    struct make_value_diff {
-        value_diff operator()(double & value, double diff) const {
-            return value_diff{value, diff};
-        }
-    };
+struct make_value_diff {
+    value_diff operator()(double &value, double diff) const {
+        return value_diff{ value, diff };
+    }
+};
 
 BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
-    typedef  double SolutionElement;
+    typedef double SolutionElement;
     typedef std::vector<SolutionElement> Solution;
-    typedef  SolutionElement Move;
-    const int  DIM = 3;
+    typedef SolutionElement Move;
+    const int DIM = 3;
     const double LOWER_BOUND = 0.;
     const double UPPER_BOUND = 1.;
 
-
-    //creating local search
-    const std::vector<double> neighb{0.1, -0.1, .01, -.01, .001, -.001};
+    // creating local search
+    const std::vector<double> neighb{ 0.1, -0.1, .01, -.01, .001, -.001 };
     std::vector<double> neighbCut(neighb.size());
-    double G{1};
+    double G{ 1 };
 
-    //components for vector
-    auto f = [&](Solution & x){
-        double & x1(x[0]), & x2(x[1]), & x3(x[2]);
-        return x1 *x2 +  x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3 + G * (2- (x1 + x2 + x3));
+    // components for vector
+    auto f = [&](Solution & x) {
+        double &x1(x[0]), &x2(x[1]), &x3(x[2]);
+        return x1 * x2 + x2 * x3 + x3 * x1 - 3 * x1 * x2 * x3 +
+               G * (2 - (x1 + x2 + x3));
     };
 
-    auto normalize = [=](SolutionElement el) {
+    auto normalize = [ = ](SolutionElement el) {
         el = std::max(el, LOWER_BOUND);
         return std::min(el, UPPER_BOUND);
     };
 
-    auto getMoves =[&] (Solution & s) {
-        auto b = data_structures::make_combine_iterator(make_value_diff{}, s, neighb);
-        return boost::make_iterator_range(b, decltype(b){});
+    auto getMoves = [&](Solution & s) {
+        auto b = data_structures::make_combine_iterator(make_value_diff{}, s,
+                                                        neighb);
+        return boost::make_iterator_range(b, decltype(b) {});
     };
 
     auto gain = [&](Solution & s, value_diff vd) {
@@ -80,22 +79,21 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
         return true;
     };
 
-    auto ls = [=](Solution & x) {
-        x = {0.3,0.3,0.3};
-        first_improving(x,
-            local_search::make_search_components(getMoves, gain, commit));
+    auto ls = [ = ](Solution & x) {
+        x = { 0.3, 0.3, 0.3 };
+        first_improving(
+            x, local_search::make_search_components(getMoves, gain, commit));
     };
 
-    //components for G.
+    // components for G.
     std::vector<double> neighbCutG(neighb.size());
     std::vector<double> x(DIM, 0);
-    first_improving(x,
-                local_search::make_search_components(getMoves, gain, commit));
+    first_improving(
+        x, local_search::make_search_components(getMoves, gain, commit));
     double best = f(x);
 
-
-    auto getMovesG =[&] (const double g) -> const std::vector<double> & {
-        for(int j : boost::irange(std::size_t(0), neighb.size())) {
+    auto getMovesG = [&](const double g)->const std::vector<double> & {
+        for (int j : boost::irange(std::size_t(0), neighb.size())) {
             neighbCutG[j] = neighb[j] + g;
         }
         return neighbCutG;
@@ -118,18 +116,19 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
         return true;
     };
 
-    first_improving(G, local_search::make_search_components(getMovesG, gainG, commitG));
+    first_improving(
+        G, local_search::make_search_components(getMovesG, gainG, commitG));
 
     ls(x);
 
-    //printing
+    // printing
     LOG(std::setprecision(10));
     LOGLN("G = " << G);
     G = 0;
     LOG("f(");
     LOG_COPY_DEL(x.begin(), x.end(), ",");
-    //TODO it would be interesting how G depends on starting point ( (0.3, 0.3, 0.3) now)
-    LOGLN( ") = \t" << f(x));
-    LOGLN("approximation " << 2./f(x));
+    // TODO it would be interesting how G depends on starting point ( (0.3, 0.3,
+    // 0.3) now)
+    LOGLN(") = \t" << f(x));
+    LOGLN("approximation " << 2. / f(x));
 }
-

@@ -7,7 +7,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 //
-//This file contains set of simple useful functors or functor adapters.
+// This file contains set of simple useful functors or functor adapters.
 
 #ifndef BOOST_FUNCTORS_HPP
 #define BOOST_FUNCTORS_HPP
@@ -15,8 +15,6 @@
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
 #include <algorithm>
-
-
 
 #include <cassert>
 #include <utility>
@@ -34,63 +32,58 @@ struct skip_functor {
      * @tparam Args
      * @param args
      */
-    template <typename ... Args >
-        void  operator()(Args&&... args) const {}
+    template <typename... Args> void operator()(Args &&... args) const {}
 };
 
 /**
- * @brief Functor returns always the same number. The number has to be known at compile time
+ * @brief Functor returns always the same number. The number has to be known at
+* compile time
  *
  * @tparam T type of returned value
  * @tparam t return value
  */
-template <typename T, T t>
-    struct return_something_functor {
-        /**
-         * @brief operator
-         *
-         * @tparam Args
-         * @param args
-         *
-         * @return
-         */
-        template <typename ... Args >
-            T  operator()(Args&&... args) const {
-                return t;
-            }
-    };
+template <typename T, T t> struct return_something_functor {
+    /**
+     * @brief operator
+     *
+     * @tparam Args
+     * @param args
+     *
+     * @return
+     */
+    template <typename... Args> T operator()(Args &&... args) const {
+        return t;
+    }
+};
 
 /**
  * @brief Functor returns always the same number (dynamic version).
  *
  * @tparam T type of returned value
  */
-template <typename T>
-    struct dynamic_return_something_functor {
-        /**
-         * @brief constructor
-         *
-         * @param t
-         */
-        dynamic_return_something_functor(T t) : m_t(t) {}
+template <typename T> struct dynamic_return_something_functor {
+    /**
+     * @brief constructor
+     *
+     * @param t
+     */
+    dynamic_return_something_functor(T t) : m_t(t) {}
 
-        /**
-         * @brief operator
-         *
-         * @tparam Args
-         * @param args
-         *
-         * @return
-         */
-        template <typename ... Args >
-            T  operator()(Args&&... args) const {
-                return m_t;
-            }
-    private:
-        T m_t;
-    };
+    /**
+     * @brief operator
+     *
+     * @tparam Args
+     * @param args
+     *
+     * @return
+     */
+    template <typename... Args> T operator()(Args &&... args) const {
+        return m_t;
+    }
 
-
+  private:
+    T m_t;
+};
 
 /**
  * @brief make function for dynamic_return_something_functor
@@ -101,11 +94,9 @@ template <typename T>
  * @return
  */
 template <typename T>
-dynamic_return_something_functor<T>
-make_dynamic_return_something_functor(T t) {
+dynamic_return_something_functor<T> make_dynamic_return_something_functor(T t) {
     return dynamic_return_something_functor<T>(t);
 }
-
 
 /**
  * @brief functor returns its argument
@@ -119,41 +110,30 @@ struct identity_functor {
      *
      * @return
      */
-    template <typename Arg>
-        auto  operator()(Arg&& arg) const ->
-        Arg
-        {
-            return std::forward<Arg>(arg);
-        }
+    template <typename Arg> auto operator()(Arg &&arg) const->Arg {
+        return std::forward<Arg>(arg);
+    }
 };
-
 
 /**
  * @brief functor return false
  */
-struct always_false :
-    public return_something_functor<bool, false> {};
-
+struct always_false : public return_something_functor<bool, false> {};
 
 /**
  * @brief functor return true
  */
-struct always_true :
-    public return_something_functor<bool, true> {};
-
+struct always_true : public return_something_functor<bool, true> {};
 
 /**
  * @brief functor returns 0
  */
-struct return_zero_functor :
-    public return_something_functor<int, 0> {};
-
+struct return_zero_functor : public return_something_functor<int, 0> {};
 
 /**
  * @brief functor returns 1
  */
-struct return_one_functor :
-    public return_something_functor<int, 1> {};
+struct return_one_functor : public return_something_functor<int, 1> {};
 
 /**
  * @brief functors calls assert(false).
@@ -165,10 +145,9 @@ struct assert_functor {
      * @tparam Args
      * @param args
      */
-    template <typename ... Args >
-        void  operator()(Args&&... args) const {
-            assert(false);
-        }
+    template <typename... Args> void operator()(Args &&... args) const {
+        assert(false);
+    }
 };
 
 /**
@@ -183,10 +162,7 @@ struct remove_reference {
      *
      * @return
      */
-    template <typename T>
-    T operator()(const T & t) const {
-        return t;
-    }
+    template <typename T> T operator()(const T &t) const { return t; }
 };
 
 /**
@@ -197,14 +173,15 @@ struct remove_reference {
  */
 template <typename Functor, typename CounterType = int>
 class counting_functor_adaptor {
-public:
+  public:
     /**
      * @brief Constructor
      *
      * @param cnt count reference
      * @param f functor
      */
-    counting_functor_adaptor(Functor f, CounterType & cnt) : m_cnt(&cnt), m_functor(std::move(f)) {}
+    counting_functor_adaptor(Functor f, CounterType &cnt)
+        : m_cnt(&cnt), m_functor(std::move(f)) {}
 
     /**
      * @brief increment the counter and checks if the given limit is reached.
@@ -214,13 +191,14 @@ public:
      * @return
      */
     template <typename... Args>
-    auto operator()(Args&&... args) -> decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
+    auto operator()(Args &&... args)
+        ->decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
         ++(*m_cnt);
         return m_functor(std::forward<Args>(args)...);
     }
 
-private:
-    CounterType * m_cnt;
+  private:
+    CounterType *m_cnt;
     Functor m_functor;
 };
 
@@ -236,47 +214,42 @@ private:
  */
 template <typename CounterType = int, typename Functor>
 counting_functor_adaptor<Functor, CounterType>
-make_counting_functor_adaptor(Functor f, CounterType & cnt) {
+make_counting_functor_adaptor(Functor f, CounterType &cnt) {
     return counting_functor_adaptor<Functor, CounterType>(std::move(f), cnt);
 }
-
-
 
 /**
  * @brief Adapts array as function, providing operator()().
  *
  * @tparam Array
  */
-template <typename Array>
-    class array_to_functor{
-        public:
-            /**
-             * @brief constructor
-             *
-             * @param array
-             * @param offset
-             */
-            array_to_functor(const Array & array, int offset = 0) :
-                m_array(&array), m_offset(offset) {}
+template <typename Array> class array_to_functor {
+  public:
+    /**
+     * @brief constructor
+     *
+     * @param array
+     * @param offset
+     */
+    array_to_functor(const Array &array, int offset = 0)
+        : m_array(&array), m_offset(offset) {}
 
-            ///Value type
-            typedef decltype(std::declval<const Array>()[0]) Value;
+    /// Value type
+    typedef decltype(std::declval<const Array>()[0]) Value;
 
-            /**
-             * @brief operator
-             *
-             * @param a
-             *
-             * @return
-             */
-            Value operator()(int a) const {
-                return (*m_array)[a + m_offset];
-            }
+    /**
+     * @brief operator
+     *
+     * @param a
+     *
+     * @return
+     */
+    Value operator()(int a) const { return (*m_array)[a + m_offset]; }
 
-        private:
-            const Array * m_array;
-            int m_offset;
-    };
+  private:
+    const Array *m_array;
+    int m_offset;
+};
 
 /**
  * @brief make function for array_to_functor
@@ -288,52 +261,52 @@ template <typename Array>
  * @return
  */
 template <typename Array>
-    array_to_functor<Array> make_array_to_functor(const Array &a, int offset = 0) {
-        return array_to_functor<Array>(a, offset);
-    }
-
+array_to_functor<Array> make_array_to_functor(const Array &a, int offset = 0) {
+    return array_to_functor<Array>(a, offset);
+}
 
 /**
- * @brief  Wrapper around a functor which adds assigmnent operator as well as default constructor.
- * Note, this struct might be dangerous. Using this struct correctly requires the underlying
+ * @brief  Wrapper around a functor which adds assigmnent operator as well as
+* default constructor.
+ * Note, this struct might be dangerous. Using this struct correctly requires
+* the underlying
  * functor to live at least as long as this wrapper.
  *
  * @tparam Functor
  */
-template <typename Functor>
-struct assignable_functor {
+template <typename Functor> struct assignable_functor {
     /**
      * @brief constructor
      *
      * @param f
      */
-   assignable_functor(Functor& f) : m_f(&f) {}
-   assignable_functor() = default;
+    assignable_functor(Functor &f) : m_f(&f) {}
+    assignable_functor() = default;
 
-   /**
-    * @brief assign operator
-    *
-    * @param f
-    *
-    * @return
-    */
-   assignable_functor& operator=(Functor& f) { m_f = f; }
+    /**
+     * @brief assign operator
+     *
+     * @param f
+     *
+     * @return
+     */
+    assignable_functor &operator=(Functor &f) { m_f = f; }
 
-   /**
-    * @brief operator()
-    *
-    * @tparam Args
-    *
-    * @return
-    */
-   template<typename ... Args>
-   auto operator()(Args&& ... args) const ->
-      decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
-      return (*m_f)(std::forward<Args>(args)...);
-   }
+    /**
+     * @brief operator()
+     *
+     * @tparam Args
+     *
+     * @return
+     */
+    template <typename... Args>
+    auto operator()(Args &&... args) const->decltype(
+        std::declval<Functor>()(std::forward<Args>(args)...)) {
+        return (*m_f)(std::forward<Args>(args)...);
+    }
 
-   private:
-      const Functor* m_f;
+  private:
+    const Functor *m_f;
 };
 
 /**
@@ -345,40 +318,41 @@ struct assignable_functor {
  * @return
  */
 template <typename Functor>
-assignable_functor<Functor>
-make_assignable_functor(Functor& f) {
-   return assignable_functor<Functor>(f);
+assignable_functor<Functor> make_assignable_functor(Functor &f) {
+    return assignable_functor<Functor>(f);
 }
 
 /**
- * @brief For given functor f, lift_iterator_functor provides operator()(Iterator iterator)
+ * @brief For given functor f, lift_iterator_functor provides
+* operator()(Iterator iterator)
  * which returns f(*iter).
  *
  * @tparam Functor
  */
-template <typename Functor>
-struct lift_iterator_functor {
+template <typename Functor> struct lift_iterator_functor {
     /**
      * @brief constructor
      *
      * @param f
      */
-   lift_iterator_functor(Functor f) : m_f(std::move(f)) {}
+    lift_iterator_functor(Functor f) : m_f(std::move(f)) {}
 
-   /**
-    * @brief operator()
-    *
-    * @tparam Iterator
-    * @param iter
-    *
-    * @return
-    */
-   template <typename Iterator>
-   auto operator()(Iterator iter) const -> decltype(std::declval<Functor>()(*iter)) {
-      return m_f(*iter);
-   }
-   private:
-      Functor m_f;
+    /**
+     * @brief operator()
+     *
+     * @tparam Iterator
+     * @param iter
+     *
+     * @return
+     */
+    template <typename Iterator>
+    auto operator()(Iterator iter) const->decltype(
+        std::declval<Functor>()(*iter)) {
+        return m_f(*iter);
+    }
+
+  private:
+    Functor m_f;
 };
 
 /**
@@ -390,13 +364,13 @@ struct lift_iterator_functor {
  * @return
  */
 template <typename Functor>
-lift_iterator_functor<Functor>
-make_lift_iterator_functor(Functor f) {
-   return lift_iterator_functor<Functor>(f);
+lift_iterator_functor<Functor> make_lift_iterator_functor(Functor f) {
+    return lift_iterator_functor<Functor>(f);
 }
 
 //************ The set of comparison functors *******************
-//functors are equivalent to corresponding std functors (e.g. std::less) but are not templated
+// functors are equivalent to corresponding std functors (e.g. std::less) but
+// are not templated
 
 /**
  * @brief Greater functor
@@ -411,11 +385,10 @@ struct Greater {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x > y) {
-            return x > y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x > y) {
+        return x > y;
+    }
 };
 
 /**
@@ -431,11 +404,10 @@ struct Less {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x < y){
-            return x < y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x < y) {
+        return x < y;
+    }
 };
 
 /**
@@ -451,11 +423,10 @@ struct GreaterEqual {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x >= y){
-            return x >= y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x >= y) {
+        return x >= y;
+    }
 };
 
 /**
@@ -471,11 +442,10 @@ struct less_equal {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x <= y){
-            return x <= y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x <= y) {
+        return x <= y;
+    }
 };
 
 /**
@@ -491,11 +461,10 @@ struct equal_to {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x == y){
-            return x == y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x == y) {
+        return x == y;
+    }
 };
 
 /**
@@ -511,50 +480,45 @@ struct not_equal_to {
      *
      * @return
      */
-    template<class T>
-        auto operator() (const T& x, const T& y) const ->
-            decltype(x != y){
-            return x != y;
-        };
+    template <class T>
+    auto operator()(const T &x, const T &y) const->decltype(x != y) {
+        return x != y;
+    }
 };
 
+/// This comparator  takes functor "f" and comparator "c"
+/// and for elements(x,y) returns c(f(x), f(y))
+/// c is Less by default
+template <typename Functor, typename Compare = Less>
+struct functor_to_comparator {
+    /**
+     * @brief constructor
+     *
+     * @param f
+     * @param c
+     */
+    functor_to_comparator(Functor f, Compare c = Compare()) : m_f(f), m_c(c) {}
 
-///This comparator  takes functor "f" and comparator "c"
-///and for elements(x,y) returns c(f(x), f(y))
-///c is Less by default
-template <typename Functor,typename Compare=Less>
-    struct functor_to_comparator {
-        /**
-         * @brief constructor
-         *
-         * @param f
-         * @param c
-         */
-        functor_to_comparator(Functor f,Compare c=Compare()) : m_f(f),m_c(c){}
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     *
+     * @return
+     */
+    template <typename T>
+    auto operator()(const T &left, const T &right) const->decltype(
+        std::declval<Compare>()(std::declval<Functor>()(left),
+                                std::declval<Functor>()(right))) {
+        return m_c(m_f(left), m_f(right));
+    }
 
-        /**
-         * @brief operator()
-         *
-         * @tparam T
-         * @param left
-         * @param right
-         *
-         * @return
-         */
-        template <typename T>
-            auto operator()(const T & left, const T & right) const ->
-                decltype(std::declval<Compare>()(
-                            std::declval<Functor>()(left),
-                            std::declval<Functor>()(right)
-                            )){
-                return m_c(m_f(left), m_f(right));
-            }
-
-    private:
-        Functor m_f;
-        Compare m_c;
-    };
-
+  private:
+    Functor m_f;
+    Compare m_c;
+};
 
 /**
  * @brief make for functor to comparator
@@ -566,14 +530,16 @@ template <typename Functor,typename Compare=Less>
  *
  * @return
  */
-template <typename Functor,typename Compare = Less>
-    functor_to_comparator<Functor,Compare>
-    make_functor_to_comparator(Functor functor,Compare compare=Compare()) {
-        return functor_to_comparator<Functor,Compare>(std::move(functor), std::move(compare));
-    };
+template <typename Functor, typename Compare = Less>
+functor_to_comparator<Functor, Compare>
+make_functor_to_comparator(Functor functor, Compare compare = Compare()) {
+    return functor_to_comparator<Functor, Compare>(std::move(functor),
+                                                   std::move(compare));
+}
 
-///Functor that scales another functor
-template <typename Functor, typename ScaleType, typename return_type = ScaleType>
+/// Functor that scales another functor
+template <typename Functor, typename ScaleType,
+          typename return_type = ScaleType>
 struct scale_functor {
 
     /**
@@ -582,8 +548,7 @@ struct scale_functor {
      * @param f
      * @param s
      */
-    scale_functor(Functor f, ScaleType s) :
-        m_f(std::move(f)), m_s(s) {}
+    scale_functor(Functor f, ScaleType s) : m_f(std::move(f)), m_s(s) {}
 
     /**
      * @brief operator()
@@ -593,12 +558,11 @@ struct scale_functor {
      *
      * @return
      */
-    template <typename Arg>
-    return_type operator()(Arg && arg) const {
+    template <typename Arg> return_type operator()(Arg &&arg) const {
         return m_s * m_f(std::forward<Arg>(arg));
     }
 
-private:
+  private:
     Functor m_f;
     ScaleType m_s;
 };
@@ -614,15 +578,18 @@ private:
  *
  * @return
  */
-template <typename ScaleType, typename return_type = ScaleType, typename Functor>
-scale_functor<Functor, ScaleType, return_type>
-make_scale_functor(Functor f, ScaleType s) {
+template <typename ScaleType, typename return_type = ScaleType,
+          typename Functor>
+scale_functor<Functor, ScaleType, return_type> make_scale_functor(Functor f,
+                                                                  ScaleType s) {
     return scale_functor<Functor, ScaleType, return_type>(f, s);
 }
 
-//****************************** This is a set of functors representing standard arithmetic
-// operations that is +, -, etc. These are equivalent to standard std:: structs but are not templated
-///plus
+//****************************** This is a set of functors representing standard
+// arithmetic
+// operations that is +, -, etc. These are equivalent to standard std:: structs
+// but are not templated
+/// plus
 struct plus {
     /**
      * @brief operator()
@@ -632,13 +599,13 @@ struct plus {
      * @param right
      */
     template <typename T>
-    auto operator()(const T & left, const T & right) const ->
-    decltype(left + right) {
+    auto operator()(const T &left,
+                    const T &right) const->decltype(left + right) {
         return left + right;
     }
 };
 
-///minus
+/// minus
 struct minus {
     /**
      * @brief operator()
@@ -648,13 +615,13 @@ struct minus {
      * @param right
      */
     template <typename T>
-    auto operator()(const T & left, const T & right) const ->
-    decltype(left - right) {
+    auto operator()(const T &left,
+                    const T &right) const->decltype(left - right) {
         return left - right;
     }
 };
 
-///max
+/// max
 struct max {
     /**
      * @brief operator()
@@ -664,17 +631,19 @@ struct max {
      * @param right
      */
     template <typename T>
-    auto operator()(const T & left, const T & right) const ->
-    decltype(std::max(left, right)) {
+    auto operator()(const T &left,
+                    const T &right) const->decltype(std::max(left, right)) {
         return std::max(left, right);
     }
 };
 
-//****************************** This is set of functors representing standard boolean operation
-//that is !, &&, ||. These are equivalent to standard std:: structs but are not templated
+//****************************** This is set of functors representing standard
+// boolean operation
+// that is !, &&, ||. These are equivalent to standard std:: structs but are not
+// templated
 //(only operator() is templated)
 
-///Not
+/// Not
 struct Not {
     /**
      * @brief operator()
@@ -683,13 +652,12 @@ struct Not {
      *
      * @return
      */
-    template <typename T>
-    auto operator()(const T & b ) const -> decltype(!b) {
+    template <typename T> auto operator()(const T &b) const->decltype(!b) {
         return !b;
     }
 };
 
-///Or
+/// Or
 struct Or {
     /**
      * @brief operator
@@ -701,13 +669,13 @@ struct Or {
      * @return
      */
     template <typename T>
-    auto operator()(const T & left, const T & right) const ->
-    decltype(left || right) {
+    auto operator()(const T &left,
+                    const T &right) const->decltype(left || right) {
         return left || right;
     }
 };
 
-///And
+/// And
 struct And {
     /**
      * @brief operator()
@@ -719,52 +687,49 @@ struct And {
      * @return
      */
     template <typename T>
-    auto operator()(const T & left, const T & right) const ->
-        decltype(left && right){
+    auto operator()(const T &left,
+                    const T &right) const->decltype(left &&right) {
         return left && right;
     }
 };
 
-
-///Functor stores binary operator "o" and two functors "f" and "g"
-///for given "args" returns o(f(args), g(args))
+/// Functor stores binary operator "o" and two functors "f" and "g"
+/// for given "args" returns o(f(args), g(args))
 template <typename FunctorLeft, typename FunctorRight, typename Operator>
-    struct lift_binary_operator_functor {
-        /**
-         * @brief constructor
-         *
-         * @param left
-         * @param right
-         * @param op
-         */
-        lift_binary_operator_functor(FunctorLeft left = FunctorLeft(),
-                                  FunctorRight right = FunctorRight(),
-                                  Operator op = Operator()) :
-            m_left(std::move(left)), m_right(std::move(right)),
-            m_operator(std::move(op)) {}
+struct lift_binary_operator_functor {
+    /**
+     * @brief constructor
+     *
+     * @param left
+     * @param right
+     * @param op
+     */
+    lift_binary_operator_functor(FunctorLeft left = FunctorLeft(),
+                                 FunctorRight right = FunctorRight(),
+                                 Operator op = Operator())
+        : m_left(std::move(left)), m_right(std::move(right)),
+          m_operator(std::move(op)) {}
 
-        /**
-         * @brief operator
-         *
-         * @tparam Args
-         *
-         * @return
-         */
-        template <typename ... Args>
-            auto  operator()(Args&&... args) const ->
-                decltype(std::declval<Operator>()(
-                            std::declval<FunctorLeft>()(std::forward<Args>(args)...),
-                            std::declval<FunctorRight>()(std::forward<Args>(args)...)
-                            )){
-                return m_operator(m_left(std::forward<Args>(args)...),
-                                  m_right(std::forward<Args>(args)...));
-            }
+    /**
+     * @brief operator
+     *
+     * @tparam Args
+     *
+     * @return
+     */
+    template <typename... Args>
+    auto operator()(Args &&... args) const->decltype(std::declval<Operator>()(
+        std::declval<FunctorLeft>()(std::forward<Args>(args)...),
+        std::declval<FunctorRight>()(std::forward<Args>(args)...))) {
+        return m_operator(m_left(std::forward<Args>(args)...),
+                          m_right(std::forward<Args>(args)...));
+    }
 
-    private:
-        FunctorLeft m_left;
-        FunctorRight m_right;
-        Operator m_operator;
-    };
+  private:
+    FunctorLeft m_left;
+    FunctorRight m_right;
+    Operator m_operator;
+};
 
 /**
  * @brief make function for lift_binary_operator_functor
@@ -779,131 +744,129 @@ template <typename FunctorLeft, typename FunctorRight, typename Operator>
  * @return
  */
 template <typename FunctorLeft, typename FunctorRight, typename Operator>
-    lift_binary_operator_functor<FunctorLeft, FunctorRight, Operator>
-    make_lift_binary_operator_functor(
-            FunctorLeft left, FunctorRight right, Operator op) {
-        return lift_binary_operator_functor
-                <FunctorLeft, FunctorRight, Operator>(
-                    std::move(left), std::move(right), std::move(op));
-    }
-
+lift_binary_operator_functor<FunctorLeft, FunctorRight, Operator>
+make_lift_binary_operator_functor(FunctorLeft left, FunctorRight right,
+                                  Operator op) {
+    return lift_binary_operator_functor<FunctorLeft, FunctorRight, Operator>(
+        std::move(left), std::move(right), std::move(op));
+}
 
 //******************** this is set of functors
-//allowing two compose functors  using
-//standard logical operators
+// allowing two compose functors  using
+// standard logical operators
 
+/// not_functor
+template <typename Functor> struct not_functor {
+    /**
+     * @brief constructor
+     *
+     * @param functor
+     */
+    not_functor(Functor functor = Functor()) : m_functor(functor) {}
 
-///not_functor
+    /**
+     * @brief operator()
+     *
+     * @tparam Args
+     *
+     * @return
+     */
+    template <typename... Args>
+    auto operator()(Args &&... args) const->decltype(
+        std::declval<Functor>()(std::forward<Args>(args)...)) {
+        return !m_functor(std::forward<Args>(args)...);
+    }
+
+  private:
+    Functor m_functor;
+};
+
+/// make for Not
 template <typename Functor>
-    struct not_functor {
-        /**
-         * @brief constructor
-         *
-         * @param functor
-         */
-        not_functor(Functor functor= Functor()) :
-            m_functor(functor) {}
+not_functor<Functor> make_not_functor(Functor functor) {
+    return not_functor<Functor>(std::move(functor));
+}
 
-        /**
-         * @brief operator()
-         *
-         * @tparam Args
-         *
-         * @return
-         */
-        template <typename ... Args>
-            auto operator()(Args&&... args) const ->
-                decltype(std::declval<Functor>()(std::forward<Args>(args)...)) {
-                return !m_functor(std::forward<Args>(args)...);
-            }
-
-    private:
-        Functor m_functor;
-    };
-
-///make for Not
-template <typename Functor>
-    not_functor<Functor>
-    make_not_functor(Functor functor) {
-        return not_functor<Functor>(std::move(functor));
-    }
-
-
-///or_functor
+/// or_functor
 template <typename FunctorLeft, typename FunctorRight>
-    class or_functor :
-            public lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> {
-        typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> base;
+class or_functor
+    : public lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> {
+    typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> base;
 
-    public:
-        /**
-         * @brief constructor
-         *
-         * @param left
-         * @param right
-         */
-        or_functor(FunctorLeft left = FunctorLeft(),
-                  FunctorRight right = FunctorRight()) :
-            base(std::move(left), std::move(right)) {}
-    };
+  public:
+    /**
+     * @brief constructor
+     *
+     * @param left
+     * @param right
+     */
+    or_functor(FunctorLeft left = FunctorLeft(),
+               FunctorRight right = FunctorRight())
+        : base(std::move(left), std::move(right)) {}
+};
 
-///make for or_functor
+/// make for or_functor
 template <typename FunctorLeft, typename FunctorRight>
-    or_functor<FunctorLeft, FunctorRight>
-    make_or_functor(FunctorLeft left, FunctorRight right) {
-        return or_functor<FunctorLeft, FunctorRight>(std::move(left), std::move(right));
-    }
+or_functor<FunctorLeft, FunctorRight> make_or_functor(FunctorLeft left,
+                                                      FunctorRight right) {
+    return or_functor<FunctorLeft, FunctorRight>(std::move(left),
+                                                 std::move(right));
+}
 
-///and_functor
+/// and_functor
 template <typename FunctorLeft, typename FunctorRight>
-    class and_functor :
-            public lift_binary_operator_functor<FunctorLeft, FunctorRight, And> {
-        typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, And> base;
+class and_functor
+    : public lift_binary_operator_functor<FunctorLeft, FunctorRight, And> {
+    typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, And> base;
 
-    public:
+  public:
 
-        /**
-         * @brief constructor
-         *
-         * @param left
-         * @param right
-         */
-        and_functor(FunctorLeft left = FunctorLeft(), FunctorRight right = FunctorRight()) :
-            base(std::move(left), std::move(right)) {}
-    };
+    /**
+     * @brief constructor
+     *
+     * @param left
+     * @param right
+     */
+    and_functor(FunctorLeft left = FunctorLeft(),
+                FunctorRight right = FunctorRight())
+        : base(std::move(left), std::move(right)) {}
+};
 
-///make and_functor
+/// make and_functor
 template <typename FunctorLeft, typename FunctorRight>
-    and_functor<FunctorLeft, FunctorRight>
-    make_and_functor(FunctorLeft left, FunctorRight right) {
-        return and_functor<FunctorLeft, FunctorRight>(std::move(left), std::move(right));
-    }
+and_functor<FunctorLeft, FunctorRight> make_and_functor(FunctorLeft left,
+                                                        FunctorRight right) {
+    return and_functor<FunctorLeft, FunctorRight>(std::move(left),
+                                                  std::move(right));
+}
 
-///xor_functor
+/// xor_functor
 template <typename FunctorLeft, typename FunctorRight>
-    class xor_functor :
-            public lift_binary_operator_functor<FunctorLeft, FunctorRight, not_equal_to> {
-        typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, not_equal_to> base;
+class xor_functor : public lift_binary_operator_functor<
+    FunctorLeft, FunctorRight, not_equal_to> {
+    typedef lift_binary_operator_functor<FunctorLeft, FunctorRight,
+                                         not_equal_to> base;
 
-    public:
-        /**
-         * @brief constructor
-         *
-         * @param left
-         * @param right
-         */
-        xor_functor(FunctorLeft left = FunctorLeft(), FunctorRight right = FunctorRight()) :
-            base(std::move(left), std::move(right)) {}
+  public:
+    /**
+     * @brief constructor
+     *
+     * @param left
+     * @param right
+     */
+    xor_functor(FunctorLeft left = FunctorLeft(),
+                FunctorRight right = FunctorRight())
+        : base(std::move(left), std::move(right)) {}
+};
 
-    };
-
-///make for Xor
+/// make for Xor
 template <typename FunctorLeft, typename FunctorRight>
-    xor_functor<FunctorLeft, FunctorRight>
-    make_xor_functor(FunctorLeft left, FunctorRight right) {
-        return xor_functor<FunctorLeft, FunctorRight>(std::move(left), std::move(right));
-    }
+xor_functor<FunctorLeft, FunctorRight> make_xor_functor(FunctorLeft left,
+                                                        FunctorRight right) {
+    return xor_functor<FunctorLeft, FunctorRight>(std::move(left),
+                                                  std::move(right));
+}
 
-} //utils
-} //paal
+} //! utils
+} //! paal
 #endif /* BOOST_FUNCTORS_HPP */

@@ -15,14 +15,14 @@
 #include <istream>
 
 namespace paal {
-namespace{
+namespace {
 typedef std::vector<std::string> Words;
 
-Words read_SS(std::istream & ist) {
+Words read_SS(std::istream &ist) {
     int n;
     ist >> n;
     Words m_words;
-    while(n--){
+    while (n--) {
         std::string word;
         ist >> word;
         m_words.push_back(std::move(word));
@@ -30,5 +30,5 @@ Words read_SS(std::istream & ist) {
     return m_words;
 }
 }
-}//!paal
+}      //!paal
 #endif /* READ_SS_HPP */

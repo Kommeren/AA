@@ -29,7 +29,7 @@ std::pair<Graph, std::vector<int>> create_instance() {
 }
 
 template <typename Graph>
-void run_test(const Graph & graph, const std::vector<int> & optimal) {
+void run_test(const Graph &graph, const std::vector<int> &optimal) {
     using VT = typename boost::graph_traits<Graph>::vertex_descriptor;
     auto index = get(boost::vertex_index, graph);
     auto weight = get(boost::edge_weight, graph);
@@ -60,8 +60,8 @@ void run_test(const Graph & graph, const std::vector<int> & optimal) {
 
 template <typename VertexList>
 using Graph = boost::adjacency_list<boost::vecS, VertexList, boost::undirectedS,
-                boost::property<boost::vertex_index_t, int>,
-                boost::property<boost::edge_weight_t, int>>;
+                                    boost::property<boost::vertex_index_t, int>,
+                                    boost::property<boost::edge_weight_t, int>>;
 
 BOOST_AUTO_TEST_CASE(KCut) {
     auto instance = create_instance<Graph<boost::vecS>>();
@@ -82,4 +82,3 @@ BOOST_AUTO_TEST_CASE(KCut_list) {
 
     run_test(graph, optimal);
 }
-

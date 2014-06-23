@@ -10,13 +10,11 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
 
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/join.hpp>
-
 
 namespace paal {
 namespace ir {
@@ -25,11 +23,11 @@ namespace ir {
  * Utilities class. Responsible for calculating the cost of given edges.
  */
 class steiner_utils {
-public:
+  public:
     /**
      * Calculates total cost of given edges.
      */
-    template<typename Metric, typename Terminals, typename Result>
+    template <typename Metric, typename Terminals, typename Result>
     static typename data_structures::metric_traits<Metric>::DistanceType
     count_cost(const Result& steiner_vertices, const Terminals& terminals, const Metric& cost_map) {
         using Vertex = typename data_structures::metric_traits<Metric>::VertexType;
@@ -50,7 +48,7 @@ public:
     }
 };
 
-} //ir
-} //paal
+} // ir
+} // paal
 
 #endif /* STEINER_UTILS_HPP */

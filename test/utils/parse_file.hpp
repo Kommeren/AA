@@ -13,23 +13,23 @@
 #include <limits>
 
 namespace paal {
-    template <typename Functor>
-        void parse(const std::string & filename, Functor f) {
-            std::ifstream is_test_cases(filename);
-            assert(is_test_cases.good());
-            while(is_test_cases.good()) {
-                std::string line;
-                is_test_cases >> line;
-                if(line == "") {
-                    return;
-                }
-                if(line[0] == '#') {
-                    is_test_cases.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                    continue;
-                }
-                f(line, is_test_cases);
-            }
+template <typename Functor> void parse(const std::string &filename, Functor f) {
+    std::ifstream is_test_cases(filename);
+    assert(is_test_cases.good());
+    while (is_test_cases.good()) {
+        std::string line;
+        is_test_cases >> line;
+        if (line == "") {
+            return;
         }
+        if (line[0] == '#') {
+            is_test_cases.ignore(std::numeric_limits<std::streamsize>::max(),
+                                 '\n');
+            continue;
+        }
+        f(line, is_test_cases);
+    }
+}
 
-}//paal
+} //! paal
 #endif /* PARSE_FILE_HPP */

@@ -22,13 +22,12 @@
 
 using lp_types = boost::mpl::list<paal::lp::glp>;
 
-template <typename LP, typename RowBounds,
-        typename ColBounds, typename CostCoefs,
-        typename Coefficients>
-void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
-        CostCoefs & cost_coefs, Coefficients & coefs,
-        double best_cost, int rows_num, int cols_num, int non_zeros,
-        paal::lp::simplex_type type) {
+template <typename LP, typename RowBounds, typename ColBounds,
+          typename CostCoefs, typename Coefficients>
+void run_test(RowBounds &row_bounds, ColBounds &col_bounds,
+              CostCoefs &cost_coefs, Coefficients &coefs, double best_cost,
+              int rows_num, int cols_num, int non_zeros,
+              paal::lp::simplex_type type) {
 
     LP lp("LP long test", paal::lp::MINIMIZE);
     std::unordered_map<std::string, paal::lp::col_id> col_ids;
@@ -36,8 +35,8 @@ void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
     std::string col_name;
     for (auto c : col_bounds) {
         col_name = c.first;
-        col_ids[col_name] = lp.add_column(0., c.second.first,
-                c.second.second, col_name);
+        col_ids[col_name] =
+            lp.add_column(0., c.second.first, c.second.second, col_name);
     }
 
     int non_zero_cost_coefs = 0;
@@ -55,7 +54,8 @@ void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
 
         paal::lp::linear_expression expr;
 
-        for (auto elem : boost::make_iterator_range(coefs.equal_range(row_name))) {
+        for (auto elem :
+             boost::make_iterator_range(coefs.equal_range(row_name))) {
             expr += elem.second.second * col_ids[elem.second.first];
         }
 
@@ -64,10 +64,10 @@ void run_test(RowBounds & row_bounds, ColBounds & col_bounds,
 
     BOOST_CHECK_EQUAL(rows_num, lp.rows_number() + 1);
     BOOST_CHECK_EQUAL(cols_num, lp.columns_number());
-    auto lp_non_zeros = boost::accumulate(lp.get_rows(), 0,
-        [&](int sum, paal::lp::row_id row) {
-            return sum + lp.get_row_degree(row);
-        });
+    auto lp_non_zeros =
+        boost::accumulate(lp.get_rows(), 0, [&](int sum, paal::lp::row_id row) {
+        return sum + lp.get_row_degree(row);
+    });
     BOOST_CHECK_EQUAL(non_zeros, lp_non_zeros + non_zero_cost_coefs);
 
     auto status = lp.solve_simplex(type);
@@ -80,7 +80,8 @@ BOOST_AUTO_TEST_SUITE(linear_programming_long)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_long, LP, lp_types) {
     std::string testDir = "test/data/LP/";
-    paal::parse(testDir + "cases.txt", [&](const std::string & fname, std::istream & is_test_cases) {
+    paal::parse(testDir + "cases.txt",
+                [&](const std::string & fname, std::istream & is_test_cases) {
         double best_cost;
         int rows_num, cols_num, non_zeros;
         is_test_cases >> best_cost >> rows_num >> cols_num >> non_zeros;
@@ -91,7 +92,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_long, LP, lp_types) {
         std::unordered_map<std::string, std::pair<double, double>> row_bounds;
         std::unordered_map<std::string, std::pair<double, double>> col_bounds;
         std::unordered_map<std::string, double> cost_coefs;
-        std::unordered_multimap<std::string, std::pair<std::string, double>> coefs;
+        std::unordered_multimap<std::string, std::pair<std::string, double>>
+            coefs;
 
         paal::read_lp(ifs, row_bounds, col_bounds, cost_coefs, coefs);
         LOGLN("primal");

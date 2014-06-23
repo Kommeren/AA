@@ -18,19 +18,20 @@
 
 #include <thread>
 
-BOOST_AUTO_TEST_SUITE( simulated_annealing )
+BOOST_AUTO_TEST_SUITE(simulated_annealing)
 
 namespace ls = paal::local_search;
 using namespace paal;
 
-    BOOST_AUTO_TEST_CASE(CoolingSchemaTest) {
-        std::chrono::seconds sec(1);
-        auto exponential = ls::make_exponential_cooling_schema_dependant_on_time(std::chrono::seconds(10), 1024, 1);
-        for(int i : boost::irange(0, 10)) {
-            std::this_thread::sleep_for(sec);
-            LOGLN("Temperature after " << i << " seconds: " << exponential());
-            BOOST_CHECK_EQUAL(exponential(), pow(2, 9 - i));
-        }
+BOOST_AUTO_TEST_CASE(CoolingSchemaTest) {
+    std::chrono::seconds sec(1);
+    auto exponential = ls::make_exponential_cooling_schema_dependant_on_time(
+        std::chrono::seconds(10), 1024, 1);
+    for (int i : boost::irange(0, 10)) {
+        std::this_thread::sleep_for(sec);
+        LOGLN("Temperature after " << i << " seconds: " << exponential());
+        BOOST_CHECK_EQUAL(exponential(), pow(2, 9 - i));
     }
+}
 
 BOOST_AUTO_TEST_SUITE_END()

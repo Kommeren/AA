@@ -8,28 +8,26 @@
 #ifndef EUCLIDEAN_METRIC_HPP
 #define EUCLIDEAN_METRIC_HPP
 
-
-
-
 #include <cmath>
 
 namespace paal {
 
 struct euclidean_metric {
-    int operator()(const std::pair<int, int> & p1, const std::pair<int, int> & p2) const {
-        return sqrt(pow(p1.first - p2.first, 2) + pow(p1.second - p2.second, 2));
+    int operator()(const std::pair<int, int> &p1,
+                   const std::pair<int, int> &p2) const {
+        return sqrt(pow(p1.first - p2.first, 2) +
+                    pow(p1.second - p2.second, 2));
     }
 };
 
 namespace data_structures {
 
-    template <>
-    struct metric_traits<euclidean_metric> {
-        typedef std::pair<int, int> VertexType;
-        typedef int DistanceType;
-    };
-}//data_structures
+template <> struct metric_traits<euclidean_metric> {
+    typedef std::pair<int, int> VertexType;
+    typedef int DistanceType;
+};
+} // data_structures
 
-}//paal
+} // paal
 
 #endif /* EUCLIDEAN_METRIC_HPP */

@@ -12,7 +12,12 @@ namespace paal {
 /// Linear Programming namespace.
 namespace lp {
 /// LP problem type.
-enum problem_type {OPTIMAL, INFEASIBLE, UNBOUNDED, UNDEFINED};
+enum problem_type {
+    OPTIMAL,
+    INFEASIBLE,
+    UNBOUNDED,
+    UNDEFINED
+};
 }
 }
 #endif /* PROBLEM_TYPE_HPP */

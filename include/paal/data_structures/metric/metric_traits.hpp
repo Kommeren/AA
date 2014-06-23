@@ -10,24 +10,22 @@
 
 #include "paal/utils/type_functions.hpp"
 
-
 #include <type_traits>
 
 namespace paal {
 namespace data_structures {
 
-    /**
-     * @brief base for metric traits
-     *
-     * @tparam Metric
-     * @tparam _VertexType
-     */
-template <typename Metric, typename _VertexType>
-struct _metric_traits {
+/**
+ * @brief base for metric traits
+ *
+ * @tparam Metric
+ * @tparam _VertexType
+ */
+template <typename Metric, typename _VertexType> struct _metric_traits {
     typedef int VertexType;
-    ///Distance type
-    typedef puretype(std::declval<Metric>()
-             (std::declval<VertexType>(), std::declval<VertexType>())) DistanceType;
+    /// Distance type
+    typedef puretype(std::declval<Metric>()(
+        std::declval<VertexType>(), std::declval<VertexType>())) DistanceType;
 };
 
 /**
@@ -37,7 +35,6 @@ struct _metric_traits {
  */
 template <typename Metric>
 struct metric_traits : public _metric_traits<Metric, int> {};
-
 }
 }
 #endif /* METRIC_TRAITS_HPP */

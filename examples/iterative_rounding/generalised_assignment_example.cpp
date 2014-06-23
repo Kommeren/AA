@@ -6,14 +6,13 @@
  * @date 2013-02-04
  */
 
-
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
 #include <iostream>
 #include <vector>
 
 int main() {
-//! [Generalised Assignment Example]
+    //! [Generalised Assignment Example]
     // sample problem
     std::vector<int> machines = {0,1};
     std::vector<int> jobs = {0,1};
@@ -23,24 +22,24 @@ int main() {
     cost[0][1] = 3;
     cost[1][0] = 1;
     cost[1][1] = 3;
-    auto costf = [&](int i, int j){return cost[i][j];};
+    auto costf = [&](int i, int j) { return cost[i][j]; };
 
     std::vector<std::vector<int>> time(2, std::vector<int>(2));
     time[0][0] = 2;
     time[0][1] = 2;
     time[1][0] = 1;
     time[1][1] = 1;
-    auto timef = [&](int i, int j){return time[i][j];};
+    auto timef = [&](int i, int j) { return time[i][j]; };
 
-    std::vector<int> T = {2, 2};
-    auto Tf = [&](int i){return T[i];};
+    std::vector<int> T = { 2, 2 };
+    auto Tf = [&](int i) { return T[i]; };
 
     std::vector<std::pair<int, int>> jobs_to_machines;
 
     // solve it
     auto result = paal::ir::generalised_assignment_iterative_rounding(
-            machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-            costf, timef, Tf, std::back_inserter(jobs_to_machines));
+        machines.begin(), machines.end(), jobs.begin(), jobs.end(), costf,
+        timef, Tf, std::back_inserter(jobs_to_machines));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
@@ -49,11 +48,10 @@ int main() {
                 << jm.second << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
-    }
-    else {
+    } else {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Generalised Assignment Example]
+    //! [Generalised Assignment Example]
     return 0;
 }

@@ -21,12 +21,12 @@ struct make_tuple {
      * @return
      */
     template <typename... Args>
-        auto operator()(Args&&...args) const ->
-        decltype(std::make_tuple(std::forward<Args>(args)...)) {
-            return std::make_tuple(std::forward<Args>(args)...);
-        }
+    auto operator()(Args &&... args) const->decltype(
+        std::make_tuple(std::forward<Args>(args)...)) {
+        return std::make_tuple(std::forward<Args>(args)...);
+    }
 };
 
-}//!paal
+} //!paal
 
 #endif /* MAKE_TUPLE_HPP */

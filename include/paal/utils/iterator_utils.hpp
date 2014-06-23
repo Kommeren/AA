@@ -8,7 +8,6 @@
 #include "type_functions.hpp"
 #include "functors.hpp"
 
-
 #include <boost/iterator/filter_iterator.hpp>
 
 #include <functional>
@@ -19,16 +18,18 @@
 namespace paal {
 namespace utils {
 
-    /**
-     * @brief this iterator exlcludes one specific element from range
-     *
-     * @tparam Iterator
-     */
+/**
+ * @brief this iterator exlcludes one specific element from range
+ *
+ * @tparam Iterator
+ */
 template <typename Iterator>
-struct iterator_with_excluded_element :
-    public boost::filter_iterator<decltype(std::bind(utils::not_equal_to(),
-                                           std::declval<typename std::iterator_traits<Iterator>::value_type>() ,
-                                           std::placeholders::_1)), Iterator> {
+struct iterator_with_excluded_element : public boost::filter_iterator<
+    decltype(std::bind(
+        utils::not_equal_to(),
+        std::declval<typename std::iterator_traits<Iterator>::value_type>(),
+        std::placeholders::_1)),
+    Iterator> {
 
     typedef typename std::iterator_traits<Iterator>::value_type Element;
     /**
@@ -38,17 +39,18 @@ struct iterator_with_excluded_element :
      * @param end
      * @param e
      */
-    iterator_with_excluded_element(Iterator i, Iterator end, const Element &  e)
-        : boost::filter_iterator<decltype(std::bind(utils::not_equal_to(),
-                                                    std::declval<Element>(),
-                                                    std::placeholders::_1)), Iterator >
-          (std::bind(utils::not_equal_to(), e, std::placeholders::_1), i, end )  {}
+    iterator_with_excluded_element(Iterator i, Iterator end, const Element &e)
+        : boost::filter_iterator<
+              decltype(std::bind(utils::not_equal_to(), std::declval<Element>(),
+                                 std::placeholders::_1)),
+              Iterator>(std::bind(utils::not_equal_to(), e,
+                                  std::placeholders::_1),
+                        i, end) {}
 
     iterator_with_excluded_element() = default;
 };
 
-} //utils
-} //paal
+} // utils
+} // paal
 
 #endif // ITERATOR_HELPERS_HPP
-

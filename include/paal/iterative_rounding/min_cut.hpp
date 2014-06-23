@@ -26,12 +26,10 @@ public:
     using Vertex = Traits::vertex_descriptor;
 
     /// Constructor.
-    min_cut_finder() :
-        m_graph(0),
-        m_cap(get(boost::edge_capacity, m_graph)),
-        m_rev(get(boost::edge_reverse, m_graph)),
-        m_colors(get(boost::vertex_color, m_graph))
-    { }
+    min_cut_finder()
+        : m_graph(0), m_cap(get(boost::edge_capacity, m_graph)),
+          m_rev(get(boost::edge_reverse, m_graph)),
+          m_colors(get(boost::vertex_color, m_graph)) {}
 
     /**
      * (Re)Initializes the graph.
@@ -48,9 +46,7 @@ public:
     /**
      * Adds a new vertex to the graph.
      */
-    Vertex add_vertex_to_graph() {
-        return add_vertex(m_graph);
-    }
+    Vertex add_vertex_to_graph() { return add_vertex(m_graph); }
 
     /**
      * Adds an edge to the graph.
@@ -100,35 +96,34 @@ public:
     }
 
     /**
-     * Checks if the given vertex belongs to the source side of the last checked cut.
+     * Checks if the given vertex belongs to the source side of the last checked
+     * cut.
      */
     bool is_in_source_set(Vertex v) const {
         return (m_src_color == get(m_colors, v));
     }
 
     /**
-     * Returns the number of vertices in the source size of the last checked cut.
+     * Returns the number of vertices in the source size of the last checked
+     * cut.
      */
     int source_set_size() const {
         auto verts = vertices(m_graph);
         return std::accumulate(verts.first, verts.second, 0,
-                [&](int count, Vertex v){ return count + is_in_source_set(v); });
+                               [&](int count, Vertex v) {
+            return count + is_in_source_set(v);
+        });
     }
-
 
     /**
      * Returns the pair of vertices defining the last checked cut.
      */
-    std::pair<Vertex, Vertex> get_last_cut() const {
-        return m_last_cut;
-    }
+    std::pair<Vertex, Vertex> get_last_cut() const { return m_last_cut; }
 
     /**
      * Returns the capacity of a given edge.
      */
-    double get_capacity(Edge e) const {
-        return get(m_cap, e);
-    }
+    double get_capacity(Edge e) const { return get(m_cap, e); }
 
     /**
      * Sets the capacity of a given edge.
@@ -152,14 +147,13 @@ private:
     Graph m_graph;
 
     EdgeCapacity m_cap;
-    EdgeReverse  m_rev;
+    EdgeReverse m_rev;
     VertexColors m_colors;
 
     boost::default_color_type m_src_color;
     std::pair<Vertex, Vertex> m_last_cut;
 };
 
-
-} //ir
-} //paal
+} //! ir
+} //! paal
 #endif /* MIN_CUT_HPP */

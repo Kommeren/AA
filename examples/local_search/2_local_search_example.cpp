@@ -12,36 +12,34 @@
 #include "paal/data_structures/cycle/cycle_algo.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 
-
 #include <vector>
 #include <iostream>
 
-using namespace  paal::local_search::two_local_search;
-using namespace  paal;
+using namespace paal::local_search::two_local_search;
+using namespace paal;
 
 int main() {
-//! [Two Local Search Example]
-    //sample data
-    typedef  sample_graphs_metrics SGM;
+    //! [Two Local Search Example]
+    // sample data
+    typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
     const int size = gm.size();
     std::cout << size << std::endl;
     std::vector<int> v(size);
     std::iota(v.begin(), v.end(), 0);
 
-    //create random solution
+    // create random solution
     std::random_shuffle(v.begin(), v.end());
     typedef data_structures::simple_cycle<int> Cycle;
     Cycle cycle(v.begin(), v.end());
     std::cout << "Length \t" << simple_algo::get_length(gm, cycle) << std::endl;
 
-    //search
+    // search
     tsp_first_improving(cycle, get_default_two_local_components(gm));
 
-    //printing
+    // printing
     std::cout << "Length \t" << simple_algo::get_length(gm, cycle) << std::endl;
 
-//! [Two Local Search Example]
+    //! [Two Local Search Example]
     return 0;
 }
-

@@ -34,7 +34,7 @@ std::pair<Graph, int> create_instance() {
     const int terminals_num = 3;
     int i = 0;
     for (auto v : boost::make_iterator_range(vertices(graph))) {
-        put(boost::vertex_color, graph, v, i+1);
+        put(boost::vertex_color, graph, v, i + 1);
         ++i;
         if (i == terminals_num) {
             break;
@@ -45,8 +45,7 @@ std::pair<Graph, int> create_instance() {
     return std::make_pair(graph, optimal);
 }
 
-template <typename Graph>
-void run_test(const Graph & graph, int optimal) {
+template <typename Graph> void run_test(const Graph &graph, int optimal) {
     using VT = typename boost::graph_traits<Graph>::vertex_descriptor;
     auto index = get(boost::vertex_index, graph);
     auto weight = boost::get(boost::edge_weight, graph);
@@ -72,10 +71,11 @@ void run_test(const Graph & graph, int optimal) {
 }
 
 template <typename VertexList>
-using Graph = boost::adjacency_list<boost::vecS, VertexList, boost::undirectedS,
-                boost::property<boost::vertex_index_t, int,
+using Graph = boost::adjacency_list<
+    boost::vecS, VertexList, boost::undirectedS,
+    boost::property<boost::vertex_index_t, int,
                     boost::property<boost::vertex_color_t, int>>,
-                boost::property<boost::edge_weight_t, int>>;
+    boost::property<boost::edge_weight_t, int>>;
 
 BOOST_AUTO_TEST_CASE(multiway_cutS) {
     auto instance = create_instance<Graph<boost::vecS>>();
@@ -96,4 +96,3 @@ BOOST_AUTO_TEST_CASE(multiway_cutS_list) {
 
     run_test(graph, optimal);
 }
-

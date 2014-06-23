@@ -10,100 +10,82 @@
 
 namespace paal {
 
-
 namespace detail {
 
 /**
- * @brief if the sign = true, class represents plus_infinity: object bigger than everything
+ * @brief if the sign = true, class represents plus_infinity: object bigger than
+ * everything
  *        if the sign = false, class represents minus_infinity
  */
-template <bool sign>
-class infinity {
-    //this is used to disable some operators overloads to remove disambiguities
+template <bool sign> class infinity {
+    // this is used to disable some operators overloads to remove disambiguities
     template <typename T>
-    using disable_other_infinity =
-        typename std::enable_if<!std::is_same<typename std::decay<T>::type,
-                                 infinity<!sign>>::value>::type;
+    using disable_other_infinity = typename std::enable_if<!std::is_same<
+        typename std::decay<T>::type, infinity<!sign>>::value>::type;
 
-public:
-    ///operator<
-    template <typename T>
-    bool operator<( T &&) const {
-        return !sign;
-    }
+  public:
+    /// operator<
+    template <typename T> bool operator<(T &&) const { return !sign; }
 
-    ///operator<
-    bool operator<(infinity) const {
-        return false;
-    }
+    /// operator<
+    bool operator<(infinity) const { return false; }
 
+    /// operator>
+    template <typename T> bool operator>(T &&) const { return sign; }
 
-    ///operator>
-    template <typename T>
-    bool operator>( T &&) const {
-        return sign;
-    }
+    /// operator>
+    bool operator>(infinity) const { return false; }
 
-    ///operator>
-    bool operator>(infinity) const {
-        return false;
-    }
-
-    ///operator<=
-    template <typename T>
-    bool operator<=( T && t) const {
+    /// operator<=
+    template <typename T> bool operator<=(T &&t) const {
         return !(*this > std::forward<T>(t));
     }
 
-    ///operator<=
-    bool operator<=(infinity) const {
-        return true;
-    }
+    /// operator<=
+    bool operator<=(infinity) const { return true; }
 
-    ///operator>=
-    template <typename T>
-    bool operator>=( T && t) const {
+    /// operator>=
+    template <typename T> bool operator>=(T &&t) const {
         return !(*this < std::forward<T>(t));
     }
 
-    ///operator>=
-    bool operator>=(infinity) const {
-        return true;
+    /// operator>=
+    bool operator>=(infinity) const { return true; }
+
+    /// friend operator<
+    template <typename T, typename = disable_other_infinity<T>>
+    friend bool operator<(T &&t, infinity) {
+        return infinity{}
+        > std::forward<T>(t);
     }
 
-
-    ///friend operator<
+    /// friend operator>
     template <typename T, typename = disable_other_infinity<T>>
-    friend bool operator<( T && t, infinity) {
-        return infinity{} > std::forward<T>(t);
+    friend bool operator>(T &&t, infinity) {
+        return infinity{}
+        < std::forward<T>(t);
     }
 
-    ///friend operator>
+    /// friend operator<=
     template <typename T, typename = disable_other_infinity<T>>
-    friend bool operator>( T && t, infinity) {
-        return infinity{} < std::forward<T>(t);
+    friend bool operator<=(T &&t, infinity) {
+        return infinity{}
+        >= std::forward<T>(t);
     }
 
-    ///friend operator<=
+    /// friend operator>=
     template <typename T, typename = disable_other_infinity<T>>
-    friend bool operator<=( T && t, infinity) {
-        return infinity{} >= std::forward<T>(t);
-    }
-
-    ///friend operator>=
-    template <typename T, typename = disable_other_infinity<T>>
-    friend bool operator>=( T && t, infinity) {
-        return infinity{} <= std::forward<T>(t);
+    friend bool operator>=(T &&t, infinity) {
+        return infinity{}
+        <= std::forward<T>(t);
     }
 };
 
-template <bool sign>
-bool operator<(infinity<!sign>, infinity<sign>) {
+template <bool sign> bool operator<(infinity<!sign>, infinity<sign>) {
     return sign;
 }
 
-template <bool sign>
-bool operator>(infinity<sign>, infinity<!sign>) {
+template <bool sign> bool operator>(infinity<sign>, infinity<!sign>) {
     return sign;
 }
 
@@ -117,13 +99,11 @@ bool operator>=(infinity<!sign> left, infinity<sign> right) {
     return !(left < right);
 }
 
-}//!detail
+} //!detail
 
+using minus_infinity = detail::infinity<false>;
+using plus_infinity = detail::infinity<true>;
 
-using minus_infinity  = detail::infinity<false>;
-using plus_infinity   = detail::infinity<true>;
-
-}//!paal
-
+} //!paal
 
 #endif /* INFINITY_HPP */

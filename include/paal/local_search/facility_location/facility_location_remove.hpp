@@ -8,7 +8,6 @@
 #ifndef FACILITY_LOCATION_REMOVE_HPP
 #define FACILITY_LOCATION_REMOVE_HPP
 
-
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 
@@ -19,7 +18,6 @@
 #include <vector>
 #include <numeric>
 #include <cstdlib>
-
 
 namespace paal {
 namespace local_search {
@@ -39,15 +37,17 @@ struct facility_location_gain_remove {
      *
      * @return
      */
-        template <typename Solution, typename ChosenElement>
-    auto operator()(Solution & s,
-            ChosenElement e) ->
-                typename data_structures::facility_location_solution_traits<puretype(s.getfacility_location_solution())>::Dist {
+    template <typename Solution, typename ChosenElement>
+    auto operator()(Solution &s, ChosenElement e)
+        ->typename data_structures::facility_location_solution_traits<
+              puretype(s.getfacility_location_solution())>::Dist {
 
-        typename data_structures::facility_location_solution_traits<puretype(s.getfacility_location_solution())>::Dist ret, back;
+        typename data_structures::facility_location_solution_traits<
+            puretype(s.getfacility_location_solution())>::Dist ret,
+            back;
 
         ret = s.remove_facility_tentative(e);
-        //TODO for capacitated version we should  just restart copy
+        // TODO for capacitated version we should  just restart copy
         back = s.add_facility_tentative(e);
         assert(ret == -back);
         return -ret;
@@ -66,10 +66,8 @@ struct facility_location_commit_remove {
      * @param s
      * @param e
      */
-        template <typename Solution, typename ChosenElement>
-    bool operator()(
-            Solution & s,
-            ChosenElement e) {
+    template <typename Solution, typename ChosenElement>
+    bool operator()(Solution &s, ChosenElement e) {
         s.remove_facility(e);
         return true;
     }
@@ -88,9 +86,7 @@ struct facility_locationget_moves_remove {
      * @return
      */
     template <typename Solution>
-    auto operator()(const Solution & sol) ->
-        decltype(sol.getChosenCopy())
-    {
+    auto operator()(const Solution &sol)->decltype(sol.getChosenCopy()) {
         return sol.getChosenCopy();
     }
 };

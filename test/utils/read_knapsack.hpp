@@ -13,16 +13,13 @@
 #include <cassert>
 #include <vector>
 
-inline void read(const std::string & testDir,
-          int testId,
-          int & capacity,
-          std::vector<int> & weights,
-          std::vector<int> & values,
-          std::vector<int> & optimal) {
+inline void read(const std::string &testDir, int testId, int &capacity,
+                 std::vector<int> &weights, std::vector<int> &values,
+                 std::vector<int> &optimal) {
     auto filePrefix = "p0" + std::to_string(testId);
     std::string fname = filePrefix + "_c.txt";
 
-    //read capacity
+    // read capacity
     {
         std::ifstream ifs(testDir + fname);
         assert(ifs.good());
@@ -30,7 +27,7 @@ inline void read(const std::string & testDir,
         ifs.close();
     }
 
-    //read weights
+    // read weights
     fname = filePrefix + "_w.txt";
     paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int weight = std::stoi(s);
@@ -38,7 +35,7 @@ inline void read(const std::string & testDir,
         weights.push_back(weight);
     });
 
-    //read profits
+    // read profits
     fname = filePrefix + "_p.txt";
     paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int val = std::stoi(s);
@@ -47,12 +44,12 @@ inline void read(const std::string & testDir,
     });
     assert(values.size() == weights.size());
 
-    //read profits
+    // read profits
     fname = filePrefix + "_s.txt";
     int idx(0);
-    paal::parse(testDir + fname,  [&](const std::string & s, std::istream &) {
+    paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         bool chosen = std::stoi(s);
-        if(chosen) {
+        if (chosen) {
             optimal.push_back(idx);
         }
         ++idx;

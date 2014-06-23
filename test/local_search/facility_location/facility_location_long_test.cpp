@@ -27,42 +27,44 @@ using namespace paal;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
     std::string testDir = "test/data/FL_ORLIB/";
-    parse(testDir + "uncapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
+    parse(testDir + "uncapopt.txt",
+          [&](const std::string & fname, std::istream & is_test_cases) {
         double optTemp;
         is_test_cases >> optTemp;
         long long opt = cast(optTemp);
 
         LOGLN("TEST " << fname);
-        LOGLN(std::setprecision(20) <<  "OPT " << opt);
+        LOGLN(std::setprecision(20) << "OPT " << opt);
 
         std::ifstream ifs(testDir + "/cases/" + fname);
         std::vector<long long> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;
-        boost::integer_range<int> fac(0,0);
-        boost::integer_range<int> clients(0,0);
-        auto metric = paal::read_orlib_FL<cap::uncapacitated>(ifs, facCost, facCap, demands, fac, clients);
+        boost::integer_range<int> fac(0, 0);
+        boost::integer_range<int> clients(0, 0);
+        auto metric = paal::read_orlib_FL<cap::uncapacitated>(
+            ifs, facCost, facCap, demands, fac, clients);
 
         auto cost = paal::utils::make_array_to_functor(facCost);
 
         typedef paal::data_structures::voronoi<decltype(metric)> VorType;
 
-        typedef paal::data_structures::facility_location_solution
-            <decltype(cost), VorType> Sol;
+        typedef paal::data_structures::facility_location_solution<
+            decltype(cost), VorType> Sol;
         typedef typename VorType::GeneratorsSet FSet;
-        VorType voronoi( FSet{},  FSet(clients.begin(), clients.end()), metric);
+        VorType voronoi(FSet{}, FSet(clients.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), FSet(fac.begin(), fac.end()), cost);
 
         default_remove_fl_components::type rem;
-        default_add_fl_components   ::type add;
-        default_swap_fl_components  ::type swap;
+        default_add_fl_components::type add;
+        default_swap_fl_components::type swap;
         utils::always_false nop;
 
-        facility_location_local_search(sol, paal::local_search::first_improving_strategy{},
-                    nop, nop, rem, add, swap);
+        facility_location_local_search(
+            sol, paal::local_search::first_improving_strategy{}, nop, nop, rem,
+            add, swap);
 
         long long c = simple_algo::get_fl_cost(metric, cost, sol);
-        check_result(c,opt,3.,paal::utils::less_equal(),MULTIPL);
+        check_result(c, opt, 3., paal::utils::less_equal(), MULTIPL);
     });
-
 }

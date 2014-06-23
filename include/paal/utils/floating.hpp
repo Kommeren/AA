@@ -55,7 +55,8 @@ public:
      */
     bool e(T a, T b) const {
         return std::abs(a - b) < m_epsilon;
-        //return abs(a -b ) < m_epsilon; //this line breaks generalised_assignment_long_test TODO investigate
+        // return abs(a -b ) < m_epsilon; //this line breaks
+        // generalised_assignment_long_test TODO investigate
     }
 
     /**
@@ -66,9 +67,7 @@ public:
      *
      * @return
      */
-    bool g(T a, T b) const {
-        return a > b + m_epsilon;
-    }
+    bool g(T a, T b) const { return a > b + m_epsilon; }
 
     /**
      * @brief greater equals
@@ -78,9 +77,7 @@ public:
      *
      * @return
      */
-    bool ge(T a, T b) const {
-        return a >= b - m_epsilon;
-    }
+    bool ge(T a, T b) const { return a >= b - m_epsilon; }
 
     /**
      * @brief less equals
@@ -90,33 +87,28 @@ public:
      *
      * @return
      */
-    bool le(T a, T b) const {
-        return a <= b + m_epsilon;
-    }
+    bool le(T a, T b) const { return a <= b + m_epsilon; }
 
     /**
      * @brief get_epsilon used in comparison
      *
      * @return
      */
-    double get_epsilon() const {
-        return m_epsilon;
-    }
+    double get_epsilon() const { return m_epsilon; }
 
     /**
-     * @brief returns default epsilon equals the smallest possible difference on doubles
+     * @brief returns default epsilon equals the smallest possible difference on
+    * doubles
      *
      * @return
      */
-    static T default_epsilon() {
-        return std::numeric_limits<T>::epsilon();
-    }
+    static T default_epsilon() { return std::numeric_limits<T>::epsilon(); }
 
-private:
+  private:
     const T m_epsilon;
 };
 
-} //utils
-} //paal
+} // utils
+} // paal
 
 #endif // UTILS_FLOATING_HPP

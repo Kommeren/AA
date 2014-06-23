@@ -11,4 +11,3 @@ BOOST_AUTO_TEST_CASE(lp_compilation_error_6_eq_expr_le_7) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

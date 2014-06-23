@@ -8,7 +8,6 @@
 #ifndef TRIVIAL_COMMIT_HPP
 #define TRIVIAL_COMMIT_HPP
 
-
 /**
  * @brief Used in case when update is actually the new solution
  */
@@ -21,7 +20,7 @@ struct trivial_commit {
      * @param u
      */
     template <typename Solution>
-    bool operator()(Solution & s, const Solution & u) const {
+    bool operator()(Solution &s, const Solution &u) const {
         s = u;
         return true;
     }

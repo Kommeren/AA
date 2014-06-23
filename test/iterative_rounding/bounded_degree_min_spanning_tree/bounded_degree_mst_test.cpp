@@ -24,17 +24,18 @@ using namespace paal::ir;
 
 template <typename VertexList, typename EdgeProp>
 using Graph = boost::adjacency_list<boost::vecS, VertexList, boost::undirectedS,
-                boost::property<boost::vertex_index_t, int>, EdgeProp>;
+                                    boost::property<boost::vertex_index_t, int>,
+                                    EdgeProp>;
 
 using EdgeProp = boost::property<boost::edge_index_t, std::size_t,
-            boost::property<boost::edge_weight_t, int>>;
+                                 boost::property<boost::edge_weight_t, int>>;
 using VectorGraph = Graph<boost::vecS, EdgeProp>;
 
 using Edge = boost::graph_traits<VectorGraph>::edge_descriptor;
 using ResultTree = std::set<Edge>;
 
 template <typename Cost>
-Edge add_edge_to_graph(VectorGraph & g, Cost & cost, int u, int v, double c) {
+Edge add_edge_to_graph(VectorGraph &g, Cost &cost, int u, int v, double c) {
     bool b;
     Edge e;
     std::tie(e, b) = add_edge(u, v, g);
@@ -45,7 +46,7 @@ Edge add_edge_to_graph(VectorGraph & g, Cost & cost, int u, int v, double c) {
 
 BOOST_AUTO_TEST_SUITE(bounded_degree_mst)
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
-    //sample problem
+    // sample problem
     LOGLN("Sample problem:");
     VectorGraph g;
     auto costs = get(boost::edge_weight, g);
@@ -76,7 +77,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     ON_LOG(for (auto const & e : result_tree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
-              << ") " << "in tree");
+                       << ") "
+                       << "in tree");
     })
 
     BOOST_CHECK_EQUAL(correct_bdmst.size(),result_tree.size());
@@ -84,7 +86,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
-    //sample problem
+    // sample problem
     LOGLN("Sample problem:");
     VectorGraph g;
 
@@ -94,10 +96,12 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
                          add_edge(2, 1, 1, g);
     correct_bdmst.insert(add_edge(0, 2, 2, g).first);
 
-    std::vector<double> costs = {173, 176, 37};
-    auto cost = boost::make_iterator_property_map(costs.begin(), get(boost::edge_index, g));
+    std::vector<double> costs = { 173, 176, 37 };
+    auto cost = boost::make_iterator_property_map(costs.begin(),
+                                                  get(boost::edge_index, g));
 
-    auto bounds = [&](int){return 2;};
+    auto bounds = [&](int) { return 2; };
+
     {
         ResultTree result_tree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
@@ -121,12 +125,16 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_list) {
     // boost::listS instead of boost::vecS for vertex storage
-    using ListGraph = Graph<boost::listS, boost::property<boost::edge_weight_t, double>>;
+    using ListGraph =
+        Graph<boost::listS, boost::property<boost::edge_weight_t, double>>;
     using EdgeT = boost::graph_traits<ListGraph>::edge_descriptor;
 
-    std::vector<std::pair<int, int>> edges = {{1,0},{4,2},{2,3},{4,3},{3,1},{4,1},
-            {5,3},{2,1},{5,4},{4,0}};
-    std::vector<double> costs = {173, 176, 176, 190, 37, 260, 105, 84, 243, 259};
+    std::vector<std::pair<int, int>> edges = { { 1, 0 }, { 4, 2 }, { 2, 3 },
+                                               { 4, 3 }, { 3, 1 }, { 4, 1 },
+                                               { 5, 3 }, { 2, 1 }, { 5, 4 },
+                                               { 4, 0 } };
+    std::vector<double> costs = { 173, 176, 176, 190, 37, 260, 105, 84, 243,
+                                  259 };
     ListGraph g(edges.begin(), edges.end(), costs.begin(), 6);
 
     auto index = get(boost::vertex_index, g);
@@ -162,7 +170,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {
     add_edge_to_graph(g, costs, 4, 6, 15);
     add_edge_to_graph(g, costs, 5, 6, 4);
 
-    auto bounds = [&](int){return 6;};
+    auto bounds = [&](int) { return 6; };
 
     auto bdmst(make_bounded_degree_mst(g, bounds, std::back_inserter(result_tree)));
     auto invalid = bdmst.check_input_validity();
@@ -202,4 +210,3 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
     BOOST_CHECK(result.first == lp::INFEASIBLE);
 }
 BOOST_AUTO_TEST_SUITE_END()
-

@@ -17,7 +17,8 @@
 #include <unordered_map>
 
 /*
- * This is an example implementation of an algorithm within the Iterative Rounding framework.
+ * This is an example implementation of an algorithm within the Iterative
+ * Rounding framework.
  * The implemented algorithm is a vertex cover 2-approximation.
  */
 
@@ -33,11 +34,9 @@ public:
     using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
     using VertexMap = std::unordered_map<Vertex, paal::lp::col_id>;
 
-    const Graph & get_graph() const {
-        return m_g;
-    }
+    const Graph &get_graph() const { return m_g; }
 
-    auto get_cost(Vertex v) -> decltype(std::declval<CostMap>()(v)) {
+    auto get_cost(Vertex v)->decltype(std::declval<CostMap>()(v)) {
         return m_cost_map(v);
     }
 
@@ -45,17 +44,15 @@ public:
         m_vertex_map.insert(typename VertexMap::value_type(v, col));
     }
 
-    paal::lp::col_id vertex_to_column(Vertex v) {
-        return m_vertex_map[v];
-    }
+    paal::lp::col_id vertex_to_column(Vertex v) { return m_vertex_map[v]; }
 
     void add_to_cover(Vertex v) {
         *m_cover = v;
         ++m_cover;
     }
 
-private:
-    const Graph & m_g;
+  private:
+    const Graph &m_g;
     CostMap m_cost_map;
     OutputIter m_cover;
     VertexMap m_vertex_map;
@@ -65,11 +62,12 @@ private:
 //! [Iterative Rounding Components Example]
 struct vertex_cover_init {
     template <typename Problem, typename LP>
-    void operator()(Problem & problem, LP & lp) {
+    void operator()(Problem &problem, LP &lp) {
         lp.set_optimization_type(paal::lp::MINIMIZE);
 
         // variables for vertices
-        for (auto v : boost::make_iterator_range(vertices(problem.get_graph()))) {
+        for (auto v :
+             boost::make_iterator_range(vertices(problem.get_graph()))) {
             problem.bind_col_to_vertex(lp.add_column(problem.get_cost(v)), v);
         }
 
@@ -84,9 +82,10 @@ struct vertex_cover_init {
 
 struct vertex_cover_set_solution {
     template <typename Problem, typename GetSolution>
-    void operator()(Problem & problem, const GetSolution & solution) {
+    void operator()(Problem &problem, const GetSolution &solution) {
         // add vertices with column value equal 1 to cover
-        for (auto v : boost::make_iterator_range(vertices(problem.get_graph()))) {
+        for (auto v :
+             boost::make_iterator_range(vertices(problem.get_graph()))) {
             if (m_compare.e(solution(problem.vertex_to_column(v)), 1)) {
                 problem.add_to_cover(v);
             }
@@ -98,10 +97,8 @@ private:
 };
 
 using vertex_cover_ir_components =
-        ir::IRcomponents<vertex_cover_init,
-                         ir::round_condition_greater_than_half,
-                         paal::utils::always_false,
-                         vertex_cover_set_solution>;
+    ir::IRcomponents<vertex_cover_init, ir::round_condition_greater_than_half,
+                     paal::utils::always_false, vertex_cover_set_solution>;
 //! [Iterative Rounding Components Example]
 
 int main() {
@@ -111,19 +108,22 @@ int main() {
     using Vertex = boost::graph_traits<Graph>::vertex_descriptor;
 
     // sample problem
-    std::vector<std::pair<int, int>> edges {{0,1},{0,2},{1,2},{1,3},{1,4},{1,5},{5,0},{3,4}};
-    std::vector<int> costs {1,2,1,2,1,5};
+    std::vector<std::pair<int, int>> edges{ { 0, 1 }, { 0, 2 }, { 1, 2 },
+                                            { 1, 3 }, { 1, 4 }, { 1, 5 },
+                                            { 5, 0 }, { 3, 4 } };
+    std::vector<int> costs{ 1, 2, 1, 2, 1, 5 };
 
     Graph g(edges.begin(), edges.end(), 6);
     auto vertex_costs = paal::utils::make_array_to_functor(costs);
     std::vector<Vertex> result_cover;
     auto insert_iter = std::back_inserter(result_cover);
 
-    vertex_cover<Graph, decltype(vertex_costs), decltype(insert_iter)>
-        problem(g, vertex_costs, insert_iter);
+    vertex_cover<Graph, decltype(vertex_costs), decltype(insert_iter)> problem(
+        g, vertex_costs, insert_iter);
 
     // solve it
-    auto result = ir::solve_iterative_rounding(problem, vertex_cover_ir_components());
+    auto result =
+        ir::solve_iterative_rounding(problem, vertex_cover_ir_components());
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
@@ -132,12 +132,10 @@ int main() {
             std::cout << "Vertex " << v << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
-    }
-    else {
+    } else {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Iterative Rounding Example]
+    //! [Iterative Rounding Example]
     return 0;
 }
-

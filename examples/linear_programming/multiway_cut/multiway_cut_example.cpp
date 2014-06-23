@@ -10,8 +10,8 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
-int main(){
-//! [Multiway Cut Example]
+int main() {
+    //! [Multiway Cut Example]
     // sample data
     std::vector<std::pair<int,int>> edges_p{{0,3},{1,3},
                                            {0,4},{2,4},
@@ -24,15 +24,16 @@ int main(){
     const int vertices_num = 9;
     std::vector<int> cost_edges{100,100,100,100,100,100,10,10,10,10,10,10,1,1,1};
 
-    std::vector<int> terminals = {0,1,2};
-    boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                    boost::property<boost::vertex_index_t, int,
+    std::vector<int> terminals = { 0, 1, 2 };
+    boost::adjacency_list<
+        boost::vecS, boost::vecS, boost::undirectedS,
+        boost::property<boost::vertex_index_t, int,
                         boost::property<boost::vertex_color_t, int>>,
                     boost::property<boost::edge_weight_t, int>
                     > graph(edges_p.begin(), edges_p.end(), cost_edges.begin(), vertices_num);
 
     for (std::size_t i = 1; i <= terminals.size(); ++i) {
-        put(boost::vertex_color, graph, terminals[i-1], i);
+        put(boost::vertex_color, graph, terminals[i - 1], i);
     }
 
     //solve
@@ -46,5 +47,5 @@ int main(){
         std::cout << "  " << i.first << "      ( " << i.second << " )" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Multiway Cut Example]
+    //! [Multiway Cut Example]
 }

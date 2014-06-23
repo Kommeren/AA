@@ -24,7 +24,6 @@
 
 #include <boost/range/join.hpp>
 
-
 namespace paal {
 namespace ir {
 
@@ -36,10 +35,9 @@ struct steiner_tree_compare_traits {
 const double steiner_tree_compare_traits::EPSILON = 1e-10;
 }
 
-
-template <template <typename> class OracleStrategy = lp::random_violated_separation_oracle>
+template <template <typename> class OracleStrategy =
+              lp::random_violated_separation_oracle>
 using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
-
 
 /**
  * @class steiner_tree
@@ -79,36 +77,33 @@ public:
     /**
      * Move constructor
      */
-    steiner_tree(steiner_tree&& other) = default;
+    steiner_tree(steiner_tree &&other) = default;
 
     /**
      * Returns the separation oracle.
      */
-    Oracle & get_oracle() {
-        return m_oracle;
-    }
+    Oracle &get_oracle() { return m_oracle; }
 
     /**
      * Generates all the components using specified strategy.
      */
     void gen_components() {
-        m_strategy.gen_components(m_cost_map, m_terminals, m_steiner_vertices, m_components);
-        //std::cout << "Generated: " << m_components.size() << " components\n";
+        m_strategy.gen_components(m_cost_map, m_terminals, m_steiner_vertices,
+                                  m_components);
+        // std::cout << "Generated: " << m_components.size() << " components\n";
     }
 
     /**
      * Gets reference to all the components.
      */
-    const steiner_components<Vertex, Dist>& get_components() const {
+    const steiner_components<Vertex, Dist> &get_components() const {
         return m_components;
     }
 
     /**
      * Gets reference to all the terminals.
      */
-    const Terminals& get_terminals() const {
-        return m_terminals;
-    }
+    const Terminals &get_terminals() const { return m_terminals; }
 
     /**
      * Adds map entry from component id to LP lp::col_id.
@@ -121,9 +116,7 @@ public:
     /**
      * Finds LP lp::col_id based on component id.
      */
-    lp::col_id find_column_lp(int id) const {
-        return m_elements_map.at(id);
-    }
+    lp::col_id find_column_lp(int id) const { return m_elements_map.at(id); }
 
     /**
      * Adds elements to solution.
@@ -169,16 +162,18 @@ public:
         return m_compare;
     }
 
-private:
-    Metric m_cost_map; // metric in current state
-    Terminals m_terminals; // terminals in current state
+  private:
+    Metric m_cost_map;            // metric in current state
+    Terminals m_terminals;        // terminals in current state
     Terminals m_steiner_vertices; // vertices that are not terminals
-    steiner_components<Vertex, Dist> m_components; // components in current state
-    Strategy m_strategy; // strategy to generate the components
+    steiner_components<Vertex, Dist> m_components; // components in current
+                                                   // state
+    Strategy m_strategy;      // strategy to generate the components
     Result m_result_iterator; // list of selected Steiner Vertices
-    Compare m_compare; // comparison method
+    Compare m_compare;        // comparison method
 
-    std::unordered_map<int, lp::col_id> m_elements_map; // maps componentId -> col_id in LP
+    std::unordered_map<int, lp::col_id> m_elements_map; // maps componentId ->
+                                                        // col_id in LP
     Oracle m_oracle;
 };
 
@@ -187,26 +182,28 @@ private:
  * Initialization of the IR Steiner Tree algorithm.
  */
 class steiner_tree_init {
-public:
+  public:
     /**
      * Initializes LP.
      */
     template <typename Problem, typename LP>
-    void operator()(Problem& problem, LP & lp) {
+    void operator()(Problem &problem, LP &lp) {
         lp.clear();
         lp.set_lp_name("steiner tree");
         problem.gen_components();
         lp.set_optimization_type(lp::MINIMIZE);
         add_variables(problem, lp);
     }
-private:
+
+  private:
     /**
      * Adds all the components as columns of LP.
      */
     template <typename Problem, typename LP>
-    void add_variables(Problem& problem, LP & lp) {
+    void add_variables(Problem &problem, LP &lp) {
         for (int i = 0; i < problem.get_components().size(); ++i) {
-            lp::col_id col = lp.add_column(problem.get_components().find(i).get_cost(), 0, 1);
+            lp::col_id col = lp.add_column(
+                problem.get_components().find(i).get_cost(), 0, 1);
             problem.add_column_lp(i, col);
         }
     }
@@ -216,22 +213,25 @@ private:
  * Round Condition: step of iterative-randomized rounding algorithm.
  */
 class steiner_tree_round_condition {
-public:
+  public:
     steiner_tree_round_condition() {}
 
     /**
-     * Selects one component according to probability, adds it to solution and merges selected vertices.
+     * Selects one component according to probability, adds it to solution and
+     * merges selected vertices.
      */
-    template<typename Problem, typename LP>
-    void operator()(Problem& problem, LP& lp) {
+    template <typename Problem, typename LP>
+    void operator()(Problem &problem, LP &lp) {
         std::vector<double> weights;
         weights.reserve(problem.get_components().size());
         for (int i = 0; i < problem.get_components().size(); ++i) {
             lp::col_id cId = problem.find_column_lp(i);
             weights.push_back(lp.get_col_value(cId));
         }
-        int selected = paal::utils::random_select(weights.begin(), weights.end()) - weights.begin();
-        const auto & comp = problem.get_components().find(selected);
+        int selected =
+            paal::utils::random_select(weights.begin(), weights.end()) -
+            weights.begin();
+        const auto &comp = problem.get_components().find(selected);
         problem.add_to_solution(comp.get_steiner_elements());
         problem.update_graph(comp);
         steiner_tree_init()(problem, lp);
@@ -265,17 +265,16 @@ steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
             terminals, steiner_vertices, result, strategy, oracle);
 }
 
-template <
-         typename Init = steiner_tree_init,
-         typename RoundCondition = steiner_tree_round_condition,
-         typename RelaxCondition = utils::always_false,
-         typename SetSolution = utils::skip_functor,
-         typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-         typename ResolveLPToExtremePoint = lp::row_generation_solve_lp,
-         typename StopCondition = steiner_tree_stop_condition>
-             using steiner_tree_ir_components = IRcomponents<Init, RoundCondition, RelaxCondition,
-                        SetSolution, SolveLPToExtremePoint, ResolveLPToExtremePoint, StopCondition>;
-
+template <typename Init = steiner_tree_init,
+          typename RoundCondition = steiner_tree_round_condition,
+          typename RelaxCondition = utils::always_false,
+          typename SetSolution = utils::skip_functor,
+          typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
+          typename ResolveLPToExtremePoint = lp::row_generation_solve_lp,
+          typename StopCondition = steiner_tree_stop_condition>
+using steiner_tree_ir_components =
+    IRcomponents<Init, RoundCondition, RelaxCondition, SetSolution,
+                 SolveLPToExtremePoint, ResolveLPToExtremePoint, StopCondition>;
 
 /**
  * @brief Solves the Steiner Tree problem using Iterative Rounding.
@@ -307,6 +306,6 @@ void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& 
     paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));
 }
 
-} //ir
-} //paal
+} //! ir
+} //! paal
 #endif /* STEINER_TREE_HPP */

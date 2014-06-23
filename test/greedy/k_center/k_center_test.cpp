@@ -15,22 +15,22 @@
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
 
-
 BOOST_AUTO_TEST_CASE(KCenter) {
-    const int NUM_CENTERS=3;
-    const int NUM_ITEMS=6;
-    const double OPTIMAL=1;
-    const double APPROXIMATION_RATIO=2;
-    auto metric=[](int a,int b){return 0.1+abs(a-b)*0.9;};
-    auto items=boost::irange(0,NUM_ITEMS);
+    const int NUM_CENTERS = 3;
+    const int NUM_ITEMS = 6;
+    const double OPTIMAL = 1;
+    const double APPROXIMATION_RATIO = 2;
+    auto metric = [](int a, int b) { return 0.1 + abs(a - b) * 0.9; };
+    auto items = boost::irange(0, NUM_ITEMS);
     std::vector<int> centers;
-    //solution
-    double radius=paal::greedy::kCenter(metric,NUM_CENTERS,items.begin(),items.end(),back_inserter(centers));
+    // solution
+    double radius = paal::greedy::kCenter(metric, NUM_CENTERS, items.begin(),
+                                          items.end(), back_inserter(centers));
     LOGLN("Radius " << radius);
     LOGLN("Centers:");
     LOG_COPY_RANGE_DEL(centers, " ");
     LOGLN("");
-    BOOST_CHECK_EQUAL(centers.size(),NUM_CENTERS);
-    check_result(radius,OPTIMAL,APPROXIMATION_RATIO);
-    paal::in_balls(items,centers,metric,radius);
+    BOOST_CHECK_EQUAL(centers.size(), NUM_CENTERS);
+    check_result(radius, OPTIMAL, APPROXIMATION_RATIO);
+    paal::in_balls(items, centers, metric, radius);
 }

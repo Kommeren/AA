@@ -20,11 +20,12 @@ namespace paal {
  *
  * @return
  */
-inline float fast_pow2 (float p)
-{
+inline float fast_pow2(float p) {
     float clipp = (p < -126) ? -126.0f : p;
-    union { uint32_t i; float f; } v = { static_cast<uint32_t> (
-            (1 << 23) * (clipp + 126.94269504f) ) };
+    union {
+        uint32_t i;
+        float f;
+    } v = { static_cast<uint32_t>((1 << 23) * (clipp + 126.94269504f)) };
     return v.f;
 }
 
@@ -35,11 +36,10 @@ inline float fast_pow2 (float p)
  *
  * @return
  */
-inline float fast_exp(float p)
-{
+inline float fast_exp(float p) {
     static const float multiplier = 1 / std::log(2);
-    return fast_pow2 (multiplier * p);
+    return fast_pow2(multiplier * p);
 }
-}//!paal
+} //!paal
 
 #endif /* FAST_EXP_HPP */

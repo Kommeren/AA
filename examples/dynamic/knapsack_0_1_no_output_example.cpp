@@ -6,7 +6,6 @@
  * @date 2013-09-20
  */
 
-
 #include "paal/dynamic/knapsack_0_1.hpp"
 
 #include <boost/range/irange.hpp>
@@ -15,24 +14,23 @@
 #include <iostream>
 
 int main() {
-//! [Knapsack Example]
+    //! [Knapsack Example]
 
-    std::vector<int> sizes{1,2,3,1,2,4,1,10};
+    std::vector<int> sizes{ 1, 2, 3, 1, 2, 4, 1, 10 };
     int capacity = 6;
-    std::vector<int> values{3,2,65,1,2,3,1,23};
+    std::vector<int> values{ 3, 2, 65, 1, 2, 3, 1, 23 };
     auto objects = boost::irange(std::size_t(0), sizes.size());
 
-    //Knapsack 0/1 does not compute the items in knapsack
+    // Knapsack 0/1 does not compute the items in knapsack
     std::cout << "Knapsack 0 / 1 no output" << std::endl;
-    auto maxValue = paal::knapsack_0_1_no_output(std::begin(objects), std::end(objects),
-            capacity,
-            paal::utils::make_array_to_functor(sizes),
-            paal::utils::make_array_to_functor(values));
+    auto maxValue = paal::knapsack_0_1_no_output(
+        std::begin(objects), std::end(objects), capacity,
+        paal::utils::make_array_to_functor(sizes),
+        paal::utils::make_array_to_functor(values));
 
-    std::cout << "Max value " << maxValue.first << ", Total size "  << maxValue.second << std::endl;
-//! [Knapsack Example]
+    std::cout << "Max value " << maxValue.first << ", Total size "
+              << maxValue.second << std::endl;
+    //! [Knapsack Example]
 
     return 0;
 }
-
-

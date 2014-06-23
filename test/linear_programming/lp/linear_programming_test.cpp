@@ -24,20 +24,18 @@ using namespace paal;
 using lp_types = boost::mpl::list<lp::glp>;
 
 template <typename LP>
-void log_solution(lp::problem_type status, const LP & lp_instance) {
+void log_solution(lp::problem_type status, const LP &lp_instance) {
     if (status == lp::OPTIMAL) {
         LOGLN("Optimal solution cost: " << lp_instance.get_obj_value());
-        for (auto column : lp_instance.get_columns() ) {
+        for (auto column : lp_instance.get_columns()) {
             boost::ignore_unused_variable_warning(column);
-            LOGLN(lp_instance.get_col_name(column) << " = "
-                        << lp_instance.get_col_value(column));
+            LOGLN(lp_instance.get_col_name(column)
+                  << " = " << lp_instance.get_col_value(column));
         }
-    }
-    else {
+    } else {
         LOGLN("Optimal solution not found");
     }
 }
-
 
 BOOST_AUTO_TEST_SUITE(linear_programming_test)
 
@@ -74,9 +72,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_example, LP, lp_types) {
     log_solution(status, lp_instance);
 }
 
-
-
-
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_expressions, LP, lp_types) {
     LP lp_instance;
 
@@ -108,66 +103,68 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_expressions, LP, lp_types) {
 
     auto U = lp_instance.add_column(-50);
 
-    auto expr4 = -U + U + 0.2 * (X * 7 + (U + X) * 3) + U + 2 * U + 5 * X + (T - T) * 11;
+    auto expr4 =
+        -U + U + 0.2 * (X * 7 + (U + X) * 3) + U + 2 * U + 5 * X + (T - T) * 11;
 
     auto row6 = lp_instance.add_row(expr4 >= 3);
 
-    lp_instance.set_row_expression(row2, lp_instance.get_row_expression(row2) + 5 * U);
-    lp_instance.set_row_expression(row3, lp_instance.get_row_expression(row3) - 2 * U);
+    lp_instance.set_row_expression(
+        row2, lp_instance.get_row_expression(row2) + 5 * U);
+    lp_instance.set_row_expression(
+        row3, lp_instance.get_row_expression(row3) - 2 * U);
 
     // solve it
     lp_instance.solve_simplex();
 
-    std::vector<lp::col_id> columns = {X, Y, Z, T, U};
-    std::vector<lp::row_id> rows = {row1, row2, row3, row4, row5, row6};
+    std::vector<lp::col_id> columns = { X, Y, Z, T, U };
+    std::vector<lp::row_id> rows = { row1, row2, row3, row4, row5, row6 };
     std::vector<std::vector<double>> coefs = {
-            {1,   0.5,  0,    2,   0},
-            {1,   0.5,  0,    2,   5},
-            {2,   0,    -3,   5,   -2},
-            {0.2, 0.35, -0.3, 2.5, 0},
-            {1,   0,    1,    0,   0},
-            {7,   0,    0,    0,   3.6},
-        };
-    std::vector<int> row_degrees = {3, 4, 4, 4, 2, 2};
-    std::vector<int> col_degrees = {6, 3, 3, 4, 3};
+        { 1, 0.5, 0, 2, 0 }, { 1, 0.5, 0, 2, 5 }, { 2, 0, -3, 5, -2 },
+        { 0.2, 0.35, -0.3, 2.5, 0 }, { 1, 0, 1, 0, 0 }, { 7, 0, 0, 0, 3.6 },
+    };
+    std::vector<int> row_degrees = { 3, 4, 4, 4, 2, 2 };
+    std::vector<int> col_degrees = { 6, 3, 3, 4, 3 };
     const double MAX = lp::lp_traits::PLUS_INF;
     const double MIN = lp::lp_traits::MINUS_INF;
-    std::vector<double> lower_bounds = {7, MIN, 8.5, -10, MIN,   3};
-    std::vector<double> upper_bounds = {MAX, 10, 8.5,  20,  100, MAX};
+    std::vector<double> lower_bounds = { 7, MIN, 8.5, -10, MIN, 3 };
+    std::vector<double> upper_bounds = { MAX, 10, 8.5, 20, 100, MAX };
 
     for (int row_num : boost::irange(0, int(rows.size()))) {
         auto expr = lp_instance.get_row_expression(rows[row_num]);
         for (int col_num : boost::irange(0, int(columns.size()))) {
-            BOOST_CHECK_SMALL(expr.get_coefficient(columns[col_num]) - coefs[row_num][col_num],
-                                std::numeric_limits<double>::epsilon());
+            BOOST_CHECK_SMALL(expr.get_coefficient(columns[col_num]) -
+                                  coefs[row_num][col_num],
+                              std::numeric_limits<double>::epsilon());
         }
         if (lower_bounds[row_num] == MIN) {
-            BOOST_CHECK(lp_instance.get_row_lower_bound(rows[row_num]) == lower_bounds[row_num]);
-        }
-        else {
-            BOOST_CHECK_SMALL(lp_instance.get_row_lower_bound(rows[row_num]) - lower_bounds[row_num],
-                                std::numeric_limits<double>::epsilon());
+            BOOST_CHECK(lp_instance.get_row_lower_bound(rows[row_num]) ==
+                        lower_bounds[row_num]);
+        } else {
+            BOOST_CHECK_SMALL(lp_instance.get_row_lower_bound(rows[row_num]) -
+                                  lower_bounds[row_num],
+                              std::numeric_limits<double>::epsilon());
         }
         if (upper_bounds[row_num] == MAX) {
-            BOOST_CHECK(lp_instance.get_row_upper_bound(rows[row_num]) == upper_bounds[row_num]);
+            BOOST_CHECK(lp_instance.get_row_upper_bound(rows[row_num]) ==
+                        upper_bounds[row_num]);
+        } else {
+            BOOST_CHECK_SMALL(lp_instance.get_row_upper_bound(rows[row_num]) -
+                                  upper_bounds[row_num],
+                              std::numeric_limits<double>::epsilon());
         }
-        else {
-            BOOST_CHECK_SMALL(lp_instance.get_row_upper_bound(rows[row_num]) - upper_bounds[row_num],
-                                std::numeric_limits<double>::epsilon());
-        }
-        BOOST_CHECK_EQUAL(lp_instance.get_row_degree(rows[row_num]), row_degrees[row_num]);
+        BOOST_CHECK_EQUAL(lp_instance.get_row_degree(rows[row_num]),
+                          row_degrees[row_num]);
     }
 
     for (int col_num : boost::irange(0, int(columns.size()))) {
-        BOOST_CHECK_EQUAL(lp_instance.get_col_degree(columns[col_num]), col_degrees[col_num]);
+        BOOST_CHECK_EQUAL(lp_instance.get_col_degree(columns[col_num]),
+                          col_degrees[col_num]);
     }
 }
 
-
-
-
 template <typename LP>
-void run_single_solve_test(lp::simplex_type solve_type, lp::simplex_type resolve_type) {
+void run_single_solve_test(lp::simplex_type solve_type,
+                           lp::simplex_type resolve_type) {
     LP lp("test instance", lp::MAXIMIZE);
     auto X = lp.add_column(500, 0, lp::lp_traits::PLUS_INF, "x");
     auto Y = lp.add_column(300, 0, lp::lp_traits::PLUS_INF, "y");
@@ -176,17 +173,23 @@ void run_single_solve_test(lp::simplex_type solve_type, lp::simplex_type resolve
 
     auto status = lp.solve_simplex(solve_type);
     BOOST_CHECK_EQUAL(status, lp::OPTIMAL);
-    BOOST_CHECK_SMALL(lp.get_obj_value() - 3400, std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_col_value(X) - 2, 4 * std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_col_value(Y) - 8, 10 * std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_obj_value() - 3400,
+                      std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_col_value(X) - 2,
+                      4 * std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_col_value(Y) - 8,
+                      10 * std::numeric_limits<double>::epsilon());
 
     lp.add_row(12 >= X + 2 * Y);
 
     status = lp.resolve_simplex(resolve_type);
     BOOST_CHECK_EQUAL(status, lp::OPTIMAL);
-    BOOST_CHECK_SMALL(lp.get_obj_value() - 3200, std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_col_value(X) - 4, std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_col_value(Y) - 4, std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_obj_value() - 3200,
+                      std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_col_value(X) - 4,
+                      std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_col_value(Y) - 4,
+                      std::numeric_limits<double>::epsilon());
 }
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_solve, LP, lp_types) {
@@ -195,9 +198,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_solve, LP, lp_types) {
     run_single_solve_test<LP>(lp::DUAL, lp::PRIMAL);
     run_single_solve_test<LP>(lp::DUAL, lp::DUAL);
 }
-
-
-
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     LP lp("test instance", lp::MAXIMIZE);
@@ -210,7 +210,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     auto row4 = lp.add_row(-1 <= Y + 0.2 * X <= 11.2, "row4");
 
     BOOST_CHECK_EQUAL(lp.columns_number(), 2);
-    std::unordered_map<lp::col_id, std::string> columns({{X, "x"}, {Y, "y"}});
+    std::unordered_map<lp::col_id, std::string> columns(
+        { { X, "x" }, { Y, "y" } });
     for (auto col : lp.get_columns()) {
         BOOST_CHECK(columns.find(col) != columns.end());
         BOOST_CHECK_EQUAL(lp.get_col_name(col), columns.find(col)->second);
@@ -219,7 +220,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     }
 
     BOOST_CHECK_EQUAL(lp.rows_number(), 4);
-    std::unordered_map<lp::row_id, std::string> rows({{row1, "row1"}, {row2, "row2"}, {row3, "row3"}, {row4, "row4"}});
+    std::unordered_map<lp::row_id, std::string> rows(
+        { { row1, "row1" }, { row2, "row2" }, { row3, "row3" },
+          { row4, "row4" } });
     for (auto row : lp.get_rows()) {
         BOOST_CHECK(rows.find(row) != rows.end());
         BOOST_CHECK_EQUAL(lp.get_row_name(row), rows.find(row)->second);
@@ -237,7 +240,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     lp.delete_row(row3);
     BOOST_CHECK_EQUAL(lp.rows_number(), 2);
 
-    columns = std::unordered_map<lp::col_id, std::string>({{Y, "y"}});
+    columns = std::unordered_map<lp::col_id, std::string>({ { Y, "y" } });
     for (auto col : lp.get_columns()) {
         BOOST_CHECK(columns.find(col) != columns.end());
         BOOST_CHECK_EQUAL(lp.get_col_name(col), columns.find(col)->second);
@@ -245,7 +248,8 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
         BOOST_CHECK_EQUAL(boost::distance(lp.get_rows_in_column(col)), 2);
     }
 
-    rows = std::unordered_map<lp::row_id, std::string>({{row1, "row1"}, {row4, "row4"}});
+    rows = std::unordered_map<lp::row_id, std::string>(
+        { { row1, "row1" }, { row4, "row4" } });
     for (auto row : lp.get_rows()) {
         BOOST_CHECK(rows.find(row) != rows.end());
         BOOST_CHECK_EQUAL(lp.get_row_name(row), rows.find(row)->second);
@@ -273,11 +277,13 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_methods, LP, lp_types) {
     // solve
     auto status = lp.solve_simplex(lp::PRIMAL);
     BOOST_CHECK_EQUAL(status, lp::OPTIMAL);
-    BOOST_CHECK_SMALL(lp.get_obj_value() - 340, std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_row_sum(row1) - 10, std::numeric_limits<double>::epsilon());
-    BOOST_CHECK_SMALL(lp.get_row_sum(row4) - 12, std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_obj_value() - 340,
+                      std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_row_sum(row1) - 10,
+                      std::numeric_limits<double>::epsilon());
+    BOOST_CHECK_SMALL(lp.get_row_sum(row4) - 12,
+                      std::numeric_limits<double>::epsilon());
 }
-
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_zeros, LP, lp_types) {
     LP lp("test instance", lp::MAXIMIZE);
@@ -298,6 +304,4 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_zeros, LP, lp_types) {
     BOOST_CHECK_EQUAL(expr.non_zeros(), 1);
 }
 
-
 BOOST_AUTO_TEST_SUITE_END()
-

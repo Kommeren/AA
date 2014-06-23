@@ -77,6 +77,7 @@ BOOST_AUTO_TEST_CASE(multiway_cut_random) {
     auto rand_vertex_id_in_component=[&](int component){
         return (((rand_vertex_id())/NU_COMPONENTS)*NU_COMPONENTS+component)%NU_VERTICES;
     };
+
     {
         //add edges to terminals
         int source,target,nu_edges_copy=NU_TERMINAL_EDGES;
@@ -135,7 +136,8 @@ BOOST_AUTO_TEST_CASE(multiway_cut_triangle) {
     //  * * * * *
     //
     // in the oder words we have triangle
-    // and we several times get all triangle add point on each edge and connect them dividing triangle on 4 triangle
+    // and we several times get all triangle add point on each edge and connect
+    // them dividing triangle on 4 triangle
     // edges added in each step have ten times smaller cost
 
     static const int SIZ=33;
@@ -156,6 +158,7 @@ BOOST_AUTO_TEST_CASE(multiway_cut_triangle) {
         }
         return cost;
     };
+
     {
         for(auto i:size_range)
         for(auto j:size_range){
@@ -177,8 +180,8 @@ BOOST_AUTO_TEST_CASE(multiway_cut_triangle) {
                     boost::property < boost::edge_weight_t, int>
                     > graph(edges_p.begin(),edges_p.end(),cost_edges.begin(),NU_VERTICES);
 
-    for(std::size_t i=1;i<=terminals.size();i++)
-        put (boost::vertex_color,graph,terminals[i-1],i);
+    for (std::size_t i = 1; i <= terminals.size(); i++)
+        put(boost::vertex_color, graph, terminals[i - 1], i);
 
     int cost_cut=::test(graph);
     check_result(cost_cut,OPTIMAL,2);

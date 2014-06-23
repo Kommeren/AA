@@ -8,7 +8,6 @@
 #ifndef STEINER_STRATEGY_HPP
 #define STEINER_STRATEGY_HPP
 
-
 #include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
 #include "paal/utils/floating.hpp"
 
@@ -87,14 +86,16 @@ public:
         }
         for (int i = 0; i < m_iterations; ++i) {
             std::set<Vertex> curr;
-            while ((int) curr.size() < m_component_max_size) {
+            while ((int)curr.size() < m_component_max_size) {
                 if (curr.size() > 1) {
-                    int c = (int) rand() % m_component_max_size; // TODO: Is this fair probability?
+                    int c =
+                        (int)rand() %
+                        m_component_max_size; // TODO: Is this fair probability?
                     if (c == 0) {
                         break;
                     }
                 }
-                int r = (int) rand() % terminals.size();
+                int r = (int)rand() % terminals.size();
                 curr.insert(terminals[r]);
             }
             std::vector<Vertex> elements(curr.begin(), curr.end());
@@ -102,7 +103,8 @@ public:
             components.add(std::move(c));
         }
     }
-private:
+
+  private:
     int m_iterations;
     int m_component_max_size;
 };
@@ -135,9 +137,9 @@ public:
                 elements.clear();
                 elements.push_back(start);
                 int limit = 2 + rand() % (m_component_max_size - 1);
-                while ((int) elements.size() < limit) {
+                while ((int)elements.size() < limit) {
                     prob.resize(terminals.size());
-                    for (int k = 0; k < (int) prob.size(); ++k) {
+                    for (int k = 0; k < (int)prob.size(); ++k) {
                         for (auto e : elements) {
                             if (e == terminals[k]) {
                                 prob[k] = 0;
@@ -148,9 +150,10 @@ public:
                             prob[k] = std::max(prob[k], 1.0 / cost);
                         }
                     }
-                    int selected = paal::utils::random_select<false>(prob.begin(), prob.end()) - prob.begin();
-                    if (selected < 0)
-                        break;
+                    int selected = paal::utils::random_select<false>(
+                                       prob.begin(), prob.end()) -
+                                   prob.begin();
+                    if (selected < 0) break;
                     elements.push_back(terminals[selected]);
                 }
                 steiner_component<Vertex, Dist> c(elements, cost_map, terminals, steiner_vertices);
@@ -158,12 +161,13 @@ public:
             }
         }
     }
-private:
+
+  private:
     int m_iterations;
     int m_component_max_size;
 };
 
-} //ir
-} //paal
+} // ir
+} // paal
 
 #endif /* STEINER_STRATEGY_HPP */

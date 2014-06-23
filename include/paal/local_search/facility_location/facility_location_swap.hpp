@@ -24,13 +24,13 @@ namespace paal {
 namespace local_search {
 namespace facility_location {
 
-    /**
-     * @brief swap type
-     *
-     * @tparam T
-     */
+/**
+ * @brief swap type
+ *
+ * @tparam T
+ */
 template <typename T> class Swap {
-public:
+  public:
     /**
      * @brief constructor
      *
@@ -46,48 +46,38 @@ public:
      *
      * @return
      */
-    T get_from() const {
-        return m_from;
-    }
+    T get_from() const { return m_from; }
 
     /**
      * @brief to getter
      *
      * @return
      */
-    T get_to() const {
-        return m_to;
-    }
+    T get_to() const { return m_to; }
 
     /**
      * @brief form setter
      *
      * @param from
      */
-    void set_from(T from) {
-        m_from = from;
-    }
+    void set_from(T from) { m_from = from; }
 
     /**
      * @brief from setter
      *
      * @param to
      */
-    void set_to(T to) {
-        m_to = to;
-    }
+    void set_to(T to) { m_to = to; }
 
-private:
+  private:
     T m_from;
     T m_to;
 };
 
-///operator() creates Swap  from (from, to)
+/// operator() creates Swap  from (from, to)
 struct make_swap {
-    ///operator()
-    template <typename T>
-    Swap<T>
-    operator()(T from, T to) const {
+    /// operator()
+    template <typename T> Swap<T> operator()(T from, T to) const {
         return Swap<T>(from, to);
     }
 };
@@ -107,22 +97,23 @@ struct facility_location_gain_swap {
      *
      * @return
      */
-        template <class Solution, class VertexType>
-    auto operator()(Solution & sol,
-            const Swap<VertexType> & s) ->
-                typename data_structures::facility_location_solution_traits<puretype(sol.getfacility_location_solution())>::Dist {
+    template <class Solution, class VertexType>
+    auto operator()(Solution &sol, const Swap<VertexType> &s)
+        ->typename data_structures::facility_location_solution_traits<
+              puretype(sol.getfacility_location_solution())>::Dist {
 
-        typename data_structures::facility_location_solution_traits<puretype(sol.getfacility_location_solution())>::Dist ret, back;
+        typename data_structures::facility_location_solution_traits<
+            puretype(sol.getfacility_location_solution())>::Dist ret,
+            back;
 
-        ret   = sol.add_facility_tentative(s.get_to());
-        ret  += sol.remove_facility_tentative(s.get_from());
-        back  = sol.add_facility_tentative(s.get_from());
+        ret = sol.add_facility_tentative(s.get_to());
+        ret += sol.remove_facility_tentative(s.get_from());
+        back = sol.add_facility_tentative(s.get_from());
         back += sol.remove_facility_tentative(s.get_to());
         assert(ret == -back);
         return -ret;
     }
 };
-
 
 /**
  * @brief commit functor for facility location problem
@@ -136,8 +127,7 @@ struct facility_location_commit_swap {
      * @param s
      */
     template <typename Solution, typename VertexType>
-    bool operator()(Solution & sol,
-            const Swap<VertexType> & s) {
+    bool operator()(Solution &sol, const Swap<VertexType> &s) {
         sol.add_facility(s.get_to());
         sol.remove_facility(s.get_from());
         return true;
@@ -149,26 +139,24 @@ struct facility_location_commit_swap {
  */
 struct facility_locationget_moves_swap {
 
-    ///operator()
+    /// operator()
     template <typename Solution>
-    auto operator()(const Solution &s) ->
-        boost::iterator_range<data_structures::combine_iterator<make_swap
-                    , puretype(s.getChosenCopy())
-                    , puretype(s.getUnchosenCopy())>>
+    auto operator()(const Solution &s)
+        ->boost::iterator_range<data_structures::combine_iterator<
+              make_swap, puretype(s.getChosenCopy()),
+              puretype(s.getUnchosenCopy())>>
 
-        //this does NOT work on clang-3.4!!!
-    /*    std::pair<
-        decltype(data_structures::make_combine_iterator(make_swap{}
-                , s.getUnchosenCopy()
-                , s.getChosenCopy())),
-        decltype(data_structures::make_combine_iterator(make_swap{}
-                , s.getUnchosenCopy()
-                , s.getChosenCopy()))>*/
-    {
-        auto begin = data_structures::make_combine_iterator(make_swap{}
-                , s.getChosenCopy()
-                , s.getUnchosenCopy()
-                );
+        // this does NOT work on clang-3.4!!!
+        /*    std::pair<
+            decltype(data_structures::make_combine_iterator(make_swap{}
+                    , s.getUnchosenCopy()
+                    , s.getChosenCopy())),
+            decltype(data_structures::make_combine_iterator(make_swap{}
+                    , s.getUnchosenCopy()
+                    , s.getChosenCopy()))>*/
+        {
+        auto begin = data_structures::make_combine_iterator(
+            make_swap{}, s.getChosenCopy(), s.getUnchosenCopy());
         decltype(begin) end;
         return boost::make_iterator_range(begin, end);
     }

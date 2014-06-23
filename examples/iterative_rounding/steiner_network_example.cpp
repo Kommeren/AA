@@ -6,7 +6,6 @@
  * @date 2013-06-24
  */
 
-
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
@@ -31,8 +30,8 @@ int main() {
     std::vector<Edge> result_network;
 
     // optional input validity checking
-    auto steiner_network = paal::ir::make_steiner_network(g, restrictions,
-                                std::back_inserter(result_network));
+    auto steiner_network = paal::ir::make_steiner_network(
+        g, restrictions, std::back_inserter(result_network));
     auto error = steiner_network.check_input_validity();
     if (error) {
         std::cerr << "The input is not valid!" << std::endl;
@@ -42,7 +41,7 @@ int main() {
 
     // solve it
     auto result = paal::ir::steiner_network_iterative_rounding(
-                    g, restrictions, std::back_inserter(result_network));
+        g, restrictions, std::back_inserter(result_network));
 
     // print result
     if (result.first == paal::lp::OPTIMAL) {
@@ -51,12 +50,10 @@ int main() {
             std::cout << "Edge " << e << std::endl;
         }
         std::cout << "Cost of the solution: " << *(result.second) << std::endl;
-    }
-    else {
+    } else {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-//! [Steiner Network Example]
+    //! [Steiner Network Example]
     return 0;
 }
-

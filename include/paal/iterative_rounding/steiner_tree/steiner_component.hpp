@@ -37,13 +37,15 @@ public:
         auto dw = paal::steiner_tree::make_dreyfus_wagner(cost_map, m_elements, steiner_vertices);
         dw.solve();
         m_cost = dw.get_cost();
-        auto & steiner = dw.steiner_tree_zelikovsky11per6approximation();
-        m_steiner_elements.insert(m_steiner_elements.begin(), steiner.begin(), steiner.end());
+        auto &steiner = dw.steiner_tree_zelikovsky11per6approximation();
+        m_steiner_elements.insert(m_steiner_elements.begin(), steiner.begin(),
+                                  steiner.end());
         m_edges = std::move(dw.get_edges());
     }
 
     /**
-     * @brief Each component has versions, where sink is chosen from its terminals
+     * @brief Each component has versions, where sink is chosen from its
+     * terminals
      */
     Vertex get_sink(int version) const {
         assert(version < count_terminals());
@@ -53,62 +55,57 @@ public:
     /**
      * Returns vector composed of component's terminals.
      */
-    const std::vector<Vertex>& get_elements() const {
-        return m_elements;
-    }
+    const std::vector<Vertex> &get_elements() const { return m_elements; }
 
     /**
-     * Returns vector composed of component's nonterminals, i.e. Steiner elements.
+     * Returns vector composed of component's nonterminals, i.e. Steiner
+     * elements.
      */
-    const std::vector<Vertex>& get_steiner_elements() const {
+    const std::vector<Vertex> &get_steiner_elements() const {
         return m_steiner_elements;
     }
 
     /**
      * Returns edges spanning the component.
      */
-    const std::vector<Edge>& get_edges() const {
-        return m_edges;
-    }
+    const std::vector<Edge> &get_edges() const { return m_edges; }
 
     /**
      * Returns degree of component, i.e. number of terminals.
      */
-    int count_terminals() const {
-        return m_size;
-    }
+    int count_terminals() const { return m_size; }
 
     /**
      * Returns minimal cost of spanning a component.
      */
-    Dist get_cost() const {
-        return m_cost;
-    }
+    Dist get_cost() const { return m_cost; }
 
     /**
      * Prints the component.
      */
-    friend std::ostream& operator<< (std::ostream& stream, const steiner_component& component) {
+    friend std::ostream &operator<<(std::ostream &stream,
+                                    const steiner_component &component) {
         for (int i = 0; i < component.m_size; i++) {
             stream << component.m_elements[i] << " ";
         }
         stream << ": ";
-        for (auto edge: component.m_edges) {
+        for (auto edge : component.m_edges) {
             stream << "(" << edge.first << "," << edge.second << ") ";
         }
         stream << component.m_cost;
         return stream;
     }
 
-private:
+  private:
     const std::vector<Vertex> m_elements; // terminals of the component
-    int m_size; // m_elements.size()
+    int m_size;                           // m_elements.size()
     Dist m_cost; // minimal cost of spanning the component
-    std::vector<Vertex> m_steiner_elements; // non-terminals selected for spanning tree
-    std::vector<Edge> m_edges; // edges spanning the component
+    std::vector<Vertex> m_steiner_elements; // non-terminals selected for
+                                            // spanning tree
+    std::vector<Edge> m_edges;              // edges spanning the component
 };
 
-} //ir
-} //paal
+} // ir
+} // paal
 
 #endif /* STEINER_COMPONENT_HPP */

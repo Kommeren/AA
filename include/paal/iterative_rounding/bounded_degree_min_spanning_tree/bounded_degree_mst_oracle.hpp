@@ -8,14 +8,12 @@
 #ifndef BOUNDED_DEGREE_MST_ORACLE_HPP
 #define BOUNDED_DEGREE_MST_ORACLE_HPP
 
-
 #include "paal/iterative_rounding/min_cut.hpp"
 #include "paal/lp/lp_base.hpp"
 
 #include <boost/optional.hpp>
 
 #include <vector>
-
 
 namespace paal {
 namespace ir {
@@ -31,7 +29,7 @@ class bdmst_violation_checker {
     using AuxEdgeList = std::vector<AuxEdge>;
     using Violation = boost::optional<double>;
 
-public:
+  public:
     using Candidate = std::pair<AuxVertex, AuxVertex>;
     using CandidateList = std::vector<Candidate>;
 
@@ -39,7 +37,8 @@ public:
      * Returns an iterator range of violated constraint candidates.
      */
     template <typename Problem, typename LP>
-    const CandidateList & get_violation_candidates(const Problem & problem, const LP & lp) {
+    const CandidateList &get_violation_candidates(const Problem &problem,
+                                                  const LP &lp) {
         fill_auxiliary_digraph(problem, lp);
         initialize_candidates(problem);
         return m_candidate_list;
@@ -50,12 +49,11 @@ public:
      * returns the violation value and violated constraint ID.
      */
     template <typename Problem>
-    Violation check_violation(Candidate candidate, const Problem & problem) {
+    Violation check_violation(Candidate candidate, const Problem &problem) {
         double violation = find_violation(candidate.first, candidate.second);
         if (problem.get_compare().g(violation, 0)) {
             return violation;
-        }
-        else {
+        } else {
             return Violation{};
         }
     }
@@ -64,40 +62,42 @@ public:
      * Adds a violated constraint to the LP.
      */
     template <typename Problem, typename LP>
-    void add_violated_constraint(Candidate violating_pair, const Problem & problem, LP & lp) {
+    void add_violated_constraint(Candidate violating_pair,
+                                 const Problem &problem, LP &lp) {
         if (violating_pair != m_min_cut.get_last_cut()) {
             find_violation(violating_pair.first, violating_pair.second);
         }
 
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
 
         lp::linear_expression expr;
-        for (auto const & e : problem.get_edge_map().right) {
+        for (auto const &e : problem.get_edge_map().right) {
             auto u = get(index, source(e.second, g));
             auto v = get(index, target(e.second, g));
-            if (m_min_cut.is_in_source_set(u) && m_min_cut.is_in_source_set(v)) {
+            if (m_min_cut.is_in_source_set(u) &&
+                m_min_cut.is_in_source_set(v)) {
                 expr += e.first;
             }
         }
         lp.add_row(std::move(expr) <= m_min_cut.source_set_size() - 2);
     }
 
-private:
+  private:
 
     /**
      * Creates the auxiliary directed graph used for feasibility testing.
      */
     template <typename Problem, typename LP>
-    void fill_auxiliary_digraph(const Problem & problem, const LP & lp) {
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
+    void fill_auxiliary_digraph(const Problem &problem, const LP &lp) {
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
         m_vertices_num = num_vertices(g);
         m_min_cut.init(m_vertices_num);
         m_src_to_v.resize(m_vertices_num);
         m_v_to_trg.resize(m_vertices_num);
 
-        for (auto const & e : problem.get_edge_map().right) {
+        for (auto const &e : problem.get_edge_map().right) {
             lp::col_id col_idx = e.first;
             double col_val = lp.get_col_value(col_idx) / 2;
 
@@ -113,8 +113,11 @@ private:
 
         for (auto v : boost::make_iterator_range(vertices(g))) {
             auto aux_v = get(index, v);
-            m_src_to_v[aux_v] = m_min_cut.add_edge_to_graph(m_src, aux_v, degree_of(problem, v, lp) / 2).first;
-            m_v_to_trg[aux_v] = m_min_cut.add_edge_to_graph(aux_v, m_trg, 1).first;
+            m_src_to_v[aux_v] = m_min_cut
+                .add_edge_to_graph(m_src, aux_v, degree_of(problem, v, lp) / 2)
+                .first;
+            m_v_to_trg[aux_v] =
+                m_min_cut.add_edge_to_graph(aux_v, m_trg, 1).first;
         }
     }
 
@@ -122,9 +125,9 @@ private:
      * Initializes the list of cut candidates.
      */
     template <typename Problem>
-    void initialize_candidates(const Problem & problem) {
-        const auto & g = problem.get_graph();
-        const auto & index = problem.get_index();
+    void initialize_candidates(const Problem &problem) {
+        const auto &g = problem.get_graph();
+        const auto &index = problem.get_index();
         auto src = *(std::next(vertices(g).first, rand() % m_vertices_num));
         auto aux_src = get(index, src);
         m_candidate_list.clear();
@@ -138,10 +141,11 @@ private:
     }
 
     /**
-     * Calculates the sum of the variables for edges incident with a given vertex.
+     * Calculates the sum of the variables for edges incident with a given
+     * vertex.
      */
     template <typename Problem, typename LP, typename Vertex>
-    double degree_of(const Problem & problem, const Vertex & v, const LP & lp) {
+    double degree_of(const Problem &problem, const Vertex &v, const LP &lp) {
         double res = 0;
         auto adj_edges = out_edges(v, problem.get_graph());
 
@@ -155,7 +159,8 @@ private:
     }
 
     /**
-     * Finds the most violated set of vertices containing \c src and not containing \c trg and returns its violation value.
+     * Finds the most violated set of vertices containing \c src and not
+     * containing \c trg and returns its violation value.
      * @param src vertex to be contained in the violating set
      * @param trg vertex not to be contained in the violating set
      * @return violation of the found set
@@ -182,18 +187,17 @@ private:
 
     int m_vertices_num;
 
-    AuxVertex   m_src;
-    AuxVertex   m_trg;
+    AuxVertex m_src;
+    AuxVertex m_trg;
 
-    AuxEdgeList  m_src_to_v;
-    AuxEdgeList  m_v_to_trg;
+    AuxEdgeList m_src_to_v;
+    AuxEdgeList m_v_to_trg;
 
     CandidateList m_candidate_list;
 
     min_cut_finder m_min_cut;
 };
 
-
-} //ir
-} //paal
+} //! ir
+} //! paal
 #endif /* BOUNDED_DEGREE_MST_ORACLE_HPP */

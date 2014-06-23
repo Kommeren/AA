@@ -8,23 +8,21 @@
 
 #include <boost/test/unit_test.hpp>
 
-
-
 using namespace paal::data_structures;
 using namespace paal::local_search::facility_location;
-
 
 BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
-    std::vector<int> fcosts{7,8};
-    auto cost = [&](int i){ return fcosts[i];};
+    std::vector<int> fcosts{ 7, 8 };
+    auto cost = [&](int i) { return fcosts[i]; };
 
     typedef voronoi<decltype(gm)> VorType;
     typedef typename VorType::GeneratorsSet FSet;
-    VorType voronoi(FSet{SGM::A}, FSet{SGM::A,SGM::B,SGM::C,SGM::D,SGM::E} , gm);
+    VorType voronoi(FSet{ SGM::A },
+                    FSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
     typedef facility_location_solution<decltype(cost), VorType> Sol;
-    Sol sol(std::move(voronoi), FSet{SGM::B}, cost);
+    Sol sol(std::move(voronoi), FSet{ SGM::B }, cost);
     facility_location_solution_adapter<Sol> sa(sol);
 
     {

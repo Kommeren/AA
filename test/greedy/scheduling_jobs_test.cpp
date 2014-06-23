@@ -25,30 +25,35 @@ typedef double Job;
 typedef int Machine;
 
 namespace {
-   const vector<Machine> input_machines = {10, 20, 30};
-   // comments show optimal grouping
-   const vector<Job> input_jobs = {2, 2, 6,/* # */ 1, 2, 4, 6, 7,/* # */ 1, 1, 2, 3, 3, 3, 5, 12};
-   const Time opt = 1;
+const vector<Machine> input_machines = { 10, 20, 30 };
+// comments show optimal grouping
+const vector<Job> input_jobs = { 2, 2, 6, /* # */ 1, 2, 4, 6, 7, /* # */ 1, 1,
+                                 2, 3, 3, 3, 5, 12 };
+const Time opt = 1;
 }
 
 BOOST_AUTO_TEST_CASE(testDeterministicRounding) {
-   vector<Job> jobs = input_jobs;
-   vector<Machine> machines = input_machines;
-   vector<pair<decltype(machines)::iterator, decltype(jobs)::iterator>> result;
-   schedule_deterministic(machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-      back_inserter(result), identity_functor(), identity_functor());
-   check_jobs(result, jobs);
-   Time max_time = get_max_time(result, identity_functor());
-   check_result(max_time,opt,2.0);
+    vector<Job> jobs = input_jobs;
+    vector<Machine> machines = input_machines;
+    vector<pair<decltype(machines) ::iterator, decltype(jobs) ::iterator>>
+        result;
+    schedule_deterministic(machines.begin(), machines.end(), jobs.begin(),
+                           jobs.end(), back_inserter(result),
+                           identity_functor(), identity_functor());
+    check_jobs(result, jobs);
+    Time max_time = get_max_time(result, identity_functor());
+    check_result(max_time, opt, 2.0);
 }
 
 BOOST_AUTO_TEST_CASE(testRandomizedRounding) {
-   vector<Job> jobs = input_jobs;
-   vector<Machine> machines = input_machines;
-   vector<std::pair<decltype(machines)::iterator, decltype(jobs)::iterator>> result;
-   schedule_randomized(machines.begin(), machines.end(), jobs.begin(), jobs.end(),
-      back_inserter(result), identity_functor(), identity_functor());
-   check_jobs(result, jobs);
-   Time max_time = get_max_time(result, identity_functor());
-   check_result(max_time,opt,2.0);
+    vector<Job> jobs = input_jobs;
+    vector<Machine> machines = input_machines;
+    vector<std::pair<decltype(machines) ::iterator, decltype(jobs) ::iterator>>
+        result;
+    schedule_randomized(machines.begin(), machines.end(), jobs.begin(),
+                        jobs.end(), back_inserter(result), identity_functor(),
+                        identity_functor());
+    check_jobs(result, jobs);
+    Time max_time = get_max_time(result, identity_functor());
+    check_result(max_time, opt, 2.0);
 }

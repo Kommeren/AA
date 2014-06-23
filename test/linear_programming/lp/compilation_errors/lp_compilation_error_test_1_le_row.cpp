@@ -11,4 +11,3 @@ BOOST_AUTO_TEST_CASE(lp_compilation_error_1_le_row) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
-

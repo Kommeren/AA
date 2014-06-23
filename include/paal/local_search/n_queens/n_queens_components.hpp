@@ -8,13 +8,10 @@
 #ifndef N_QUEENS_COMPONENETS_HPP
 #define N_QUEENS_COMPONENETS_HPP
 
-
-
 #include "paal/data_structures/subset_iterator.hpp"
 
 #include <boost/iterator/function_input_iterator.hpp>
 #include <boost/range/adaptor/transformed.hpp>
-
 
 namespace paal {
 namespace local_search {
@@ -36,20 +33,16 @@ struct Move {
      *
      * @return
      */
-    int get_from() const {
-        return m_from;
-    }
+    int get_from() const { return m_from; }
 
     /**
      * @brief getter for m_to
      *
      * @return
      */
-    int get_to() const {
-        return m_to;
-    }
+    int get_to() const { return m_to; }
 
-private:
+  private:
     int m_from;
     int m_to;
 };
@@ -66,10 +59,7 @@ struct make_move {
      *
      * @return
      */
-    Move operator()(int from,
-                    int to) const {
-        return Move(from, to);
-    }
+    Move operator()(int from, int to) const { return Move(from, to); }
 };
 
 /**
@@ -77,13 +67,13 @@ struct make_move {
  */
 struct n_queens_commit {
     template <typename Solution>
-        /**
-         * @brief Operator swaps elements of the solution range
-         *
-         * @param sol
-         * @param move
-         */
-    bool operator()(Solution & sol, Move move) const {
+    /**
+     * @brief Operator swaps elements of the solution range
+     *
+     * @param sol
+     * @param move
+     */
+        bool operator()(Solution &sol, Move move) const {
         sol.swap_queens(move.get_from(), move.get_to());
         return true;
     }
@@ -91,35 +81,33 @@ struct n_queens_commit {
 
 namespace detail {
 
-    struct tuple_to_move {
-        using result_type = Move;
-        result_type operator() (std::tuple<int, int> t) const {
-            return Move(std::get<0>(t), std::get<1>(t));
-        }
-    };
-}//!detail
+struct tuple_to_move {
+    using result_type = Move;
+    result_type operator()(std::tuple<int, int> t) const {
+        return Move(std::get<0>(t), std::get<1>(t));
+    }
+};
+} //!detail
 
 /**
  * @brief n_queensget_moves functor
  */
 class n_queensget_moves {
 
-
     /**
      * @brief Functor needed for type computation
      *
      * @tparam Solution
      */
-    template <typename Solution>
-    struct types_eval {
+    template <typename Solution> struct types_eval {
         using SolutionIter = decltype(std::declval<Solution>().begin());
-        using Subset = data_structures::subsets_iterator<2, SolutionIter, make_move>;
+        using Subset =
+            data_structures::subsets_iterator<2, SolutionIter, make_move>;
         using IterPair = std::pair<Subset, Subset>;
         using Range = boost::iterator_range<Subset>;
-
     };
 
-public:
+  public:
     /**
      * @brief operator() returns all the elements
      *
@@ -129,12 +117,11 @@ public:
      * @return
      */
     template <typename Solution>
-    auto operator()(const Solution & solution) const ->
-        typename types_eval<Solution>::Range
-    {
-        return boost::make_iterator_range(data_structures::make_subsets_iterator_range<2>
-                        (solution.begin(), solution.end(), make_move{}));
-            ;
+    auto operator()(
+        const Solution &solution) const->typename types_eval<Solution>::Range {
+        return boost::make_iterator_range(
+            data_structures::make_subsets_iterator_range<2>(
+                solution.begin(), solution.end(), make_move{}));
     }
 };
 
@@ -152,21 +139,20 @@ struct n_queens_gain {
      * @return
      */
     template <typename Solution>
-    int operator()(const Solution & solution, Move move) const {
+    int operator()(const Solution &solution, Move move) const {
         int x1 = move.get_from();
         int y1 = solution.get_y(x1);
         int x2 = move.get_to();
         int y2 = solution.get_y(x2);
 
-        return - solution.get_num_attacing(x1, y2)
-               - solution.get_num_attacing(x2, y1)
-               + solution.get_num_attacing(x1, y1) - 2
-               + solution.get_num_attacing(x2, y2) - 2
-               - 2 * (std::abs(x1 - x2) == std::abs(y1 - y2));
+        return -solution.get_num_attacing(x1, y2) -
+               solution.get_num_attacing(x2, y1) +
+               solution.get_num_attacing(x1, y1) - 2 +
+               solution.get_num_attacing(x2, y2) - 2 -
+               2 * (std::abs(x1 - x2) == std::abs(y1 - y2));
     }
 };
 } //!local_search
 } //!paal
-
 
 #endif /* N_QUEENS_COMPONENETS_HPP */

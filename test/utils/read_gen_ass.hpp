@@ -28,14 +28,14 @@ void read_gen_ass(std::istream & is, M & costs, M & times,
     times = M(jobs_cnt, machines_cnt);
     machines_bounds.resize(machines_cnt);
 
-    for(int m : machines) {
-        for(int j : jobs) {
+    for (int m : machines) {
+        for (int j : jobs) {
             is >> costs(j, m);
         }
     }
 
-    for(int m : machines) {
-        for(int j : jobs) {
+    for (int m : machines) {
+        for (int j : jobs) {
             is >> times(j, m);
         }
     }
@@ -44,6 +44,5 @@ void read_gen_ass(std::istream & is, M & costs, M & times,
         is >> machines_bounds[m];
     }
 }
-
 }
 #endif /* READ_GEN_ASS_HPP */

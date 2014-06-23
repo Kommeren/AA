@@ -8,15 +8,12 @@
 #ifndef STATIC_LAZY_JOIN_HPP
 #define STATIC_LAZY_JOIN_HPP
 
-
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/fusion/include/begin.hpp>
 
-
 namespace paal {
 namespace data_structures {
-
 
 /**
  * @brief class for polymorphic join on boost fusion sequence
@@ -24,59 +21,43 @@ namespace data_structures {
 class polymorfic_fold {
 
     struct Fold {
-        template <typename Functor,
-                 typename IterEnd,
-                 typename AccumulatorFunctor,
-                 typename AccumulatorData>
-                     typename std::result_of<AccumulatorFunctor(AccumulatorData)>::type
-                     operator()(
-                             Functor,
-                             AccumulatorFunctor accumulatorFunctor,
-                             AccumulatorData accumulatorData,
-                             IterEnd,
-                             IterEnd) const {
-                         return accumulatorFunctor(accumulatorData);
-                     }
+        template <typename Functor, typename IterEnd,
+                  typename AccumulatorFunctor, typename AccumulatorData>
+        typename std::result_of<
+            AccumulatorFunctor(AccumulatorData)>::type operator()(
+            Functor, AccumulatorFunctor accumulatorFunctor,
+            AccumulatorData accumulatorData, IterEnd, IterEnd) const {
+            return accumulatorFunctor(accumulatorData);
+        }
 
-        template <typename Functor,
-                 typename IterBegin,
-                 typename IterEnd,
-                 typename AccumulatorFunctor,
-                 typename AccumulatorData,
-                 ///this dummy condition is needed because on the lookup phase
-                 ///some compilers on some instances (clang-3.4) try to instantiate this template
-                 ///which causes infinite loop
-                 typename Dummy = typename  std::enable_if<!std::is_same<IterEnd, IterBegin>::value>::type>
-                     auto  operator()(
-                             Functor f,
-                             AccumulatorFunctor accumulatorFunctor,
-                             AccumulatorData accumulatorData,
-                             IterBegin begin,
-                             IterEnd end) const ->
-                     typename  std::result_of<Functor(
-                             typename boost::fusion::result_of::deref<IterBegin>::type,
-                             AccumulatorFunctor,
-                             AccumulatorData,
-                             //TODO Why this move is needed??? (without it doesn't compile on clang-3.4)
-                             decltype(std::move(std::bind(*this, f,
-                                     std::placeholders::_1,
-                                     std::placeholders::_2,
-                                     boost::fusion::next(begin),
-                                     end))))>::type
-                     {
-                         auto continuation = std::bind(*this, f,
-                                 std::placeholders::_1,
-                                 std::placeholders::_2,
-                                 boost::fusion::next(begin),
-                                 end);
+        template <typename Functor, typename IterBegin, typename IterEnd,
+                  typename AccumulatorFunctor, typename AccumulatorData,
+                  /// this dummy condition is needed because on the lookup phase
+                  /// some compilers on some instances (clang-3.4) try to
+                  /// instantiate this template
+                  /// which causes infinite loop
+                  typename Dummy = typename std::enable_if<
+                      !std::is_same<IterEnd, IterBegin>::value>::type>
+        auto operator()(Functor f, AccumulatorFunctor accumulatorFunctor,
+                        AccumulatorData accumulatorData, IterBegin begin,
+                        IterEnd end) const
+            ->typename std::result_of<Functor(
+                  typename boost::fusion::result_of::deref<IterBegin>::type,
+                  AccumulatorFunctor, AccumulatorData,
+                  // TODO Why this move is needed??? (without it doesn't compile
+                  // on clang-3.4)
+                  decltype(std::move(std::bind(
+                      *this, f, std::placeholders::_1, std::placeholders::_2,
+                      boost::fusion::next(begin), end))))>::type {
+            auto continuation = std::bind(*this, f, std::placeholders::_1,
+                                          std::placeholders::_2,
+                                          boost::fusion::next(begin), end);
 
-                         return f(*begin, accumulatorFunctor, accumulatorData, continuation);
-                     }
-
+            return f(*begin, accumulatorFunctor, accumulatorData, continuation);
+        }
     };
 
-
-public:
+  public:
     /**
      * @brief operator()
      *
@@ -91,18 +72,17 @@ public:
      *
      * @return
      */
-    template <typename Functor, typename AccumulatorFunctor, typename AccumulatorData, typename Sequence>
-        auto operator()(
-                Functor f,
-                AccumulatorFunctor accumulatorFunctor,
-                AccumulatorData accumulatorData,
-                Sequence & seq) const ->
-        decltype(Fold{}(f, accumulatorFunctor, accumulatorData,
-                    boost::fusion::begin(seq), boost::fusion::end(seq)))
-        {
-            return Fold{}(f, accumulatorFunctor, accumulatorData,
-                    boost::fusion::begin(seq), boost::fusion::end(seq));
-        }
+    template <typename Functor, typename AccumulatorFunctor,
+              typename AccumulatorData, typename Sequence>
+    auto operator()(Functor f, AccumulatorFunctor accumulatorFunctor,
+                    AccumulatorData accumulatorData, Sequence &seq) const
+        ->decltype(Fold{
+    }(f, accumulatorFunctor, accumulatorData, boost::fusion::begin(seq),
+      boost::fusion::end(seq))) {
+        return Fold{}
+        (f, accumulatorFunctor, accumulatorData, boost::fusion::begin(seq),
+         boost::fusion::end(seq));
+    }
 };
 
 /**
@@ -118,9 +98,9 @@ class Satisfy {
      * @return
      */
     template <typename Predicate, typename IterEnd>
-        bool satisfy(Predicate, IterEnd, IterEnd) const {
-            return false;
-        }
+    bool satisfy(Predicate, IterEnd, IterEnd) const {
+        return false;
+    }
 
     /**
      * @brief operator()
@@ -134,16 +114,14 @@ class Satisfy {
      * @return
      */
     template <typename Predicate, typename IterBegin, typename IterEnd>
-        bool satisfy(
-                Predicate pred,
-                IterBegin begin, IterEnd end) const {
-            if(pred(*begin)) {
-                return true;
-            }
-            return satisfy(pred, boost::fusion::next(begin), end);
+    bool satisfy(Predicate pred, IterBegin begin, IterEnd end) const {
+        if (pred(*begin)) {
+            return true;
         }
+        return satisfy(pred, boost::fusion::next(begin), end);
+    }
 
-public:
+  public:
     /**
      * @brief operator()
      *
@@ -155,16 +133,13 @@ public:
      * @return
      */
     template <typename Predicate, typename Seq>
-        bool operator()(
-                Predicate pred,
-                Seq & seq) const {
-            return satisfy(pred, boost::fusion::begin(seq), boost::fusion::end(seq));
-        }
+    bool operator()(Predicate pred, Seq &seq) const {
+        return satisfy(pred, boost::fusion::begin(seq),
+                       boost::fusion::end(seq));
+    }
 };
-
 
 } //!data_structures
 } //!paal
-
 
 #endif /* STATIC_LAZY_JOIN_HPP */

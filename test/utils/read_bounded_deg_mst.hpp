@@ -16,9 +16,9 @@
 namespace paal {
 
 template <typename Graph, typename Cost>
-void add_edge_to_graph(Graph & g, Cost & cost, int u, int v, double c) {
+void add_edge_to_graph(Graph &g, Cost &cost, int u, int v, double c) {
     bool b;
-    typename boost::graph_traits < Graph >::edge_descriptor e;
+    typename boost::graph_traits<Graph>::edge_descriptor e;
     std::tie(e, b) = add_edge(u, v, g);
     assert(b);
     cost[e] = c;
@@ -31,14 +31,18 @@ inline void read_bdmst(std::istream & is, int vertices_num, int edges_num,
     int u, v, b;
     double c;
 
-    is >> s; is >> s; is >> s;
+    is >> s;
+    is >> s;
+    is >> s;
 
     for (int i = 0; i < vertices_num; i++) {
         is >> u >> b;
         deg_bounds[u] = b;
     }
 
-    is >> s; is >> s; is >> s;
+    is >> s;
+    is >> s;
+    is >> s;
 
     for (int i = 0; i < edges_num; i++) {
         is >> u >> v >> b >> c;
@@ -48,6 +52,5 @@ inline void read_bdmst(std::istream & is, int vertices_num, int edges_num,
     is >> s; is >> s;
     is >> best_cost;
 }
-
 }
 #endif /* READ_BOUNDED_DEG_MST_HPP */
