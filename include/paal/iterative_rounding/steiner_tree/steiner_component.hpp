@@ -30,6 +30,7 @@ class steiner_component {
 public:
     typedef typename std::pair<Vertex, Vertex> Edge;
 
+    ///constuctor
     template<typename Metric, typename Terminals>
     steiner_component(std::vector<Vertex> & el, const Metric & costMap,
             const Terminals & term, const Terminals& steinerVertices) :

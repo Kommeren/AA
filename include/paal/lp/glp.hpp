@@ -452,9 +452,11 @@ private:
      */
     problem_type run_simplex(simplex_type type, bool resolve) {
         m_glpk_control.meth = simplex_type_to_glp(type);
-        if (!resolve) {
-            glp_adv_basis(m_lp, 0);
-        }
+        //if (!resolve) {
+        //TODO waiting for response to on
+        //http://lists.gnu.org/archive/html/bug-glpk/
+        glp_adv_basis(m_lp, 0);
+        //}
         int ret = glp_simplex(m_lp, &m_glpk_control);
         if (resolve && ret != 0) {
             // if basis is not valid, create basis and try again

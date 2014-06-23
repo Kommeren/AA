@@ -7,6 +7,7 @@
  */
 
 #include "utils/logger.hpp"
+#include "iterative_rounding/log_visitor.hpp"
 
 #include "paal/utils/functors.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
@@ -20,22 +21,6 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-struct log_visitor : public trivial_visitor {
-    template <typename Problem, typename LP>
-    void solve_lp(const Problem &, LP & lp) {
-        LOGLN(lp);
-    }
-
-    template <typename Problem, typename LP>
-    void round_col(const Problem &, LP & lp, lp::col_id col, double val) {
-        LOGLN("Column "<< col.get() << " rounded to " << val);
-    }
-
-    template <typename Problem, typename LP>
-    void relax_row(const Problem &, LP & lp, lp::row_id row) {
-        LOGLN("Relax row " << row.get());
-    }
-};
 
 template <typename VertexList, typename EdgeProp>
 using Graph = boost::adjacency_list<boost::vecS, VertexList, boost::undirectedS,
@@ -86,8 +71,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(resultTree, resultTree.begin()),
-                    bdmst_ir_components<>(), bdmst_oracle<>(),
-                    log_visitor());
+                    bdmst_ir_components<>{}, bdmst_oracle<>{},
+                    log_visitor{});
 
     ON_LOG(for (auto const & e : resultTree) {
         LOGLN("Edge (" << indices[source(e, g)] << ", " << indices[target(e, g)]
@@ -117,8 +102,8 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree resultTree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin()),
-                    bdmst_ir_components<>(), bdmst_oracle<>(),
-                    log_visitor());
+                    bdmst_ir_components<>{}, bdmst_oracle<>{},
+                    log_visitor{});
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
         BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
@@ -127,7 +112,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree resultTree;
         auto bdmst(make_bounded_degree_mst(g, bounds, boost::weight_map(cost),
                     std::inserter(resultTree, resultTree.begin())));
-        solve_iterative_rounding(bdmst, bdmst_ir_components<>(), log_visitor());
+        solve_iterative_rounding(bdmst, bdmst_ir_components<>{}, log_visitor{});
 
         BOOST_CHECK_EQUAL(correctBdmst.size(),resultTree.size());
         BOOST_CHECK(std::equal(correctBdmst.begin(), correctBdmst.end(), resultTree.begin()));
@@ -212,7 +197,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_infeasible_test) {
 
     BOOST_CHECK(!invalid);
 
-    auto result = solve_iterative_rounding(bdmst, bdmst_ir_components<>());
+    auto result = solve_iterative_rounding(bdmst, bdmst_ir_components<>{});
 
     BOOST_CHECK(result.first == lp::INFEASIBLE);
 }

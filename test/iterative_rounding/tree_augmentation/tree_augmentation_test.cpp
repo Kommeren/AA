@@ -18,19 +18,6 @@ using namespace paal;
 using namespace paal::ir;
 using namespace boost;
 
-struct log_visitor : public trivial_visitor {
-
-    template <typename LP>
-    void round_col(LP & lp, int col, double val) {
-        LOGLN("Column "<< col << " rounded to " << val);
-    }
-
-    template <typename LP>
-    void relax_row(LP & lp, int row) {
-        LOGLN("Relax row " << row);
-    }
-};
-
 template <typename VertexList, typename EdgeProp>
 using Graph = adjacency_list<vecS, VertexList, undirectedS,
                 property<vertex_index_t, int>, EdgeProp>;

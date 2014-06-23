@@ -302,7 +302,6 @@ private:
     }
 
 
-    LP m_lp;
     std::string m_problem_name;
 
     ColSet m_col_ids;

@@ -7,8 +7,8 @@
  */
 
 #include "utils/logger.hpp"
+#include "iterative_rounding/log_visitor.hpp"
 
-#include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
 
@@ -19,18 +19,6 @@
 using namespace  paal;
 using namespace  paal::ir;
 
-struct log_visitor : public trivial_visitor {
-
-    template <typename Problem, typename LP>
-    void round_col(const Problem &, LP & lp, lp::col_id col, double val) {
-        LOGLN("Column "<< col.get() << " rounded to " << val);
-    }
-
-    template <typename Problem, typename LP>
-    void relax_row(const Problem &, LP & lp, lp::row_id row) {
-        LOGLN("Relax row " << row.get());
-    }
-};
 
 BOOST_AUTO_TEST_SUITE(generalised_assignment)
 BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
@@ -59,7 +47,7 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
          machines.begin(), machines.end(),
          jobs.begin(), jobs.end(),
          cost, time, T, std::inserter(jobsToMachines, jobsToMachines.begin()),
-         paal::ir::ga_ir_components<>(), log_visitor());
+         paal::ir::ga_ir_components<>{}, log_visitor{});
 
      ON_LOG(for(const std::pair<int, int> & jm : jobsToMachines) {
          LOGLN("Job " << jm.first << " assigned to Machine " << jm.second);
@@ -73,11 +61,11 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
 
     //compile with trivial visitor
     {
-         std::unordered_map<int, int> jobsToMachines2;
+         jobsToMachines.clear();
          paal::ir::generalised_assignment_iterative_rounding(
             machines.begin(), machines.end(),
             jobs.begin(), jobs.end(),
-            cost, time, T, std::inserter(jobsToMachines2, jobsToMachines2.begin()));
+            cost, time, T, std::inserter(jobsToMachines, jobsToMachines.begin()));
     }
 }
 

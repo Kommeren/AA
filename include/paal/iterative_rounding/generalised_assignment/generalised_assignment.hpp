@@ -26,15 +26,17 @@ struct ga_relax_condition {
      */
     template <typename Problem, typename LP>
     bool operator()(Problem & problem, const LP & lp, lp::row_id row) {
-        auto & machineRows = problem.get_machine_rows();
-        return machineRows.find(row) != machineRows.end() &&
-            (
-             lp.get_row_degree(row) <= 1 ||
-             (
-              lp.get_row_degree(row) == 2 &&
-              problem.get_compare().ge(lp.get_row_sum(row), 1)
-             )
-            );
+        auto && machine_rows = problem.get_machine_rows();
+        if (machine_rows.find(row) == machine_rows.end()) {
+            return false;
+        }
+        auto row_deg = lp.get_row_degree(row);
+        return  row_deg <= 1 ||
+                    (
+                     row_deg == 2 &&
+                     problem.get_compare().ge(lp.get_row_sum(row), 1)
+                    )
+            ;
     }
 };
 
@@ -90,8 +92,8 @@ class ga_init {
         void add_variables(Problem & problem, LP & lp) {
             auto & colIdx = problem.get_col_idx();
             colIdx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
-            for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
-                for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
+            for(auto && j : boost::make_iterator_range(problem.get_jobs())) {
+                for(auto && m : boost::make_iterator_range(problem.get_machines())) {
                     if (problem.get_proceeding_time()(j, m) <= problem.get_machine_available_time()(m)) {
                         colIdx.push_back(lp.add_column(problem.get_cost()(j,m)));
                     }
@@ -121,12 +123,12 @@ class ga_init {
         void add_constraints_for_machines(Problem & problem, LP & lp)  {
             auto & colIdx = problem.get_col_idx();
             int mIdx(0);
-            for(typename Problem::MachineRef m : boost::make_iterator_range(problem.get_machines())) {
+            for(auto && m : boost::make_iterator_range(problem.get_machines())) {
                 auto T = problem.get_machine_available_time()(m);
                 int jIdx(0);
                 lp::linear_expression expr;
 
-                for(typename Problem::JobRef j : boost::make_iterator_range(problem.get_jobs())) {
+                for(auto && j : boost::make_iterator_range(problem.get_jobs())) {
                     auto t = problem.get_proceeding_time()(j, m);
                     auto x = colIdx[problem.idx(jIdx, mIdx)];
                     expr += x * t;
@@ -165,10 +167,8 @@ class generalised_assignment {
         using Job = typename std::iterator_traits<JobIter>::value_type;
         using Machine = typename std::iterator_traits<MachineIter>::value_type;
 
-        using JobRef = typename std::iterator_traits<JobIter>::reference;
-        using MachineRef = typename std::iterator_traits<MachineIter>::reference;
         using Compare = utils::Compare<double>;
-        using MachineRows = std::set<lp::row_id>;
+        using MachineRows = std::unordered_set<lp::row_id>;
         using ColIdx = std::vector<lp::col_id>;
 
         /**
@@ -306,7 +306,7 @@ class generalised_assignment {
         JobsToMachinesOutputIterator m_job_to_machine;
         const Compare m_compare;
         ColIdx m_col_idx;
-        std::set<lp::row_id> m_machine_rows;
+        MachineRows m_machine_rows;
 };
 
 /**
