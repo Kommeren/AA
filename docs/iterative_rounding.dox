@@ -184,7 +184,7 @@ Now we can introduce the paal::ir::solve_iterative_rounding interface:
 template <typename Problem,
           typename IRComponents,
           typename Visitor = paal::ir::trivial_visitor,
-          typename LP = paal::lp::GLP>
+          typename LP = paal::lp::glp>
 paal::ir::IRResult solve_iterative_rounding(Problem & problem, IRComponents components, Visitor visitor = Visitor());
 </pre>
 
@@ -194,7 +194,7 @@ In the case when our algorithm uses dependent rounding, we should apply the paal
 template <typename Problem,
           typename IRComponents,
           typename Visitor = paal::ir::trivial_visitor,
-          typename LP = paal::lp::GLP>
+          typename LP = paal::lp::glp>
 paal::ir::IRResult solve_dependent_iterative_rounding(Problem & problem, IRComponents components, Visitor visitor = Visitor());
 </pre>
 
