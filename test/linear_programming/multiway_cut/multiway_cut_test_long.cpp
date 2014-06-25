@@ -155,7 +155,7 @@ BOOST_AUTO_TEST_CASE(multiway_cut_triangle) {
     std::vector<long long> cost_edges;
     std::srand(SEED);
     auto coordinates= [&](int x,int y){return x*SIZ+y;};
-    auto size_range=boost::irange(0,SIZ);
+    auto size_range = paal::irange(SIZ);
     auto add_edge_to_graph=env_to_add_edge(edges_p,cost_edges);
     auto gen_cost=[](int position){
         long long cost=1;

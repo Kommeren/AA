@@ -81,6 +81,11 @@
             <ul>
             <li>\ref stein_zel
             </ul>
+        <li> Clustering
+            <ul>
+            <li> \ref k_means_clustering_engine
+            <li> \ref k_means_clustering
+            </ul>
         </ul>
     <li> Concepts
         <ul>

@@ -1,0 +1,50 @@
+/*! \page k_means_clustering_engine k-means clustering engine
+
+\section def Problem definition
+
+In the k-means clustering problem we are given:
+- a set of observation \f$(x_1,x_2, ...x_n)\f$
+- function given distances between observation and center \f$d\f$.
+- function given center for cluster \f$c\f$.
+- function given start position of cluster center \f$c\f$.
+k-means clustering aims to partition the n observations into k sets \f$(k<=n)\f$.
+\f$S ={S_1,S_2,...,S_k}\f$ and give for each set center so as to minimize the within-cluster sum of distances from center to all observation:
+
+\f{eqnarray*}
+\mbox{argmin}_{S}\sum\limits_{i=1}^k\sum_{x_j\in S_i} d(x_j-c(S_i))  & \\
+\f}
+
+
+\section Solution
+
+TODO
+
+  Example:
+\snippet k_means_clustering_engine_example.cpp K Means Clustering Engine Example
+
+  complete example is k_means_clustering_engine_example.cpp
+
+\subsection parameters_kmeans Parameters
+
+IN: <i>ObservationRange </i> observation_range
+
+IN: <i>const unsigned int </i> number_of_cluster
+
+IN: <i>GetCoordinates </i> distance
+
+IN: <i>Center </i> center functor return center of set of samples
+
+IN: <i>StarterCenter </i> get_starter_center
+
+OUT: <i>OutputIterator</i> result
+
+
+\subsection com_kmeans The Complexity
+
+TODO
+
+\subsection References
+
+TODO
+
+*/

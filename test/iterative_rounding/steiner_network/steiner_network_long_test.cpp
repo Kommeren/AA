@@ -105,15 +105,15 @@ void random_tree(Edges & edges, RestrictionVec & restrictions,
     };
 
     // Generate a random tree on non-special vertices.
-    for (int v : boost::join(boost::irange(first + 1, vertices_num),
-                        boost::irange(special_vertices, first))) {
+    for (auto v : boost::join(paal::irange(first + 1, vertices_num),
+                              paal::irange(special_vertices, first))) {
         generate_tree_edge(v);
     }
 
     // Join special vertices with non-zero restrictions to the random tree.
     // There is be a path in the tree between every pair of vertices,
     // so we decrement special vertices restrictions.
-    for (int v : boost::irange(0, special_vertices)) {
+    for (int v : paal::irange(special_vertices)) {
         if (non_zero(restrictions[v])) {
             generate_tree_edge(v);
             dec(restrictions[v]);
@@ -183,8 +183,8 @@ int generate_instance(Graph & g, RestrictionVec & res, int vertices_num,
     generate_restrictions(res, max_res);
 
     auto cost = get(boost::edge_weight, g);
-    for (int i : boost::irange(0, vertices_num)) {
-        for (int j : boost::irange(i+1, vertices_num)) {
+    for (int i : paal::irange(vertices_num)) {
+        for (int j : paal::irange(i+1, vertices_num)) {
             paal::add_edge_to_graph(g, cost, i, j, rand_cost());
         }
     }
@@ -214,7 +214,7 @@ template <typename Restrictions>
 void run_test(const Graph & g, const Cost & costs, const Restrictions & restrictions,
         int vertices_num) {
     // default heuristics
-    for (int i : boost::irange(0, 5)) {
+    for (int i : paal::irange(5)) {
         LOGLN("random violated, seed " << i);
         srand(i);
         run_single_test<paal::lp::random_violated_separation_oracle>(
@@ -244,7 +244,7 @@ void run_test_case(const std::vector<int> & vertices_num, const std::vector<int>
     RestrictionVec res;
     auto seed = [](int x) { return 12345 * x; };
 
-    for (int i : boost::irange(0, int(vertices_num.size()))) {
+    for (int i : paal::irange(vertices_num.size())) {
         int vertices = generate_instance(g, res, vertices_num[i], min_edge_num[i],
                 special_vertices[i], max_res[i], seed(i), graph_type_tag);
         LOGLN("vertices: " << vertices);

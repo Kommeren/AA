@@ -20,7 +20,6 @@
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/as_array.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/graph/successive_shortest_path_nonnegative_weights.hpp>

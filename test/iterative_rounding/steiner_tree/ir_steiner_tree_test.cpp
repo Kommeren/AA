@@ -18,6 +18,7 @@
 #include "test_utils/test_result_check.hpp"
 
 #include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -86,7 +87,7 @@ void run_multiple_seed_tests(Strategy& strategy) {
         sample_graphs_metrics::get_graph_steiner_vertices();
 
     int best_cost = std::numeric_limits<int>::max();
-    for (int i : boost::irange(0, 5)) {
+    for (int i : paal::irange(5)) {
         srand(i);
         LOGLN("small graph, seed " << i);
         result.clear();
@@ -106,7 +107,7 @@ void run_multiple_seed_tests(Strategy& strategy) {
         sample_graphs_metrics::get_graph_steiner_bigger_vertices();
 
     best_cost = std::numeric_limits<int>::max();
-    for (int i : boost::irange(0, 5)) {
+    for (int i : paal::irange(5)) {
         LOGLN("big graph, seed " << i);
         srand(i);
         result.clear();
@@ -153,7 +154,7 @@ BOOST_AUTO_TEST_CASE(test_graph_all_generator) {
         sample_graphs_metrics::get_graph_steiner_vertices();
 
     int best_cost = std::numeric_limits<int>::max();
-    for (int i : boost::irange(0, 5)) {
+    for (int i : paal::irange(5)) {
         auto strategy = paal::ir::make_steiner_tree_graph_all_generator<Vertex>(
             small_graph, terminals, 5);
         srand(i);
@@ -176,7 +177,7 @@ BOOST_AUTO_TEST_CASE(test_graph_all_generator) {
         sample_graphs_metrics::get_graph_steiner_bigger_vertices();
 
     best_cost = std::numeric_limits<int>::max();
-    for (int i : boost::irange(0, 5)) {
+    for (int i : paal::irange(5)) {
         auto strategy = paal::ir::make_steiner_tree_graph_all_generator<Vertex>(
             bigger_graph, terminals, 5);
         LOGLN("big graph, seed " << i);

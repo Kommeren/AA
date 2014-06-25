@@ -60,8 +60,8 @@ BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
         LOG("TEST " << test.test_name << "\n");
         LOG("OPT " << test.optimal << "\n");
 
-        for (int i : boost::irange(0, 5)) {
-            LOGLN("random violated, seed " << i);
+        for (int i : paal::irange(5)) {
+            LOGLN("random violated/, seed " << i);
             srand(i);
             run_test(test, strategy_rand);
 

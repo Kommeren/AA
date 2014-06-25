@@ -136,9 +136,9 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_expressions, LP, lp_types) {
     std::vector<double> lower_bounds = { 7, MIN, 8.5, -10, MIN, 3 };
     std::vector<double> upper_bounds = { MAX, 10, 8.5, 20, 100, MAX };
 
-    for (int row_num : boost::irange(0, int(rows.size()))) {
+    for (int row_num : paal::irange(rows.size())) {
         auto expr = lp_instance.get_row_expression(rows[row_num]);
-        for (int col_num : boost::irange(0, int(columns.size()))) {
+        for (int col_num : paal::irange(columns.size())) {
             BOOST_CHECK_SMALL(expr.get_coefficient(columns[col_num]) -
                                   coefs[row_num][col_num],
                               std::numeric_limits<double>::epsilon());
@@ -163,7 +163,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_expressions, LP, lp_types) {
                           row_degrees[row_num]);
     }
 
-    for (int col_num : boost::irange(0, int(columns.size()))) {
+    for (int col_num : paal::irange(columns.size())) {
         BOOST_CHECK_EQUAL(lp_instance.get_col_degree(columns[col_num]),
                           col_degrees[col_num]);
     }
