@@ -6,6 +6,7 @@
  * @date 2014-01-28
  */
 
+    //! [K Center Example]
 #include "paal/greedy/k_center/k_center.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
 
@@ -15,7 +16,6 @@
 #include <vector>
 
 int main() {
-    //! [K Center Example]
     // sample data
     const int parts = 2;
     paal::data_structures::array_metric<int> m(3);
@@ -33,5 +33,5 @@ int main() {
                                        vertices.end(), back_inserter(centers))
               << std::endl;
 
-    //! [K Center Example]
 }
+    //! [K Center Example]

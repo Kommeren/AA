@@ -6,6 +6,7 @@
  * @version 1.0
  * @date 2013-02-04
  */
+    //! [Steiner Tree Example]
 #include "paal/steiner_tree/zelikovsky_11_per_6.hpp"
 
 #include "test/utils/sample_graph.hpp"
@@ -13,7 +14,6 @@
 #include <iostream>
 
 int main() {
-    //! [Steiner Tree Example]
     // sample metric
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_steiner();
@@ -36,6 +36,6 @@ int main() {
     std::cout << "Steiner points:" << std::endl;
     std::copy(steiner_points.begin(), steiner_points.end(),
               std::ostream_iterator<int>(std::cout, "\n"));
-    //! [Steiner Tree Example]
     return 0;
 }
+    //! [Steiner Tree Example]

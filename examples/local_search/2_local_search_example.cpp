@@ -6,6 +6,7 @@
  * @date 2013-02-01
  */
 
+    //! [Two Local Search Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
@@ -19,7 +20,6 @@ using namespace paal::local_search::two_local_search;
 using namespace paal;
 
 int main() {
-    //! [Two Local Search Example]
     // sample data
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
@@ -40,6 +40,6 @@ int main() {
     // printing
     std::cout << "Length \t" << simple_algo::get_length(gm, cycle) << std::endl;
 
-    //! [Two Local Search Example]
     return 0;
 }
+    //! [Two Local Search Example]

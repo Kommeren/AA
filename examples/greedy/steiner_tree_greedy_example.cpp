@@ -6,6 +6,7 @@
  * @date 2013-09-20
  */
 
+    //! [steiner tree greedy Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/greedy/steiner_tree_greedy.hpp"
@@ -13,7 +14,6 @@
 #include <iostream>
 
 int main() {
-    //! [steiner tree greedy Example]
     typedef sample_graphs_metrics SGM;
     auto g = SGM::get_graph_steiner();
     auto index = get(boost::vertex_index, g);
@@ -39,5 +39,5 @@ int main() {
         sum += get(weight, e);
     }
     std::cout << "result " << sum << std::endl;
-    //! [steiner tree greedy Example]
 }
+    //! [steiner tree greedy Example]

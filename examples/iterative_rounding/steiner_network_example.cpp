@@ -6,6 +6,7 @@
  * @date 2013-06-24
  */
 
+//! [Steiner Network Example]
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
@@ -14,7 +15,6 @@
 #include <vector>
 
 int main() {
-//! [Steiner Network Example]
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
         boost::undirectedS, boost::no_property,
         boost::property<boost::edge_weight_t, int>>;
@@ -54,6 +54,6 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Steiner Network Example]
     return 0;
 }
+    //! [Steiner Network Example]

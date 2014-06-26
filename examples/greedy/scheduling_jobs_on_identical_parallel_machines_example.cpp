@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-09-06
  */
+
 //! [Scheduling Jobs Example]
 
 #include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
@@ -48,5 +49,5 @@ int main() {
     cout << "Solution:" << maximumLoad << endl;
     return 0;
 }
-//! [Scheduling Jobs Example]
 
+//! [Scheduling Jobs Example]

@@ -6,6 +6,7 @@
  * @date 2013-10-17
  */
 
+//! [Tree Augmentation Example]
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
@@ -14,7 +15,6 @@
 #include <vector>
 
 int main() {
-//! [Tree Augmentation Example]
     using EdgeProp = boost::property<boost::edge_weight_t, double,
                 boost::property<boost::edge_color_t, bool>>;
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
@@ -58,6 +58,6 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Tree Augmentation Example]
     return 0;
 }
+    //! [Tree Augmentation Example]

@@ -6,12 +6,12 @@
  * @date 2013-02-04
  */
 
+//! [Local Search Components Example]
 #include "paal/local_search/local_search.hpp"
 
 #include <vector>
 #include <iostream>
 
-//! [Local Search Components Example]
 namespace ls = paal::local_search;
 using namespace paal;
 
@@ -53,6 +53,6 @@ int main() {
 
     // print
     std::cout << "Local search solution: " << solution << std::endl;
-    //! [Local Search Example]
     return 0;
 }
+    //! [Local Search Example]

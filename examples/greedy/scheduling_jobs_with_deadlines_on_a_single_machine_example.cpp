@@ -6,6 +6,7 @@
  * @date 2013-09-17
  */
 
+    //! [Scheduling Jobs Example]
 #include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -19,7 +20,6 @@ using namespace paal::greedy::
 using namespace std;
 using namespace paal::utils;
 int main() {
-    //! [Scheduling Jobs Example]
     // sample data
     typedef double Time;
     vector<Time> time = { 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1 };
@@ -40,6 +40,6 @@ int main() {
     }
     // print result
     cout << "Solution: " << delay << endl;
-    //! [Scheduling Jobs Example]
     return 0;
 }
+    //! [Scheduling Jobs Example]

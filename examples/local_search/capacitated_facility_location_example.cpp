@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-02-01
  */
+    //! [CFL Search Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
@@ -14,7 +15,6 @@
 using namespace paal::local_search::facility_location;
 
 int main() {
-    //! [CFL Search Example]
     // sample data
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
@@ -54,7 +54,7 @@ int main() {
     auto const &ch = sol.get_chosen_facilities();
     std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
-    //! [CFL Search Example]
 
     return 0;
 }
+    //! [CFL Search Example]

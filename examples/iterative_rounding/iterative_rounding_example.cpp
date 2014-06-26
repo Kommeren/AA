@@ -1,11 +1,16 @@
 /**
  * @file iterative_rounding_example.cpp
  * @brief Iterative rounding example
+ * This is an example implementation of an algorithm within the Iterative
+ * Rounding framework.
+ * The implemented algorithm is a vertex cover 2-approximation.
  * @author Piotr Godlewski
  * @version 1.0
  * @date 2014-03-24
  */
 
+
+//! [Iterative Rounding Problem Example]
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/functors.hpp"
@@ -16,13 +21,6 @@
 #include <iostream>
 #include <unordered_map>
 
-/*
- * This is an example implementation of an algorithm within the Iterative
- * Rounding framework.
- * The implemented algorithm is a vertex cover 2-approximation.
- */
-
-//! [Iterative Rounding Problem Example]
 namespace ir = paal::ir;
 
 template <typename Graph, typename CostMap, typename OutputIter>
@@ -136,6 +134,6 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Iterative Rounding Example]
     return 0;
 }
+    //! [Iterative Rounding Example]

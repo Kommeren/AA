@@ -6,13 +6,13 @@
  * @date 2013-02-04
  */
 
+    //! [Generalised Assignment Example]
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
 #include <iostream>
 #include <vector>
 
 int main() {
-    //! [Generalised Assignment Example]
     // sample problem
     std::vector<int> machines = {0,1};
     std::vector<int> jobs = {0,1};
@@ -52,6 +52,6 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Generalised Assignment Example]
     return 0;
 }
+    //! [Generalised Assignment Example]

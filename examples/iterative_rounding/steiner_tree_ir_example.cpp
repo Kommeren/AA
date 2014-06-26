@@ -6,6 +6,7 @@
  * @date 2014-06-05
  */
 
+//! [IR Steiner Tree Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
@@ -14,7 +15,6 @@
 #include <vector>
 
 int main() {
-//! [IR Steiner Tree Example]
     using SGM = sample_graphs_metrics;
     auto metric = SGM::get_graph_metric_steiner();
 
@@ -40,6 +40,6 @@ int main() {
     std::cout << "Cost of the solution: " << cost << std::endl;
 
     paal::lp::glp::free_env();
-//! [IR Steiner Tree Example]
 }
 
+//! [IR Steiner Tree Example]

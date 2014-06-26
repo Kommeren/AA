@@ -6,13 +6,13 @@
  * @date 2014-02-04
  */
 
+    //! [Local Search Example]
 #include "paal/local_search/local_search.hpp"
 
 #include <vector>
 #include <iostream>
 
 int main() {
-    //! [Local Search Example]
     namespace ls = paal::local_search;
 
     auto f = [](int x) { return -x * x + 12 * x - 27; };
@@ -35,6 +35,6 @@ int main() {
                         ls::make_search_components(getMoves, gain, commit));
 
     std::cout << "Local search solution: " << solution << std::endl;
-    //! [Local Search Example]
     return 0;
 }
+    //! [Local Search Example]

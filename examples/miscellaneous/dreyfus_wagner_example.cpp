@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-08-01
  */
+    //! [Dreyfus Wagner Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
@@ -12,7 +13,6 @@
 #include <iostream>
 
 int main() {
-    //! [Dreyfus Wagner Example]
     // prepare metric
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_steiner();
@@ -39,6 +39,6 @@ int main() {
                   << std::endl;
     }
 
-    //! [Dreyfus Wagner Example]
     return 0;
 }
+    //! [Dreyfus Wagner Example]

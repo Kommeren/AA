@@ -5,6 +5,7 @@
  * @version 1.0
  * @date 2013-02-01
  */
+    //! [K Median Search Example]
 #include "test/utils/sample_graph.hpp"
 
 #include "paal/local_search/k_median/k_median.hpp"
@@ -13,7 +14,6 @@
 #include <iostream>
 
 int main() {
-    //! [K Median Search Example]
     // sample data
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
@@ -47,7 +47,7 @@ int main() {
               << std::endl;
 
     std::cout << std::endl;
-    //! [K Median Search Example]
 
     return 0;
 }
+    //! [K Median Search Example]

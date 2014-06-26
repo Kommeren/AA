@@ -6,6 +6,7 @@
  * @date 2013-09-20
  */
 
+    //! [Knapsack Example]
 #include "paal/dynamic/knapsack_0_1_fptas.hpp"
 
 #include <boost/range/irange.hpp>
@@ -14,7 +15,6 @@
 #include <iostream>
 
 int main() {
-    //! [Knapsack Example]
 
     std::vector<int> sizes{ 1, 2, 3, 1, 2, 4, 1, 10 };
     int capacity = 6;
@@ -33,7 +33,7 @@ int main() {
     std::cout << "Max value " << maxValue.first << ", Total size "
               << maxValue.second << std::endl;
 
-    //! [Knapsack Example]
 
     return 0;
 }
+    //! [Knapsack Example]

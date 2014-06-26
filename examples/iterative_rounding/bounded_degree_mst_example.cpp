@@ -7,6 +7,7 @@
  */
 
 
+//! [Bounded-Degree Minimum Spanning Tree Example]
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -16,7 +17,6 @@
 #include <vector>
 
 int main() {
-//! [Bounded-Degree Minimum Spanning Tree Example]
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS,
         boost::undirectedS, boost::no_property,
         boost::property<boost::edge_weight_t, int>>;
@@ -58,6 +58,6 @@ int main() {
         std::cout << "The instance is infeasible" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Bounded-Degree Minimum Spanning Tree Example]
     return 0;
 }
+    //! [Bounded-Degree Minimum Spanning Tree Example]

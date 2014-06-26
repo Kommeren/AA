@@ -6,12 +6,12 @@
  * @date 2013-11-13
  */
 
+    //! [Multiway Cut Example]
 #include "paal/multiway_cut/multiway_cut.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
 int main() {
-    //! [Multiway Cut Example]
     // sample data
     std::vector<std::pair<int,int>> edges_p{{0,3},{1,3},
                                            {0,4},{2,4},
@@ -47,5 +47,5 @@ int main() {
         std::cout << "  " << i.first << "      ( " << i.second << " )" << std::endl;
     }
     paal::lp::glp::free_env();
-    //! [Multiway Cut Example]
 }
+    //! [Multiway Cut Example]

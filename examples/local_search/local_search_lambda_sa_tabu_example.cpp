@@ -6,6 +6,7 @@
  * @date 2014-02-04
  */
 
+    //! [Local Search Example]
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/simulated_annealing.hpp"
 #include "paal/data_structures/tabu_list/tabu_list.hpp"
@@ -15,7 +16,6 @@
 #include <iostream>
 
 int main() {
-    //! [Local Search Example]
     namespace ls = paal::local_search;
     using Solution = int;
     using Move = int;
@@ -44,7 +44,6 @@ int main() {
 
     // print
     std::cout << "Local search solution: " << solution << std::endl;
-    //! [Local Search Example]
 
     // simulated annealing:
     // now each move is accepted with certain probability depending on
@@ -115,3 +114,4 @@ int main() {
 
     return 0;
 }
+    //! [Local Search Example]

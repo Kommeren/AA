@@ -6,6 +6,7 @@
  * @date 2013-11-19
  */
 
+//! [Scheduling Jobs Example]
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
 #include "paal/utils/functors.hpp"
 
@@ -13,7 +14,6 @@
 #include <unordered_map>
 #include <utility>
 
-//! [Scheduling Jobs Example]
 typedef double Time;
 typedef std::pair<Time, char> Job;
 typedef int Machine;
