@@ -19,6 +19,7 @@
    glp_adv_basis, but run it only when glp_simplex fails.
    This is not done beacause of the bug in the glpk.
    It should be done when the bug is fixed.
+   http://lists.gnu.org/archive/html/bug-glpk/2014-06/msg00000.html
 
 
 * GREEDY
