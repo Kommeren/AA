@@ -13,7 +13,7 @@ and in each step we remove lightest cut to increase number components by 1
   example:
 \snippet k_cut_example.cpp K Cut Example
 
-  complete example is k_cut_example.cpp
+  example file is k_cut_example.cpp
 
 \subsection parameters_kcut Parameters
 

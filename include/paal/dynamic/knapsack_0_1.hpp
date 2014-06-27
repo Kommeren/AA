@@ -9,10 +9,9 @@
 #define KNAPSACK_0_1_HPP
 
 #include "paal/utils/functors.hpp"
-#include "paal/utils/less_pointees.hpp"
 #include "paal/utils/knapsack_utils.hpp"
+#include "paal/utils/less_pointees.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
-#include "paal/dynamic/knapsack/get_upper_bound.hpp"
 #include "paal/dynamic/knapsack/knapsack_common.hpp"
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 
@@ -44,15 +43,14 @@ struct Knapsack_0_1_get_position_range {
  *        Function solve returns the optimal value
  *        Function Retrieve solution returns chosen elements
  *
- * @tparam ObjectsIter
+ * @tparam Objects
  * @tparam ObjectSizeFunctor
  * @tparam ObjectValueFunctor
  */
-template <typename ObjectsIter, typename ObjectSizeFunctor,
+template <typename Objects, typename ObjectSizeFunctor,
           typename ObjectValueFunctor, typename Comparator>
 class Knapsack_0_1 {
-    using base =
-        knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>;
+    using base = knapsack_base<Objects, ObjectSizeFunctor, ObjectValueFunctor>;
     using SizeType = typename base::SizeType;
     using ValueType = typename base::ValueType;
     using ObjectType = typename base::ObjectType;
@@ -74,17 +72,17 @@ class Knapsack_0_1 {
      * @returns the optimal value
      */
     template <typename GetBestElement>
-    ReturnType solve(ObjectsIter oBegin, ObjectsIter oEnd, SizeType capacity,
+    ReturnType solve(Objects objects, SizeType capacity,
                      GetBestElement getBest) {
         m_object_on_size.resize(capacity + 1);
-        fill_table(m_object_on_size, oBegin, oEnd, capacity);
+        fill_table(m_object_on_size, objects, capacity);
         auto maxValue = getBest(m_object_on_size.begin(),
                                 m_object_on_size.end(), m_comparator);
 
         if (maxValue != m_object_on_size.end()) {
             return ReturnType(**maxValue, maxValue - m_object_on_size.begin());
         } else {
-            return ReturnType(ValueType(), SizeType());
+            return ReturnType(ValueType{}, SizeType{});
         }
     }
 
@@ -92,19 +90,19 @@ class Knapsack_0_1 {
     // that is, the chosen objects
     // this is done by simple divide and conquer strategy
     template <typename OutputIterator>
-    void retrieve_solution(ValueType maxValue, SizeType size,
-                           ObjectsIter oBegin, ObjectsIter oEnd,
-                           OutputIterator out) const {
+    void retrieve_solution(ValueType maxValue, SizeType size, Objects objects,
+                           OutputIterator & out) const {
         m_object_on_size.resize(size + 1);
         m_object_on_size_rec.resize(size + 1);
-        retrieve_solution_rec(maxValue, size, oBegin, oEnd, out);
+        retrieve_solution_rec(maxValue, size, std::begin(objects),
+                              std::end(objects), out);
     }
 
   private:
-    template <typename OutputIterator>
+    template <typename OutputIterator, typename ObjectsIter>
     void retrieve_solution_rec(ValueType maxValue, SizeType capacity,
                                ObjectsIter oBegin, ObjectsIter oEnd,
-                               OutputIterator out) const {
+                               OutputIterator & out) const {
         if (maxValue == ValueType()) {
             return;
         }
@@ -122,11 +120,13 @@ class Knapsack_0_1 {
 
         // main case, at least 2 objects left
         auto midle = oBegin + objNr / 2;
-        fill_table(m_object_on_size, oBegin, midle, capacity);
-        fill_table(m_object_on_size_rec, midle, oEnd, capacity);
+        fill_table(m_object_on_size, boost::make_iterator_range(oBegin, midle),
+                   capacity);
+        fill_table(m_object_on_size_rec,
+                   boost::make_iterator_range(midle, oEnd), capacity);
 
-        SizeType capacityLeftPartInOptimalSolution = SizeType();
-        for (auto capacityLeftPart : boost::irange(SizeType(), capacity + 1)) {
+        SizeType capacityLeftPartInOptimalSolution{};
+        for (auto capacityLeftPart : boost::irange(SizeType{}, capacity + 1)) {
             auto left = m_object_on_size[capacityLeftPart];
             auto right = m_object_on_size_rec[capacity - capacityLeftPart];
             if (left && right) {
@@ -148,11 +148,14 @@ class Knapsack_0_1 {
             out);
     }
 
-    void fill_table(ValueOrNullVector &values, ObjectsIter oBegin,
-                    ObjectsIter oEnd, SizeType capacity) const {
+    template <typename ObjectsRange>
+    void fill_table(ValueOrNullVector &values, ObjectsRange &&objects,
+                    SizeType capacity) const {
         fill_knapsack_dynamic_table(
-            values.begin(), values.begin() + capacity + 1, oBegin, oEnd, m_size,
-            [&](ValueOrNull val, ObjectsIter obj) {
+            values.begin(), values.begin() + capacity + 1,
+            std::forward<ObjectsRange>(objects), m_size,
+            [&](ValueOrNull val,
+                typename boost::range_iterator<ObjectsRange>::type obj) {
             return *val + m_value(*obj);
         },
             [&](ValueOrNull left, ValueOrNull right) {
@@ -161,7 +164,7 @@ class Knapsack_0_1 {
             [](ValueOrNull & val) {
             val = ValueType{};
         },
-            Knapsack_0_1_get_position_range());
+            Knapsack_0_1_get_position_range{});
     }
 
     ObjectSizeFunctor m_size;
@@ -171,75 +174,73 @@ class Knapsack_0_1 {
     mutable ValueOrNullVector m_object_on_size_rec;
 };
 
-template <typename Knapsack, typename IndexType, typename ValueType,
-          typename ObjectsIter, typename OutputIterator>
-void retrieve_solution(const Knapsack &knapsack, ValueType maxValue,
-                       IndexType size, ObjectsIter oBegin, ObjectsIter oEnd,
-                       OutputIterator out, retrieve_solution_tag) {
-    knapsack.retrieve_solution(maxValue, size, oBegin, oEnd, out);
+template <typename Objects, typename ObjectSizeFunctor,
+          typename ObjectValueFunctor, typename Comparator>
+Knapsack_0_1<Objects, ObjectSizeFunctor, ObjectValueFunctor, Comparator>
+make_knapsack_0_1(ObjectSizeFunctor size, ObjectValueFunctor value,
+                  Comparator comp) {
+    return Knapsack_0_1<Objects, ObjectSizeFunctor, ObjectValueFunctor,
+                        Comparator>(size, value, comp);
 }
 
 template <typename Knapsack, typename IndexType, typename ValueType,
-          typename ObjectsIter, typename OutputIterator>
+          typename Objects, typename OutputIterator>
 void retrieve_solution(const Knapsack &knapsack, ValueType maxValue,
-                       IndexType size, ObjectsIter oBegin, ObjectsIter oEnd,
-                       OutputIterator out, no_retrieve_solution_tag) {}
+                       IndexType size, Objects &&objects, OutputIterator & out,
+                       retrieve_solution_tag) {
+    knapsack.retrieve_solution(maxValue, size, objects, out);
+}
+
+template <typename Knapsack, typename IndexType, typename ValueType,
+          typename Objects, typename OutputIterator>
+void retrieve_solution(const Knapsack &knapsack, ValueType maxValue,
+                       IndexType size, Objects &&objects, OutputIterator & out,
+                       no_retrieve_solution_tag) {}
 
 /**
  * @brief Solution to Knapsack 0/1 problem
  *  overload for integral Size case
  */
-template <typename ObjectsIter, typename OutputIterator,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename retrieve_solution_tag>
-FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
-         FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-             capacity, // capacity is of size type
-         OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-         zero_one_tag, integral_size_tag,
+template <typename KnapsackData, typename retrieve_solution_tag>
+typename KnapsackData::return_type
+knapsack(KnapsackData knap_data, zero_one_tag, integral_size_tag,
          retrieve_solution_tag retrieve_solutionTag) {
-    typedef detail::FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter>
-        ValueType;
+    using Value = typename KnapsackData::value;
 
-    Knapsack_0_1<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor,
-                 utils::less> knapsack(size, value);
-    auto maxValueAndSize = knapsack.solve(
-        oBegin, oEnd, capacity,
-        get_max_element_on_capacity_indexed_collection<ValueType>());
-    retrieve_solution(knapsack, maxValueAndSize.first, maxValueAndSize.second,
-                      oBegin, oEnd, out, retrieve_solutionTag);
-    return maxValueAndSize;
+    auto knapsack = make_knapsack_0_1<typename KnapsackData::objects>(
+        knap_data.get_size(), knap_data.get_value(), utils::less{});
+    auto value_size =
+        knapsack.solve(knap_data.get_objects(), knap_data.get_capacity(),
+                       get_max_element_on_capacity_indexed_collection<Value>());
+    retrieve_solution(knapsack, value_size.first, value_size.second,
+                      knap_data.get_objects(), knap_data.get_output_iter(),
+                      retrieve_solutionTag);
+    return value_size;
 }
 
 /**
  * @brief Solution to Knapsack 0/1 problem
  *  overload for integral Value case
  */
-template <typename ObjectsIter, typename OutputIterator,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename retrieve_solution_tag>
-FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor, ObjectsIter>
-knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
-         FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-             capacity, // capacity is of size type
-         OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-         zero_one_tag, integral_value_tag,
+template <typename KnapsackData, typename retrieve_solution_tag>
+typename KnapsackData::return_type
+knapsack(KnapsackData knap_data, zero_one_tag, integral_value_tag,
          retrieve_solution_tag retrieve_solutionTag) {
-    typedef FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> SizeType;
-    typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
+    using Value = typename KnapsackData::value;
+    using Size = typename KnapsackData::size;
 
-    Knapsack_0_1<ObjectsIter, ObjectValueFunctor, ObjectSizeFunctor,
-                 utils::greater> knapsack(value, size);
-    auto maxValue = get_value_upper_bound(oBegin, oEnd, capacity, value, size,
-                                          zero_one_tag());
-    auto maxValueAndSize = knapsack.solve(
-        oBegin, oEnd, maxValue, get_max_element_on_value_indexed_collection<
-                                    boost::optional<SizeType>, ValueType>(
-                                    boost::optional<SizeType>(capacity + 1)));
-    retrieve_solution(knapsack, maxValueAndSize.first, maxValueAndSize.second,
-                      oBegin, oEnd, out, retrieve_solutionTag);
-    return std::make_pair(maxValueAndSize.second, maxValueAndSize.first);
+    auto knapsack = make_knapsack_0_1<typename KnapsackData::objects>(
+        knap_data.get_value(), knap_data.get_size(), utils::greater{});
+    auto maxValue = get_value_bound(knap_data, zero_one_tag{}, upper_tag{});
+    auto value_size = knapsack.solve(
+        knap_data.get_objects(), maxValue,
+        get_max_element_on_value_indexed_collection<boost::optional<Size>,
+                                                    Value>(
+            boost::optional<Size>(knap_data.get_capacity() + 1)));
+    retrieve_solution(knapsack, value_size.first, value_size.second,
+                      knap_data.get_objects(), knap_data.get_output_iter(),
+                      retrieve_solutionTag);
+    return std::make_pair(value_size.second, value_size.first);
 }
 
 } // detail
@@ -247,7 +248,7 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
 /**
  * @brief Solution to Knapsack 0/1 problem
  *
- * @tparam ObjectsIter
+ * @tparam Objects
  * @tparam OutputIterator
  * @tparam ObjectSizeFunctor
  * @tparam ObjectValueFunctor
@@ -257,26 +258,27 @@ knapsack(ObjectsIter oBegin, ObjectsIter oEnd,
  * @param size functor that for given object returns its size
  * @param value functor that for given object returns its value
  */
-template <typename ObjectsIter, typename OutputIterator,
-          typename ObjectSizeFunctor,
-          typename ObjectValueFunctor = utils::return_something_functor<int, 1>>
-detail::FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor,
-                                     ObjectsIter>
-knapsack_0_1(ObjectsIter oBegin, ObjectsIter oEnd,
-             detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
+template <typename Objects, typename OutputIterator, typename ObjectSizeFunctor,
+          typename ObjectValueFunctor = utils::return_one_functor>
+typename detail::knapsack_base<Objects, ObjectSizeFunctor,
+                               ObjectValueFunctor>::return_type
+knapsack_0_1(Objects &&objects,
+             detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>
                  capacity, // capacity is of size type
              OutputIterator out, ObjectSizeFunctor size,
-             ObjectValueFunctor value = ObjectValueFunctor()) {
+             ObjectValueFunctor value = ObjectValueFunctor{}) {
 
-    return detail::knapsack_check_integrality(oBegin, oEnd, capacity, out, size,
-                                              value, detail::zero_one_tag());
+    return detail::knapsack_check_integrality(
+        detail::make_knapsack_data(std::forward<Objects>(objects), capacity,
+                                   size, value, out),
+        detail::zero_one_tag{});
 }
 
 /**
  * @brief Solution to Knapsack 0/1 problem, without retrieving the objects in
 * the solution
  *
- * @tparam ObjectsIter
+ * @tparam Objects
  * @tparam OutputIterator
  * @tparam ObjectSizeFunctor
  * @tparam ObjectValueFunctor
@@ -285,19 +287,20 @@ knapsack_0_1(ObjectsIter oBegin, ObjectsIter oEnd,
  * @param size functor that for given object returns its size
  * @param value functor that for given object returns its value
  */
-template <typename ObjectsIter, typename ObjectSizeFunctor,
-          typename ObjectValueFunctor = utils::return_something_functor<int, 1>>
-detail::FunctorsOnIteratorPValuePair<ObjectValueFunctor, ObjectSizeFunctor,
-                                     ObjectsIter>
-knapsack_0_1_no_output(
-    ObjectsIter oBegin, ObjectsIter oEnd,
-    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        capacity, // capacity is of size type
-    ObjectSizeFunctor size, ObjectValueFunctor value = ObjectValueFunctor()) {
+template <typename Objects, typename ObjectSizeFunctor,
+          typename ObjectValueFunctor = utils::return_one_functor>
+typename detail::knapsack_base<Objects, ObjectSizeFunctor,
+                               ObjectValueFunctor>::return_type
+knapsack_0_1_no_output(Objects &&objects,
+                       detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>
+                           capacity, // capacity is of size type
+                       ObjectSizeFunctor size,
+                       ObjectValueFunctor value = ObjectValueFunctor{}) {
+    auto out = boost::make_function_output_iterator(utils::skip_functor{});
     return detail::knapsack_check_integrality(
-        oBegin, oEnd, capacity,
-        boost::make_function_output_iterator(utils::skip_functor()), size,
-        value, detail::zero_one_tag(), detail::no_retrieve_solution_tag());
+        detail::make_knapsack_data(
+            std::forward<Objects>(objects), capacity, size, value, out),
+        detail::zero_one_tag{}, detail::no_retrieve_solution_tag{});
 }
 
 } // paal

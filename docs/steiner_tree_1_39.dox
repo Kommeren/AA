@@ -15,7 +15,7 @@ We iterate this process until all terminals are connected.
 Example:
  \snippet steiner_tree_ir_example.cpp IR Steiner Tree Example
 
-  complete example is in steiner_tree_ir_example.cpp
+  example file is in steiner_tree_ir_example.cpp
 
 \subsection apps_st2 Approximation Ratio
 The approximation ratio for this algorithm equals 1.39

@@ -14,7 +14,7 @@
 #include <vector>
 
 inline void read(const std::string &testDir, int testId, int &capacity,
-                 std::vector<int> &weights, std::vector<int> &values,
+                 std::vector<std::pair<int, int>> &weights_values,
                  std::vector<int> &optimal) {
     auto filePrefix = "p0" + std::to_string(testId);
     std::string fname = filePrefix + "_c.txt";
@@ -32,21 +32,22 @@ inline void read(const std::string &testDir, int testId, int &capacity,
     paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int weight = std::stoi(s);
         assert(weight);
-        weights.push_back(weight);
+        weights_values.push_back(std::make_pair(weight, 0));
     });
 
     // read profits
     fname = filePrefix + "_p.txt";
+    int idx{ -1 };
     paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         int val = std::stoi(s);
         assert(val);
-        values.push_back(val);
+        weights_values[++idx].second = val;
+        assert(std::size_t(idx) < weights_values.size());
     });
-    assert(values.size() == weights.size());
 
     // read profits
     fname = filePrefix + "_s.txt";
-    int idx(0);
+    idx = 0;
     paal::parse(testDir + fname, [&](const std::string & s, std::istream &) {
         bool chosen = std::stoi(s);
         if (chosen) {

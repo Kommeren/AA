@@ -9,7 +9,7 @@
 #define KNAPSACK_TAGS_UTILS_HPP
 
 #include "paal/dynamic/knapsack/knapsack_fptas_common.hpp"
-#include "paal/dynamic/knapsack_fptas.hpp"
+#include "paal/dynamic/knapsack_unbounded_fptas.hpp"
 #include "paal/dynamic/knapsack_0_1_fptas.hpp"
 
 namespace pd = paal::detail;
@@ -34,15 +34,20 @@ template <typename MaxValue> void print_max_value(MaxValue maxValue) {
 }
 
 template <typename MaxValue>
-void print_result(MaxValue maxValue, const std::vector<int> &result,
+void print_result(MaxValue maxValue,
+                  const std::vector<std::pair<int, int>> &result,
                   pd::no_retrieve_solution_tag) {
     print_max_value(maxValue);
 }
 
 template <typename MaxValue>
-void print_result(MaxValue maxValue, const std::vector<int> &result,
+void print_result(MaxValue maxValue,
+                  const std::vector<std::pair<int, int>> &result,
                   pd::retrieve_solution_tag) {
-    LOG_COPY_RANGE_DEL(result, " ");
+    ON_LOG(for (auto o
+                : result) {
+        std::cout << "{ size = " << o.first << ", value = " << o.second << "} ";
+    });
     LOGLN("");
     print_max_value(maxValue);
 }
@@ -50,24 +55,21 @@ void print_result(MaxValue maxValue, const std::vector<int> &result,
 template <typename IntegralTag, typename IsZeroOne,
           typename RetrieveSolution = pd::retrieve_solution_tag,
           typename Objects, typename ObjectSizeFunctor,
-          typename ObjectValueFunctor>
-typename paal::detail::knapsack_base<
-    typename boost::range_iterator<Objects>::type, ObjectSizeFunctor,
-    ObjectValueFunctor>::return_type
-detail_knapsack(
-    const Objects &objects,
-    paal::detail::FunctorOnIteratorPValue<
-        ObjectSizeFunctor, typename boost::range_iterator<Objects>::type>
-        capacity, // capacity is of size type
-    ObjectSizeFunctor size,
-    ObjectValueFunctor value) {
-    std::vector<int> result;
+          typename ObjectValueFunctor,
+          typename Base = typename paal::detail::knapsack_base<
+              Objects, ObjectSizeFunctor, ObjectValueFunctor>>
+typename Base::return_type detail_knapsack(Objects &objects,
+                                           typename Base::SizeType capacity,
+                                           ObjectSizeFunctor size,
+                                           ObjectValueFunctor value) {
+    std::vector<std::pair<int, int>> result;
     LOGLN("Knapsack " << to_string(IsZeroOne())
                       << " on " + to_string(IntegralTag()) + " " +
                              to_string(RetrieveSolution()));
-    auto ret = pd::knapsack(std::begin(objects), std::end(objects), capacity,
-                            std::back_inserter(result), size, value,
-                            IsZeroOne(), IntegralTag(), RetrieveSolution());
+    auto out = std::back_inserter(result);
+    auto ret =
+        pd::knapsack(pd::make_knapsack_data(objects, capacity, size, value, out),
+                     IsZeroOne(), IntegralTag(), RetrieveSolution());
     print_result(ret, result, RetrieveSolution());
     return ret;
 }
@@ -77,48 +79,42 @@ struct on_size_tag {};
 
 template <
     typename IsZeroOne, typename RetrieveSolution = pd::retrieve_solution_tag,
-    typename Objects, typename ObjectSizeFunctor, typename ObjectValueFunctor>
-typename paal::detail::knapsack_base<
-    typename boost::range_iterator<Objects>::type, ObjectSizeFunctor,
-    ObjectValueFunctor>::return_type
-detail_knapsack_fptas(
-    double epsilon, const Objects &objects,
-    paal::detail::FunctorOnIteratorPValue<
-        ObjectSizeFunctor, typename boost::range_iterator<Objects>::type>
-        capacity, // capacity is of size type
-    ObjectSizeFunctor size,
-    ObjectValueFunctor value, on_value_tag) {
-    std::vector<int> result;
+    typename Objects, typename ObjectSizeFunctor, typename ObjectValueFunctor,
+    typename Base = typename paal::detail::knapsack_base<
+        Objects, ObjectSizeFunctor, ObjectValueFunctor>>
+typename Base::return_type
+detail_knapsack_fptas(double epsilon, Objects &objects,
+                      typename Base::SizeType capacity, ObjectSizeFunctor size,
+                      ObjectValueFunctor value, on_value_tag) {
+    std::vector<std::pair<int, int>> result;
+    auto out = std::back_inserter(result);
     LOGLN("Knapsack fptas epsilon "
           << epsilon << " " << to_string(IsZeroOne())
           << " on value " + to_string(RetrieveSolution()));
     auto ret = pd::knapsack_general_on_value_fptas_retrieve(
-        epsilon, std::begin(objects), std::end(objects), capacity,
-        std::back_inserter(result), size, value, IsZeroOne());
+        epsilon, pd::make_knapsack_data(objects, capacity, size, value, out),
+        IsZeroOne{});
     print_result(ret, result, RetrieveSolution());
     return ret;
 }
 
 template <
     typename IsZeroOne, typename RetrieveSolution = pd::retrieve_solution_tag,
-    typename Objects, typename ObjectSizeFunctor, typename ObjectValueFunctor>
-typename paal::detail::knapsack_base<
-    typename boost::range_iterator<Objects>::type, ObjectSizeFunctor,
-    ObjectValueFunctor>::return_type
-detail_knapsack_fptas(
-    double epsilon, const Objects &objects,
-    paal::detail::FunctorOnIteratorPValue<
-        ObjectSizeFunctor, typename boost::range_iterator<Objects>::type>
-        capacity, // capacity is of size type
-    ObjectSizeFunctor size,
-    ObjectValueFunctor value, on_size_tag) {
-    std::vector<int> result;
+    typename Objects, typename ObjectSizeFunctor, typename ObjectValueFunctor,
+    typename Base = typename paal::detail::knapsack_base<
+        Objects, ObjectSizeFunctor, ObjectValueFunctor>>
+typename Base::return_type
+detail_knapsack_fptas(double epsilon, Objects &objects,
+                      typename Base::SizeType capacity, ObjectSizeFunctor size,
+                      ObjectValueFunctor value, on_size_tag) {
+    std::vector<std::pair<int, int>> result;
     LOGLN("Knapsack fptas epsilon "
           << epsilon << " " << to_string(IsZeroOne())
           << " on size " + to_string(RetrieveSolution()));
+    auto out = std::back_inserter(result);
     auto ret = pd::knapsack_general_on_size_fptas_retrieve(
-        epsilon, std::begin(objects), std::end(objects), capacity,
-        std::back_inserter(result), size, value, IsZeroOne());
+        epsilon, pd::make_knapsack_data(objects, capacity, size, value,out),
+        IsZeroOne{});
     print_result(ret, result, RetrieveSolution());
     return ret;
 }

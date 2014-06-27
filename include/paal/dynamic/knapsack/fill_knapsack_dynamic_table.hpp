@@ -8,6 +8,8 @@
 #ifndef FILL_KNAPSACK_DYNAMIC_TABLE_HPP
 #define FILL_KNAPSACK_DYNAMIC_TABLE_HPP
 
+#include "paal/utils/knapsack_utils.hpp"
+
 namespace paal {
 /**
  * @brief Computes dynamic algorithm table (valuesBegin, valuesEnd)
@@ -18,60 +20,56 @@ namespace paal {
  * @param valuesBegin begin of the table which will store
  *  the values for specific positions in dynamic algorithm computation
  * @param valuesEnd
- * @param oBegin - possible object collection
- * @param oEnd
+ * @param objects - possible object collection
  * @param size - functor, for given opbjedt return its size
- * @param combine - for given ObjectsIter and value gives new object
- * representing adding *ObjectsIter to value
+ * @param combine - for given Objects and value gives new object
+ * representing adding *Objects to value
  * @param compare - compares to values.
  * @param init - discover element and assign the 0 value
  * @param get_range
  *
  * @tparam ValueIterator has to be RandomAccess output iterator
- * @tparam ObjectsIter
+ * @tparam Objects
  * @tparam ObjectSizeFunctor
  * @tparam Combine
  * @tparam Compare
  * @tparam Init
  * @tparam GetPositionRange
  */
-template <typename ValueIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename Combine, typename Compare,
-          typename Init, typename GetPositionRange>
-detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
+template <typename ValueIterator, typename Objects, typename ObjectSizeFunctor,
+          typename Combine, typename Compare, typename Init,
+          typename GetPositionRange>
+detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>
 fill_knapsack_dynamic_table(ValueIterator valuesBegin, ValueIterator valuesEnd,
-                            ObjectsIter oBegin, ObjectsIter oEnd,
-                            ObjectSizeFunctor size, Combine combine,
-                            Compare compare, Init init,
+                            Objects &&objects, ObjectSizeFunctor size,
+                            Combine combine, Compare compare, Init init,
                             GetPositionRange get_range) {
-    typedef typename std::iterator_traits<ValueIterator>::value_type
-        ValueOrNull;
-    ValueOrNull nullVallue = ValueOrNull();
-    typedef detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        SizeType;
-    typedef typename std::iterator_traits<ObjectsIter>::reference ObjectRef;
+    using Size = detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>;
 
-    SizeType maxSize = std::distance(valuesBegin, valuesEnd);
+    Size maxSize = std::distance(valuesBegin, valuesEnd);
 
-    std::fill(valuesBegin + 1, valuesEnd, nullVallue);
+    std::fill(valuesBegin + 1, valuesEnd, boost::none);
     init(*valuesBegin);
 
     auto posRange = get_range(0, maxSize);
-    for (auto objIter = oBegin; objIter != oEnd; ++objIter) {
-        ObjectRef obj = *objIter;
+
+    auto objIter = std::begin(objects);
+    auto oEnd = std::end(objects);
+    for (; objIter != oEnd; ++objIter) {
+        auto &&obj = *objIter;
         auto objSize = size(obj);
         // for each position, from largest to smallest
         for (auto pos : posRange) {
             auto stat = *(valuesBegin + pos);
             // if position was reached before
-            if (stat != nullVallue) {
-                SizeType newPos = pos + objSize;
+            if (stat != boost::none) {
+                Size newPos = pos + objSize;
                 auto &newStat = *(valuesBegin + newPos);
                 // if we're not exceeding maxSize
                 if (newPos < maxSize) {
                     auto newValue = combine(stat, objIter);
                     // if the value is bigger than previous
-                    if (newStat == nullVallue || compare(newStat, newValue)) {
+                    if (newStat == boost::none || compare(newStat, newValue)) {
                         // update value
                         newStat = newValue;
                     }
@@ -82,5 +80,5 @@ fill_knapsack_dynamic_table(ValueIterator valuesBegin, ValueIterator valuesEnd,
     return maxSize - 1;
 }
 
-} //! paal
+}      //! paal
 #endif /* FILL_KNAPSACK_DYNAMIC_TABLE_HPP */

@@ -35,7 +35,7 @@ namespace detail {
  * contract pair of words with largest overlap until one word stays
     \snippet shortest_superstring_example.cpp Shortest Superstring Example
  *
- * complete example is shortest_superstring_example.cpp
+ * example file is shortest_superstring_example.cpp
  *
  * @tparam Words
  */
@@ -70,7 +70,7 @@ template <typename Words> class shortest_superstring {
      *
         \snippet shortest_superstring_example.cpp Shortest Superstring Example
      *
-     * complete example is shortest_superstring_example.cpp
+     * example file is shortest_superstring_example.cpp
      *
      */
     Word get_solution() {
@@ -221,7 +221,7 @@ template <typename Words> class shortest_superstring {
  * words canot contains letter 0
     \snippet shortest_superstring_example.cpp Shortest Superstring Example
  *
- * complete example is shortest_superstring_example.cpp
+ * example file is shortest_superstring_example.cpp
  * @tparam Words
  */
 template <typename Words>

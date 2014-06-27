@@ -6,17 +6,19 @@
  * @date 2013-09-20
  */
 
+
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
 #include "utils/knapsack_tags_utils.hpp"
 #include "utils/parse_file.hpp"
 
-#include "paal/dynamic/knapsack.hpp"
+#include "paal/dynamic/knapsack_unbounded.hpp"
 #include "paal/dynamic/knapsack_0_1.hpp"
 #include "paal/utils/floating.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/algorithm/random_shuffle.hpp>
 
 #include <fstream>
 
@@ -31,76 +33,88 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
 
         int capacity;
-        std::vector<int> sizes;
-        std::vector<int> values;
+        std::vector<std::pair<int, int>> objects;
         std::vector<int> optimal;
 
-        auto sizesFunct = make_array_to_functor(sizes);
-        auto valuesFunct = make_array_to_functor(values);
+        auto size = [](std::pair<int, int> object) { return object.first; }
+        ;
+        auto value = [](std::pair<int, int> object) { return object.second; }
+        ;
 
-        read(testDir + "cases/", testId, capacity, sizes, values, optimal);
+        read(testDir + "cases/", testId, capacity, objects, optimal);
         LOGLN("capacity " << capacity);
         LOGLN("sizes ");
 
-        LOG_COPY_RANGE_DEL(sizes, " ");
         LOGLN("");
-        LOGLN("values ");
-        LOG_COPY_RANGE_DEL(values, " ");
+        LOGLN("size values");
+        ON_LOG(for (auto o
+                    : objects) {
+            std::cout << "{ size = " << o.first << ", value = " << o.second
+                      << "} ";
+        });
         LOGLN("");
         LOGLN("Optimal 0/1");
         LOG_COPY_RANGE_DEL(optimal, " ");
         LOGLN("");
-        auto opt_0_1 = std::accumulate(optimal.begin(), optimal.end(), 0,
-                                       [&](int sum, int i) {
-            return sum + values[i];
+        auto opt_0_1 = boost::accumulate(optimal, 0, [&](int sum, int i) {
+            return sum + objects[i].second;
         });
-        ON_LOG(auto optSize = ) std::accumulate(optimal.begin(), optimal.end(),
-                                                0, [&](int sum, int i) {
-            return sum + sizes[i];
+        ON_LOG(auto optSize = )
+            boost::accumulate(optimal, 0, [&](int sum, int i) {
+            return sum + objects[i].first;
         });
         LOGLN("Opt size " << optSize << " opt " << opt_0_1);
         LOGLN("");
 
-        auto objects = boost::irange(std::size_t(0), values.size());
-
         // KNAPSACK
-        auto opt = detail_knapsack<pd::integral_value_and_size_tag,
-                                   pd::no_zero_one_tag>(
-            objects, capacity, sizesFunct, valuesFunct).first;
+        auto opt =
+            detail_knapsack<pd::integral_value_and_size_tag, pd::unbounded_tag>(
+                objects, capacity, size, value).first;
+
+        boost::random_shuffle(objects);
 
         auto maxValue =
-            detail_knapsack<pd::integral_value_tag, pd::no_zero_one_tag>(
-                objects, capacity, sizesFunct, valuesFunct);
+            detail_knapsack<pd::integral_value_tag, pd::unbounded_tag>(
+                objects, capacity, size, value);
+
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt, maxValue.first);
-        maxValue = detail_knapsack<pd::integral_size_tag, pd::no_zero_one_tag>(
-            objects, capacity, sizesFunct, valuesFunct);
+        maxValue = detail_knapsack<pd::integral_size_tag, pd::unbounded_tag>(
+            objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt, maxValue.first);
 
         // KNAPSACK 0/1
 
         maxValue =
             detail_knapsack<pd::integral_value_and_size_tag, pd::zero_one_tag>(
-                objects, capacity, sizesFunct, valuesFunct);
+                objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::integral_size_tag, pd::zero_one_tag>(
-            objects, capacity, sizesFunct, valuesFunct);
+            objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::integral_value_tag, pd::zero_one_tag>(
-            objects, capacity, sizesFunct, valuesFunct);
+            objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
 
         maxValue =
             detail_knapsack<pd::integral_value_and_size_tag, pd::zero_one_tag,
-                            pd::no_retrieve_solution_tag>(
-                objects, capacity, sizesFunct, valuesFunct);
+                            pd::no_retrieve_solution_tag>(objects, capacity,
+                                                          size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::integral_size_tag, pd::zero_one_tag,
                                    pd::no_retrieve_solution_tag>(
-            objects, capacity, sizesFunct, valuesFunct);
+            objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
         maxValue = detail_knapsack<pd::integral_value_tag, pd::zero_one_tag,
                                    pd::no_retrieve_solution_tag>(
-            objects, capacity, sizesFunct, valuesFunct);
+            objects, capacity, size, value);
+        boost::random_shuffle(objects);
         BOOST_CHECK_EQUAL(opt_0_1, maxValue.first);
 
         // FPTAS
@@ -108,33 +122,36 @@ BOOST_AUTO_TEST_CASE(KnapSackLong) {
                           0.6, 0.7 };
 
         for (auto epsilon : epsilons) {
-            // KNAPSACK
-            maxValue = detail_knapsack_fptas<pd::no_zero_one_tag,
+            // KNAPSACK unbounded on value
+            maxValue = detail_knapsack_fptas<pd::unbounded_tag,
                                              pd::retrieve_solution_tag>(
-                epsilon, objects, capacity, sizesFunct, valuesFunct,
-                on_value_tag());
+                epsilon, objects, capacity, size, value, on_value_tag{});
+            boost::random_shuffle(objects);
             BOOST_CHECK(double(opt) * (1. - epsilon) <= maxValue.first);
             BOOST_CHECK(capacity >= maxValue.second);
 
-            maxValue = detail_knapsack_fptas<pd::no_zero_one_tag,
+            // KNAPSACK unbounded on size
+            // this might possibly fail since this version is not really a FPTAS
+            maxValue = detail_knapsack_fptas<pd::unbounded_tag,
                                              pd::retrieve_solution_tag>(
-                epsilon, objects, capacity, sizesFunct, valuesFunct,
-                on_size_tag());
+                epsilon, objects, capacity, size, value, on_size_tag{});
+            boost::random_shuffle(objects);
             BOOST_CHECK(opt <= maxValue.first);
             BOOST_CHECK(double(capacity) * (1. + epsilon) >= maxValue.second);
 
-            // KNAPSACK 0_1
+            // KNAPSACK 0_1 on value
             maxValue = detail_knapsack_fptas<pd::zero_one_tag,
                                              pd::retrieve_solution_tag>(
-                epsilon, objects, capacity, sizesFunct, valuesFunct,
-                on_value_tag());
+                epsilon, objects, capacity, size, value, on_value_tag{});
+            boost::random_shuffle(objects);
             BOOST_CHECK(double(opt_0_1) * (1. - epsilon) <= maxValue.first);
             BOOST_CHECK(capacity >= maxValue.second);
 
+            // KNAPSACK 0_1 on size
             maxValue = detail_knapsack_fptas<pd::zero_one_tag,
                                              pd::retrieve_solution_tag>(
-                epsilon, objects, capacity, sizesFunct, valuesFunct,
-                on_size_tag());
+                epsilon, objects, capacity, size, value, on_size_tag{});
+            boost::random_shuffle(objects);
             BOOST_CHECK(opt_0_1 <= maxValue.first);
             BOOST_CHECK(double(capacity) * (1. + epsilon) >= maxValue.second);
         }

@@ -12,7 +12,7 @@ We compute the minimum spanning tree and lift the result tree to the original gr
 Example:
  \snippet steiner_tree_greedy_example.cpp steiner tree greedy Example
   
-  complete example is steiner_tree_greedy_example.cpp
+  example file is steiner_tree_greedy_example.cpp
 
 \subsection apps_steiner_tree_greedy Approximation Ratio equals 2
 

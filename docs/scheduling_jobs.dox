@@ -31,7 +31,7 @@ to not overflow its value type.
   example:
 \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
 
-  complete example is scheduling_jobs_example.cpp
+  example file is scheduling_jobs_example.cpp
 
 \subsection app_scheduling_jobs Approximation Ratio equals 2.
 

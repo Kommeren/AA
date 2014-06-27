@@ -10,7 +10,7 @@ We solve this problem by local search, using well  known 2-opt moves (see paal::
 \snippet 2_local_search_example.cpp Two Local Search Example
  
 
-  complete example is 2_local_search_example.cpp
+  example file is 2_local_search_example.cpp
 
 \subsection appto Approximation Ratio
 Approximation ratio equals \f$4\sqrt{n}\f$ and \f$O(log(n)/log(log(n)))\f$ for euclidean instances in \f$R^2\f$. 

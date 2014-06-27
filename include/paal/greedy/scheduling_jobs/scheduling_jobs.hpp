@@ -182,7 +182,7 @@ void schedule(MachineIterator mfirst, MachineIterator mlast, JobIterator jfirst,
  * Example:
  *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
- * Complete example is scheduling_jobs_example.cpp
+ * example file is scheduling_jobs_example.cpp
  *
  * @param mfirst
  * @param mlast
@@ -215,7 +215,7 @@ void schedule_deterministic(const MachineIterator mfirst,
  * Example:
  *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
- * Complete example is scheduling_jobs_example.cpp
+ * example file is scheduling_jobs_example.cpp
  *
  * @param mfirst
  * @param mlast

@@ -40,7 +40,7 @@ class compare {
  * example:
  *  \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs On Identical Parallel Machines Example
  *
- * complete example is
+ * example file is
  * scheduling_jobs_on_identical_parallel_machines_example.cpp
  * @param n_machines
  * @param first

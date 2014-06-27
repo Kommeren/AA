@@ -262,7 +262,7 @@ auto multiway_cut(const Graph &g, OutputIterator out,
  * example:
  *  \snippet multiway_cut_example.cpp  Multiway Cut Example
  *
- * complete example is  multiway_cut_example.cpp
+ * example file is  multiway_cut_example.cpp
  * @param Graph graph
  * @param int repeats number of sets of radius
  * @param OutputIterator result pairs of vertex descriptor and number form (1,2,

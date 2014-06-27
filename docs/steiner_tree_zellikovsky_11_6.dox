@@ -9,7 +9,7 @@ We solve this problem using Zelikovsky 11/6 approximation algorithm. The algorit
   example: 
    \snippet zelikovsky_11_per_6_example.cpp Steiner Tree Example
 
-  complete example is zelikovsky_11_per_6_example.cpp
+  example file is zelikovsky_11_per_6_example.cpp
 
 \subsection apps_st Approximation Ratio equals 11/6
 \subsection com The complexity 

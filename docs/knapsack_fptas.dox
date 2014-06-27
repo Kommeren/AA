@@ -1,61 +1,58 @@
-/*! \page knapsack_fptas Knapsack FPTAS
+/*! \page knapsack_fptas Knapsack 0/1 FPTAS
 
 \section def Problem definition.
 \copydoc knapsack_def
 
 \section solkd Solution
-<!--
-Both variants of Knapsack are solved using standard dynamic approach on modified size or values.
-When the values are modified we get standard \f$(1-\epsilon)\f$ approximation of the knapsack problem.
-When the sizes are modified we get the optimal value of the knapsack but capacity can be  exceeded by \f$(1+\epsilon)\f$.
-In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
--->
-0/1 Knapsack is solved using standard dynamic approach on modified size or values.
+\a Knapsack \a 0/1 is solved using standard dynamic approach on modified sizes or values.
 When the values are modified we get standard \f$(1-\epsilon)\f$ approximation of the knapsack problem.
 When the sizes are modified we get the optimal value of the knapsack but capacity can be  exceeded by \f$(1+\epsilon)\f$.
 The divide and conquer approach is used to retrieve the set of objects in the optimal solution.
+There are several versions of the algorithm depending on the type of the approximation (on size or on value).
+Analogously to dynamic approach, there are two versions of each algorithm : standard and _no_output . The first one solves the \a knapsack 0/1 with retrieving solution and the second one omits this procedure. Although retrieving solution does not increase the complexity, it is a costly procedure.
 
-<!-- Knapsack example - modified values: 
-\snippet knapsack_on_value_fptas_example.cpp Knapsack Example
+List of the algorithms with examples:
+
+<!--
+Knapsack unbounded example - modified values: 
+\snippet knapsack_unbounded_on_value_fptas_example.cpp Knapsack Example
  
-  complete example is knapsack_on_value_fptas_example.cpp
+  example file is knapsack_unbounded_on_value_fptas_example.cpp
  
-Knapsack example - modified sizes: 
-\snippet knapsack_on_size_fptas_example.cpp Knapsack Example
+ Knapsack unbounded example - modified sizes: 
+\snippet knapsack_unbounded_on_size_fptas_example.cpp Knapsack Example
  
-  complete example is knapsack_on_size_fptas_example.cpp
+  example file is knapsack_unbounded_on_size_fptas_example.cpp
 -->
 
 Knapsack 0/1 example - modified values: 
 \snippet knapsack_0_1_on_value_fptas_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_on_value_fptas_example.cpp
+  example file is knapsack_0_1_on_value_fptas_example.cpp
 
 Knapsack 0/1 example - modified sizes: 
 \snippet knapsack_0_1_on_size_fptas_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_on_size_fptas_example.cpp
+  example file is knapsack_0_1_on_size_fptas_example.cpp
  
-Knapsack 0/1 example - modified values (does not compute items in knapsack): 
+Knapsack 0/1 example - modified values (without computing items in knapsack): 
 \snippet knapsack_0_1_on_value_fptas_no_output_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_on_value_fptas_no_output_example.cpp
+  example file is knapsack_0_1_on_value_fptas_no_output_example.cpp
 
-Knapsack 0/1 example - modified sizes (does not compute items in knapsack): 
+Knapsack 0/1 example - modified sizes (without computing items in knapsack): 
 \snippet knapsack_0_1_on_size_fptas_no_output_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_on_size_fptas_no_output_example.cpp
-
-<!-- The library provides functions paal::knapsack_on_size_fptas and function which solves standard knapsack problem.--> There are two versions of knapsack 0/1 problem : knapsack_0_1 and knapsack_0_1_no_output . One solves the Knapsack 0/1 with retrieving solution and one omits this procedure. Although retrieving solution does not increase the complexity, it is costly procedure.
+  example file is knapsack_0_1_on_size_fptas_no_output_example.cpp
 
 \subsection Complexity
-The algorithms works in \f$O(n^2 / \epsilon)\f$ and in \f$O(n / \epsilon)\f$ memory.
+The algorithms works in \f$O(n^2 / \epsilon)\f$ time and in \f$O(n / \epsilon)\f$ memory.
 
 
 \subsection References
 
-The algorithm is described in the \cite Williamson:2011:DAA:1971947 with optimizations from \cite journals/jco/KellererP99. 
-We use knapsack dynamic algorithm described in \ref knapsack_dynamic.
+The algorithm is described in the \cite Williamson:2011:DAA:1971947. We use optimizations from \cite journals/jco/KellererP99. 
+We use dynamic algorithm for knapsack described in \ref knapsack_dynamic.
 
 \subsection knapsack_greedy_sa See Also
 <ul>

@@ -28,7 +28,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread -Wall -fno-strict-aliasing")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe -g")
 
 file(GLOB BOOST_SUBS "${PROJECT_DIR}/boost/*")
 

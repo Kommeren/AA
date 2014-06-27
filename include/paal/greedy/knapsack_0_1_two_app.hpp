@@ -11,10 +11,12 @@
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/greedy/knapsack/knapsack_general.hpp"
+#include "paal/greedy/knapsack/knapsack_greedy.hpp"
 
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/iterator/filter_iterator.hpp>
+#include <boost/range/algorithm/find_if.hpp>
+#include <boost/range/algorithm/sort.hpp>
 
 #include <type_traits>
 #include <utility>
@@ -22,69 +24,63 @@
 namespace paal {
 
 namespace detail {
-template <typename ObjectsIterIter, typename ObjectSizeFunctor,
-          typename ObjectValueFunctor>
-std::tuple<FunctorOnIteratorPValue<
-               ObjectValueFunctor,
-               typename std::iterator_traits<ObjectsIterIter>::value_type>,
-           FunctorOnIteratorPValue<
-               ObjectValueFunctor,
-               typename std::iterator_traits<ObjectsIterIter>::value_type>,
-           std::pair<ObjectsIterIter, ObjectsIterIter>>
-get_greedy_fill(
-    ObjectsIterIter oBegin, ObjectsIterIter oEnd,
-    FunctorOnIteratorPValue<
-        ObjectSizeFunctor,
-        typename std::iterator_traits<ObjectsIterIter>::value_type> capacity,
-    ObjectValueFunctor value, ObjectSizeFunctor size, zero_one_tag) {
-    typedef typename std::iterator_traits<ObjectsIterIter>::value_type
-        ObjectsIter;
-    typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> ValueType;
-    typedef FunctorOnIteratorPValue<ObjectValueFunctor, ObjectsIter> SizeType;
+template <typename KnapsackData,
+          typename ObjectIter = typename KnapsackData::object_iter,
+          typename ObjectRef = typename KnapsackData::object_ref,
+          typename Size = typename KnapsackData::size,
+          typename Value = typename KnapsackData::value>
+std::tuple<Value, Size, boost::iterator_range<ObjectIter>>
+get_greedy_fill(KnapsackData knap_data, zero_one_tag) {
 
-                    auto starValue = utils::make_lift_iterator_functor(value);
-                    auto starSize = utils::make_lift_iterator_functor(size);
-                    auto density = make_Density(starValue, starSize);
-                    auto compare = utils::make_functor_to_comparator(density, utils::greater());
+    auto density = knap_data.get_density();
+    auto compare = utils::make_functor_to_comparator(density, utils::greater{});
+    // objects must be lvalue because we return a subrange of this range
+    auto &objects = knap_data.get_objects();
 
     // finding the biggest set elements with the greatest density
-    std::sort(oBegin, oEnd, compare);
+    boost::sort(objects, compare);
 
-    ValueType valueSum = ValueType();
-    SizeType sizeSum = SizeType();
-    auto end = std::find_if(oBegin, oEnd,
-                            [ =, &sizeSum, &valueSum](ObjectsIter objIter) {
-        auto newSize = sizeSum + size(*objIter);
-        if (newSize > capacity) {
+    Value valueSum{};
+    Size sizeSum{};
+    auto range = boost::find_if<boost::return_begin_found>(
+        objects, [ =, &sizeSum, &valueSum](ObjectRef obj) {
+        auto newSize = sizeSum + knap_data.get_size(obj);
+        if (newSize > knap_data.get_capacity()) {
             return true;
         }
         sizeSum = newSize;
-        valueSum += value(*objIter);
+        valueSum += knap_data.get_value(obj);
         return false;
     });
-    return std::make_tuple(valueSum, sizeSum, std::make_pair(oBegin, end));
+    return std::make_tuple(valueSum, sizeSum, range);
 }
 
 template <typename ObjectsRange, typename OutputIter>
-void greedy_to_output(ObjectsRange range, OutputIter out, zero_one_tag) {
-    for (auto obj : boost::make_iterator_range(range)) {
-        *out = *obj;
+void greedy_to_output(ObjectsRange range, OutputIter & out, zero_one_tag) {
+    for (auto obj : range) {
+        *out = obj;
         ++out;
     }
 }
 
-} // detail
+} //! detail
 
-template <typename OutputIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor>
-typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
+/// this version of algorithm might permute, the input range
+template <typename OutputIterator, typename Objects, typename ObjectSizeFunctor,
+          typename ObjectValueFunctor,
+          // this enable if assures that range can be permuted
+          typename std::enable_if<
+              !detail::is_range_const<Objects>::value>::type * = nullptr>
+typename detail::knapsack_base<Objects, ObjectSizeFunctor,
                                ObjectValueFunctor>::return_type
 knapsack_0_1_two_app(
-    ObjectsIter oBegin, ObjectsIter oEnd,
-    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter> capacity,
+    Objects &&objects,
+    typename detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects> capacity,
     OutputIterator out, ObjectValueFunctor value, ObjectSizeFunctor size) {
-    return detail::knapsack_general_two_app(oBegin, oEnd, capacity, out, value,
-                                            size, detail::zero_one_tag());
+    return detail::knapsack_general_two_app(
+        detail::make_knapsack_data(std::forward<Objects>(objects), capacity,
+                                   size, value, out),
+        detail::zero_one_tag());
 }
-}
+}      //! paal
 #endif /* KNAPSACK_0_1_TWO_APP_HPP */

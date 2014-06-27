@@ -6,13 +6,15 @@
  * @date 2013-09-20
  */
 
+#define LOGGER_ON
+
 #include "utils/logger.hpp"
 #include "utils/read_knapsack.hpp"
 #include "utils/parse_file.hpp"
 #include "utils/test_result_check.hpp"
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
-#include "paal/greedy/knapsack_two_app.hpp"
+#include "paal/greedy/knapsack_unbounded_two_app.hpp"
 #include "paal/utils/floating.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -31,54 +33,112 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
 
         int capacity;
-        std::vector<int> sizes;
-        std::vector<int> values;
+        std::vector<std::pair<int, int>> sizes_values;
         std::vector<int> optimal;
+        auto size = [](std::pair<int, int> object) { return object.first; }
+        ;
+        auto value = [](std::pair<int, int> object) { return object.second; }
+        ;
 
-        read(testDir + "cases/", testId, capacity, sizes, values, optimal);
+        read(testDir + "cases/", testId, capacity, sizes_values, optimal);
         LOGLN("capacity " << capacity);
-        LOGLN("sizes ");
-        LOG_COPY_RANGE_DEL(sizes, " ");
-        LOGLN("\nvalues ");
-        LOG_COPY_RANGE_DEL(values, " ");
+        //      LOGLN("size - value pairs ");
+        //        LOG_COPY_RANGE_DEL(sizes_values, " ");
         LOGLN("");
-        auto objects = boost::irange(std::size_t(0), values.size());
         // KNAPSACK 0/1
         {
-            std::vector<int> result;
+            std::vector<std::pair<int, int>> result;
+            auto value_sum = [&](int sum, int i) {
+                return sum + sizes_values[i].second;
+            }
+            ;
+            auto opt = boost::accumulate(optimal, 0, value_sum);
             LOGLN("Knapsack 0/1");
-            auto maxValue = knapsack_0_1_two_app(
-                std::begin(objects), std::end(objects), capacity,
-                std::back_inserter(result), make_array_to_functor(values),
-                make_array_to_functor(sizes));
+            auto maxValue =
+                knapsack_0_1_two_app(sizes_values, capacity,
+                                     std::back_inserter(result), value, size);
 
             LOGLN("Max value " << maxValue.first << ", Total size "
                                << maxValue.second);
-            LOG_COPY_RANGE_DEL(result, " ");
+            //       LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
-            auto opt = std::accumulate(optimal.begin(), optimal.end(), 0,
-                                       [&](int sum, int i) {
-                return sum + values[i];
-            });
             LOGLN("OPT");
             LOG_COPY_RANGE_DEL(optimal, " ");
             LOGLN("");
-            check_result(maxValue.first,opt,0.5,paal::utils::greater_equal());
+
+            BOOST_CHECK(maxValue.second <= capacity);
+            check_result(maxValue.first, opt, 0.5, greater_equal{});
         }
 
         // KNAPSACK
         {
-            std::vector<int> result;
-            LOGLN("Knapsack");
-            ON_LOG(auto maxValue = ) knapsack_two_app(
-                std::begin(objects), std::end(objects), capacity,
-                std::back_inserter(result), make_array_to_functor(values),
-                make_array_to_functor(sizes));
+            std::vector<std::pair<int, int>> result;
+            LOGLN("Knapsack unbounded");
+            auto maxValue = knapsack_unbounded_two_app(
+                sizes_values, capacity, std::back_inserter(result), value,
+                size);
 
             LOGLN("Max value " << maxValue.first << ", Total size "
                                << maxValue.second);
-            LOG_COPY_RANGE_DEL(result, " ");
+            //         LOG_COPY_RANGE_DEL(result, " ");
             LOGLN("");
+            BOOST_CHECK(maxValue.second <= capacity);
         }
     });
+}
+
+#include <iostream>
+
+BOOST_AUTO_TEST_CASE(KnapsackTwoAppLongPerf) {
+    std::srand(42);
+    const int OBJECTS_NR = static_cast<int>(1e7);
+    const int MAX = static_cast<int>(1e2);
+
+    using Objects = std::vector<std::pair<int, int>>;
+    Objects objects(OBJECTS_NR);
+
+    auto rand_from_range = [ = ]() { return (std::rand() % MAX) + 1; }
+    ;
+    auto rand_pair = [ = ]() {
+        return std::make_pair(rand_from_range(), rand_from_range());
+    }
+    ;
+    std::generate_n(objects.begin(), OBJECTS_NR, rand_pair);
+
+    auto total_size =
+        boost::accumulate(objects, 0, [&](int sum, std::pair<int, int> p) {
+        return sum + p.first;
+    });
+
+    auto size = [](std::pair<int, int> object) { return object.first; }
+    ;
+    auto value = [](std::pair<int, int> object) { return object.second; }
+    ;
+
+    auto capacity = total_size / 2;
+    LOGLN("capacity = " << capacity);
+
+    // KNAPSACK
+    {
+        Objects result;
+        LOGLN("Knapsack unbounded");
+        auto maxValue = knapsack_unbounded_two_app(
+            objects, capacity, std::back_inserter(result), value, size);
+
+        LOGLN("Max value " << maxValue.first << ", Total size "
+                           << maxValue.second);
+        BOOST_CHECK(maxValue.second <= capacity);
+    }
+
+    // KNAPSACK 0/1
+    {
+        Objects result;
+        LOGLN("Knapsack 0/1");
+        auto maxValue = knapsack_0_1_two_app(
+            objects, capacity, std::back_inserter(result), value, size);
+
+        LOGLN("Max value " << maxValue.first << ", Total size "
+                           << maxValue.second);
+        BOOST_CHECK(maxValue.second <= capacity);
+    }
 }

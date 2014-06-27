@@ -14,7 +14,7 @@ And we assign longest not assigned job to machine which has smallest load, until
   example:
 \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs On Identical Parallel Machines Example
 
-  complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
+  example file is scheduling_jobs_on_identical_parallel_machines_example.cpp
 
 \subsection parameters_sjoipm Parameters
 IN: int n_machines

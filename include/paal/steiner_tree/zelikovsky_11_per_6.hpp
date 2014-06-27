@@ -47,7 +47,7 @@ namespace detail {
  * Example: <br>
    \snippet zelikovsky_11_per_6_example.cpp Steiner Tree Example
  *
- * complete example is steiner_tree_example.cpp
+ * example file is steiner_tree_example.cpp
  *
  * @tparam Metric we only use this metric for distances  (Steiner, Terminal) and
  (Terminal, Terminal)

@@ -4,21 +4,30 @@
 \copydoc knapsack_def
 
 \section Solution 
-This solution implements standard greedy algorithm. 
+This solution implements the greedy algorithm. 
+The algorithm proceeds in rounds in which one new object is added to the set of objects.
+The new object added to the set is the one with the biggest average value (value to size ratio).
+The algorithm returns the better of the following two sets:
+<ul>
+<li>  the greedy chosen set of the size not greater than the capacity 
+<li> or the most valuable item with the size not greater than the capacity of the knapsack.
+</ul>
+Note that the algorithm might change the order of objects in the range.
+
 Knapsack 0/1  example: 
 \snippet knapsack_0_1_two_app_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_two_app_example.cpp
+  example file is knapsack_0_1_two_app_example.cpp
 
 Knapsack  example: 
-\snippet knapsack_two_app_example.cpp Knapsack Example
+\snippet knapsack_unbounded_two_app_example.cpp Knapsack Example
  
-  complete example is knapsack_two_app_example.cpp
+  example file is knapsack_unbounded_two_app_example.cpp
 
 \subsection knapsack_greedy_app Approximation ratio equals 2.
 
 \subsection knapsack_greedy_compl Complexity
-The algorithms works in \f$O(n log(n))\f$ and in \f$O(n)\f$ memory where \a n is the number of objects.
+The algorithms works in \f$O(n log(n))\f$ time and in \f$O(1)\f$ memory where \a n is the number of objects.
 
 \subsection knapsack_greedy_ref References
 

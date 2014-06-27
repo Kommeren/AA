@@ -11,6 +11,12 @@
 #ifdef LOGGER_ON
 #include <iostream>
 #include "paal/utils/type_functions.hpp"
+
+template <typename V, typename W, typename Stream>
+Stream &operator<<(Stream &o, const std::pair<V, W> &p) {
+    o << "{" << p.first << ", " << p.second << "} ";
+}
+
 #define LOGLN(x) std::cout << x << std::endl << std::flush
 #define LOG(x) std::cout << x << std::flush
 #define ON_LOG(x) x

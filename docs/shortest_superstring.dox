@@ -11,7 +11,7 @@ Then we merge pair of words with maximum overlap until 1 words left.
   example: 
 \snippet shortest_superstring_example.cpp Shortest Superstring Example
  
-  complete example is shortest_superstring_example.cpp
+  example file is shortest_superstring_example.cpp
 
 \subsection app_shortest_superstring Approximation Ratio is 3.5, but is conjecture that is 2.
 

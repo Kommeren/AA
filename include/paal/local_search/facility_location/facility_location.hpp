@@ -66,7 +66,7 @@ struct default_swap_fl_components {
  * example:
     \snippet facility_location_example.cpp FL Search Example
  *
- * complete example is facility_location_example.cpp
+ * example file is facility_location_example.cpp
  *
  * @tparam voronoi
  * @tparam FacilityCost

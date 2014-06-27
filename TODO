@@ -1,5 +1,9 @@
 * disable typedefs warning in doxygen
-* knapsack (not 0/1) fptas is not realy fptas
+* knapsack unbounded fptas is not realy fptas
+  there is a problem with number of objects. 
+  The number of objects is included in the multiplier. 
+  In the current version we use incorrect number of items.
+  One of the solution could be to group the small eelements in the bigger bundles.
 * doxygen does not see some of the references
     (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi.)
 * alternative kanpsack algorithm (n*(1/epsilon)^2)
@@ -8,7 +12,7 @@
 * ITERATIVE ROUNDING
 ** error checking for generalized assignment
 ** move and copy constructor in glp class
-** glp.get_columns() zwraca kolumny w odwrotnej kolejnosci
+** glp.get_columns() returns columns in random order
 ** LP formulation in separate dir
 ** improve row generation ?
 ** resolving solution by moving a point ?
@@ -28,5 +32,5 @@
 ** steiner forest (conjecture)
 
 *LOCAL_SEARCH
-** maybe 0 shouldnt be hardcoded
+** maybe 0 shouldn't be hardcoded
 

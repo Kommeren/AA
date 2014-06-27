@@ -64,7 +64,7 @@ template <typename Stream> struct pretty_stream {
           m_epsilon{ epsilon } {}
 
     /**
-     * @brief operator<< for double
+     * @brief pretty_to_string for double
      *
      * @param x
      * @param epsilon

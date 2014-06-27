@@ -26,7 +26,7 @@ namespace greedy {
  * and fill start time of all jobs
  * example:
  * \snippet scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp Scheduling Jobs On Single Machine Example
- * complete example is
+ * example file is
  * scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
  * @param first - jobs begin
  * @param last - jobs end
@@ -55,7 +55,7 @@ auto scheduling_jobs_with_deadlines_on_a_single_machine(
     auto get_due_date_from_iterator =
         utils::make_lift_iterator_functor(get_due_date);
     auto due_date_compatator = utils::make_functor_to_comparator(
-        get_due_date_from_iterator, utils::greater());
+        get_due_date_from_iterator, utils::greater{});
     using QueueType = std::priority_queue<
         InputIterator, std::vector<InputIterator>, decltype(due_date_compatator)>;
     QueueType active_jobs_iters(due_date_compatator);

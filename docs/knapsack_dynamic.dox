@@ -4,31 +4,42 @@
 \copydoc knapsack_def
 
 \section solkd Solution
-Both variants of Knapsack are solved using the dynamic approach. The dynamic table can be index both by size and value. 
-The algorithm chooses better of these two.
-In case of capacity indexed table, we construct a table of size \f$[0-capacity]\f$. Each cell of the table contains information about the best value for this size of knapsack.
-The value indexed table case is analogous.
-In each round we update the table adding new objects from object set. 
-In the Knapsack 0/1, the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
- Knapsack example: 
-\snippet knapsack_example.cpp Knapsack Example
+Both variants of the knapsack problem are solved using the dynamic approach. 
+In our library, both variants of the knapsack problem are solved using dynamic programming. 
+Our algorithm is actually composed out of two algorithms, and the faster of these two is chosen. 
+In the first one the dynamic table is indexed by total size of the items, whereas in the second one it is indexed by values.
+In the size indexed case, we construct a table of size \f$[0-capacity]\f$. 
+Each cell of the table contains an information about the best value for this size of knapsack.
+The value indexed case is analogous.
+The algorithm proceeds in rounds in which one new object is added to the table.
+
+In the \a knapsack \a 0/1 it is impossible to read the resulting set of objects directly from the computed dynamic table without additional computation. We can only read the optimal value of the knapsack and the size of the optimal set.
+In this case the divide and conquer approach is used to retrieve the set of objects in the optimal solution.
+The algorithm divides the set of objects into two groups and computes the dynamic table for both groups.
+In the next step algorithm finds cells in the both computed tables satisfying the optimality conditions and proceed recursively. (see \cite conf/asap/NibbelinkRM07 for more details).
+
+Knapsack unbounded example: 
+\snippet knapsack_unbounded_example.cpp Knapsack Example
  
-  complete example is knapsack_example.cpp
+  example file is knapsack_unbounded_example.cpp
  
 Knapsack 0/1 example: 
 \snippet knapsack_0_1_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_example.cpp
+  example file is knapsack_0_1_example.cpp
 
-Knapsack 0/1 (does not compute items in knapsack) example: 
-\snippet knapsack_0_1_example.cpp Knapsack Example
+Knapsack 0/1 example (without computing items in knapsack) example: 
+\snippet knapsack_0_1_no_output_example.cpp Knapsack Example
  
-  complete example is knapsack_0_1_no_output_example.cpp
+  example file is knapsack_0_1_no_output_example.cpp
 
-The library provides function paal::knapsack function which solves standard knapsack problem. And two versions of knapsack 0/1 problem : knapsack_0_1 and knapsack_0_1_no_output . One solves the Knapsack 0/1 with retrieving solution and one omitting this procedure. Although retrieving solution does not increase the complexity, it is costly procedure.
+The library provides knapsack_unbounded function which solves the unbounded version of the problem and two versions of knapsack 0/1 problem : knapsack_0_1 and knapsack_0_1_no_output. 
+
+The first one solves the \a knapsack \a 0/1 with retrieving solution whereas the second one without this procedure.
+Although retrieving solution does not increase the overall complexity, it is a costly procedure.
 
 \subsection Complexity
-The algorithms works in \f$O(min(Capacity, Opt) * NumberOfObjects)\f$ and in \f$O(min(Capacity, Opt))\f$ memory, where Opt is the optimal value of the knapsack.
+The algorithms works in \f$O(min(Capacity, Opt) * NumberOfObjects)\f$ time and in \f$O(min(Capacity, Opt))\f$ memory, where Opt is the optimal value of the knapsack.
 
 \subsection References
 

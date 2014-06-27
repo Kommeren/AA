@@ -37,7 +37,7 @@ We select cheapest solution, from all randomly chosen.
   example:
 \snippet multiway_cut_example.cpp Multiway Cut Example
 
-  complete example is multiway_cut_example.cpp
+  example file is multiway_cut_example.cpp
 
 \subsection parameters_multiway_cut Parameters
 

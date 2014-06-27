@@ -9,7 +9,7 @@ Not an approximation algorithm by itself, it is used to solve subproblems in man
 
 Example:
  \snippet dreyfus_wagner_example.cpp Dreyfus Wagner Example
-  complete example is dreyfus_wagner_example.cpp
+  example file is dreyfus_wagner_example.cpp
  
 \subsection com The complexity
  Complexity of the algorithm is \f$O(3^{|T|} * |V| + 2^{|T|} * |V|^2)\f$, where \a T is the set of terminals.

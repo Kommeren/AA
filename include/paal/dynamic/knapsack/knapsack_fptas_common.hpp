@@ -8,144 +8,160 @@
 #ifndef KNAPSACK_FPTAS_COMMON_HPP
 #define KNAPSACK_FPTAS_COMMON_HPP
 
-#include "paal/dynamic/knapsack/get_lower_bound.hpp"
+#include "paal/dynamic/knapsack/get_bound.hpp"
 
 namespace paal {
 namespace detail {
 
-template <typename OutputIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename IsZeroOne, typename RetrieveSolution>
-typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                               ObjectValueFunctor>::return_type
-knapsack_general_on_value_fptas(
-    double epsilon, ObjectsIter oBegin, ObjectsIter oEnd,
-    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        capacity, // capacity is of size type
-    OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-    IsZeroOne is_0_1_Tag, RetrieveSolution retrieve_solution) {
-    typedef detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                                  ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::ValueType ValueType;
-    typedef typename base::return_type return_type;
-    if (oBegin == oEnd) {
-        return return_type();
-    }
-
-    double maxValue = detail::get_value_lower_bound(oBegin, oEnd, capacity,
-                                                    value, size, is_0_1_Tag);
-    auto multiplier =
-        get_multiplier(oBegin, oEnd, epsilon, maxValue, value, is_0_1_Tag);
-
-    if (!multiplier) {
-        return knapsack_check_integrality(oBegin, oEnd, capacity, out, size,
-                                          value, is_0_1_Tag, retrieve_solution);
-    }
-
-    auto newValue =
-        utils::make_scale_functor<double, ValueType>(value, *multiplier);
-    auto ret =
-        knapsack_check_integrality(oBegin, oEnd, capacity, out, size, newValue,
-                                   is_0_1_Tag, retrieve_solution);
-    return std::make_pair(ValueType(double(ret.first) / *multiplier),
-                          ret.second);
+/**
+ * @brief computes multiplier for FPTAS, version for 0/1
+ */
+template <typename Objects, typename Functor>
+boost::optional<double> get_multiplier(Objects &&objects, double epsilon,
+                                       double lowerBound, Functor,
+                                       detail::zero_one_tag) {
+    double n = boost::distance(objects);
+    auto ret = n / (epsilon * lowerBound);
+    static const double SMALLEST_MULTIPLIER = 1.;
+    if (ret > SMALLEST_MULTIPLIER) return boost::none;
+    return ret;
 }
 
-template <typename OutputIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename IsZeroOne, typename RetrieveSolution>
-typename knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                       ObjectValueFunctor>::return_type
-knapsack_general_on_size_fptas(
-    double epsilon, ObjectsIter oBegin, ObjectsIter oEnd,
-    FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        capacity, // capacity is of size type
-    OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-    IsZeroOne is_0_1_Tag, RetrieveSolution retrieve_solution) {
-    typedef knapsack_base<ObjectsIter, ObjectSizeFunctor, ObjectValueFunctor>
-        base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::SizeType SizeType;
-    typedef typename base::return_type return_type;
-    if (oBegin == oEnd) {
-        return return_type();
+// TODO this multiplier does not guarantee fptas
+/**
+ * @brief computes multiplier for FPTAS, unbounded version
+ *
+ */
+template <typename Objects, typename Functor>
+boost::optional<double> get_multiplier(Objects &&objects, double epsilon,
+                                       double lowerBound, Functor f,
+                                       detail::unbounded_tag) {
+    double minF =
+        f(*boost::min_element(objects, utils::make_functor_to_comparator(f)));
+    double n = int(double(lowerBound) * (1. + epsilon) / minF +
+                   1.); // maximal number of elements in the found solution
+    auto ret = n / (epsilon * lowerBound);
+    static const double SMALLEST_MULTIPLIER = 1.;
+    if (ret > SMALLEST_MULTIPLIER) return boost::none;
+    return ret;
+}
+
+template <typename KnapsackData, typename IsZeroOne, typename RetrieveSolution,
+          typename ReturnType = typename KnapsackData::return_type>
+ReturnType knapsack_general_on_value_fptas(double epsilon,
+                                           KnapsackData knap_data,
+                                           IsZeroOne is_0_1_Tag,
+                                           RetrieveSolution retrieve_solution) {
+    using ObjectRef = typename KnapsackData::object_ref;
+    using Value = typename KnapsackData::value;
+    using Size = typename KnapsackData::size;
+
+    auto &&objects = knap_data.get_objects();
+
+    if (boost::empty(objects)) {
+        return ReturnType{};
     }
 
-    auto multiplier =
-        get_multiplier(oBegin, oEnd, epsilon, capacity, size, is_0_1_Tag);
+    double maxValue =
+        detail::get_value_bound(knap_data, is_0_1_Tag, lower_tag{});
+    auto multiplier = get_multiplier(objects, epsilon, maxValue,
+                                     knap_data.get_value(), is_0_1_Tag);
 
     if (!multiplier) {
-        return knapsack_check_integrality(oBegin, oEnd, capacity, out, size,
-                                          value, is_0_1_Tag, retrieve_solution);
+        return knapsack_check_integrality(std::move(knap_data), is_0_1_Tag,
+                                          retrieve_solution);
     }
 
-    auto newSize =
-        utils::make_scale_functor<double, SizeType>(size, *multiplier);
+    auto newValue = utils::make_scale_functor<double, Value>(
+        knap_data.get_value(), *multiplier);
     auto ret = knapsack_check_integrality(
-        oBegin, oEnd, SizeType(capacity * *multiplier), out, newSize, value,
+        detail::make_knapsack_data(objects, knap_data.get_capacity(),
+                                   knap_data.get_size(), newValue,
+                                   knap_data.get_output_iter()),
         is_0_1_Tag, retrieve_solution);
-    return return_type(ret.first, double(ret.second) / *multiplier);
+    return std::make_pair(Value(double(ret.first) / *multiplier), ret.second);
 }
 
-template <typename OutputIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename IsZeroOne>
-typename knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                       ObjectValueFunctor>::return_type
-knapsack_general_on_value_fptas_retrieve(
-    double epsilon, ObjectsIter oBegin, ObjectsIter oEnd,
-    FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        capacity, // capacity is of size type
-    OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-    IsZeroOne is_0_1_Tag) {
-    typedef detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                                  ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::ValueType ValueType;
+template <typename KnapsackData, typename IsZeroOne, typename RetrieveSolution,
+          typename ReturnType = typename KnapsackData::return_type>
+ReturnType knapsack_general_on_size_fptas(double epsilon,
+                                          KnapsackData knap_data,
+                                          IsZeroOne is_0_1_Tag,
+                                          RetrieveSolution retrieve_solution) {
+    using ObjectRef = typename KnapsackData::object_ref;
+    using Size = typename KnapsackData::size;
 
-    ValueType realValue = ValueType();
+    auto &&objects = knap_data.get_objects();
+
+    if (boost::empty(objects)) {
+        return ReturnType{};
+    }
+
+    auto multiplier = get_multiplier(objects, epsilon, knap_data.get_capacity(),
+                                     knap_data.get_size(), is_0_1_Tag);
+
+    if (!multiplier) {
+        return knapsack_check_integrality(std::move(knap_data), is_0_1_Tag,
+                                          retrieve_solution);
+    }
+
+    auto newSize = utils::make_scale_functor<double, Size>(knap_data.get_size(),
+                                                           *multiplier);
+    auto ret = knapsack_check_integrality(
+        detail::make_knapsack_data(
+            objects, Size(knap_data.get_capacity() * *multiplier), newSize,
+            knap_data.get_value(), knap_data.get_output_iter()),
+        is_0_1_Tag, retrieve_solution);
+    return ReturnType(ret.first, double(ret.second) / *multiplier);
+}
+
+template <typename KnapsackData, typename IsZeroOne>
+typename KnapsackData::return_type
+knapsack_general_on_value_fptas_retrieve(double epsilon, KnapsackData knap_data,
+                                         IsZeroOne is_0_1_Tag) {
+    using ObjectRef = typename KnapsackData::object_ref;
+    using Value = typename KnapsackData::value;
+
+    Value realValue{};
     auto addValue = [&](ObjectRef obj) {
-        realValue += value(obj);
-        return *out = obj;
-    };
+        realValue += knap_data.get_value(obj);
+        knap_data.out(obj);
+    }
+    ;
 
     auto newOut = boost::make_function_output_iterator(addValue);
 
     auto reducedReturn = knapsack_general_on_value_fptas(
-        epsilon, oBegin, oEnd, capacity, newOut, size, value, is_0_1_Tag,
-        retrieve_solution_tag());
+        epsilon, detail::make_knapsack_data(
+                     knap_data.get_objects(), knap_data.get_capacity(),
+                     knap_data.get_size(), knap_data.get_value(), newOut),
+        is_0_1_Tag, retrieve_solution_tag{});
     return std::make_pair(realValue, reducedReturn.second);
 }
 
-template <typename OutputIterator, typename ObjectsIter,
-          typename ObjectSizeFunctor, typename ObjectValueFunctor,
-          typename IsZeroOne>
-typename detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                               ObjectValueFunctor>::return_type
-knapsack_general_on_size_fptas_retrieve(
-    double epsilon, ObjectsIter oBegin, ObjectsIter oEnd,
-    detail::FunctorOnIteratorPValue<ObjectSizeFunctor, ObjectsIter>
-        capacity, // capacity is of size type
-    OutputIterator out, ObjectSizeFunctor size, ObjectValueFunctor value,
-    IsZeroOne is_0_1_Tag) {
-    typedef detail::knapsack_base<ObjectsIter, ObjectSizeFunctor,
-                                  ObjectValueFunctor> base;
-    typedef typename base::ObjectRef ObjectRef;
-    typedef typename base::SizeType SizeType;
+template <typename KnapsackData, typename IsZeroOne,
+          typename ReturnType = typename KnapsackData::return_type>
+ReturnType knapsack_general_on_size_fptas_retrieve(double epsilon,
+                                                   KnapsackData knap_data,
+                                                   IsZeroOne is_0_1_Tag) {
+    using ObjectRef = typename KnapsackData::object_ref;
+    using Size = typename KnapsackData::size;
 
-    SizeType realSize = SizeType();
-    auto addSize = [&](ObjectRef obj) {
-        realSize += size(obj);
-        return *out = obj;
-    };
+    Size realSize{};
+    auto add_size = [&](ObjectRef obj) {
+        realSize += knap_data.get_size(obj);
+        knap_data.out(obj);
+    }
+    ;
 
-    auto newOut = boost::make_function_output_iterator(addSize);
+    auto newOut = boost::make_function_output_iterator(add_size);
 
     auto reducedReturn = knapsack_general_on_size_fptas(
-        epsilon, oBegin, oEnd, capacity, newOut, size, value, is_0_1_Tag,
-        retrieve_solution_tag());
-    return std::make_pair(reducedReturn.first, realSize);
+        epsilon, detail::make_knapsack_data(
+                     knap_data.get_objects(), knap_data.get_capacity(),
+                     knap_data.get_size(), knap_data.get_value(), newOut),
+        is_0_1_Tag, retrieve_solution_tag{});
+    return ReturnType(reducedReturn.first, realSize);
 }
 
 } // detail

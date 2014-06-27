@@ -22,7 +22,7 @@ Capacitated Facility Location (CFL) problem is solved in the same way as uncapac
   example: 
 \snippet capacitated_facility_location_example.cpp CFL Search Example
  
-  complete example is capacitated_facility_location_example.cpp
+  example file is capacitated_facility_location_example.cpp
 
 \subsection app_cfl Approximation Ratio equals 6.
 The approximation ratio is proved to be  equal 6 when we use all three move types: add, remove and swap.
