@@ -21,7 +21,6 @@
 #include <unordered_map>
 
 namespace paal {
-/// Iterative Rounding namespace.
 namespace ir {
 
 /**

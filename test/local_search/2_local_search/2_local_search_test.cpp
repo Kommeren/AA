@@ -19,7 +19,7 @@
 
 using std::string;
 using std::vector;
-using namespace paal::local_search::two_local_search;
+using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(two_local_search_test) {
@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(two_local_search_test) {
     auto lsc = get_default_two_local_components(gm);
 
     // printing
-    LOGLN("Length \t" << simple_algo::get_length(gm, cycle));
+    LOGLN("Length \t" << get_cycle_length(gm, cycle));
 
     // setting logger
     auto logger = utils::make_two_ls_logger(gm, 100);

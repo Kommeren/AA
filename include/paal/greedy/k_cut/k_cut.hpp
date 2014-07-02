@@ -30,12 +30,12 @@ namespace greedy {
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut_example.cpp
- * @param Graph graph
- * @param int numberOfParts
- * @param OutputIterator result pairs of vertex_descriptor and number form (1,2,
+ * @param graph
+ * @param number_of_parts
+ * @param result pairs of vertex_descriptor and number form (1,2,
 * ... ,k) id of part
- * @param VertexIndexMap indexMap
- * @param EdgeWeightMap weightMap
+ * @param index_map
+ * @param weight_map
  * @tparam InGraph
  * @tparam OutputIterator
  * @tparam VertexIndexMap
@@ -146,11 +146,10 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut_example.cpp
- * @param Graph graph
- * @param int number_of_parts
- * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
+ * @param graph
+ * @param number_of_parts
+ * @param result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
  * @param params
- * @param EdgeWeightMap weight_map
  * @tparam InGraph
  * @tparam OutputIterator
  * @tparam T
@@ -180,9 +179,9 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,
  *  \snippet k_cut_example.cpp K Cut Example
  *
  * complete example is k_cut_example.cpp
- * @param Graph graph
- * @param int number_of_parts
- * @param OutputIterator result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
+ * @param graph
+ * @param number_of_parts
+ * @param result pairs of vertex_descriptor and number form (1,2, ... ,k) id of part
  * @tparam InGraph
  * @tparam OutputIterator
  */

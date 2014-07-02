@@ -32,10 +32,8 @@ template <typename Graph> struct graph_metric_traits {
     typedef graph_type::Sparse GraphTypeTag;
 };
 
-/// implementation of different strategies of computing metric
-namespace metric_fillers {
 
-/// generic
+/// generic strategies of computing metric
 template <typename GraphTypeTag> struct graph_metric_filler_impl;
 
 /**
@@ -57,7 +55,7 @@ template <> struct graph_metric_filler_impl<graph_type::Sparse> {
 };
 
 /**
- * @brief specialization for Dense graphs
+ * @brief specialization strategies of computing metric for Dense graphs
  */
 template <> struct graph_metric_filler_impl<graph_type::Dense> {
     template <typename Graph, typename ResultMatrix>
@@ -71,7 +69,6 @@ template <> struct graph_metric_filler_impl<graph_type::Dense> {
         boost::floyd_warshall_all_pairs_shortest_paths(g, rm);
     }
 };
-}
 
 /**
  * @class graph_metric
@@ -87,10 +84,10 @@ template <
     typename Graph, typename DistanceType,
     typename GraphType = typename graph_metric_traits<Graph>::GraphTypeTag>
 struct graph_metric : public array_metric<DistanceType>,
-                      public metric_fillers::graph_metric_filler_impl<
+                      public graph_metric_filler_impl<
                           typename graph_metric_traits<Graph>::GraphTypeTag> {
     typedef array_metric<DistanceType> GMBase;
-    typedef metric_fillers::graph_metric_filler_impl<
+    typedef graph_metric_filler_impl<
         typename graph_metric_traits<Graph>::GraphTypeTag> GMFBase;
 
     /**

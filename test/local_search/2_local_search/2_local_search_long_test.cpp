@@ -16,7 +16,7 @@
 
 using std::string;
 using std::vector;
-using namespace paal::local_search::two_local_search;
+using namespace paal::local_search;
 using namespace paal;
 
 std::string path = "test/data/TSPLIB/symmetrical/";
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
         // printing
         LOGLN("Graph:\t" << fname);
-        LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
+        LOGLN("Length before\t" << get_cycle_length(mtx, cycle));
 
         // setting logger
         auto logger = utils::make_two_ls_logger(mtx, 100);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
         // search
         two_local_search(cycle, paal::local_search::first_improving_strategy{},
                          logger, utils::always_false(), lsc);
-        check_result(float(simple_algo::get_length(mtx, cycle)), opt,
+        check_result(float(get_cycle_length(mtx, cycle)), opt,
                      4 * sqrt(size));
     }
 }

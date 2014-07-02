@@ -19,13 +19,12 @@
  */
 
 namespace paal {
-namespace suffix_arrays {
 
 /**
- * @param Letter a1
- * @param int a2
- * @param Letter b1
- * @param int b2
+ * @param a1
+ * @param a2
+ * @param b1
+ * @param b2
  * @brief return true if pair (a1,a2) is smaller than pair (b1,b2) in
  * lexicographic order
  * and false otherwise
@@ -38,12 +37,12 @@ inline bool leq(Letter a1, int a2, Letter b1,
     return (a1 < b1 || (a1 == b1 && a2 <= b2));
 }
 /**
- * @param int a1
- * @param Letter a2
- * @param int a3
- * @param int b1
- * @param Letter b2
- * @param int b3
+ * @param a1
+ * @param a2
+ * @param a3
+ * @param b1
+ * @param b2
+ * @param b3
  * @brief return true if triple (a1,a2,a3) is smaller than triple (b1,b2,b3) in
  * lexicographic order
  * and false otherwise
@@ -57,13 +56,13 @@ inline bool leq(Letter a1, Letter a2, int a3, Letter b1, Letter b2, int b3) {
 template <typename Iterator>
 static void radix_pass(std::vector<int> const &sortFrom,
                        std::vector<int> &sortTo, Iterator r, int n,
-                       int maxLetter) { // count occurrences
-    std::vector<int> c(maxLetter + 1);
+                       int max_letter) { // count occurrences
+    std::vector<int> c(max_letter + 1);
     for (auto i : boost::irange(0, n)) {
         c[*(r + sortFrom[i])]++; // count occurrences
     }
     int sum = 0;
-    for (auto i : boost::irange(0, maxLetter + 1)) { // exclusive prefix sums
+    for (auto i : boost::irange(0, max_letter + 1)) { // exclusive prefix sums
         int t = c[i];
         c[i] = sum;
         sum += t;
@@ -81,14 +80,14 @@ static void radix_pass(std::vector<int> const &sortFrom,
  * suffix_array[i] contains the starting position of the i-1'th smallest suffix
 * in Word
  * @tparam Letter
- * @param vector<Letter> text - text
- * @param vector<int> place for suffix_array
- * @param Letter max_letter optional parameter max_letter in alphabet
+ * @param text - text
+ * @param SA place for suffix_array
+ * @param max_letter optional parameter max_letter in alphabet
  */
-// find the suffix array SA of text[0..n-1] in {1..maxLetter}^n
+// find the suffix array SA of text[0..n-1] in {1..max_letter}^n
 template <typename Letter>
 void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
-                   Letter maxLetter = 0) {
+                   Letter max_letter = 0) {
     int n = text.size() - 3;
     int n0 = (n + 2) / 3, n1 = (n + 1) / 3, n2 = n / 3, n02 = n0 + n2;
     text.resize(text.size() + 3);
@@ -96,10 +95,10 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     std::vector<int> SA12;
     std::vector<int> text0;
     std::vector<int> SA0;
-    if (maxLetter == 0)
+    if (max_letter == 0)
         for (auto i : text) {
-            if (maxLetter < i) {
-                maxLetter = i;
+            if (max_letter < i) {
+                max_letter = i;
             }
         }
     // generate positions of mod 1 and mod  2 suffixes
@@ -113,9 +112,9 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     SA12.resize(n02 + 3);
     text12.resize(n02 + 3);
     // lsb radix sort the mod 1 and mod 2 triples
-    radix_pass(text12, SA12, text.begin() + 2, n02, maxLetter);
-    radix_pass(SA12, text12, text.begin() + 1, n02, maxLetter);
-    radix_pass(text12, SA12, text.begin(), n02, maxLetter);
+    radix_pass(text12, SA12, text.begin() + 2, n02, max_letter);
+    radix_pass(SA12, text12, text.begin() + 1, n02, max_letter);
+    radix_pass(text12, SA12, text.begin(), n02, max_letter);
 
     // find lexicographic names of triples
     int name = 0;
@@ -155,7 +154,7 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
             text0.push_back(3 * SA12[i]);
         }
     }
-    radix_pass(text0, SA0, text.begin(), n0, maxLetter);
+    radix_pass(text0, SA0, text.begin(), n0, max_letter);
     auto GetI = [&](int t)->int {
         return SA12[t] < n0 ? SA12[t] * 3 + 1 : (SA12[t] - n0) * 3 + 2;
     };
@@ -201,20 +200,18 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
  * suffix_array[i] contains the starting position of the i-1'th smallest suffix
 * in Word
  * @tparam Letter
- * @param vector<Letter> text - text
- * @param vector<int> place for suffix_array
- * @param Letter max_letter optional parameter max_letter in alphabet
+ * @param text - text
+ * @param SA place for suffix_array
+ * @param max_letter optional parameter max_letter in alphabet
  */
-// find the suffix array SA of text[0..n-1] in {1..maxLetter}^n
+// find the suffix array SA of text[0..n-1] in {1..max_letter}^n
 template <typename Letter>
 void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
-                  Letter maxLetter = 0) {
+                  Letter max_letter = 0) {
     text.resize(text.size() + 3);
-    _suffix_array<Letter>(text, SA, maxLetter);
+    _suffix_array<Letter>(text, SA, max_letter);
     text.resize(text.size() - 3);
-}
-;
+};
 
-}      //!suffix_arrays
-}      //!paal
+} //!paal
 #endif /*SUFFIX_ARRAY_HPP*/

@@ -29,7 +29,7 @@ int main() {
 
     // run algorithm
     std::vector<int> steiner_points;
-    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(
+    paal::steiner_tree_zelikovsky11per6approximation(
         gm, voronoi, std::back_inserter(steiner_points));
 
     // print result

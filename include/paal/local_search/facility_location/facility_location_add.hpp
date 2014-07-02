@@ -21,7 +21,6 @@
 
 namespace paal {
 namespace local_search {
-namespace facility_location {
 
 /**
  * @brief commit functor for add moves in facility location problem
@@ -85,7 +84,6 @@ struct facility_location_gain_add {
     }
 };
 
-} // facility_location
 } // local_search
 } // paal
 

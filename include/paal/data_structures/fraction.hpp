@@ -1,3 +1,11 @@
+/**
+ * @file fraction.hpp
+ * @brief
+ * @author Robert Rosolek
+ * @version 1.0
+ * @date
+ */
+
 #ifndef FRACTION_HPP
 #define FRACTION_HPP
 

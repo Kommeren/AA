@@ -18,7 +18,6 @@
 
 namespace paal {
 namespace local_search {
-namespace two_local_search {
 
 /**
  @brief represents step of 2 local search in multi solution where Solution is
@@ -53,10 +52,9 @@ using TwoLocalcomponents = data_structures::components<
 * type names in template.
  *
  * @tparam Gain
- * @tparam get_moves
- * @param c
- * @param ich
- * @param ng
+ * @tparam GetMoves
+ * @param ch
+ * @param gm
  *
  * @return
  */
@@ -90,9 +88,10 @@ decltype(make_two_local_search_components(
  * @tparam Cycle
  * @tparam components
  * @param cycle
- * @param psa
- * @param gsc
- * @param components
+ * @param searchStrategy
+ * @param on_success
+ * @param on_fail
+ * @param comps
  *
  * @return
  */
@@ -103,7 +102,7 @@ bool two_local_search(Cycle &cycle, SearchStrategy searchStrategy,
                       components... comps) {
     typedef data_structures::cycle_start_from_last_change<Cycle> CSFLCh;
     CSFLCh cycleSFLCh(cycle);
-    local_search::two_local_search::two_local_search_adapter<CSFLCh>
+    local_search::two_local_search_adapter<CSFLCh>
         cycleAdapted(cycleSFLCh);
     return local_search(cycleAdapted, std::move(searchStrategy),
                         std::move(on_success), std::move(on_fail),
@@ -113,11 +112,10 @@ bool two_local_search(Cycle &cycle, SearchStrategy searchStrategy,
 /**
  * @brief simple version of two_local_search
  *
- * @tparam SearchStrategy
  * @tparam Cycle
  * @tparam components
  * @param cycle
- * @param components
+ * @param comps
  *
  * @return
  */
@@ -128,7 +126,6 @@ bool tsp_first_improving(Cycle &cycle, components... comps) {
                             std::move(comps)...);
 }
 
-} // two_local_search
 } // local_search
 } // paal
 

@@ -76,10 +76,11 @@ class search_obj_function_components_tosearch_components {
  * @tparam ContinueOnSuccess
  * @tparam ContinueOnFail
  * @tparam Solution
- * @tparam components
+ * @tparam SearchObjFunctioncomponents
  * @param solution
- * @param psa
- * @param gsc
+ * @param searchStrategy
+ * @param on_success
+ * @param on_fail
  * @param components
  *
  * @return
@@ -112,9 +113,9 @@ bool local_search_obj_fun(Solution &solution, SearchStrategy searchStrategy,
  *
  * @tparam SearchStrategy
  * @tparam Solution
- * @tparam components
+ * @tparam Components
  * @param solution
- * @param components
+ * @param comps
  *
  * @return
  */

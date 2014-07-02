@@ -23,7 +23,7 @@ int main() {
 
     // run algorithm
     auto dw =
-        paal::steiner_tree::make_dreyfus_wagner(gm, terminals, nonterminals);
+        paal::make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
 
     // print result

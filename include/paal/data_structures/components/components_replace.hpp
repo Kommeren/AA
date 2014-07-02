@@ -14,7 +14,7 @@ namespace paal {
 namespace data_structures {
 
 /**
- * @brief Generic version of ReplaceType
+ * @brief Generic version of replaced_type
  *
  * @tparam Name
  * @tparam NewType
@@ -24,7 +24,7 @@ template <typename Name, typename NewType, typename components>
 class replaced_type;
 
 /**
- * @class ReplaceType
+ * @class replaced_type
  * @brief Returns type of  components<Names, Types>, with Type for Name change
  * to NewType
  *
@@ -113,8 +113,7 @@ class temp_replaced_components {
  * this Name
  *        (If the type is the same, set member function from components class
  * chould be used).
- *        The function returns components class fo type ReplaceType<Name,
- * NewType, Oldcomponents >::type.
+ *        The function returns components class fo type replaced_type<Name, NewType, Oldcomponents >::type.
  *        The function creates temporary object wich behaves like result
  * components
  *        and creates final object calling special Copy constructor.

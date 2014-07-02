@@ -37,7 +37,6 @@
 #include <stack>
 
 namespace paal {
-namespace steiner_tree {
 
 namespace detail {
 /**
@@ -365,5 +364,4 @@ void steiner_tree_zelikovsky11per6approximation(const Metric &m,
     st.get_result_steiner_vertices(out);
 }
 
-} // steiner_tree
 } // paal

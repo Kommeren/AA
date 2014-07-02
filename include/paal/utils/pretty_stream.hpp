@@ -65,7 +65,7 @@ template <typename Stream> struct pretty_stream {
      * @brief operator<< for double
      *
      * @param x
-     *
+     * @param epsilon
      * @return
      */
     inline std::string pretty_to_string(double x, double epsilon = 1e-9) {

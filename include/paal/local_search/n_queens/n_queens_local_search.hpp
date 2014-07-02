@@ -38,8 +38,9 @@ using n_queens_local_search_components = data_structures::components<
  * @tparam NQueensPositionsVector
  * @tparam components
  * @param pos
- * @param psa
- * @param gsc
+ * @param searchStrategy
+ * @param on_success
+ * @param on_fail
  * @param nQueenscomponents
  *
  * @return

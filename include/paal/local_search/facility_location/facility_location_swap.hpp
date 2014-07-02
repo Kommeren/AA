@@ -22,7 +22,6 @@
 
 namespace paal {
 namespace local_search {
-namespace facility_location {
 
 /**
  * @brief swap type
@@ -162,7 +161,6 @@ struct facility_locationget_moves_swap {
     }
 };
 
-} // facility_location
 } // local_search
 } // paal
 

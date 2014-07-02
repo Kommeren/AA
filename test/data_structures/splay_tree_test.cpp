@@ -10,7 +10,7 @@
 #include <random>
 
 
-using paal::data_structures::splay_tree::splay_tree;
+using paal::data_structures::splay_tree;
 
 template <typename T, typename I> bool check_content(T &t, I begin, I end) {
     if (!std::equal(begin, end, t.begin())) {

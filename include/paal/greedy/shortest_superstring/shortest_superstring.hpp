@@ -51,11 +51,11 @@ template <typename Words> class shortest_superstring {
 
         initialize(words);
 
-        suffix_arrays::suffix_array<Letter>(m_sum_words, m_suffix_array);
+        suffix_array<Letter>(m_sum_words, m_suffix_array);
 
         data_structures::rank(m_suffix_array, m_rank);
 
-        suffix_arrays::lcp(m_suffix_array, m_rank, m_lcp, m_sum_words);
+        lcp(m_suffix_array, m_rank, m_lcp, m_sum_words);
 
         m_prefix_tree.build_prefix_tree();
 
@@ -215,7 +215,7 @@ template <typename Words> class shortest_superstring {
 } //!detail
 
 /**
- * @param Words words
+ * @param words
  * @brief return word contains all words as subwords,
  * of lenght at most 3.5 larger than shortest superstring.
  * words canot contains letter 0

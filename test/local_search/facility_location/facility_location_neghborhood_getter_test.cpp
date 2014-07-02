@@ -9,7 +9,7 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace paal::data_structures;
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationRemoveTest) {
     typedef sample_graphs_metrics SGM;

@@ -22,7 +22,7 @@
 #include <string>
 
 using std::vector;
-using namespace paal::local_search::two_local_search;
+using namespace paal::local_search;
 using namespace paal;
 
 std::string path = "test/data/TSPLIB/symmetrical/";
@@ -44,7 +44,7 @@ template <typename Cycle> void test() {
 
     // printing
     LOG_COPY_DEL(cycle.vbegin(), cycle.vend(), ",");
-    LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
+    LOGLN("Length before\t" << get_cycle_length(mtx, cycle));
 
     // setting logger
     auto logger = utils::make_two_ls_logger(mtx);
@@ -78,7 +78,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     typedef data_structures::simple_cycle<int> Cycle;
     std::random_shuffle(v.begin(), v.end());
     Cycle cycle(v.begin(), v.end());
-    int startLen = simple_algo::get_length(mtx, cycle);
+    int startLen = get_cycle_length(mtx, cycle);
 
     // creating local search
     auto lsc = get_default_two_local_components(mtx);
@@ -93,7 +93,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB_cut) {
     auto logger = utils::make_two_ls_logger(mtx);
 
     // printing
-    LOGLN("Length before\t" << simple_algo::get_length(mtx, cycle));
+    LOGLN("Length before\t" << get_cycle_length(mtx, cycle));
     paal::local_search::first_improving_strategy strategy{};
 
     // search

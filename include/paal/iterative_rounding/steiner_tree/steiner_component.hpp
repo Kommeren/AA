@@ -34,7 +34,7 @@ public:
     steiner_component(std::vector<Vertex> & el, const Metric & cost_map,
             const Terminals & term, const Terminals& steiner_vertices) :
         m_elements(el), m_size(el.size()) {
-        auto dw = paal::steiner_tree::make_dreyfus_wagner(cost_map, m_elements, steiner_vertices);
+        auto dw = paal::make_dreyfus_wagner(cost_map, m_elements, steiner_vertices);
         dw.solve();
         m_cost = dw.get_cost();
         auto &steiner = dw.steiner_tree_zelikovsky11per6approximation();

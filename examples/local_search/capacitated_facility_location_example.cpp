@@ -12,7 +12,7 @@
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
 #include "paal/utils/functors.hpp"
 
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 
 int main() {
     // sample data

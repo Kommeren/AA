@@ -31,12 +31,9 @@ template <typename Name, typename Default> struct NameWithDefault;
  */
 struct copy_tag {};
 
-/**
- * @brief This namespace block contains implementation of the main class
- * components<Names,Types> and needed meta functions
- */
+// This namespace block contains implementation of the main class
+// components<Names,Types> and needed meta functions
 namespace detail {
-
 /**
  * @brief wraps type to constructible type
  *
@@ -388,10 +385,8 @@ class components<TypesVector<Name, NamesRest...>,
 };
 } // detail
 
-/**
- * @brief This namespace contains class which sets all defaults and all needed
- * meta functions.
- */
+//This namespace contains class which sets all defaults and all needed meta functions.
+
 namespace detail {
 
 template <typename Names, typename Defaults, typename TypesPrefix>
@@ -413,9 +408,7 @@ class set_defaults {
 };
 } // detail
 
-/**
- * @brief Here are some meta functions, to parse the arguments
- */
+//Here are some meta functions, to parse the arguments
 namespace detail {
 /**
  * @brief get_name, gets name for either Name, or NamesWithDefaults struct

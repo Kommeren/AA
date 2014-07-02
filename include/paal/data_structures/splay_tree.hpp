@@ -20,7 +20,6 @@
 
 namespace paal {
 namespace data_structures {
-namespace splay_tree {
 
 template <typename T> class splay_tree;
 
@@ -641,7 +640,6 @@ template <typename T> class splay_tree {
     mutable node_ptr root_;
     std::unordered_map<T, node_type *> t_to_node_;
 };
-}
 }
 }
 

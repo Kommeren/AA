@@ -9,7 +9,6 @@
 #define PROBLEM_TYPE_HPP
 
 namespace paal {
-/// Linear Programming namespace.
 namespace lp {
 /// LP problem type.
 enum problem_type {

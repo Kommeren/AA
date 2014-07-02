@@ -25,6 +25,7 @@ namespace paal {
  * representing adding *ObjectsIter to value
  * @param compare - compares to values.
  * @param init - discover element and assign the 0 value
+ * @param get_range
  *
  * @tparam ValueIterator has to be RandomAccess output iterator
  * @tparam ObjectsIter

@@ -21,7 +21,6 @@
 
 namespace paal {
 namespace local_search {
-namespace facility_location {
 
 /**
  * @brief gain functor for facility location
@@ -91,7 +90,6 @@ struct facility_locationget_moves_remove {
     }
 };
 
-} // facility_location
 } // local_search
 } // paal
 

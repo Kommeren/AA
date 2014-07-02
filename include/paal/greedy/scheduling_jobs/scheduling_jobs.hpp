@@ -1,4 +1,4 @@
-/*
+/**
  * @file scheduling_jobs.hpp
  * @brief
  * @author Robert Rosolek
@@ -175,19 +175,19 @@ void schedule(MachineIterator mfirst, MachineIterator mlast, JobIterator jfirst,
 }
 } //!detail
 
-/*
+/**
  * @brief this is deterministic solve scheduling jobs on machines with different
  * speeds problem and return schedule example:
- *  \snippet scheduling_example.cpp Scheduling Jobs Example
+ *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_example.cpp
- * @param MachineIterator mfirst
- * @param MachineIterator mlast
- * @param JobIterator jfirst
- * @param JobIterator jlast
- * @param OutputIterator result
- * @param GetSpeed get_speed
- * @param GetLoad get_load
+ * @param mfirst
+ * @param mlast
+ * @param jfirst
+ * @param jlast
+ * @param result
+ * @param get_speed
+ * @param get_load
  * @tparam MachineIterator
  * @tparam JobIterator
  * @tparam OutputIterator
@@ -205,20 +205,20 @@ void schedule_deterministic(const MachineIterator mfirst,
                      utils::always_true{});
 }
 
-/*
+/**
  * @brief this is randomized solve scheduling jobs on machines with different
  * speeds problem and return schedule example:
- *  \snippet scheduling_example.cpp Scheduling Jobs Example
+ *  \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
  *
  * complete example is scheduling_jobs_example.cpp
- * @param MachineIterator mfirst
- * @param MachineIterator mlast
- * @param JobIterator jfirst
- * @param JobIterator jlast
- * @param OutputIterator result
- * @param GetSpeed get_speed
- * @param GetLoad get_load
- * @param RandomNumberGenerator gen
+ * @param mfirst
+ * @param mlast
+ * @param jfirst
+ * @param jlast
+ * @param result
+ * @param get_speed
+ * @param get_load
+ * @param gen
  * @tparam MachineIterator
  * @tparam JobIterator
  * @tparam OutputIterator

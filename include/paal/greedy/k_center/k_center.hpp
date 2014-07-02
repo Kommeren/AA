@@ -19,9 +19,11 @@ namespace greedy {
  *  \snippet k_center_example.cpp K Center Example
  *
  * complete example is k_center_example.cpp
- * @param Metric metric
- * @param int numberOfClusters
- * @param OutputIterator result ItemIterators
+ * @param metric
+ * @param numberOfClusters
+ * @param result ItemIterators
+ * @param iBegin
+ * @param iEnd
  * @tparam array_metric
  * @tparam OutputIterator
  * @tparam ItemIterator

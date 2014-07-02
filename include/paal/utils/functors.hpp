@@ -1,3 +1,11 @@
+/**
+ * @file functors.hpp
+ * @brief
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date
+ */
+
 //=======================================================================
 // Copyright 2013 University of Warsaw.
 // Authors: Piotr Wygocki

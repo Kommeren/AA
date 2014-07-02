@@ -15,7 +15,6 @@
 #include <bitset>
 
 namespace paal {
-namespace steiner_tree {
 
 /**
  * Implements Dreyfus-Wagner algorithm.
@@ -292,7 +291,6 @@ make_dreyfus_wagner(const Metric &metric, const Terminals &terminals,
         metric, terminals, nonTerminals);
 }
 
-} // steiner_tree
 } // paal
 
 #endif /* DREYFUS_WAGNER_HPP */

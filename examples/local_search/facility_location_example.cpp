@@ -13,7 +13,7 @@
 
 #include <iostream>
 
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 
 int main() {
     // sample data

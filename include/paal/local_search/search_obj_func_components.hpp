@@ -48,7 +48,7 @@ using search_componentsObjFun = typename componentsObjFun::type<Args...>;
  * @brief make function for search_componentsObjFun
  *
  * @tparam Args
- * @param componentsObjFun::make_components(std::forward(args
+ * @param args
  *
  * @return
  */

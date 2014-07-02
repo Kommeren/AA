@@ -25,16 +25,13 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
 
     auto jobs = boost::irange(0, int(time.size()));
 
-    std::vector<std::pair<decltype(jobs) ::iterator, Time>> jobsToStartDates;
+    std::vector<std::pair<decltype(jobs)::iterator, Time>> jobsToStartDates;
 
-    Time delay =
-        paal::greedy::scheduling_jobs_with_deadlines_on_a_single_machine::
-            schedulingJobsWithDeadlinesOnASingleMachine(
-                jobs.begin(), jobs.end(),
-                paal::utils::make_array_to_functor(time),
-                paal::utils::make_array_to_functor(relase),
-                paal::utils::make_array_to_functor(dueDate),
-                back_inserter(jobsToStartDates));
+    Time delay = paal::greedy::schedulingJobsWithDeadlinesOnASingleMachine(
+        jobs.begin(), jobs.end(), paal::utils::make_array_to_functor(time),
+        paal::utils::make_array_to_functor(relase),
+        paal::utils::make_array_to_functor(dueDate),
+        back_inserter(jobsToStartDates));
     Time maxDelay = 0;
     int jobId;
     for (auto jobStartTime : jobsToStartDates) {

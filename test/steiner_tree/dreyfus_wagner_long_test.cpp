@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(steinlib_test) {
     int k = 0;
     for (const steiner_tree_test &test : data) {
         LOGLN("TEST " << test.test_name);
-        auto dw = paal::steiner_tree::make_dreyfus_wagner(
+        auto dw = paal::make_dreyfus_wagner(
             test.metric, test.terminals, test.steiner_points);
         dw.solve();
         int res = dw.get_cost();

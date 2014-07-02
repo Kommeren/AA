@@ -25,11 +25,10 @@ BOOST_AUTO_TEST_CASE(kmedian_test) {
     Sol sol(std::move(voronoi), USet{ SGM::A, SGM::C }, k);
 
     // create facility location local search components
-    paal::local_search::k_median::default_k_median_components::type swap;
+    paal::local_search::default_k_median_components::type swap;
 
     // search
-    paal::local_search::facility_location::facility_location_first_improving(
-        sol, swap);
+    paal::local_search::facility_location_first_improving(sol, swap);
 
     // print result
     ON_LOG(auto const &ch = ) sol.get_chosen_facilities();

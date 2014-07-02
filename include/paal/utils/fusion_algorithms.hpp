@@ -23,10 +23,9 @@ class polymorfic_fold {
     struct Fold {
         template <typename Functor, typename IterEnd,
                   typename AccumulatorFunctor, typename AccumulatorData>
-        typename std::result_of<
-            AccumulatorFunctor(AccumulatorData)>::type operator()(
-            Functor, AccumulatorFunctor accumulatorFunctor,
-            AccumulatorData accumulatorData, IterEnd, IterEnd) const {
+        typename std::result_of<AccumulatorFunctor(AccumulatorData)>::type
+        operator()(Functor, AccumulatorFunctor accumulatorFunctor,
+                   AccumulatorData accumulatorData, IterEnd, IterEnd) const {
             return accumulatorFunctor(accumulatorData);
         }
 
@@ -41,14 +40,14 @@ class polymorfic_fold {
         auto operator()(Functor f, AccumulatorFunctor accumulatorFunctor,
                         AccumulatorData accumulatorData, IterBegin begin,
                         IterEnd end) const
-            ->typename std::result_of<Functor(
-                  typename boost::fusion::result_of::deref<IterBegin>::type,
-                  AccumulatorFunctor, AccumulatorData,
-                  // TODO Why this move is needed??? (without it doesn't compile
-                  // on clang-3.4)
-                  decltype(std::move(std::bind(
-                      *this, f, std::placeholders::_1, std::placeholders::_2,
-                      boost::fusion::next(begin), end))))>::type {
+            -> typename std::result_of<Functor(
+                typename boost::fusion::result_of::deref<IterBegin>::type,
+                AccumulatorFunctor, AccumulatorData,
+                // TODO Why this move is needed??? (without it doesn't compile
+                // on clang-3.4)
+                decltype(std::move(std::bind(
+                    *this, f, std::placeholders::_1, std::placeholders::_2,
+                    boost::fusion::next(begin), end))))>::type {
             auto continuation = std::bind(*this, f, std::placeholders::_1,
                                           std::placeholders::_2,
                                           boost::fusion::next(begin), end);
@@ -76,10 +75,10 @@ class polymorfic_fold {
               typename AccumulatorData, typename Sequence>
     auto operator()(Functor f, AccumulatorFunctor accumulatorFunctor,
                     AccumulatorData accumulatorData, Sequence &seq) const
-        ->decltype(Fold{
-    }(f, accumulatorFunctor, accumulatorData, boost::fusion::begin(seq),
-      boost::fusion::end(seq))) {
-        return Fold{}
+        -> decltype(Fold {}(f, accumulatorFunctor, accumulatorData,
+                            boost::fusion::begin(seq),
+                            boost::fusion::end(seq))) {
+        return Fold {}
         (f, accumulatorFunctor, accumulatorData, boost::fusion::begin(seq),
          boost::fusion::end(seq));
     }
@@ -89,9 +88,8 @@ class polymorfic_fold {
  * @brief Find for StaticLazyJoin
  */
 class Satisfy {
-
     /**
-     * @brief operator(), specialization for empty Join
+     * @brief satisfy, specialization for empty Join
      *
      * @tparam Predicate
      *
@@ -103,13 +101,14 @@ class Satisfy {
     }
 
     /**
-     * @brief operator()
+     * @brief satisfy
      *
      * @tparam Predicate
-     * @tparam GetRangeAndTag
-     * @tparam GetRangeAndTagRest
+     * @tparam IterBegin
+     * @tparam IterEnd
      * @param pred
-     * @param join
+     * @param begin
+     * @param end
      *
      * @return
      */

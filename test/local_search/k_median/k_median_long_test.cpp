@@ -24,7 +24,7 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(KMedianLong) {
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
                         VSet(fac.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),
                 fac.size());
-        paal::local_search::k_median::default_k_median_components::type swap;
+        paal::local_search::default_k_median_components::type swap;
 
         facility_location_first_improving(sol, swap);
 

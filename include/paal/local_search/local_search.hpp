@@ -217,10 +217,11 @@ template <typename Solution> struct local_search_concepts<Solution> {};
  * @brief local search simple solution
  *
  * @param solution the initial solution which going to be possibly improved by
-* local_search
+ *local_search
+ * @param searchStrategy
  * @param succ post search action
  * @param fail global stop condition
- * @param components
+ * @param comps
  *
  * @return true if the solution is improved
  */
@@ -253,8 +254,8 @@ bool local_search(Solution &solution, SearchStrategy searchStrategy,
  * @brief
  *
  * @param solution the initial solution which going to be possibly improved by
-* local_search
- * @param components
+ *local_search
+ * @param comps
  *
  * @return true if the solution is improved
  */
@@ -289,8 +290,10 @@ bool best_improving(Solution &solution, components... comps) {
  *        Note that this strategy might commit non-improving moves
  *
  * @tparam Solution
+ * @tparam ContinueOnSuccess
  * @tparam components
  * @param solution
+ * @param on_success
  * @param comps
  *
  * @return

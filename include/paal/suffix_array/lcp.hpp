@@ -9,7 +9,6 @@
 #define LCP_HPP
 
 namespace paal {
-namespace suffix_arrays {
 /**
  *
  * @brief
@@ -20,10 +19,10 @@ namespace suffix_arrays {
 * smallest suffix
  * and its predecessor in the suffix array
  * @tparam Letter
- * @param vector<int> suffix_array
- * @param vector<int> rank
- * @param vector<int> place for Lcp
- * @param vector<Letter> word
+ * @param suffix_array
+ * @param rank
+ * @param lcp place for Lcp
+ * @param sumWords
  */
 template <typename Letter>
 void lcp(std::vector<int> const &suffix_array, std::vector<int> const &rank,
@@ -43,8 +42,6 @@ void lcp(std::vector<int> const &suffix_array, std::vector<int> const &rank,
         }
     }
 }
-;
-} //!suffix_arrays
 } //!paal
 
 #endif /*LCP*/

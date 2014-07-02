@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
             FSet(test.steiner_points.begin(), test.steiner_points.end()),
             test.metric);
         std::vector<int> selectedSteinerPoints;
-        paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(
+        paal::steiner_tree_zelikovsky11per6approximation(
             test.metric, voronoi, std::back_inserter(selectedSteinerPoints));
 
         auto resRange = boost::join(test.terminals, selectedSteinerPoints);

@@ -27,7 +27,7 @@ template <typename Matrix> class two_ls_logger {
         if (m_cnt++ % m_action_per_log == 0) {
             LOGLN("Length after\t"
                   << m_cnt << ": "
-                  << simple_algo::get_length(m_mtx, cycle.get_cycle()));
+                  << get_cycle_length(m_mtx, cycle.get_cycle()));
         }
         return true;
     }

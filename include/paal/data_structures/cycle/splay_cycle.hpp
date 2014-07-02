@@ -22,8 +22,7 @@ namespace data_structures {
  */
 template <typename T>
 class splay_cycle {
-    using splay_tree = splay_tree::splay_tree<T>;
-    using SIter = typename splay_tree::iterator;
+    using SIter = typename splay_tree<T>::iterator;
 public:
     typedef cycle_iterator<SIter> VIter;
 
@@ -96,7 +95,7 @@ public:
     }
 
   private:
-    splay_tree m_splay_tree;
+    splay_tree<T> m_splay_tree;
     const std::size_t m_size;
 };
 

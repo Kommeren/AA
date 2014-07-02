@@ -16,7 +16,6 @@
 
 namespace paal {
 namespace local_search {
-namespace facility_location {
 
 /**
  * @class default_remove_fl_components
@@ -49,7 +48,7 @@ struct default_swap_fl_components {
 };
 
 /**
- * @function facility_location_local_search
+ * facility_location_local_search
  * @brief this is model of LocalSearchStepMultiSolution concept. See \ref
  local_search_page.<br>
  * The Move is facility_location::Move. <br>
@@ -90,11 +89,10 @@ bool facility_location_local_search(facility_location_solution &fls,
 /**
  * @brief simple version of local search for facility location
  *
- * @tparam SearchStrategy
  * @tparam facility_location_solution
  * @tparam components
  * @param fls
- * @param components
+ * @param comps
  *
  * @return
  */
@@ -104,7 +102,6 @@ bool facility_location_first_improving(facility_location_solution &fls,
     return facility_location_local_search(
         fls, first_improving_strategy{}, utils::always_true{},
         utils::always_false{}, std::move(comps)...);
-}
 }
 }
 }

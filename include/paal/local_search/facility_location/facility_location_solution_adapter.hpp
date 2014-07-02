@@ -25,7 +25,6 @@
 
 namespace paal {
 namespace local_search {
-namespace facility_location {
 
 /**
  * @brief facility_location_solution adapter
@@ -184,7 +183,6 @@ class facility_location_solution_adapter {
     std::size_t m_last_used_chosen;
 };
 
-} // facility_location
 } // local_search
 } // paal
 

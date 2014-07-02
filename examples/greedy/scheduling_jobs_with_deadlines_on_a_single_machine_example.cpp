@@ -15,8 +15,7 @@
 #include <iostream>
 #include <utility>
 
-using namespace paal::greedy::
-    scheduling_jobs_with_deadlines_on_a_single_machine;
+using namespace paal::greedy;
 using namespace std;
 using namespace paal::utils;
 int main() {

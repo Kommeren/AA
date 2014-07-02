@@ -1,3 +1,10 @@
+/**
+ * @file functors_example.cpp
+ * @brief
+ * @author Piotr Wygocki
+ * @version 1.0
+ * @date
+ */
 
 #include "paal/utils/functors.hpp"
 

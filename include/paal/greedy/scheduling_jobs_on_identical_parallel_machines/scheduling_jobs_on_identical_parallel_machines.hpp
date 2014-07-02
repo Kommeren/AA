@@ -28,11 +28,11 @@ namespace greedy {
  *
  * complete example is
  * scheduling_jobs_on_identical_parallel_machines_example.cpp
- * @param int n_machines
- * @param _RandomAccessIter first
- * @param _RandomAccessIter last
- * @param OutputIterator result
- * @tparam _RandomAccessIter
+ * @param n_machines
+ * @param first
+ * @param last
+ * @param result
+ * @param getTime
  */
 template <class InputIterator, class OutputIterator, class GetTime>
 void scheduling_jobs_on_identical_parallel_machines(int n_machines,

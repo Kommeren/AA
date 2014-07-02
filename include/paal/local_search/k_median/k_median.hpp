@@ -15,7 +15,6 @@
 
 namespace paal {
 namespace local_search {
-namespace k_median {
 
 /**
  * @class default_k_median_components
@@ -24,11 +23,10 @@ namespace k_median {
  */
 struct default_k_median_components {
     typedef Multisearch_components<
-        facility_location::facility_locationget_moves_swap,
-        facility_location::facility_location_gain_swap,
-        facility_location::facility_location_commit_swap> type;
+        facility_locationget_moves_swap,
+        facility_location_gain_swap,
+        facility_location_commit_swap> type;
 };
-}
 }
 }
 

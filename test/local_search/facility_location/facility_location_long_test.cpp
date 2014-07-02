@@ -22,7 +22,7 @@
 #include <iostream>
 #include <iomanip>
 
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {

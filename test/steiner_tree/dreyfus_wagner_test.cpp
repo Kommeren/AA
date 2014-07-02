@@ -12,7 +12,6 @@
 #include <boost/test/unit_test.hpp>
 
 using namespace paal;
-using namespace paal::steiner_tree;
 
 BOOST_AUTO_TEST_CASE(testBasic) {
     typedef sample_graphs_metrics SGM;

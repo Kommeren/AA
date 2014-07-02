@@ -12,7 +12,6 @@
 
 namespace paal {
 namespace local_search {
-namespace two_local_search {
 
 /**
  * @brief adapts cycle to have begin and end pointing to edge collection
@@ -70,7 +69,6 @@ template <typename Cycle> class two_local_search_adapter {
     Cycle &m_cycle;
 };
 
-} // two_local_search
 } // local_search
 } // paal
 

@@ -24,7 +24,7 @@
 #include <fstream>
 #include <iomanip>
 
-using namespace paal::local_search::facility_location;
+using namespace paal::local_search;
 using namespace paal;
 
 template <typename Metric, typename Cost> class fl_logger {

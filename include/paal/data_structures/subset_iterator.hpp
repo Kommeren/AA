@@ -17,7 +17,10 @@
 
 namespace paal {
 namespace data_structures {
-
+/**
+ * @tparam Iterator
+ * @tparam k
+ */
 template <int k, typename Iterator>
 class subsets_iterator_engine
     : private subsets_iterator_engine<k - 1, Iterator> {
@@ -231,6 +234,7 @@ subsets_iterator_engine<k, Iterator> make_subsets_iterator_engine(Iterator b,
  *
  * @tparam Iterator
  * @tparam k
+ * @tparam Joiner
  */
 template <int k, typename Iterator, typename Joiner = make_tuple>
 class subsets_iterator : public boost::iterator_facade<
@@ -303,9 +307,10 @@ class subsets_iterator : public boost::iterator_facade<
  *
  * @tparam Iterator
  * @tparam k
- * @tparam Pointer
+ * @tparam Joiner
  * @param b
  * @param e
+ * @param joiner
  *
  * @return
  */

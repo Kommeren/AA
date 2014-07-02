@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(zelikowsky_test) {
 
     std::vector<int> steiner;
 
-    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(
+    paal::steiner_tree_zelikovsky11per6approximation(
         gm, voronoi, std::back_inserter(steiner));
     BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), SGM::E);
@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
                      FSet{ { 1, 1 } }, em);
     std::vector<std::pair<int, int>> steiner;
 
-    paal::steiner_tree::steiner_tree_zelikovsky11per6approximation(
+    paal::steiner_tree_zelikovsky11per6approximation(
         em, voronoi, std::back_inserter(steiner));
     BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
     BOOST_CHECK_EQUAL(steiner.front(), make_pair(1, 1));

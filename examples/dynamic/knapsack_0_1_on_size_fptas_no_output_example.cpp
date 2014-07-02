@@ -1,12 +1,12 @@
 /**
- * @file knapsack_0_1_on_size_fptas_example.cpp
+ * @file knapsack_0_1_on_size_fptas_no_output_example.cpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-09-20
  */
 
-    //! [Knapsack Example]
+//! [Knapsack Example]
 #include "paal/dynamic/knapsack_0_1_fptas.hpp"
 
 #include <boost/range/irange.hpp>
@@ -36,4 +36,4 @@ int main() {
 
     return 0;
 }
-    //! [Knapsack Example]
+//! [Knapsack Example]

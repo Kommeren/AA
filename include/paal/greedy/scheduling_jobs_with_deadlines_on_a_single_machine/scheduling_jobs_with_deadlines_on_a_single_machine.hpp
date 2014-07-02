@@ -20,7 +20,6 @@
 
 namespace paal {
 namespace greedy {
-namespace scheduling_jobs_with_deadlines_on_a_single_machine {
 
 /**
  * @brief solve scheduling jobs on identical parallel machines problem
@@ -30,12 +29,12 @@ namespace scheduling_jobs_with_deadlines_on_a_single_machine {
  *
  * complete example is
  * scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
- * @param InputIterator first - jobs begin
- * @param InputIterator last - jobs end
- * @param GetTime getTime
- * @param GetReleaseDate getReleaseDate
- * @param GetDueDate getDueDate
- * @param OutputIterator result
+ * @param first - jobs begin
+ * @param last - jobs end
+ * @param getTime
+ * @param getReleaseDate
+ * @param getDueDate
+ * @param result
  * @tparam Time
  * @tparam InputIterator
  * @tparam OutputIterator
@@ -87,7 +86,7 @@ auto schedulingJobsWithDeadlinesOnASingleMachine(
 
     return longestDelay;
 }
-} //!scheduling_Jobs_with_deadlines_on_a_single_machine
+
 } //!greedy
 } //!paal
 
