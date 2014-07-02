@@ -99,8 +99,8 @@ using vertex_cover_ir_components =
                      paal::utils::always_false, vertex_cover_set_solution>;
 //! [Iterative Rounding Components Example]
 
-int main() {
 //! [Iterative Rounding Example]
+int main() {
     using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
         boost::no_property, boost::no_property>;
     using Vertex = boost::graph_traits<Graph>::vertex_descriptor;
@@ -136,4 +136,4 @@ int main() {
     paal::lp::glp::free_env();
     return 0;
 }
-    //! [Iterative Rounding Example]
+//! [Iterative Rounding Example]

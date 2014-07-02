@@ -9,8 +9,6 @@
 //! [LP Example]
 #include "paal/lp/glp.hpp"
 
-#include <boost/range/iterator_range.hpp>
-
 #include <iostream>
 
 using LP = paal::lp::glp;
