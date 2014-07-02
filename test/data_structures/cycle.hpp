@@ -11,17 +11,11 @@
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/range/algorithm/equal.hpp>
 
 #include <vector>
 #include <string>
 
-template <typename I1, typename I2>
-bool vec_equals(I1 b1, I1 e1, I2 b2, I2 e2) {
-    if (std::distance(b1, e1) != std::distance(b2, e2)) {
-        return false;
-    }
-    return std::equal(b1, e1, b2);
-}
 
 namespace {
 std::vector<std::string> v = { "1", "2", "3", "4", "5", "6", "7", "8", "9",
@@ -32,7 +26,7 @@ template <typename El, typename Sol, typename Cycle>
 void check_swap(Cycle &c, const El &p1, const El &p2, const El &start,
                 const Sol &sol) {
     c.flip(p1, p2);
-    BOOST_CHECK(vec_equals(sol.begin(), sol.end(), c.vbegin(start), c.vend()));
+    BOOST_CHECK(boost::equal(sol, boost::make_iterator_range(c.vbegin(start), c.vend())));
 }
 
 template <template <class> class Cycle> void swap_edges_3() {

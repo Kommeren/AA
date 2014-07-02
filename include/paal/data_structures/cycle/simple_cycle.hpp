@@ -28,8 +28,8 @@ namespace data_structures {
  */
 template <typename CycleEl, typename IdxT = int> class simple_cycle {
   public:
-    typedef std::pair<CycleEl, CycleEl> CycleElPair;
-    typedef CycleEl CycleElement;
+    using cycle_el_pair = std::pair<CycleEl, CycleEl>;
+    using cycle_element = CycleEl;
 
     /**
      * @brief constructor
@@ -186,7 +186,7 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
         IdxT m_first;
     };
 
-    typedef std::pair<vertex_iterator, vertex_iterator> vertex_iteratorRange;
+    using vertices =  boost::iterator_range<vertex_iterator>;
 
     /**
      * @brief begin of the vertices range starting at el
@@ -220,8 +220,8 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
      *
      * @return
      */
-    vertex_iteratorRange get_vertices_range(const CycleEl &el) const {
-        return vertex_iteratorRange(vbegin(el), vend());
+    vertices get_vertices_range(const CycleEl &el) const {
+        return vertices(vbegin(el), vend());
     }
 
     /**
@@ -229,7 +229,7 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
      *
      * @return
      */
-    vertex_iteratorRange get_vertices_range() const {
+    vertices get_vertices_range() const {
         return get_vertices_range(from_idx(0));
     }
 
@@ -238,8 +238,8 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
      * @brief Iterator on cycle edges
      */
     class edge_iterator
-        : public std::iterator<std::forward_iterator_tag, CycleElPair,
-                               ptrdiff_t, CycleElPair *, const CycleElPair &> {
+        : public std::iterator<std::forward_iterator_tag, cycle_el_pair,
+                               ptrdiff_t, cycle_el_pair *, const cycle_el_pair &> {
       public:
         /**
          * @brief constructor
@@ -308,14 +308,14 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
          *
          * @return
          */
-        const CycleElPair *const operator->() const { return &m_curr; }
+        const cycle_el_pair *const operator->() const { return &m_curr; }
 
         /**
          * @brief operator*()
          *
          * @return
          */
-        const CycleElPair &operator*() const { return m_curr; }
+        const cycle_el_pair &operator*() const { return m_curr; }
 
       private:
         /**
@@ -338,10 +338,10 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
         const simple_cycle *m_cycle;
         IdxT m_idx;
         IdxT m_first;
-        CycleElPair m_curr;
+        cycle_el_pair m_curr;
     };
 
-    typedef std::pair<edge_iterator, edge_iterator> edge_iteratorRange;
+    using edges = boost::iterator_range<edge_iterator>;
 
     /**
      * @brief returns edges range starting at el
@@ -350,8 +350,8 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
      *
      * @return
      */
-    edge_iteratorRange get_edge_range(const CycleEl &el) const {
-        return edge_iteratorRange(edge_iterator(*this, el), edge_iterator());
+    edges get_edge_range(const CycleEl &el) const {
+        return edges(edge_iterator(*this, el), edge_iterator());
     }
 
     /**
@@ -359,7 +359,7 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
      *
      * @return
      */
-    edge_iteratorRange get_edge_range() const {
+    edges get_edge_range() const {
         return get_edge_range(from_idx(0));
     }
 
@@ -446,7 +446,7 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
     /// mapping from elements to indexes
     bimap<CycleEl, IdxT> m_cycle_idx;
 
-    typedef std::vector<IdxT> SorsMap;
+    using SorsMap = std::vector<IdxT>;
 
     /// predecessors
     SorsMap m_predecessor_map;
@@ -462,7 +462,7 @@ template <typename CycleEl, typename IdxT = int> class simple_cycle {
  */
 template <typename CycleEl, typename IdxT = int>
 class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
-    typedef simple_cycle<CycleEl, IdxT> base;
+    using Base = simple_cycle<CycleEl, IdxT>;
 
   public:
     /**
@@ -474,7 +474,7 @@ class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
      */
     template <typename Iter>
     Simplecycle_start_from_last_change(Iter b, Iter e)
-        : base(b, e), m_last_id(0) {}
+        : Base(b, e), m_last_id(0) {}
 
     /**
      * @brief flip remembers last changed position
@@ -485,7 +485,7 @@ class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
     void flip(const CycleEl &begin, const CycleEl &end) {
         IdxT e1 = to_idx(begin);
         m_last_id = prev_idx(e1);
-        base::flip(begin, end);
+        Base::flip(begin, end);
     }
 
     /**
@@ -493,8 +493,8 @@ class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
      *
      * @return
      */
-    typename base::vertex_iterator vbegin() const {
-        return base::vbegin(from_idx(m_last_id));
+    typename Base::vertex_iterator vbegin() const {
+        return Base::vbegin(from_idx(m_last_id));
     }
 
   private:
