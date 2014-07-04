@@ -17,31 +17,31 @@
 
 BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     // sample data
-    typedef double Time;
+    using Time = double;
     std::vector<Time> time = { 2.1, 3.1, 4.1, 5.1, 6.1, 7.1, 8.1 };
     std::vector<Time> relase = { 1, 2, 3, 4, 5, 6, 7 };
-    std::vector<Time> dueDate = { -1, 0, -2, -3, -4, -5, -6 };
-    double bestDelay = 36.7;
+    std::vector<Time> due_date = { -1, 0, -2, -3, -4, -5, -6 };
+    double BEST_DELAY = 36.7;
 
     auto jobs = boost::irange(0, int(time.size()));
+    std::vector<std::pair<decltype(jobs)::iterator, Time>> jobs_to_start_dates;
 
-    std::vector<std::pair<decltype(jobs)::iterator, Time>> jobsToStartDates;
-
-    Time delay = paal::greedy::schedulingJobsWithDeadlinesOnASingleMachine(
-        jobs.begin(), jobs.end(), paal::utils::make_array_to_functor(time),
-        paal::utils::make_array_to_functor(relase),
-        paal::utils::make_array_to_functor(dueDate),
-        back_inserter(jobsToStartDates));
-    Time maxDelay = 0;
+    Time delay =
+        paal::greedy::scheduling_jobs_with_deadlines_on_a_single_machine(
+            jobs.begin(), jobs.end(), paal::utils::make_array_to_functor(time),
+            paal::utils::make_array_to_functor(relase),
+            paal::utils::make_array_to_functor(due_date),
+            back_inserter(jobs_to_start_dates));
+    Time max_delay = 0;
     int jobId;
-    for (auto jobStartTime : jobsToStartDates) {
-        Time startTime = jobStartTime.second;
-        jobId = (*(jobStartTime.first));
-        LOGLN("Job " << jobId << " Start time: " << startTime);
-        if ((startTime + time[jobId] - dueDate[jobId]) > maxDelay)
-            maxDelay = startTime + time[jobId] - dueDate[jobId];
+    for (auto job_start_time : jobs_to_start_dates) {
+        Time start_time = job_start_time.second;
+        jobId = (*(job_start_time.first));
+        LOGLN("Job " << jobId << " Start time: " << start_time);
+        if ((start_time + time[jobId] - due_date[jobId]) > max_delay)
+            max_delay = start_time + time[jobId] - due_date[jobId];
     }
     // print result
-    check_result(delay, bestDelay, 2);
-    BOOST_CHECK_EQUAL(delay, maxDelay);
+    check_result(delay, BEST_DELAY, 2);
+    BOOST_CHECK_EQUAL(delay, max_delay);
 }

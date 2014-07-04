@@ -11,9 +11,9 @@ Scheduling Jobs on Identical Parallel Machines problem is solved by greedy algor
 We sort all jobs from longest to shortest.
 And we assign longest not assigned job to machine which has smallest load, until all jobs are assigned.
 
-  example: 
-\snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs Example
- 
+  example:
+\snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs On Identical Parallel Machines Example
+
   complete example is scheduling_jobs_on_identical_parallel_machines_example.cpp
 
 \subsection parameters_sjoipm Parameters
@@ -22,7 +22,7 @@ IN: InputIterator first iterator to collection of jobs is not const because we s
 IN: InputIterator last
 OUT: OutputIterator result pair of machine id and job iterator
 IN: GetTime getTime
-  
+
 \subsection app_sjoipm Approximation Ratio equals 4/3.
 
 \subsection com_sjoipm The complexity
