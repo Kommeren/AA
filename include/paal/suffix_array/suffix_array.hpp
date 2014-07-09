@@ -7,9 +7,11 @@
  */
 #ifndef SUFFIX_ARRAY_HPP
 #define SUFFIX_ARRAY_HPP
-#include "boost/range/irange.hpp"
 
+#include "boost/range/algorithm/fill.hpp"
+#include "boost/range/algorithm/max_element.hpp"
 #include "boost/range/irange.hpp"
+#include "boost/range/numeric.hpp"
 
 /*
  * algorithm from:
@@ -20,6 +22,7 @@
 
 namespace paal {
 
+namespace detail {
 /**
  * @param a1
  * @param a2
@@ -52,25 +55,35 @@ template <typename Letter>
 inline bool leq(Letter a1, Letter a2, int a3, Letter b1, Letter b2, int b3) {
     return (a1 < b1 || (a1 == b1 && leq(a2, a3, b2, b3)));
 }
-// stably sort sortFrom[0..n-1] to sortTo[0..n-1] with keys in 0..K from r
-template <typename Iterator>
-static void radix_pass(std::vector<int> const &sortFrom,
-                       std::vector<int> &sortTo, Iterator r, int n,
-                       int max_letter) { // count occurrences
-    std::vector<int> c(max_letter + 1);
-    for (auto i : boost::irange(0, n)) {
-        c[*(r + sortFrom[i])]++; // count occurrences
+
+struct radix_pass {
+
+    template <typename Letter>
+    radix_pass(int max_letter, const std::vector<Letter> & text) {
+        if (max_letter == 0) {
+            max_letter = *boost::max_element(text);
+        }
+        c.resize(max_letter + 2);
     }
-    int sum = 0;
-    for (auto i : boost::irange(0, max_letter + 1)) { // exclusive prefix sums
-        int t = c[i];
-        c[i] = sum;
-        sum += t;
+
+    // stably sort sortFrom[0..n-1] to sortTo[0..n-1] with keys in 0..K from r
+    template <typename Iterator>
+    void operator()(std::vector<int> const &sortFrom,
+            std::vector<int> &sortTo, Iterator r, int n) { // count occurrences
+        boost::fill(c, 0);
+        for (auto i : boost::irange(0, n)) {
+            ++c[r[sortFrom[i]] + 1]; // count occurrences
+        }
+
+        boost::partial_sum(c, c.begin());
+
+        for (auto i : boost::irange(0, n)) {
+            sortTo[c[r[sortFrom[i]]]++] = sortFrom[i]; // sort
+        }
     }
-    for (auto i : boost::irange(0, n)) {
-        sortTo[c[*(r + sortFrom[i])]++] = sortFrom[i]; // sort
-    }
-}
+private:
+    std::vector<int> c;
+};
 
 /**
  *
@@ -86,21 +99,17 @@ static void radix_pass(std::vector<int> const &sortFrom,
  */
 // find the suffix array SA of text[0..n-1] in {1..max_letter}^n
 template <typename Letter>
-void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
-                   Letter max_letter = 0) {
+void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
+                   Letter max_letter) {
     int n = text.size() - 3;
+    assert(n >= 0);
     int n0 = (n + 2) / 3, n1 = (n + 1) / 3, n2 = n / 3, n02 = n0 + n2;
     text.resize(text.size() + 3);
     std::vector<int> text12;
     std::vector<int> SA12;
     std::vector<int> text0;
     std::vector<int> SA0;
-    if (max_letter == 0)
-        for (auto i : text) {
-            if (max_letter < i) {
-                max_letter = i;
-            }
-        }
+    radix_pass radix{max_letter, text};
     // generate positions of mod 1 and mod  2 suffixes
     // the "+(n0-n1)" adds a dummy mod 1 suffix if n%3 == 1
     for (auto i : boost::irange(0, n + (n0 - n1))) {
@@ -112,13 +121,13 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     SA12.resize(n02 + 3);
     text12.resize(n02 + 3);
     // lsb radix sort the mod 1 and mod 2 triples
-    radix_pass(text12, SA12, text.begin() + 2, n02, max_letter);
-    radix_pass(SA12, text12, text.begin() + 1, n02, max_letter);
-    radix_pass(text12, SA12, text.begin(), n02, max_letter);
+    radix(text12, SA12, text.begin() + 2, n02);
+    radix(SA12, text12, text.begin() + 1, n02);
+    radix(text12, SA12, text.begin(), n02);
 
     // find lexicographic names of triples
     int name = 0;
-    Letter c0 = Letter(), c1 = Letter(), c2 = Letter();
+    Letter c0 = Letter{}, c1 = Letter{}, c2 = Letter{};
     for (auto i : boost::irange(0, n02)) {
         if (text[SA12[i]] != c0 || text[SA12[i] + 1] != c1 ||
             text[SA12[i] + 2] != c2 || name == 0) {
@@ -136,8 +145,7 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
 
     // recurse if names are not yet unique
     if (name < n02) {
-        _suffix_array<int>(text12, SA12 /*, n02*/,
-                           name); // parametrized by int intentionally
+        suffix_array<int>(text12, SA12, name); // parametrized by int intentionally
         // store unique names in s12 using the suffix array
         for (auto i : boost::irange(0, n02)) {
             text12[SA12[i]] = i + 1;
@@ -154,7 +162,7 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
             text0.push_back(3 * SA12[i]);
         }
     }
-    radix_pass(text0, SA0, text.begin(), n0, max_letter);
+    radix(text0, SA0, text.begin(), n0);
     auto GetI = [&](int t)->int {
         return SA12[t] < n0 ? SA12[t] * 3 + 1 : (SA12[t] - n0) * 3 + 2;
     };
@@ -190,7 +198,9 @@ void _suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
         }
     }
 }
-;
+
+}//!detail
+
 
 /**
  *
@@ -209,9 +219,9 @@ template <typename Letter>
 void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
                   Letter max_letter = 0) {
     text.resize(text.size() + 3);
-    _suffix_array<Letter>(text, SA, max_letter);
+    detail::suffix_array(text, SA, max_letter);
     text.resize(text.size() - 3);
-};
+}
 
 } //!paal
 #endif /*SUFFIX_ARRAY_HPP*/
