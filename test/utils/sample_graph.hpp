@@ -21,11 +21,14 @@ struct sample_graphs_metrics {
     using GraphWithoutEdgeWeight = boost::adjacency_list<
         boost::vecS, boost::vecS, boost::undirectedS,
         boost::property<boost::vertex_color_t, int>, boost::no_property>;
+    using ListGraph = boost::adjacency_list<
+        boost::listS, boost::listS, boost::undirectedS,
+        boost::property<boost::vertex_color_t, int>, EdgeProp>;
     using Edge = std::pair<int, int>;
     using GraphMT = paal::data_structures::graph_metric<Graph, int>;
     using Terminals = std::vector<int>;
 
-    enum nodes { A, B, C, D, E, F, G, H };
+    enum nodes { A, B, C, D, E, F, G, H, I, J, K, L };
 
     // graph small
     static Graph get_graph_small() {
@@ -37,6 +40,63 @@ struct sample_graphs_metrics {
         int num_arcs = sizeof(edge_array) / sizeof(Edge);
 
         Graph g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return g;
+    }
+
+    static Graph get_graph_medium() {
+        const int num_nodes = 9;
+        Edge edge_array[] = { Edge(A, B), Edge(B, C), Edge(B, D), Edge(B, E),
+                              Edge(D, E), Edge(E, F), Edge(F, G), Edge(G, H),
+                              Edge(E, H), Edge(H, I) };
+
+        int weights[] = {64, 23, 54, 63, 25, 49, 32, 15, 74, 31};
+        int num_arcs = sizeof(edge_array) / sizeof(Edge);
+
+        Graph g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return g;
+    }
+
+    static ListGraph get_list_graph_medium() {
+        const int num_nodes = 9;
+        Edge edge_array[] = { Edge(A, B), Edge(B, C), Edge(B, D), Edge(B, E),
+                              Edge(D, E), Edge(E, F), Edge(F, G), Edge(G, H),
+                              Edge(E, H), Edge(H, I) };
+
+        int weights[] = {64, 23, 54, 63, 25, 49, 32, 15, 74, 31};
+        int num_arcs = sizeof(edge_array) / sizeof(Edge);
+
+        ListGraph g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return g;
+    }
+
+    static Graph get_star_medium() {
+        const int num_nodes = 11;
+        Edge edge_array[] = { Edge(A, B), Edge(A, C), Edge(A, D), Edge(A, E),
+                              Edge(A, F), Edge(A, G), Edge(A, H), Edge(A, I),
+                              Edge(A, J), Edge(A, K) };
+        int weights[] = { 64, 23, 54, 63, 25, 49, 32, 15, 74, 31};
+        int num_arcs = sizeof(edge_array) / sizeof(Edge);
+
+        Graph g(edge_array, edge_array + num_arcs, weights, num_nodes);
+
+        return g;
+    }
+
+    static Graph get_star_random(int seed, int num_nodes, int minW, int maxW) {
+        std::srand(seed);
+
+        int center = std::rand() % num_nodes;
+
+        std::vector< std::pair<int, int> > edges;
+        std::vector<int> weights(num_nodes-1);
+
+        for (int v: boost::irange(0,num_nodes)) if (v != center) edges.push_back(std::make_pair(center, v));
+        for (int i: boost::irange(0,num_nodes-1)) weights[i] = rand() % (maxW - minW + 1) + minW;
+
+        Graph g(edges.begin(), edges.end(), weights.begin(), num_nodes);
 
         return g;
     }

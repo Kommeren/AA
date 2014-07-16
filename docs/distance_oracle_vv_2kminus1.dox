@@ -1,0 +1,56 @@
+/*! \page do_vv_2kminus1 2k-1 Approximate Vertex-Vertex Distance Oracle
+
+\section def Problem definition
+
+In a vertex-vertex distance oracle problem we are given a graph \f$G(V,E)\f$.
+The goal is to build an oracle, a structure that answer queries about a distance between two vertices.
+An oracle may return approximated distances in favor of better running time than standard shortest-path algorithms.
+
+\section Solution
+
+We solve the problem by constructing 2k-1 Approximate Distance Oracle of Thorup and Zwick \cite Thorup2001.
+
+We begin a construction of the oracle by selecting a sequence of \f$k+1\f$ layers
+\f{eqnarray*}
+V = A_0 \supseteq A_1 \supseteq \dots \supseteq A_k = \emptyset
+\f}
+For each vertex \f$v\f$ and each layer \f$A_i\f$ we find a parent \f$p_i(v)\f$, which is a vertex of \f$A_i\f$ closest to \f$v\f$.
+For each vertex \f$v\f$ we compute distances to all vertices in its bunch
+\f{eqnarray*}
+B(v) = \sum_{i=0}^{k-1} \lbrace u : u \in A_i \setminus A_{i+1}, \delta(v,u) < \delta(v,A_{i+1}) \rbrace
+\f}
+
+As an approximate distance between vertices \f$u\f$ and \f$v\f$ the oracle returns a distance \f$\delta(u,p_i(u)) + \delta(p_i(u),v)\f$ with \f$p_i(u) \in B(v)\f$ for an appropriate \f$i\f$.
+
+  example:
+\snippet distance_oracle_example.cpp Distance Oracle Example
+
+  complete example is distance_oracle_example.cpp
+
+\subsection parameters_do_vv_2kminus1 Parameters
+
+IN: const Graph& g
+
+IN: int k - an approximation parameter
+
+IN: const boost::bgl_named_params<P, T, R>& params = boost::no_named_parameters()
+
+IN: Rand && random_engine=std::default_random_engine(5426u)
+
+\subsection named_parameters_do_vv_2kminus1 Named parameters
+
+IN: vertex_index_map(VertexIndexMap indexMap)
+
+IN: weight_map(EdgeWeightMap weightMap) - a map containing weights of edges
+
+\subsection app_do_vv_2kminus1 Approximation ratio
+Approximation ratio equals \f$2k-1\f$ for a given positive integer \f$k\f$.
+
+\subsection com_do_vv_2kminus1 The complexity
+The query time complexity is \f$O(k)\f$, where \f$k\f$ is an approximation parameter.
+The oracle requires expected \f$O(kmn^{1/k})\f$ initialization time and expected \f$O(kn^{1+1/k})\f$ space,
+where \f$n\f$ is a number of graph vertices and \f$m\f$ is a number of its edges.
+
+\subsection References
+The oracle is described in \cite Thorup2001.
+*/

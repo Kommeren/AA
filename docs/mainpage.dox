@@ -85,6 +85,7 @@
     <li> Data Structures
         <ul>
         <li>\ref comps
+        <li>\ref do_vv_2kminus1
         <li>\ref paal::data_structures::graph_metric
         <li>\ref paal::data_structures::array_metric
         <li>\ref paal::data_structures::simple_cycle
