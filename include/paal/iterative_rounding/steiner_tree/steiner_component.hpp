@@ -1,17 +1,17 @@
 /**
  * @file steiner_component.hpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Wygocki
  * @version 1.0
  * @date 2013-08-01
  */
 #ifndef STEINER_COMPONENT_HPP
 #define STEINER_COMPONENT_HPP
 
-
-#include "paal/data_structures/metric/graph_metrics.hpp"
-#include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
+
+#include <boost/range/algorithm/transform.hpp>
 
 #include <iosfwd>
 #include <set>
@@ -28,19 +28,37 @@ template <typename Vertex, typename Dist>
 class steiner_component {
 public:
     using Edge = typename std::pair<Vertex, Vertex>;
+    using Vertices = typename std::vector<Vertex>;
 
-    ///constuctor
+    ///constructor
     template<typename Metric, typename Terminals>
-    steiner_component(std::vector<Vertex> & el, const Metric & cost_map,
-            const Terminals & term, const Terminals& steiner_vertices) :
-        m_elements(el), m_size(el.size()) {
-        auto dw = paal::make_dreyfus_wagner(cost_map, m_elements, steiner_vertices);
+    steiner_component(const Metric & cost_map, Vertices terminals, const Terminals& steiner_vertices) :
+        m_terminals(std::move(terminals)), m_size(m_terminals.size()) {
+
+        auto all_elements = boost::join(m_terminals, steiner_vertices);
+        data_structures::array_metric<typename data_structures::metric_traits<Metric>::DistanceType>
+            fast_metric(cost_map, all_elements);
+        auto term_nr = boost::distance(m_terminals);
+        auto all_elements_nr = boost::distance(all_elements);
+        auto dw = paal::make_dreyfus_wagner(fast_metric,
+                    boost::irange(0, int(term_nr)),
+                    boost::irange(0, int(all_elements_nr)));
         dw.solve();
         m_cost = dw.get_cost();
-        auto &steiner = dw.steiner_tree_zelikovsky11per6approximation();
-        m_steiner_elements.insert(m_steiner_elements.begin(), steiner.begin(),
-                                  steiner.end());
-        m_edges = std::move(dw.get_edges());
+        auto &steiner = dw.get_steiner_elements();
+        m_steiner_elements.resize(steiner.size());
+        auto id_to_elem = [&](int i){
+                if(i < term_nr) {
+                    return m_terminals[i];
+                } else {
+                    return steiner_vertices[i - term_nr];
+                }
+        };
+        boost::transform(steiner, m_steiner_elements.begin(), id_to_elem);
+        m_edges.resize(dw.get_edges().size());
+        boost::transform(dw.get_edges(), m_edges.begin(), [=](std::pair<int, int> e) {
+            return std::make_pair(id_to_elem(e.first), id_to_elem(e.second));
+        });
     }
 
     /**
@@ -49,19 +67,19 @@ public:
      */
     Vertex get_sink(int version) const {
         assert(version < count_terminals());
-        return m_elements[version];
+        return m_terminals[version];
     }
 
     /**
      * Returns vector composed of component's terminals.
      */
-    const std::vector<Vertex> &get_elements() const { return m_elements; }
+    const Vertices &get_terminals() const { return m_terminals; }
 
     /**
      * Returns vector composed of component's nonterminals, i.e. Steiner
      * elements.
      */
-    const std::vector<Vertex> &get_steiner_elements() const {
+    const Vertices &get_steiner_elements() const {
         return m_steiner_elements;
     }
 
@@ -86,7 +104,7 @@ public:
     friend std::ostream &operator<<(std::ostream &stream,
                                     const steiner_component &component) {
         for (int i = 0; i < component.m_size; i++) {
-            stream << component.m_elements[i] << " ";
+            stream << component.m_terminals[i] << " ";
         }
         stream << ": ";
         for (auto edge : component.m_edges) {
@@ -97,10 +115,10 @@ public:
     }
 
   private:
-    const std::vector<Vertex> m_elements; // terminals of the component
-    int m_size;                           // m_elements.size()
+    const Vertices m_terminals; // terminals of the component
+    int m_size;                           // m_terminals.size()
     Dist m_cost; // minimal cost of spanning the component
-    std::vector<Vertex> m_steiner_elements; // non-terminals selected for
+    Vertices m_steiner_elements; // non-terminals selected for
                                             // spanning tree
     std::vector<Edge> m_edges;              // edges spanning the component
 };

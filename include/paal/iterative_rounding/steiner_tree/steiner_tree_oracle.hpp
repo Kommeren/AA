@@ -31,7 +31,6 @@ class steiner_tree_violation_checker {
 
   public:
     using Candidate = AuxVertex;
-
     steiner_tree_violation_checker() : m_current_graph_size(-1) {}
 
     /**
@@ -39,7 +38,7 @@ class steiner_tree_violation_checker {
      */
     template <typename Problem, typename LP>
     auto get_violation_candidates(const Problem &problem, const LP &lp)
-        ->decltype(problem.get_terminals()) {
+        ->decltype(boost::irange(0, int(problem.get_terminals().size()))) {
 
         int graph_size = problem.get_terminals().size();
         if (graph_size != m_current_graph_size) {
@@ -50,7 +49,8 @@ class steiner_tree_violation_checker {
         } else {
             update_auxiliary_digraph(problem, lp);
         }
-        return problem.get_terminals();
+        //TODO - rethink - why do we return the whole collection instead of returning m_root see check_violation implementation
+        return boost::irange(0, int(problem.get_terminals().size()));
     }
 
     /**
@@ -89,7 +89,7 @@ class steiner_tree_violation_checker {
         for (int i = 0; i < components.size(); ++i) {
             auto u = m_artif_vertices[i];
             int ver = components.find_version(i);
-            auto v = m_terminals_to_aux[components.find(i).get_sink(ver)];
+            auto v = m_terminals_to_aux[problem.get_idx(components.find(i).get_sink(ver))];
             if (m_min_cut.is_in_source_set(u) &&
                 !m_min_cut.is_in_source_set(v)) {
                 expr += problem.find_column_lp(i);
@@ -105,14 +105,14 @@ class steiner_tree_violation_checker {
      *
      * Graph contains a vertex for each component and each terminal
      * Sources of every component have out edges with infinite weight
-     * Target has in edge with weigth x_i from LP
+     * Target has in edge with weight x_i from LP
      */
     template <typename Problem, typename LP>
     void create_auxiliary_digraph(Problem &problem, const LP &lp) {
         m_min_cut.init(0);
         m_artif_vertices.clear();
         m_terminals_to_aux.clear();
-        for (auto term : problem.get_terminals()) {
+        for (auto term : boost::irange(0, int(problem.get_terminals().size()))) {
             m_terminals_to_aux[term] = m_min_cut.add_vertex_to_graph();
         }
         const auto &components = problem.get_components();
@@ -123,15 +123,15 @@ class steiner_tree_violation_checker {
             int ver = components.find_version(i);
             auto sink = components.find(i).get_sink(ver);
             for (auto w : boost::make_iterator_range(components.find(i)
-                                                         .get_elements())) {
+                                                         .get_terminals())) {
                 if (w != sink) {
                     double INF = std::numeric_limits<double>::max();
-                    m_min_cut.add_edge_to_graph(m_terminals_to_aux[w], new_v,
+                    m_min_cut.add_edge_to_graph(m_terminals_to_aux[problem.get_idx(w)], new_v,
                                                 INF);
                 } else {
                     lp::col_id x = problem.find_column_lp(i);
                     double col_val = lp.get_col_value(x);
-                    m_min_cut.add_edge_to_graph(new_v, m_terminals_to_aux[sink],
+                    m_min_cut.add_edge_to_graph(new_v, m_terminals_to_aux[problem.get_idx(sink)],
                                                 col_val);
                 }
             }
@@ -151,7 +151,7 @@ class steiner_tree_violation_checker {
             auto sink = components.find(i).get_sink(ver);
             lp::col_id x = problem.find_column_lp(i);
             double col_val = lp.get_col_value(x);
-            m_min_cut.add_edge_to_graph(component_v, m_terminals_to_aux[sink],
+            m_min_cut.add_edge_to_graph(component_v, m_terminals_to_aux[problem.get_idx(sink)],
                                         col_val);
         }
     }
@@ -163,8 +163,7 @@ class steiner_tree_violation_checker {
     template <typename Terminals>
     AuxVertex select_root(const Terminals &terminals) {
         // TODO: Maybe it's better to select random vertex rather than first
-        AuxVertex ret = *terminals.begin();
-        return ret;
+        return 0;
     }
 
     /**
@@ -183,7 +182,7 @@ class steiner_tree_violation_checker {
     // maps componentId to auxGraph vertex
     std::unordered_map<int, AuxVertex> m_artif_vertices;
 
-    // maps teminals to auxGraph vertices
+    // maps terminals to auxGraph vertices
     std::unordered_map<AuxVertex, AuxVertex> m_terminals_to_aux;
 
     min_cut_finder m_min_cut;

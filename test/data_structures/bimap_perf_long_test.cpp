@@ -41,7 +41,7 @@ template <typename Bimap> void test_get_idx(const Bimap &b) {
 
 template <typename Bimap> void test() {
     ON_LOG(time_t t1 = time(NULL));
-    Bimap b(vec.begin(), vec.end());
+    Bimap b(vec);
     ON_LOG(time_t t2 = time(NULL));
     LOGLN("construction time " << t2 - t1);
     ON_LOG(t1 = t2);

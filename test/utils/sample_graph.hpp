@@ -2,6 +2,7 @@
 #define SAMPLE_GRAPH_HPP
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
+#include "paal/data_structures/metric/euclidean_metric.hpp"
 
 struct sample_graphs_metrics {
     typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
@@ -70,6 +71,12 @@ struct sample_graphs_metrics {
         graph_t g(edge_array, edge_array + num_arcs, weights, num_nodes);
 
         return GraphMT(g);
+    }
+
+    template <typename Points = std::vector<std::pair<int, int>>>
+    static std::tuple<paal::data_structures::euclidean_metric<int>, Points, Points>
+    get_euclidean_steiner_sample() {
+        return std::make_tuple(paal::data_structures::euclidean_metric<int>{}, Points{ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } }, Points{{ 1, 1 }});
     }
 };
 

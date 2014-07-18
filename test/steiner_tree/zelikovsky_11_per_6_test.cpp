@@ -12,7 +12,6 @@
 
 #include "utils/logger.hpp"
 #include "utils/sample_graph.hpp"
-#include "utils/euclidean_metric.hpp"
 
 #include <iosfwd>
 
@@ -41,16 +40,17 @@ BOOST_AUTO_TEST_CASE(zelikowsky_test) {
 }
 
 BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
-    paal::euclidean_metric em;
-    using std::make_pair;
-    typedef paal::data_structures::voronoi<paal::euclidean_metric> voronoiT;
-    typedef typename voronoiT::GeneratorsSet FSet;
-    voronoiT voronoi(FSet{ { 0, 0 }, { 0, 2 }, { 2, 0 }, { 2, 2 } },
-                     FSet{ { 1, 1 } }, em);
+    using EMetric = paal::data_structures::euclidean_metric<int>;
+    using VoronoiT = paal::data_structures::voronoi<EMetric>;
+    using FSet = typename VoronoiT::GeneratorsSet;
+
+    auto test_case = sample_graphs_metrics::get_euclidean_steiner_sample<FSet>();
+    VoronoiT voronoi(std::get<1>(test_case), std::get<2>(test_case), std::get<0>(test_case));
+
     std::vector<std::pair<int, int>> steiner;
 
     paal::steiner_tree_zelikovsky11per6approximation(
-        em, voronoi, std::back_inserter(steiner));
+        std::get<0>(test_case), voronoi, std::back_inserter(steiner));
     BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
-    BOOST_CHECK_EQUAL(steiner.front(), make_pair(1, 1));
+    BOOST_CHECK_EQUAL(steiner.front(), std::make_pair(1, 1));
 }

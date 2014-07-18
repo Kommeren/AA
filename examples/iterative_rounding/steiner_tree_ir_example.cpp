@@ -25,7 +25,7 @@ int main() {
     // solve it
     paal::ir::steiner_tree_iterative_rounding(metric, terminals,
             nonterminals, std::back_inserter(selected_nonterminals),
-            paal::ir::all_generator());
+            paal::ir::all_generator{});
 
     // print result
     std::cout << "Selected vertices:" << std::endl;

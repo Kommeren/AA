@@ -66,3 +66,18 @@ BOOST_AUTO_TEST_CASE(test_2) {
     rem_add(vor, SGM::D);
     rem_add(vor, SGM::E);
 }
+
+BOOST_AUTO_TEST_CASE(test_make_voronoi) {
+    LOGLN("Test 1");
+    typedef sample_graphs_metrics SGM;
+    auto gm = SGM::get_graph_metric_small();
+
+    typedef voronoi<decltype(gm)> voronoi;
+    typedef paal::data_structures::voronoi_traits<voronoi> VT;
+    typedef typename VT::GeneratorsSet GSet;
+    typedef typename VT::VerticesSet VSet;
+    voronoi vor(GSet{ SGM::A, SGM::B },
+                VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
+
+    BOOST_CHECK(vor == make_voronoi(GSet{ SGM::A, SGM::B }, VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm));
+}

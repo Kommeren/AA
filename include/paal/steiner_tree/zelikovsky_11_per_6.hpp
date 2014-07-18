@@ -115,8 +115,7 @@ template <typename Metric, typename voronoi> class steiner_tree {
         auto sc = local_search::make_search_components(ng, obj_fun, su);
 
         auto lsSolution = data_structures::metric_to_bgl_with_index(
-            m_metric, m_voronoi.get_generators().begin(),
-            m_voronoi.get_generators().end(), m_t_idx);
+            m_metric, m_voronoi.get_generators(), m_t_idx);
 
         fill_sub_dists();
 

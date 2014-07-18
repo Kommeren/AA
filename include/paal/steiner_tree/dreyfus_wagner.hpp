@@ -11,7 +11,10 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 
+#include <boost/range/join.hpp>
+
 #include <unordered_map>
+#include <unordered_set>
 #include <bitset>
 
 namespace paal {
@@ -30,6 +33,7 @@ class dreyfus_wagner {
     typedef typename std::pair<Vertex, Vertex> Edge;
     typedef typename std::bitset<TerminalsLimit> TerminalsBitSet;
     typedef std::pair<Vertex, TerminalsBitSet> State;
+    using steiner_elements =  std::unordered_set<Vertex, boost::hash<Vertex>>;
 
     /**
      * Constructor used for solving Steiner Tree problem.
@@ -65,17 +69,17 @@ class dreyfus_wagner {
     /**
      * Gets the optimal Steiner Tree cost.
      */
-    Dist get_cost() { return m_cost; }
+    Dist get_cost() const { return m_cost; }
 
     /**
      * Gets edges belonging to optimal tree.
      */
-    const std::vector<Edge> &get_edges() { return m_edges; }
+    const std::vector<Edge> &get_edges() const { return m_edges; }
 
     /**
      * Gets selected Steiner vertices.
      */
-    const std::set<Vertex> &steiner_tree_zelikovsky11per6approximation() {
+    const steiner_elements &get_steiner_elements() const {
         return m_steiner_elements;
     }
 
@@ -104,7 +108,7 @@ class dreyfus_wagner {
         Dist best = split_vertex(v, remaining);
         Vertex cand = v;
 
-        for (Vertex w : m_non_terminals) {
+        for (Vertex w : boost::join(m_non_terminals, m_terminals)) {
             Dist val = split_vertex(w, remaining);
             val += m_cost_map(v, w);
             if (best < 0 || val < best) {
@@ -225,7 +229,7 @@ class dreyfus_wagner {
      */
     struct state_hash {
         std::size_t operator()(const State &k) const {
-            return std::hash<Vertex>()(k.first) ^
+            return boost::hash<Vertex>()(k.first) ^
                    (std::hash<TerminalsBitSet>()(k.second) << 1);
         }
     };
@@ -257,11 +261,11 @@ class dreyfus_wagner {
     const NonTerminals &m_non_terminals; // list of all non-terminals
 
     Dist m_cost;                         // cost of optimal Steiner Tree
-    std::set<Vertex> m_steiner_elements; // non-terminals selected for spanning
+    steiner_elements m_steiner_elements; // non-terminals selected for spanning
                                          // tree
     std::vector<Edge> m_edges;           // edges spanning the component
 
-    std::unordered_map<Vertex, int> m_elements_map; // maps Vertex to position
+    std::unordered_map<Vertex, int, boost::hash<Vertex>> m_elements_map; // maps Vertex to position
                                                     // in m_terminals vector
     typedef std::pair<Dist, Vertex> StateV;
     typedef std::pair<Dist, TerminalsBitSet> StateBM;

@@ -13,6 +13,7 @@
 #include "paal/iterative_rounding/steiner_tree/steiner_tree.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/range/adaptor/sliced.hpp>
 
 #include <fstream>
 #include <vector>
@@ -38,11 +39,11 @@ void run_test(const steiner_tree_test & test) {
     LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
 }
 
-BOOST_AUTO_TEST_CASE(steiner_long_test) {
+BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
     std::vector<steiner_tree_test> data;
     read_steinlib_tests(data);
-    int k = 0;
-    for (const steiner_tree_test &test : data) {
+    // First tests only
+    for (const steiner_tree_test &test : data | boost::adaptors::sliced(0, 10)) {
         LOG("TEST " << test.test_name << "\n");
         LOG("OPT " << test.optimal << "\n");
 
@@ -57,8 +58,5 @@ BOOST_AUTO_TEST_CASE(steiner_long_test) {
 
         LOGLN("first violated");
         run_test<paal::lp::first_violated_separation_oracle>(test);
-
-        // First tests only
-        if (++k == 10) break;
     }
 }

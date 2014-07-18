@@ -46,7 +46,7 @@ private:
             const Terminals& steiner_vertices) {
 
         if (curr.size() > 1) {
-            steiner_component<Vertex, Dist> c(curr, cost_map, terminals, steiner_vertices);
+            steiner_component<Vertex, Dist> c(cost_map, curr, steiner_vertices);
             components.add(std::move(c));
         }
         if ((int) curr.size() >= m_component_max_size)
@@ -99,7 +99,7 @@ public:
                 curr.insert(terminals[r]);
             }
             std::vector<Vertex> elements(curr.begin(), curr.end());
-            steiner_component<Vertex, Dist> c(elements, cost_map, terminals, steiner_vertices);
+            steiner_component<Vertex, Dist> c(cost_map, elements, steiner_vertices);
             components.add(std::move(c));
         }
     }
@@ -156,7 +156,7 @@ public:
                     if (selected < 0) break;
                     elements.push_back(terminals[selected]);
                 }
-                steiner_component<Vertex, Dist> c(elements, cost_map, terminals, steiner_vertices);
+                steiner_component<Vertex, Dist> c(cost_map, elements, steiner_vertices);
                 components.add(std::move(c));
             }
         }

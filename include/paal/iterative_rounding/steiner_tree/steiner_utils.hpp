@@ -1,7 +1,7 @@
 /**
  * @file steiner_utils.hpp
  * @brief
- * @author Maciej Andrejczuk
+ * @author Maciej Andrejczuk, Piotr Wygocki
  * @version 1.0
  * @date 2013-08-01
  */
@@ -36,11 +36,12 @@ class steiner_utils {
         auto all_elements = boost::range::join(terminals, steiner_vertices);
         paal::data_structures::bimap<Vertex> idx;
         auto g = paal::data_structures::metric_to_bgl_with_index(cost_map,
-                boost::begin(all_elements), boost::end(all_elements), idx);
-        std::vector<Vertex> pm(all_elements.size());
+                all_elements, idx);
+        std::vector<int> pm(all_elements.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         auto idx_m = paal::data_structures::make_metric_on_idx(cost_map, idx);
-        Dist cost = 0;
+
+        Dist cost{};
         for (int i : boost::irange(0, int(pm.size()))) {
             cost += idx_m(i, pm[i]);
         }

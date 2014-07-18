@@ -10,6 +10,8 @@
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
 
+#include <boost/range/algorithm/copy.hpp>
+
 #include <iostream>
 
 int main() {
@@ -29,9 +31,7 @@ int main() {
     // print result
     std::cout << "Cost = " << dw.get_cost() << std::endl;
     std::cout << "Steiner points:" << std::endl;
-    std::set<int> steiner_points =
-        dw.steiner_tree_zelikovsky11per6approximation();
-    std::copy(steiner_points.begin(), steiner_points.end(),
+    boost::copy(dw.get_steiner_elements(),
               std::ostream_iterator<int>(std::cout, "\n"));
     std::cout << "Edges:" << std::endl;
     for (auto edge : dw.get_edges()) {

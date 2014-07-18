@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
         LOG_COPY_RANGE_DEL(resRange, ",");
         paal::data_structures::bimap<int> idx;
         auto g = paal::data_structures::metric_to_bgl_with_index(
-            test.metric, boost::begin(resRange), boost::end(resRange), idx);
+            test.metric, resRange, idx);
         std::vector<int> pm(resRange.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         auto idxM = paal::data_structures::make_metric_on_idx(test.metric, idx);

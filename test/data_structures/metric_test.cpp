@@ -26,7 +26,7 @@ BOOST_AUTO_TEST_CASE(Copyrectangle_array_metric) {
     auto r1 = boost::irange(0, 1);
     auto r2 = boost::irange(0, 2);
     paal::data_structures::rectangle_array_metric<int> copy(
-        m, boost::begin(r1), boost::end(r1), boost::begin(r2), boost::end(r2));
+        m, r1, r2);
 
     BOOST_CHECK(copy(0, 0) == 1);
     BOOST_CHECK(copy(0, 1) == 2);
@@ -37,8 +37,7 @@ BOOST_AUTO_TEST_CASE(Copyarray_metric) {
     m(0, 0) = 13;
 
     auto r1 = boost::irange(0, 1);
-    paal::data_structures::array_metric<int> copy(m, boost::begin(r1),
-                                                  boost::end(r1));
+    paal::data_structures::array_metric<int> copy(m, r1);
 
     BOOST_CHECK(copy(0, 0) == 13);
 }

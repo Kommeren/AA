@@ -18,9 +18,9 @@ namespace paal {
 namespace data_structures {
 
 namespace graph_type {
-class Sparse;
-class Dense;
-class Large;
+class sparse_tag;
+class dense_tag;
+class large_tag;
 }
 
 /**
@@ -29,17 +29,18 @@ class Large;
  * @tparam Graph
  */
 template <typename Graph> struct graph_metric_traits {
-    typedef graph_type::Sparse GraphTypeTag;
+    //default graph_type
+    using graph_tag_type = graph_type::sparse_tag;
 };
 
 
 /// generic strategies of computing metric
-template <typename GraphTypeTag> struct graph_metric_filler_impl;
+template <typename graph_tag_type> struct graph_metric_filler_impl;
 
 /**
- * @brief specialization for Sparse graphs
+ * @brief specialization for sparse_tag graphs
  */
-template <> struct graph_metric_filler_impl<graph_type::Sparse> {
+template <> struct graph_metric_filler_impl<graph_type::sparse_tag> {
     /**
      * @brief fill_matrix function
      *
@@ -55,9 +56,9 @@ template <> struct graph_metric_filler_impl<graph_type::Sparse> {
 };
 
 /**
- * @brief specialization strategies of computing metric for Dense graphs
+ * @brief specialization strategies of computing metric for dense_tag graphs
  */
-template <> struct graph_metric_filler_impl<graph_type::Dense> {
+template <> struct graph_metric_filler_impl<graph_type::dense_tag> {
     template <typename Graph, typename ResultMatrix>
     /**
      * @brief fill_matrixFunction
@@ -82,13 +83,13 @@ template <> struct graph_metric_filler_impl<graph_type::Dense> {
 // GraphType could be sparse, dense, large ...
 template <
     typename Graph, typename DistanceType,
-    typename GraphType = typename graph_metric_traits<Graph>::GraphTypeTag>
+    typename GraphType = typename graph_metric_traits<Graph>::graph_tag_type>
 struct graph_metric : public array_metric<DistanceType>,
                       public graph_metric_filler_impl<
-                          typename graph_metric_traits<Graph>::GraphTypeTag> {
+                          typename graph_metric_traits<Graph>::graph_tag_type> {
     typedef array_metric<DistanceType> GMBase;
     typedef graph_metric_filler_impl<
-        typename graph_metric_traits<Graph>::GraphTypeTag> GMFBase;
+        typename graph_metric_traits<Graph>::graph_tag_type> GMFBase;
 
     /**
      * @brief constructor
@@ -103,7 +104,7 @@ struct graph_metric : public array_metric<DistanceType>,
 // TODO implement
 /// Specialization for large graphs
 template <typename Graph, typename DistanceType>
-struct graph_metric<Graph, DistanceType, graph_type::Large> {
+struct graph_metric<Graph, DistanceType, graph_type::large_tag> {
     /**
      * @brief constructor
      *
@@ -119,7 +120,7 @@ template <typename OutEdgeList, typename VertexList, typename Directed,
 struct graph_metric_traits<
     boost::adjacency_list<OutEdgeList, VertexList, Directed, VertexProperties,
                           EdgeProperties, GraphProperties, EdgeList>> {
-    typedef graph_type::Sparse GraphTypeTag;
+    typedef graph_type::sparse_tag graph_tag_type;
 };
 
 /// Specialization for adjacency_matrix
@@ -127,7 +128,7 @@ template <typename Directed, typename VertexProperty, typename EdgeProperty,
           typename GraphProperty, typename Allocator>
 struct graph_metric_traits<boost::adjacency_matrix<
     Directed, VertexProperty, EdgeProperty, GraphProperty, Allocator>> {
-    typedef graph_type::Dense GraphTypeTag;
+    typedef graph_type::dense_tag graph_tag_type;
 };
 
 } //!data_structures

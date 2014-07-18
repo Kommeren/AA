@@ -15,14 +15,9 @@
 namespace paal {
 namespace utils {
 
-// template <typename Idx, typename... Args>
-// On gcc 4.6 I get sorry unimplemented ... !!!
-
 /// contracts to vertices in adjacency_matrix
-template <typename Directed, typename VertexProperty, typename EdgeProperty,
-          typename GraphProperty, typename Allocator, typename Idx>
-void contract(boost::adjacency_matrix<Directed, VertexProperty, EdgeProperty,
-                                      GraphProperty, Allocator> &amatrix,
+template <typename Idx, typename... GraphArgs>
+void contract(boost::adjacency_matrix<GraphArgs...> &amatrix,
               Idx v, Idx w) {
     typedef boost::graph_traits<puretype(amatrix)> mtraits;
     typedef typename mtraits::edge_descriptor MEdge;
@@ -35,7 +30,7 @@ void contract(boost::adjacency_matrix<Directed, VertexProperty, EdgeProperty,
         we = std::min(we, wf);
         wf = we;
 
-        // TODO hide  checkking
+        // TODO hide  checking
         auto teste = edge(target(e, amatrix), w, amatrix).first;
         auto testf = edge(target(e, amatrix), v, amatrix).first;
         auto wte = weight_map[teste];

@@ -12,6 +12,9 @@
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 
+#include <boost/range/algorithm_ext/iota.hpp>
+#include <boost/range/algorithm/find.hpp>
+
 #include <fstream>
 
 namespace paal {
@@ -69,7 +72,8 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
 
     steiner_points.resize(N);
 
-    std::iota(steiner_points.begin(), steiner_points.end(), 0);
+    //we actually add one additional steiner point not connected to any other point
+    boost::iota(steiner_points, 0);
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
 
@@ -87,6 +91,7 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     auto color = get(boost::vertex_color, g);
     for (int i : boost::irange(0, T)) {
         terminals[i] = read_int(is, "T");
+        steiner_points.erase(boost::find(steiner_points, terminals[i]));
         put(color, terminals[i], 1);
     }
     return g;
@@ -110,10 +115,15 @@ inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
         if (fname == ".stp") return;
         std::ifstream ifs(testDir + "/I080/" + fname);
         assert(ifs.good());
-        assert(ifs.good());
+
         std::vector<int> terminals;
         std::vector<int> steiner_points;
+
         Graph graph(paal::read_steinlib(ifs, terminals, steiner_points));
+        LOGLN("Terminals: ");
+        LOG_COPY_RANGE_DEL(terminals, " "); LOGLN("");
+        LOGLN("Steiner points: ");
+        LOG_COPY_RANGE_DEL(steiner_points, " "); LOGLN(""); LOGLN("");
         steiner_tree_test test(fname, opt, terminals, steiner_points, graph);
         data.push_back(test);
     }

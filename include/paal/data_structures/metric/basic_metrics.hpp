@@ -69,24 +69,20 @@ template <typename DistanceTypeParam> class rectangle_array_metric {
      * @brief constructor from another metric
      *
      * @tparam OtherMetrics
-     * @tparam XIterator
-     * @tparam YIterator
      * @param other
-     * @param xBegin
-     * @param xEnd
-     * @param yBegin
-     * @param yEnd
+     * @param xrange
+     * @param yrange
      */
-    template <typename OtherMetrics, typename XIterator, typename YIterator>
-    rectangle_array_metric(const OtherMetrics &other, XIterator xBegin,
-                           XIterator xEnd, YIterator yBegin, YIterator yEnd)
-        : rectangle_array_metric(std::distance(xBegin, xEnd),
-                                 std::distance(yBegin, yEnd)) {
+    template <typename OtherMetrics, typename XRange, typename YRange>
+    rectangle_array_metric(const OtherMetrics &other, XRange && xrange
+                           , YRange && yrange)
+        : rectangle_array_metric(boost::distance(xrange),
+                                 boost::distance(yrange)) {
         int i = 0;
-        for (auto v : boost::make_iterator_range(xBegin, xEnd)) {
+        for (auto && v : xrange) {
             int j = 0;
-            for (auto w : boost::make_iterator_range(yBegin, yEnd)) {
-                this->m_matrix[i][j] = other(v, w);
+            for (auto && w : yrange) {
+                m_matrix[i][j] = other(v, w);
                 ++j;
             }
             ++i;
@@ -108,6 +104,11 @@ template <typename DistanceTypeParam> class rectangle_array_metric {
         return *this;
     }
 
+    ///operator==
+    bool operator==(const rectangle_array_metric & other) const {
+        return m_matrix == other.m_matrix;
+    }
+
   protected:
     /**
      * @brief dimention of multi array
@@ -117,6 +118,8 @@ template <typename DistanceTypeParam> class rectangle_array_metric {
     /// matrix with data
     matrix_type m_matrix;
 };
+
+
 
 /**
  * @brief this metric is rectangle_array_metric with N == M.
@@ -146,15 +149,13 @@ class array_metric : public rectangle_array_metric<DistanceTypeParam> {
      * @brief constructor from another metric
      *
      * @tparam OtherMetrics
-     * @tparam ItemIterator
+     * @tparam Items
      * @param other
-     * @param iBegin
-     * @param iEnd
+     * @param items
      */
-    template <typename OtherMetrics, typename ItemIterator>
-    array_metric(const OtherMetrics &other, ItemIterator iBegin,
-                 ItemIterator iEnd)
-        : base(other, iBegin, iEnd, iBegin, iEnd) {}
+    template <typename OtherMetrics, typename Items>
+    array_metric(const OtherMetrics &other, Items && items)
+        : base(other, items, items) {}
 };
 }
 }

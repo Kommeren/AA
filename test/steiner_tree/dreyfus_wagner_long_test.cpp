@@ -15,25 +15,24 @@
 #include "paal/data_structures/bimap.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/range/adaptor/sliced.hpp>
 
 #include <vector>
 #include <fstream>
 
 using namespace paal;
 
-BOOST_AUTO_TEST_CASE(steinlib_test) {
+BOOST_AUTO_TEST_CASE(dreyfus_wagner_steinlib_long_test) {
     std::vector<steiner_tree_test> data;
     LOGLN("READING INPUT...");
     read_steinlib_tests(data);
-    int k = 0;
-    for (const steiner_tree_test &test : data) {
+    // Smaller tests only
+    for (const steiner_tree_test &test : data | boost::adaptors::sliced(0, 50)) {
         LOGLN("TEST " << test.test_name);
         auto dw = paal::make_dreyfus_wagner(
             test.metric, test.terminals, test.steiner_points);
         dw.solve();
         int res = dw.get_cost();
         BOOST_CHECK_EQUAL(res, test.optimal);
-        // Smaller tests only
-        if (++k == 50) break;
     }
 }

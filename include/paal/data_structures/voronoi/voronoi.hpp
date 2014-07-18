@@ -173,6 +173,13 @@ template <typename Metric> class voronoi {
                boost::adaptors::map_values;
     }
 
+    ///operator==
+    bool operator==(const voronoi & vor) const {
+        return boost::equal(m_generators_to_vertices, vor.m_generators_to_vertices) &&
+               m_cost_of_no_generator == vor.m_cost_of_no_generator &&
+               m_metric == vor.m_metric;
+    }
+
   private:
 
     /**
@@ -252,6 +259,29 @@ template <typename Metric> class voronoi {
     const Metric &m_metric;
     const Dist m_cost_of_no_generator;
 };
+
+
+namespace detail {
+    template <typename Metric>
+    using v_t = typename metric_traits<Metric>::VertexType;
+
+    template <typename Metric>
+    using generators_set_t = std::unordered_set<v_t<Metric>, boost::hash<v_t<Metric>>>;
+
+    template <typename Metric>
+    using dist_t = typename metric_traits<Metric>::DistanceType;
+}
+
+///make for voronoi
+template <typename Metric>
+voronoi<Metric> make_voronoi(
+        const detail::generators_set_t<Metric> & generators,
+        detail::generators_set_t<Metric> vertices,
+        const Metric & metric,
+        detail::dist_t<Metric> costOfNoGenerator = std::numeric_limits<detail::dist_t<Metric>>::max())
+{
+    return voronoi<Metric>(generators, std::move(vertices), metric, costOfNoGenerator);
+}
 
 /**
  * @brief specialization of voronoi_traits

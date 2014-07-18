@@ -22,7 +22,7 @@ namespace data_structures {
  * @tparam _VertexType
  */
 template <typename Metric, typename _VertexType> struct _metric_traits {
-    typedef int VertexType;
+    typedef _VertexType VertexType;
     /// Distance type
     typedef puretype(std::declval<Metric>()(
         std::declval<VertexType>(), std::declval<VertexType>())) DistanceType;

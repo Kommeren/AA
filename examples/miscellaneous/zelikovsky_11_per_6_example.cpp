@@ -34,8 +34,7 @@ int main() {
 
     // print result
     std::cout << "Steiner points:" << std::endl;
-    std::copy(steiner_points.begin(), steiner_points.end(),
-              std::ostream_iterator<int>(std::cout, "\n"));
+    boost::copy(steiner_points, std::ostream_iterator<int>(std::cout, "\n"));
     return 0;
 }
     //! [Steiner Tree Example]

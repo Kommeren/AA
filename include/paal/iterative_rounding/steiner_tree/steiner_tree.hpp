@@ -1,7 +1,7 @@
 /**
  * @file steiner_tree.hpp
  * @brief
- * @author Maciej Andrejczuk, Piotr Godlewski
+ * @author Maciej Andrejczuk, Piotr Godlewski, Piotr Wygocki
  * @version 1.0
  * @date 2013-08-01
  */
@@ -23,6 +23,7 @@
 #include "paal/utils/floating.hpp"
 
 #include <boost/range/join.hpp>
+#include <boost/range/irange.hpp>
 
 namespace paal {
 namespace ir {
@@ -59,25 +60,44 @@ public:
     using Dist = typename MT::DistanceType;
     using Edge = typename std::pair<Vertex, Vertex>;
     using Compare = utils::compare<double>;
-    using Metric = data_structures::array_metric<Dist>;
+    using VertexIndex = data_structures::bimap<Vertex>;
+    using MetricIdx = data_structures::array_metric<Dist>;
+    using Metric = data_structures::metric_on_idx<
+                        data_structures::array_metric<Dist> &,
+                        const VertexIndex &,
+                        data_structures::read_values_tag>;
 
+private:
+    Terminals m_terminals;        // terminals in current state
+    Terminals m_steiner_vertices; // vertices that are not terminals
+    VertexIndex m_vertex_index; //mapping vertices to numbers for 0 to n.
+    MetricIdx m_cost_map_idx;            // metric in current state (operates on indexes)
+    Metric m_cost_map;            // metric in current state
+    steiner_components<Vertex, Dist> m_components; // components in current
+                                                   // state
+    Strategy m_strategy;      // strategy to generate the components
+    Result m_result_iterator; // list of selected Steiner Vertices
+    Compare m_compare;        // comparison method
+
+    std::unordered_map<int, lp::col_id> m_elements_map; // maps componentId ->
+                                                        // col_id in LP
+
+    Oracle m_oracle;
+
+public:
     /**
      * Constructor.
      */
     steiner_tree(const OrigMetric& metric, const Terminals& terminals,
             const Terminals& steiner_vertices, Result result,
-            const Strategy& strategy = Strategy(), Oracle oracle = Oracle()) :
-        m_cost_map(metric, boost::begin(boost::range::join(terminals, steiner_vertices)),
-                boost::end(boost::range::join(terminals, steiner_vertices))),
+            const Strategy& strategy = Strategy{}, Oracle oracle = Oracle{}) :
         m_terminals(terminals), m_steiner_vertices(steiner_vertices),
+        m_vertex_index(boost::range::join(m_terminals, m_steiner_vertices)),
+        m_cost_map_idx(metric, boost::range::join(m_terminals, m_steiner_vertices)),
+        m_cost_map(m_cost_map_idx, m_vertex_index),
         m_strategy(strategy), m_result_iterator(result),
         m_compare(steiner_tree_compare_traits::EPSILON), m_oracle(oracle) {
     }
-
-    /**
-     * Move constructor
-     */
-    steiner_tree(steiner_tree &&other) = default;
 
     /**
      * Returns the separation oracle.
@@ -90,7 +110,6 @@ public:
     void gen_components() {
         m_strategy.gen_components(m_cost_map, m_terminals, m_steiner_vertices,
                                   m_components);
-        // std::cout << "Generated: " << m_components.size() << " components\n";
     }
 
     /**
@@ -104,6 +123,11 @@ public:
      * Gets reference to all the terminals.
      */
     const Terminals &get_terminals() const { return m_terminals; }
+
+    ///return idx of the vertex
+    auto get_idx(Vertex v)  const -> decltype(m_vertex_index.get_idx(v)) {
+        return m_vertex_index.get_idx(v);
+    }
 
     /**
      * Adds map entry from component id to LP lp::col_id.
@@ -128,12 +152,15 @@ public:
     /**
      * Recalculates distances after two vertices were merged.
      */
-    void merge_vertices(Vertex u, Vertex w) {
-        auto all_elements = boost::range::join(m_terminals, m_steiner_vertices);
-        for (Vertex i: all_elements) {
-            for (Vertex j: all_elements) {
-                Dist x = m_cost_map(i, u) + m_cost_map(w, j);
-                m_cost_map(i, j) = std::min(m_cost_map(i, j), x);
+    void merge_vertices(Vertex u_vertex, Vertex w_vertex) {
+        auto all_elements = boost::irange(0, int(boost::distance(m_terminals)
+                                           + boost::distance(m_steiner_vertices)));
+        auto u = get_idx(u_vertex);
+        auto w = get_idx(w_vertex);
+        for (auto i: all_elements) {
+            for (auto j: all_elements) {
+                Dist x = m_cost_map_idx(i, u) + m_cost_map_idx(w, j);
+                m_cost_map_idx(i, j) = std::min(m_cost_map_idx(i, j), x);
             }
         }
     }
@@ -142,7 +169,7 @@ public:
      * Merges a component into its sink.
      */
     void update_graph(const steiner_component<Vertex, Dist>& selected) {
-        const std::vector<Vertex>& v = selected.get_elements();
+        const std::vector<Vertex>& v = selected.get_terminals();
         auto all_elements_except_first = boost::make_iterator_range(++v.begin(), v.end());
         for (auto e : all_elements_except_first) {
             merge_vertices(v[0], e);
@@ -162,19 +189,6 @@ public:
         return m_compare;
     }
 
-  private:
-    Metric m_cost_map;            // metric in current state
-    Terminals m_terminals;        // terminals in current state
-    Terminals m_steiner_vertices; // vertices that are not terminals
-    steiner_components<Vertex, Dist> m_components; // components in current
-                                                   // state
-    Strategy m_strategy;      // strategy to generate the components
-    Result m_result_iterator; // list of selected Steiner Vertices
-    Compare m_compare;        // comparison method
-
-    std::unordered_map<int, lp::col_id> m_elements_map; // maps componentId ->
-                                                        // col_id in LP
-    Oracle m_oracle;
 };
 
 
@@ -299,8 +313,8 @@ template <typename Oracle = steiner_tree_oracle<>, typename Strategy = all_gener
     typename OrigMetric, typename Terminals, typename Result,
     typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
 void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steiner_vertices,
-        Result result, Strategy strategy, IRcomponents comps = IRcomponents(),
-        Oracle oracle = Oracle(), Visitor visitor = Visitor()) {
+        Result result, Strategy strategy, IRcomponents comps = IRcomponents{},
+        Oracle oracle = Oracle{}, Visitor visitor = Visitor{}) {
 
     auto steiner = paal::ir::make_steiner_tree(metric, terminals, steiner_vertices, result, strategy, oracle);
     paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));

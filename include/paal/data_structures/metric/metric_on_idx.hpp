@@ -9,9 +9,14 @@
 #define METRIC_ON_IDX_HPP
 
 #include "paal/data_structures/bimap_traits.hpp"
+#include "paal/data_structures/metric/basic_metrics.hpp"
 
 namespace paal {
 namespace data_structures {
+
+
+struct read_values_tag{};
+struct read_indexes_tag{};
 
 /**
  * @brief this metric is keeps inner metric and index
@@ -20,11 +25,25 @@ namespace data_structures {
  * @tparam Metric
  * @tparam Bimap
  */
-template <typename Metric, typename Bimap> class metric_on_idx {
+template <typename Metric, typename Bimap, typename Strategy = read_indexes_tag> class metric_on_idx {
+    Metric m_metric;
+    Bimap m_idx;
+    using btraits = bimap_traits<typename std::decay<Bimap>::type>;
+
+    auto read(typename btraits::Val v, read_values_tag) const -> decltype( m_idx.get_idx(v)) {
+        return m_idx.get_idx(v);
+    }
+
+    auto read(typename btraits::Idx v, read_indexes_tag) const -> decltype(m_idx.get_val(v)) {
+        return m_idx.get_val(v);
+    }
+
+    template <typename Vertex>
+    auto read(Vertex && v) const -> decltype(this->read(v, Strategy())) {
+        return read(v, Strategy{});
+    }
+
   public:
-    typedef data_structures::metric_traits<Metric> MT;
-    typedef typename MT::DistanceType DistanceType;
-    typedef typename bimap_traits<Bimap>::Idx VertexType;
 
     /**
      * @brief constructor
@@ -32,7 +51,7 @@ template <typename Metric, typename Bimap> class metric_on_idx {
      * @param m
      * @param idx
      */
-    metric_on_idx(const Metric &m, const Bimap &idx)
+    metric_on_idx(Metric m, Bimap idx)
         : m_metric(m), m_idx(idx) {}
 
     /**
@@ -43,13 +62,23 @@ template <typename Metric, typename Bimap> class metric_on_idx {
      *
      * @return
      */
-    DistanceType operator()(VertexType i, VertexType j) const {
-        return m_metric(m_idx.get_val(i), m_idx.get_val(j));
+    template <typename Vertex>
+    auto operator()(const Vertex & i, const Vertex & j) -> decltype(m_metric(this->read(i), this->read(j))) {
+        return m_metric(read(i), read(j));
     }
 
-  private:
-    const Metric &m_metric;
-    const Bimap &m_idx;
+    /**
+     * @brief operator() const
+     *
+     * @param i
+     * @param j
+     *
+     * @return
+     */
+    template <typename Vertex>
+    auto operator()(const Vertex & i, const Vertex & j) const ->  decltype(m_metric(this->read(i), this->read(j))){
+        return m_metric(read(i), read(j));
+    }
 };
 
 /**
@@ -62,11 +91,26 @@ template <typename Metric, typename Bimap> class metric_on_idx {
  *
  * @return
  */
+template <typename Strategy = read_indexes_tag, typename Metric, typename Bimap>
+metric_on_idx<Metric, Bimap, Strategy> make_metric_on_idx(Metric && m,
+                                                Bimap && b) {
+    return metric_on_idx<Metric, Bimap, Strategy>(std::forward<Metric>(m), std::forward<Bimap>(b));
+}
+
+
 template <typename Metric, typename Bimap>
-metric_on_idx<Metric, Bimap> make_metric_on_idx(const Metric &m,
-                                                const Bimap &b) {
-    return metric_on_idx<Metric, Bimap>(m, b);
-}
-}
-}
+struct metric_traits<metric_on_idx<Metric, Bimap, read_indexes_tag>> :
+public _metric_traits<metric_on_idx<Metric, Bimap, read_indexes_tag>,
+       typename bimap_traits<typename std::decay<Bimap>::type>::Idx>
+{};
+
+template <typename Metric, typename Bimap>
+struct metric_traits<metric_on_idx<Metric, Bimap, read_values_tag>> :
+public _metric_traits<metric_on_idx<Metric, Bimap, read_values_tag>,
+       typename bimap_traits<typename std::decay<Bimap>::type>::Val>
+{};
+
+
+} //! data_structures
+} //! paal
 #endif /* METRIC_ON_IDX_HPP */

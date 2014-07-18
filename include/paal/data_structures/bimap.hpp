@@ -37,14 +37,13 @@ template <typename T, typename Idx = int> class bimap_mic {
     /**
      * @brief constructor
      *
-     * @tparam Iter
-     * @param b
-     * @param e
+     * @tparam Range
+     * @param range
      */
-    template <typename Iter> bimap_mic(Iter b, Iter e) {
-        std::size_t s = std::distance(b, e);
+    template <typename Range> bimap_mic(Range && range) {
+        std::size_t s = boost::distance(range);
         m_index.reserve(s);
-        for (const T &t : boost::make_iterator_range(b, e)) {
+        for (const T &t : range) {
             add(t);
         }
     }
@@ -124,15 +123,14 @@ template <typename T, typename Idx = int> class bimap {
     /**
      * @brief constructor
      *
-     * @tparam Iter
-     * @param b
-     * @param e
+     * @tparam Range
+     * @param range
      */
-    template <typename Iter> bimap(Iter b, Iter e) {
-        std::size_t s = std::distance(b, e);
+    template <typename Range> bimap(Range && range) {
+        std::size_t s = boost::distance(range);
         m_id_to_t.reserve(s);
         m_t_to_id.reserve(s);
-        for (const T &t : boost::make_iterator_range(b, e)) {
+        for (const T &t : range) {
             add(t);
         }
     }

@@ -13,7 +13,7 @@
 #include "paal/utils/functors.hpp"
 
 #include <boost/graph/adjacency_matrix.hpp>
-#include <boost/iterator/transform_iterator.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 
 namespace paal {
 namespace data_structures {
@@ -32,26 +32,22 @@ template <typename Metric> struct adjacency_matrix {
 };
 
 /**
- * @brief we assume that (vbegin, vend) is sequence
- * of values  (0, vend - vbegin).
+ * @brief we assume that vertices is sequence
+ * of values  (0, vertices.size()).
  *
  * @param m
- * @param vbegin
- * @param vend
+ * @param vertices
  */
-template <typename Metric, typename VertexIter>
+template <typename Metric, typename Vertices>
 typename adjacency_matrix<Metric>::type metric_to_bgl(const Metric &m,
-                                                      VertexIter vbegin,
-                                                      VertexIter vend) {
+                                                      Vertices && vertices) {
     typedef typename adjacency_matrix<Metric>::type Graph;
-    const unsigned N = std::distance(vbegin, vend);
+    const unsigned N = boost::distance(vertices);
     typedef metric_traits<Metric> MT;
-    typedef typename MT::VertexType VertexType;
     typedef typename MT::DistanceType Dist;
     Graph g(N);
-    auto r = boost::make_iterator_range(vbegin, vend);
-    for (VertexType v : r) {
-        for (VertexType w : r) {
+    for (auto && v : vertices) {
+        for (auto && w : vertices) {
             if (v < w) {
                 bool succ = add_edge(
                     v, w, boost::property<boost::edge_weight_t, Dist>(m(v, w)),
@@ -67,28 +63,25 @@ typename adjacency_matrix<Metric>::type metric_to_bgl(const Metric &m,
  * @brief  produces graph from metric with index
  *
  * @tparam Metric
- * @tparam VertexIter
+ * @tparam Vertices
  * @param m
- * @param vbegin
- * @param vend
+ * @param vertices
  * @param idx
  *
  * @return
  */
-template <typename Metric, typename VertexIter>
+template <typename Metric, typename Vertices>
 typename adjacency_matrix<Metric>::type metric_to_bgl_with_index(
-    const Metric &m, VertexIter vbegin, VertexIter vend,
-    bimap<typename std::iterator_traits<VertexIter>::value_type> &idx) {
+    const Metric &m, Vertices && vertices,
+    bimap<typename boost::range_value<Vertices>::type> &idx) {
     typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::VertexType VertexType;
-    idx = data_structures::bimap<VertexType>(vbegin, vend);
+    idx = data_structures::bimap<VertexType>(vertices);
     auto idxMetric = data_structures::make_metric_on_idx(m, idx);
     auto transLambda = [&](VertexType v) { return idx.get_idx(v); };
     auto trans = utils::make_assignable_functor(transLambda);
 
-    return metric_to_bgl(idxMetric,
-                         boost::make_transform_iterator(vbegin, trans),
-                         boost::make_transform_iterator(vend, trans));
+    return metric_to_bgl(idxMetric, vertices | boost::adaptors::transformed(trans));
 }
 
 } //!data_structures
