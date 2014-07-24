@@ -26,7 +26,6 @@
 
 #include <utility>
 
-
 namespace paal {
 namespace auctions {
 

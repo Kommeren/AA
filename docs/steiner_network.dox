@@ -43,7 +43,9 @@ complete example of the usage can be found in file steiner_network_example.cpp
 \section app_steiner_network Approximation Ratio
 The approximation ratio of this algorithm equals 2.
 
-\section Complexity
+\section com_steiner_network Complexity
+\todo This paragraph is wrong. It doesn't account for the fact that as we generate more rows
+in the row generation technique, our lp instance gets bigger.
 
 The time complexity of the algorithm is \f$O(|E|*(|V|+|E|+LP_{rowgen}))\f$, where
 \f$|V|\f$ and \f$|E|\f$ are respectively the numbers of vertices and edges

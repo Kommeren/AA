@@ -71,14 +71,7 @@ class glp_impl {
      * Sets the problem optimization type (min/max).
      */
     void set_optimization_type(optimization_type opt_type) {
-        switch (opt_type) {
-        case MINIMIZE:
-            glp_set_obj_dir(m_lp, GLP_MIN);
-            break;
-        case MAXIMIZE:
-            glp_set_obj_dir(m_lp, GLP_MAX);
-            break;
-        }
+        glp_set_obj_dir(m_lp, opt_type == MINIMIZE ? GLP_MIN : GLP_MAX);
     }
 
     /**
@@ -285,6 +278,15 @@ class glp_impl {
      */
     double get_col_upper_bound(col_id col) const {
         return get_col_bounds(col).second;
+    }
+
+    /**
+     * Returns row dual value.
+     * Should be called only after the LP has been solved and if it
+     * wasn't modified afterwards.
+     */
+    double get_row_dual_value(row_id row) const {
+       return glp_get_row_dual(m_lp, get_row(row));
     }
 
     /**

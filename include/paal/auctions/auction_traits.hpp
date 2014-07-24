@@ -1,10 +1,3 @@
-//=======================================================================
-// Copyright (c)
-//
-// Distributed under the Boost Software License, Version 1.0. (See
-// accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
-//=======================================================================
 /**
  * @file auction_traits.hpp
  * @brief
@@ -33,57 +26,86 @@ namespace auctions {
 /**
  * @brief Types associated with all auctions.
  *
- * @tparam AuctionComponents
+ * @tparam Auction
  */
-template <class AuctionComponents>
+template <class Auction>
 struct auction_traits {
-   using bidders_t = decltype(std::declval<AuctionComponents>().template get<bidders>());
-   using bidder_iterator_t = puretype(std::begin(std::declval<bidders_t>()));
-   using bidder_t = range_to_ref_t<bidders_t>;
-   using bidder_val_t = range_to_elem_t<bidders_t>;
-   using items_t = decltype(std::declval<AuctionComponents>().template get<items>());
-   using item_t = range_to_ref_t<items_t>;
-   using item_val_t = range_to_elem_t<items_t>;
+   using bidders_universe_t =
+      decltype(std::declval<Auction>().template get<bidders>());
+   using bidder_iterator_t =
+      puretype(std::begin(std::declval<bidders_universe_t>()));
+   using bidder_t = range_to_ref_t<bidders_universe_t>;
+   using bidder_val_t = range_to_elem_t<bidders_universe_t>;
+   using items_universe_t =
+      decltype(std::declval<Auction>().template get<items>());
+   using item_t = range_to_ref_t<items_universe_t>;
+   using item_val_t = range_to_elem_t<items_universe_t>;
    using copies_num_t = puretype(
-      std::declval<AuctionComponents>().template call<get_copies_num>(std::declval<item_t>())
+      std::declval<Auction>().template call<get_copies_num>(
+         std::declval<item_t>()
+      )
    );
 };
 
 /**
  * @brief Types associated with value query auction.
  *
- * @tparam ValueQueryAuctionComponents
+ * @tparam ValueQueryAuction
  */
-template <class ValueQueryAuctionComponents>
-class value_query_auction_traits: public auction_traits<ValueQueryAuctionComponents> {
-   using super = auction_traits<ValueQueryAuctionComponents>;
+template <class ValueQueryAuction>
+class value_query_auction_traits: public auction_traits<ValueQueryAuction> {
+   using base = auction_traits<ValueQueryAuction>;
 
    public:
-      using value_t = puretype(std::declval<const ValueQueryAuctionComponents&>().template call<value_query>(
-         std::declval<typename super::bidder_t>(),
-         std::unordered_set<typename super::item_val_t>() // any container of items with count method
+      using value_t = puretype(std::declval<const ValueQueryAuction&>().template call<value_query>(
+         std::declval<typename base::bidder_t>(),
+         std::unordered_set<typename base::item_val_t>() // any container of items with count method
       ));
+};
+
+/**
+ * @brief Types associated with demand query auction.
+ *
+ * @tparam DemandQueryAuction
+ */
+template <class DemandQueryAuction>
+struct demand_query_auction_traits: auction_traits<DemandQueryAuction> {
+
+      using result_t = puretype(
+         std::declval<DemandQueryAuction>().template call<demand_query>(
+            std::declval<typename auction_traits<DemandQueryAuction>::bidder_t>(),
+            // this is a little tricky, in order to obtain the value type, we pass prices and threshold
+            // as double types, because value type needs to be able to operate with doubles anyway
+            utils::make_dynamic_return_something_functor(double(1.0)) // any functor with double operator()
+         )
+      );
+
+      using items_t = typename result_t::first_type;
+      using value_t = typename result_t::second_type;
 };
 
 /**
  * @brief Types associated with gamma oracle auction.
  *
- * @tparam GammaOracleAuctionComponents
+ * @tparam GammaOracleAuction
  */
-template <class GammaOracleAuctionComponents>
-struct gamma_oracle_auction_traits: auction_traits<GammaOracleAuctionComponents> {
-   using value_t = puretype(
-      std::declval<GammaOracleAuctionComponents>(). template call<gamma_oracle>(
-         std::declval<typename auction_traits<GammaOracleAuctionComponents>::bidder_t>(),
-         // this is a little tricky, in order to obtain the value type, we pass prices and threshold
-         // as double types, because value type needs to be able to operate with doubles anyway
-         utils::make_dynamic_return_something_functor(double(1.0)), // any functor with double operator()
-         double(1.0), // any double
-         boost::make_function_output_iterator(utils::skip_functor{}) // any item output iterator
-      )->den
-   );
-   using frac_t = data_structures::fraction<value_t, value_t>;
-   using gamma_oracle_result_t = boost::optional<frac_t>;
+template <class GammaOracleAuction>
+class gamma_oracle_auction_traits: public auction_traits<GammaOracleAuction> {
+   using temp_result_t = puretype(
+         *std::declval<GammaOracleAuction>(). template call<gamma_oracle>(
+            std::declval<typename auction_traits<GammaOracleAuction>::bidder_t>(),
+            // this is a little tricky, in order to obtain the value type, we pass prices
+            // as double types, because value type needs to be able to operate with doubles anyway
+            utils::make_dynamic_return_something_functor(double(1.0)), // any functor with double operator()
+            double(1.0) // any double
+         )
+      );
+
+   public:
+      using items_t = typename temp_result_t::first_type;
+      using value_t = typename temp_result_t::second_type::den_type;
+      using frac_t = data_structures::fraction<value_t, value_t>;
+      using result_t = boost::optional<std::pair<items_t, frac_t>>;
 };
 
 } //!auctions

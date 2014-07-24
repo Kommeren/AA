@@ -22,10 +22,35 @@
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/test/unit_test.hpp>
 
-#include <iterator>
-#include <unordered_map>
-#include <unordered_set>
-#include <utility>
+template <class Auction, class Bidders, class Items>
+void check_auction_bidders_and_items(Auction&& auction,
+      Bidders&& want_bidders, Items&& want_items)
+{
+   BOOST_CHECK(want_bidders == auction.template get<paal::auctions::bidders>());
+   BOOST_CHECK(want_items == auction.template get<paal::auctions::items>());
+}
+
+template <
+   class Items,
+   class DemandQueryAuction,
+   class GetPrices,
+   class Bidder,
+   class Eps = double,
+   class Traits = paal::auctions::demand_query_auction_traits<DemandQueryAuction>
+>
+bool check_demand_query(
+   DemandQueryAuction&& auction,
+   Bidder&& bidder,
+   GetPrices get_prices,
+   typename Traits::result_t want,
+   Eps eps = 1e-8
+) {
+   auto got = auction.template call<paal::auctions::demand_query>(
+      std::forward<Bidder>(bidder), get_prices
+   );
+   paal::utils::compare<typename Traits::value_t> cmp{eps};
+   return cmp.e(want.second, got.second) && want.first == got.first;
+}
 
 template <
    class Items,
@@ -36,62 +61,17 @@ template <
 >
 bool check_gamma_oracle(
    GammaOracleAuction&& auction,
-   Bidder bidder,
+   Bidder&& bidder,
    GetPrices get_prices,
    typename Traits::value_t threshold,
-   typename Traits::gamma_oracle_result_t want_frac,
-   Items want_items = Items{}
+   typename Traits::result_t want
 ) {
-   std::vector<typename Traits::item_val_t> got_items;
-   auto got_frac = auction.template call<paal::auctions::gamma_oracle>(
-      bidder, get_prices, threshold, std::back_inserter(got_items)
+   auto got = auction.template call<paal::auctions::gamma_oracle>(
+      std::forward<Bidder>(bidder), get_prices, threshold
    );
-   if (!want_frac || !got_frac) return !want_frac == !got_frac;
-   return paal::data_structures::are_fractions_equal(*want_frac, *got_frac, 1e-3) &&
-      want_items == Items(std::begin(got_items), std::end(got_items));
-}
-
-template <
-   class ValueQueryAuction,
-   class Assignments,
-   class Traits = paal::auctions::value_query_auction_traits<ValueQueryAuction>
->
-typename Traits::value_t
-assignment_value(ValueQueryAuction&& value_query, const Assignments& assignments)
-{
-   using Bidder = typename Traits::bidder_val_t;
-   using Item = typename Traits::item_val_t;
-
-   std::unordered_map<Bidder, std::unordered_set<Item>>  bidder_to_items;
-   for (auto& assignment: assignments)
-      bidder_to_items[assignment.first].insert(assignment.second);
-
-   return paal::utils::accumulate_functor(
-      bidder_to_items,
-      typename Traits::value_t(0),
-      [&](decltype(*bidder_to_items.cbegin()) it)
-      {
-         return value_query.template call<paal::auctions::value_query>(it.first, it.second);
-      }
-   );
-}
-
-template <class Auction, class Assignments>
-bool is_feasible(Auction&& auction, const Assignments& assignments)
-{
-   using Traits = paal::auctions::auction_traits<Auction>;
-   using Item = typename Traits::item_val_t;
-   using CopiesNum = typename Traits::copies_num_t;
-
-   std::unordered_map<Item, CopiesNum> count;
-   for (auto& assignment: assignments)
-      ++count[assignment.second];
-
-   return boost::algorithm::all_of(count, [&](decltype(*count.cbegin()) item_count)
-   {
-      return item_count.second <=
-         auction.template call<paal::auctions::get_copies_num>(item_count.first);
-   });
+   if (!want || !got) return !want == !got;
+   return paal::data_structures::are_fractions_equal(want->second, got->second, 1e-3) &&
+      want->first == got->first;
 }
 
 #endif // PAAL_AUCTIONS_HPP

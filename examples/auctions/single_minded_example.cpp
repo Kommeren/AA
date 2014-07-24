@@ -15,6 +15,7 @@
 
 #include "paal/auctions/single_minded_auctions.hpp"
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -37,8 +38,8 @@ int main()
    };
    std::vector<Bidder> bidders {"Pooh Bear", "Rabbit"};
    std::vector<Item> items {"honey", "baby carrot", "carrot", "jam"};
-   auto get_value = [&](Bidder bidder) { return bids[bidder].second; };
-   auto get_items = [&](Bidder bidder) -> const Items& { return bids[bidder].first; };
+   auto get_value = [&](Bidder bidder) { return bids.at(bidder).second; };
+   auto get_items = [&](Bidder bidder) -> const Items& { return bids.at(bidder).first; };
    auto get_copies_num = [](Item item) { return item == "baby carrot" ? 2 : 1; };
 
    auto auction = pa::make_single_minded_to_value_query_auction(

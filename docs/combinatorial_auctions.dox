@@ -20,8 +20,8 @@ bidders. The <b><i> social welfare </i></b> obtained by an allocation is \f$\sum
 Apart from receiving a bundle of items \f$S_i\f$, bidder \f$i\f$ might also be charged a price \f$p_i\f$.
 In such case her <b><i>utility</i></b> is equal to \f$v_i(S_i) - p_i\f$.
 
-In <b><i> winner determination </i></b> problem the goal is to find a socially efficient allocation, that is one
-that maximizes social welfare among all allocations.
+In \anchor winner_determination <b><i> winner determination </i></b> problem the goal is to find a socially
+efficient allocation, that is one that maximizes social welfare among all allocations.
 
 Let \f$V = V_1 \times \cdots \times V_k\f$ denote the space of all bidders' valid valuations,
 and let \f$A\f$ be the set of all items allocations.
@@ -97,15 +97,41 @@ kinds of oracles, answering different types of queries:
          \snippet value_query_example.cpp Value Query Auction Use Example
          <br>
 
-   <li> <i><b>Demand Query</b>: The auctioneer presents item prices
+   <li> \anchor demand_query <i><b>Demand Query</b>: The auctioneer presents item prices
          \f$p_j\f$ for each \f$j \in U\f$; the bidder reports a demand bundle under these prices,
-         i.e., some set \f$S\f$ that maximizes \f$v(S) - \sum_{i \in S} p_i\f$.</i><br>
+         i.e., some set \f$S\f$ that maximizes utility \f$v(S) - \sum_{i \in S} p_i\f$.</i><br>
 
          Being able to answer demand queries appears to be a natural requirement from a bidder,
          as without this ability, if the bidder comes to a market in which the items have prices,
          she herself would not know what she prefers to buy.
 
-         \todo write about demand queries in our library once they are introduced
+         In our library auctions with demand query oracles are represented as class
+         paal::auctions::demand_query_auction_components (created using \ref comps class),
+         with the following components:
+         <ol>
+            <li> <i>bidders</i> \ref bidders "as above"
+            <li> <i>items</i> \ref items "as above"
+            <li> <i>get_copies_num</i> \ref get_copies_num "as above"
+            <li> <i>demand_query</i> functor representing a demand query oracle.
+            <pre>
+            demand_query_archetype {
+               template<class GetPrice>
+               std::pair<ItemsBundle, Value> operator()(Bidder, GetPrice);
+            }
+            </pre>
+            GetPrice is a functor that for any item returns its price.
+            The oracle should return a pair consisting of
+            the result bundle \f$S^*\f$ and its corresponding utility
+            \f$v(S^*) - \sum_{i \in S^*} p_i\f$.
+         </ol>
+         <b>Example:</b><br>
+         Complete example: demand_query_example.cpp <br>
+         We start with defining the auction components:
+         \snippet demand_query_example.cpp Demand Query Auction Components Example
+         Then we create the auction:
+         \snippet demand_query_example.cpp Demand Query Auction Create Example
+         We can use it as follows:
+         \snippet demand_query_example.cpp Demand Query Auction Use Example
          <br>
 
    <li> \anchor gamma_oracle <i><b>\f$\gamma\f$-Oracle Query</b>: The auctioneer presents \f$\gamma \geq 1\f$,
@@ -132,17 +158,17 @@ kinds of oracles, answering different types of queries:
             <li> <i>gamma_oracle</i> functor representing a \f$\gamma\f$-oracle.
             <pre>
             gamma_oracle_archetype {
-               template<class GetPrice, class Threshold, class OutputIterator>
-               boost::optional<paal::data_structures::fraction<Value, Value>>
-               operator()(Bidder, GetPrice, Threshold, OutputIterator);
+               template<class GetPrice, class Threshold>
+               boost::optional<std::pair<ItemsBundle, paal::data_structures::fraction<Value, Value>>>
+               operator()(Bidder, GetPrice, Threshold);
             }
             </pre>
             GetPrice is a functor that for any item returns its price.
             Threshold is a parameter \f$z\f$ from \f$\gamma\f$-oracle definition.
             If \f$v(S) \leq z\f$ for all sets \f$S\f$ then oracle should return <i>boost::none</i>.
-            Otherwise it should copy the result bundle \f$S^*\f$ to the OutputIterator and return
-            its corresponding fraction \f$\frac{\sum_{j \in S^*}p_j}{v(S^*) - z}\f$ as
-            <i>paal::data_structures::fraction</i>.
+            Otherwise it should return a pair consisting of the result bundle \f$S^*\f$ and
+            its corresponding fraction \f$\frac{\sum_{j \in S^*}p_j}{v(S^*) - z}\f$
+            (represented as object of class <i>paal::data_structures::fraction</i>).
          </ol>
          <b>Example:</b><br>
          Complete example: gamma_oracle_example.cpp <br>
@@ -169,6 +195,7 @@ functions for a number of well-established bidding languages:
          Adapter functions:
          <ol>
          <li> paal::auctions::make_single_minded_to_value_query_auction
+         <li> paal::auctions::make_single_minded_to_demand_query_auction
          <li> paal::auctions::make_single_minded_to_gamma_oracle_auction
          </ol>
          <br>
@@ -183,6 +210,7 @@ functions for a number of well-established bidding languages:
          Adapter functions:
          <ol>
          <li> paal::auctions::make_xor_bids_to_value_query_auction
+         <li> paal::auctions::make_xor_bids_to_demand_query_auction
          <li> paal::auctions::make_xor_bids_to_gamma_oracle_auction
          </ol>
          <br>

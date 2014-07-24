@@ -29,6 +29,10 @@ namespace data_structures {
  * @tparam B
  */
 template <class A, class B> struct fraction {
+    ///numerator type
+    using num_type = A;
+    /// denominator type
+    using den_type = B;
     /// numerator
     A num;
     /// denominator
@@ -42,13 +46,15 @@ template <class A, class B> struct fraction {
  *
  * @tparam A
  * @tparam B
+ * @tparam C
+ * @tparam D
  * @param f1
  * @param f2
  *
  * @return
  */
-template <class A, class B>
-bool operator<(const fraction<A, B> &f1, const fraction<A, B> &f2)
+template <class A, class B, class C, class D>
+bool operator<(const fraction<A, B> &f1, const fraction<C, D> &f2)
 {
     return f1.num * f2.den < f2.num * f1.den;
 }
@@ -58,13 +64,15 @@ bool operator<(const fraction<A, B> &f1, const fraction<A, B> &f2)
  *
  * @tparam A
  * @tparam B
+ * @tparam C
+ * @tparam D
  * @param f1
  * @param f2
  *
  * @return
  */
-template <class A, class B>
-bool operator>(const fraction<A, B> &f1, const fraction<A, B> &f2)
+template <class A, class B, class C, class D>
+bool operator>(const fraction<A, B> &f1, const fraction<C, D> &f2)
 {
     return f2 < f1;
 }
@@ -74,13 +82,15 @@ bool operator>(const fraction<A, B> &f1, const fraction<A, B> &f2)
  *
  * @tparam A
  * @tparam B
+ * @tparam C
+ * @tparam D
  * @param f1
  * @param f2
  *
  * @return
  */
-template <class A, class B>
-bool operator<=(const fraction<A, B> &f1, const fraction<A, B> &f2)
+template <class A, class B, class C, class D>
+bool operator<=(const fraction<A, B> &f1, const fraction<C, D> &f2)
 {
     return !(f2 < f1);
 }
@@ -90,13 +100,15 @@ bool operator<=(const fraction<A, B> &f1, const fraction<A, B> &f2)
  *
  * @tparam A
  * @tparam B
+ * @tparam C
+ * @tparam D
  * @param f1
  * @param f2
  *
  * @return
  */
-template <class A, class B>
-bool operator>=(const fraction<A, B> &f1, const fraction<A, B> &f2)
+template <class A, class B, class C, class D>
+bool operator>=(const fraction<A, B> &f1, const fraction<C, D> &f2)
 {
     return !(f1 < f2);
 }

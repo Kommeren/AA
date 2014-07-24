@@ -29,6 +29,8 @@ void print_solution(paal::lp::problem_type status, const LP &lp_instance) {
         std::cout << "Optimal solution not found" << std::endl;
     }
     std::cout << lp_instance << std::endl;
+    // TODO example should show how to read a valuation of a variable, one
+    // has to search documentation quite extensively to find that
 }
 
 int main() {
@@ -40,6 +42,9 @@ int main() {
     auto X = lp_instance.add_column(500, 0, paal::lp::lp_traits::PLUS_INF, "x");
     auto Y = lp_instance.add_column(300, 0, paal::lp::lp_traits::PLUS_INF, "y");
 
+    // TODO example should should show how to create an expression with
+    // 0 or 1 variable. This is the most standard use case, we use that
+    // every time we create an expression in the loop
     auto expr = X + Y;
     std::cout << expr << std::endl;
     std::cout << (expr >= 7) << std::endl;

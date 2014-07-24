@@ -20,47 +20,45 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include <cassert>
+#include <iostream>
+#include <utility>
 #include <vector>
 
 //! [Gamma Oracle Auction Components Example]
 
 namespace pa = paal::auctions;
 namespace pds = paal::data_structures;
+
 using Bidder = std::string;
 using Item = std::string;
+using Items = std::vector<Item>;
 using Value = int;
 using Frac = pds::fraction<Value, Value>;
 
 const std::vector<Bidder> bidders {"Pooh Bear", "Rabbit"};
 
-const std::vector<Item> items {"honey", "baby carrot", "carrot", "jam"};
+const Items items {"honey", "baby carrot", "carrot", "jam"};
 
 const int gamma_val = 2;
 
 struct gamma_oracle_func {
-      template <class GetPrice, class Threshold, class OutputIterator>
-      boost::optional<Frac>
-      operator()(
-         Bidder bidder,
-         GetPrice get_price,
-         Threshold z,
-         OutputIterator result_items
-      ) const
+      template <class GetPrice, class Threshold>
+      boost::optional<std::pair<Items, Frac>>
+      operator()(Bidder bidder, GetPrice get_price, Threshold z) const
       {
          if (bidder == "Pooh Bear") {
-            const int honey_val = 10;
-            if (honey_val <= z) return boost::none;
-            *result_items = "honey";
-            return Frac(get_price("honey"), honey_val - z);
+            const Value val = 10;
+            if (val <= z) return boost::none;
+            return std::make_pair(Items{"honey"}, Frac(get_price("honey"), val - z));
          }
 
          assert(bidder == "Rabbit");
 
-         const int baby_val = 2, val = 3;
-         auto baby_carrot_price = get_price("baby carrot"), carrot_price = get_price("carrot");
-         auto baby_carrot_frac = Frac(baby_carrot_price, baby_val - z),
-            carrot_frac = Frac(carrot_price, val - z),
-            both_carrots_frac = Frac(baby_carrot_price + carrot_price, baby_val + val - z);
+         const Value baby_val = 2, val = 3;
+         const auto baby_price = get_price("baby carrot"), price = get_price("carrot");
+         const auto baby_frac = Frac(baby_price, baby_val - z),
+            frac = Frac(price, val - z),
+            both_frac = Frac(baby_price + price, baby_val + val - z);
 
          auto check = [=](Frac candidate, Frac other1, Frac other2) {
             if (candidate.den <= 0) return false;
@@ -70,18 +68,12 @@ struct gamma_oracle_func {
             return check_single(candidate, other1) && check_single(candidate, other2);
          };
 
-         if (check(baby_carrot_frac, carrot_frac, both_carrots_frac)) {
-            *result_items = "baby carrot";
-            return baby_carrot_frac;
-         }
-         if (check(carrot_frac, baby_carrot_frac, both_carrots_frac)) {
-            *result_items = "carrot";
-            return carrot_frac;
-         }
-         if (check(both_carrots_frac, baby_carrot_frac, carrot_frac)) {
-            boost::copy(std::vector<Item>{"baby carrot", "carrot"}, result_items);
-            return both_carrots_frac;
-         }
+         if (check(baby_frac, frac, both_frac))
+            return std::make_pair(Items{"baby carrot"}, baby_frac);
+         if (check(frac, baby_frac, both_frac))
+            return std::make_pair(Items{"carrot"}, frac);
+         if (check(both_frac, baby_frac, frac))
+            return std::make_pair(Items{"baby carrot", "carrot"}, both_frac);
          return boost::none;
       }
 };
@@ -100,17 +92,20 @@ int main()
    auto get_price_func = [](Item item) { return item == "honey" ? 5 : 2; };
 
    std::cout << "pooh bear buys: ";
-   auto got_pooh_bear = auction.call<pa::gamma_oracle>(
-      "Pooh Bear", get_price_func, 10, std::ostream_iterator<Item>(std::cout, ", ")
-   );
-   if (!got_pooh_bear) std::cout << "nothing";
+   auto got_pooh_bear =
+      auction.call<pa::gamma_oracle>("Pooh Bear", get_price_func, 10);
+   if (!got_pooh_bear)
+      std::cout << "nothing";
+   else
+      boost::copy(got_pooh_bear->first, std::ostream_iterator<Item>(std::cout, ", "));
    std::cout << std::endl;
 
    std::cout << "rabbit oracle buys: ";
-   auto got_rabbit = auction.call<pa::gamma_oracle>(
-      "Rabbit", get_price_func, 1, std::ostream_iterator<Item>(std::cout, ", ")
-   );
-   if (!got_rabbit) std::cout << "nothing";
+   auto got_rabbit = auction.call<pa::gamma_oracle>("Rabbit", get_price_func, 1);
+   if (!got_rabbit)
+      std::cout << "nothing";
+   else
+      boost::copy(got_rabbit->first, std::ostream_iterator<Item>(std::cout, ", "));
    std::cout << std::endl;
 
    //! [Gamma Oracle Auction Use Example]

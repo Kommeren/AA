@@ -18,6 +18,7 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include <cassert>
+#include <iostream>
 #include <iterator>
 #include <string>
 #include <set>

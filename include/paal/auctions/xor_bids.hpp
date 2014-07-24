@@ -21,6 +21,8 @@
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/concept_check.hpp>
+#include <boost/concept/requires.hpp>
 #include <boost/optional/optional.hpp>
 #include <boost/range/adaptor/filtered.hpp>
 #include <boost/range/algorithm/copy.hpp>
@@ -39,15 +41,59 @@ namespace detail {
 namespace paal {
 namespace auctions {
 
+   namespace concepts {
+
+      template <
+         class Bidders,
+         class Items,
+         class GetBids,
+         class GetValue,
+         class GetItems,
+         class GetCopiesNum
+      >
+      class xor_bids {
+         Bidders bidders;
+         Items items;
+         GetBids get_bids;
+         GetValue get_value;
+         GetItems get_items;
+         GetCopiesNum get_copies_num;
+
+         xor_bids() {}
+
+         public:
+            BOOST_CONCEPT_USAGE(xor_bids)
+            {
+               auto&& bids = get_bids(*std::begin(bidders));
+               BOOST_CONCEPT_ASSERT((boost::ForwardRangeConcept<
+                        decltype(bids)>));
+               auto bid = std::begin(bids);
+               using value_t = puretype(get_value(*bid));
+               static_assert(std::is_arithmetic<value_t>::value,
+                     "get_value return type is not arithmetic!");
+               auto&& bid_items = get_items(*bid);
+               using bundle_t = puretype(bid_items);
+               static_assert(std::is_move_constructible<bundle_t>::value,
+                     "bundle_t is not move constructible!");
+               static_assert(std::is_default_constructible<bundle_t>::value,
+                     "bundle_t is not default constructible!");
+               BOOST_CONCEPT_ASSERT((boost::ForwardRangeConcept<
+                        decltype(bid_items)>));
+            }
+      };
+   } //!concepts
+
    namespace detail {
 
       template <class Bidder, class GetBids, class GetValue, class GetItems>
       struct xor_bids_traits {
          using bid_iterator =
-            typename boost::range_iterator<typename std::result_of<GetBids(Bidder)>::type>::type;
+            typename boost::range_iterator<typename std::result_of<
+               GetBids(Bidder)>::type>::type;
          using bid = typename std::iterator_traits<bid_iterator>::reference;
          using value = pure_result_of_t<GetValue(bid)>;
          using items = typename std::result_of<GetItems(bid)>::type;
+         using items_val = typename std::decay<items>::type;
          using item = range_to_ref_t<items>;
          template <class GetPrice>
          using price = pure_result_of_t<GetPrice(item)>;
@@ -135,10 +181,108 @@ namespace auctions {
       get_copies_num
    ))
    {
+      BOOST_CONCEPT_ASSERT((concepts::xor_bids<Bidders, Items, GetBids, GetValue, GetItems, GetCopiesNum>));
       return make_value_query_auction_components(
          std::forward<Bidders>(bidders),
          std::forward<Items>(items),
          detail::xor_bids_value_query<GetBids, GetValue, GetItems>(get_bids, get_value, get_items),
+         get_copies_num
+      );
+   }
+
+   namespace detail {
+
+      template <class GetBids, class GetValue, class GetItems>
+      class xor_bids_demand_query {
+
+         GetBids m_get_bids;
+         GetValue m_get_value;
+         GetItems m_get_items;
+
+         template <class Bidder>
+         using traits = xor_bids_traits<Bidder, GetBids, GetValue, GetItems>;
+
+         template <class Bidder, class GetPrice, class Base = traits<Bidder>>
+         struct price_traits : Base {
+            using price = typename Base::template price<GetPrice>;
+            using utility = promote_with_t<price, typename Base::value>;
+         };
+
+         public:
+            xor_bids_demand_query(GetBids get_bids, GetValue get_value,
+                  GetItems get_items) : m_get_bids(get_bids),
+            m_get_value(get_value), m_get_items(get_items) {}
+
+         template <class Bidder, class GetPrice>
+         auto operator()(Bidder&& bidder, GetPrice get_price) const
+         {
+            using Traits = price_traits<Bidder, GetPrice>;
+            using Items = typename Traits::items_val;
+            using Res = std::pair<Items, typename Traits::utility>;
+
+            Res best = {Items{}, 0};
+            auto&& bids = m_get_bids(std::forward<Bidder>(bidder));
+            for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
+               const auto value = m_get_value(*bid);
+               const auto price =
+                  utils::sum_functor(m_get_items(*bid), get_price);
+               const auto util = value - price;
+               if (util > best.second)
+                  best = {m_get_items(*bid), util};
+            }
+            return best;
+         }
+      };
+
+   } //!detail
+
+   /**
+    * @brief Create demand query auction from xor bids valuations.
+    *
+    * @param bidders
+    * @param items
+    * @param get_bids
+    * @param get_value
+    * @param get_items
+    * @param get_copies_num
+    * @tparam Bidders
+    * @tparam Items
+    * @tparam GetBids
+    * @tparam GetValue
+    * @tparam GetItems
+    * @tparam GetCopiesNum
+    */
+   template<
+      class Bidders,
+      class Items,
+      class GetBids,
+      class GetValue,
+      class GetItems,
+      class GetCopiesNum = utils::return_one_functor
+   >
+   auto make_xor_bids_to_demand_query_auction(
+      Bidders&& bidders,
+      Items&& items,
+      GetBids get_bids,
+      GetValue get_value,
+      GetItems get_items,
+      GetCopiesNum get_copies_num = GetCopiesNum{}
+   ) ->
+   decltype(make_demand_query_auction_components(
+      std::forward<Bidders>(bidders),
+      std::forward<Items>(items),
+      detail::xor_bids_demand_query<GetBids, GetValue, GetItems>(get_bids,
+         get_value, get_items),
+      get_copies_num
+   ))
+   {
+      BOOST_CONCEPT_ASSERT((concepts::xor_bids<Bidders, Items, GetBids,
+               GetValue, GetItems, GetCopiesNum>));
+      return make_demand_query_auction_components(
+         std::forward<Bidders>(bidders),
+         std::forward<Items>(items),
+         detail::xor_bids_demand_query<GetBids, GetValue, GetItems>(get_bids,
+            get_value, get_items),
          get_copies_num
       );
    }
@@ -152,17 +296,24 @@ namespace auctions {
          GetValue m_get_value;
          GetItems m_get_items;
 
-         template <class GetBids_, class GetValue_, class GetItems_, class Gamma_>
+         template <
+            class GetBids_,
+            class GetValue_,
+            class GetItems_,
+            class Gamma_
+         >
          friend class ::detail::test_xor_bids_gamma_oracle;
 
          template <class Bidder>
          using traits = xor_bids_traits<Bidder, GetBids, GetValue, GetItems>;
 
-         template <class Bidder, class GetPrice>
-         struct price_traits {
-            using price = typename traits<Bidder>::template price<GetPrice>;
-            using frac = paal::data_structures::fraction<price, typename traits<Bidder>::value>;
-            using best_bid = boost::optional<std::pair<typename traits<Bidder>::bid_iterator, frac>>;
+         template <class Bidder, class GetPrice, class Base = traits<Bidder>>
+         struct price_traits : public Base {
+            using price = typename Base::template price<GetPrice>;
+            using frac =
+               paal::data_structures::fraction<price, typename Base::value>;
+            using best_bid =
+               boost::optional<std::pair<typename Base::bid_iterator, frac>>;
          };
 
          template <
@@ -170,19 +321,25 @@ namespace auctions {
             class GetPrice,
             class Threshold,
             class IsBetter,
-            class Traits = price_traits<Bidder, GetPrice>,
-            class BestBid = typename Traits::best_bid
+            class BestBid = typename price_traits<Bidder, GetPrice>::best_bid
          >
          BestBid
-         calculate_best(Bidder&& bidder, GetPrice get_price, Threshold threshold, IsBetter is_better) const
+         calculate_best(
+            Bidder&& bidder,
+            GetPrice get_price,
+            Threshold threshold,
+            IsBetter is_better
+         ) const
          {
             BestBid result{};
             auto&& bids = m_get_bids(std::forward<Bidder>(bidder));
             for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
-               auto value = m_get_value(*bid);
+               const auto value = m_get_value(*bid);
                if (value <= threshold) continue;
-               auto price = utils::accumulate_functor(m_get_items(*bid), typename Traits::price(0), get_price);
-               typename Traits::frac frac(price, value - threshold);
+               const auto price = utils::sum_functor(m_get_items(*bid),
+                     get_price);
+               const auto frac =
+                  data_structures::make_fraction(price, value - threshold);
                if (is_better(frac, result))
                   result = std::make_pair(bid, frac);
             }
@@ -196,7 +353,9 @@ namespace auctions {
             class Traits = price_traits<Bidder, GetPrice>,
             class BestBid = typename Traits::best_bid
          >
-         BestBid minimum_frac(Bidder&& bidder, GetPrice get_price, Threshold threshold) const
+         BestBid
+         minimum_frac(Bidder&& bidder, GetPrice get_price, Threshold threshold)
+         const
          {
             return calculate_best(
                std::forward<Bidder>(bidder),
@@ -222,13 +381,19 @@ namespace auctions {
             xor_bids_gamma_oracle(GetBids get_bids, GetValue get_value, GetItems get_items)
                : m_get_bids(get_bids), m_get_value(get_value), m_get_items(get_items) {}
 
-            template <class Bidder, class GetPrice, class Threshold, class OutputIterator>
-            auto operator()(Bidder&& bidder, GetPrice get_price, Threshold threshold, OutputIterator result_items)
-            -> boost::optional<typename price_traits<decltype(bidder), GetPrice>::frac> const
+            template <
+               class Bidder,
+               class GetPrice,
+               class Threshold,
+               class Traits = price_traits<Bidder, GetPrice>
+            >
+            boost::optional<std::pair<typename Traits::items_val, typename Traits::frac>>
+            operator()(Bidder&& bidder, GetPrice get_price, Threshold threshold) const
             {
-               auto best = minimum_frac(std::forward<Bidder>(bidder), get_price, threshold);
+               const auto best = minimum_frac(std::forward<Bidder>(bidder),
+                     get_price, threshold);
                if (!best) return boost::none;
-               return output(*best, result_items);
+               return std::make_pair(m_get_items(*best->first), best->second);
             }
       };
    }; //!detail
@@ -264,8 +429,8 @@ namespace auctions {
       GetValue get_value,
       GetItems get_items,
       GetCopiesNum get_copies_num = GetCopiesNum{}
-   ) ->
-   decltype(make_gamma_oracle_auction_components(
+   )
+   -> decltype(make_gamma_oracle_auction_components(
       std::forward<Bidders>(bidders),
       std::forward<Items>(items),
       detail::xor_bids_gamma_oracle<GetBids, GetValue, GetItems>(get_bids, get_value, get_items),
@@ -273,6 +438,7 @@ namespace auctions {
       get_copies_num
    ))
    {
+      BOOST_CONCEPT_ASSERT((concepts::xor_bids<Bidders, Items, GetBids, GetValue, GetItems, GetCopiesNum>));
       return make_gamma_oracle_auction_components(
          std::forward<Bidders>(bidders),
          std::forward<Items>(items),

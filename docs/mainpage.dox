@@ -71,7 +71,8 @@
             </ul>
         <li>\ref combinatorial_auctions
             <ul>
-            <li> \ref winner_determination_in_multi_unit_CAs
+            <li> \ref winner_determination_in_MUCA
+            <li> \ref fractional_winner_determination_in_MUCA
             </ul>
         <li> Miscellaneous
             <ul>

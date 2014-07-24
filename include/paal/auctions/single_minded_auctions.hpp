@@ -26,6 +26,41 @@
 namespace paal {
 namespace auctions {
 
+   namespace concepts {
+      template <
+         class Bidders,
+         class Items,
+         class GetValue,
+         class GetItems,
+         class GetCopiesNum
+      >
+      class single_minded {
+         Bidders bidders;
+         Items items;
+         GetValue get_value;
+         GetItems get_items;
+         GetCopiesNum get_copies_num;
+
+         single_minded() {}
+
+         public:
+            BOOST_CONCEPT_USAGE(single_minded)
+            {
+               using value_t = puretype(get_value(*std::begin(bidders)));
+               static_assert(std::is_arithmetic<value_t>::value,
+                     "get_value return type is not arithmetic!");
+               auto&& bid_items = get_items(*std::begin(bidders));
+               using bundle_t = puretype(bid_items);
+               static_assert(std::is_move_constructible<bundle_t>::value,
+                     "bundle_t is not move constructible!");
+               static_assert(std::is_default_constructible<bundle_t>::value,
+                     "bundle_t is not default constructible!");
+               BOOST_CONCEPT_ASSERT((boost::ForwardRangeConcept<
+                        decltype(bid_items)>));
+            }
+      };
+   } //!concepts
+
    namespace detail {
 
       struct get_bids {
@@ -37,7 +72,7 @@ namespace auctions {
          }
       };
 
-   }; //!detail
+   } //!detail
 
    /**
     * @brief Create value query auction from single minded valuations.
@@ -75,7 +110,58 @@ namespace auctions {
          get_items,
          get_copies_num
    )) {
+      BOOST_CONCEPT_ASSERT((concepts::single_minded<Bidders, Items, GetValue, GetItems, GetCopiesNum>));
       return make_xor_bids_to_value_query_auction(
+         std::forward<Bidders>(bidders),
+         std::forward<Items>(items),
+         detail::get_bids(),
+         get_value,
+         get_items,
+         get_copies_num
+      );
+   }
+
+   // TODO all constructions in this file are essentially the same, maybe it's possible
+   // to refactor it using some C++ magic?
+
+   /**
+    * @brief Create demand query auction from single minded valuations.
+    *
+    * @param bidders
+    * @param items
+    * @param get_value
+    * @param get_items
+    * @param get_copies_num
+    * @tparam Bidders
+    * @tparam Items
+    * @tparam GetValue
+    * @tparam GetItems
+    * @tparam GetCopiesNum
+    */
+   template<
+      class Bidders,
+      class Items,
+      class GetValue,
+      class GetItems,
+      class GetCopiesNum = utils::return_one_functor
+   >
+   auto make_single_minded_to_demand_query_auction(
+      Bidders&& bidders,
+      Items&& items,
+      GetValue get_value,
+      GetItems get_items,
+      GetCopiesNum get_copies_num = GetCopiesNum{}
+   )
+   -> decltype(make_xor_bids_to_demand_query_auction(
+         std::forward<Bidders>(bidders),
+         std::forward<Items>(items),
+         detail::get_bids(),
+         get_value,
+         get_items,
+         get_copies_num
+   )) {
+      BOOST_CONCEPT_ASSERT((concepts::single_minded<Bidders, Items, GetValue, GetItems, GetCopiesNum>));
+      return make_xor_bids_to_demand_query_auction(
          std::forward<Bidders>(bidders),
          std::forward<Items>(items),
          detail::get_bids(),
@@ -121,6 +207,7 @@ namespace auctions {
       get_items,
       get_copies_num
    )) {
+      BOOST_CONCEPT_ASSERT((concepts::single_minded<Bidders, Items, GetValue, GetItems, GetCopiesNum>));
       return make_xor_bids_to_gamma_oracle_auction(
          std::forward<Bidders>(bidders),
          std::forward<Items>(items),

@@ -34,6 +34,10 @@ using range_to_ref_t = typename boost::range_reference<Range>::type;
 template <typename Range>
 using range_to_elem_t = typename boost::range_value<Range>::type;
 
+/// for given collection returns its difference type
+template <typename Range>
+using range_to_diff_type_t = typename boost::range_difference<Range>::type;
+
 namespace detail {
 
     template <typename T, int k>
@@ -55,9 +59,13 @@ using k_tuple_t = typename detail::k_tuple<T, k>::type;
 template <class F>
 using pure_result_of_t = typename std::decay<typename std::result_of<F>::type>::type;
 
+/// return type obtained after adding values of given types
+template <typename T1, typename T2>
+using promote_with_t = puretype(std::declval<T1>() + std::declval<T2>());
+
 /// return type after promotion with double
 template <typename T>
-using promote_with_double_t = puretype(std::declval<T>() + 0.0);
+using promote_with_double_t = promote_with_t<T, double>;
 
 } //!paal
 

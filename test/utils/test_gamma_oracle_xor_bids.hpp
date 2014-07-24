@@ -44,16 +44,9 @@ namespace detail {
          )
          : m_gamma(gamma), m_gamma_oracle(get_bids, get_value, get_items) {}
 
-         template <class Bidder, class GetPrice, class Threshold, class OutputIterator>
-         auto operator()(
-            Bidder&& bidder,
-            GetPrice get_price,
-            Threshold threshold,
-            OutputIterator result_items
-         )
-         -> puretype(m_gamma_oracle(
-            std::forward<Bidder>(bidder), get_price, threshold, result_items
-         )) const
+         template <class Bidder, class GetPrice, class Threshold>
+         auto operator()(Bidder&& bidder, GetPrice get_price, Threshold threshold)
+         -> puretype(m_gamma_oracle(std::forward<Bidder>(bidder), get_price, threshold)) const
          {
             using Traits =
                typename xor_bids_gamma_oracle:: template price_traits<decltype(bidder), GetPrice>;
@@ -61,17 +54,18 @@ namespace detail {
             auto best =
                m_gamma_oracle.minimum_frac(std::forward<Bidder>(bidder), get_price, threshold);
             if (!best) return boost::none;
+            auto best_frac = best->second;
             auto result = m_gamma_oracle.calculate_best(
                std::forward<Bidder>(bidder),
                get_price,
                threshold,
                [&](typename Traits::frac frac, const typename Traits::best_bid& result)
                {
-                  return frac <= m_gamma * best->second && (!result || result->second < frac);
+                  return frac <= m_gamma * best_frac && (!result || result->second < frac);
                }
             );
             assert(result);
-            return m_gamma_oracle.output(*result, result_items);
+            return std::make_pair(m_gamma_oracle.m_get_items(*result->first), result->second);
          }
 
    };

@@ -8,7 +8,7 @@
 /**
  * @file functors.hpp
  * @brief This file contains set of simple useful functors or functor adapters.
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Robert Rosolek
  * @version 1.0
  * @date 2013-02-01
  */
@@ -20,6 +20,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <tuple>
 #include <utility>
 
 #include <boost/range/adaptor/transformed.hpp>
@@ -137,6 +138,83 @@ struct identity_functor {
         return std::forward<Arg>(arg);
     }
 };
+
+/**
+ * @brief functor composition: x -> f(g(x))
+ *
+ * @tparam F
+ * @tparam G
+ * @param f
+ * @param g
+ *
+ * @return
+ */
+template <typename F, typename G>
+auto compose(F f, G g) {
+   return std::bind(f, std::bind(g, std::placeholders::_1));
+}
+
+/**
+ * @brief functor composition, variadic case
+ *
+ * @tparam F
+ * @tparam Fs
+ * @param f
+ * @param fs
+ *
+ * @return
+ */
+template <typename F, typename... Fs>
+auto compose(F f, Fs... fs) {
+   return compose(f, compose(fs...));
+}
+
+namespace detail {
+   /// necessary for ADL to work for get
+   template <typename T> void get(T t) {}
+}
+
+// TODO make it work also with std::tuple, for that use ADL trick for get
+// function and branch compile time between boost::tuples::length and
+// std::tuple_size.
+/**
+ * @brief transforms a functor taking multiple parameters into a functor
+ * taking a tuple parameter.
+ * @tparam F
+ */
+template <class F>
+class tuple_uncurry {
+   F m_f;
+   public:
+   /**
+    * @brief constructor
+    *
+    * @param f
+    */
+      tuple_uncurry(F f) : m_f(f) {}
+
+      /**
+       * @brief operator
+       *
+       * @tparam Tuple
+       * @param t
+       */
+      template <class Tuple>
+      auto operator()(Tuple&& t) const {
+         using detail::get;
+         return m_f(get<0>(t), get<1>(t));
+      }
+};
+
+/**
+ * @brief make for tuple_uncurry
+ *
+ * @tparam F
+ * @param f
+ *
+ * @return
+ */
+template <class F> auto make_tuple_uncurry(F f) { return tuple_uncurry<F>(f); }
 
 /**
  * @brief functor return false
@@ -616,15 +694,18 @@ struct plus {
     /**
      * @brief operator()
      *
-     * @tparam T
+     * @tparam T1
+     * @tparam T2
      * @param left
      * @param right
      */
-    template <typename T>
-    auto operator()(const T &left,
-                    const T &right) const->decltype(left + right) {
-        return left + right;
+    template <typename T1, typename T2>
+    auto operator()(T1&& left, T2&& right) const
+    -> decltype(std::forward<T1>(left) + std::forward<T2>(right)) {
+        return std::forward<T1>(left) + std::forward<T2>(right);
     }
+    // TODO change other operations (minus, max, less, etc..) like this one:
+    // with two different types and perfect forwarding
 };
 
 /// minus
@@ -899,15 +980,39 @@ auto make_xor_functor(FunctorLeft left, FunctorRight right) {
 }
 
 /// combination of boost::accumulate and boost::adaptors::transformed
-template <typename Range, typename T, typename Functor, typename BinaryOperation = plus>
-T accumulate_functor(const Range& rng, T init, Functor f, BinaryOperation bin_op = BinaryOperation{}) {
+template <
+   typename Range,
+   typename T,
+   typename Functor,
+   typename BinaryOperation = plus
+>
+T accumulate_functor(
+   const Range& rng,
+   T init,
+   Functor f,
+   BinaryOperation bin_op = BinaryOperation{}
+) {
    return boost::accumulate(
       rng | boost::adaptors::transformed(make_assignable_functor(f)),
       init,
-      [&](T t1, T t2) {
-         return bin_op(t1, t2);
-      }
+      bin_op
    );
+}
+
+/**
+ * @brief sum of functor values over the range elements
+ *
+ * @tparam Range
+ * @tparam Functor
+ * @param rng
+ * @param f
+ *
+ * @return
+ */
+template <typename Range, typename Functor>
+auto sum_functor(const Range& rng, Functor f) {
+   using T = pure_result_of_t<Functor(range_to_elem_t<Range>)>;
+   return accumulate_functor(rng, T(0), f);
 }
 
 } //! utils

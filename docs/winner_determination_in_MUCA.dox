@@ -1,0 +1,48 @@
+/*! \page winner_determination_in_MUCA Winner Determination in MUCA
+
+\section def Problem definition.
+We have a set of bidders \f$K\f$, \f$|K| = k\f$ and a set of all kinds of goods for sale \f$U\f$, \f$|U| = m\f$.
+Each good \f$ e \in U\f$ is available in \f$b_e \in \mathbb{N}\f$ copies, \f$ B = min_e \{b_e\}\f$. Let
+\f$v_{i,S} > 0\f$ be the valuation of a bidder \f$ i \in K\f$ for a bundle \f$S \subseteq U\f$.
+
+\ref winner_determination "Winner determination problem" can be formulated as the following integer linear program:
+
+\f{eqnarray*}
+\mbox{max:} & \sum_{i \in K} \sum_{S \subseteq U} v_{i,S} x_{i,S} & \\
+\mbox{subject to:} & & \\
+& \sum_{i \in K} \sum_{S: S \subseteq U, e \in S} x_{i,S} \leq b_e & \mbox{ for every } e\in U\\
+& \sum_{S \subseteq U} x_{i,S} \leq 1  & \mbox{ for every } i\in K\\
+& x_{i,S} \in \{0,1\} & \mbox{ for every } i\in K, S \subseteq U\\
+\f}
+
+where \f$x_{i,S}\f$ is 1 iff a bidder \f$ i \f$ gets assigned a bundle \f$ S \f$. Bidders are supposed to specify
+their bids through a \f$\gamma\f$-oracle (see \ref gamma_oracle "gamma oracle query"): given prices \f$ p_j \f$
+for each \f$ j \in U\f$, and a bidding threshold \f$ z_i \geq 0 \f$, a \f$\gamma\f$-oracle of a bidder \f$ i \f$
+either decides that \f$v_{i,S} \leq z_i\f$ for all \f$S \subseteq U\f$ (i.e., \f$ i \f$ cannot buy anything), or
+otherwise the oracle outputs \f$S^* \subseteq U\f$ such that
+\f$ \frac{\sum_{j \in S^*} p_j}{v_{i,S^*} - z_i} \leq \gamma \cdot \frac{\sum_{j \in S} p_j}{v_{i,S} - z_i} \f$
+for all \f$S \subseteq U\f$ with \f$v_{i, S} > z_i \f$.
+
+\section Solution
+
+We solve the problem using a combinatorial, primal dual algorithm.
+
+\section Example
+\snippet winner_determination_in_MUCA_example.cpp Winner Determination In MUCA Example
+
+  complete example is winner_determination_in_MUCA_example.cpp
+\section app_winner_determination_in_MUCA Approximation Ratio
+\f$e \cdot (2 \gamma + 1) \cdot m^{1 / (B + 1)}\f$.
+
+\section com_winner_determination_in_multi_unit_CAs Complexity
+<b>Time complexity:</b> \f$O(m + k^2 * \log_{1 + 2 \gamma} (c_{max} / c_{min}) * GO_{time})\f$,
+where \f$GO_{time}\f$ is the time complexity of one gamma oracle query, \f$c_{max} / c_{min}\f$
+is respectively the maximum / minimum \f$c_{i, S}\f$.<br>
+<b>Memory complexity:</b> \f$O(k + \min(\sum_{j \in U} b_e, m * k) + GO_{mem})\f$, where \f$GO_{mem}\f$
+is the memory complexity of one gamma oracle query.
+
+\section References
+The algorithm is described in \cite BriestKV11, section 6.
+
+*/
+

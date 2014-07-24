@@ -15,6 +15,7 @@
 
 #include "paal/auctions/xor_bids.hpp"
 
+#include <iostream>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>

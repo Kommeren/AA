@@ -41,14 +41,6 @@ class singleton_iterator : public boost::iterator_facade<
      *
      * @param elem
      */
-    singleton_iterator() {}
-
-    /**
-     * @brief private constructor. Use make_singleton_iterator_begin,
-     *              make_singleton_iterator_end.
-     *
-     * @param elem
-     */
     singleton_iterator(Elem elem) : m_elem(elem) {}
 
     friend class boost::iterator_core_access;
@@ -62,6 +54,14 @@ class singleton_iterator : public boost::iterator_facade<
     Elem dereference() const { return m_elem.get(); }
 
     boost::optional<Elem> m_elem;
+
+    public:
+       /**
+        * @brief public constructor to satisfy the concept requirements. However
+        * one should use make_singleton_iterator_begin,
+        * make_singleton_iterator_end.
+        */
+       singleton_iterator() {}
 };
 
 /**
