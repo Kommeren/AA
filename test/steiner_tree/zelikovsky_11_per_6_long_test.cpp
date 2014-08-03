@@ -27,33 +27,31 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
         LOGLN("TEST " << test.test_name);
         LOGLN("OPT " << test.optimal);
 
-        typedef decltype(test.metric) Metric;
-        typedef paal::data_structures::voronoi<Metric> voronoiT;
-        typedef typename voronoiT::GeneratorsSet FSet;
+        using Metric = decltype(test.metric);
+        using voronoiT = paal::data_structures::voronoi<Metric>;
+        using FSet = typename voronoiT::GeneratorsSet;
         voronoiT voronoi(
             FSet(test.terminals.begin(), test.terminals.end()),
             FSet(test.steiner_points.begin(), test.steiner_points.end()),
             test.metric);
-        std::vector<int> selectedSteinerPoints;
+        std::vector<int> selected_steiner_points;
         paal::steiner_tree_zelikovsky11per6approximation(
-            test.metric, voronoi, std::back_inserter(selectedSteinerPoints));
+            test.metric, voronoi, std::back_inserter(selected_steiner_points));
 
-        auto resRange = boost::join(test.terminals, selectedSteinerPoints);
-        LOG_COPY_RANGE_DEL(resRange, ",");
+        auto res_range = boost::join(test.terminals, selected_steiner_points);
+        LOG_COPY_RANGE_DEL(res_range, ",");
         paal::data_structures::bimap<int> idx;
         auto g = paal::data_structures::metric_to_bgl_with_index(
-            test.metric, resRange, idx);
-        std::vector<int> pm(resRange.size());
+            test.metric, res_range, idx);
+        std::vector<int> pm(res_range.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
-        auto idxM = paal::data_structures::make_metric_on_idx(test.metric, idx);
+        auto idx_m = paal::data_structures::make_metric_on_idx(test.metric, idx);
         int res(0);
         for (int i : boost::irange(0, int(pm.size()))) {
             if (pm[i] != i) {
-                res += idxM(i, pm[i]);
+                res += idx_m(i, pm[i]);
             }
         }
         check_result(res, test.optimal, 11. / 6);
     }
-
-    // BOOST_CHECK_EQUAL(s, 6);
 }

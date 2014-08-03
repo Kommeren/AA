@@ -33,7 +33,7 @@ void run_test(const steiner_tree_test & test) {
     paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
             test.metric, test.terminals, test.steiner_points,
             std::back_inserter(result), strategy_rand);
-        ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
+    ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
 
     LOG("RES " << res << "\n");
     LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");

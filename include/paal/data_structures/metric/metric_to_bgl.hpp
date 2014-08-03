@@ -5,6 +5,9 @@
  * @version 1.0
  * @date 2013-02-01
  */
+#ifndef METRIC_TO_BGL_HPP
+#define METRIC_TO_BGL_HPP
+
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
 #include "paal/data_structures/bimap.hpp"
@@ -25,10 +28,10 @@ namespace data_structures {
  * @tparam Metric
  */
 template <typename Metric> struct adjacency_matrix {
-    typedef data_structures::metric_traits<Metric> MT;
-    typedef boost::adjacency_matrix<
+    using MT = data_structures::metric_traits<Metric>;
+    using type = boost::adjacency_matrix<
         boost::undirectedS, boost::no_property,
-        boost::property<boost::edge_weight_t, typename MT::DistanceType>> type;
+        boost::property<boost::edge_weight_t, typename MT::DistanceType>>;
 };
 
 /**
@@ -41,10 +44,10 @@ template <typename Metric> struct adjacency_matrix {
 template <typename Metric, typename Vertices>
 typename adjacency_matrix<Metric>::type metric_to_bgl(const Metric &m,
                                                       Vertices && vertices) {
-    typedef typename adjacency_matrix<Metric>::type Graph;
+    using Graph = typename adjacency_matrix<Metric>::type;
     const unsigned N = boost::distance(vertices);
-    typedef metric_traits<Metric> MT;
-    typedef typename MT::DistanceType Dist;
+    using MT = metric_traits<Metric>;
+    using Dist = typename MT::DistanceType;
     Graph g(N);
     for (auto && v : vertices) {
         for (auto && w : vertices) {
@@ -74,8 +77,8 @@ template <typename Metric, typename Vertices>
 typename adjacency_matrix<Metric>::type metric_to_bgl_with_index(
     const Metric &m, Vertices && vertices,
     bimap<typename boost::range_value<Vertices>::type> &idx) {
-    typedef data_structures::metric_traits<Metric> MT;
-    typedef typename MT::VertexType VertexType;
+    using MT = data_structures::metric_traits<Metric>;
+    using VertexType = typename MT::VertexType;
     idx = data_structures::bimap<VertexType>(vertices);
     auto idxMetric = data_structures::make_metric_on_idx(m, idx);
     auto transLambda = [&](VertexType v) { return idx.get_idx(v); };
@@ -86,3 +89,4 @@ typename adjacency_matrix<Metric>::type metric_to_bgl_with_index(
 
 } //!data_structures
 } //!paal
+#endif /* METRIC_TO_BGL_HPP */

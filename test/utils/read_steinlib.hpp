@@ -1,12 +1,12 @@
 /**
- * @file read_orlib_fc.hpp
+ * @file read_steinlib.hpp
  * @brief
  * @author Piotr Wygocki
  * @version 1.0
  * @date 2013-02-15
  */
-#ifndef READ_ORLIB_FC_HPP
-#define READ_ORLIB_FC_HPP
+#ifndef READ_STEINLIB_HPP
+#define READ_STEINLIB_HPP
 
 #include "utils/logger.hpp"
 
@@ -19,10 +19,10 @@
 
 namespace paal {
 
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
                               boost::property<boost::vertex_color_t, int>,
-                              boost::property<boost::edge_weight_t, int>> Graph;
-typedef paal::data_structures::graph_metric<Graph, int> GraphMT;
+                              boost::property<boost::edge_weight_t, int>>;
+using GraphMT = paal::data_structures::graph_metric<Graph, int>;
 
 struct steiner_tree_test {
     steiner_tree_test(std::string name, int opt, std::vector<int> term,
@@ -62,7 +62,7 @@ inline int read_int(std::istream &is, const std::string &token) {
 
 inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
                            std::vector<int> &steiner_points) {
-    typedef std::pair<int, int> Edge;
+    using Edge = std::pair<int, int>;
 
     go_to_section(is, "Graph");
     int N, E, T;
@@ -105,15 +105,15 @@ inline void read_line(std::istream &is, std::string &fname, int &OPT) {
 }
 
 inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
-    std::string testDir = "test/data/STEINLIB/";
-    std::ifstream is_test_cases(testDir + "/index");
+    std::string test_dir = "test/data/STEINLIB/";
+    std::ifstream is_test_cases(test_dir + "/index");
     assert(is_test_cases.good());
     while (is_test_cases.good()) {
         std::string fname;
         int opt;
         read_line(is_test_cases, fname, opt);
         if (fname == ".stp") return;
-        std::ifstream ifs(testDir + "/I080/" + fname);
+        std::ifstream ifs(test_dir + "/I080/" + fname);
         assert(ifs.good());
 
         std::vector<int> terminals;
@@ -129,4 +129,4 @@ inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
     }
 }
 }
-#endif /* READ_ORLIB_FC_HPP */
+#endif /* READ_STEINLIB_HPP */

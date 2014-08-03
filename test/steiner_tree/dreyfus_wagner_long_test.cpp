@@ -8,11 +8,9 @@
 
 #include "utils/logger.hpp"
 #include "utils/read_steinlib.hpp"
-#include "utils/sample_graph.hpp"
 #include "utils/test_result_check.hpp"
 
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
-#include "paal/data_structures/bimap.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/adaptor/sliced.hpp>

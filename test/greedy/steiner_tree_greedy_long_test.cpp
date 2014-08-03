@@ -35,41 +35,41 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
 
         auto const &g = test.graph;
         auto N = num_vertices(g);
-        typedef puretype(g) Graph;
-        typedef boost::graph_traits<Graph>::edge_descriptor Edge;
-        edge_filter<Edge> eFilter;
+        using Graph = puretype(g);
+        using Edge = boost::graph_traits<Graph>::edge_descriptor;
+        edge_filter<Edge> e_filter;
 
         paal::steiner_tree_greedy(
-            g, std::inserter(eFilter.edges, eFilter.edges.begin()));
+            g, std::inserter(e_filter.edges, e_filter.edges.begin()));
 
         LOGLN("terminals:");
         LOG_COPY_RANGE_DEL(test.terminals, ",");
         LOGLN("");
 
         LOGLN("chosen edges:");
-        LOG_COPY_RANGE_DEL(eFilter.edges, "'");
+        LOG_COPY_RANGE_DEL(e_filter.edges, "'");
         LOGLN("");
-        boost::filtered_graph<Graph, edge_filter<Edge>> fg(g, eFilter);
+        boost::filtered_graph<Graph, edge_filter<Edge>> fg(g, e_filter);
 
         std::vector<int> components(N);
-        std::vector<int> colorMap(N);
+        std::vector<int> color_map(N);
         auto index = get(boost::vertex_index, g);
-        auto colorPMap =
-            boost::make_iterator_property_map(colorMap.begin(), index);
+        auto color_p_map =
+            boost::make_iterator_property_map(color_map.begin(), index);
         boost::connected_components(fg, &components[0],
-                                    boost::color_map(colorPMap));
-        auto treeColor = components[test.terminals.front()];
+                                    boost::color_map(color_p_map));
+        auto tree_color = components[test.terminals.front()];
 
         for (auto v : boost::make_iterator_range(vertices(fg))) {
             if (std::find(test.terminals.begin(), test.terminals.end(), v) !=
                 test.terminals.end()) {
-                BOOST_CHECK_EQUAL(components[v], treeColor);
+                BOOST_CHECK_EQUAL(components[v], tree_color);
             }
         }
 
         auto weight = get(boost::edge_weight, g);
         int res(0);
-        for (auto e : eFilter.edges) {
+        for (auto e : e_filter.edges) {
             res += weight(e);
         }
         check_result(res, test.optimal, 2.);

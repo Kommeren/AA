@@ -44,19 +44,19 @@ enum Terminals {
  * @tparam ColorMap
  * @param g - given graph
  * @param out - edge output iterator
- * @param edgeWeight
- * @param colorMap
+ * @param edge_weight
+ * @param color_map
  */
 template <typename Graph, typename OutputIterator, typename EdgeWeightMap,
           typename ColorMap>
 void steiner_tree_greedy(const Graph &g, OutputIterator out,
-                         EdgeWeightMap edgeWeight, ColorMap colorMap) {
-    typedef typename boost::property_traits<EdgeWeightMap>::value_type value;
-    typedef boost::adjacency_matrix<
+                         EdgeWeightMap edge_weight, ColorMap color_map) {
+    using value = typename boost::property_traits<EdgeWeightMap>::value_type;
+    using TerminalGraph = boost::adjacency_matrix<
         boost::undirectedS, boost::no_property,
-        boost::property<boost::edge_weight_t, value>> TerminalGraph;
-    typedef typename boost::graph_traits<Graph>::vertex_descriptor vertex;
-    typedef typename boost::graph_traits<Graph>::edge_descriptor edge;
+        boost::property<boost::edge_weight_t, value>>;
+    using vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
+    using edge = typename boost::graph_traits<Graph>::edge_descriptor;
     auto N = num_vertices(g);
 
     // distance array used in the dijkstra runs
@@ -64,13 +64,13 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
 
     // computing terminals
     std::vector<int> terminals;
-    auto terminalsNr =
+    auto terminals_nr =
         boost::accumulate(vertices(g), 0, [ = ](int sum, vertex v) {
-        return sum + get(colorMap, v);
+        return sum + get(color_map, v);
     });
-    terminals.reserve(terminalsNr);
+    terminals.reserve(terminals_nr);
     for (auto v : boost::make_iterator_range(vertices(g))) {
-        if (get(colorMap, v) == Terminals::TERMINAL) {
+        if (get(color_map, v) == Terminals::TERMINAL) {
             terminals.push_back(v);
         }
     }
@@ -80,46 +80,46 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
     }
 
     // computing distances between terminals
-    // creating terminalGraph
-    TerminalGraph terminalGraph(N);
-    for (auto vIter = terminals.begin(); vIter != terminals.end(); ++vIter) {
-        boost::dijkstra_shortest_paths(g, *vIter,
+    // creating terminal_graph
+    TerminalGraph terminal_graph(N);
+    for (auto v_iter = terminals.begin(); v_iter != terminals.end(); ++v_iter) {
+        boost::dijkstra_shortest_paths(g, *v_iter,
                                        boost::distance_map(&distance[0]));
         for (auto w :
-             boost::make_iterator_range(std::next(vIter), terminals.end())) {
-            add_edge(*vIter, w, distance[w], terminalGraph);
+             boost::make_iterator_range(std::next(v_iter), terminals.end())) {
+            add_edge(*v_iter, w, distance[w], terminal_graph);
         }
     }
 
-    // computing spanning tree on terminalGraph
-    std::vector<int> terminalsPredecessors(N);
-    boost::prim_minimum_spanning_tree(terminalGraph, &terminalsPredecessors[0],
+    // computing spanning tree on terminal_graph
+    std::vector<int> terminals_predecessors(N);
+    boost::prim_minimum_spanning_tree(terminal_graph, &terminals_predecessors[0],
                                       boost::root_vertex(terminals.front()));
 
     // computing result
-    std::vector<edge> treeEdges;
-    treeEdges.reserve(terminalsNr);
+    std::vector<edge> tree_edges;
+    tree_edges.reserve(terminals_nr);
     std::vector<edge> vpred(N);
     for (auto v : terminals) {
-        auto globalPred = terminalsPredecessors[v];
-        if (globalPred != v) {
+        auto global_pred = terminals_predecessors[v];
+        if (global_pred != v) {
             boost::fill(vpred, edge());
             boost::dijkstra_shortest_paths(
-                g, globalPred,
+                g, global_pred,
                 boost::visitor(make_dijkstra_visitor(record_edge_predecessors(
                     &vpred[0], boost::on_edge_relaxed())))
-                    .distance_map(&distance[0]).weight_map(edgeWeight));
-            auto localPred = vpred[v];
-            while (localPred != edge()) {
-                treeEdges.push_back(localPred);
-                v = source(localPred, g);
-                localPred = vpred[v];
+                    .distance_map(&distance[0]).weight_map(edge_weight));
+            auto local_pred = vpred[v];
+            while (local_pred != edge()) {
+                tree_edges.push_back(local_pred);
+                v = source(local_pred, g);
+                local_pred = vpred[v];
             }
-            assert(localPred == edge());
+            assert(local_pred == edge());
         }
     }
-    boost::sort(treeEdges);
-    boost::copy(boost::unique(treeEdges), out);
+    boost::sort(tree_edges);
+    boost::copy(boost::unique(tree_edges), out);
 }
 
 /**

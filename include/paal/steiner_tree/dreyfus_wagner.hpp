@@ -27,21 +27,21 @@ template <typename Metric, typename Terminals, typename NonTerminals,
           unsigned int TerminalsLimit = 32>
 class dreyfus_wagner {
   public:
-    typedef data_structures::metric_traits<Metric> MT;
-    typedef typename MT::VertexType Vertex;
-    typedef typename MT::DistanceType Dist;
-    typedef typename std::pair<Vertex, Vertex> Edge;
-    typedef typename std::bitset<TerminalsLimit> TerminalsBitSet;
-    typedef std::pair<Vertex, TerminalsBitSet> State;
+    using MT = data_structures::metric_traits<Metric>;
+    using Vertex = typename MT::VertexType;
+    using Dist = typename MT::DistanceType;
+    using Edge = typename std::pair<Vertex, Vertex>;
+    using TerminalsBitSet = typename std::bitset<TerminalsLimit>;
+    using State = std::pair<Vertex, TerminalsBitSet>;
     using steiner_elements =  std::unordered_set<Vertex, boost::hash<Vertex>>;
 
     /**
      * Constructor used for solving Steiner Tree problem.
      */
-    dreyfus_wagner(const Metric &costMap, const Terminals &term,
-                   const NonTerminals &nonTerminals)
-        : m_cost_map(costMap), m_terminals(term),
-          m_non_terminals(nonTerminals) {
+    dreyfus_wagner(const Metric &cost_map, const Terminals &term,
+                   const NonTerminals &non_terminals)
+        : m_cost_map(cost_map), m_terminals(term),
+          m_non_terminals(non_terminals) {
 
         for (int i = 0; i < (int)m_terminals.size(); i++) {
             m_elements_map[m_terminals[i]] = i;
@@ -116,14 +116,14 @@ class dreyfus_wagner {
                 cand = w;
             }
         }
-        for (auto vertexAndTerminalId : m_elements_map) {
-            Vertex w = vertexAndTerminalId.first;
-            int terminalId = vertexAndTerminalId.second;
-            if (!remaining.test(terminalId)) continue;
-            remaining.reset(terminalId);
+        for (auto vertex_and_terminal_id : m_elements_map) {
+            Vertex w = vertex_and_terminal_id.first;
+            int terminal_id = vertex_and_terminal_id.second;
+            if (!remaining.test(terminal_id)) continue;
+            remaining.reset(terminal_id);
             Dist val = connect_vertex(w, remaining);
             val += m_cost_map(v, w);
-            remaining.set(terminalId);
+            remaining.set(terminal_id);
 
             if (best < 0 || val < best) {
                 best = val;
@@ -190,16 +190,16 @@ class dreyfus_wagner {
         if (remaining.none()) return;
         Vertex next = m_best_cand.at(code_state(v, remaining)).second;
 
-        auto terminalIdIter = m_elements_map.find(next);
+        auto terminal_id_iter = m_elements_map.find(next);
         if (v == next) { // called wagner directly from dreyfus
             retrieve_solution_split(next, remaining);
-        } else if (terminalIdIter == m_elements_map.end()) { // nonterminal
+        } else if (terminal_id_iter == m_elements_map.end()) { // nonterminal
             add_vertex_to_graph(next);
             add_edge_to_graph(v, next);
             retrieve_solution_split(next, remaining);
         } else { // terminal
             add_edge_to_graph(v, next);
-            remaining.flip(terminalIdIter->second);
+            remaining.flip(terminal_id_iter->second);
             retrieve_solution_connect(next, remaining);
         }
     }
@@ -267,8 +267,8 @@ class dreyfus_wagner {
 
     std::unordered_map<Vertex, int, boost::hash<Vertex>> m_elements_map; // maps Vertex to position
                                                     // in m_terminals vector
-    typedef std::pair<Dist, Vertex> StateV;
-    typedef std::pair<Dist, TerminalsBitSet> StateBM;
+    using StateV = std::pair<Dist, Vertex>;
+    using StateBM = std::pair<Dist, TerminalsBitSet>;
     std::unordered_map<State, StateV, state_hash> m_best_cand; // stores result
                                                                // of dreyfus
                                                                // method for
@@ -290,9 +290,9 @@ class dreyfus_wagner {
 template <unsigned int TerminalsLimit = 32, typename Metric, typename Terminals, typename NonTerminals>
 dreyfus_wagner<Metric, Terminals, NonTerminals, TerminalsLimit>
 make_dreyfus_wagner(const Metric &metric, const Terminals &terminals,
-                    const NonTerminals &nonTerminals) {
+                    const NonTerminals &non_terminals) {
     return dreyfus_wagner<Metric, Terminals, NonTerminals, TerminalsLimit>(
-        metric, terminals, nonTerminals);
+        metric, terminals, non_terminals);
 }
 
 } // paal
