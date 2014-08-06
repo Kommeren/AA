@@ -145,7 +145,7 @@ public:
                                 prob[k] = 0;
                                 break;
                             }
-                            int cost = cost_map(e, elements[k]);
+                            int cost = cost_map(e, terminals[k]);
                             assert(cost > 0);
                             prob[k] = std::max(prob[k], 1.0 / cost);
                         }
@@ -153,7 +153,7 @@ public:
                     int selected = paal::utils::random_select<false>(
                                        prob.begin(), prob.end()) -
                                    prob.begin();
-                    if (selected < 0) break;
+                    if (selected == prob.size()) break;
                     elements.push_back(terminals[selected]);
                 }
                 steiner_component<Vertex, Dist> c(cost_map, elements, steiner_vertices);

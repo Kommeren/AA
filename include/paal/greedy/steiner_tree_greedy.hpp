@@ -51,12 +51,12 @@ template <typename Graph, typename OutputIterator, typename EdgeWeightMap,
           typename ColorMap>
 void steiner_tree_greedy(const Graph &g, OutputIterator out,
                          EdgeWeightMap edge_weight, ColorMap color_map) {
-    using value = typename boost::property_traits<EdgeWeightMap>::value_type;
+    using Value = typename boost::property_traits<EdgeWeightMap>::value_type;
     using TerminalGraph = boost::adjacency_matrix<
         boost::undirectedS, boost::no_property,
-        boost::property<boost::edge_weight_t, value>>;
-    using vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
-    using edge = typename boost::graph_traits<Graph>::edge_descriptor;
+        boost::property<boost::edge_weight_t, Value>>;
+    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
+    using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
     auto N = num_vertices(g);
 
     // distance array used in the dijkstra runs
@@ -65,7 +65,7 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
     // computing terminals
     std::vector<int> terminals;
     auto terminals_nr =
-        boost::accumulate(vertices(g), 0, [ = ](int sum, vertex v) {
+        boost::accumulate(vertices(g), 0, [ = ](int sum, Vertex v) {
         return sum + get(color_map, v);
     });
     terminals.reserve(terminals_nr);
@@ -97,25 +97,25 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
                                       boost::root_vertex(terminals.front()));
 
     // computing result
-    std::vector<edge> tree_edges;
+    std::vector<Edge> tree_edges;
     tree_edges.reserve(terminals_nr);
-    std::vector<edge> vpred(N);
+    std::vector<Edge> vpred(N);
     for (auto v : terminals) {
         auto global_pred = terminals_predecessors[v];
         if (global_pred != v) {
-            boost::fill(vpred, edge());
+            boost::fill(vpred, Edge());
             boost::dijkstra_shortest_paths(
                 g, global_pred,
                 boost::visitor(make_dijkstra_visitor(record_edge_predecessors(
                     &vpred[0], boost::on_edge_relaxed())))
                     .distance_map(&distance[0]).weight_map(edge_weight));
             auto local_pred = vpred[v];
-            while (local_pred != edge()) {
+            while (local_pred != Edge()) {
                 tree_edges.push_back(local_pred);
                 v = source(local_pred, g);
                 local_pred = vpred[v];
             }
-            assert(local_pred == edge());
+            assert(local_pred == Edge());
         }
     }
     boost::sort(tree_edges);
