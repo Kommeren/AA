@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_CASE(splay_cycle_test) {
     BOOST_CHECK(boost::equal(construct_range(), v));
     LOG_COPY_RANGE_DEL(construct_range(), ",");
     LOGLN("");
-    ON_LOG(paal::simple_algo::print(sc, std::cout));
+    ON_LOG(paal::print_cycle(sc, std::cout));
 
     auto range_rotated = boost::make_iterator_range(sc.vbegin(3), sc.vend());
     BOOST_CHECK(

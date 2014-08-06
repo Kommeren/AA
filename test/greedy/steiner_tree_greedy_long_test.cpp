@@ -5,7 +5,6 @@
  * @version 1.0
  * @date 2013-09-20
  */
-
 #include "utils/read_steinlib.hpp"
 #include "utils/test_result_check.hpp"
 
@@ -39,7 +38,7 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
         using Edge = boost::graph_traits<Graph>::edge_descriptor;
         edge_filter<Edge> e_filter;
 
-        paal::steiner_tree_greedy(
+        auto result = paal::steiner_tree_greedy(
             g, std::inserter(e_filter.edges, e_filter.edges.begin()));
 
         LOGLN("terminals:");
@@ -72,6 +71,10 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
         for (auto e : e_filter.edges) {
             res += weight(e);
         }
+        int sum_weight =result.first;
+        int lower_bound =result.second;
+        BOOST_CHECK_EQUAL(res,sum_weight);
+        BOOST_CHECK(lower_bound <= test.optimal);
         check_result(res, test.optimal, 2.);
     }
 }

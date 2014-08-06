@@ -1,12 +1,14 @@
 /**
  * @file steiner_tree_greedy.hpp
  * @brief
- * @author Piotr Wygocki
+ * @author Piotr Wygocki, Piotr Smuleicz
  * @version 1.0
  * @date 2013-11-27
  */
 #ifndef STEINER_TREE_GREEDY_HPP
 #define STEINER_TREE_GREEDY_HPP
+
+#include <paal/utils/functors.hpp>
 
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/properties.hpp>
@@ -15,8 +17,8 @@
 #include <boost/graph/named_function_params.hpp>
 #include <boost/graph/two_bit_color_map.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <boost/graph/adjacency_matrix.hpp>
-#include <boost/graph/prim_minimum_spanning_tree.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/algorithm/unique.hpp>
 #include <boost/range/algorithm/fill.hpp>
@@ -24,17 +26,48 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include <algorithm>
+#include <utility>
+
+/// enum for edge base property
+enum edge_base_t { edge_base };
+
+namespace boost {
+/// macro create edge base property
+BOOST_INSTALL_PROPERTY(edge, base);
+}
 
 namespace paal {
 
 /**
  * @brief enum indicates if given color represents terminal or NONTERMINAL.
  */
-enum Terminals {
-    NONTERMINAL,
-    TERMINAL
+enum Terminals { NONTERMINAL, TERMINAL };
+
+namespace detail {
+template <typename NearestMap, typename LastEdgeMap, typename Tag>
+class nearest_recorder
+    : boost::base_visitor<nearest_recorder<NearestMap, LastEdgeMap, Tag>> {
+  public:
+    using event_filter = Tag;
+    nearest_recorder(NearestMap &nearest_map, LastEdgeMap &vpred)
+        : m_nearest_map(nearest_map), m_vpred(vpred) {};
+    template <typename Edge, typename Graph>
+    void operator()(Edge const e, Graph const &g) {
+        m_nearest_map[target(e, g)] = m_nearest_map[source(e, g)];
+        m_vpred[target(e, g)] = e;
+    }
+
+  private:
+    NearestMap &m_nearest_map;
+    LastEdgeMap &m_vpred;
 };
 
+template <typename NearestMap, typename LastEdgeMap, typename Tag>
+nearest_recorder<NearestMap, LastEdgeMap, Tag>
+make_nearest_recorder(NearestMap &nearest_map, LastEdgeMap &vpred, Tag) {
+    return nearest_recorder<NearestMap, LastEdgeMap, Tag>{ nearest_map, vpred };
+}
+}
 /**
  * @brief non-named version of  steiner_tree_greedy
  *
@@ -49,77 +82,106 @@ enum Terminals {
  */
 template <typename Graph, typename OutputIterator, typename EdgeWeightMap,
           typename ColorMap>
-void steiner_tree_greedy(const Graph &g, OutputIterator out,
-                         EdgeWeightMap edge_weight, ColorMap color_map) {
-    using Value = typename boost::property_traits<EdgeWeightMap>::value_type;
-    using TerminalGraph = boost::adjacency_matrix<
-        boost::undirectedS, boost::no_property,
-        boost::property<boost::edge_weight_t, Value>>;
+auto steiner_tree_greedy(const Graph &g, OutputIterator out,
+                         EdgeWeightMap edge_weight, ColorMap color_map)
+    -> typename std::pair<
+          typename boost::property_traits<EdgeWeightMap>::value_type,
+          typename boost::property_traits<EdgeWeightMap>::value_type> {
     using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
     using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
+    using Base = typename boost::property<edge_base_t, Edge>;
+    using Weight = typename boost::property_traits<EdgeWeightMap>::value_type;
+    using WeightProperty =
+        typename boost::property<boost::edge_weight_t, Weight, Base>;
+    using TerminalGraph =
+        boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                              boost::no_property, WeightProperty>;
+    using EdgeTerminal =
+        typename boost::graph_traits<TerminalGraph>::edge_descriptor;
+
     auto N = num_vertices(g);
 
     // distance array used in the dijkstra runs
-    std::vector<int> distance(N);
+    std::vector<Weight> distance(N);
 
     // computing terminals
     std::vector<int> terminals;
-    auto terminals_nr =
-        boost::accumulate(vertices(g), 0, [ = ](int sum, Vertex v) {
-        return sum + get(color_map, v);
-    });
+    auto terminals_nr = utils::accumulate_functor(
+        vertices(g), 0, [=](Vertex v) { return get(color_map, v); });
     terminals.reserve(terminals_nr);
     for (auto v : boost::make_iterator_range(vertices(g))) {
         if (get(color_map, v) == Terminals::TERMINAL) {
             terminals.push_back(v);
         }
     }
-
     if (terminals.empty()) {
-        return;
+        return std::make_pair(Weight{}, Weight{});
     }
+    std::vector<Vertex> nearest_terminal(num_vertices(g));
+    auto index = get(boost::vertex_index, g);
+    auto nearest_terminal_map = boost::make_iterator_property_map(
+        nearest_terminal.begin(), get(boost::vertex_index, g));
+    for (auto terminal : terminals) {
+        nearest_terminal_map[terminal] = terminal;
+    }
+
+    // compute voronoi diagram each vertex get nearest terminal and last edge on
+    // path to nearest terminal
+    auto distance_map = make_iterator_property_map(distance.begin(), index);
+    std::vector<Edge> vpred(N);
+    auto last_edge = boost::make_iterator_property_map(
+        vpred.begin(), get(boost::vertex_index, g));
+    boost::dijkstra_shortest_paths(
+        g, terminals.begin(), terminals.end(), boost::dummy_property_map(),
+        distance_map, edge_weight, index, utils::less(),
+        boost::closed_plus<Weight>(), std::numeric_limits<Weight>::max(), 0,
+        boost::make_dijkstra_visitor(detail::make_nearest_recorder(
+            nearest_terminal_map, last_edge, boost::on_edge_relaxed{})));
 
     // computing distances between terminals
     // creating terminal_graph
     TerminalGraph terminal_graph(N);
-    for (auto v_iter = terminals.begin(); v_iter != terminals.end(); ++v_iter) {
-        boost::dijkstra_shortest_paths(g, *v_iter,
-                                       boost::distance_map(&distance[0]));
-        for (auto w :
-             boost::make_iterator_range(std::next(v_iter), terminals.end())) {
-            add_edge(*v_iter, w, distance[w], terminal_graph);
+    for (auto w : boost::make_iterator_range(edges(g))) {
+        const auto &nearest_to_source = nearest_terminal_map[source(w, g)];
+        const auto &nearest_to_target = nearest_terminal_map[target(w, g)];
+        if (nearest_to_source != nearest_to_target) {
+            add_edge(nearest_to_source, nearest_to_target,
+                     WeightProperty(distance[source(w, g)] +
+                                        distance[target(w, g)] + edge_weight[w],
+                                    Base(w)),
+                     terminal_graph);
         }
     }
-
     // computing spanning tree on terminal_graph
-    std::vector<int> terminals_predecessors(N);
-    boost::prim_minimum_spanning_tree(terminal_graph, &terminals_predecessors[0],
-                                      boost::root_vertex(terminals.front()));
+    std::vector<Edge> terminal_edge;
+    boost::kruskal_minimum_spanning_tree(terminal_graph,
+                                         std::back_inserter(terminal_edge));
 
     // computing result
     std::vector<Edge> tree_edges;
     tree_edges.reserve(terminals_nr);
-    std::vector<Edge> vpred(N);
-    for (auto v : terminals) {
-        auto global_pred = terminals_predecessors[v];
-        if (global_pred != v) {
-            boost::fill(vpred, Edge());
-            boost::dijkstra_shortest_paths(
-                g, global_pred,
-                boost::visitor(make_dijkstra_visitor(record_edge_predecessors(
-                    &vpred[0], boost::on_edge_relaxed())))
-                    .distance_map(&distance[0]).weight_map(edge_weight));
-            auto local_pred = vpred[v];
-            while (local_pred != Edge()) {
-                tree_edges.push_back(local_pred);
-                v = source(local_pred, g);
-                local_pred = vpred[v];
+    for (auto edge : terminal_edge) {
+        auto base = get(edge_base, terminal_graph, edge);
+        tree_edges.push_back(base);
+        for (auto pom : { source(base, g), target(base, g) }) {
+            while (nearest_terminal_map[pom] != pom) {
+                tree_edges.push_back(vpred[pom]);
+                pom = source(vpred[pom], g);
             }
-            assert(local_pred == Edge());
         }
     }
+
+    // because in each voronoi region we have unique patch to all vertex from
+    // terminal, result graph contain no cycle
+    // and all leaf are terminal
+
     boost::sort(tree_edges);
-    boost::copy(boost::unique(tree_edges), out);
+    auto get_weight=[&](Edge edge){return edge_weight[edge];};
+    auto lower_bound=utils::accumulate_functor(tree_edges, Weight{}, get_weight);
+    auto unique_edges = boost::unique(tree_edges);
+    auto cost_solution=utils::accumulate_functor(unique_edges, Weight{}, get_weight);
+    boost::copy(unique_edges, out);
+    return std::make_pair(cost_solution, lower_bound / 2.);
 }
 
 /**
@@ -136,9 +198,9 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
  */
 template <typename Graph, typename OutputIterator, typename P, typename T,
           typename R>
-void steiner_tree_greedy(const Graph &g, OutputIterator out,
+auto steiner_tree_greedy(const Graph &g, OutputIterator out,
                          const boost::bgl_named_params<P, T, R> &params) {
-    steiner_tree_greedy(
+    return steiner_tree_greedy(
         g, out, choose_const_pmap(get_param(params, boost::edge_weight), g,
                                   boost::edge_weight),
         choose_const_pmap(get_param(params, boost::vertex_color), g,
@@ -154,8 +216,8 @@ void steiner_tree_greedy(const Graph &g, OutputIterator out,
  * @param out - edge output iterator
  */
 template <typename Graph, typename OutputIterator>
-void steiner_tree_greedy(const Graph &g, OutputIterator out) {
-    steiner_tree_greedy(g, out, boost::no_named_parameters());
+auto steiner_tree_greedy(const Graph &g, OutputIterator out) {
+    return steiner_tree_greedy(g, out, boost::no_named_parameters());
 }
 
 } // paal

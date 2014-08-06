@@ -19,9 +19,10 @@
 
 namespace paal {
 
-using Graph = boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
-                              boost::property<boost::vertex_color_t, int>,
-                              boost::property<boost::edge_weight_t, int>>;
+using Graph =
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,
+                          boost::property<boost::vertex_color_t, int>,
+                          boost::property<boost::edge_weight_t, int>>;
 using GraphMT = paal::data_structures::graph_metric<Graph, int>;
 
 struct steiner_tree_test {
@@ -39,9 +40,9 @@ struct steiner_tree_test {
 
 struct steiner_tree_test_with_metric : public steiner_tree_test {
     steiner_tree_test_with_metric(std::string name, int opt,
-            std::vector<int> term, std::vector<int> steiner, Graph g)
-        : steiner_tree_test(name, opt, term, steiner, g),
-          metric(g) {}
+                                  std::vector<int> term,
+                                  std::vector<int> steiner, Graph g)
+        : steiner_tree_test(name, opt, term, steiner, g), metric(g) {}
 
     GraphMT metric;
 };
@@ -75,12 +76,12 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     go_to_section(is, "Graph");
     int N, E, T;
     N = read_int(is, "Nodes");
-    ++N; // Nodes are nubered from 1 in STEINLIB
     E = read_int(is, "Edges");
 
     steiner_points.resize(N);
 
-    //we actually add one additional steiner point not connected to any other point
+    // we actually add one additional steiner point not connected to any other
+    // point
     boost::iota(steiner_points, 0);
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
@@ -89,6 +90,8 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
         Edge e;
         std::string s;
         is >> s >> e.first >> e.second >> weights[i];
+        --e.first;
+        --e.second;
         edges[i] = e;
         assert(s == "E");
     }
@@ -98,7 +101,7 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     terminals.resize(T);
     auto color = get(boost::vertex_color, g);
     for (int i : boost::irange(0, T)) {
-        terminals[i] = read_int(is, "T");
+        terminals[i] = read_int(is, "T") - 1;
         steiner_points.erase(boost::find(steiner_points, terminals[i]));
         put(color, terminals[i], 1);
     }
@@ -112,8 +115,8 @@ inline void read_line(std::istream &is, std::string &fname, int &OPT) {
     fname += ".stp";
 }
 
-inline void read_steinlib_tests(
-        std::vector<steiner_tree_test_with_metric> &data) {
+inline void
+read_steinlib_tests(std::vector<steiner_tree_test_with_metric> &data) {
     std::string test_dir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(test_dir + "/index");
     assert(is_test_cases.good());
@@ -130,11 +133,14 @@ inline void read_steinlib_tests(
 
         Graph graph(paal::read_steinlib(ifs, terminals, steiner_points));
         LOGLN("Terminals: ");
-        LOG_COPY_RANGE_DEL(terminals, " "); LOGLN("");
+        LOG_COPY_RANGE_DEL(terminals, " ");
+        LOGLN("");
         LOGLN("Steiner points: ");
-        LOG_COPY_RANGE_DEL(steiner_points, " "); LOGLN(""); LOGLN("");
+        LOG_COPY_RANGE_DEL(steiner_points, " ");
+        LOGLN("");
+        LOGLN("");
         steiner_tree_test_with_metric test(fname, opt, terminals,
-            steiner_points, graph);
+                                           steiner_points, graph);
         data.push_back(test);
     }
 }

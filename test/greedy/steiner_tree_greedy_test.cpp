@@ -13,33 +13,80 @@
 #include "paal/greedy/steiner_tree_greedy.hpp"
 
 #include <boost/test/unit_test.hpp>
+#include <boost/property_map/function_property_map.hpp>
 
-BOOST_AUTO_TEST_SUITE(steiner_treeGreedy)
-static const int OPTIMAL = 4;
-static const int APPROXIMATION_RATIO = 2;
-BOOST_AUTO_TEST_CASE(steiner_tree_test) {
-    typedef sample_graphs_metrics SGM;
-    auto g = SGM::get_graph_steiner();
-    typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
-    std::set<Edge> steinerEdges;
+#include <vector>
+#include <map>
 
-    paal::steiner_tree_greedy(
-        g, std::inserter(steinerEdges, steinerEdges.begin()));
-    BOOST_CHECK(std::size_t(3) <= steinerEdges.size() &&
-                steinerEdges.size() <= std::size_t(4));
+BOOST_AUTO_TEST_SUITE(steiner_tree_greedy)
+typedef sample_graphs_metrics SGM;
+
+template <typename Graph, typename Tree> int get_sum(Graph g, Tree &edges) {
     auto weight = get(boost::edge_weight, g);
     auto sum = 0;
-    for (auto e : steinerEdges) {
+    for (auto e : edges) {
         sum += get(weight, e);
     }
-    check_result(sum, OPTIMAL, APPROXIMATION_RATIO);
+    return sum;
 }
 
-BOOST_AUTO_TEST_CASE(steiner_tree_testParameters) {
+template <typename Graph> int test(Graph g) {
+    typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
+    std::vector<Edge> steiner_edges;
+    auto result = paal::steiner_tree_greedy(
+        g, std::inserter(steiner_edges, steiner_edges.begin()));
+    auto result_check = get_sum(g, steiner_edges);
+    BOOST_CHECK_EQUAL(result_check,result.first);
+    return result.first;
+}
+BOOST_AUTO_TEST_CASE(steiner_tree_test) {
+    const int OPTIMAL = 4;
+    const int APPROXIMATION_RATIO = 2;
+    LOGLN("steiner_tree_multi_edges");
+    check_result(test(SGM::get_graph_steiner()), OPTIMAL, APPROXIMATION_RATIO);
+}
+
+BOOST_AUTO_TEST_CASE(not_conected_terminals) {
+    LOGLN("not conected teerminals");
+    BOOST_CHECK_EQUAL(test(SGM::two_points_steiner()), 0);
+}
+
+BOOST_AUTO_TEST_CASE(steiner_tree_multi_edges_test) {
+    LOGLN("steiner_tree_multi_edges");
+    BOOST_CHECK_EQUAL(test(SGM::get_graph_steiner_multi_edges()), 23);
+}
+
+BOOST_AUTO_TEST_CASE(steiner_tree_test_cycle) {
+    LOGLN("steiner_tree_test_cycle");
+    BOOST_CHECK_EQUAL(test(SGM::get_graph_stainer_tree_cycle()), 10);
+}
+
+BOOST_AUTO_TEST_CASE(steiner_tree_test_no_weight_in_graph) {
+    LOGLN("no weights in graph");
+    typedef sample_graphs_metrics SGM;
+    auto g = SGM::get_graph_steiner_edge();
+    typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
+    std::vector<Edge> steiner_edges;
+    auto color = get(boost::vertex_color, g);
+    std::map<Edge, int> edge_weight;
+    boost::associative_property_map<std::map<Edge, int>>
+    edge_weight_property_map(edge_weight);
+    for (auto w : boost::make_iterator_range(edges(g))) {
+        edge_weight_property_map[w] = 1;
+    }
+    paal::steiner_tree_greedy(
+        g, std::inserter(steiner_edges, steiner_edges.begin()),
+        edge_weight_property_map, color);
+}
+
+BOOST_AUTO_TEST_CASE(steiner_tree_test_Parameters) {
+    const int OPTIMAL = 4;
+    const int APPROXIMATION_RATIO = 2;
+    LOGLN("steiner_tree_test_Parameters");
     typedef sample_graphs_metrics SGM;
     auto g = SGM::get_graph_steiner();
     typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
-    std::set<Edge> steinerEdges;
+    std::vector<Edge> steiner_edges;
     std::vector<int> color(num_vertices(g));
     {
         auto c = &color[0];
@@ -52,17 +99,12 @@ BOOST_AUTO_TEST_CASE(steiner_tree_testParameters) {
     auto index = get(boost::vertex_index, g);
     auto colorPMap = boost::make_iterator_property_map(color.begin(), index);
 
-    paal::steiner_tree_greedy(g,
-                              std::inserter(steinerEdges, steinerEdges.begin()),
-                              boost::vertex_color_map(colorPMap));
-    BOOST_CHECK(std::size_t(3) <= steinerEdges.size() &&
-                steinerEdges.size() <= std::size_t(4));
-    auto weight = get(boost::edge_weight, g);
-    auto sum = 0;
-    for (auto e : steinerEdges) {
-        sum += get(weight, e);
-    }
-    check_result(sum, OPTIMAL, APPROXIMATION_RATIO);
+    paal::steiner_tree_greedy(
+        g, std::inserter(steiner_edges, steiner_edges.begin()),
+        boost::vertex_color_map(colorPMap));
+    BOOST_CHECK(std::size_t(3) <= steiner_edges.size() &&
+                steiner_edges.size() <= std::size_t(4));
+    check_result(get_sum(g, steiner_edges), OPTIMAL, APPROXIMATION_RATIO);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
