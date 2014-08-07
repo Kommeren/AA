@@ -27,7 +27,7 @@ using Terminals = std::vector<int>;
 using Metric = GraphMT;
 
 template <template <typename> class OracleStrategy>
-void run_test(const steiner_tree_test & test) {
+void run_test(const steiner_tree_test_with_metric & test) {
     paal::ir::random_generator strategy_rand(50, 5);
     std::vector<int> result;
     paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
@@ -40,10 +40,10 @@ void run_test(const steiner_tree_test & test) {
 }
 
 BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
-    std::vector<steiner_tree_test> data;
+    std::vector<steiner_tree_test_with_metric> data;
     read_steinlib_tests(data);
     // First tests only
-    for (const steiner_tree_test &test : data | boost::adaptors::sliced(0, 10)) {
+    for (const auto &test : data | boost::adaptors::sliced(0, 10)) {
         LOG("TEST " << test.test_name << "\n");
         LOG("OPT " << test.optimal << "\n");
 

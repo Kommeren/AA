@@ -28,13 +28,21 @@ struct steiner_tree_test {
     steiner_tree_test(std::string name, int opt, std::vector<int> term,
                       std::vector<int> steiner, Graph g)
         : test_name(name), optimal(opt), terminals(term),
-          steiner_points(steiner), graph(g), metric(g) {}
+          steiner_points(steiner), graph(g) {}
 
     std::string test_name;
     int optimal;
     std::vector<int> terminals;
     std::vector<int> steiner_points;
     Graph graph;
+};
+
+struct steiner_tree_test_with_metric : public steiner_tree_test {
+    steiner_tree_test_with_metric(std::string name, int opt,
+            std::vector<int> term, std::vector<int> steiner, Graph g)
+        : steiner_tree_test(name, opt, term, steiner, g),
+          metric(g) {}
+
     GraphMT metric;
 };
 
@@ -104,7 +112,8 @@ inline void read_line(std::istream &is, std::string &fname, int &OPT) {
     fname += ".stp";
 }
 
-inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
+inline void read_steinlib_tests(
+        std::vector<steiner_tree_test_with_metric> &data) {
     std::string test_dir = "test/data/STEINLIB/";
     std::ifstream is_test_cases(test_dir + "/index");
     assert(is_test_cases.good());
@@ -124,7 +133,8 @@ inline void read_steinlib_tests(std::vector<steiner_tree_test> &data) {
         LOG_COPY_RANGE_DEL(terminals, " "); LOGLN("");
         LOGLN("Steiner points: ");
         LOG_COPY_RANGE_DEL(steiner_points, " "); LOGLN(""); LOGLN("");
-        steiner_tree_test test(fname, opt, terminals, steiner_points, graph);
+        steiner_tree_test_with_metric test(fname, opt, terminals,
+            steiner_points, graph);
         data.push_back(test);
     }
 }

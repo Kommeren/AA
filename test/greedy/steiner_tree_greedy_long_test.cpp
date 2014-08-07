@@ -26,10 +26,10 @@ template <typename Edge> struct edge_filter {
 
 BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
 
-    std::vector<paal::steiner_tree_test> data;
+    std::vector<paal::steiner_tree_test_with_metric> data;
     LOGLN("READING INPUT...");
     read_steinlib_tests(data);
-    for (paal::steiner_tree_test &test : data) {
+    for (const auto &test : data) {
         LOGLN("TEST " << test.test_name);
         LOGLN("OPT " << test.optimal);
 

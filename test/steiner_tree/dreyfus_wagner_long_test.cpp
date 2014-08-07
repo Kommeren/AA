@@ -21,11 +21,11 @@
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(dreyfus_wagner_steinlib_long_test) {
-    std::vector<steiner_tree_test> data;
+    std::vector<steiner_tree_test_with_metric> data;
     LOGLN("READING INPUT...");
     read_steinlib_tests(data);
     // Smaller tests only
-    for (const steiner_tree_test &test : data | boost::adaptors::sliced(0, 50)) {
+    for (const auto &test : data | boost::adaptors::sliced(0, 50)) {
         LOGLN("TEST " << test.test_name);
         auto dw = paal::make_dreyfus_wagner(
             test.metric, test.terminals, test.steiner_points);
