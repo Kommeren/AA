@@ -19,8 +19,8 @@ struct read_values_tag{};
 struct read_indexes_tag{};
 
 /**
- * @brief this metric is keeps inner metric and index
- *        given vertices are reindex and passed to inner metric
+ * @brief This metric keeps inner metric and index.
+ *        Given vertices are reindex and passed to inner metric.
  *
  * @tparam Metric
  * @tparam Bimap
@@ -30,7 +30,7 @@ template <typename Metric, typename Bimap, typename Strategy = read_indexes_tag>
     Bimap m_idx;
     using btraits = bimap_traits<typename std::decay<Bimap>::type>;
 
-    auto read(typename btraits::Val v, read_values_tag) const -> decltype( m_idx.get_idx(v)) {
+    auto read(typename btraits::Val v, read_values_tag) const -> decltype(m_idx.get_idx(v)) {
         return m_idx.get_idx(v);
     }
 

@@ -23,7 +23,11 @@
 #include "paal/utils/floating.hpp"
 
 #include <boost/range/join.hpp>
-#include <boost/range/irange.hpp>
+#include <boost/range/algorithm/unique.hpp>
+#include <boost/range/algorithm/sort.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
+#include <vector>
 
 namespace paal {
 namespace ir {
@@ -57,29 +61,32 @@ class steiner_tree {
 public:
     using MT = data_structures::metric_traits<OrigMetric>;
     using Vertex = typename MT::VertexType;
+    using Vertices = std::vector<Vertex>;
     using Dist = typename MT::DistanceType;
     using Edge = typename std::pair<Vertex, Vertex>;
     using Compare = utils::compare<double>;
     using VertexIndex = data_structures::bimap<Vertex>;
     using MetricIdx = data_structures::array_metric<Dist>;
     using Metric = data_structures::metric_on_idx<
-                        data_structures::array_metric<Dist> &,
+                        MetricIdx &,
                         const VertexIndex &,
                         data_structures::read_values_tag>;
 
 private:
     Terminals m_terminals;        // terminals in current state
     Terminals m_steiner_vertices; // vertices that are not terminals
-    VertexIndex m_vertex_index; //mapping vertices to numbers for 0 to n.
+    VertexIndex m_terminals_index; // mapping terminals to numbers for 0 to n.
+    VertexIndex m_vertex_index; // mapping vertices to numbers for 0 to n.
     MetricIdx m_cost_map_idx;            // metric in current state (operates on indexes)
     Metric m_cost_map;            // metric in current state
     steiner_components<Vertex, Dist> m_components; // components in current
                                                    // state
     Strategy m_strategy;      // strategy to generate the components
     Result m_result_iterator; // list of selected Steiner Vertices
+    Vertices m_selected_elements; // list of selected Steiner Vertices
     Compare m_compare;        // comparison method
 
-    std::unordered_map<int, lp::col_id> m_elements_map; // maps componentId ->
+    std::unordered_map<int, lp::col_id> m_elements_map; // maps component_id ->
                                                         // col_id in LP
 
     Oracle m_oracle;
@@ -92,6 +99,7 @@ public:
             const Terminals& steiner_vertices, Result result,
             const Strategy& strategy = Strategy{}, Oracle oracle = Oracle{}) :
         m_terminals(terminals), m_steiner_vertices(steiner_vertices),
+        m_terminals_index(m_terminals),
         m_vertex_index(boost::range::join(m_terminals, m_steiner_vertices)),
         m_cost_map_idx(metric, boost::range::join(m_terminals, m_steiner_vertices)),
         m_cost_map(m_cost_map_idx, m_vertex_index),
@@ -124,9 +132,11 @@ public:
      */
     const Terminals &get_terminals() const { return m_terminals; }
 
-    ///return idx of the vertex
-    auto get_idx(Vertex v)  const -> decltype(m_vertex_index.get_idx(v)) {
-        return m_vertex_index.get_idx(v);
+    /**
+     * Returns the index of a terminal.
+     */
+    auto get_terminal_idx(Vertex v) const -> decltype(m_terminals_index.get_idx(v)) {
+        return m_terminals_index.get_idx(v);
     }
 
     /**
@@ -146,23 +156,15 @@ public:
      * Adds elements to solution.
      */
     void add_to_solution(const std::vector<Vertex>& steiner_elements) {
-        std::copy(steiner_elements.begin(), steiner_elements.end(), m_result_iterator);
+        boost::copy(steiner_elements, std::back_inserter(m_selected_elements));
     }
 
     /**
-     * Recalculates distances after two vertices were merged.
+     * Removes duplicates and sets the final solution.
      */
-    void merge_vertices(Vertex u_vertex, Vertex w_vertex) {
-        auto all_elements = boost::irange(0, int(boost::distance(m_terminals)
-                                           + boost::distance(m_steiner_vertices)));
-        auto u = get_idx(u_vertex);
-        auto w = get_idx(w_vertex);
-        for (auto i: all_elements) {
-            for (auto j: all_elements) {
-                Dist x = m_cost_map_idx(i, u) + m_cost_map_idx(w, j);
-                m_cost_map_idx(i, j) = std::min(m_cost_map_idx(i, j), x);
-            }
-        }
+    void set_solution() {
+        boost::sort(m_selected_elements);
+        boost::copy(boost::unique(m_selected_elements), m_result_iterator);
     }
 
     /**
@@ -180,6 +182,7 @@ public:
         // Clean components, they will be generated once again
         m_components.clear();
         m_elements_map.clear();
+        m_terminals_index = VertexIndex(m_terminals);
     }
 
     /**
@@ -187,6 +190,31 @@ public:
      */
     utils::compare<double> get_compare() const {
         return m_compare;
+    }
+
+private:
+    /**
+     * Returns the index of a vertex.
+     */
+    auto get_idx(Vertex v) const -> decltype(m_vertex_index.get_idx(v)) {
+        return m_vertex_index.get_idx(v);
+    }
+
+    /**
+     * Recalculates distances after two vertices were merged.
+     */
+    void merge_vertices(Vertex u_vertex, Vertex w_vertex) {
+        auto all_elements = boost::range::join(m_terminals, m_steiner_vertices);
+        auto u = get_idx(u_vertex);
+        auto w = get_idx(w_vertex);
+        for (auto i_vertex: all_elements) {
+            for (auto j_vertex: all_elements) {
+                auto i = get_idx(i_vertex);
+                auto j = get_idx(j_vertex);
+                Dist x = m_cost_map_idx(i, u) + m_cost_map_idx(w, j);
+                m_cost_map_idx(i, j) = std::min(m_cost_map_idx(i, j), x);
+            }
+        }
     }
 
 };
@@ -267,6 +295,20 @@ public:
 };
 
 /**
+ * Set Solution component.
+ */
+class steiner_tree_set_solution {
+public:
+    /**
+     * Removes duplicates from selected Steiner vertices list.
+     */
+    template <typename Problem, typename GetSolution>
+    void operator()(Problem & problem, const GetSolution &) {
+        problem.set_solution();
+    }
+};
+
+/**
  * Makes steiner_tree object. Just to avoid providing type names in template.
  */
 template<typename Oracle = steiner_tree_oracle<>,
@@ -282,7 +324,7 @@ steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
 template <typename Init = steiner_tree_init,
           typename RoundCondition = steiner_tree_round_condition,
           typename RelaxCondition = utils::always_false,
-          typename SetSolution = utils::skip_functor,
+          typename SetSolution = steiner_tree_set_solution,
           typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
           typename ResolveLPToExtremePoint = lp::row_generation_solve_lp,
           typename StopCondition = steiner_tree_stop_condition>
@@ -312,12 +354,14 @@ using steiner_tree_ir_components =
 template <typename Oracle = steiner_tree_oracle<>, typename Strategy = all_generator,
     typename OrigMetric, typename Terminals, typename Result,
     typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
-void steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals, const Terminals& steiner_vertices,
-        Result result, Strategy strategy, IRcomponents comps = IRcomponents{},
-        Oracle oracle = Oracle{}, Visitor visitor = Visitor{}) {
+lp::problem_type steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals,
+        const Terminals& steiner_vertices, Result result, Strategy strategy,
+        IRcomponents comps = IRcomponents{}, Oracle oracle = Oracle{},
+        Visitor visitor = Visitor{}) {
 
     auto steiner = paal::ir::make_steiner_tree(metric, terminals, steiner_vertices, result, strategy, oracle);
-    paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));
+    auto res = paal::ir::solve_dependent_iterative_rounding(steiner, std::move(comps), std::move(visitor));
+    return res.first;
 }
 
 } //! ir

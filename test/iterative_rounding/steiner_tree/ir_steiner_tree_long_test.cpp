@@ -30,9 +30,11 @@ template <template <typename> class OracleStrategy>
 void run_test(const steiner_tree_test_with_metric & test) {
     paal::ir::random_generator strategy_rand(50, 5);
     std::vector<int> result;
-    paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
+    auto status =
+        paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
             test.metric, test.terminals, test.steiner_points,
             std::back_inserter(result), strategy_rand);
+    BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
     ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
 
     LOG("RES " << res << "\n");

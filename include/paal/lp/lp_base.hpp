@@ -214,6 +214,18 @@ template <typename LP> class lp_base : public LP {
     const RowSet &get_rows() const { return m_row_ids; }
 
     /**
+     * Returns column primal value.
+     * Should be called only after the LP has been solved and if it
+     * wasn't modified afterwards.
+     */
+    double get_col_value(col_id col) const {
+        return std::min(
+                std::max(LP::get_col_value(col),
+                    LP::get_col_lower_bound(col)),
+                LP::get_col_upper_bound(col));
+    }
+
+    /**
      * Returns the number of non-zero coefficients in the given LP matrix
      * column.
      */

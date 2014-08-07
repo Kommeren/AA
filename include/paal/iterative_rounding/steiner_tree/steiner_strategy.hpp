@@ -102,6 +102,7 @@ public:
             steiner_component<Vertex, Dist> c(cost_map, elements, steiner_vertices);
             components.add(std::move(c));
         }
+        // TODO some terminals may not be in any component
     }
 
   private:

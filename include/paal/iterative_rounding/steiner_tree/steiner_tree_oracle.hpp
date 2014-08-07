@@ -89,7 +89,7 @@ class steiner_tree_violation_checker {
         for (int i = 0; i < components.size(); ++i) {
             auto u = m_artif_vertices[i];
             int ver = components.find_version(i);
-            auto v = m_terminals_to_aux[problem.get_idx(components.find(i).get_sink(ver))];
+            auto v = m_terminals_to_aux[problem.get_terminal_idx(components.find(i).get_sink(ver))];
             if (m_min_cut.is_in_source_set(u) &&
                 !m_min_cut.is_in_source_set(v)) {
                 expr += problem.find_column_lp(i);
@@ -126,13 +126,14 @@ class steiner_tree_violation_checker {
                                                          .get_terminals())) {
                 if (w != sink) {
                     double INF = std::numeric_limits<double>::max();
-                    m_min_cut.add_edge_to_graph(m_terminals_to_aux[problem.get_idx(w)], new_v,
+                    m_min_cut.add_edge_to_graph(m_terminals_to_aux[problem.get_terminal_idx(w)], new_v,
                                                 INF);
                 } else {
                     lp::col_id x = problem.find_column_lp(i);
                     double col_val = lp.get_col_value(x);
-                    m_min_cut.add_edge_to_graph(new_v, m_terminals_to_aux[problem.get_idx(sink)],
-                                                col_val);
+                    m_min_cut.add_edge_to_graph(new_v,
+                            m_terminals_to_aux[problem.get_terminal_idx(sink)],
+                            col_val);
                 }
             }
         }
@@ -146,13 +147,12 @@ class steiner_tree_violation_checker {
     void update_auxiliary_digraph(Problem &problem, const LP &lp) {
         const auto &components = problem.get_components();
         for (int i = 0; i < components.size(); ++i) {
-            AuxVertex component_v = m_artif_vertices[i];
+            auto component_v = m_artif_vertices[i];
             int ver = components.find_version(i);
             auto sink = components.find(i).get_sink(ver);
-            lp::col_id x = problem.find_column_lp(i);
-            double col_val = lp.get_col_value(x);
-            m_min_cut.add_edge_to_graph(component_v, m_terminals_to_aux[problem.get_idx(sink)],
-                                        col_val);
+            double col_val = lp.get_col_value(problem.find_column_lp(i));
+            m_min_cut.set_capacity(component_v,
+                m_terminals_to_aux[problem.get_terminal_idx(sink)], col_val);
         }
     }
 
@@ -179,10 +179,10 @@ class steiner_tree_violation_checker {
     AuxVertex m_root;         // root vertex, sink of all max-flows
     int m_current_graph_size; // size of current graph
 
-    // maps componentId to auxGraph vertex
+    // maps component_id to aux_graph vertex
     std::unordered_map<int, AuxVertex> m_artif_vertices;
 
-    // maps terminals to auxGraph vertices
+    // maps terminals to aux_graph vertices
     std::unordered_map<AuxVertex, AuxVertex> m_terminals_to_aux;
 
     min_cut_finder m_min_cut;

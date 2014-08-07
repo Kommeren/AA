@@ -66,8 +66,6 @@ public:
         std::tie(e_rev, b_rev) = add_edge(trg, src, m_graph);
         assert(b && b_rev);
 
-        cap = std::max(0., cap);
-        rev_cap = std::max(0., rev_cap);
         put(m_cap, e, cap);
         put(m_cap, e_rev, rev_cap);
 
@@ -130,6 +128,15 @@ public:
      */
     void set_capacity(Edge e, double cap) {
         put(m_cap, e, cap);
+    }
+
+    /**
+     * Sets the capacity of a given edge.
+     */
+    void set_capacity(Vertex src, Vertex trg, double cap) {
+        auto e = edge(src, trg, m_graph);
+        assert(e.second);
+        set_capacity(e.first, cap);
     }
 
 private:

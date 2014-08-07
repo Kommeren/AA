@@ -30,8 +30,9 @@ BOOST_AUTO_TEST_CASE(test_all_generator) {
     // small graph
     UserMetric metrics(create_small_graph());
     boost::tie(terminals, steiner_vertices) = get_small_graph_vertices();
-    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
-            std::back_inserter(result), strategy_all);
+    auto status = paal::ir::steiner_tree_iterative_rounding(metrics, terminals,
+            steiner_vertices, std::back_inserter(result), strategy_all);
+    BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
     int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
     BOOST_CHECK(cost == 4);
 
@@ -50,8 +51,9 @@ BOOST_AUTO_TEST_CASE(test_all_generator) {
     result.clear();
     metrics = UserMetric(create_bigger_graph());
     boost::tie(terminals, steiner_vertices) = get_bigger_graph_vertices();
-    paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
-            std::back_inserter(result), strategy_all);
+    status = paal::ir::steiner_tree_iterative_rounding(metrics, terminals,
+            steiner_vertices, std::back_inserter(result), strategy_all);
+    BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
     cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
     BOOST_CHECK(cost == 15);
 }
@@ -70,8 +72,9 @@ void run_multiple_seed_tests(Strategy& strategy) {
         srand(i);
         LOGLN("small graph, seed " << i);
         result.clear();
-        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
-                std::back_inserter(result), strategy);
+        auto status = paal::ir::steiner_tree_iterative_rounding(metrics, terminals,
+                steiner_vertices, std::back_inserter(result), strategy);
+        BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
         BOOST_CHECK(cost >= 4);
     }
@@ -83,8 +86,9 @@ void run_multiple_seed_tests(Strategy& strategy) {
         LOGLN("big graph, seed " << i);
         srand(i);
         result.clear();
-        paal::ir::steiner_tree_iterative_rounding(metrics, terminals, steiner_vertices,
-                std::back_inserter(result), strategy);
+        auto status = paal::ir::steiner_tree_iterative_rounding(metrics, terminals,
+                steiner_vertices, std::back_inserter(result), strategy);
+        BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
         BOOST_CHECK(cost >= 15);
     }
@@ -92,7 +96,7 @@ void run_multiple_seed_tests(Strategy& strategy) {
 
 BOOST_AUTO_TEST_CASE(test_all_generator_seeds) {
     LOGLN("strategy_all");
-    paal::ir::random_generator strategy_all(5);
+    paal::ir::all_generator strategy_all(5);
     run_multiple_seed_tests(strategy_all);
 }
 
@@ -118,8 +122,9 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
 
     std::tie(em, terminals, steiner_vertices) = sample_graphs_metrics::get_euclidean_steiner_sample();
 
-    paal::ir::steiner_tree_iterative_rounding(em, terminals, steiner_vertices,
+    auto status = paal::ir::steiner_tree_iterative_rounding(em, terminals, steiner_vertices,
                 std::back_inserter(result), strategy_rand);
+    BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
     int cost = paal::ir::steiner_utils::count_cost(result, terminals, em);
 
     BOOST_CHECK_EQUAL(result.size(), std::size_t(1));
