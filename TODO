@@ -8,6 +8,7 @@
     (http://siekiera.mimuw.edu.pl/~paal/stein.html -> paal::data_structures::Voronoi.)
 * alternative kanpsack algorithm (n*(1/epsilon)^2)
 * make better traits, maybe it supposed to look like std::iterator traits
+* function comparing 2 metrics
 
 * ITERATIVE ROUNDING
 ** error checking for generalized assignment

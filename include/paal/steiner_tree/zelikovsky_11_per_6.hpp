@@ -93,11 +93,11 @@ template <typename Metric, typename voronoi> class steiner_tree {
         auto ng = [&](const AMatrix & t) {
             return boost::make_iterator_range(
                 boost::make_zip_iterator(boost::make_tuple(
-                    subsets.first,
+                    boost::begin(subsets),
                     boost::make_transform_iterator(m_subs_dists.begin(),
                                                    utils::remove_reference()))),
                 boost::make_zip_iterator(boost::make_tuple(
-                    subsets.second,
+                    boost::end(subsets),
                     boost::make_transform_iterator(
                         m_subs_dists.end(), utils::remove_reference()))));
         };
@@ -154,8 +154,8 @@ template <typename Metric, typename voronoi> class steiner_tree {
         boost::hash<ThreeTuple>>;
 
     template <typename Iter>
-    std::pair<data_structures::subsets_iterator<SUSBSET_SIZE, Iter>,
-              data_structures::subsets_iterator<SUSBSET_SIZE, Iter>>
+    boost::iterator_range<
+        data_structures::subsets_iterator<SUSBSET_SIZE, Iter>>
     make_three_subset_range(Iter b, Iter e) {
         return data_structures::make_subsets_iterator_range<SUSBSET_SIZE>(b, e);
     }
@@ -185,10 +185,10 @@ template <typename Metric, typename voronoi> class steiner_tree {
         auto ti = boost::irange<int>(0, N);
 
         auto sub_range = make_three_subset_range(ti.begin(), ti.end());
-        m_subs_dists.reserve(std::distance(sub_range.first, sub_range.second));
+        m_subs_dists.reserve(boost::distance(sub_range));
 
         // finding nearest vertex to subset
-        for (const ThreeTuple &subset : boost::make_iterator_range(sub_range)) {
+        for (const ThreeTuple &subset : sub_range) {
             // TODO awful coding, need to be changed to loop
             // TODO There is possible problem, one point could belong to two
             // voronoi regions

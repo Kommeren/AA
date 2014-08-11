@@ -55,7 +55,7 @@ using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
  * @tparam Oracle separation oracle
  */
 template<typename OrigMetric, typename Terminals, typename Result,
-    typename Strategy = all_generator,
+    typename Strategy = steiner_tree_all_generator,
     typename Oracle = steiner_tree_oracle<>>
 class steiner_tree {
 public:
@@ -351,11 +351,11 @@ using steiner_tree_ir_components =
  * @param oracle
  * @param visitor
  */
-template <typename Oracle = steiner_tree_oracle<>, typename Strategy = all_generator,
+template <typename Oracle = steiner_tree_oracle<>, typename Strategy = steiner_tree_all_generator,
     typename OrigMetric, typename Terminals, typename Result,
     typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
 lp::problem_type steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals,
-        const Terminals& steiner_vertices, Result result, Strategy strategy,
+        const Terminals& steiner_vertices, Result result, Strategy strategy = Strategy{},
         IRcomponents comps = IRcomponents{}, Oracle oracle = Oracle{},
         Visitor visitor = Visitor{}) {
 

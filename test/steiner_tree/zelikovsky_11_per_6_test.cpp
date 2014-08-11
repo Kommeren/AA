@@ -23,11 +23,11 @@ std::ostream &operator<<(std::ostream &o, const std::pair<int, int> &p) {
 }
 
 BOOST_AUTO_TEST_CASE(zelikowsky_test) {
-    typedef sample_graphs_metrics SGM;
+    using SGM = sample_graphs_metrics;
     auto gm = SGM::get_graph_metric_steiner();
-    typedef decltype(gm) Metric;
-    typedef paal::data_structures::voronoi<Metric> voronoiT;
-    typedef typename voronoiT::GeneratorsSet FSet;
+    using Metric = decltype(gm);
+    using voronoiT = paal::data_structures::voronoi<Metric>;
+    using FSet = typename voronoiT::GeneratorsSet;
     voronoiT voronoi(FSet{ SGM::A, SGM::B, SGM::C, SGM::D }, FSet{ SGM::E },
                      gm);
 

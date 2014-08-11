@@ -11,6 +11,7 @@
 
 #include <boost/iterator/filter_iterator.hpp>
 #include <boost/iterator/transform_iterator.hpp>
+#include <boost/range/iterator_range.hpp>
 
 #ifndef SUBSET_ITERATOR_HPP
 #define SUBSET_ITERATOR_HPP
@@ -315,11 +316,10 @@ class subsets_iterator : public boost::iterator_facade<
  * @return
  */
 template <int k, typename Iterator, typename Joiner = make_tuple>
-std::pair<subsets_iterator<k, Iterator, Joiner>,
-          subsets_iterator<k, Iterator, Joiner>>
+boost::iterator_range<subsets_iterator<k, Iterator, Joiner>>
 make_subsets_iterator_range(Iterator b, Iterator e, Joiner joiner = Joiner{}) {
     typedef subsets_iterator<k, Iterator, Joiner> SI;
-    return std::make_pair(SI(b, e, joiner), SI(e, e, joiner));
+    return boost::make_iterator_range(SI(b, e, joiner), SI(e, e, joiner));
 }
 
 } // data_structures

@@ -26,24 +26,28 @@ using Dist = int;
 using Terminals = std::vector<int>;
 using Metric = GraphMT;
 
-template <template <typename> class OracleStrategy>
-void run_test(const steiner_tree_test_with_metric & test) {
-    paal::ir::random_generator strategy_rand(50, 5);
+static const double APPROXIMATION_RATIO = 1.39;
+
+template <template <typename> class OracleStrategy =
+        paal::lp::random_violated_separation_oracle, typename Strategy>
+void run_test(const steiner_tree_test_with_metric& test, const Strategy& strategy) {
     std::vector<int> result;
     auto status =
         paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
             test.metric, test.terminals, test.steiner_points,
-            std::back_inserter(result), strategy_rand);
+            std::back_inserter(result), strategy);
     BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
-    ON_LOG(int res = )paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
+    int res = paal::ir::steiner_utils::count_cost(result, test.terminals, test.metric);
 
     LOG("RES " << res << "\n");
     LOG("APPROXIMATION_RATIO:" << double(res) / double(test.optimal) << "\n");
+    check_result(res, test.optimal, APPROXIMATION_RATIO);
 }
 
 BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
     std::vector<steiner_tree_test_with_metric> data;
     read_steinlib_tests(data);
+    paal::ir::steiner_tree_random_generator strategy_rand(50, 5);
     // First tests only
     for (const auto &test : data | boost::adaptors::sliced(0, 10)) {
         LOG("TEST " << test.test_name << "\n");
@@ -52,13 +56,19 @@ BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
         for (int i : boost::irange(0, 5)) {
             LOGLN("random violated, seed " << i);
             srand(i);
-            run_test<paal::lp::random_violated_separation_oracle>(test);
+            run_test(test, strategy_rand);
+
+            LOGLN("random violated + graph strategy, seed " << i);
+            srand(i);
+            auto strategy_graph = paal::ir::make_steiner_tree_graph_all_generator<Vertex>(
+                    test.graph, test.terminals, 5);
+            run_test(test, strategy_graph);
         }
 
         LOGLN("most violated");
-        run_test<paal::lp::most_violated_separation_oracle>(test);
+        run_test<paal::lp::most_violated_separation_oracle>(test, strategy_rand);
 
         LOGLN("first violated");
-        run_test<paal::lp::first_violated_separation_oracle>(test);
+        run_test<paal::lp::first_violated_separation_oracle>(test, strategy_rand);
     }
 }

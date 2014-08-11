@@ -146,9 +146,8 @@ class two_local_searchget_moves {
     template <typename Solution>
     auto operator()(
         Solution &solution) const->typename types_eval<Solution>::Range {
-        return boost::make_iterator_range(
-            data_structures::make_subsets_iterator_range<2>(
-                solution.begin(), solution.end(), make_swap{}));
+        return data_structures::make_subsets_iterator_range<2>(
+                solution.begin(), solution.end(), make_swap{});
     }
 };
 
