@@ -51,19 +51,19 @@ namespace detail {
  *
  * @tparam Metric we only use this metric for distances  (Steiner, Terminal) and
  (Terminal, Terminal)
- * @tparam voronoi models WeakVoronoi (see \ref voronoi). This is a voronoi
+ * @tparam Voronoi models WeakVoronoi (see \ref voronoi). This is a Voronoi
  division where generators are terminals  of the steiner tree.
  */
-template <typename Metric, typename voronoi> class steiner_tree {
+template <typename Metric, typename Voronoi> class steiner_tree {
     using Idx = int;
 
   public:
     using MT = data_structures::metric_traits<Metric>;
     using Dist = typename MT::DistanceType;
     using VertexType = typename MT::VertexType;
-    static const int SUSBSET_SIZE = 3;
+    static const int SUBSET_SIZE = 3;
 
-    using ThreeTuple = typename utils::k_tuple<Idx, SUSBSET_SIZE>::type;
+    using ThreeTuple = typename utils::k_tuple<Idx, SUBSET_SIZE>::type;
     using Move = boost::tuple<ThreeTuple, Dist>;
     using ResultSteinerVertices = std::vector<VertexType>;
 
@@ -71,12 +71,11 @@ template <typename Metric, typename voronoi> class steiner_tree {
      * @brief
      *
      * @param m
-     * @param voronoi
+     * @param vor
      */
-    steiner_tree(const Metric &m, const voronoi &vor)
+    steiner_tree(const Metric &m, const Voronoi &vor)
         : m_metric(m), m_voronoi(vor),
-          N(std::distance(vor.get_generators().begin(),
-                          vor.get_generators().end())),
+          N(boost::distance(vor.get_generators())),
           m_save(N) {}
 
     template <typename OutputIterator>
@@ -88,9 +87,9 @@ template <typename Metric, typename voronoi> class steiner_tree {
         }
 
         auto ti = boost::irange<int>(0, N);
-        auto subsets = this->make_three_subset_range(ti.begin(), ti.end());
+        auto subsets = make_three_subset_range(ti.begin(), ti.end());
 
-        auto ng = [&](const AMatrix & t) {
+        auto get_moves = [&](const AMatrix &) {
             return boost::make_iterator_range(
                 boost::make_zip_iterator(boost::make_tuple(
                     boost::begin(subsets),
@@ -103,16 +102,17 @@ template <typename Metric, typename voronoi> class steiner_tree {
         };
 
         auto obj_fun = [&](const AMatrix & m, const Move & t) {
-            return this->gain(t);
+            return gain(t);
         };
 
-        auto su = [&](AMatrix & m, const Move & t) {
-            this->contract(m, get<0>(t));
+        auto commit_move = [&](AMatrix & m, const Move & t) {
+            contract(m, get<0>(t));
             res.push_back(m_nearest_vertex[get<0>(t)]);
             return true;
         };
 
-        auto sc = local_search::make_search_components(ng, obj_fun, su);
+        auto search_components = local_search::make_search_components(
+            get_moves, obj_fun, commit_move);
 
         auto ls_solution = data_structures::metric_to_bgl_with_index(
             m_metric, m_voronoi.get_generators(), m_t_idx);
@@ -123,10 +123,10 @@ template <typename Metric, typename voronoi> class steiner_tree {
         local_search::local_search(ls_solution,
                                    local_search::best_improving_strategy{},
                                    [ = ](AMatrix & a) {
-            this->find_save(a);
+            find_save(a);
             return true;
         },
-                                   utils::always_false(), sc);
+                                   utils::always_false(), search_components);
 
         unique_res(res);
         boost::copy(res, out);
@@ -140,13 +140,13 @@ template <typename Metric, typename voronoi> class steiner_tree {
     using SpanningTree = boost::subgraph<boost::adjacency_list<
         boost::listS, boost::vecS, boost::undirectedS, boost::no_property,
         SpanningTreeEdgeProp>>;
-    using gtraits = boost::graph_traits<SpanningTree>;
-    using SEdge = typename gtraits::edge_descriptor;
+    using GTraits = boost::graph_traits<SpanningTree>;
+    using SEdge = typename GTraits::edge_descriptor;
 
     // Adjacency Matrix types
     using AMatrix = typename data_structures::adjacency_matrix<Metric>::type;
-    using mtraits = boost::graph_traits<AMatrix>;
-    using MEdge = typename mtraits::edge_descriptor;
+    using MTraits = boost::graph_traits<AMatrix>;
+    using MEdge = typename MTraits::edge_descriptor;
 
     // other types
     using ThreeSubsetsDists = std::vector<Dist>;
@@ -155,9 +155,9 @@ template <typename Metric, typename voronoi> class steiner_tree {
 
     template <typename Iter>
     boost::iterator_range<
-        data_structures::subsets_iterator<SUSBSET_SIZE, Iter>>
+        data_structures::subsets_iterator<SUBSET_SIZE, Iter>>
     make_three_subset_range(Iter b, Iter e) {
-        return data_structures::make_subsets_iterator_range<SUSBSET_SIZE>(b, e);
+        return data_structures::make_subsets_iterator_range<SUBSET_SIZE>(b, e);
     }
 
     void unique_res(ResultSteinerVertices &res) {
@@ -177,8 +177,8 @@ template <typename Metric, typename voronoi> class steiner_tree {
         std::tie(a, b, c) = get<0>(t);
 
         assert(m(a, b) == m(b, c) || m(b, c) == m(c, a) || m(c, a) == m(a, b));
-        return this->max3(m(a, b), m(b, c), m(c, a)) +
-               this->min3(m(a, b), m(b, c), m(c, a)) - get<1>(t);
+        return max3(m(a, b), m(b, c), m(c, a)) +
+               min3(m(a, b), m(b, c), m(c, a)) - get<1>(t);
     }
 
     void fill_sub_dists() {
@@ -189,7 +189,8 @@ template <typename Metric, typename voronoi> class steiner_tree {
 
         // finding nearest vertex to subset
         for (const ThreeTuple &subset : sub_range) {
-            // TODO awful coding, need to be changed to loop
+            // TODO awful coding, need to be changed to loop (using fold
+            // form utils/fusion.hpp)
             // TODO There is possible problem, one point could belong to two
             // voronoi regions
             // In our implementation the point will be in exactly one region and
@@ -209,11 +210,10 @@ template <typename Metric, typename voronoi> class steiner_tree {
                 m_nearest_vertex[subset] = *std::min_element(
                     boost::begin(range), boost::end(range),
                     utils::make_functor_to_comparator([&](VertexType v) {
-                    return this->dist(v, subset);
+                    return dist(v, subset);
                 }));
             }
-            m_subs_dists.push_back(
-                this->dist(m_nearest_vertex[subset], subset));
+            m_subs_dists.push_back(dist(m_nearest_vertex[subset], subset));
         }
     }
 
@@ -267,33 +267,33 @@ template <typename Metric, typename voronoi> class steiner_tree {
         });
     }
 
-    void create_subgraphs(SpanningTree &g, SpanningTree &G1, SpanningTree &G2) {
+    void create_subgraphs(SpanningTree &g, SpanningTree &g1, SpanningTree &g2) {
         int n = num_vertices(g);
         std::vector<Idx> comps(n);
         boost::connected_components(g, &comps[0]);
         int c1 = comps[0];
         int c2 = -1;
 
-        for (int i = 0; i < n; ++i) {
+        for (auto i : boost::irange(0, n)) {
             if (comps[i] == c1) {
-                add_vertex(g.local_to_global(i), G1);
+                add_vertex(g.local_to_global(i), g1);
             } else {
                 assert(c2 == -1 || comps[i] == c2);
                 c2 = comps[i];
-                add_vertex(g.local_to_global(i), G2);
+                add_vertex(g.local_to_global(i), g2);
             }
         }
     }
 
-    // setting m_save(v,w) = max_dist, for each v in G1 and w in G2
-    void move_save(const SpanningTree &G1, const SpanningTree &G2,
+    // setting m_save(v,w) = max_dist, for each v in g1 and w in g2
+    void move_save(const SpanningTree &g1, const SpanningTree &g2,
                    Dist max_dist) {
-        auto v1 = vertices(G1);
-        auto v2 = vertices(G2);
+        auto v1 = vertices(g1);
+        auto v2 = vertices(g2);
         for (auto v : boost::make_iterator_range(v1)) {
             for (auto w : boost::make_iterator_range(v2)) {
-                auto vg = G1.local_to_global(v);
-                auto wg = G2.local_to_global(w);
+                auto vg = g1.local_to_global(v);
+                auto wg = g2.local_to_global(w);
                 m_save(vg, wg) = max_dist;
                 m_save(wg, vg) = max_dist;
             }
@@ -323,19 +323,19 @@ template <typename Metric, typename voronoi> class steiner_tree {
             SEdge max_el = max_edge(e_range, weight_map);
             Dist max_dist = get(weight_map, max_el);
             remove_edge(max_el, g);
-            SpanningTree &G1 = g.create_subgraph();
-            SpanningTree &G2 = g.create_subgraph();
-            create_subgraphs(g, G1, G2);
+            SpanningTree &g1 = g.create_subgraph();
+            SpanningTree &g2 = g.create_subgraph();
+            create_subgraphs(g, g1, g2);
 
-            move_save(G1, G2, max_dist);
+            move_save(g1, g2, max_dist);
 
-            s.push(&G1);
-            s.push(&G2);
+            s.push(&g1);
+            s.push(&g2);
         }
     }
 
     const Metric &m_metric;
-    const voronoi &m_voronoi;
+    const Voronoi &m_voronoi;
     ThreeSubsetsDists m_subs_dists;
     NearstByThreeSubsets m_nearest_vertex;
     int N;
@@ -348,17 +348,17 @@ template <typename Metric, typename voronoi> class steiner_tree {
  * @brief 11/6 approximation for steiner_tree problem
  *
  * @tparam Metric
- * @tparam voronoi
+ * @tparam Voronoi
  * @tparam OutputIterator
  * @param m
  * @param v
  * @param out
  */
-template <typename Metric, typename voronoi, typename OutputIterator>
+template <typename Metric, typename Voronoi, typename OutputIterator>
 void steiner_tree_zelikovsky11per6approximation(const Metric &m,
-                                                const voronoi &v,
+                                                const Voronoi &v,
                                                 OutputIterator out) {
-    detail::steiner_tree<Metric, voronoi> st(m, v);
+    detail::steiner_tree<Metric, Voronoi> st(m, v);
     st.get_result_steiner_vertices(out);
 }
 
