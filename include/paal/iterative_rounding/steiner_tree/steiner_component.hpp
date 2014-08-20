@@ -42,7 +42,7 @@ public:
         auto all_elements_nr = boost::distance(all_elements);
         auto dw = paal::make_dreyfus_wagner(fast_metric,
                     boost::irange(0, int(term_nr)),
-                    boost::irange(0, int(all_elements_nr)));
+                    boost::irange(int(term_nr), int(all_elements_nr)));
         dw.solve();
         m_cost = dw.get_cost();
         auto &steiner = dw.get_steiner_elements();

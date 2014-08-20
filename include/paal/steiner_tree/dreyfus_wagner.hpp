@@ -43,6 +43,7 @@ class dreyfus_wagner {
         : m_cost_map(cost_map), m_terminals(term),
           m_non_terminals(non_terminals) {
 
+        assert(m_terminals.size() <= TerminalsLimit);
         for (int i = 0; i < (int)m_terminals.size(); i++) {
             m_elements_map[m_terminals[i]] = i;
         }
