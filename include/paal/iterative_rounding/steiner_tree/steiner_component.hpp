@@ -12,6 +12,7 @@
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
 
 #include <boost/range/algorithm/transform.hpp>
+#include <boost/range/join.hpp>
 
 #include <iosfwd>
 #include <set>

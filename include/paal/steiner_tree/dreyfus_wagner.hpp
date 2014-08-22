@@ -11,8 +11,6 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 
-#include <boost/range/join.hpp>
-
 #include <unordered_map>
 #include <unordered_set>
 #include <bitset>
@@ -103,18 +101,27 @@ class dreyfus_wagner {
             return cost;
         }
         // Check in the map if already computed
-        if (m_best_cand.find(code_state(v, remaining)) != m_best_cand.end()) {
-            return m_best_cand[code_state(v, remaining)].first;
+        auto iter = m_best_cand.find(code_state(v, remaining));
+        if (iter != m_best_cand.end()) {
+            return iter->second.first;
         }
         Dist best = split_vertex(v, remaining);
         Vertex cand = v;
 
-        for (Vertex w : boost::join(m_non_terminals, m_terminals)) {
-            Dist val = split_vertex(w, remaining);
-            val += m_cost_map(v, w);
-            if (best < 0 || val < best) {
-                best = val;
-                cand = w;
+        auto try_vertex = [&](Vertex w) {
+                Dist val = split_vertex(w, remaining);
+                val += m_cost_map(v, w);
+                if (best < 0 || val < best) {
+                    best = val;
+                    cand = w;
+                }
+            };
+        for (Vertex w : m_non_terminals) {
+            try_vertex(w);
+        }
+        for (auto w_with_id : m_elements_map) {
+            if (!remaining.test(w_with_id.second)) {
+                try_vertex(w_with_id.first);
             }
         }
         for (auto vertex_and_terminal_id : m_elements_map) {
@@ -143,8 +150,9 @@ class dreyfus_wagner {
             return 0;
         }
         // Check in the map if already computed
-        if (m_best_split.find(code_state(v, remaining)) != m_best_split.end()) {
-            return m_best_split[code_state(v, remaining)].first;
+        auto iter = m_best_split.find(code_state(v, remaining));
+        if (iter != m_best_split.end()) {
+            return iter->second.first;
         }
         int k = smallest_bit(remaining) +
                 1; // optimalization, to avoid checking subset twice
@@ -194,7 +202,8 @@ class dreyfus_wagner {
         auto terminal_id_iter = m_elements_map.find(next);
         if (v == next) { // called wagner directly from dreyfus
             retrieve_solution_split(next, remaining);
-        } else if (terminal_id_iter == m_elements_map.end()) { // nonterminal
+        } else if (terminal_id_iter == m_elements_map.end() // nonterminal
+                || !remaining.test(terminal_id_iter->second)) { // terminal not in remaining
             add_vertex_to_graph(next);
             add_edge_to_graph(v, next);
             retrieve_solution_split(next, remaining);
