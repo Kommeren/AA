@@ -12,6 +12,7 @@
 #include <numeric>
 #include <limits>
 #include <cmath>
+#include <random>
 
 namespace paal {
 namespace utils {

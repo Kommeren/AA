@@ -9,6 +9,7 @@
 #define SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
 
 #include "paal/local_search/local_search.hpp"
+#include <vector>
 
 namespace {
 int f(int x) { return -x * x + 12 * x - 27; }

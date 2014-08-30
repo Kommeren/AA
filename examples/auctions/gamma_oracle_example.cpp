@@ -13,6 +13,7 @@
 #include <boost/range/algorithm/copy.hpp>
 
 #include <cassert>
+#include <vector>
 
 //! [Gamma Oracle Auction Components Example]
 

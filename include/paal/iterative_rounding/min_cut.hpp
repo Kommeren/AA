@@ -11,6 +11,8 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
 
+#include <numeric>
+
 namespace paal {
 namespace ir {
 

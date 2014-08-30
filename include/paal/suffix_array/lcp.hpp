@@ -8,6 +8,8 @@
 #ifndef LCP_HPP
 #define LCP_HPP
 
+#include <vector>
+
 namespace paal {
 /**
  *

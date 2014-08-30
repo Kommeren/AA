@@ -468,9 +468,9 @@ struct bdmst_set_solution {
      */
     template <typename Problem, typename GetSolution>
     void operator()(Problem & problem, const GetSolution & solution) {
-        for (auto edge_and_col : problem.get_original_edges_map()) {
-            if (m_compare.e(solution(edge_and_col.first), 1)) {
-                problem.add_to_result_spanning_tree(edge_and_col.second);
+        for (auto col_and_edge : problem.get_original_edges_map()) {
+            if (m_compare.e(solution(col_and_edge.first), 1)) {
+                problem.add_to_result_spanning_tree(col_and_edge.second);
             }
         }
     }

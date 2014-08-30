@@ -12,6 +12,7 @@
 #include "paal/local_search/search_traits.hpp"
 
 #include <chrono>
+#include <random>
 
 namespace paal {
 namespace local_search {

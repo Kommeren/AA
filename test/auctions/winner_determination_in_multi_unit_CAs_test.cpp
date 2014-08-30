@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(testDetermineWinners)
    using Bids = std::vector<Bid>;
 std::set<Bidder> bidders {"John", "Bob", "Steve"}; std::map<Bidder, Bids> bids {
       {"John", {
-         { {}, 0.0},
+         { Items{}, 0.0},
          { {"apple", "ball"}, 1.7},
       }},
       {"Bob", {

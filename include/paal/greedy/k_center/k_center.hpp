@@ -9,6 +9,7 @@
 #define K_CENTER
 
 #include "paal/data_structures/metric/metric_traits.hpp"
+#include <vector>
 
 namespace paal {
 namespace greedy {

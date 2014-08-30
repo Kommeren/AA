@@ -10,6 +10,7 @@
 #define FAST_EXP_HPP
 
 #include <cstdint>
+#include <cmath>
 
 namespace paal {
 

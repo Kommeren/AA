@@ -193,8 +193,8 @@ class iterative_rounding  {
      * @brief Sets the solution to the problem using SetSolution component.
      */
     void set_solution() {
-        call<SetSolution>(m_problem, std::bind(&iterative_rounding::get_val,
-                                               this, std::placeholders::_1));
+        call<SetSolution>(m_problem, boost::bind(&iterative_rounding::get_val,
+                                               this, _1));
     }
 
     /**
