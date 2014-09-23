@@ -57,8 +57,7 @@ using Multisearch_components = search_components<Args...>;
  * @return search_components or Multisearch_components
  */
 template <typename... Args>
-auto make_search_components(Args &&... args)
-    ->decltype(components::make_components(std::forward<Args>(args)...)) {
+auto make_search_components(Args &&... args) {
     return components::make_components(std::forward<Args>(args)...);
 }
 

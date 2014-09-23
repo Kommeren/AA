@@ -46,9 +46,9 @@ int main() {
     Sol sol(std::move(voronoi), USet{ SGM::B }, facilityCost);
 
     // search
-    facility_location_first_improving(sol, default_remove_fl_components::type(),
-                                      default_add_fl_components::type(),
-                                      default_swap_fl_components::type());
+    facility_location_first_improving(sol, default_remove_fl_components(),
+                                      default_add_fl_components(),
+                                      default_swap_fl_components());
 
     // print result
     auto const &ch = sol.get_chosen_facilities();

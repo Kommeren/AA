@@ -11,11 +11,15 @@
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
 
+#include <boost/range/algorithm/copy.hpp>
+
 #include <iostream>
 
 using namespace paal::local_search;
 
 int main() {
+
+
     // sample data
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_small();
@@ -37,16 +41,15 @@ int main() {
             paal::utils::make_array_to_functor(fcosts));
 
     // create facility location local search components
-    default_remove_fl_components::type rem;
-    default_add_fl_components::type add;
-    default_swap_fl_components::type swap;
+    default_remove_fl_components rem;
+    default_add_fl_components add;
+    default_swap_fl_components swap;
 
     // search
     facility_location_first_improving(sol, rem, add, swap);
 
     // print result
-    auto const &ch = sol.get_chosen_facilities();
-    std::copy(ch.begin(), ch.end(), std::ostream_iterator<int>(std::cout, ","));
+    boost::copy(sol.get_chosen_facilities(), std::ostream_iterator<int>(std::cout, ","));
     std::cout << std::endl;
 
     return true;

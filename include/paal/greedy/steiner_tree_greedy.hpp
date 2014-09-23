@@ -1,7 +1,7 @@
 /**
  * @file steiner_tree_greedy.hpp
  * @brief
- * @author Piotr Wygocki, Piotr Smuleicz
+ * @author Piotr Wygocki, Piotr Smulewicz
  * @version 1.0
  * @date 2013-11-27
  */
@@ -10,20 +10,23 @@
 
 #include <paal/utils/functors.hpp>
 
-#include <boost/property_map/property_map.hpp>
-#include <boost/graph/properties.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <boost/graph/graph_concepts.hpp>
 #include <boost/graph/graph_traits.hpp>
-#include <boost/graph/named_function_params.hpp>
-#include <boost/graph/two_bit_color_map.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
-#include <boost/range/numeric.hpp>
-#include <boost/range/algorithm/unique.hpp>
+#include <boost/graph/named_function_params.hpp>
+#include <boost/graph/properties.hpp>
+#include <boost/graph/two_bit_color_map.hpp>
+
+#include <boost/property_map/property_map.hpp>
+
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/sort.hpp>
-#include <boost/range/algorithm/copy.hpp>
+#include <boost/range/algorithm/unique.hpp>
+#include <boost/range/as_array.hpp>
+#include <boost/range/numeric.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -109,7 +112,7 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out,
     auto terminals_nr = utils::accumulate_functor(
         vertices(g), 0, [=](Vertex v) { return get(color_map, v); });
     terminals.reserve(terminals_nr);
-    for (auto v : boost::make_iterator_range(vertices(g))) {
+    for (auto v : boost::as_array(vertices(g))) {
         if (get(color_map, v) == Terminals::TERMINAL) {
             terminals.push_back(v);
         }
@@ -141,7 +144,7 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out,
     // computing distances between terminals
     // creating terminal_graph
     TerminalGraph terminal_graph(N);
-    for (auto w : boost::make_iterator_range(edges(g))) {
+    for (auto w : boost::as_array(edges(g))) {
         const auto &nearest_to_source = nearest_terminal_map[source(w, g)];
         const auto &nearest_to_target = nearest_terminal_map[target(w, g)];
         if (nearest_to_source != nearest_to_target) {

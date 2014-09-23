@@ -68,7 +68,7 @@ class fitness_from_gain_and_get_moves {
         Move;
 
   public:
-    typedef typename pure_result_of_t<Gain(Solution &, Move &)>::type type;
+    typedef pure_result_of_t<Gain(Solution &, Move &)> type;
 };
 
 /**
@@ -78,10 +78,9 @@ class fitness_from_gain_and_get_moves {
  * @tparam Solution
  */
 template <typename SearchComponents, typename Solution>
-struct fitness : fitness_from_gain_and_get_moves<
+using fitness_t = typename fitness_from_gain_and_get_moves<
     typename search_components_traits<SearchComponents>::GainT,
-    typename search_components_traits<SearchComponents>::GetMovesT, Solution> {
-};
+    typename search_components_traits<SearchComponents>::GetMovesT, Solution>::type;
 
 } //! local_search
 } //! paal

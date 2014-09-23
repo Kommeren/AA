@@ -30,17 +30,24 @@ namespace data_structures {
  * clients.
  *
  * @tparam FacilityCost
- * @tparam voronoiType
+ * @tparam VoronoiType
  */
-template <typename FacilityCost, typename voronoiType>
+template <typename FacilityCost, typename VoronoiType>
 class facility_location_solution {
-  public:
-    typedef voronoi_traits<voronoiType> VT;
+public:
+    typedef voronoi_traits<VoronoiType> VT;
     typedef typename VT::VertexType VertexType;
     typedef typename VT::DistanceType Dist;
     typedef typename VT::GeneratorsSet ChosenFacilitiesSet;
     typedef std::unordered_set<VertexType, boost::hash<VertexType>>
         UnchosenFacilitiesSet;
+
+private:
+
+    VoronoiType m_voronoi;
+    UnchosenFacilitiesSet m_unchosen_facilities;
+    const FacilityCost &m_fac_costs;
+public:
 
     /**
      * @brief constructor
@@ -49,7 +56,7 @@ class facility_location_solution {
      * @param uf
      * @param c
      */
-    facility_location_solution(voronoiType voronoi, UnchosenFacilitiesSet uf,
+    facility_location_solution(VoronoiType voronoi, UnchosenFacilitiesSet uf,
                                const FacilityCost &c)
         : m_voronoi(std::move(voronoi)), m_unchosen_facilities(std::move(uf)),
           m_fac_costs(c) {}
@@ -81,20 +88,15 @@ class facility_location_solution {
     }
 
     /// gets clients assigned to specific facility
-    decltype(std::declval<voronoiType>().get_vertices_for_generator(
-        std::declval<VertexType>()))
-        get_clients_for_facility(VertexType f) const {
+    auto get_clients_for_facility(VertexType f) const ->
+    decltype(m_voronoi.get_vertices_for_generator(f))
+    {
         return m_voronoi.get_vertices_for_generator(f);
     }
 
     /// gets voronoi
-    const voronoiType &get_voronoi() const { return m_voronoi; }
+    const VoronoiType &get_voronoi() const { return m_voronoi; }
 
-  private:
-
-    voronoiType m_voronoi;
-    UnchosenFacilitiesSet m_unchosen_facilities;
-    const FacilityCost &m_fac_costs;
 };
 
 /**

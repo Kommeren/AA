@@ -17,6 +17,7 @@
 namespace paal {
 namespace local_search {
 
+
 /**
  * @brief This functors returns potential (temperature) using the following
  * schema. The start potential equals given startTemperature, the end
@@ -83,8 +84,7 @@ struct exponential_cooling_schema_dependant_on_time {
  * @return
  */
 template <typename Clock = std::chrono::system_clock, typename Duration>
-exponential_cooling_schema_dependant_on_time<Duration, Clock>
-make_exponential_cooling_schema_dependant_on_time(Duration duration,
+auto make_exponential_cooling_schema_dependant_on_time(Duration duration,
                                                   double startTemperature,
                                                   double endTemperature) {
     return exponential_cooling_schema_dependant_on_time<Duration, Clock>(
@@ -164,19 +164,17 @@ template <typename Solution, typename ProbabilisticGain, typename GetMoves,
 double start_temperature(Solution &solution, ProbabilisticGain gain,
                          GetMoves get_moves, SetTemperature set_temperature,
                          double acceptance_rate = 0.4,
-                         int repeats_number = 1000, double epsilon = 0.0001) {
+                         int repeats_number = 1e3, double epsilon = 1e-4) {
     assert(acceptance_rate >= 0. && acceptance_rate <= 1.);
-    using MoveRef =
-        typename move_type_from_get_moves<GetMoves, Solution>::reference;
 
     auto get_success_rate = [&](int t) {
         set_temperature(t);
         int number_of_success = 0;
         int total = 0;
         for (int i = 0; i < repeats_number; ++i) {
-            for (MoveRef move : get_moves(solution)) {
+            for (auto && move : get_moves(solution)) {
                 ++total;
-                if (gain(solution, move) > 0) {
+                if (detail::positive_delta(gain(solution, move))) {
                     ++number_of_success;
                 }
             }
@@ -239,6 +237,8 @@ double start_temperature(Solution &solution, ProbabilisticGain gain,
 template <typename Gain, typename GetTemperature,
           typename random_generator = std::default_random_engine>
 struct simulated_annealing_gain_adaptor {
+
+
     /**
      * @brief constructor
      *
@@ -262,8 +262,6 @@ struct simulated_annealing_gain_adaptor {
          * @brief creates is_chosen for Move  object
          *
          * @param d
-         *
-         * @return
          */
         static is_chosen make_chosen(Delta d) { return is_chosen(true, d); }
 
@@ -271,8 +269,6 @@ struct simulated_annealing_gain_adaptor {
          * @brief creates is_chosen for Move which is not chosen
          *
          * @param d
-         *
-         * @return
          */
         static is_chosen make_unchosen(Delta d) { return is_chosen(false, d); }
 
@@ -282,12 +278,9 @@ struct simulated_annealing_gain_adaptor {
          *        If some element is bigger than zero, then this element is
         * chosen.
          *
-         * @param i given int must be 0
          */
-        is_chosen(int i)
-            : m_is_chosen(false), m_delta(std::numeric_limits<Delta>::max()) {
-            assert(i == 0);
-        }
+        is_chosen()
+            : m_is_chosen(false), m_delta(std::numeric_limits<Delta>::max()) {}
 
         /**
          * @brief operator<. Chosen move is always bigger then unchosen
@@ -319,50 +312,14 @@ struct simulated_annealing_gain_adaptor {
             }
         }
 
-        /**
-         * @brief operator< (int)
-         *
-         * @param i
-         *
-         * @return
-         */
-        bool operator<(int i) const { return *this < is_chosen(i); }
+        bool chosen() const {
+            return m_is_chosen;
+        }
 
-        /**
-         * @brief operator>(int)
-         *
-         * @param i
-         *
-         * @return
-         */
-        bool operator>(int i) const { return *this > is_chosen(i); }
+        bool delta() const {
+            return m_delta;
+        }
 
-        /**
-         * @brief operator>(int, is_chosen)
-         *
-         * @param i
-         * @param ich
-         *
-         * @return
-         */
-        friend bool operator>(int i, is_chosen ich) { return ich < i; }
-
-        /**
-         * @brief operator<(int, is_chosen)
-         *
-         * @param i
-         * @param ich
-         *
-         * @return
-         */
-        friend bool operator<(int i, is_chosen ich) { return ich > i; }
-
-        /**
-         * @brief conversion to delta operator
-         *
-         * @return
-         */
-        operator Delta() { return m_delta; }
 
       private:
         /**
@@ -391,7 +348,7 @@ struct simulated_annealing_gain_adaptor {
         ->is_chosen<typename std::result_of<Gain(Args...)>::type> {
         auto delta = m_gain(std::forward<Args>(args)...);
         using Delta = decltype(delta);
-        if (delta > 0) {
+        if (detail::positive_delta(delta)) {
             return is_chosen<Delta>::make_chosen(delta);
         } else {
             if (m_distribution(m_rand) <
@@ -424,10 +381,9 @@ struct simulated_annealing_gain_adaptor {
  */
 template <typename Gain, typename GetTemperature,
           typename random_generator = std::default_random_engine>
-simulated_annealing_gain_adaptor<Gain, GetTemperature, random_generator>
-make_simulated_annealing_gain_adaptor(Gain gain, GetTemperature getTemperature,
-                                      random_generator rand =
-                                          random_generator()) {
+auto make_simulated_annealing_gain_adaptor(Gain gain, GetTemperature getTemperature,
+                                           random_generator rand =
+                                           random_generator()) {
     return simulated_annealing_gain_adaptor<Gain, GetTemperature,
                                             random_generator>(
         std::move(gain), std::move(getTemperature), std::move(rand));
@@ -468,7 +424,7 @@ struct simulated_annealing_commit_adaptor {
      * @return
      */
     template <typename... Args> bool operator()(Args &&... args) {
-        if (m_gain(args...) > 0) {
+        if (detail::positive_delta(m_gain(args...))) {
             return m_commit(std::forward<Args>(args)...);
         } else {
             return false;
@@ -491,9 +447,7 @@ struct simulated_annealing_commit_adaptor {
  */
 template <typename Commit, typename Gain, typename GetTemperature,
           typename random_generator = std::default_random_engine>
-simulated_annealing_commit_adaptor<Commit, Gain, GetTemperature,
-                                   random_generator>
-make_simulated_annealing_commit_adaptor(Commit commit, Gain gain,
+auto make_simulated_annealing_commit_adaptor(Commit commit, Gain gain,
                                         GetTemperature getTemperature,
                                         random_generator rand =
                                             random_generator{}) {

@@ -13,6 +13,7 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/functors.hpp"
 
+#include <boost/range/as_array.hpp>
 #include <boost/range/adaptor/map.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -40,8 +41,19 @@ template <typename Metric> class voronoi {
     typedef typename metric_traits<Metric>::DistanceType Dist;
     // TODO change to vector
     typedef GeneratorsSet Vertices;
-    typedef typename GeneratorsToVertices::const_iterator
-        VerticesForGeneratorIter;
+  private:
+    typedef std::unordered_map<VertexType,
+                               typename GeneratorsToVertices::iterator,
+                               boost::hash<VertexType>> VerticesToGenerators;
+
+    VerticesToGenerators m_vertices_to_generators;
+    GeneratorsToVertices m_generators_to_vertices;
+    Vertices m_vertices;
+    GeneratorsSet m_generators;
+
+    const Metric &m_metric;
+    const Dist m_cost_of_no_generator;
+public:
 
     /**
      * @brief Constructor
@@ -166,11 +178,12 @@ template <typename Metric> class voronoi {
      *
      * @param g
      */
-    decltype(std::pair<VerticesForGeneratorIter, VerticesForGeneratorIter>() |
-             boost::adaptors::map_values)
-        get_vertices_for_generator(VertexType g) const {
-        return m_generators_to_vertices.equal_range(g) |
-               boost::adaptors::map_values;
+    auto get_vertices_for_generator(VertexType g) const ->
+    decltype(boost::as_array(m_generators_to_vertices.equal_range(g) |
+             boost::adaptors::map_values))
+    {
+        return boost::as_array(m_generators_to_vertices.equal_range(g) |
+               boost::adaptors::map_values);
     }
 
     ///operator==
@@ -247,17 +260,6 @@ template <typename Metric> class voronoi {
             m_generators_to_vertices.insert(std::make_pair(f, v));
     }
 
-    typedef std::unordered_map<VertexType,
-                               typename GeneratorsToVertices::iterator,
-                               boost::hash<VertexType>> VerticesToGenerators;
-
-    VerticesToGenerators m_vertices_to_generators;
-    GeneratorsToVertices m_generators_to_vertices;
-    Vertices m_vertices;
-    GeneratorsSet m_generators;
-
-    const Metric &m_metric;
-    const Dist m_cost_of_no_generator;
 };
 
 

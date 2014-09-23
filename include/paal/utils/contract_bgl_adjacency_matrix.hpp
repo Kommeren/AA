@@ -11,6 +11,7 @@
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/graph/adjacency_matrix.hpp>
+#include <boost/range/as_array.hpp>
 
 namespace paal {
 namespace utils {
@@ -23,7 +24,7 @@ void contract(boost::adjacency_matrix<GraphArgs...> &amatrix,
     typedef typename mtraits::edge_descriptor MEdge;
     auto const &weight_map = get(boost::edge_weight, amatrix);
     weight_map[edge(v, w, amatrix).first] = 0;
-    for (const MEdge &e : boost::make_iterator_range(out_edges(v, amatrix))) {
+    for (auto && e : boost::as_array(out_edges(v, amatrix))) {
         MEdge f = edge(w, target(e, amatrix), amatrix).first;
         auto &we = weight_map[e];
         auto &wf = weight_map[f];

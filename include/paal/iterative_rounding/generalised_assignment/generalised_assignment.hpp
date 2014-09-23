@@ -12,7 +12,6 @@
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 
-
 namespace paal {
 namespace ir {
 
@@ -45,8 +44,8 @@ struct ga_set_solution {
      */
     template <typename Problem, typename GetSolution>
     void operator()(Problem &problem, const GetSolution &solution) {
-        auto jbegin = problem.get_jobs().first;
-        auto mbegin = problem.get_machines().first;
+        auto jbegin = std::begin(problem.get_jobs());
+        auto mbegin = std::begin(problem.get_machines());
         auto &col_idx = problem.get_col_idx();
         auto job_to_machine = problem.get_job_to_machines();
 
@@ -90,9 +89,8 @@ class ga_init {
     void add_variables(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
         col_idx.reserve(problem.get_machines_cnt() * problem.get_jobs_cnt());
-        for (auto &&j : boost::make_iterator_range(problem.get_jobs())) {
-            for (auto &&m :
-                 boost::make_iterator_range(problem.get_machines())) {
+        for (auto &&j : problem.get_jobs()) {
+            for (auto &&m : problem.get_machines()) {
                 if (problem.get_proceeding_time()(j, m) <=
                     problem.get_machine_available_time()(m)) {
                     col_idx.push_back(lp.add_column(problem.get_cost()(j, m)));
@@ -123,12 +121,12 @@ class ga_init {
     void add_constraints_for_machines(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
         int m_idx(0);
-        for (auto &&m : boost::make_iterator_range(problem.get_machines())) {
+        for (auto &&m : problem.get_machines()) {
             auto T = problem.get_machine_available_time()(m);
             int j_idx(0);
             lp::linear_expression expr;
 
-            for (auto &&j : boost::make_iterator_range(problem.get_jobs())) {
+            for (auto &&j : problem.get_jobs()) {
                 auto t = problem.get_proceeding_time()(j, m);
                 auto x = col_idx[problem.idx(j_idx, m_idx)];
                 expr += x * t;
@@ -234,15 +232,15 @@ class generalised_assignment {
     /**
      * Returns the machines iterator range.
      */
-    std::pair<MachineIter, MachineIter> get_machines() {
-        return std::make_pair(m_mbegin, m_mend);
+    boost::iterator_range<MachineIter> get_machines() {
+        return boost::make_iterator_range(m_mbegin, m_mend);
     }
 
     /**
      * Returns the jobs iterator range.
      */
-    std::pair<JobIter, JobIter> get_jobs() {
-        return std::make_pair(m_jbegin, m_jend);
+    boost::iterator_range<JobIter> get_jobs() {
+        return boost::make_iterator_range(m_jbegin, m_jend);
     }
 
     /**

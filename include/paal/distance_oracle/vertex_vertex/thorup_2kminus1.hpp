@@ -11,6 +11,7 @@
 
 #include "paal/utils/functors.hpp"
 
+#include <boost/range/as_array.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/property_map/property_map.hpp>
@@ -134,7 +135,7 @@ class distance_oracle_thorup2kminus1approximation {
         std::vector<int> nearest(num_vertices(g), -1);
         std::vector<VT> roots;
 
-        for (auto v: boost::make_iterator_range(vertices(g))) {
+        for (auto v: boost::as_array(vertices(g))) {
             int v_ind = m_index[v];
             if (m_layer_num[v_ind] >= layer_num) {
                 nearest[v_ind] = v_ind;
@@ -400,7 +401,7 @@ class distance_oracle_thorup2kminus1approximation {
         std::vector<cluster_dist> distance(num_vertices(g));
         std::vector<int> last_accessed(num_vertices(g), -1);
 
-        for (auto v: boost::make_iterator_range(vertices(g))) {
+        for (auto v: boost::as_array(vertices(g))) {
             compute_cluster(g, edge_weight, v, k, limit, distance, last_accessed);
         }
     }

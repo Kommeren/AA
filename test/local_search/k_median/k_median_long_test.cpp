@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(KMedianLong) {
                         VSet(fac.begin(), clients.end()), metric);
         Sol sol(std::move(voronoi), USet(clients.begin(), clients.end()),
                 fac.size());
-        paal::local_search::default_k_median_components::type swap;
+        paal::local_search::default_k_median_components swap;
 
         facility_location_first_improving(sol, swap);
 

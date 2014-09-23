@@ -18,7 +18,7 @@
 
 namespace paal {
 namespace data_structures {
-
+//TODO change name to product
 /**
  * @brief class representing set of ranges with two operation next and call
  *

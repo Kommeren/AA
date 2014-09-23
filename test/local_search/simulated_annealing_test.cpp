@@ -21,8 +21,8 @@ namespace ls = paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(simulated_annealing_gain_adaptor_test) {
-    int currentSolution(0);
-    int best(0);
+    int currentSolution{};
+    int best{};
     auto sa_gain = ls::make_simulated_annealing_gain_adaptor(
         gain{}, ls::make_exponential_cooling_schema_dependant_on_time(
                     std::chrono::seconds(1), 10, 0.1));
@@ -38,11 +38,11 @@ BOOST_AUTO_TEST_CASE(simulated_annealing_gain_adaptor_test) {
 }
 
 BOOST_AUTO_TEST_CASE(simulated_annealing_commit_adaptor_test) {
-    int currentSolution(0);
-    int best(0);
+    int currentSolution{};
+    int best{};
     auto sa_commit = ls::make_simulated_annealing_commit_adaptor(
         commit{}, gain{},
-        ls::exponential_cooling_schema_dependant_on_iteration(1000, 0.999));
+        ls::exponential_cooling_schema_dependant_on_iteration(1e3, 1-1e-3));
 
     auto record_solution_commit = ls::make_record_solution_commit_adapter(
         best, std::move(sa_commit), paal::utils::make_functor_to_comparator(f));
@@ -61,21 +61,21 @@ BOOST_AUTO_TEST_CASE(simulated_annealing_commit_adaptor_test) {
 BOOST_AUTO_TEST_CASE(start_temperature_test) {
     double t;
 
-    int solution{ 0 };
+    int solution{};
     auto cooling = [&]() { return t; };
     auto set_temperature = [&](double _t) { t = _t; };
     auto sa_gain = ls::make_simulated_annealing_gain_adaptor(gain{}, cooling);
 
-    auto get_success_rate = [&](double temp, int repeats_number = 1000) {
+    auto get_success_rate = [&](double temp, int repeats_number = 1e3) {
         set_temperature(temp);
         get_moves gm{};
 
-        int number_of_success = 0;
-        int total_moves = 0;
+        int number_of_success{};
+        int total_moves{};
         for (int i = 0; i < repeats_number; ++i) {
             for (auto move : gm(solution)) {
                 ++total_moves;
-                if (sa_gain(solution, move) > 0) {
+                if (paal::local_search::detail::positive_delta(sa_gain(solution, move))) {
                     ++number_of_success;
                 }
             }
@@ -89,7 +89,7 @@ BOOST_AUTO_TEST_CASE(start_temperature_test) {
     BOOST_CHECK_EQUAL(temp, 0.);
 
     for (auto ratio : { 0.6, 0.7, 0.8, 0.9, 0.95, 0.99 }) {
-        int repeat = 1000.;
+        int repeat = 1e3;
         temp = ls::start_temperature(solution, sa_gain, get_moves{},
                                      set_temperature, ratio, repeat);
         auto succ_rate = get_success_rate(temp, repeat);

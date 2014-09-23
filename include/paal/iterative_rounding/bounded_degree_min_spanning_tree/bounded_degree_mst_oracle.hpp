@@ -12,6 +12,7 @@
 #include "paal/lp/lp_base.hpp"
 
 #include <boost/optional.hpp>
+#include <boost/range/as_array.hpp>
 
 #include <vector>
 
@@ -111,7 +112,7 @@ class bdmst_violation_checker {
         m_src = m_min_cut.add_vertex_to_graph();
         m_trg = m_min_cut.add_vertex_to_graph();
 
-        for (auto v : boost::make_iterator_range(vertices(g))) {
+        for (auto v : boost::as_array(vertices(g))) {
             auto aux_v = get(index, v);
             m_src_to_v[aux_v] = m_min_cut
                 .add_edge_to_graph(m_src, aux_v, degree_of(problem, v, lp) / 2)
@@ -131,7 +132,7 @@ class bdmst_violation_checker {
         auto src = *(std::next(vertices(g).first, rand() % m_vertices_num));
         auto aux_src = get(index, src);
         m_candidate_list.clear();
-        for (auto v : boost::make_iterator_range(vertices(g))) {
+        for (auto v : boost::as_array(vertices(g))) {
             if (v != src) {
                 auto aux_v = get(index, v);
                 m_candidate_list.push_back(std::make_pair(aux_src, aux_v));
@@ -147,9 +148,8 @@ class bdmst_violation_checker {
     template <typename Problem, typename LP, typename Vertex>
     double degree_of(const Problem &problem, const Vertex &v, const LP &lp) {
         double res = 0;
-        auto adj_edges = out_edges(v, problem.get_graph());
 
-        for (auto e : boost::make_iterator_range(adj_edges)) {
+        for (auto e : boost::as_array(out_edges(v, problem.get_graph()))) {
             auto col_id = problem.edge_to_col(e);
             if (col_id) {
                 res += lp.get_col_value(*col_id);

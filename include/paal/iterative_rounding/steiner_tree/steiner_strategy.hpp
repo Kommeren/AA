@@ -15,6 +15,7 @@
 
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/filtered_graph.hpp>
+#include <boost/range/as_array.hpp>
 
 #include <vector>
 #include <unordered_set>
@@ -163,7 +164,7 @@ private:
     }
 
     void merge_vertices(int trg, int src) {
-        for (auto v : boost::make_iterator_range(adjacent_vertices(src,
+        for (auto v : boost::as_array(adjacent_vertices(src,
                 m_terminals_graph))) {
             if (trg != v) {
                 add_edge(trg, v, m_terminals_graph);

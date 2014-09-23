@@ -21,6 +21,7 @@
 #include <boost/graph/named_function_params.hpp>
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/range/as_array.hpp>
 
 #include <fstream>
 #include <tuple>
@@ -60,7 +61,7 @@ template <typename LP> class multiway_cut_lp {
     // returns the number of variables
     template <typename Graph, typename WeightMap>
     void add_variables(const Graph &graph, int k, const WeightMap &weight_map) {
-        for (auto e : boost::make_iterator_range(edges(graph))) {
+        for (auto e : boost::as_array(edges(graph))) {
             for (int i = 0; i < k; ++i) {
                 auto col_idx = m_lp.add_column(get(weight_map, e));
                 edges_column.push_back(col_idx);
@@ -78,7 +79,7 @@ template <typename LP> class multiway_cut_lp {
     void add_constraints(const Graph &graph, int k, const IndexMap &index_map,
                          const ColorMap &color_map) {
         int db_index = 0;
-        for (auto edge : boost::make_iterator_range(edges(graph))) {
+        for (auto edge : boost::as_array(edges(graph))) {
             auto sour = get(index_map, source(edge, graph));
             auto targ = get(index_map, target(edge, graph));
             for (auto i : boost::irange(0, k)) {
@@ -96,7 +97,7 @@ template <typename LP> class multiway_cut_lp {
             ++db_index;
         }
         db_index = 0;
-        for (auto vertex : boost::make_iterator_range(vertices(graph))) {
+        for (auto vertex : boost::as_array(vertices(graph))) {
             auto col = get(color_map, vertex);
             if (col != 0) {
                 auto x_col = vertices_column[
@@ -137,7 +138,7 @@ auto make_cut(const Graph &graph, int k, const VertexIndexMap &index_map,
             mc_lp.vertices_column[vertices_column_index(vertex, k, dimension)]);
     };
 
-    for (auto vertex : boost::make_iterator_range(vertices(graph))) {
+    for (auto vertex : boost::as_array(vertices(graph))) {
         for (int dimension = 0; dimension < k; ++dimension)
             if (1.0 - get_column(get(index_map, vertex), dimension) <
                     random_radiuses[dimension] ||
@@ -149,7 +150,7 @@ auto make_cut(const Graph &graph, int k, const VertexIndexMap &index_map,
                 break;
             }
     }
-    for (auto edge : boost::make_iterator_range(edges(graph))) {
+    for (auto edge : boost::as_array(edges(graph))) {
         if (vertex_to_part[get(index_map, source(edge, graph))] !=
             vertex_to_part[get(index_map, target(edge, graph))])
             cut_cost += get(weight_map, edge);
@@ -171,7 +172,7 @@ auto multiway_cut_dispatch(const Graph &graph, OutputIterator result,
     using CostType = detail::CostType<Graph>;
     Distribution dis(0, 1);
     int terminals = 0;
-    for (auto vertex : boost::make_iterator_range(vertices(graph))) {
+    for (auto vertex : boost::as_array(vertices(graph))) {
         terminals = std::max(terminals, get(color_map, vertex));
     }
     detail::multiway_cut_lp<LP> multiway_cut_lp;
@@ -189,7 +190,7 @@ auto multiway_cut_dispatch(const Graph &graph, OutputIterator result,
             cut_cost = res;
         }
     }
-    for (auto v : boost::make_iterator_range(vertices(graph))) {
+    for (auto v : boost::as_array(vertices(graph))) {
         *result = std::make_pair(v, best_solution[get(index_map, v)]);
         ++result;
     }

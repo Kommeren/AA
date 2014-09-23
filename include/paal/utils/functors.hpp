@@ -110,7 +110,7 @@ template <typename T> struct dynamic_return_something_functor {
  * @return
  */
 template <typename T>
-dynamic_return_something_functor<T> make_dynamic_return_something_functor(T t) {
+auto make_dynamic_return_something_functor(T t) {
     return dynamic_return_something_functor<T>(t);
 }
 
@@ -229,8 +229,7 @@ class counting_functor_adaptor {
  * @return
  */
 template <typename CounterType = int, typename Functor>
-counting_functor_adaptor<Functor, CounterType>
-make_counting_functor_adaptor(Functor f, CounterType &cnt) {
+auto make_counting_functor_adaptor(Functor f, CounterType &cnt) {
     return counting_functor_adaptor<Functor, CounterType>(std::move(f), cnt);
 }
 
@@ -277,7 +276,7 @@ template <typename Array> class array_to_functor {
  * @return
  */
 template <typename Array>
-array_to_functor<Array> make_array_to_functor(const Array &a, int offset = 0) {
+auto make_array_to_functor(const Array &a, int offset = 0) {
     return array_to_functor<Array>(a, offset);
 }
 
@@ -334,7 +333,7 @@ template <typename Functor> struct assignable_functor {
  * @return
  */
 template <typename Functor>
-assignable_functor<Functor> make_assignable_functor(Functor &f) {
+auto make_assignable_functor(Functor &f) {
     return assignable_functor<Functor>(f);
 }
 
@@ -380,7 +379,7 @@ template <typename Functor> struct lift_iterator_functor {
  * @return
  */
 template <typename Functor>
-lift_iterator_functor<Functor> make_lift_iterator_functor(Functor f) {
+auto make_lift_iterator_functor(Functor f) {
     return lift_iterator_functor<Functor>(f);
 }
 
@@ -549,8 +548,7 @@ struct functor_to_comparator {
  * @return
  */
 template <typename Functor, typename Compare = less>
-functor_to_comparator<Functor, Compare>
-make_functor_to_comparator(Functor functor, Compare compare = Compare()) {
+auto make_functor_to_comparator(Functor functor, Compare compare = Compare()) {
     return functor_to_comparator<Functor, Compare>(std::move(functor),
                                                    std::move(compare));
 }
@@ -598,8 +596,7 @@ struct scale_functor {
  */
 template <typename ScaleType, typename ReturnType = ScaleType,
           typename Functor>
-scale_functor<Functor, ScaleType, ReturnType> make_scale_functor(Functor f,
-                                                                  ScaleType s) {
+auto make_scale_functor(Functor f, ScaleType s) {
     return scale_functor<Functor, ScaleType, ReturnType>(f, s);
 }
 
@@ -762,9 +759,8 @@ struct lift_binary_operator_functor {
  * @return
  */
 template <typename FunctorLeft, typename FunctorRight, typename Operator>
-lift_binary_operator_functor<FunctorLeft, FunctorRight, Operator>
-make_lift_binary_operator_functor(FunctorLeft left, FunctorRight right,
-                                  Operator op) {
+auto make_lift_binary_operator_functor(FunctorLeft left, FunctorRight right,
+                                       Operator op) {
     return lift_binary_operator_functor<FunctorLeft, FunctorRight, Operator>(
         std::move(left), std::move(right), std::move(op));
 }
@@ -801,17 +797,16 @@ template <typename Functor> struct not_functor {
 
 /// make for Not
 template <typename Functor>
-not_functor<Functor> make_not_functor(Functor functor) {
+auto make_not_functor(Functor functor) {
     return not_functor<Functor>(std::move(functor));
 }
 
 /// or_functor
 template <typename FunctorLeft, typename FunctorRight>
-class or_functor
+struct or_functor
     : public lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> {
     typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, Or> base;
 
-  public:
     /**
      * @brief constructor
      *
@@ -825,19 +820,17 @@ class or_functor
 
 /// make for or_functor
 template <typename FunctorLeft, typename FunctorRight>
-or_functor<FunctorLeft, FunctorRight> make_or_functor(FunctorLeft left,
-                                                      FunctorRight right) {
+auto make_or_functor(FunctorLeft left,
+                     FunctorRight right) {
     return or_functor<FunctorLeft, FunctorRight>(std::move(left),
                                                  std::move(right));
 }
 
 /// and_functor
 template <typename FunctorLeft, typename FunctorRight>
-class and_functor
+struct and_functor
     : public lift_binary_operator_functor<FunctorLeft, FunctorRight, And> {
     typedef lift_binary_operator_functor<FunctorLeft, FunctorRight, And> base;
-
-  public:
 
     /**
      * @brief constructor
@@ -852,20 +845,18 @@ class and_functor
 
 /// make and_functor
 template <typename FunctorLeft, typename FunctorRight>
-and_functor<FunctorLeft, FunctorRight> make_and_functor(FunctorLeft left,
-                                                        FunctorRight right) {
+auto make_and_functor(FunctorLeft left, FunctorRight right) {
     return and_functor<FunctorLeft, FunctorRight>(std::move(left),
                                                   std::move(right));
 }
 
 /// xor_functor
 template <typename FunctorLeft, typename FunctorRight>
-class xor_functor : public lift_binary_operator_functor<
+struct xor_functor : public lift_binary_operator_functor<
     FunctorLeft, FunctorRight, not_equal_to> {
     typedef lift_binary_operator_functor<FunctorLeft, FunctorRight,
                                          not_equal_to> base;
 
-  public:
     /**
      * @brief constructor
      *
@@ -879,8 +870,7 @@ class xor_functor : public lift_binary_operator_functor<
 
 /// make for Xor
 template <typename FunctorLeft, typename FunctorRight>
-xor_functor<FunctorLeft, FunctorRight> make_xor_functor(FunctorLeft left,
-                                                        FunctorRight right) {
+auto make_xor_functor(FunctorLeft left, FunctorRight right) {
     return xor_functor<FunctorLeft, FunctorRight>(std::move(left),
                                                   std::move(right));
 }

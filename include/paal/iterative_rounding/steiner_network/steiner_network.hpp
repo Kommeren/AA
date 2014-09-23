@@ -18,6 +18,7 @@
 
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/named_function_params.hpp>
+#include <boost/range/as_array.hpp>
 
 
 namespace paal {
@@ -305,7 +306,7 @@ class steiner_network_init {
     // adding variables
     template <typename Problem, typename LP>
     void add_variables(Problem &problem, LP &lp) {
-        for (auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
+        for (auto e : boost::as_array(edges(problem.get_graph()))) {
             lp::col_id col = lp.add_column(problem.get_cost(e), 0, 1);
             problem.bind_edge_to_col(e, col);
         }

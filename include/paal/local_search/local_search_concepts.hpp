@@ -17,9 +17,9 @@ namespace paal {
 namespace local_search {
 namespace concepts {
 
-template <typename X, typename Solution, typename SearchComponents>
+template <typename Functor, typename Solution, typename SearchComponents>
 struct concepts_base {
-    X x;
+    Functor functor;
     Solution s;
     typedef typename move_type<SearchComponents, Solution>::value_type Move;
     Move u;
@@ -28,7 +28,7 @@ struct concepts_base {
 template <typename X, typename Solution, typename SearchComponents>
 struct get_moves : concepts_base<X, Solution, SearchComponents> {
     BOOST_CONCEPT_USAGE(get_moves) {
-        auto i = this->x(this->s);
+        auto i = this->functor(this->s);
         auto b = std::begin(i);
         auto e = std::end(i);
         for (auto x = b; x != e; ++x) {
@@ -42,14 +42,14 @@ struct get_moves : concepts_base<X, Solution, SearchComponents> {
 template <typename X, typename Solution, typename SearchComponents>
 struct gain : concepts_base<X, Solution, SearchComponents> {
     BOOST_CONCEPT_USAGE(gain) {
-        boost::ignore_unused_variable_warning(this->x(this->s, this->u) > 0);
+        boost::ignore_unused_variable_warning(this->functor(this->s, this->u) > this->functor(this->s, this->u));
     }
 };
 
 template <typename X, typename Solution, typename SearchComponents>
 struct commit : concepts_base<X, Solution, SearchComponents> {
     BOOST_CONCEPT_USAGE(commit) {
-        bool b = this->x(this->s, this->u);
+        bool b = this->functor(this->s, this->u);
         boost::ignore_unused_variable_warning(b);
     }
 };

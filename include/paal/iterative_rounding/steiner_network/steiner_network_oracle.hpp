@@ -10,6 +10,8 @@
 
 #include "paal/iterative_rounding/min_cut.hpp"
 
+#include <boost/range/as_array.hpp>
+
 namespace paal {
 namespace ir {
 
@@ -34,7 +36,7 @@ class steiner_network_violation_checker {
         const auto &index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
-        for (auto e : boost::make_iterator_range(edges(g))) {
+        for (auto e : boost::as_array(edges(g))) {
             auto u = get(index, source(e, g));
             auto v = get(index, target(e, g));
             m_min_cut.add_edge_to_graph(u, v, 1, 1);

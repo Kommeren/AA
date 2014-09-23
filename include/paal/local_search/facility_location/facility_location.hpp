@@ -22,30 +22,27 @@ namespace local_search {
  * @brief Model of Multisearch_components with default multi search components
  * for facility location.
  */
-struct default_remove_fl_components {
-    typedef Multisearch_components<facility_locationget_moves_remove,
-                                   facility_location_gain_remove,
-                                   facility_location_commit_remove> type;
-};
+using default_remove_fl_components =
+    Multisearch_components<facility_locationget_moves_remove,
+                           facility_location_gain_remove,
+                           facility_location_commit_remove>;
 
 /**
  * @brief add components for facility location
  */
-struct default_add_fl_components {
-    typedef Multisearch_components<facility_locationget_moves_add,
-                                   facility_location_gain_add,
-                                   facility_location_commit_add> type;
-};
+using default_add_fl_components =
+    Multisearch_components<facility_locationget_moves_add,
+                           facility_location_gain_add,
+                           facility_location_commit_add>;
 
 /**
  * @brief Swap components for facility location
  *
  */
-struct default_swap_fl_components {
-    typedef Multisearch_components<facility_locationget_moves_swap,
-                                   facility_location_gain_swap,
-                                   facility_location_commit_swap> type;
-};
+using default_swap_fl_components =
+    Multisearch_components<facility_locationget_moves_swap,
+                           facility_location_gain_swap,
+                           facility_location_commit_swap>;
 
 /**
  * facility_location_local_search
@@ -103,5 +100,5 @@ bool facility_location_first_improving(facility_location_solution &fls,
         fls, first_improving_strategy{}, utils::always_true{},
         utils::always_false{}, std::move(comps)...);
 }
-}
-}
+} //! local_search
+} //! paal

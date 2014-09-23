@@ -225,7 +225,7 @@ class iterative_rounding  {
         auto column = m_lp.get_rows_in_column(*col_iter);
         lp::row_id row;
         double coef;
-        for (auto const &c : boost::make_iterator_range(column)) {
+        for (auto const &c : column) {
             boost::tie(row, coef) = c;
             double ub = m_lp.get_row_upper_bound(row);
             double lb = m_lp.get_row_lower_bound(row);

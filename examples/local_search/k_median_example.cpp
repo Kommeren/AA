@@ -33,7 +33,7 @@ int main() {
     Sol sol(std::move(voronoi), USet{ SGM::A, SGM::C }, k);
 
     // create facility location local search step
-    paal::local_search::default_k_median_components::type swap;
+    paal::local_search::default_k_median_components swap;
 
     // search
     paal::local_search::facility_location_first_improving(

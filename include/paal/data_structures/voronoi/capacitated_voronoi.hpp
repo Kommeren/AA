@@ -11,7 +11,9 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/range/as_array.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/numeric.hpp>
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/graph/successive_shortest_path_nonnegative_weights.hpp>
 #include <boost/graph/find_flow_cost.hpp>
@@ -61,8 +63,6 @@ class capacitated_voronoi {
          * @brief operator-
          *
          * @param d
-         *
-         * @return
          */
         Dist operator-(Dist d) {
             return Dist(
@@ -72,8 +72,6 @@ class capacitated_voronoi {
 
         /**
          * @brief how many vertices are not covered
-         *
-         * @return
          */
         DistI get_dist_to_full_assignment() const {
             return m_dist_to_full_assignment;
@@ -81,8 +79,6 @@ class capacitated_voronoi {
 
         /**
          * @brief sum of distances from vertices to facilities
-         *
-         * @return
          */
         DistI get_real_dist() const { return m_real_dist; }
 
@@ -90,8 +86,6 @@ class capacitated_voronoi {
          * @brief operator==
          *
          * @param d
-         *
-         * @return
          */
         bool operator==(Dist d) const {
             return m_real_dist == d.m_real_dist &&
@@ -102,24 +96,20 @@ class capacitated_voronoi {
          * @brief operator>
          *
          * @param d
-         *
-         * @return
          */
-        bool operator>(DistI d) {
-            if (m_dist_to_full_assignment > DistI(0)) {
+        bool operator>(Dist d) const {
+            if (m_dist_to_full_assignment > d.m_dist_to_full_assignment) {
                 return true;
-            } else if (m_dist_to_full_assignment < DistI(0)) {
+            } else if (m_dist_to_full_assignment < d.m_dist_to_full_assignment) {
                 return false;
             }
-            return m_real_dist > d;
+            return m_real_dist > d.m_real_dist;
         }
 
         /**
          * @brief operator+=
          *
          * @param d
-         *
-         * @return
          */
         const Dist &operator+=(Dist d) {
             m_real_dist += d.m_real_dist;
@@ -131,8 +121,6 @@ class capacitated_voronoi {
          * @brief operator+
          *
          * @param d
-         *
-         * @return
          */
         Dist operator+(Dist d) {
             Dist ret(d);
@@ -201,7 +189,6 @@ class capacitated_voronoi {
     typedef boost::graph_traits<Graph> GTraits;
     typedef typename GTraits::edge_descriptor ED;
     typedef typename GTraits::edge_iterator EI;
-    typedef typename GTraits::out_edge_iterator OEI;
     typedef typename GTraits::in_edge_iterator IEI;
     typedef typename GTraits::vertex_descriptor VD;
     typedef typename boost::property_map<
@@ -270,7 +257,7 @@ class capacitated_voronoi {
           m_v_to_graph_v(other.m_v_to_graph_v),
           m_g_to_graph_v(other.m_g_to_graph_v) {
         auto rev = get(boost::edge_reverse, m_g);
-        for (auto e : boost::make_iterator_range(edges(m_g))) {
+        for (auto e : boost::as_array(edges(m_g))) {
             auto eb = edge(target(e, m_g), source(e, m_g), m_g);
             assert(eb.second);
             rev[e] = eb.first;
@@ -307,7 +294,7 @@ class capacitated_voronoi {
 
         // removing flow from the net
         for (const ED &e :
-             boost::make_iterator_range(in_edges(genGraph, m_g))) {
+             boost::as_array(in_edges(genGraph, m_g))) {
             bool b;
             VD v = source(e, m_g);
             if (v == m_t) {
@@ -354,15 +341,15 @@ class capacitated_voronoi {
      * and the second element is the flow from this vertex to given generator
      *
      */
-    std::pair<VForGenerator, VForGenerator>
+    boost::iterator_range<VForGenerator>
     get_vertices_for_generator(VertexType gen) const {
         IEI ei, end;
         VD v = m_g_to_graph_v.at(gen);
         auto r = in_edges(v, m_g);
         Trans t;
         t.m_v = this;
-        return std::make_pair(VForGenerator(r.first, t),
-                              VForGenerator(r.second, t));
+        return boost::make_iterator_range(VForGenerator(r.first, t),
+                                          VForGenerator(r.second, t));
     }
 
     /**
@@ -372,10 +359,8 @@ class capacitated_voronoi {
      */
     Dist get_cost() const {
         auto residual_capacity = get(boost::edge_residual_capacity, m_g);
-        OEI ei, end;
-        std::tie(ei, end) = out_edges(m_s, m_g);
         DistI resCap =
-            std::accumulate(ei, end, DistI(0), [&](DistI d, const ED & e) {
+            boost::accumulate(out_edges(m_s, m_g), DistI(0), [&](DistI d, const ED & e) {
             return d + residual_capacity[e];
         });
 
@@ -401,11 +386,11 @@ class capacitated_voronoi {
         auto capacity = get(boost::edge_capacity, v.m_g);
         auto residual_capacity = get(boost::edge_residual_capacity, v.m_g);
         auto name = get(boost::vertex_name, v.m_g);
-        for (int v : boost::make_iterator_range(verticesToDisplay)) {
+        for (auto v : boost::as_array(verticesToDisplay)) {
             s << v << "-> " << name[v] << ", ";
         }
         s << "\n";
-        for (auto e : boost::make_iterator_range(edgesToDisplay)) {
+        for (auto e : boost::as_array(edgesToDisplay)) {
             s << e << "-> " << residual_capacity[e] << "-> " << capacity[e]
               << ", ";
         }

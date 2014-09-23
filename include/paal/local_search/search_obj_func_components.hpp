@@ -53,8 +53,7 @@ using search_componentsObjFun = typename componentsObjFun::type<Args...>;
  * @return
  */
 template <typename... Args>
-auto make_search_componentsObjFun(Args &&... args)
-    ->decltype(componentsObjFun::make_components(std::forward<Args>(args)...)) {
+auto make_search_componentsObjFun(Args &&... args) {
     return componentsObjFun::make_components(std::forward<Args>(args)...);
 }
 

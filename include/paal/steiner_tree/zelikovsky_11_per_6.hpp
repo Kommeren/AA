@@ -24,6 +24,7 @@
 #include <boost/graph/subgraph.hpp>
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 
+#include <boost/range/combine.hpp>
 #include <boost/range/join.hpp>
 #include <boost/range/irange.hpp>
 #include <boost/range/algorithm/copy.hpp>
@@ -90,15 +91,8 @@ template <typename Metric, typename Voronoi> class steiner_tree {
         auto subsets = make_three_subset_range(ti.begin(), ti.end());
 
         auto get_moves = [&](const AMatrix &) {
-            return boost::make_iterator_range(
-                boost::make_zip_iterator(boost::make_tuple(
-                    boost::begin(subsets),
-                    boost::make_transform_iterator(m_subs_dists.begin(),
-                                                   utils::remove_reference()))),
-                boost::make_zip_iterator(boost::make_tuple(
-                    boost::end(subsets),
-                    boost::make_transform_iterator(
-                        m_subs_dists.end(), utils::remove_reference()))));
+            return boost::combine(subsets, m_subs_dists | boost::adaptors::transformed(
+                                                   utils::remove_reference()));
         };
 
         auto obj_fun = [&](const AMatrix & m, const Move & t) {

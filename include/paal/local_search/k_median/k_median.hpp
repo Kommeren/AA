@@ -21,12 +21,11 @@ namespace local_search {
  * @brief Model of Multisearch_components with default multi search components
  * for k-median.
  */
-struct default_k_median_components {
-    typedef Multisearch_components<
+using default_k_median_components =
+    Multisearch_components<
         facility_locationget_moves_swap,
         facility_location_gain_swap,
-        facility_location_commit_swap> type;
-};
+        facility_location_commit_swap>;
 }
 }
 

@@ -10,6 +10,8 @@
 
 #include "paal/utils/functors.hpp"
 
+#include "paal/local_search/local_search.hpp"
+
 #include <chrono>
 #include <random>
 
@@ -280,12 +282,12 @@ struct tabu_gain_adaptor {
         ->decltype(std::declval<Gain>()(std::forward<Args>(args)...)) {
         if (!m_tabu_list.is_tabu(std::forward<Args>(args)...)) {
             auto diff = m_aspiration_criteria_gain(std::forward<Args>(args)...);
-            if (diff > 0) {
+            if (detail::positive_delta(diff)) {
                 m_tabu_list.accept(std::forward<Args>(args)...);
             }
             return diff;
         }
-        return 0;
+        return decltype(std::declval<Gain>()(std::forward<Args>(args)...)){};
     }
 
   private:

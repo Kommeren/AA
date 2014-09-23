@@ -16,6 +16,7 @@
 #include "paal/lp/separation_oracles.hpp"
 
 #include <boost/bimap.hpp>
+#include <boost/range/as_array.hpp>
 #include <boost/graph/connected_components.hpp>
 
 namespace paal {
@@ -408,7 +409,7 @@ struct bdmst_init {
      */
     template <typename Problem, typename LP>
     void add_variables(Problem & problem, LP & lp) {
-        for (auto e : boost::make_iterator_range(edges(problem.get_graph()))) {
+        for (auto e : boost::as_array(edges(problem.get_graph()))) {
             auto col = lp.add_column(problem.get_cost(e), 0, 1);
             problem.bind_edge_to_col(e, col);
         }
@@ -423,11 +424,10 @@ struct bdmst_init {
     void add_degree_bound_constraints(Problem &problem, LP &lp) {
         auto const &g = problem.get_graph();
 
-        for (auto v : boost::make_iterator_range(vertices(g))) {
-            auto adj_edges = out_edges(v, g);
+        for (auto v : boost::as_array(vertices(g))) {
             lp::linear_expression expr;
 
-            for (auto e : boost::make_iterator_range(adj_edges)) {
+            for (auto e : boost::as_array(out_edges(v, g))) {
                 expr += *(problem.edge_to_col(e));
             }
 

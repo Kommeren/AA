@@ -59,9 +59,7 @@ using TwoLocalcomponents = data_structures::components<
  * @return
  */
 template <typename Gain, typename GetMoves = two_local_searchget_moves>
-TwoLocalcomponents<Gain, GetMoves>
-make_two_local_search_components(Gain ch, GetMoves gm = GetMoves{}) {
-
+auto make_two_local_search_components(Gain ch, GetMoves gm = GetMoves{}) {
     return TwoLocalcomponents<Gain, GetMoves>(std::move(ch), std::move(gm));
 }
 

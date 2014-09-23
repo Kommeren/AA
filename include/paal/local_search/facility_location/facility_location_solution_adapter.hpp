@@ -37,15 +37,11 @@ template <typename facility_location_solution>
 class facility_location_solution_adapter {
     typedef facility_location_solution FLS;
 
-    template <typename Collection>
+    //TODO in fractioned MUCA commit, there will be function separated for that
+    template <typename Collection, typename Range
+                = const typename boost::iterator_range<typename Collection::const_iterator>::type>
     auto get_cycledCopy(const Collection &col, std::size_t index) const
-        ->decltype(boost::join(
-              boost::make_iterator_range(
-                  std::declval<typename Collection::const_iterator>(),
-                  std::declval<typename Collection::const_iterator>()),
-              boost::make_iterator_range(
-                  std::declval<typename Collection::const_iterator>(),
-                  std::declval<typename Collection::const_iterator>()))) {
+        -> boost::joined_range<Range, Range> {
         return boost::join(
             boost::make_iterator_range(col.begin() + index, col.end()),
             boost::make_iterator_range(col.begin(), col.begin() + index));
@@ -62,6 +58,18 @@ class facility_location_solution_adapter {
     typedef std::vector<VertexType> UnchosenCopy;
     typedef std::vector<VertexType> ChosenCopy;
 
+  private:
+    facility_location_solution &m_sol;
+    /// copy of all unchosen facilities
+    UnchosenCopy m_unchosen_copy;
+    /// copy of all chosen facilities
+    ChosenCopy m_chosen_copy;
+    /// index of last facility removed from unchosen
+    std::size_t m_last_used_unchosen;
+    /// index of last facility removed from chosen
+    std::size_t m_last_used_chosen;
+
+public:
     /**
      * @brief constructor creates cycled range of all facilities
      *
@@ -153,7 +161,7 @@ class facility_location_solution_adapter {
      */
     auto getUnchosenCopy() const->decltype(
         std::declval<facility_location_solution_adapter>().get_cycledCopy(
-            UnchosenCopy{}, std::size_t{})) {
+            m_unchosen_copy, m_last_used_unchosen)) {
         return get_cycledCopy(m_unchosen_copy, m_last_used_unchosen);
     }
 
@@ -166,21 +174,9 @@ class facility_location_solution_adapter {
      */
     auto getChosenCopy() const->decltype(
         std::declval<facility_location_solution_adapter>().get_cycledCopy(
-            ChosenCopy{}, std::size_t{})) {
+            m_chosen_copy, m_last_used_chosen)) {
         return get_cycledCopy(m_chosen_copy, m_last_used_chosen);
     }
-
-  private:
-
-    facility_location_solution &m_sol;
-    /// copy of all unchosen facilities
-    UnchosenCopy m_unchosen_copy;
-    /// copy of all chosen facilities
-    ChosenCopy m_chosen_copy;
-    /// index of last facility removed from unchosen
-    std::size_t m_last_used_unchosen;
-    /// index of last facility removed from chosen
-    std::size_t m_last_used_chosen;
 };
 
 } // local_search

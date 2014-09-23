@@ -17,6 +17,7 @@
 #include <boost/graph/one_bit_color_map.hpp>
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/graph/subgraph.hpp>
+#include <boost/range/as_array.hpp>
 
 #include <queue>
 
@@ -75,7 +76,7 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
     //get part id and compute minimum cost of cut of that part and add it to queue
     auto make_cut = [&](int id) {
         vertex_in_part=0;
-        for (auto v: boost::make_iterator_range(vertices(graph))) {
+        for (auto v: boost::as_array(vertices(graph))) {
             if (vertex_to_part[get(index_map, v)] == id) {
                 vertex_in_subgraph_to_vertex[vertex_in_part] = v;
                 vertex_to_vertex_in_subgraph[get(index_map, v)] = vertex_in_part;
@@ -83,7 +84,7 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
             }
         }
         Graph part(vertex_in_part);
-        for (auto edge : boost::make_iterator_range(edges(graph))) {
+        for (auto edge : boost::as_array(edges(graph))) {
             auto sour = get(index_map, source(edge,graph));
             auto targ = get(index_map, target(edge,graph));
             if (vertex_to_part[sour] == id &&
@@ -129,7 +130,7 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
         auto cut = cuts.top();
         cuts.pop();
         ++id_part;
-        for (auto v: boost::make_iterator_range(vertices(graph))) {
+        for (auto v: boost::as_array(vertices(graph))) {
             if (vertex_to_part[get(index_map, v)] == cut.second ||
                     vertex_to_part[get(index_map, v)] == cut.second + 1) {
                 *result = std::make_pair(v, id_part);

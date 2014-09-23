@@ -14,6 +14,8 @@
 #include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
 
+#include <boost/range/iterator_range.hpp>
+
 #include <glpk.h>
 
 namespace paal {
@@ -309,7 +311,7 @@ class glp_impl {
      * Returns the identifiers and coefficients of all rows in a given column,
      * which constraint matrix coefficient is non-zero (as an iterator range).
      */
-    std::pair<RowsInColumnIterator, RowsInColumnIterator>
+    boost::iterator_range<RowsInColumnIterator>
     get_rows_in_column(col_id col) const {
         int size = glp_get_mat_col(m_lp, get_col(col), &m_idx_rows_tmp[0],
                                    &m_val_rows_tmp[0]);
@@ -317,8 +319,8 @@ class glp_impl {
             m_rows_tmp[i].first = get_row_id(m_idx_rows_tmp[i]);
             m_rows_tmp[i].second = m_val_rows_tmp[i];
         }
-        return std::make_pair(m_rows_tmp.begin() + 1,
-                              m_rows_tmp.begin() + size + 1);
+        return boost::make_iterator_range(m_rows_tmp.begin() + 1,
+                                          m_rows_tmp.begin() + size + 1);
     }
 
   private:

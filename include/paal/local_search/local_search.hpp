@@ -25,6 +25,13 @@
 namespace paal {
 namespace local_search {
 
+namespace detail {
+    template <typename Delta>
+    bool positive_delta(Delta && d) {
+        return d > typename std::decay<Delta>::type{};
+    }
+}
+
 /**
  * @brief this predicates returns true if there is a move with positive gain
  *        and the commit was successful
@@ -37,24 +44,16 @@ struct find_positive_predicate {
      * @tparam componentsAndSolution
      * @param compsAndSol
      *
-     * @return
+     * @return true after successful commit, false otherwise
      */
     template <typename componentsAndSolution>
     bool operator()(componentsAndSolution &compsAndSol) const {
         auto &solution = compsAndSol.second;
         auto &comps = compsAndSol.first;
+        auto && adjustmentSet = comps.template call<GetMoves>(solution);
 
-        using MoveRef =
-            typename move_type<puretype(comps), puretype(solution)>::reference;
-        //        using Delta = typename fitness<puretype(comps),
-        // puretype(solution)>::type;
-        //        TODO use above in comparison
-
-        decltype(comps.template call<GetMoves>(solution)) adjustmentSet =
-            comps.template call<GetMoves>(solution);
-
-        for (MoveRef move : boost::make_iterator_range(adjustmentSet)) {
-            if (comps.template call<Gain>(solution, move) > 0) {
+        for (auto && move : adjustmentSet) {
+            if (detail::positive_delta(comps.template call<Gain>(solution, move))) {
                 if (comps.template call<Commit>(solution, move)) {
                     return true;
                 }
@@ -114,23 +113,17 @@ struct max_functor {
                     Continuation continuation) const {
         auto &comps = compsAndSol.first;
         auto &solution = compsAndSol.second;
+        auto && adjustmentSet = comps.template call<GetMoves>(solution);
 
-        using Move =
-            typename move_type<puretype(comps), puretype(solution)>::value_type;
-        using MoveRef =
-            typename move_type<puretype(comps), puretype(solution)>::reference;
-
-        decltype(comps.template call<GetMoves>(solution)) adjustmentSet =
-            comps.template call<GetMoves>(solution);
-
+        //thanks to this checks move doesn't have to be default constructible
         if (boost::empty(adjustmentSet)) {
             return continuation(accumulatorFunctor, accumulatorData);
         }
 
-        Move maxMove = *std::begin(adjustmentSet);
+        auto maxMove = *std::begin(adjustmentSet);
         auto maxGain = comps.template call<Gain>(solution, maxMove);
 
-        for (MoveRef move : boost::make_iterator_range(
+        for (auto && move : boost::make_iterator_range(
                  ++std::begin(adjustmentSet), std::end(adjustmentSet))) {
             auto gain = comps.template call<Gain>(solution, move);
             if (gain > maxGain) {

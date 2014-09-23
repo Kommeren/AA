@@ -11,6 +11,7 @@
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/functors.hpp"
 
+
 namespace paal {
 namespace simple_algo {
 
@@ -33,16 +34,12 @@ get_cfl_cost(const Metric &m, const FCosts &fcosts, const FLSolution &fls) {
 
     typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::DistanceType Dist;
-    typedef typename MT::VertexType VertexType;
 
-    Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0),
-                             [&](Dist d, VertexType f) {
-        return d + fcosts(f);
-    });
+    //TODO use sum_functor when appears
+    Dist d = utils::accumulate_functor(ch, Dist(0), fcosts);
 
-    for (VertexType f : ch) {
-        for (std::pair<VertexType, Dist> v :
-             boost::make_iterator_range(fls.get_clients_for_facility(f))) {
+    for (auto && f : ch) {
+        for (auto && v : fls.get_clients_for_facility(f)) {
             d += m(v.first, f) * v.second;
         }
     }
@@ -69,16 +66,12 @@ get_fl_cost(const Metric &m, const FCosts &fcosts, const FLSolution &fls) {
 
     typedef data_structures::metric_traits<Metric> MT;
     typedef typename MT::DistanceType Dist;
-    typedef typename MT::VertexType VertexType;
 
-    Dist d = std::accumulate(ch.begin(), ch.end(), Dist(0),
-                             [&](Dist d, VertexType f) {
-        return d + fcosts(f);
-    });
+    //TODO use sum_functor when appears
+    Dist d = utils::accumulate_functor(ch, Dist(0), fcosts);
 
-    for (VertexType f : ch) {
-        for (VertexType v :
-             boost::make_iterator_range(fls.get_clients_for_facility(f))) {
+    for (auto && f : ch) {
+        for (auto && v : fls.get_clients_for_facility(f)) {
             d += m(v, f);
         }
     }

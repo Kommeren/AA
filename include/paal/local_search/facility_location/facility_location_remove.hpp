@@ -46,7 +46,7 @@ struct facility_location_gain_remove {
             back;
 
         ret = s.remove_facility_tentative(e);
-        // TODO for capacitated version we should  just restart copy
+        // TODO for capacitated version we should just restart copy
         back = s.add_facility_tentative(e);
         assert(ret == -back);
         return -ret;

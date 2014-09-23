@@ -22,6 +22,7 @@
 #include <boost/graph/named_function_params.hpp>
 #include <boost/graph/stoer_wagner_min_cut.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/range/as_array.hpp>
 #include <boost/range/distance.hpp>
 
 #include <algorithm>
@@ -138,7 +139,7 @@ struct ta_set_solution {
     template <typename Problem, typename GetSolution>
     void operator()(Problem &problem, const GetSolution &solution) {
         for (auto e :
-             boost::make_iterator_range(edges(problem.get_links_graph()))) {
+             boost::as_array(edges(problem.get_links_graph()))) {
             if (!problem.is_in_solution(e)) {
                 auto col = problem.edge_to_col(e);
                 if (m_compare.e(solution(col), 1)) {
@@ -177,7 +178,7 @@ class ta_init {
      */
     template <typename Problem, typename LP>
     void add_variables(Problem & problem, LP & lp) {
-        for (auto e : boost::make_iterator_range(edges(problem.get_links_graph()))) {
+        for (auto e : boost::as_array(edges(problem.get_links_graph()))) {
             lp::col_id col_idx = lp.add_column(problem.get_cost(e), 0);
             problem.bind_edge_to_col(e, col_idx);
         }
@@ -190,7 +191,7 @@ class ta_init {
     template <typename Problem, typename LP>
     void add_cut_constraints(Problem &problem, LP &lp) {
         for (auto e :
-             boost::make_iterator_range(edges(problem.get_tree_graph()))) {
+             boost::as_array(edges(problem.get_tree_graph()))) {
             lp::linear_expression expr;
             for (auto pe : problem.get_covered_by(e)) {
                 expr += problem.edge_to_col(pe);
@@ -357,7 +358,7 @@ class tree_aug {
         auto pred_map =
             boost::make_iterator_property_map(pred.begin(), m_index);
         std::set<Vertex> seen;
-        for (auto u : boost::make_iterator_range(vertices(m_g))) {
+        for (auto u : boost::as_array(vertices(m_g))) {
             auto tmp = seen.insert(u);
             assert(tmp.second);
             boost::breadth_first_search(
@@ -365,7 +366,7 @@ class tree_aug {
                                boost::record_edge_predecessors(
                                    pred_map, boost::on_tree_edge()))));
 
-            for (auto e : boost::make_iterator_range(out_edges(u, m_ntree))) {
+            for (auto e : boost::as_array(out_edges(u, m_ntree))) {
                 auto node = target(e, m_ntree);
                 if (!seen.count(node)) {
                     while (node != u) {
