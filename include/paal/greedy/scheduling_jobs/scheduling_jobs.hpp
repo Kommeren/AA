@@ -40,9 +40,8 @@ struct sched_traits {
     typedef typename std::iterator_traits<MachineIterator>::reference
         machine_reference;
     typedef typename std::iterator_traits<JobIterator>::reference job_reference;
-    typedef typename utils::pure_result_of<GetSpeed(machine_reference)>::type
-        speed_t;
-    typedef typename utils::pure_result_of<GetLoad(job_reference)>::type load_t;
+    typedef pure_result_of_t<GetSpeed(machine_reference)> speed_t;
+    typedef pure_result_of_t<GetLoad(job_reference)> load_t;
     typedef data_structures::fraction<load_t, speed_t> frac_t;
 };
 

@@ -32,11 +32,11 @@ template <class AuctionComponents>
 struct auction_traits {
    using bidders_t = decltype(std::declval<AuctionComponents>().template get<bidders>());
    using bidder_iterator_t = puretype(std::begin(std::declval<bidders_t>()));
-   using bidder_t = typename utils::collection_to_ref<bidders_t>::type;
-   using bidder_val_t = typename utils::collection_to_elem<bidders_t>::type;
+   using bidder_t = range_to_ref_t<bidders_t>;
+   using bidder_val_t = range_to_elem_t<bidders_t>;
    using items_t = decltype(std::declval<AuctionComponents>().template get<items>());
-   using item_t = typename utils::collection_to_ref<items_t>::type;
-   using item_val_t = typename utils::collection_to_elem<items_t>::type;
+   using item_t = range_to_ref_t<items_t>;
+   using item_val_t = range_to_elem_t<items_t>;
    using copies_num_t = puretype(
       std::declval<AuctionComponents>().template call<get_copies_num>(std::declval<item_t>())
    );

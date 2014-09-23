@@ -41,8 +41,8 @@ namespace detail {
  */
 template <typename Words> class shortest_superstring {
   public:
-    typedef typename utils::collection_to_elem<Words>::type Word;
-    typedef typename utils::collection_to_elem<Word>::type Letter;
+    typedef range_to_elem_t<Words> Word;
+    typedef range_to_elem_t<Word> Letter;
 
     shortest_superstring(const Words &words)
         : m_length(count_sum_lenght(words)),

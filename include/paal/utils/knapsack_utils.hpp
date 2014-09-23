@@ -59,7 +59,6 @@ density<Value, Size> make_density(Value value, Size size) {
 
 
 namespace detail {
-
 template <typename Functor, typename Range>
 using FunctorOnRangePValue =
     puretype(std::declval<Functor>()(*std::begin(std::declval<Range>())));

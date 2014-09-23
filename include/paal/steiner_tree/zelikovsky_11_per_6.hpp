@@ -63,7 +63,7 @@ template <typename Metric, typename Voronoi> class steiner_tree {
     using VertexType = typename MT::VertexType;
     static const int SUBSET_SIZE = 3;
 
-    using ThreeTuple = typename utils::k_tuple<Idx, SUBSET_SIZE>::type;
+    using ThreeTuple = k_tuple_t<Idx, SUBSET_SIZE>;
     using Move = boost::tuple<ThreeTuple, Dist>;
     using ResultSteinerVertices = std::vector<VertexType>;
 

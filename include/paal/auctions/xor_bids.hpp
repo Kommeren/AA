@@ -39,11 +39,11 @@ namespace auctions {
          using bid_iterator =
             typename boost::range_iterator<typename std::result_of<GetBids(Bidder)>::type>::type;
          using bid = typename std::iterator_traits<bid_iterator>::reference;
-         using value = typename utils::pure_result_of<GetValue(bid)>::type;
+         using value = pure_result_of_t<GetValue(bid)>;
          using items = typename std::result_of<GetItems(bid)>::type;
-         using item = typename utils::collection_to_ref<items>::type;
+         using item = range_to_ref_t<items>;
          template <class GetPrice>
-         using price = typename utils::pure_result_of<GetPrice(item)>::type;
+         using price = pure_result_of_t<GetPrice(item)>;
       };
 
       template <class GetBids, class GetValue, class GetItems>

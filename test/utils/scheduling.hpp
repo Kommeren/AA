@@ -50,8 +50,7 @@ void check_jobs(Result result, std::vector<Job> jobs) {
 
 template <class Result, class GetSpeed>
 double get_max_time(const Result &result, GetSpeed getSpeed) {
-    typedef typename paal::utils::collection_to_elem<Result>::type::first_type
-        MachineIter;
+    typedef typename paal::range_to_elem_t<Result>::first_type MachineIter;
     typedef typename std::iterator_traits<MachineIter>::value_type Machine;
     std::unordered_map<Machine, double, boost::hash<Machine>> machineTime;
     for (const auto &machineJobPair : result) {

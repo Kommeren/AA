@@ -68,7 +68,7 @@ class fitness_from_gain_and_get_moves {
         Move;
 
   public:
-    typedef typename utils::pure_result_of<Gain(Solution &, Move &)>::type type;
+    typedef typename pure_result_of_t<Gain(Solution &, Move &)>::type type;
 };
 
 /**

@@ -15,55 +15,43 @@
 #include <tuple>
 
 namespace paal {
-namespace utils {
 
 /// for given expression returns its type with removed const and reference
 #define puretype(t) typename std::decay<decltype(t)>::type
 
-/// for given collection returns type of its reference
-template <typename Collection> struct collection_to_ref {
-    typedef typename std::iterator_traits<typename boost::range_iterator<
-        typename std::remove_reference<Collection>::type>::type>::reference
-        type;
-};
+/// for given range returns type of its reference
+template <typename Range>
+using range_to_ref_t = typename boost::range_reference<Range>::type;
 
-/// for given collection returns type of its element
-template <typename Collection> struct collection_to_elem {
-    typedef typename std::iterator_traits<typename boost::range_iterator<
-        typename std::remove_reference<Collection>::type>::type>::value_type
-        type;
-};
+/// for given range returns type of its element
+template <typename Range>
+using range_to_elem_t = typename boost::range_value<Range>::type;
+
+namespace detail {
+
+    template <typename T, int k>
+    struct k_tuple {
+        using type = decltype(
+            std::tuple_cat(std::declval<std::tuple<T>>(),
+                       std::declval<typename k_tuple<T, k - 1>::type>()));
+    };
+
+    template <typename T>
+    struct k_tuple<T, 1> {using type = std::tuple<T>;};
+}
 
 /// returns tuple consisting of k times type T
-template <typename T, int k> struct k_tuple {
-    typedef decltype(
-        std::tuple_cat(std::declval<std::tuple<T>>(),
-                       std::declval<typename k_tuple<T, k - 1>::type>())) type;
-};
-
-/// returns tuple consisting of k times type T; boundary case
-template <typename T> struct k_tuple<T, 1> {
-    typedef std::tuple<T> type;
-};
-
-/// return type of the function //TODO redundant with std::result_of
-template <typename T, typename F, typename... Args> struct return_type {
-    typedef decltype(((std::declval<T *>())->*
-                      (std::declval<F>()))(std::declval<Args>()...)) type;
-};
+template <typename T, int k>
+using k_tuple_t = typename detail::k_tuple<T, k>::type;
 
 /// return pure type of function (decays const and reference)
-template <class F> struct pure_result_of {
-    typedef typename std::decay<typename std::result_of<F>::type>::type type;
-};
+template <class F>
+using pure_result_of_t = typename std::decay<typename std::result_of<F>::type>::type;
 
 /// return type after promotion with double
 template <typename T>
-struct promote_with_double {
-   using type = puretype(std::declval<T>() + 0.0);
-};
+using promote_with_double_t = puretype(std::declval<T>() + 0.0);
 
-} //!utils
 } //!paal
 
 #endif // TYPE_FUNCTIONS_HPP

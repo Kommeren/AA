@@ -45,8 +45,7 @@ template <typename T> class object_with_copy {
     // if you use *. in decltype instead of -> you get
     // "sorry, unimplemented: mangling dotstar_expr" :)
     template <typename F, typename... Args>
-    typename utils::return_type<T, F, Args...>::type
-        // typename std::result_of<F>::type //TODO investigate
+    typename std::result_of<F(T*, Args...)>::type
         invoke(F f, Args... args) {
         (m_copy.*(f))(args...);
         return (m_obj.*(f))(args...);
@@ -64,7 +63,7 @@ template <typename T> class object_with_copy {
      * @return the same as f
      */
     template <typename F, typename... Args>
-    typename utils::return_type<T, F, Args...>::type
+    typename std::result_of<F(T*, Args...)>::type
     invoke_on_copy(F f, Args... args) const {
         return (m_copy.*(f))(args...);
     }

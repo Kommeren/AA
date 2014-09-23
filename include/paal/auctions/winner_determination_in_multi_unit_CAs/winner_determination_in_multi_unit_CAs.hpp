@@ -36,7 +36,7 @@ namespace detail {
    template <class GammaOracleAuctionComponents>
    struct determine_winners_in_gamma_oracle_auction_traits {
       using traits = gamma_oracle_auction_traits<GammaOracleAuctionComponents>;
-      using value = typename utils::promote_with_double<typename traits::value_t>::type;
+      using value = promote_with_double_t<typename traits::value_t>;
       using item_val = typename traits::item_val_t;
       using item_set = std::vector<item_val>; // TODO allow for different container
       using bidder_attributes = detail::bidder_attributes<value, item_set>;
@@ -205,7 +205,7 @@ void determine_winners_in_gamma_oracle_auction(
    Epsilon epsilon = 1e-8
 ) {
    using Traits = gamma_oracle_auction_traits<GammaOracleAuctionComponents>;
-   using Value = typename utils::promote_with_double<typename Traits::value_t>::type;
+   using Value = promote_with_double_t<typename Traits::value_t>;
    using ItemVal = typename Traits::item_val_t;
 
    std::unordered_map<ItemVal, Value> map;

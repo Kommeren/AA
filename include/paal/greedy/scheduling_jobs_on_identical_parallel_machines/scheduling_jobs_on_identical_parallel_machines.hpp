@@ -56,7 +56,7 @@ void scheduling_jobs_on_identical_parallel_machines(int n_machines,
                                                     GetTime get_time) {
     using JobReference =
         typename std::iterator_traits<InputIterator>::reference;
-    using Time = typename utils::pure_result_of<GetTime(JobReference)>::type;
+    using Time = pure_result_of_t<GetTime(JobReference)>;
 
     std::sort(first, last, utils::greater());
     std::vector<int> load(n_machines);
