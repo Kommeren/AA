@@ -39,7 +39,7 @@ the above formulation.
 & 0 \le x_e & \mbox{ for every }e\in E\\
 \f}
 
-example:
+\section Example
    \snippet tree_augmentation_example.cpp Tree Augmentation Example
 
 complete example of the usage can be found in file tree_augmentation_example.cpp

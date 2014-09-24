@@ -2,13 +2,25 @@
 
 \section mot Motivation
 
-The \a components class is boost.fusion.map-like class with constant set of keys (names) that supports default values for each key.
+The \a components class is boost.fusion.map-like class with constant set of
+keys (names) that supports default values for each key.
 
-This class is used in the design of template function, that instead of taking several arguments takes one \a components class representing these arguments (see \ref mot_exmpl for more details). One can think of the \a components class as a tuple containing these arguments.
+This class is used in the design of template function, that instead of taking
+several arguments takes one \a components class representing these arguments
+(see \ref mot_exmpl for more details). One can think of the \a components class
+as a tuple containing these arguments.
 
-This way of designing a template function provides many benefits. The arguments are binded together, this feature is valuable when the function arguments depend on each other. While the arguments are grouped together into one \a components class, one can easily replace one of them (see \ref repl_comps for more details).
+This way of designing a template function provides many benefits. The arguments
+are binded together, this feature is valuable when the function arguments
+depend on each other. While the arguments are grouped together into one \a
+components class, one can easily replace one of them (see \ref repl_comps for
+more details).
 
-There are more benefits of this design. Assume that one is implementing a template function and wants to provide several  configurations of the default arguments and permits the function's user to easily create the new configuration of the defaults arguments. This can be easily  done using the \a components class (see \ref mot_exmpl for more details).
+There are more benefits of this design. Assume that one is implementing
+a template function and wants to provide several  configurations of the default
+arguments and permits the function's user to easily create the new
+configuration of the defaults arguments. This can be easily  done using the \a
+components class (see \ref mot_exmpl for more details).
 
 \subsection mot_exmpl Motivating example
 Suppose that we would like to write a function which takes three functors: Init, Start and Stop.
@@ -40,13 +52,16 @@ and specify the  appropriate \a components class:
 </pre>
 
 
-In order to use the function, the user needs to implement InitImpl, StartImpl, StopImpl functors.
-Then the function can be called as follows:
+In order to use the function, the user needs to implement InitImpl, StartImpl,
+StopImpl functors.  Then the function can be called as follows:
 <pre>
     DoStuffComponents<InitImpl, StartImpl, StopImpl> doStuffComponents;
     do_stuff(doStuffComponents);
 </pre>
-Here, we have assumed that all the implementations have default constructors, however, this is not mandatory. There are different ways of initializing components (see section: \ref const_comp for more details).
+Here, we have assumed that all the
+implementations have default constructors, however, this is not mandatory.
+There are different ways of initializing components (see section: \ref
+const_comp for more details).
 
 Let us now discuss how to access the parameters in DoStuffComponets:
 <pre>
@@ -74,15 +89,22 @@ A user can construct the \a DoStuffComponents as follows:
     DoStuffComponents<InitImpl, StartImpl, StopImpl> doStuffComponents3;
 </pre>
 
-The above example illustrates the main motivation for the \a components class. The library also provides much more handy ways of manipulating the \a components, which will be described in the following sections.
+The above example illustrates the main motivation for the \a components class.
+The library also provides much more handy ways of manipulating the \a
+components, which will be described in the following sections.
 
 \section def_comp Defining Components
-A components can have any type including reference types. Default parameters can be specified for any number of components (when a component has a default value then also all following components must have a default value).
-The components class can be defined using template aliasing (this is the preferred way):
+
+A components can have any type including
+reference types. Default parameters can be specified for any number of
+components (when a component has a default value then also all following
+components must have a default value).  The components class can be defined
+using template aliasing (this is the preferred way):
+
 <pre>
     //inside library:
-    template <typename... Args>
-    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
+    template <typename... Args> using DoStuffComponents = Components<Init,
+    Start, Stop>::type<Args...>;
 
     //user:
     DoStuffComponents<InitImpl, BeginImpl, StopImpl> doStuffComponents;
@@ -110,14 +132,16 @@ There are several ways of constructing components:
     typedef DoStuffComponents<double, int, int> MyDoStuffComponents;
 
     MyDoStuffComponents doStuffComponents;
-    MyDoStuffComponents doStuffComponents(1,2);
+    MyDoStuffComponents
+    doStuffComponents(1,2);
     int a;
     MyDoStuffComponents doStuffComponents(a);
 </pre>
-<li> By providing any object and a CopyTag. This tag indicates, that the passed object has  get<Name> member functions for some Names:
+<li> By providing any object and a CopyTag. This tag indicates, that
+    the passed object has  get<Name> member functions for some Names:
 <pre>
-    template <typename... Args>
-    using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
+    template <typename... Args> using DoStuffComponents = Components<Init,
+    Start, Stop>::type<Args...>;
     typedef DoStuffComponents<int, int, int> Big;
 
     template <typename... Args>
@@ -150,7 +174,8 @@ There are several ways of constructing components:
 If the deduced type should be a reference, the std::ref wraper should be used.
 
 </ul>
-The important thing is that a component does not need to have a default constructor unless the default constructor is actually used.
+The important thing is that a component does not need to have a default
+constructor unless the default constructor is actually used.
 
 \section repl_comps Replacing Components
 The components can be replaced in a given \a components instance. A new instance is created this way:
@@ -173,17 +198,23 @@ The components can be replaced in a given \a components instance. A new instance
 
         The main differences between boost.parameter and \a components classes are:
         <ul>
-        <li> The \a components class supports different sets of default arguments. The default arguments in the function call can be easily changed by the user.
+        <li> The \a components class supports different sets of default arguments.
+                The default arguments in the function call can be easily changed by the user.
         <li> The \a components class is written in pure C++ (no macros).
-        <li> The \a components supports default arguments only when they have a default constructor (boost.parameter is much more flexible here).
+        <li> The \a components supports default arguments only
+                when they have a default constructor (boost.parameter is much more flexible here).
         </ul>
-        The \a components class is not designed to replace boost.parameter but in many cases (e.g., when the arguments are functors or when the given arguments can depend on each other)
+        The \a components class is not designed to replace boost.parameter
+        but in many cases (e.g., when the arguments are
+        functors or when the given arguments can depend on each other)
         it might be a more natural design.
 
     <li> Boost.Fusion
 
-        Although the idea of the \a components is very similar to boost.fusion.map, the \a components gives some functionalities that are not offered by boost.fusion.map.
-        For example, it supports different initialization methods (see section: \ref const_comp for more details).
+        Although the idea of the \a components is very similar to
+        boost.fusion.map, the \a components gives some functionalities that are
+        not offered by boost.fusion.map.  For example, it supports different
+        initialization methods (see section: \ref const_comp for more details).
 
 </ul>
 

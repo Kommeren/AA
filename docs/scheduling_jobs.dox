@@ -14,7 +14,8 @@ We calculate the lower bound for the solution \f$T_{LB} = max_jT_j\f$ ,where
 We then obtain the fractional allocation in the following way:
 <ul>
 <li> Let \a j be the first job such that \f$\sum_{k=1}^{j}p_k > T_{LB} \cdot s_1\f$.
-<li> Assign to machine 1 jobs 1, \f$\dots\f$, \a j-1, plus a fraction of \a j in order to equate \f$l_1=T_{LB} \cdot s_1\f$.
+<li> Assign to machine 1 jobs 1, \f$\dots\f$, \a j-1,
+plus a fraction of \a j in order to equate \f$l_1=T_{LB} \cdot s_1\f$.
 <li> Continue recursively with the unassigned fractions of jobs and machines 2, \f$\dots\f$, m.
 </ul>
 Finally we round to an integral schedule. Function scheduleDeterministic uses the
@@ -28,7 +29,7 @@ some fraction of it.
 <b> Attention </b> Our solution needs the value of \f$\sum_{j=1}^{N}p_j \cdot \sum_{i=1}^{M}s_i\f$
 to not overflow its value type.
 
-  example:
+\section Example
 \snippet scheduling_jobs_example.cpp Scheduling Jobs Example
 
   example file is scheduling_jobs_example.cpp

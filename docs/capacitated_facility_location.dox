@@ -1,13 +1,25 @@
 /*! \page cfl Capacitated Facility Location
 
-\section def Problem definition.
-In capacitated facility location we have set of possible facilities locations, set of clients. Each client \a i has specific demand \a clientDemand(i), each facility \a j has specific capacity \a facilityCapacity(j) and \a facilityCost(j), additionally for each client \a i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to determine the set of open facilities and  assign the demand of each client to some set of open facilities in such a way that:
+\section def Problem definition
+
+In capacitated facility location we have set
+of possible facilities locations, set of clients. Each client \a i has specific
+demand \a clientDemand(i), each facility \a j has specific capacity \a
+facilityCapacity(j) and \a facilityCost(j), additionally for each client \a
+i and facility \a j, there is a cost per unit of assigning \a i to \a j, \a
+m(i,j) (the transportation cost). The goal is to determine the set of open
+facilities and  assign the demand of each client to some set of open facilities
+in such a way that:
 <ol>
-<li> sum of the demand assigned to one facility is no greater than facility's capacity
-<li> minimize the sum of the cost of the open facilities (production cost) and the cost of assigning clients demands (the transportation cost).
+    <li> sum of the demand assigned to one facility is no
+    greater than facility's capacity
+    <li> minimize the sum of the cost of the open
+    facilities (production cost) and the cost of assigning clients demands (the
+    transportation cost).
 </ol>
 
-More formally, let \f$x_{ij}\f$ denote the demand assigned by client \a i to facility \a j and \f$y_i\f$ indicates if the facility is open, we want to minimize 
+More formally, let \f$x_{ij}\f$ denote the demand assigned
+by client \a i to facility \a j and \f$y_i\f$ indicates if the facility is open, we want to minimize
 \f{eqnarray*}{&\sum_{x_{ij}}x_{ij} * m(i,j) + \sum_{y_i}y_i * facilityCost(i) \\
 where:&\\
 &\forall_{i}\sum_j{x_{ij}} = clientDemand(i)\\
@@ -18,18 +30,26 @@ where:&\\
 
 \section Solution
 
-Capacitated Facility Location (CFL) problem is solved in the same way as uncapacitated facility location (see paal::local_search::facility_location::FacilityLocationLocalSearchStep). The only difference is that we use capacitated version fo the voronoi (see paal::data_structures::CapacitatedVoronoi).
-  example: 
+Capacitated Facility Location (CFL) problem is solved in the same way
+as uncapacitated facility location (see paal::local_search::facility_location::FacilityLocationLocalSearchStep).
+The only difference is that we use capacitated version fo the voronoi (see paal::data_structures::CapacitatedVoronoi).
+\section Example
 \snippet capacitated_facility_location_example.cpp CFL Search Example
- 
+
   example file is capacitated_facility_location_example.cpp
 
 \subsection app_cfl Approximation Ratio equals 6.
 The approximation ratio is proved to be  equal 6 when we use all three move types: add, remove and swap.
 
 \subsection com_cfl Complexity
-The complexity of cheking the gain of the  add and the gain of the remove operation of  algorithm equals to the complexity of the min_cost_max_flow on the graph with number of edges equals \f$O(|Clients| * |Facilities|)\f$ and number of vertices equals \f$O(|Clients|  + |Facilities|)\f$. Currently we use boost::successive_shortest_path_nonnegative_weights (to appear).
-Swap operation is performed by one add and one remove.
+
+The complexity of cheking the gain of the  add
+and the gain of the remove operation of  algorithm equals to the complexity of
+the min_cost_max_flow on the graph with number of edges equals \f$O(|Clients|
+* |Facilities|)\f$ and number of vertices equals \f$O(|Clients|
++ |Facilities|)\f$. Currently we use
+boost::successive_shortest_path_nonnegative_weights (to appear).  Swap
+operation is performed by one add and one remove.
 
 \subsection References
 The algorithm is described in the \cite Korupolu1998. The Approximation ratio analysis is in \cite Chudak1047770.

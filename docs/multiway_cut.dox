@@ -19,7 +19,8 @@ comment \f$ c_{v,i}=1\f$ iff \f$v\f$ is in part \f$i\f$
 We put terminals in k dimensional space, with Manhattan metric,
 i-th terminal in point 0, 0, 0, ... 0, 0, 1(i-th position), 0, 0, ... 0, 0.
 All others vertices have sum of coordinates equal to 1.
-We minimize sum of all edges: edge cost multiply by edge length in <a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan metric </a>
+We minimize sum of all edges: edge cost multiply by edge length
+in <a href="http://en.wikipedia.org/wiki/Taxicab_geometry">Manhattan metric </a>
 We solve the following lp to find the location of the others vertices.
 \f{eqnarray*}
 \mbox{minimize:} & 1/2*\sum_{e\in E} \ c_e \sum_{i \in \{1,2, ... ,k\}} |c_{s(e),i}-c_{t(e),i}|& \\
@@ -34,7 +35,7 @@ Then several times we:
 
 We select cheapest solution, from all randomly chosen.
 
-  example:
+\section Example
 \snippet multiway_cut_example.cpp Multiway Cut Example
 
   example file is multiway_cut_example.cpp
@@ -68,10 +69,13 @@ We choose rays many times to increase chance to get 2 approximation.
 
 \subsection com_multiway_cut The complexity
 
-Complexity of the algorithm is \f$O(|LP|+|R|*(|E|+|V|*|K|))\f$ where \a R is number of repeats \a K is number of terminals,  \a V is number of vertices \a E is number of edges
+Complexity of the algorithm is \f$O(|LP|+|R|*(|E|+|V|*|K|))\f$ where \a R
+is number of repeats \a K is number of terminals,  \a V is number of vertices \a E is number of edges
 and \a LP is cost of solve LP by simplex
 \subsection mem_multiway_cut The memory
-Memory complexity of the algorithm is \f$O(|LP|+|K|*(|V|+|E|))\f$ where \a K is number of terminals  \a V is number of vertices, \a E is number of edges and \a LP is memory cost of solve LP by simplex
+Memory complexity of the algorithm is \f$O(|LP|+|K|*(|V|+|E|))\f$
+where \a K is number of terminals  \a V is number of vertices, \a E is number
+of edges and \a LP is memory cost of solve LP by simplex
 
 
 \subsection References

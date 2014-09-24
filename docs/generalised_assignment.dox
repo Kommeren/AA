@@ -27,7 +27,7 @@ An LP relaxation of the problem is as follows. We introduce a binary variable
 We solve the problem using the Shmoys and Tardos approximation iterative
 rounding algorithm (using the above LP formulation).
 
-example:
+\section Example
    \snippet generalised_assignment_example.cpp Generalised Assignment Example
 
 complete example of the usage can be found in file generalised_assignment_example.cpp

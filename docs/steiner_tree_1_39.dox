@@ -12,7 +12,7 @@ We sample one component with probability proportional to the value of the associ
 in a fractional solution: the sampled component is contracted and the LP is updated consequently.
 We iterate this process until all terminals are connected.
 
-Example:
+\section Example
  \snippet steiner_tree_ir_example.cpp IR Steiner Tree Example
 
   example file is in steiner_tree_ir_example.cpp

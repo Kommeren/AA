@@ -10,19 +10,22 @@ To configure Gerrit, do the following steps:
 http://siekiera.mimuw.edu.pl:8082/
 </pre>
 
-<li> In settings, open SSH Public Keys tab. Add the public key from the machine you're using for development (cat .ssh/id_rsa.pub)
+<li> In settings, open SSH Public Keys tab.
+Add the public key from the machine you're using for development (cat .ssh/id_rsa.pub)
      If you don't have one it can be generate using
 <pre>
 ssh-keygen -t rsa
 </pre>
-   after invoking that command there will be two files in your .ssh directory : id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address.
+   after invoking that command there will be two files in your .ssh directory :
+   id_rsa and id_rsa.pub. Move id_rsa.pub to contain your real email address.
 
 <li> Clone write access version of the repository
 <pre>
 git clone --recursive ssh://\<login\>\@siekiera.mimuw.edu.pl:29418/paal
 </pre>
 
-<li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message. This is required by Gerrit and allows keeping many versions of the same commit.
+<li> Download commit message hook. It will add a line 'Change-Id: ...' to every commit message.
+        This is required by Gerrit and allows keeping many versions of the same commit.
 <pre>
 scp -p -P 29418 \<login\>\@siekiera.mimuw.edu.pl:hooks/commit-msg \<projectDir\>/.git/hooks/
 </pre>
@@ -62,9 +65,12 @@ http://gerrit-documentation.googlecode.com/svn/Documentation/2.6/intro-quick.htm
 <ul>
 <li> The code review is divided into four parts. Each part is reviewed separately. Parts:
 <ul>
-<li> Interface and Problem Description - this phase  includes the public interface and main functions from private interface, the algorithm should be designed. The documentation consists of problem description (this helps understanding the interface).
+<li> Interface and Problem Description - this phase  includes the public interface
+    and main functions from private interface, the algorithm should be designed.
+    The documentation consists of problem description (this helps understanding the interface).
 All declarations must compile, templates should be instantiated in test or example.
-<li> Tests - both unit tests (short test) and efficiency test (long tests). Test should fail (use BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES).
+<li> Tests - both unit tests (short test) and efficiency test (long tests).
+      Test should fail (use BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES).
 <li> Implementation
 <li> Documentation in the standard form.
 </ul>

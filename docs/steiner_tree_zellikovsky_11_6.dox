@@ -1,18 +1,24 @@
 /*! \page stein_zel Steiner Tree 11/6 Approximation
 
 \section def Problem definition.
-\copydoc stein_def 
+\copydoc stein_def
 
 \section sol_zel Solution
-We solve this problem using Zelikovsky 11/6 approximation algorithm. The algorithm exploit model of the WeakVoronoi concept (see \ref voronoi), where the generators are the terminals and the vertices are nonterminals.  There is one additional assumption on metric i.e.  we only use this metric only for distances (Nonterminal, Terminal) and (Terminal, Terminal).
 
-  example: 
+We solve this problem using Zelikovsky 11/6
+approximation algorithm. The algorithm exploit model of the WeakVoronoi concept
+(see \ref voronoi), where the generators are the terminals and the vertices are
+nonterminals.  There is one additional assumption on metric i.e.  we only use
+this metric only for distances (Nonterminal, Terminal) and (Terminal,
+Terminal).
+
+\section Example
    \snippet zelikovsky_11_per_6_example.cpp Steiner Tree Example
 
   example file is zelikovsky_11_per_6_example.cpp
 
 \subsection apps_st Approximation Ratio equals 11/6
-\subsection com The complexity 
+\subsection com The complexity
 Complexity of the algorithm is \f$O(|V|*|E| + |T|^4)\f$ where \a T is the set of terminals.
 
 \subsection References

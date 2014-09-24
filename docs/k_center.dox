@@ -2,14 +2,17 @@
 
 \section def Problem definition
 
-In the k-center problem we are given a set of items \f$I\f$, metric \f$d\f$ and number \f$k\f$.
-We want to select \f$k\f$ clusters' centers (items), in such a way that the maximum distance of items to clusters' centers is minimized.
+In the k-center problem we are given a set of items \f$I\f$, metric \f$d\f$ and
+number \f$k\f$.  We want to select \f$k\f$ clusters' centers (items), in such
+a way that the maximum distance of items to clusters' centers is minimized.
 
-In geometric terms, our goal is to find the centers of \f$k\f$ different balls of same radius that cover all points so that their radius is as small as possible
+In geometric terms, our goal is to find the centers of \f$k\f$ different balls
+of same radius that cover all points so that their radius is as small as
+possible
 
-More formally:
-Given set of items \f$I\f$ and metric \f$d(v_i,v_j)\f$, find a subset \f$S \subseteq I\f$ with \f$|S|=k\f$ that minimizes
-\f$max_{v\in I}min_{s\in S}d(v,s)\f$
+More formally: Given set of items \f$I\f$ and metric \f$d(v_i,v_j)\f$, find
+a subset \f$S \subseteq I\f$ with \f$|S|=k\f$ that minimizes \f$max_{v\in
+I}min_{s\in S}d(v,s)\f$
 
 \section Solution
 
@@ -17,7 +20,8 @@ Here we implement the following algorithm:
 
 1. We select first item arbitrary, and make it a cluster by putting it into \f$S\f$;
 
-2. We find next cluster center by finding an item that is as fa as possible from all other cluster centers and add it to \f$S\f$.
+2. We find next cluster center by finding an item that is as fa as possible
+from all other cluster centers and add it to \f$S\f$.
 
 We repeat step 2 until \f$|S|=k\f$. When the algorithm finishes we return clusters in \f$S\f$.
 
@@ -31,7 +35,7 @@ Pseudocode:
 & & \hspace{1cm}\color{blue}S\leftarrow \color{blue}S \cup \{\color{red}j\}\\
 \f}
 
-  Example:
+\section Example
 \snippet k_center_example.cpp K Center Example
 
   example file is k_center_example.cpp
@@ -55,8 +59,9 @@ The iterator type must be a model of <i>Output Iterator</i>
 \subsection app_kcenter Approximation Ratio
 Approximation ratio of this algorithm is equal to 2.
 
-\subsection com_kcenter The Complexity
-The time complexity of the algorithm is \f$O(|I|*k)\f$, where \f$I\f$ is the number of items and \f$k\f$ is the number of clusters' centers.
+\subsection com_kcenter The Complexity The time complexity of the algorithm is
+\f$O(|I|*k)\f$, where \f$I\f$ is the number of items and \f$k\f$ is the number
+of clusters' centers.
 
 The memory complexity of the algorithm is \f$O(|I|)\f$, where \f$I\f$ is the number of items
 

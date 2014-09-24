@@ -27,7 +27,7 @@ for all \f$S \subseteq U\f$ with \f$c_{i, S} > z_i \f$.
 
 We solve the problem using a combinatorial, primal dual algorithm.
 
-  example:
+\section Example
 \snippet winner_determination_in_multi_unit_CAs_example.cpp Winner Determination In Multi Unit CAs Example
 
   complete example is winner_determination_in_multi_unit_CAs_example.cpp

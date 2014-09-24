@@ -17,7 +17,8 @@ max f(x) over x in X. <br><br>
 
 A well known heuristic for solving such problems is the local search(LS). <br>
 Assume that we have feasible solution x' in X. <br>
-The LS algorithm searches the neighborhood N(x') (the set of posible moves) of x' and tries to find between them a better solution x'' with f(x'') > f(x'). <br>
+The LS algorithm searches the neighborhood N(x') (the set of posible moves)
+of x' and tries to find between them a better solution x'' with f(x'') > f(x'). <br>
 If a better solution is found we set x' to x'' and continue. <br>
 If a better solution couldn't be found we finish the search with resulting local optimum x*. <br><br>
 
@@ -42,15 +43,21 @@ Let us write the pseudocode for this operation:  <br><br>
  }
 </pre>
 
-Note that we are working with moves (not with the full solution). This idea will be used in the our C++ implementation. <br>
-We use this approach because usually moves are much lighter then full solutions. <br>
+Note that we are working with moves (not with the full solution). This idea
+will be used in the our C++ implementation. <br> We use this approach because
+usually moves are much lighter then full solutions. <br>
 
 \section local_search_interface  LOCAL SEARCH INTERFACE
-Our local search procedes in steps. One step of the local search consists on checking possible moves and finding a move with positive gain (or the move with the biggest gain in the SteepestSlope strategy).
-In other words, by the one step of the local search we understand one search through the neighborhood.
+
+Our local search procedes in steps. One step of the local search consists on checking possible
+moves and finding a move with positive gain (or the move with the biggest gain
+in the SteepestSlope strategy).  In other words, by the one step of the local
+search we understand one search through the neighborhood.
 
  In the default variant, we prolong search as long as the last step is producing the move with positive gain.
-In the more general case one can check some additional stop condition and perform some operations between the local search steps. In order to make it possible we introduce two additional concepts:
+In the more general case one can check some additional stop condition
+and perform some operations between the local search steps.
+In order to make it possible we introduce two additional concepts:
 <pre>
     class PostSearchActionArchetype {
         void operator()(Solution &);
@@ -67,7 +74,8 @@ The GlobalStopCondition is checked after each successful search step.
 As mentioned before there are two possible strategies in step excecution.
 <ul>
 
-<li> We can iterate through  moves until we find the move with positive gain. This strategy is called ChooseFirstBetter and this is this is the default strategy.
+<li> We can iterate through  moves until we find the move with positive gain.
+    This strategy is called ChooseFirstBetter and this is this is the default strategy.
 <li> We can iterate through all moves and chose one with the largest gain. This strategy is called SteepestSlope.
 </ul>
 
@@ -77,7 +85,8 @@ The \ref local_search section introduces complete interface of the local search.
 
 In order to present the local search step interface we first need to introduce several concepts.<br>
 Note that <i>Solution</i> is the solution type and <i>Move</i> is the type of single move. <br>
-<i>MoveIteratorsRange</i> is assumed to be std::pair of iterators, pointing to the begin and end of the collection of moves. <br><br>
+<i>MoveIteratorsRange</i> is assumed to be std::pair of iterators,
+pointing to the begin and end of the collection of moves. <br><br>
 
 Concepts:
 <ol>
@@ -102,11 +111,15 @@ Concepts:
     }
     </pre>
     </li>
-    <li> <i>SearchComponents</i> All of the previous concepts are grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
+    <li> <i>SearchComponents</i> All of the previous concepts are
+    grouped together into one class using \ref comps class with four components: GetMoves, Gain, Commit, StopCondition.
     </li>
 </ol>
 
-Now we can introduce the paal::local_search::local_search interface. Note that you can pass arbitrary number of SearchComponents to one local search. If your problem has many different Move types it might be useful to provide SearchComponents for each type of Move.
+Now we can introduce the paal::local_search::local_search interface. Note that
+you can pass arbitrary number of SearchComponents to one local search. If your
+problem has many different Move types it might be useful to provide
+SearchComponents for each type of Move.
 
 The simple version of local search:
 <pre>

@@ -1,19 +1,25 @@
 /*! \page twoopt 2-opt for Traveling Salesman Problem
 
-\section def Problem definition.
-In the Traveling Salesman Problem (TSP) we are given set of nodes and metric \a m. Our goal is to find such permutation of nodes \f$(a_1, a_2, ... ,a_n)\f$ such that the sum  \f$m(a_1, a_2) + m(a_2, a_3) + ... + m(a_(n-1),a_n) + m(a_n, a_1)\f$ is minimized.
+\section def Problem definition
+
+In the Traveling Salesman Problem (TSP) we
+are given set of nodes and metric \a m. Our goal is to find such permutation of
+nodes \f$(a_1, a_2, ... ,a_n)\f$ such that the sum  \f$m(a_1, a_2) + m(a_2,
+a_3) + ... + m(a_(n-1),a_n) + m(a_n, a_1)\f$ is minimized.
 
 \section Solution
-We solve this problem by local search, using well  known 2-opt moves (see paal::local_search::two_local_search::TwoLocalSearchStep for more details).
 
-  example: 
+We solve this problem by local search, using well  known
+2-opt moves (see paal::local_search::two_local_search::TwoLocalSearchStep for
+more details).
+
+\section Example
 \snippet 2_local_search_example.cpp Two Local Search Example
- 
 
   example file is 2_local_search_example.cpp
 
 \subsection appto Approximation Ratio
-Approximation ratio equals \f$4\sqrt{n}\f$ and \f$O(log(n)/log(log(n)))\f$ for euclidean instances in \f$R^2\f$. 
+Approximation ratio equals \f$4\sqrt{n}\f$ and \f$O(log(n)/log(log(n)))\f$ for euclidean instances in \f$R^2\f$.
 Although the approximation ratio is weak, the algorithm works well in many practical instances.
 
 \subsection comto Complexity

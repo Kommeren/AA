@@ -1,9 +1,13 @@
 /*! \page knapsack_def Knapsack Definition
-In the knapsack problem we are given a set of objects and the capacity of the knapsack. Each object has its size and value.
+In the knapsack problem we are given a set of objects and the capacity of the
+knapsack. Each object has its size and value.
 
-The goal is to choose a subset of objects of total size not exceeding the capacity, while maximizing the sum of the objects values.
+The goal is to choose a subset of objects of total size not exceeding the
+capacity, while maximizing the sum of the objects values.
 
-There are two variants of this problem. In the \a knapsack \a 0/1 problem each object from the objects set can be chosen only once.  In the second variant called \a knapsack \a unbounded problem, each object can be chosen many times.
+There are two variants of this problem. In the \a knapsack \a 0/1 problem each
+object from the objects set can be chosen only once.  In the second variant
+called \a knapsack \a unbounded problem, each object can be chosen many times.
 
 
 */

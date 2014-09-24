@@ -24,7 +24,7 @@ implementation we use the GLPK (GNU Linear Programming Kit) library.
 Although the simplex method is not guaranteed to work in polynomial time,
 it usually works equally fast or faster then polynomial algorithms.
 
-example:
+\section Example
    \snippet lp_example.cpp LP Example
 
 complete usage example can be found in file lp_example.cpp
@@ -54,10 +54,14 @@ with exponential number of rows:
  }
 </pre>
 
-In other words we start with a subset (maybe empty) of rows and solve the LP, and then while the obtained solution is infeasible add a violated row to the LP and resolve it.
+In other words we start with a subset (maybe empty) of rows and solve the LP,
+and then while the obtained solution is infeasible add a violated row to the LP
+and resolve it.
 
 \subsection row_generation_interface  Row generation interface
-The row generation LP (re)solving is implemented by two classes: paal::lp::row_generation_solve_lp and paal::lp::row_generation_resolve_lp, both of which implement the following interface:
+The row generation LP (re)solving is implemented by two classes:
+paal::lp::row_generation_solve_lp and paal::lp::row_generation_resolve_lp,
+both of which implement the following interface:
 <pre>
  row_generation_solve_lp {
      paal::lp::problem_type operator(Problem & problem, LP & lp);
@@ -73,7 +77,9 @@ Here <i>LP</i> is the linear programming instance type.<br>
  }
 </pre>
 
-<i>Oracle</i> is the Separation Oracle concept class. It is responsible for checking if the current LP solution is a feasible solution to the given Problem and if not, adding some violated constraint to the LP. It must implement the following interface:
+<i>Oracle</i> is the Separation Oracle concept class.
+It is responsible for checking if the current LP solution is a feasible solution
+to the given Problem and if not, adding some violated constraint to the LP. It must implement the following interface:
 <pre>
  OracleArchetype {
     bool feasible_solution(const Problem & problem, const LP & lp);
@@ -83,7 +89,9 @@ Here <i>LP</i> is the linear programming instance type.<br>
 </pre>
 
 \subsection oracle_strategies Separation oracle strategies
-Typical separation oracles iterate over a set of the constraints that could be violated and choose one violated row to be added to the LP. The library provides a number of typical separation oracle strategies using this model:
+Typical separation oracles iterate over a set of the constraints
+that could be violated and choose one violated row to be added to the LP.
+The library provides a number of typical separation oracle strategies using this model:
 <ol>
 <li> paal::lp::most_violated_separation_oracle
 <li> paal::lp::first_violated_separation_oracle
@@ -108,7 +116,9 @@ This class is responsible for:
  }
 </pre>
 
-<i>CandidateIteratorRange</i> is an iterator range of possible constraints (candidates) that could be violated. <i>Candidate</i> is a single constraint (candidate) that could be violated.
+<i>CandidateIteratorRange</i> is an iterator range of possible
+constraints (candidates) that could be violated.
+<i>Candidate</i> is a single constraint (candidate) that could be violated.
 
 \section References
 

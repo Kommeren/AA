@@ -20,9 +20,10 @@ For each vertex \f$v\f$ we compute distances to all vertices in its bunch
 B(v) = \sum_{i=0}^{k-1} \lbrace u : u \in A_i \setminus A_{i+1}, \delta(v,u) < \delta(v,A_{i+1}) \rbrace
 \f}
 
-As an approximate distance between vertices \f$u\f$ and \f$v\f$ the oracle returns a distance \f$\delta(u,p_i(u)) + \delta(p_i(u),v)\f$ with \f$p_i(u) \in B(v)\f$ for an appropriate \f$i\f$.
+As an approximate distance between vertices \f$u\f$ and \f$v\f$
+the oracle returns a distance \f$\delta(u,p_i(u)) + \delta(p_i(u),v)\f$ with \f$p_i(u) \in B(v)\f$ for an appropriate \f$i\f$.
 
-  example:
+\section Example
 \snippet distance_oracle_example.cpp Distance Oracle Example
 
   complete example is distance_oracle_example.cpp

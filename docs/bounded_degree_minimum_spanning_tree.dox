@@ -48,7 +48,8 @@ until solution to the LP is integral.
 As the LP formulation has got an exponential number of constraints, we need
 to use a separation oracle and the row generation technique to solve it.
 
-example:
+
+\section Example
    \snippet bounded_degree_mst_example.cpp Bounded-Degree Minimum Spanning Tree Example
 
 complete example of the usage can be found in file bounded_degree_mst_example.cpp

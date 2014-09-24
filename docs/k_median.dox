@@ -1,9 +1,15 @@
 /*! \page kmedian K-Median
 
 \section def Problem definition.
-In facility location we have set of possible facilities locations, set of clients and the number \a k. For each client \a i and facility \a j, there is a cost of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal is to determine the set of \a k open facilities and  assign each client to some set of open facilities to minimize  the cost of assigning clients (the transportation cost).
 
-More formally, let \f$x_{ij}\f$ indicates if  client \a i is assigned to facility \a j and \f$y_i\f$ indicates if the facility is open, we want to minimize 
+In facility location we have set of possible facilities locations, set of
+clients and the number \a k. For each client \a i and facility \a j, there is
+a cost of assigning \a i to \a j, \a m(i,j) (the transportation cost). The goal
+is to determine the set of \a k open facilities and  assign each client to some
+set of open facilities to minimize  the cost of assigning clients (the
+transportation cost).
+
+More formally, let \f$x_{ij}\f$ indicates if  client \a i is assigned to facility \a j and \f$y_i\f$ indicates if the facility is open, we want to minimize
 \f{eqnarray*}{&\sum_{x_{ij}}x_{ij} * m(i,j)\\
 where:&\\
 &\forall_{i}\sum_j{x_{ij}} = 1\\
@@ -15,10 +21,17 @@ where:&\\
 
 \section Solution
 
-Facility Location (FL) problem is solved by local search. Given a move which opens one facility and close one facility,  we check if the move can our solution, if yes, we apply the move.(see paal::local_search::facility_location::KMedianLocalSearchStep for more details). Current solution to the assignement problem (assign clients to chosen facilities) is kept in the class which models \ref voronoi conecpt, where generators are facilities and vertices are clients.  
-  example: 
+Facility Location (FL) problem is solved by local search. Given a move which
+opens one facility and close one facility,  we check if the move can our
+solution, if yes, we apply the move.(see
+paal::local_search::facility_location::KMedianLocalSearchStep for more
+details). Current solution to the assignement problem (assign clients to chosen
+facilities) is kept in the class which models \ref voronoi conecpt, where
+generators are facilities and vertices are clients.
+
+\section Example
 \snippet k_median_example.cpp K Median Search Example
- 
+
   example file is k_median_example.cpp
 
 \subsection app_km Approximation Ratio equals 5.
@@ -28,6 +41,6 @@ The complexity of the computing the gain for eachmove equals complexity of the s
 
 \subsection References
 
-The algorithm an analises is described in \cite Arya01localsearch 
+The algorithm an analises is described in \cite Arya01localsearch
 
 */

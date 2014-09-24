@@ -6,7 +6,8 @@
 \section sol_steiner_tree_greedy Solution
 This is an implementation of the standard greedy approach.
 We consider a graph composed only out of the terminal nodes.
-The distances between terminal nodes are equal to the shortest path distance between these terminals in the original graph.
+The distances between terminal nodes are equal to the shortest path distance
+between these terminals in the original graph.
 We compute the minimum spanning tree \a T  in this graph and lift the result tree to the original graph.
 We use a fast implementation of this approach proposed in \cite mehlhorn1988fasterapproxspg,
 which does not build this graph explicitly, but only finds Voronoi regions around terminals.
@@ -15,7 +16,7 @@ If the input graph is not connected we return Steiner trees for all connected co
 The value returned by the algorithm is a pair containing: the weight of the tree,
 and the lower bound on the weight of the optimal tree (equal to half of sum of distances in \a T).
 
-Example:
+\section Example
  \snippet steiner_tree_greedy_example.cpp steiner tree greedy Example
 
   example file is steiner_tree_greedy_example.cpp
@@ -23,7 +24,8 @@ Example:
 \subsection apps_steiner_tree_greedy Approximation Ratio equals 2
 
 \subsection com_sjwdoasm The complexity
-Complexity of the algorithm is \f$O(|E|*\log(|V|))\f$ where \a E is the number of edges and \a V is the number of vertices.
+Complexity of the algorithm is \f$O(|E|*\log(|V|))\f$ where \a E is the number of
+edges and \a V is the number of vertices.
 
 Memory complexity of the algorithm is \f$O(|E|)\f$.
 

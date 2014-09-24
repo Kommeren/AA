@@ -1,9 +1,11 @@
 /*! \page sjoipm Scheduling Jobs on Identical Parallel Machines
 
 \section def Problem definition.
-In scheduling jobs on identical parallel machines we have M identical machines and N jobs to be processed.
-Each job must be processed on one of these machines for \f$p_{j}\f$ time units without interruption, and each job is available for processing at time 0.
-The aim is to complete all jobs as soon as possible.
+In scheduling jobs on identical parallel
+machines we have M identical machines and N jobs to be processed.  Each job
+must be processed on one of these machines for \f$p_{j}\f$ time units without
+interruption, and each job is available for processing at time 0.  The aim is
+to complete all jobs as soon as possible.
 
 \section Solution
 
@@ -11,7 +13,7 @@ Scheduling Jobs on Identical Parallel Machines problem is solved by greedy algor
 We sort all jobs from longest to shortest.
 And we assign longest not assigned job to machine which has smallest load, until all jobs are assigned.
 
-  example:
+\section Example
 \snippet scheduling_jobs_on_identical_parallel_machines_example.cpp Scheduling Jobs On Identical Parallel Machines Example
 
   example file is scheduling_jobs_on_identical_parallel_machines_example.cpp

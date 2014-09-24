@@ -3,25 +3,27 @@
 \section def Problem definition.
 \copydoc knapsack_def
 
-\section Solution 
-This solution implements the greedy algorithm. 
+\section Solution
+This solution implements the greedy algorithm.
 The algorithm proceeds in rounds in which one new object is added to the set of objects.
 The new object added to the set is the one with the biggest average value (value to size ratio).
 The algorithm returns the better of the following two sets:
 <ul>
-<li>  the greedy chosen set of the size not greater than the capacity 
+<li>  the greedy chosen set of the size not greater than the capacity
 <li> or the most valuable item with the size not greater than the capacity of the knapsack.
 </ul>
 Note that the algorithm might change the order of objects in the range.
 
-Knapsack 0/1  example: 
+\section Examples
+
+Knapsack 0/1  example:
 \snippet knapsack_0_1_two_app_example.cpp Knapsack Example
- 
+
   example file is knapsack_0_1_two_app_example.cpp
 
-Knapsack  example: 
+Knapsack  example:
 \snippet knapsack_unbounded_two_app_example.cpp Knapsack Example
- 
+
   example file is knapsack_unbounded_two_app_example.cpp
 
 \subsection knapsack_greedy_app Approximation ratio equals 2.

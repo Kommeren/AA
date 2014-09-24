@@ -8,15 +8,15 @@ In shortest superstring problem we have set of words, we want to find shortest s
 Shortest Superstring is solved by greedy algorithm.
 First we remove all repeat words, and proper substring of other words.
 Then we merge pair of words with maximum overlap until 1 words left.
-  example: 
+\section Example
 \snippet shortest_superstring_example.cpp Shortest Superstring Example
- 
+
   example file is shortest_superstring_example.cpp
 
 \subsection app_shortest_superstring Approximation Ratio is 3.5, but is conjecture that is 2.
 
 \subsection Complexity
-O(max(n,k)) 
+O(max(n,k))
 n is size of input
 k is size max letter in alphabet
 \subsection References

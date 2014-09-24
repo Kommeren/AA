@@ -9,10 +9,15 @@ Index:
 
 
 \section preliminaries Preliminaries
-In the iterative rounding method we consider a linear programming relaxation of the given problem.<br>
-After solving the linear programming relaxation the fractional solution is being rounded (some variables are fixed to integer values)
-and/or relaxed (some constraints are removed from the problem) according to some rounding and relaxing rules (specfic to the problem).<br>
-The obtained simplified linear program is then resolved and the process is iterated until we obtain a solution to the original problem.<br>
+
+In the iterative rounding method we
+consider a linear programming relaxation of the given problem.<br> After
+solving the linear programming relaxation the fractional solution is being
+rounded (some variables are fixed to integer values) and/or relaxed (some
+constraints are removed from the problem) according to some rounding and
+relaxing rules (specfic to the problem).<br> The obtained simplified linear
+program is then resolved and the process is iterated until we obtain a solution
+to the original problem.<br>
 
 Let us write the pseudo code for this operation:<br>
 
@@ -46,7 +51,10 @@ The relax step proceeds as follows:
  }
 </pre>
 
-Note that in most algorithms we can relax an arbitrary number of relaxable constraints (as long as we relax at least one, in order to make progress). The framework allows to set a limit on the number of constraints relaxed in each iteration.<br><br>
+Note that in most algorithms we can relax an arbitrary number of relaxable
+constraints (as long as we relax at least one, in order to make progress). The
+framework allows to set a limit on the number of constraints relaxed in each
+iteration.<br><br>
 
 There are two possible versions of the round step. The most common one is similar to the above relax step:
 
@@ -66,12 +74,21 @@ There are two possible versions of the round step. The most common one is simila
 
 That is, we decide independetly whether each column should be rounded.<br>
 
-In another version, called <i>dependent rounding</i>, we do the rounding based on the values of all columns (not independently, hence the name: <i>dependent</i> rounding).
+In another version, called <i>dependent rounding</i>, we do the rounding based
+on the values of all columns (not independently, hence the name:
+<i>dependent</i> rounding).
 
 \section iterative_rounding_interface  Iterative Rounding interface
-In order to present the iterative rounding interface we need to introduce several concepts.<br>
-Note that <i>Problem</i> is the problem type: a class containing problem input data and any additional data structures necessary to solve the problem (e.g., mapping between problem elements and LP rows or columns).<br>
-<i>LP</i> is the linear programming instance type, <i>paal::lp::col_id</i> and <i>paal::lp::row_id</i> are the LP column and row identifier types (see \ref linear_programming).<br><br>
+
+In order to
+present the iterative rounding interface we need to introduce several
+concepts.<br>
+Note that <i>Problem</i> is the problem type: a class containing
+problem input data and any additional data structures necessary to solve the
+problem (e.g., mapping between problem elements and LP rows or columns).<br>
+<i>LP</i> is the linear programming instance type, <i>paal::lp::col_id</i> and
+<i>paal::lp::row_id</i> are the LP column and row identifier types (see \ref
+linear_programming).<br><br>
 
 The Iterative Rounding framework uses eight component classes (described below):
 <ul>
@@ -87,13 +104,19 @@ The Iterative Rounding framework uses eight component classes (described below):
 
 Those components are grouped together into one class: <i>paal::ir::IRcomponents</i>, using the \ref comps class.<br>
 
-Out of the listed components only the first one (<i>Init</i>) does not have a default value and has to be provided by the user.<br>
-Also, at least one of the next 3 components (<i>RoundCondition</i>, <i>RelaxCondition</i>, <i>SetSolution</i>) should be provided by the user in order to construct the solution to the problem.
-Depending on the problem, the solution can be most easily constructed either during the execution of the algorithm (during the round/relax steps: <i>RoundCondition</i>, <i>RelaxCondition</i>) or in the end (in the <i>SetSolution</i> step).<br>
+Out of the listed components only the first one (<i>Init</i>) does not have
+a default value and has to be provided by the user.<br> Also, at least one of
+the next 3 components (<i>RoundCondition</i>, <i>RelaxCondition</i>,
+<i>SetSolution</i>) should be provided by the user in order to construct the
+solution to the problem.  Depending on the problem, the solution can be most
+easily constructed either during the execution of the algorithm (during the
+round/relax steps: <i>RoundCondition</i>, <i>RelaxCondition</i>) or in the end
+(in the <i>SetSolution</i> step).<br>
 
 Components:
 <ol>
-    <li>\anchor Init <i>Init</i> is a concept class responsible for initializing the LP form the given problem and initializing additional problem data structures.
+    <li>\anchor Init <i>Init</i> is a concept class responsible
+    for initializing the LP form the given problem and initializing additional problem data structures.
     <pre>
     InitArchetype {
         void operator()(Problem & problem, LP & lp);
@@ -101,7 +124,8 @@ Components:
     </pre>
     </li>
 
-    <li>\anchor RoundCondition <i>RoundCondition</i> is a concept class responsible for checking if a given column can be rounded according to the used rounding rules.<br>
+    <li>\anchor RoundCondition <i>RoundCondition</i> is a concept
+    class responsible for checking if a given column can be rounded according to the used rounding rules.<br>
     If the answer is positive, it returns the value to which the column is rounded.
     <pre>
     RoundConditionArchetype {
@@ -109,8 +133,10 @@ Components:
     }
     </pre>
 
-    Alternatively, if the problem uses dependent rounding then instead of the <i>RoundCondition</i> concept class we use <i>DependentRound</i> concept class.<br>
-    <i>DependentRound</i> is a concept class responsible for performing dependent rounding based on all of the column values.
+    Alternatively, if the problem uses dependent rounding then instead of the
+    <i>RoundCondition</i> concept class we use <i>DependentRound</i> concept class.<br>
+    <i>DependentRound</i> is a concept class responsible
+    for performing dependent rounding based on all of the column values.
     <pre>
     DependentRoundArchetype {
         void operator()(Problem & problem, LP & lp);
@@ -120,7 +146,8 @@ Components:
     Default component: paal::ir::default_round_condition (rounds each column, which value is integral).
     </li>
 
-    <li>\anchor RelaxCondition <i>RelaxCondition</i> is a concept class responsible for checking if the given row can be relaxed according to the used relaxing rules.
+    <li>\anchor RelaxCondition <i>RelaxCondition</i> is a
+    concept class responsible for checking if the given row can be relaxed according to the used relaxing rules.
     <pre>
     RelaxConditionArchetype {
         bool operator()(Problem & problem, const LP & lp, paal::lp::row_id row);
@@ -129,14 +156,19 @@ Components:
     Default component: paal::utils::always_false (no relaxations).
     </li>
 
-    <li>\anchor SetSolution <i>SetSolution</i> is a concept class responsible for constructing the solution of the original problem, based on the values of the final LP solution and the values of columns fixed (rounded) in previous iterations. The solution is passed as a function from column identifier to column value.
+    <li>\anchor SetSolution <i>SetSolution</i> is a concept class
+    responsible for constructing the solution of the original problem,
+    based on the values of the final LP solution and the values
+    of columns fixed (rounded) in previous iterations.
+    The solution is passed as a function from column identifier to column value.
     <pre>
     template &lt;typename GetSolution&gt;
     SetSolutionArchetype {
         void operator()(Problem & problem, const GetSolution & solution);
     }
     </pre>
-    <i>GetSolution</i> is the type of a function from <i>paal::lp::col_id</i> to <i>double</i> (function returning the value of the given column in the final LP solution).<br>
+    <i>GetSolution</i> is the type of a function from <i>paal::lp::col_id</i> to <i>double</i>
+    (function returning the value of the given column in the final LP solution).<br>
     Default component: paal::utils::skip_functor (skips solution setting).
     </li>
 
@@ -149,7 +181,8 @@ Components:
     Default component: paal::ir::default_solve_lp_to_extreme_point (finds an extreme point solution to the LP).
     </li>
 
-    <li>\anchor ResolveLP <i>ResolveLP</i> is a concept class responsible for re-solving a previously solved and modified LP.
+    <li>\anchor ResolveLP <i>ResolveLP</i> is a concept class responsible
+    for re-solving a previously solved and modified LP.
     <pre>
     ResolveLPArchetype {
         paal::lp::problem_type operator()(Problem & problem, LP & lp);
@@ -158,7 +191,9 @@ Components:
     Default component: paal::ir::default_resolve_lp_to_extreme_point (finds an extreme point solution to the LP).
     </li>
 
-    <li>\anchor StopCondition <i>StopCondition</i> is a concept class responsible for checking if the current LP solution is a valid solution to the original problem. In such case we should finish the algorithm.
+    <li>\anchor StopCondition <i>StopCondition</i> is a concept class responsible
+    for checking if the current LP solution is a valid solution to the original problem.
+    In such case we should finish the algorithm.
     <pre>
     StopConditionArchetype {
         bool operator()(const Problem & problem, const LP & lp);
@@ -167,7 +202,8 @@ Components:
     Default component: paal::ir::default_stop_condition (stops if all colums have got integer values).
     </li>
 
-    <li>\anchor RelaxationsLimit <i>RelaxationsLimit</i> is a concept class responsible for checking if the limit of relaxations number per IR iteration was reached.
+    <li>\anchor RelaxationsLimit <i>RelaxationsLimit</i> is a concept
+    class responsible for checking if the limit of relaxations number per IR iteration was reached.
     <pre>
     RelaxationsLimitArchetype {
         bool operator()(int number_of_relaxed_constraints);
@@ -188,7 +224,8 @@ template <typename Problem,
 paal::ir::IRResult solve_iterative_rounding(Problem & problem, IRComponents components, Visitor visitor = Visitor());
 </pre>
 
-In the case when our algorithm uses dependent rounding, we should apply the paal::ir::solve_dependent_iterative_rounding interface:
+In the case when our algorithm uses dependent rounding,
+we should apply the paal::ir::solve_dependent_iterative_rounding interface:
 
 <pre>
 template <typename Problem,
@@ -202,22 +239,30 @@ paal::ir::IRResult solve_dependent_iterative_rounding(Problem & problem, IRCompo
 
 Complete example: iterative_rounding_example.cpp
 
-In this example we are going to solve the minimum cost vertex cover problem (minimum cost set of vertices in a graph \f$G=(V,E)\f$, which are incident with every edge).<br>
-The algorithm follows the iterative rounding framework: we have a variable \f$x_v\f$ for every vertex \f$v\f$ (of cost \f$c_v\f$) and solve the following LP:
+In this example we are going to solve the minimum cost vertex cover problem
+(minimum cost set of vertices in a graph \f$G=(V,E)\f$, which are incident with every edge).<br>
+The algorithm follows the iterative rounding framework:
+we have a variable \f$x_v\f$ for every vertex \f$v\f$ (of cost \f$c_v\f$) and solve the following LP:
 \f{eqnarray*}
 \mbox{minimize:} & \sum_{v\in V} \ c_v x_v & \\
 \mbox{subject to:} & & \\
 & x_v + x_u \geq 1 & \mbox{ for every } (u,v)=e \in E\\
 & 0\leq x_v\leq 1 & \mbox{ for every } v\in V\\
 \f}
-We round to 1 every variable with value greater or equal to \f$\frac{1}{2}\f$ (such variable can always be found, see \cite Vazirani:2001:AA:500776 chapter 14.3). The vertex cover is the set of vertices with value 1 in the final solution.<br>
-The algorithm gives a 2-approximation (it's not the most effective implementation of the 2-approximation, but it gives a simple example of the IR framework).<br>
+We round to 1 every variable with value greater or equal to \f$\frac{1}{2}\f$
+(such variable can always be found, see \cite Vazirani:2001:AA:500776 chapter
+14.3). The vertex cover is the set of vertices with value 1 in the final
+solution.<br> The algorithm gives a 2-approximation (it's not the most
+effective implementation of the 2-approximation, but it gives a simple example
+of the IR framework).<br>
 
-First we define the vertex_cover class, which contains the problem input data and a mapping between the LP columns and graph vertices.
+First we define the vertex_cover class, which contains the problem input data
+and a mapping between the LP columns and graph vertices.
 
 \snippet iterative_rounding_example.cpp Iterative Rounding Problem Example
 
-Next we define the vertex_cover_init and vertex_cover_set_solution functors, and the vertex_cover_ir_components components class.
+Next we define the vertex_cover_init and vertex_cover_set_solution functors,
+and the vertex_cover_ir_components components class.
 
 \snippet iterative_rounding_example.cpp Iterative Rounding Components Example
 

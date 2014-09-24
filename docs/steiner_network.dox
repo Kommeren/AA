@@ -35,7 +35,7 @@ It is easy to prove that, given a clique with edge weights equal \f$r_{uv}\f$, t
 separation oracle only has to check the minimum cut values between pairs of vertices
 which are the endpoints of edges of a maximum spanning tree in this clique.
 
-example:
+\section Example
    \snippet steiner_network_example.cpp Steiner Network Example
 
 complete example of the usage can be found in file steiner_network_example.cpp
