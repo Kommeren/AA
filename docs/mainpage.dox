@@ -6,10 +6,12 @@
   \n   \n   \n   \n   \n
 
   \section Introduction
-    The PAAL is a header-only, generic library consisting of approximation algorithms,
-    data structures and several complete solutions for the various optimization problems.
-    The PAAL is implemented taking advantage of the new features of C++ introduced in the C++0x standard,
-    which in many cases simplify greatly creation of generic code.
+
+   The PAAL is an open source, a header-only, generic library consisting of
+   approximation algorithms, data structures and several complete solutions
+   for the various optimization problems.  The PAAL is implemented taking
+   advantage of the new features of C++ introduced in the C++14 standard,
+   which in many cases simplify greatly creation of generic code.
 
   \section Installation
    There is no need to install anything because the PAAL is header only.
@@ -102,51 +104,45 @@
 
   \section general_design General Design
 
-  The algorithms are written as functions:
-  <pre>
-      algorithm(ProblemDescription)
-  </pre>
-  Very often algorithms can be customized or extended, as they support many different arguments. These arguments are
-  usually wrapped using Components class (see \ref comps), which allows to specify named arguments. In such
-  case the algorithm is called as follows:
-  <pre>
-      algorithm(ProblemDescription, Components)
-  </pre>
+  The algorithms are written as template functions in STL-style.  The major
+  change is, that we support ranges instead of iterators.  Usually algorithms
+  can be customized or extended, as they support many different arguments.
+  Besides, the algorithms, the library contains many useful data-structures.
+  Our data structures introduce useful and interesting higher level concepts,
+  e.g., Metric or Cycle.
 
-  Generally the library is divided into the following three layers:
-  <pre>
-   ___________________________________________________________________________________________________
 
-      ALGORITHMS  - e. g., LocalSearch. The algorithms are written in very generic way by
-      delegating the specific tasks to the algorithm helpers.
-  ___________________________________________________________________________________________________
+  Besides standalone algorithms, the library contains frameworks which supports
+  solving general optimization methods like local search or iterative rounding.
+ The functional arguments of these frameworks are usually wrapped
+ using Components class (see \ref comps), which allows to specify named arguments.
+ In such case the algorithm is called as follows:
+ <pre>
+    algorithm(ProblemDescription, Components)
+ </pre>
+ For each concept our library delivers the default implementations of components. <br>
+ Of course the user is allowed to replace each component. <br>
 
-      ALGORITHMS COMPONENTS - e. g., GetNeighborhood or Commit in local search.
-      These are the bricks that directly manipulate the specific data-structure concepts.
-  ___________________________________________________________________________________________________
-
-      DATA_STRUCTURES - The data-structures used by algorithm helpers.
-      Our data-structures introduce useful and interesting higher level concepts, e.g., Metric or Cycle.
-  ___________________________________________________________________________________________________
-
-  </pre>
-  <br>
-  For each solution concept our library is delivering default implementations of components from each layer. <br>
-  The strength of this design is that the user is allowed to change components from each layer freely. <br><br>
-
-  For example the user can easily swap the implementation of the
-  GetNeighborhood to provide his own way of searching the neighborhood in local
-  search. <br> Also note that the same algorithm helpers that are used by local
-  search can be used to produced the simulated annealing algorithm. <br>
-  Similarly, if the user wants to swap the metric implementation to use
-  specific properties of his topology, this is not a problem at all! <br>
+Consider for example the local search framework, where the user can can easily
+swap the implementation of the GetMoves procedure to provide his own way of
+searching the neighborhood.  <br> Also note that the same components, that are
+used by local search can be used in the simulated annealing algorithm. <br>
+Similarly, if the user wants to swap the metric implementation to use specific
+properties of his topology, this is not a problem at all! <br>
 
  \section Platforms
- Currently the library compiles on the gcc 4.8.1. and clang 3.4. Unfortunately, the library does not
- compile on the newest Microsoft Visual Studio 2013 due to its poor support of C++0x.
+ Currently the library compiles on the gcc 4.8.1 and clang 3.4. Unfortunately, the library does not
+ compile on the Microsoft Visual Studio 2013 due to its poor support of C++14.
+
+ \section License
+
+ The library is released under
+ <a href="http://www.boost.org/LICENSE_1_0.txt"> Boost Software License</a>,
+ which encourages both commercial and
+ non-commercial use.
 
  \section Contact
  In case of any questions / suggestions / pull requests
  / contribution please contact Piotr Wygocki (wygos at mimuw.edu.pl).
 
-*/
+ */

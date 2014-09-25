@@ -22,12 +22,12 @@ at each moment that machine is idle, we start procesing next available job with 
 
   example file is scheduling_jobs_with_deadlines_on_a_single_machine_example.cpp
 
-\subsection app_sjwdoasm Approximation Ratio equals 2 when all due dates are negative.
+\section app_sjwdoasm Approximation Ratio equals 2 when all due dates are negative.
 
-\subsection com_sjwdoasm The complexity
+\section Complexity
 Complexity of the algorithm is \f$O(|N|*log(|N|))\f$ where \a N is size of input
 
-\subsection References
+\section References
 
 The algorithm analysis is described in \cite Williamson:2011:DAA:1971947
 

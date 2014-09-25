@@ -17,14 +17,14 @@ Terminal).
 
   example file is zelikovsky_11_per_6_example.cpp
 
-\subsection apps_st Approximation Ratio equals 11/6
-\subsection com The complexity
+\section apps_st Approximation Ratio equals 11/6
+\section com The complexity
 Complexity of the algorithm is \f$O(|V|*|E| + |T|^4)\f$ where \a T is the set of terminals.
 
-\subsection References
+\section References
 The algorithm is described in the \cite Zelikovsky93.
 
-\subsection sa_zel See Also
+\section sa_zel See Also
 
 <ul>
 <li> \ref stein_1_39

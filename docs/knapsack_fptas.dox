@@ -49,17 +49,17 @@ Knapsack 0/1 example - modified sizes (without computing items in knapsack):
 
   example file is knapsack_0_1_on_size_fptas_no_output_example.cpp
 
-\subsection Complexity
+\section Complexity
 The algorithms works in \f$O(n^2 / \epsilon)\f$ time and in \f$O(n / \epsilon)\f$ memory.
 
 
-\subsection References
+\section References
 
 The algorithm is described in the \cite Williamson:2011:DAA:1971947. We use
 optimizations from \cite journals/jco/KellererP99.  We use dynamic algorithm
 for knapsack described in \ref knapsack_dynamic.
 
-\subsection knapsack_greedy_sa See Also
+\section knapsack_greedy_sa See Also
 <ul>
 <li> \ref knapsack_dynamic
 <li> \ref knapsack_greedy

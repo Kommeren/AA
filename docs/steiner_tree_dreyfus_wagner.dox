@@ -11,13 +11,15 @@ Not an approximation algorithm by itself, it is used to solve subproblems in man
  \snippet dreyfus_wagner_example.cpp Dreyfus Wagner Example
   example file is dreyfus_wagner_example.cpp
 
-\subsection com The complexity
- Complexity of the algorithm is \f$O(3^{|T|} * |V| + 2^{|T|} * |V|^2)\f$, where \a T is the set of terminals.
+\section Complexity
 
-\subsection ref References
+ Complexity of the algorithm is \f$O(3^{|T|} * |V| + 2^{|T|} * |V|^2)\f$,
+ where \a T is the set of terminals.
+
+\section ref References
 The algorithm is described in the \cite Ding2000.
 
-\subsection sa_dreyfus See Also
+\section sa_dreyfus See Also
 
 <ul>
 <li> \ref stein_1_39

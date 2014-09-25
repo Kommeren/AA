@@ -1,3 +1,10 @@
+//=======================================================================
+// Copyright (c)
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
 /**
  * @file zelikovsky_11_per_6_example.cpp
  * @brief This is example for zelikovsky 11/6 approximation for steiner tree

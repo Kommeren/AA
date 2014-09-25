@@ -25,8 +25,8 @@ Facility Location (FL) problem is solved by local search. Given a move which
 opens one facility and close one facility,  we check if the move can our
 solution, if yes, we apply the move.(see
 paal::local_search::facility_location::KMedianLocalSearchStep for more
-details). Current solution to the assignement problem (assign clients to chosen
-facilities) is kept in the class which models \ref voronoi conecpt, where
+details). Current solution to the assignment problem (assign clients to chosen
+facilities) is kept in the class which models \ref voronoi concept, where
 generators are facilities and vertices are clients.
 
 \section Example
@@ -34,12 +34,14 @@ generators are facilities and vertices are clients.
 
   example file is k_median_example.cpp
 
-\subsection app_km Approximation Ratio equals 5.
+\section app_km Approximation Ratio equals 5.
 
-\subsection com_kmedian Complexity
-The complexity of the computing the gain for eachmove equals complexity of the swap for facility location (see \ref fl).
+\section Complexity
 
-\subsection References
+The complexity of the computing the gain for each move
+equals complexity of the swap for facility location (see \ref fl).
+
+\section References
 
 The algorithm an analises is described in \cite Arya01localsearch
 

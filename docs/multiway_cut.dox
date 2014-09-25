@@ -40,7 +40,7 @@ We select cheapest solution, from all randomly chosen.
 
   example file is multiway_cut_example.cpp
 
-\subsection parameters_multiway_cut Parameters
+\section parameters_multiway_cut Parameters
 
 IN: const Graph& g
 
@@ -52,7 +52,7 @@ IN: const boost::bgl_named_params<P, T, R>& params
 
 IN Rand && random_engine=std::default_random_engine(5426u)
 
-\subsection named_parameters_multiway_cut Named Parameters
+\section named_parameters_multiway_cut Named Parameters
 
 IN: iterations(int iterations)
 
@@ -63,22 +63,22 @@ map contains weights of edges
 
 IN: vertex_color(VertexColorMap colorMap)
 
-\subsection app_multiway_cut Approximation ratio.
+\section app_multiway_cut Approximation ratio.
 Expected Approximation Ratio equals 2.
 We choose rays many times to increase chance to get 2 approximation.
 
-\subsection com_multiway_cut The complexity
+\section Complexity
 
 Complexity of the algorithm is \f$O(|LP|+|R|*(|E|+|V|*|K|))\f$ where \a R
 is number of repeats \a K is number of terminals,  \a V is number of vertices \a E is number of edges
 and \a LP is cost of solve LP by simplex
-\subsection mem_multiway_cut The memory
+\section mem_multiway_cut The memory
 Memory complexity of the algorithm is \f$O(|LP|+|K|*(|V|+|E|))\f$
 where \a K is number of terminals  \a V is number of vertices, \a E is number
 of edges and \a LP is memory cost of solve LP by simplex
 
 
-\subsection References
+\section References
 
 The algorithm analysis is described in \cite Williamson:2011:DAA:1971947
 

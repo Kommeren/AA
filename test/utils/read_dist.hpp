@@ -1,10 +1,17 @@
+//=======================================================================
+// Copyright (c)
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
 /**
-* @file read_dist.hpp
-* @brief
-* @author Jakub Oćwieja
-* @version 1.0
-* @date 2014-05-19
-*/
+ * @file read_dist.hpp
+ * @brief
+ * @author Jakub Oćwieja
+ * @version 1.0
+ * @date 2014-05-19
+ */
 
 #ifndef READ_DIST_HPP
 #define READ_DIST_HPP

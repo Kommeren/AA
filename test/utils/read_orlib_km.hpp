@@ -1,9 +1,16 @@
+//=======================================================================
+// Copyright (c) 2014 Piotr Smulewicz
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
 /**
  * @file read_orlib_km.hpp
  * @brief
  * @author Piotr Smulewicz
  * @version 1.0
- * @date 2013-08-01
+ * @date 2014-08-01
  */
 
 /* Data files contains multiple edges

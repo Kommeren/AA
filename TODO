@@ -1,7 +1,7 @@
 * disable typedefs warning in doxygen
 * knapsack unbounded fptas is not realy fptas
-  there is a problem with number of objects. 
-  The number of objects is included in the multiplier. 
+  there is a problem with number of objects.
+  The number of objects is included in the multiplier.
   In the current version we use incorrect number of items.
   One of the solution could be to group the small eelements in the bigger bundles.
 * doxygen does not see some of the references

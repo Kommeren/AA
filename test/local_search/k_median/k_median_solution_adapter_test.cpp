@@ -1,3 +1,10 @@
+//=======================================================================
+// Copyright (c) 2014 Piotr Smulewicz
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
 #include "utils/sample_graph.hpp"
 
 #include "paal/data_structures/facility_location/k_median_solution.hpp"

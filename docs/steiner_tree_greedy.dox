@@ -21,18 +21,19 @@ and the lower bound on the weight of the optimal tree (equal to half of sum of d
 
   example file is steiner_tree_greedy_example.cpp
 
-\subsection apps_steiner_tree_greedy Approximation Ratio equals 2
+\section apps_steiner_tree_greedy Approximation Ratio equals 2
 
-\subsection com_sjwdoasm The complexity
+\section Complexity
+
 Complexity of the algorithm is \f$O(|E|*\log(|V|))\f$ where \a E is the number of
 edges and \a V is the number of vertices.
 
 Memory complexity of the algorithm is \f$O(|E|)\f$.
 
-\subsection ref References
+\section ref References
 The algorithm is described in \cite mehlhorn1988fasterapproxspg.
 
-\subsection sa_steiner_tree_greedy See also:
+\section sa_steiner_tree_greedy See also:
 
 <ul>
 <li> \ref stein_1_39

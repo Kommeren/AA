@@ -3,7 +3,9 @@
 \section def Problem definition.
 \copydoc knapsack_def
 
-\section solkd Solution Both variants of the knapsack problem are solved using
+\section solkd Solution
+
+Both variants of the knapsack problem are solved using
 the dynamic approach.  In our library, both variants of the knapsack problem
 are solved using dynamic programming.  Our algorithm is actually composed out
 of two algorithms, and the faster of these two is chosen.  In the first one the
@@ -24,6 +26,7 @@ conditions and proceed recursively. (see \cite conf/asap/NibbelinkRM07 for more
 details).
 
 \section Examples
+
 Knapsack unbounded example:
 \snippet knapsack_unbounded_example.cpp Knapsack Example
 
@@ -43,18 +46,20 @@ The library provides knapsack_unbounded function which solves the unbounded
 version of the problem and two versions of knapsack 0/1 problem : knapsack_0_1
 and knapsack_0_1_no_output.
 
-The first one solves the \a knapsack \a 0/1 with retrieving solution whereas the second one without this procedure.
-Although retrieving solution does not increase the overall complexity, it is a costly procedure.
+The first one solves the \a knapsack \a 0/1
+with retrieving solution whereas the second one without this procedure.
+Although retrieving solution does not increase
+the overall complexity, it is a costly procedure.
 
-\subsection Complexity The algorithms works in \f$O(min(Capacity, Opt)
+\section Complexity The algorithms works in \f$O(min(Capacity, Opt)
 * NumberOfObjects)\f$ time and in \f$O(min(Capacity, Opt))\f$ memory, where Opt
 is the optimal value of the knapsack.
 
-\subsection References
+\section References
 
 The algorithm is described in the \cite conf/asap/NibbelinkRM07
 
-\subsection kanpsack_greedy_sa See Also
+\section kanpsack_greedy_sa See Also
 <ul>
 <li> \ref knapsack_fptas
 <li> \ref knapsack_greedy

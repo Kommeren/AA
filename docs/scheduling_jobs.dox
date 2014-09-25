@@ -34,18 +34,19 @@ to not overflow its value type.
 
   example file is scheduling_jobs_example.cpp
 
-\subsection app_scheduling_jobs Approximation Ratio equals 2.
+\section app_scheduling_jobs Approximation Ratio equals 2.
 
-\subsection com_scheduling_jobs The complexity
+\section Complexity
+
 Time Complexity of the algorithm is \f$O(|N|*log(|N|) + |M|*log(|M|))\f$.
 Memory Complexity of the algorithm is \f$(O(|N| + |M|))\f$.
 
-\subsection gt_scheduling_jobs Game-theoretic Properties
+\section gt_scheduling_jobs Game-theoretic Properties
 Randomized version of the algorithm is thruthful in expectation: i.e. expected
 load on any given machine is a monotone (decreasing) function of its speed (when all other machines'
 speeds are fixed).
 
-\subsection References
+\section References
 
 The algorithm analysis is described in \cite AlgGameTheory, chapter 12.
 

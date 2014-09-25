@@ -54,12 +54,12 @@ to use a separation oracle and the row generation technique to solve it.
 
 complete example of the usage can be found in file bounded_degree_mst_example.cpp
 
-\subsection app_bdmst Approximation ratio
+\section app_bdmst Approximation ratio
 This algorithm doesn't have an approximation ratio in classical sense, but is a bicriteria approximation:
 one criteria is the cost, whereas the other one is violation of the degree bounds.
 The solution returned by the algorithm has lower cost than the optimal one but can violate the constraints by one.
 
-\subsection com_bdmst Complexity
+\section Complexity
 The time complexity of the algorithm is \f$O(|V|*(|V|+|E|+LP_{rowgen}))\f$, where
 \f$|V|\f$ and \f$|E|\f$ are respectively the numbers of vertices and edges
 whereas \f$LP_{rowgen}\f$ is the time of solving the LP using row generation technique.
@@ -71,7 +71,7 @@ The memory complexity of the algorithm is \f$O(|V|+|E|+LP_{mem}(|E|,|V|))\f$, wh
 \f$LP_{mem}(col, row)\f$ is the memory complexity of solving the LP with
 \f$O(col)\f$ columns and \f$O(row)\f$ rows.
 
-\subsection References
+\section References
 This iterative rounding additive one approximation by Singh and Lau is described in
 \cite SinghLauBDMST.
 */

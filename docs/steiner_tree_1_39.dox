@@ -17,13 +17,13 @@ We iterate this process until all terminals are connected.
 
   example file is in steiner_tree_ir_example.cpp
 
-\subsection apps_st2 Approximation Ratio
+\section apps_st2 Approximation Ratio
 The approximation ratio for this algorithm equals 1.39
 
-\subsection ref References
+\section ref References
 The algorithm is described in the \cite Byrka2013.
 
-\subsection sa_1_39 See Also
+\section sa_1_39 See Also
 
 <ul>
 <li> \ref stein_zel

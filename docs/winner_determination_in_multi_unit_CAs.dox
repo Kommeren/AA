@@ -28,20 +28,22 @@ for all \f$S \subseteq U\f$ with \f$c_{i, S} > z_i \f$.
 We solve the problem using a combinatorial, primal dual algorithm.
 
 \section Example
+
 \snippet winner_determination_in_multi_unit_CAs_example.cpp Winner Determination In Multi Unit CAs Example
 
   complete example is winner_determination_in_multi_unit_CAs_example.cpp
-\subsection app_winner_determination_in_multi_unit_CAs Approximation Ratio
+\section app_winner_determination_in_multi_unit_CAs Approximation Ratio
 \f$e \cdot (2 \gamma + 1) \cdot m^{1 / (B + 1)}\f$.
 
-\subsection com_winner_determination_in_multi_unit_CAs The complexity
+\section Complexity
+
 <b>Time complexity:</b> \f$O(m + k^2 * \log_{1 + 2 \gamma} (c_{max} / c_{min}) * GO_{time})\f$,
 where \f$GO_{time}\f$ is the time complexity of one gamma oracle query, \f$c_{max} / c_{min}\f$
 is respectively the maximum / minimum \f$c_{i, S}\f$.<br>
 <b>Memory complexity:</b> \f$O(k + \min(\sum_{j \in U} b_e, m * k) + GO_{mem})\f$, where \f$GO_{mem}\f$
 is the memory complexity of one gamma oracle query.
 
-\subsection References
+\section References
 The algorithm is described in \cite BriestKV11, section 6.
 
 */
