@@ -25,6 +25,7 @@
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/local_search/local_search.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
@@ -33,7 +34,6 @@
 
 #include <boost/range/combine.hpp>
 #include <boost/range/join.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
 #include <boost/iterator/zip_iterator.hpp>
@@ -94,7 +94,7 @@ template <typename Metric, typename Voronoi> class steiner_tree {
             return;
         }
 
-        auto ti = boost::irange<int>(0, N);
+        auto ti = irange(N);
         auto subsets = make_three_subset_range(ti.begin(), ti.end());
 
         auto get_moves = [&](const AMatrix &) {
@@ -183,7 +183,7 @@ template <typename Metric, typename Voronoi> class steiner_tree {
     }
 
     void fill_sub_dists() {
-        auto ti = boost::irange<int>(0, N);
+        auto ti = irange(N);
 
         auto sub_range = make_three_subset_range(ti.begin(), ti.end());
         m_subs_dists.reserve(boost::distance(sub_range));
@@ -275,7 +275,7 @@ template <typename Metric, typename Voronoi> class steiner_tree {
         int c1 = comps[0];
         int c2 = -1;
 
-        for (auto i : boost::irange(0, n)) {
+        for (auto i : irange(n)) {
             if (comps[i] == c1) {
                 add_vertex(g.local_to_global(i), g1);
             } else {

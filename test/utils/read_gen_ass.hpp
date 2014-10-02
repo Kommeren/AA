@@ -16,8 +16,7 @@
 #define READ_GEN_ASS_HPP
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
-
-#include <boost/range/irange.hpp>
+#include "paal/utils/irange.hpp"
 
 namespace paal {
 
@@ -29,8 +28,8 @@ void read_gen_ass(std::istream & is, M & costs, M & times,
                  boost::integer_range<int> & jobs) {
     int machines_cnt, jobs_cnt;
     is >> machines_cnt >> jobs_cnt;
-    machines = boost::irange(0, machines_cnt);
-    jobs    = boost::irange(0, jobs_cnt);
+    machines = paal::irange(machines_cnt);
+    jobs     = paal::irange(jobs_cnt);
     costs = M(jobs_cnt, machines_cnt);
     times = M(jobs_cnt, machines_cnt);
     machines_bounds.resize(machines_cnt);

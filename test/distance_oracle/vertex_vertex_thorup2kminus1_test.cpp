@@ -12,12 +12,12 @@
 * @version 1.0
 * @date 2014-05-11
 */
+#include "utils/sample_graph.hpp"
+#include "utils/test_result_check.hpp"
 
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
-
-#include "utils/sample_graph.hpp"
-#include "utils/test_result_check.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/copy.hpp>
 #include <boost/property_map/property_map.hpp>
@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_star_test ) {
 }
 
 BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_random_star_test ) {
-    for (int s: boost::irange(0,10)) {
+    for (int s: irange(10)) {
         auto g = SGM::get_star_random(s, 10, 20, 50);
         for (auto k: {2,3,4,5}) {
             perform_full_check(g, make_distance_oracle_thorup2kminus1approximation(g, k), 2*k-1);

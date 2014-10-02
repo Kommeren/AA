@@ -16,8 +16,7 @@
     //! [K Center Example]
 #include "paal/greedy/k_center/k_center.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
-
-#include <boost/range/irange.hpp>
+#include "paal/utils/irange.hpp"
 
 #include <iostream>
 #include <vector>
@@ -32,7 +31,7 @@ int main() {
     m(1, 0) = 3;
     m(2, 0) = 4;
     m(2, 1) = 5;
-    auto vertices = boost::irange(0, 3);
+    auto vertices = paal::irange(3);
     std::vector<int> centers;
 
     // solution

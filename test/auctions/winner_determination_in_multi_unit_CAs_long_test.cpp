@@ -17,8 +17,8 @@
 #include "utils/logger.hpp"
 #include "utils/parse_file.hpp"
 #include "utils/winner_determination_in_multi_unit_CAs.hpp"
+#include "paal/utils/irange.hpp"
 
-#include <boost/range/irange.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/property_map/vector_property_map.hpp>
 
@@ -66,8 +66,8 @@ BOOST_AUTO_TEST_CASE(testDetermineWinnersLong)
       std::vector<int> item_count(items_num);
       for (auto& cnt: item_count) data_file >> cnt;
 
-      auto bidders = boost::irange(0, bidders_num);
-      auto items = boost::irange(0, items_num);
+      auto bidders = paal::irange(bidders_num);
+      auto items = paal::irange(items_num);
       auto get_bids = [&](Bidder bidder) -> const Bids& { return bids[bidder]; };
       auto get_value = [](const Bid& bid) { return bid.second; };
       auto get_items = [](const Bid& bid) -> const Items& { return bid.first; };

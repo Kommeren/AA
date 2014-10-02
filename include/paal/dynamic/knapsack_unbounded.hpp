@@ -23,10 +23,10 @@
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/less_pointees.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/optional.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 
@@ -39,8 +39,8 @@ namespace detail {
  */
 struct knapsack_get_position_range {
     template <typename T>
-    auto operator()(T begin, T end)->decltype(boost::irange(begin, end)) {
-        return boost::irange(begin, end);
+    auto operator()(T begin, T end)->decltype(irange(begin, end)) {
+        return irange(begin, end);
     }
 };
 

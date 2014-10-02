@@ -16,6 +16,7 @@
 #define CAPACITATED_VORONOI_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/range/as_array.hpp>
@@ -433,7 +434,7 @@ class capacitated_voronoi {
         const unsigned N = num_vertices(m_g);
         m_g_to_graph_v.clear();
         auto name = get(boost::vertex_name, m_g);
-        for (unsigned i : boost::irange(unsigned(m_first_generator_id), N)) {
+        for (unsigned i : irange(unsigned(m_first_generator_id), N)) {
             m_g_to_graph_v[name[i]] = i;
         }
     }

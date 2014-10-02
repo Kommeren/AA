@@ -22,6 +22,7 @@
 #include "utils/read_steinlib.hpp"
 #include "utils/test_result_check.hpp"
 
+#include "paal/utils/irange.hpp"
 #include "paal/data_structures/bimap.hpp"
 
 #include <vector>
@@ -54,7 +55,7 @@ BOOST_AUTO_TEST_CASE(zelikovsky_11_per_6_test) {
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         auto idx_m = paal::data_structures::make_metric_on_idx(test.metric, idx);
         int res(0);
-        for (int i : boost::irange(0, int(pm.size()))) {
+        for (int i : paal::irange(pm.size())) {
             if (pm[i] != i) {
                 res += idx_m(i, pm[i]);
             }

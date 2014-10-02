@@ -17,8 +17,7 @@
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
-
-#include <boost/range/irange.hpp>
+#include "paal/utils/irange.hpp"
 
 #include <queue>
 #include <vector>
@@ -70,7 +69,7 @@ void scheduling_jobs_on_identical_parallel_machines(int n_machines,
 
     std::priority_queue<int, std::vector<int>, detail::compare> machines(load);
 
-    for (auto machine_id : boost::irange(0, n_machines)) {
+    for (auto machine_id : irange(n_machines)) {
         machines.push(machine_id);
     }
     for (auto job_iter = first; job_iter < last; job_iter++) {

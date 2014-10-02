@@ -23,7 +23,6 @@
 #include "paal/utils/floating.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/fusion/include/for_each.hpp>
 
 #include <fstream>
@@ -35,10 +34,8 @@ const int capacity = 6;
 using Objects = std::vector<std::pair<int, int>>;
 Objects objects{ { 1, 3 }, { 2, 2 }, { 3, 65 }, { 1, 1 }, { 2, 2 }, { 4, 3 },
                  { 1, 1 }, { 10, 23 } };
-auto size = [](std::pair<int, int> object) { return object.first; }
-;
-auto value = [](std::pair<int, int> object) { return object.second; }
-;
+auto size = [](std::pair<int, int> object) { return object.first; };
+auto value = [](std::pair<int, int> object) { return object.second; };
 }
 
 static const double OPT = 130;

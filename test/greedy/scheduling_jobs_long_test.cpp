@@ -16,6 +16,7 @@
 #include "utils/logger.hpp"
 #include "utils/test_result_check.hpp"
 
+#include "paal/utils/irange.hpp"
 #include "paal/greedy/scheduling_jobs/scheduling_jobs.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -46,7 +47,7 @@ BOOST_AUTO_TEST_CASE(testSchedulingJobs) {
              minJobsOnMachine += min_jobs_on_machine_step) {
             LOGLN("machines: " << numberOfMachines);
             std::vector<Machine> machines(numberOfMachines);
-            for (auto machineID : boost::irange(0, numberOfMachines)) {
+            for (auto machineID : paal::irange(numberOfMachines)) {
                 machines[machineID] =
                     std::make_pair(machineID, rand() % maxMachineSpeed + 1);
             }

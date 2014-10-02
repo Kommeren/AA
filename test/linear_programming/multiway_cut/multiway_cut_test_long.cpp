@@ -19,9 +19,9 @@
 #include "utils/test_result_check.hpp"
 
 #include "paal/multiway_cut/multiway_cut.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 

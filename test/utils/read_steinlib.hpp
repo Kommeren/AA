@@ -18,6 +18,7 @@
 #include "utils/logger.hpp"
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/range/algorithm/find.hpp>
@@ -93,7 +94,7 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     std::vector<int> weights(E);
     std::vector<Edge> edges(E);
 
-    for (int i : boost::irange(0, E)) {
+    for (int i : paal::irange(E)) {
         Edge e;
         std::string s;
         is >> s >> e.first >> e.second >> weights[i];
@@ -107,7 +108,7 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     T = read_int(is, "Terminals");
     terminals.resize(T);
     auto color = get(boost::vertex_color, g);
-    for (int i : boost::irange(0, T)) {
+    for (int i : paal::irange(T)) {
         terminals[i] = read_int(is, "T") - 1;
         steiner_points.erase(boost::find(steiner_points, terminals[i]));
         put(color, terminals[i], 1);

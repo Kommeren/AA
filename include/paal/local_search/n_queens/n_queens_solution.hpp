@@ -15,9 +15,10 @@
 #ifndef N_QUEENS_SOLUTION_HPP
 #define N_QUEENS_SOLUTION_HPP
 
+#include "paal/utils/irange.hpp"
+
 #include <boost/iterator/counting_iterator.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/numeric.hpp>
 
 #include <vector>
@@ -44,7 +45,7 @@ template <typename NQueensPositionsVector> struct n_queens_solution_adapter {
           m_numeber_attacing_diagonal_negative(boost::distance(pos), 0),
           m_numeber_attacing_diagonal_nonnegative(boost::distance(pos), 0),
           m_numeber_attacing_counter_diagonal(2 * boost::distance(pos), 0) {
-        for (auto q : boost::irange(0, int(boost::distance(pos)))) {
+        for (auto q : irange(boost::distance(pos))) {
             increase(q);
         }
     }

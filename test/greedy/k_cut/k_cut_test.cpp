@@ -17,9 +17,9 @@
 #include "utils/test_result_check.hpp"
 
 #include "paal/greedy/k_cut/k_cut.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/test/unit_test.hpp>
 
 
@@ -41,7 +41,7 @@ void run_test(const Graph &graph, const std::vector<int> &optimal) {
     auto index = get(boost::vertex_index, graph);
     auto weight = get(boost::edge_weight, graph);
 
-    for (auto i: boost::irange(2,9)) {
+    for (auto i: paal::irange(2,9)) {
         std::vector<std::pair<VT, int>> vertices_parts;
         int cost_cut = paal::greedy::k_cut(graph, i, back_inserter(vertices_parts),
             boost::weight_map(weight));

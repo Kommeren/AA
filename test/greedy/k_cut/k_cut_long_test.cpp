@@ -19,7 +19,6 @@
 #include "paal/greedy/k_cut/k_cut.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/test/unit_test.hpp>
 
 

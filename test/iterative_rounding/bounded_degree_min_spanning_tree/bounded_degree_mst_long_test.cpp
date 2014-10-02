@@ -21,6 +21,7 @@
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         auto bounds = paal::utils::make_array_to_functor(deg_bounds);
 
         // default heuristics
-        for (int i : boost::irange(0, 5)) {
+        for (int i : paal::irange(5)) {
             LOGLN("random violated, seed " << i);
             srand(i);
             run_test<paal::lp::random_violated_separation_oracle>(

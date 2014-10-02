@@ -17,6 +17,7 @@
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/copy.hpp>
@@ -115,7 +116,7 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts,OutputIterator res
                                           get(boost::edge_weight, part),
                                           boost::parity_map(parities));
 
-        for (auto i : boost::irange(0, int(num_vertices(part)))) {
+        for (auto i : irange(num_vertices(part))) {
             vertex_to_part[get(index_map, vertex_in_subgraph_to_vertex[i])] =
                     parts + get(parities, i); //return value convertable to 0/1
         }

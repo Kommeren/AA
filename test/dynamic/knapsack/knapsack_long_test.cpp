@@ -24,7 +24,6 @@
 #include "paal/utils/floating.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/algorithm/random_shuffle.hpp>
 
 #include <fstream>

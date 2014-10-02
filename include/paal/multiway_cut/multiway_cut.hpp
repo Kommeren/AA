@@ -18,6 +18,7 @@
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -89,8 +90,8 @@ template <typename LP> class multiway_cut_lp {
         for (auto edge : boost::as_array(edges(graph))) {
             auto sour = get(index_map, source(edge, graph));
             auto targ = get(index_map, target(edge, graph));
-            for (auto i : boost::irange(0, k)) {
-                for (auto j : boost::irange(0, 2)) {
+            for (auto i : irange(k)) {
+                for (auto j : irange(2)) {
                     auto x_e =
                         edges_column[vertices_column_index(db_index, k, i)];
                     auto x_src =
@@ -112,7 +113,7 @@ template <typename LP> class multiway_cut_lp {
                 m_lp.add_row(x_col == 1);
             }
             lp::linear_expression expr;
-            for (auto i : boost::irange(0, k)) {
+            for (auto i : irange(k)) {
                 expr += vertices_column[vertices_column_index(db_index, k, i)];
             }
             m_lp.add_row(std::move(expr) == 1);

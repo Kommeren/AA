@@ -20,6 +20,7 @@
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/metric/metric_to_bgl.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/prim_minimum_spanning_tree.hpp>
 #include <boost/range/join.hpp>
@@ -45,12 +46,12 @@ class steiner_utils {
         paal::data_structures::bimap<Vertex> idx;
         auto g = paal::data_structures::metric_to_bgl_with_index(cost_map,
                 all_elements, idx);
-        std::vector<int> pm(all_elements.size());
+        std::vector<std::size_t> pm(all_elements.size());
         boost::prim_minimum_spanning_tree(g, &pm[0]);
         auto idx_m = paal::data_structures::make_metric_on_idx(cost_map, idx);
 
         Dist cost{};
-        for (int i : boost::irange(0, int(pm.size()))) {
+        for (auto i : irange(pm.size())) {
             cost += idx_m(i, pm[i]);
         }
         return cost;

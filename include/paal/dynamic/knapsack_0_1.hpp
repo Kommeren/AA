@@ -18,6 +18,7 @@
 #include "paal/utils/functors.hpp"
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/less_pointees.hpp"
+#include "paal/utils/irange.hpp"
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
 #include "paal/dynamic/knapsack/knapsack_common.hpp"
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
@@ -25,7 +26,6 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/function_output_iterator.hpp>
 #include <boost/optional.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 
@@ -40,8 +40,8 @@ namespace detail {
 struct Knapsack_0_1_get_position_range {
     template <typename T>
     auto operator()(T begin, T end)
-        ->decltype(boost::irange(begin, end) | boost::adaptors::reversed) {
-        return boost::irange(begin, end) | boost::adaptors::reversed;
+        ->decltype(irange(begin, end) | boost::adaptors::reversed) {
+        return irange(begin, end) | boost::adaptors::reversed;
     }
 };
 
@@ -133,7 +133,7 @@ class Knapsack_0_1 {
                    boost::make_iterator_range(midle, oEnd), capacity);
 
         SizeType capacityLeftPartInOptimalSolution{};
-        for (auto capacityLeftPart : boost::irange(SizeType{}, capacity + 1)) {
+        for (auto capacityLeftPart : irange(capacity + 1)) {
             auto left = m_object_on_size[capacityLeftPart];
             auto right = m_object_on_size_rec[capacity - capacityLeftPart];
             if (left && right) {

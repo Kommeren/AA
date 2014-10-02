@@ -17,6 +17,7 @@
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/data_structures/metric/euclidean_metric.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 
@@ -100,8 +101,8 @@ struct sample_graphs_metrics {
         std::vector< std::pair<int, int> > edges;
         std::vector<int> weights(num_nodes-1);
 
-        for (int v: boost::irange(0,num_nodes)) if (v != center) edges.push_back(std::make_pair(center, v));
-        for (int i: boost::irange(0,num_nodes-1)) weights[i] = rand() % (maxW - minW + 1) + minW;
+        for (int v: paal::irange(num_nodes)) if (v != center) edges.push_back(std::make_pair(center, v));
+        for (int i: paal::irange(num_nodes-1)) weights[i] = rand() % (maxW - minW + 1) + minW;
 
         Graph g(edges.begin(), edges.end(), weights.begin(), num_nodes);
 

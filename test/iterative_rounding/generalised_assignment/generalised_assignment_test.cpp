@@ -18,6 +18,7 @@
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -31,8 +32,8 @@ BOOST_AUTO_TEST_SUITE(generalised_assignment)
 BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
     // sample problem
     LOGLN("sample problem:");
-    auto machines = boost::irange(0, 2);
-    auto jobs = boost::irange(0, 2);
+    auto machines = paal::irange(2);
+    auto jobs = paal::irange(2);
 
     paal::data_structures::array_metric<int> cost{ 2 };
     cost(0, 0) = 2;
@@ -79,8 +80,8 @@ BOOST_AUTO_TEST_CASE(generalised_assignment_test) {
 BOOST_AUTO_TEST_CASE(generalised_assignment_infeasible_test) {
     // infeasible problem
     LOGLN("infeasible problem:");
-    auto machines = boost::irange(0, 2);
-    auto jobs = boost::irange(0, 2);
+    auto machines = paal::irange(2);
+    auto jobs = paal::irange(2);
 
     paal::data_structures::array_metric<int> cost{ 2 };
     cost(0, 0) = 2;

@@ -15,6 +15,7 @@
 #ifndef GLP_HPP
 #define GLP_HPP
 
+#include "paal/utils/irange.hpp"
 #include "paal/data_structures/bimap.hpp"
 #include "paal/lp/constraints.hpp"
 #include "paal/lp/ids.hpp"
@@ -308,7 +309,7 @@ class glp_impl {
         linear_expression exp;
         int size = glp_get_mat_row(m_lp, get_row(row), &m_idx_cols_tmp[0],
                                    &m_val_cols_tmp[0]);
-        for (auto i : boost::irange(1, size + 1)) {
+        for (auto i : irange(1, size + 1)) {
             exp += m_val_cols_tmp[i] * get_col_id(m_idx_cols_tmp[i]);
         }
         return exp;
@@ -322,7 +323,7 @@ class glp_impl {
     get_rows_in_column(col_id col) const {
         int size = glp_get_mat_col(m_lp, get_col(col), &m_idx_rows_tmp[0],
                                    &m_val_rows_tmp[0]);
-        for (auto i : boost::irange(1, size + 1)) {
+        for (auto i : irange(1, size + 1)) {
             m_rows_tmp[i].first = get_row_id(m_idx_rows_tmp[i]);
             m_rows_tmp[i].second = m_val_rows_tmp[i];
         }

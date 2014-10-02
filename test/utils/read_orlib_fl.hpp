@@ -18,8 +18,7 @@
 #include "utils/logger.hpp"
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
-
-#include <boost/range/irange.hpp>
+#include "paal/utils/irange.hpp"
 
 #include <type_traits>
 
@@ -61,8 +60,8 @@ read_orlib_FL(std::istream &ist, std::vector<long long> &facCosts,
     int N, F;
     ist >> F >> N;
 
-    fac = boost::irange(0, F);
-    clients = boost::irange(F, N + F);
+    fac = paal::irange(F);
+    clients = paal::irange(F, N + F);
 
     data_structures::array_metric<long long> m(N + F);
     demands.resize(N);
@@ -70,15 +69,15 @@ read_orlib_FL(std::istream &ist, std::vector<long long> &facCosts,
     facCap.resize(F);
 
     double l;
-    for (int i : boost::irange(0, F)) {
+    for (int i : fac) {
         ist >> facCap[i] >> l;
         facCosts[i] = cast(l);
     }
 
-    for (int i : boost::irange(0, N)) {
+    for (int i : paal::irange(N)) {
 
         demands[i] = read_demand<IsCapacitated>(ist);
-        for (int j : boost::irange(0, F)) {
+        for (int j : fac) {
             ist >> l;
             l /= double(demands[i]);
             m(i + F, j) = cast(l);

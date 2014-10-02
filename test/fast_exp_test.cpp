@@ -17,12 +17,11 @@
 #include "utils/logger.hpp"
 
 #include "paal/utils/fast_exp.hpp"
-
-#include <boost/range/irange.hpp>
+#include "paal/utils/irange.hpp"
 
 BOOST_AUTO_TEST_CASE(FastExpTest) {
     double biggestErr = 0;
-    for (int i : boost::irange(-80, 80)) {
+    for (int i : paal::irange(-80, 80)) {
         biggestErr =
             std::max(std::abs(exp(i) - paal::fast_exp(i)) / exp(i), biggestErr);
     }

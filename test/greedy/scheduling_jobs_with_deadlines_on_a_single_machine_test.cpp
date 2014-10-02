@@ -16,9 +16,9 @@
 #include "utils/test_result_check.hpp"
 
 #include "paal/greedy/scheduling_jobs_with_deadlines_on_a_single_machine/scheduling_jobs_with_deadlines_on_a_single_machine.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_with_deadlines_on_a_single_machine) {
     std::vector<Time> due_date = { -1, 0, -2, -3, -4, -5, -6 };
     double BEST_DELAY = 36.7;
 
-    auto jobs = boost::irange(0, int(time.size()));
+    auto jobs = paal::irange(time.size());
     std::vector<std::pair<decltype(jobs)::iterator, Time>> jobs_to_start_dates;
 
     Time delay =

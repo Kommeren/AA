@@ -18,6 +18,7 @@
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/algorithm/transform.hpp>
 #include <boost/range/join.hpp>
@@ -50,8 +51,8 @@ public:
         auto term_nr = boost::distance(m_terminals);
         auto all_elements_nr = boost::distance(all_elements);
         auto dw = paal::make_dreyfus_wagner(fast_metric,
-                    boost::irange(0, int(term_nr)),
-                    boost::irange(int(term_nr), int(all_elements_nr)));
+                    irange(term_nr),
+                    irange(int(term_nr), int(all_elements_nr)));
         dw.solve();
         m_cost = dw.get_cost();
         auto &steiner = dw.get_steiner_elements();

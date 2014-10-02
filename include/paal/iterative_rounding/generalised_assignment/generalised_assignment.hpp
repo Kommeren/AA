@@ -57,7 +57,7 @@ struct ga_set_solution {
         auto &col_idx = problem.get_col_idx();
         auto job_to_machine = problem.get_job_to_machines();
 
-        for (int idx : boost::irange(0, int(col_idx.size()))) {
+        for (auto idx : irange(col_idx.size())) {
             if (problem.get_compare().e(solution(col_idx[idx]), 1)) {
                 *job_to_machine =
                     std::make_pair(*(jbegin + problem.get_j_idx(idx)),
@@ -114,9 +114,9 @@ class ga_init {
     template <typename Problem, typename LP>
     void add_constraints_for_jobs(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
-        for (int j_idx : boost::irange(0, problem.get_jobs_cnt())) {
+        for (auto j_idx : irange(problem.get_jobs_cnt())) {
             lp::linear_expression expr;
-            for (int m_idx : boost::irange(0, problem.get_machines_cnt())) {
+            for (auto m_idx : irange(problem.get_machines_cnt())) {
                 expr += col_idx[problem.idx(j_idx, m_idx)];
                 ++m_idx;
             }
@@ -128,10 +128,11 @@ class ga_init {
     template <typename Problem, typename LP>
     void add_constraints_for_machines(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
-        int m_idx(0);
+        std::size_t m_idx(0);
+        //TODO use indexed range
         for (auto &&m : problem.get_machines()) {
             auto T = problem.get_machine_available_time()(m);
-            int j_idx(0);
+            std::size_t j_idx(0);
             lp::linear_expression expr;
 
             for (auto &&j : problem.get_jobs()) {
@@ -203,19 +204,19 @@ class generalised_assignment {
     /**
      * Returns the index of the edge between a given job and a given machine.
      */
-    int idx(int j_idx, int m_idx) { return j_idx * m_m_cnt + m_idx; }
+    std::size_t idx(std::size_t j_idx, std::size_t m_idx) { return j_idx * m_m_cnt + m_idx; }
 
     /**
      * Returns the index of a job given the index of the edge between the job
      * and a machine.
      */
-    int get_j_idx(int idx) { return idx / m_m_cnt; }
+    std::size_t get_j_idx(std::size_t idx) { return idx / m_m_cnt; }
 
     /**
      * Returns the index of a machine given the index of the edge between a job
      * and the machine.
      */
-    int get_m_idx(int idx) { return idx % m_m_cnt; }
+    std::size_t get_m_idx(std::size_t idx) { return idx % m_m_cnt; }
 
     /**
      * Returns the LP rows corresponding to the machines.
@@ -230,12 +231,12 @@ class generalised_assignment {
     /**
      * Returns the number of machines in the problem.
      */
-    int get_machines_cnt() const { return m_m_cnt; }
+    std::size_t get_machines_cnt() const { return m_m_cnt; }
 
     /**
      * Returns the number of jobs in the problem.
      */
-    int get_jobs_cnt() const { return m_j_cnt; }
+    std::size_t get_jobs_cnt() const { return m_j_cnt; }
 
     /**
      * Returns the machines iterator range.
@@ -283,8 +284,8 @@ class generalised_assignment {
 
   private:
 
-    const int m_m_cnt;
-    const int m_j_cnt;
+    const std::size_t m_m_cnt;
+    const std::size_t m_j_cnt;
     JobIter m_jbegin;
     JobIter m_jend;
     MachineIter m_mbegin;

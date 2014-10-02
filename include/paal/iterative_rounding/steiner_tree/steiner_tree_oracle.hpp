@@ -16,6 +16,7 @@
 #define STEINER_TREE_ORACLE_HPP
 
 #include "paal/iterative_rounding/min_cut.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/optional.hpp>
 
@@ -45,7 +46,7 @@ class steiner_tree_violation_checker {
      */
     template <typename Problem, typename LP>
     auto get_violation_candidates(const Problem &problem, const LP &lp)
-        ->decltype(boost::irange(0, int(problem.get_terminals().size()))) {
+        ->decltype(irange(problem.get_terminals().size())) {
 
         int graph_size = problem.get_terminals().size();
         if (graph_size != m_current_graph_size) {
@@ -57,7 +58,7 @@ class steiner_tree_violation_checker {
             update_auxiliary_digraph(problem, lp);
         }
         //TODO - rethink - why do we return the whole collection instead of returning m_root see check_violation implementation
-        return boost::irange(0, int(problem.get_terminals().size()));
+        return irange(problem.get_terminals().size());
     }
 
     /**
@@ -119,7 +120,7 @@ class steiner_tree_violation_checker {
         m_min_cut.init(0);
         m_artif_vertices.clear();
         m_terminals_to_aux.clear();
-        for (auto term : boost::irange(0, int(problem.get_terminals().size()))) {
+        for (auto term : irange(problem.get_terminals().size())) {
             m_terminals_to_aux[term] = m_min_cut.add_vertex_to_graph();
         }
         const auto &components = problem.get_components();

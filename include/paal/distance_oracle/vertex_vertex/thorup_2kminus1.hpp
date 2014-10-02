@@ -17,10 +17,10 @@
 #define THORUP_2KMINUS1_HPP
 
 #include "paal/utils/functors.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/as_array.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/graph/named_function_params.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -89,7 +89,7 @@ class distance_oracle_thorup2kminus1approximation {
         int max_layer_num = 0;
         long double logp = log(p);
 
-        for (int ind: boost::irange(0, (int)num_vertices(g))) {
+        for (int ind: irange(num_vertices(g))) {
             m_layer_num[ind] = std::min(k-1, (int)(log(dist(random_engine)) / logp));
             max_layer_num = std::max(max_layer_num, m_layer_num[ind]);
         }
@@ -168,7 +168,7 @@ class distance_oracle_thorup2kminus1approximation {
                     )
             );
 
-        for (int ind: boost::irange(0, (int)num_vertices(g))) {
+        for (int ind: irange(num_vertices(g))) {
             m_parent[ind].push_back(std::make_pair(nearest[ind], distance[ind]));
         }
     }
@@ -400,8 +400,8 @@ class distance_oracle_thorup2kminus1approximation {
         //! Initialization of reusable structures
         std::vector< std::vector<DT> > limit(k+1,
                 std::vector<DT>(num_vertices(g), std::numeric_limits<DT>::max()));
-        for (int l: boost::irange(0,k)) {
-            for (int i: boost::irange(0, (int)num_vertices(g))) {
+        for (int l: irange(k)) {
+            for (int i: irange(num_vertices(g))) {
                 limit[l][i] = m_parent[i][l].second;
             }
         }
@@ -436,7 +436,7 @@ public:
             {
         long double p = powl(num_vertices(g), -1./k);
         k = choose_layers(g, k, p, random_engine);
-        for (int layer_num: boost::irange(0,k)) {
+        for (int layer_num: irange(k)) {
             compute_parents(g, edge_weight, layer_num);
         }
         compute_bunchs(g, edge_weight, k);

@@ -18,10 +18,10 @@
 #include "utils/read_bounded_deg_mst.hpp"
 
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/join.hpp>
 #include <boost/test/unit_test.hpp>
 

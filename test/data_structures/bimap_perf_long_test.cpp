@@ -15,9 +15,9 @@
 #include "utils/logger.hpp"
 
 #include "paal/data_structures/bimap.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -30,7 +30,7 @@ std::vector<int> ids(nr);
 
 template <typename Bimap> void test_get_val(const Bimap &b) {
     int t(0);
-    for (int j : boost::irange(0, 50)) {
+    for (int j : paal::irange(50)) {
         std::ignore = j; // removes warning
         for (int i : ids) {
             t += b.get_val(i); // has to do addition, because without it

@@ -15,10 +15,11 @@
 #ifndef SUFFIX_ARRAY_HPP
 #define SUFFIX_ARRAY_HPP
 
-#include "boost/range/algorithm/fill.hpp"
-#include "boost/range/algorithm/max_element.hpp"
-#include "boost/range/irange.hpp"
-#include "boost/range/numeric.hpp"
+#include "paal/utils/irange.hpp"
+
+#include <boost/range/algorithm/fill.hpp>
+#include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/numeric.hpp>
 
 /*
  * algorithm from:
@@ -78,13 +79,13 @@ struct radix_pass {
     void operator()(std::vector<int> const &sortFrom,
             std::vector<int> &sortTo, Iterator r, int n) { // count occurrences
         boost::fill(c, 0);
-        for (auto i : boost::irange(0, n)) {
+        for (auto i : irange(n)) {
             ++c[r[sortFrom[i]] + 1]; // count occurrences
         }
 
         boost::partial_sum(c, c.begin());
 
-        for (auto i : boost::irange(0, n)) {
+        for (auto i : irange(n)) {
             sortTo[c[r[sortFrom[i]]]++] = sortFrom[i]; // sort
         }
     }
@@ -119,7 +120,7 @@ void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     radix_pass radix{max_letter, text};
     // generate positions of mod 1 and mod  2 suffixes
     // the "+(n0-n1)" adds a dummy mod 1 suffix if n%3 == 1
-    for (auto i : boost::irange(0, n + (n0 - n1))) {
+    for (auto i : irange(n + (n0 - n1))) {
         if (i % 3 != 0) {
             text12.push_back(i);
         }
@@ -135,7 +136,7 @@ void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     // find lexicographic names of triples
     int name = 0;
     Letter c0 = Letter{}, c1 = Letter{}, c2 = Letter{};
-    for (auto i : boost::irange(0, n02)) {
+    for (auto i : irange(n02)) {
         if (text[SA12[i]] != c0 || text[SA12[i] + 1] != c1 ||
             text[SA12[i] + 2] != c2 || name == 0) {
             name++;
@@ -154,17 +155,17 @@ void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
     if (name < n02) {
         suffix_array<int>(text12, SA12, name); // parametrized by int intentionally
         // store unique names in s12 using the suffix array
-        for (auto i : boost::irange(0, n02)) {
+        for (auto i : irange(n02)) {
             text12[SA12[i]] = i + 1;
         }
     } else { // generate the suffix array of s12 directly
-        for (auto i : boost::irange(0, n02)) {
+        for (auto i : irange(n02)) {
             SA12[text12[i] - 1] = i;
         }
     }
 
     // stably sort the mod 0 suffixes from SA12 by their first character
-    for (auto i : boost::irange(0, n02)) {
+    for (auto i : irange(n02)) {
         if (SA12[i] < n0) {
             text0.push_back(3 * SA12[i]);
         }

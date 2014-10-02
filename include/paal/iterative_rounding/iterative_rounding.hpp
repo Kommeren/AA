@@ -20,9 +20,9 @@
 #include "paal/lp/glp.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/optional.hpp>
-#include <boost/range/irange.hpp>
 
 #include <cstdlib>
 #include <unordered_map>

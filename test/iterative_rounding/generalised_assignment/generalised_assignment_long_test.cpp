@@ -21,7 +21,6 @@
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 
-#include <boost/range/irange.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <fstream>

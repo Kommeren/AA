@@ -15,6 +15,8 @@
 
 #include "utils/sample_graph.hpp"
 
+#include "paal/utils/irange.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(MetricTest) {
@@ -30,8 +32,8 @@ BOOST_AUTO_TEST_CASE(Copyrectangle_array_metric) {
     m(0, 0) = 1;
     m(0, 1) = 2;
 
-    auto r1 = boost::irange(0, 1);
-    auto r2 = boost::irange(0, 2);
+    auto r1 = paal::irange(1);
+    auto r2 = paal::irange(2);
     paal::data_structures::rectangle_array_metric<int> copy(
         m, r1, r2);
 
@@ -43,7 +45,7 @@ BOOST_AUTO_TEST_CASE(Copyarray_metric) {
     paal::data_structures::array_metric<int> m(1);
     m(0, 0) = 13;
 
-    auto r1 = boost::irange(0, 1);
+    auto r1 = paal::irange(1);
     paal::data_structures::array_metric<int> copy(m, r1);
 
     BOOST_CHECK(copy(0, 0) == 13);

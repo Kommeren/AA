@@ -21,9 +21,9 @@
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/fl_algo.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <iterator>
 #include <iostream>

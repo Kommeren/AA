@@ -17,11 +17,11 @@
 #define BIMAP_HPP
 
 #include "paal/data_structures/bimap_traits.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/random_access_index.hpp>
 #include <boost/multi_index/hashed_index.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/functional/hash.hpp>
 
 #include <unordered_map>
@@ -234,7 +234,7 @@ class eraseable_bimap : public bimap<T, Idx> {
         m_t_to_id.erase(i);
         m_id_to_t.erase(m_id_to_t.begin() + idx);
 
-        for (int i : boost::irange(idx, Idx(m_id_to_t.size()))) {
+        for (int i : irange(idx, Idx(m_id_to_t.size()))) {
             assert(m_t_to_id.at(m_id_to_t[i]) == i + 1);
             m_t_to_id[m_id_to_t[i]] = i;
         }

@@ -18,9 +18,9 @@
 #include "paal/local_search/local_search.hpp"
 #include "paal/local_search/search_components.hpp"
 #include "paal/data_structures/combine_iterator.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 #include <string>
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     double best = f(x);
 
     auto getMovesG = [&](const double g)->const std::vector<double> & {
-        for (int j : boost::irange(std::size_t(0), neighb.size())) {
+        for (int j : paal::irange(neighb.size())) {
             neighbCutG[j] = neighb[j] + g;
         }
         return neighbCutG;

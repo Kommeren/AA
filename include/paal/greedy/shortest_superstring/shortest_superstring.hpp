@@ -15,16 +15,15 @@
 #ifndef SHORTEST_SUPERSTRING_HPP
 #define SHORTEST_SUPERSTRING_HPP
 
-#include "boost/range/irange.hpp"
 
 #include "paal/suffix_array/lcp.hpp"
 #include "paal/suffix_array/suffix_array.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/shortest_superstring/prefix_tree.hpp"
 #include "paal/data_structures/bimap.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/adaptors.hpp>
-#include "boost/range/irange.hpp"
 
 #include <vector>
 #include <algorithm>
@@ -82,7 +81,7 @@ template <typename Words> class shortest_superstring {
      */
     Word get_solution() {
         Word answer;
-        for (auto posInSumWords : boost::irange(1, m_length)) {
+        for (auto posInSumWords : irange(1, m_length)) {
             if ((!m_is_joined_sufiix[m_pos_to_word[posInSumWords]]) &&
                 (m_sum_words[posInSumWords - 1] == m_prefix_tree.DELIMITER)) {
                 for (int nextLetter = posInSumWords;
@@ -153,8 +152,7 @@ template <typename Words> class shortest_superstring {
     }
 
     void join_all_words() {
-        auto ovelapSizeRange =
-            boost::irange(0, m_length) | boost::adaptors::reversed;
+        auto ovelapSizeRange = irange(m_length) | boost::adaptors::reversed;
         for (auto overlapSize : ovelapSizeRange) {
             for (auto word : m_length_to_pos[overlapSize]) {
                 if (m_lcp[m_rank[word]] >= overlapSize) { // check if word is

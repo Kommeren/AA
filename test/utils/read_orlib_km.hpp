@@ -24,6 +24,7 @@
 #include "utils/logger.hpp"
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <type_traits>
 #include <unordered_map>
@@ -40,8 +41,8 @@ GraphMT read_orlib_KM(std::istream &ist, boost::integer_range<int> &fac,
     int V, nE, K;
     ist >> V >> nE >> K;
 
-    fac = boost::irange(0, K);
-    clients = boost::irange(K, V);
+    fac = paal::irange(K);
+    clients = paal::irange(K, V);
 
     data_structures::array_metric<long long> m(V);
 

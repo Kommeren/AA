@@ -18,9 +18,9 @@
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/greedy/k_center/k_center.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 BOOST_AUTO_TEST_CASE(KCenter) {
     const int NUM_CENTERS = 3;
@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(KCenter) {
     const double OPTIMAL = 1;
     const double APPROXIMATION_RATIO = 2;
     auto metric = [](int a, int b) { return 0.1 + abs(a - b) * 0.9; };
-    auto items = boost::irange(0, NUM_ITEMS);
+    auto items = paal::irange(NUM_ITEMS);
     std::vector<int> centers;
     // solution
     double radius = paal::greedy::kCenter(metric, NUM_CENTERS, items.begin(),

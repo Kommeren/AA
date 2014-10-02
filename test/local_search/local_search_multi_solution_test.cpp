@@ -19,7 +19,6 @@
 #include "paal/data_structures/combine_iterator.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <vector>
 #include <string>

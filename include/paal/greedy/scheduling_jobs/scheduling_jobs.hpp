@@ -20,11 +20,11 @@
 #include "paal/data_structures/fraction.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/counting_range.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/iterator_range.hpp>
 #include <boost/range/numeric.hpp>
 
@@ -78,8 +78,7 @@ typename Traits::frac_t calculate_bound(const MachineIterator mfirst,
     typedef decltype(machines_num) MachinesNumType;
     assert(jobs_num > 0 && machines_num > 0);
     Frac result(get_load(*jfirst), get_speed(*mfirst));
-    for (auto jobID :
-         boost::irange(static_cast<decltype(jobs_num)>(0), jobs_num)) {
+    for (auto jobID : irange(jobs_num)) {
         Load load = get_load(jfirst[jobID]);
         auto get_single = [ = ](MachinesNumType i) {
             return Frac(load, get_speed(mfirst[i]));

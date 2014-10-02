@@ -19,9 +19,9 @@
 #include "paal/local_search/simulated_annealing.hpp"
 #include "paal/local_search/custom_components.hpp"
 #include "paal/data_structures/components/components_replace.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
-#include <boost/range/irange.hpp>
 
 #include <thread>
 
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(CoolingSchemaTest) {
     std::chrono::seconds sec(1);
     auto exponential = ls::make_exponential_cooling_schema_dependant_on_time(
         std::chrono::seconds(10), 1024, 1);
-    for (int i : boost::irange(0, 10)) {
+    for (int i : paal::irange(10)) {
         std::this_thread::sleep_for(sec);
         LOGLN("Temperature after " << i << " seconds: " << exponential());
         BOOST_CHECK_EQUAL(exponential(), pow(2, 9 - i));

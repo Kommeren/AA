@@ -16,11 +16,11 @@
 #define PRUNE_RESTRICTIONS_TO_TREE_HPP
 
 #include "paal/utils/functors.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/function_output_iterator.hpp>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
-#include <boost/range/irange.hpp>
 
 namespace paal {
 
@@ -48,8 +48,8 @@ RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
 
     RestrictionsVector res_vec;
     TGraph g(N);
-    for (int i : boost::irange(0, N)) {
-        for (int j : boost::irange(i + 1, N)) {
+    for (auto i : irange(N)) {
+        for (auto j : irange(i + 1, N)) {
             add_edge(i, j, EdgeProp(-std::max(res(i, j), res(j, i))), g);
         }
     }

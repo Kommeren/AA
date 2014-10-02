@@ -16,7 +16,9 @@
 #ifndef READ_DIST_HPP
 #define READ_DIST_HPP
 
-#include<boost/graph/adjacency_list.hpp>
+#include "paal/utils/irange.hpp"
+
+#include <boost/graph/adjacency_list.hpp>
 
 namespace paal {
 namespace {
@@ -34,7 +36,7 @@ Graph read_dist(std::istream& ist) {
     std::vector< std::pair<int, int> > edges(m);
     std::vector< int > edgeWeights(m);
 
-    for (auto i: boost::irange(0,m)) {
+    for (auto i: paal::irange(m)) {
         ist >> edges[i].first >> edges[i].second >> edgeWeights[i];
     }
 
