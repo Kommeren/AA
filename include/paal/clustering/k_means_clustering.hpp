@@ -5,9 +5,8 @@
  * @version 1.0
  * @date 2014-06-25
  */
-#ifndef K_MEANS_CLUSTERING
-#define K_MEANS_CLUSTERING
-
+#ifndef PAAL_K_MEANS_CLUSTERING_HPP
+#define PAAL_K_MEANS_CLUSTERING_HPP
 
 #include "paal/clustering/k_means_clustering_engine.hpp"
 #include "paal/utils/irange.hpp"
@@ -16,6 +15,7 @@
 #include <boost/range/empty.hpp>
 
 #include <vector>
+
 namespace paal {
 
 /**
@@ -101,4 +101,4 @@ auto k_means(Points &&points, Centers &&centers, OutputIterator result,
 
 } //!paal
 
-#endif /* K_MEANS_CLUSTERING */
+#endif /* PAAL_K_MEANS_CLUSTERING_HPP */

@@ -15,13 +15,13 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_fl.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 
+#include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/utils/functors.hpp"
-#include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 

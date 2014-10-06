@@ -47,9 +47,9 @@ BOOST_AUTO_TEST_CASE(subset_iterator_test) {
     auto r = paal::data_structures::make_subsets_iterator_range<3>(v.begin(),
                                                                    v.end());
     typedef std::tuple<int, int, int> tup;
-    BOOST_CHECK_EQUAL(std::get<0>(*boost::begin(r)), 1);
-    BOOST_CHECK_EQUAL(std::get<1>(*boost::begin(r)), 2);
-    BOOST_CHECK_EQUAL(std::get<2>(*boost::begin(r)), 3);
+    BOOST_CHECK_EQUAL(std::get<0>(*std::begin(r)), 1);
+    BOOST_CHECK_EQUAL(std::get<1>(*std::begin(r)), 2);
+    BOOST_CHECK_EQUAL(std::get<2>(*std::begin(r)), 3);
     BOOST_CHECK_EQUAL(boost::distance(r), 7 * 6 * 5 / 6);
 }
 

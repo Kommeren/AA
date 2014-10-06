@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(testSingleMindedAuction)
       auto test = [&](Bidder bidder, Value want_util, Items want_items = Items{})
       {
          return check_demand_query<Items>(
-            auction, bidder, pu::make_dynamic_return_something_functor(1.5), {want_items, want_util}
+            auction, bidder, pu::make_dynamic_return_constant_functor(1.5), {want_items, want_util}
          );
       };
       BOOST_CHECK(test("John", 0));

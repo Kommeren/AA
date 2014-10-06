@@ -5,10 +5,11 @@
  * @version 1.0
  * @date 2014-08-13
  */
-#ifndef SUBSET_BACKTRACK_HPP
-#define SUBSET_BACKTRACK_HPP
+#ifndef PAAL_SUBSET_BACKTRACK_HPP
+#define PAAL_SUBSET_BACKTRACK_HPP
 
 #include "paal/data_structures/stack.hpp"
+#include "paal/utils/concepts.hpp"
 #include "paal/utils/singleton_iterator.hpp"
 
 #include <boost/range/algorithm/copy.hpp>
@@ -43,8 +44,7 @@ template <typename Element> class subset_backtrack {
     template <class Elements>
     subset_backtrack(const Elements &elements)
         : m_tails() {
-        //TODO change to utils::concepts::readable_range after Robert commit
-        BOOST_CONCEPT_ASSERT((boost::ForwardRangeConcept<Elements>));
+        BOOST_CONCEPT_ASSERT((utils::concepts::readable_range<Elements>));
         push(elements);
     }
 
@@ -134,4 +134,5 @@ auto make_subset_backtrack(const Elements &elements) {
 }
 
 } //! paal
-#endif /* SUBSET_BACKTRACK_HPP */
+
+#endif /* PAAL_SUBSET_BACKTRACK_HPP */

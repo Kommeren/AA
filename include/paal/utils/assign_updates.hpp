@@ -11,14 +11,14 @@
 namespace paal {
 
 /// removes boilerplate for x = max(x,y).
-/// it becomes max_assign(x, y)
+/// it becomes assign_max(x, y)
 template <typename T>
 void assign_max(T & t, const T & u) {
     t = std::max(t, u);
 }
 
 /// removes boilerplate for x = min(x,y).
-/// it becomes min_assign(x, y)
+/// it becomes assign_min(x, y)
 template <typename T>
 void assign_min(T & t, const T & u) {
     t = std::min(t, u);

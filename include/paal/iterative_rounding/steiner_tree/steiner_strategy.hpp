@@ -161,7 +161,7 @@ private:
     void merge_vertices(const Metric& cost_map) {
         auto range = vertices(m_terminals_graph);
         for (auto v_pair : data_structures::make_subsets_iterator_range<2>(
-                boost::begin(range), boost::end(range))) {
+                range.first, range.second)) {
             auto i = std::get<0>(v_pair);
             auto j = std::get<1>(v_pair);
             if (cost_map(get_val(i), get_val(j)) == Dist{}) {

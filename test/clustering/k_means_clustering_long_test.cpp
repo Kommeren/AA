@@ -8,10 +8,10 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_two_dimensional_data.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 
 #include "paal/clustering/k_means_clustering.hpp"
+#include "paal/utils/parse_file.hpp"
 #include "paal/utils/type_functions.hpp"
 
 #include <boost/range/algorithm/max_element.hpp>

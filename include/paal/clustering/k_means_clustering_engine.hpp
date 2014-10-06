@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-06-26
  */
-#ifndef K_MEANS_CLUSTERING_ENGINE
-#define K_MEANS_CLUSTERING_ENGINE
+#ifndef PAAL_K_MEANS_CLUSTERING_ENGINE_HPP
+#define PAAL_K_MEANS_CLUSTERING_ENGINE_HPP
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
@@ -180,5 +180,4 @@ auto get_random_clusters(Points &&points, int number_of_clusters,
 
 } //!paal
 
-
-#endif /* K_MEANS_CLUSTERING_ENGINE */
+#endif /* PAAL_K_MEANS_CLUSTERING_ENGINE_HPP */

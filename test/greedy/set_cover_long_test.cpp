@@ -8,12 +8,12 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_sc.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/set_cover_check.hpp"
 
 #include "paal/greedy/set_cover/set_cover.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>

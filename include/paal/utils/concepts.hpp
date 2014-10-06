@@ -12,9 +12,8 @@
  * @version 1.0
  * @date 2014-07-23
  */
-
-#ifndef UTILS_CONCEPTS_HPP
-#define UTILS_CONCEPTS_HPP
+#ifndef PAAL_CONCEPTS_HPP
+#define PAAL_CONCEPTS_HPP
 
 #include <boost/concept_check.hpp>
 #include <boost/range/concepts.hpp>
@@ -87,4 +86,4 @@ struct readable_range {
 } //!utils
 } //!paal
 
-#endif // UTILS_CONCEPTS_HPP
+#endif /* PAAL_CONCEPTS_HPP */

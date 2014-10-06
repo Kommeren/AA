@@ -15,14 +15,14 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_km.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 
+#include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/local_search/k_median/k_median.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/irange.hpp"
-#include "paal/data_structures/facility_location/fl_algo.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 

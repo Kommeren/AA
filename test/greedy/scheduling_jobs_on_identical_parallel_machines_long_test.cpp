@@ -21,7 +21,9 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <numeric>
 #include <vector>
+
 const long long MAX_TIME = 1000000000;
 const long MIN_MACHINES = 10;
 const long MAX_MACHINES = 1000000;
@@ -45,7 +47,7 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines_long) {
             std::vector<int> machines(number_of_machines);
             std::vector<Time> jobs = generate_job_loads(
                 machines, min_jobs_on_machine, MAX_TIME,
-                paal::utils::return_something_functor<int, 1>());
+                paal::utils::return_one_functor());
             LOGLN("jobs: " << jobs.size());
 
             std::vector<std::pair<int, decltype(jobs)::iterator>> result;

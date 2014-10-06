@@ -12,9 +12,8 @@
  * @version 1.0
  * @date 2014-07-17
  */
-
-#ifndef UTILS_PROPERTY_MAP_HPP
-#define UTILS_PROPERTY_MAP_HPP
+#ifndef PAAL_PROPERTY_MAP_HPP
+#define PAAL_PROPERTY_MAP_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -77,4 +76,5 @@ namespace utils {
 
 } //! utils
 } //! paal
-#endif /* UTILS_PROPERTY_MAP_HPP */
+
+#endif /* PAAL_PROPERTY_MAP_HPP */

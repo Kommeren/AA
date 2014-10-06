@@ -14,13 +14,13 @@
  */
 
 #include "test_utils/logger.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/read_gen_ass.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
 #include "paal/utils/assign_updates.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 

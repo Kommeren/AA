@@ -16,7 +16,8 @@
 #ifndef PAAL_STEINER_TREE_GREEDY_HPP
 #define PAAL_STEINER_TREE_GREEDY_HPP
 
-#include <paal/utils/functors.hpp>
+#include "paal/utils/accumulate_functors.hpp"
+#include "paal/utils/functors.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -117,7 +118,7 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out,
 
     // computing terminals
     std::vector<int> terminals;
-    auto terminals_nr = utils::accumulate_functor(
+    auto terminals_nr = accumulate_functor(
         vertices(g), 0, [=](Vertex v) { return get(color_map, v); });
     terminals.reserve(terminals_nr);
     for (auto v : boost::as_array(vertices(g))) {
@@ -188,9 +189,9 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out,
 
     boost::sort(tree_edges);
     auto get_weight=[&](Edge edge){return edge_weight[edge];};
-    auto lower_bound=utils::accumulate_functor(tree_edges, Weight{}, get_weight);
+    auto lower_bound=accumulate_functor(tree_edges, Weight{}, get_weight);
     auto unique_edges = boost::unique(tree_edges);
-    auto cost_solution=utils::accumulate_functor(unique_edges, Weight{}, get_weight);
+    auto cost_solution=accumulate_functor(unique_edges, Weight{}, get_weight);
     boost::copy(unique_edges, out);
     return std::make_pair(cost_solution, lower_bound / 2.);
 }

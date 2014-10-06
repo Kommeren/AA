@@ -12,14 +12,15 @@
  * @version 1.0
  * @date 2014-06-09
  */
+#ifndef PAAL_FRACTIONAL_WINNER_DETERMINATION_IN_MUCA_HPP
+#define PAAL_FRACTIONAL_WINNER_DETERMINATION_IN_MUCA_HPP
 
-#ifndef  fractional_winner_determination_in_MUCA_INC
-#define  fractional_winner_determination_in_MUCA_INC
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
 #include "paal/auctions/auction_utils.hpp"
 #include "paal/lp/glp.hpp"
 #include "paal/lp/lp_row_generation.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/concepts.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/property_map.hpp"
@@ -174,15 +175,15 @@ fractional_determine_winners_in_demand_query_auction(
       const auto util = res->second;
 
       // add violated constraint
-      const auto price = utils::sum_functor(items, get_price);
+      const auto price = sum_functor(items, get_price);
       const auto value = util + price;
-      const auto expr = utils::accumulate_functor(items,
+      const auto expr = accumulate_functor(items,
             lp::linear_expression(bidder_id), item_to_id_func);
       const auto bid_id = dual.add_row(expr >= value);
       generated_bids.emplace_back(bidder, bid_id, std::move(items));
    });
 
-   auto get_candidates = utils::make_dynamic_return_something_functor(
+   auto get_candidates = utils::make_dynamic_return_constant_functor(
       boost::combine(auction.template get<bidders>(), bidder_to_id));
 
    // TODO check if max_violated strategy doesn't give better performance
@@ -240,4 +241,4 @@ void fractional_determine_winners_in_demand_query_auction(
 }//!auctions
 }//!paal
 
-#endif   /* fractional_winner_determination_in_MUCA_INC */
+#endif /* PAAL_FRACTIONAL_WINNER_DETERMINATION_IN_MUCA_HPP */

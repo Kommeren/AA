@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(testXorBidsAuction)
       // TODO refactor these checks once C++14 polymorphic lambdas arrive
       BOOST_CHECK(check_demand_query<Item>(auction, "John", pu::return_one_functor(), empty));
       BOOST_CHECK(check_demand_query<Item>(
-         auction, "John", pu::make_dynamic_return_something_functor(0.8),
+         auction, "John", pu::make_dynamic_return_constant_functor(0.8),
          std::make_pair(Items{"apple", "knife"}, 0.1)
       ));
       BOOST_CHECK(check_demand_query<Item>(auction, "Bob", pu::return_one_functor(), empty));
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(testXorBidsAuction)
       BOOST_CHECK(check_demand_query<Item>(auction, "Steve", pu::return_one_functor(),
          std::make_pair(Items{"apple"}, 3.6)));
       BOOST_CHECK(check_demand_query<Item>(
-         auction, "Steve", pu::make_dynamic_return_something_functor(5.0), empty
+         auction, "Steve", pu::make_dynamic_return_constant_functor(5.0), empty
       ));
       BOOST_CHECK(check_demand_query<Item>(
          auction, "Steve", map_to_func({{"lemon", 2}, {"apple", 3}}), std::make_pair(Items{"ball"}, 2.1)

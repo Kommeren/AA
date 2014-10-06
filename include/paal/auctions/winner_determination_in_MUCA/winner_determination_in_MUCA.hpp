@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-1-7
  */
-#ifndef WINNER_DETERMINATION_IN_MUCA
-#define WINNER_DETERMINATION_IN_MUCA
+#ifndef PAAL_WINNER_DETERMINATION_IN_MUCA_HPP
+#define PAAL_WINNER_DETERMINATION_IN_MUCA_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
@@ -237,4 +237,4 @@ void determine_winners_in_gamma_oracle_auction(
 }//!auctions
 }//!paal
 
-#endif /* WINNER_DETERMINATION_IN_MUCA */
+#endif /* PAAL_WINNER_DETERMINATION_IN_MUCA_HPP */

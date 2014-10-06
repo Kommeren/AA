@@ -75,10 +75,9 @@ struct demand_query_auction_traits : public auction_traits<DemandQueryAuction> {
                 std::declval<typename auction_traits<DemandQueryAuction>::bidder_t>(),
                 // this is a little tricky, in order to obtain the value type, we pass prices and threshold
                 // as double types, because value type needs to be able to operate with doubles anyway
-                utils::make_dynamic_return_something_functor(double(1.0)) // any functor with double operator()
+                utils::make_dynamic_return_constant_functor(double(1.0)) // any functor with double operator()
                 )
             );
-
     using items_t = typename result_t::first_type;
     using value_t = typename result_t::second_type;
 };
@@ -95,7 +94,7 @@ class gamma_oracle_auction_traits: public auction_traits<GammaOracleAuction> {
             std::declval<typename auction_traits<GammaOracleAuction>::bidder_t>(),
             // this is a little tricky, in order to obtain the value type, we pass prices
             // as double types, because value type needs to be able to operate with doubles anyway
-            utils::make_dynamic_return_something_functor(double(1.0)), // any functor with double operator()
+            utils::make_dynamic_return_constant_functor(double(1.0)), // any functor with double operator()
             double(1.0) // any double
          )
       );

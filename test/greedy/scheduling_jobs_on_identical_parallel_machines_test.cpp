@@ -19,6 +19,7 @@
 
 #include "paal/greedy/scheduling_jobs_on_identical_parallel_machines/scheduling_jobs_on_identical_parallel_machines.hpp"
 
+#include <boost/range/numeric.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <vector>

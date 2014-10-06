@@ -12,6 +12,7 @@
 
 #include "paal/greedy/set_cover/budgeted_maximum_coverage.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/irange.hpp>

@@ -5,11 +5,11 @@
  * @version 1.0
  * @date 2014-10-09
  */
-#ifndef SET_COVER_CHECK_HPP
-#define SET_COVER_CHECK_HPP
+#ifndef PAAL_SET_COVER_CHECK_HPP
+#define PAAL_SET_COVER_CHECK_HPP
 
-#include <boost/range/algorithm/max_element.hpp>
 #include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/range/algorithm/max_element.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -37,4 +37,4 @@ double set_cover_result_check(Sets sets, SetsToElements sets_to_elements,
     return approximation_ratio;
 }
 
-#endif /* SET_COVER_CHECK_HPP */
+#endif /* PAAL_SET_COVER_CHECK_HPP */

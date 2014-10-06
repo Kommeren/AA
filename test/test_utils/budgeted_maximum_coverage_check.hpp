@@ -5,10 +5,11 @@
  * @version 1.0
  * @date 2014-10-09
  */
-#ifndef SET_COVER_CHECK_HPP
-#define SET_COVER_CHECK_HPP
+#ifndef PAAL_BUDGETED_MAXIMUM_COVERAGE_CHECK_HPP
+#define PAAL_BUDGETED_MAXIMUM_COVERAGE_CHECK_HPP
 
 #include "test_utils/test_result_check.hpp"
+
 #include <boost/test/unit_test.hpp>
 
 #include <vector>
@@ -37,4 +38,4 @@ void budgeted_maximum_coverage_result_check(
                  paal::utils::greater_equal());
 }
 
-#endif /* SET_COVER_CHECK_HPP */
+#endif /* PAAL_BUDGETED_MAXIMUM_COVERAGE_CHECK_HPP */

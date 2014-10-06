@@ -5,9 +5,8 @@
  * @version 1.0
  * @date 2014-09-17
  */
-
-#ifndef READ_SS_HPP
-#define READ_SS_HPP
+#ifndef PAAL_READ_TWO_DIMENSIONAL_DATA_HPP
+#define PAAL_READ_TWO_DIMENSIONAL_DATA_HPP
 
 #include <vector>
 #include <istream>
@@ -37,4 +36,5 @@ auto read_two_dimensional_data(std::istream &ist) {
 }
 
 } //!paal
-#endif /* READ_SS_HPP */
+
+#endif /* PAAL_READ_TWO_DIMENSIONAL_DATA_HPP */

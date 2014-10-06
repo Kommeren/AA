@@ -68,7 +68,7 @@ class distance_oracle_thorup2kminus1approximation {
     */
     std::vector< int > m_layer_num;
 
-    //! For each vertex v a list of vertices of consecurive layers closest to v
+    //! For each vertex v a list of vertices of consecutive layers closest to v
     std::vector< DVect > m_parent;
 
     //! For each vertex v a set of vertices w closer to v than any vertex in layer m_layer_num[w]+1

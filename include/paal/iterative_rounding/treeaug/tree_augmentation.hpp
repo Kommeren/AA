@@ -18,7 +18,7 @@
 
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/utils/bgl_edge_hash.hpp"
+#include "paal/utils/hash.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/graph/breadth_first_search.hpp>

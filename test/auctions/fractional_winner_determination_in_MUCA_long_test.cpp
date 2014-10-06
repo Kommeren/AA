@@ -13,13 +13,13 @@
  * @date 2014-06-10
  */
 
-#include "test_utils/fractional_winner_determination_in_MUCA_utils.hpp"
-#include "test_utils/parse_file.hpp"
-#include "test_utils/winner_determination_in_MUCA_utils.hpp"
+#include "test_utils/fractional_winner_determination_in_MUCA_test_utils.hpp"
+#include "test_utils/winner_determination_in_MUCA_test_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_long_test.hpp"
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/property_map/vector_property_map.hpp>
 #include <boost/range/irange.hpp>

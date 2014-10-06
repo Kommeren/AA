@@ -77,6 +77,10 @@
             <li> \ref winner_determination_in_MUCA
             <li> \ref fractional_winner_determination_in_MUCA
             </ul>
+       <li> Regression
+            <ul>
+            <li>\ref lsh_nn_regression
+            </ul>
         <li> Miscellaneous
             <ul>
             <li>\ref stein_zel

@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-08-12
  */
-#ifndef STACK_HPP
-#define STACK_HPP
+#ifndef PAAL_STACK_HPP
+#define PAAL_STACK_HPP
 
 #include <vector>
 
@@ -39,4 +39,4 @@ template <class T> class stack {
 } // !data_structures
 } // !paal
 
-#endif // STACK_HPP
+#endif /* PAAL_STACK_HPP */

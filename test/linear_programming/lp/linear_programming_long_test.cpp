@@ -12,11 +12,12 @@
  * @version 1.0
  * @date 2014-04-03
  */
+
 #include "test_utils/logger.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/read_lp.hpp"
 
 #include "paal/lp/glp.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/mpl/list.hpp>
 #include <boost/range/iterator_range.hpp>

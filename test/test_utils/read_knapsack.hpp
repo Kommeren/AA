@@ -15,7 +15,7 @@
 #ifndef PAAL_READ_KNAPSACK_HPP
 #define PAAL_READ_KNAPSACK_HPP
 
-#include "test_utils/parse_file.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <cassert>
 #include <vector>

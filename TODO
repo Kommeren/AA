@@ -30,7 +30,7 @@
 ** resolving solution by moving a point ?
 ** cplex support ???
 
-*lp
+* lp
 ** (glpk) in the resolve we don't allways want to call
    glp_adv_basis, but run it only when glp_simplex fails.
    This is not done beacause of the bug in the glpk.
@@ -41,3 +41,15 @@
 * GREEDY
 ** steiner forest (conjecture)
 
+* make install
+
+* LSH regression
+** computation of params and using them by default:
+*** w_param and hash_functions_per_point: by optimizing probability of hash
+    collisions
+** stream version of algorithm
+*** correct computing max point dimensions in lsh_nearest_neighbors_regression
+    and all tests
+** classification version
+** multithreading
+** convenient binary

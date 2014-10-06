@@ -14,7 +14,6 @@
  */
 
 #include "test_utils/logger.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/read_bounded_deg_mst.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
@@ -22,6 +21,7 @@
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>

@@ -54,7 +54,10 @@ namespace paal{
     };
 
     /// Utils namespace
-    namespace utils{}
+    namespace utils{};
+
+    /// Hash functions namespace
+    namespace hash{};
 
 };//!paal
 

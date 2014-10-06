@@ -148,3 +148,6 @@
 [submodule "boost/lexical_cast"]
 	path = boost/lexical_cast
 	url = https://github.com/boostorg/lexical_cast.git
+[submodule "boost/ublas"]
+	path = boost/ublas
+	url = https://github.com/boostorg/ublas.git

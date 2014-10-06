@@ -5,27 +5,26 @@
  * @version 1.0
  * @date 2014-03-18
  */
-#ifndef BUDGETED_MAXIMUM_COVERAGE
-#define BUDGETED_MAXIMUM_COVERAGE
+#ifndef PAAL_BUDGETED_MAXIMUM_COVERAGE_HPP
+#define PAAL_BUDGETED_MAXIMUM_COVERAGE_HPP
 
-#include "paal/utils/type_functions.hpp"
-#include "paal/utils/functors.hpp"
-#include "paal/utils/irange.hpp"
-#include "paal/utils/algorithms/subset_backtrack.hpp"
 #include "paal/data_structures/fraction.hpp"
+#include "paal/utils/accumulate_functors.hpp"
+#include "paal/utils/algorithms/subset_backtrack.hpp"
+#include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
 
 #include <boost/heap/d_ary_heap.hpp>
-#include <boost/range/irange.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/algorithm/copy.hpp>
-#include <boost/range/algorithm/fill.hpp>
-#include <boost/range/algorithm/sort.hpp>
-#include <boost/range/algorithm/for_each.hpp>
-#include <boost/range/combine.hpp>
 #include <boost/range/algorithm_ext/iota.hpp>
+#include <boost/range/algorithm/fill.hpp>
+#include <boost/range/algorithm/for_each.hpp>
+#include <boost/range/algorithm/sort.hpp>
+#include <boost/range/combine.hpp>
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 namespace paal {
 namespace greedy {
@@ -261,7 +260,7 @@ auto make_selector(const Budget budget, SetCost &cost_of_solution,
  */
 template <typename SetRange, class GetCostOfSet, class GetElementsOfSet,
           class OutputIterator, class ElementIndex, class Budget,
-          class GetWeightOfElement = paal::utils::return_one_functor>
+          class GetWeightOfElement = utils::return_one_functor>
 auto budgeted_maximum_coverage(
     SetRange && sets, GetCostOfSet set_to_cost,
     GetElementsOfSet set_to_elements, OutputIterator result,
@@ -289,7 +288,7 @@ auto budgeted_maximum_coverage(
         auto const & elements = set_to_elements(set);
         if (!boost::empty(elements)) {
             number_of_elements = std::max(number_of_elements,
-                    *utils::max_element_functor(elements, get_el_index) + 1);
+                    *max_element_functor(elements, get_el_index) + 1);
         }
     }
     element_weight weight_of_covered_elements{}, weight_of_bests_solution{};
@@ -432,4 +431,4 @@ auto budgeted_maximum_coverage(
 } //!greedy
 } //!paal
 
-#endif /* BUDGETED_MAXIMUM_COVERAGE */
+#endif /* PAAL_BUDGETED_MAXIMUM_COVERAGE_HPP */

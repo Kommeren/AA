@@ -210,7 +210,7 @@ template <typename Metric, typename Voronoi> class steiner_tree {
                 m_nearest_vertex[subset] = *m_voronoi.get_vertices().begin();
             } else {
                 m_nearest_vertex[subset] = *std::min_element(
-                    boost::begin(range), boost::end(range),
+                    std::begin(range), std::end(range),
                     utils::make_functor_to_comparator([&](VertexType v) {
                     return dist(v, subset);
                 }));

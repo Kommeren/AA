@@ -16,6 +16,7 @@
 #define PAAL_FL_ALGO_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/functors.hpp"
 
 
@@ -43,7 +44,7 @@ get_cfl_cost(const Metric &m, const FCosts &fcosts, const FLSolution &fls) {
     typedef typename MT::DistanceType Dist;
 
     //TODO use sum_functor when appears
-    Dist d = utils::accumulate_functor(ch, Dist(0), fcosts);
+    Dist d = accumulate_functor(ch, Dist(0), fcosts);
 
     for (auto && f : ch) {
         for (auto && v : fls.get_clients_for_facility(f)) {
@@ -75,7 +76,7 @@ get_fl_cost(const Metric &m, const FCosts &fcosts, const FLSolution &fls) {
     typedef typename MT::DistanceType Dist;
 
     //TODO use sum_functor when appears
-    Dist d = utils::accumulate_functor(ch, Dist(0), fcosts);
+    Dist d = accumulate_functor(ch, Dist(0), fcosts);
 
     for (auto && f : ch) {
         for (auto && v : fls.get_clients_for_facility(f)) {

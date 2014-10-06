@@ -77,14 +77,14 @@ class collection_starts_from_last_change {
      *
      * @return
      */
-    JoinedIterator begin() { return boost::begin(get_range()); }
+    JoinedIterator begin() { return std::begin(get_range()); }
 
     /**
      * @brief end
      *
      * @return
      */
-    JoinedIterator end() { return boost::end(get_range()); }
+    JoinedIterator end() { return std::end(get_range()); }
 
   private:
     /**

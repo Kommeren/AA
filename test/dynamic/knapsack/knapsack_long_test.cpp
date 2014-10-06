@@ -16,11 +16,11 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_knapsack.hpp"
 #include "test_utils/knapsack_tags_utils.hpp"
-#include "test_utils/parse_file.hpp"
 
 #include "paal/dynamic/knapsack_unbounded.hpp"
 #include "paal/dynamic/knapsack_0_1.hpp"
 #include "paal/utils/floating.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/range/algorithm/random_shuffle.hpp>

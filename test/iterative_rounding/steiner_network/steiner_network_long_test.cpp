@@ -18,6 +18,7 @@
 
 #include "paal/iterative_rounding/steiner_network/steiner_network.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/connected_components.hpp>

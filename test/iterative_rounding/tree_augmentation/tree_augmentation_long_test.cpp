@@ -13,12 +13,11 @@
  * @date 2013-07-08
  */
 
-
 #include "test_utils/logger.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/test/unit_test.hpp>

@@ -17,6 +17,7 @@
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/data_structures/fraction.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 
@@ -131,7 +132,7 @@ namespace auctions {
                      [&](Item i) { return item_set.count(std::forward<Item>(i)) > 0; }
                   );
                };
-               return utils::accumulate_functor(
+               return accumulate_functor(
                   m_get_bids(std::forward<Bidder>(bidder)) |
                      boost::adaptors::filtered(is_contained),
                   Value(0),
@@ -225,7 +226,7 @@ namespace auctions {
             for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
                const auto value = m_get_value(*bid);
                const auto price =
-                  utils::sum_functor(m_get_items(*bid), get_price);
+                  sum_functor(m_get_items(*bid), get_price);
                const auto util = value - price;
                if (util > best.second)
                   best = {m_get_items(*bid), util};
@@ -328,7 +329,7 @@ namespace auctions {
             for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
                const auto value = m_get_value(*bid);
                if (value <= threshold) continue;
-               const auto price = utils::sum_functor(m_get_items(*bid),
+               const auto price = sum_functor(m_get_items(*bid),
                      get_price);
                const auto frac =
                   data_structures::make_fraction(price, value - threshold);

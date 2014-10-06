@@ -12,6 +12,13 @@
  * @version 1.0
  * @date 2014-06-18
  */
+#ifndef PAAL_WINNER_DETERMINATION_IN_MUCA_LONG_TEST_HPP
+#define PAAL_WINNER_DETERMINATION_IN_MUCA_LONG_TEST_HPP
+
+#include <fstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 using Bidder = int;
 using Item = int;
@@ -56,3 +63,5 @@ namespace {
       return std::make_tuple(sol, bids, item_count, bidders_num, items_num);
    }
 }
+
+#endif /* PAAL_WINNER_DETERMINATION_IN_MUCA_LONG_TEST_HPP */

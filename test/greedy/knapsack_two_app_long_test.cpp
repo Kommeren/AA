@@ -15,12 +15,12 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_knapsack.hpp"
-#include "test_utils/parse_file.hpp"
 #include "test_utils/test_result_check.hpp"
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_unbounded_two_app.hpp"
 #include "paal/utils/floating.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/test/unit_test.hpp>
 

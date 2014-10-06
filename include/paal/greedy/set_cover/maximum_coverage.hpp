@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-04-16
  */
-#ifndef MAXIMUM_COVERAGE
-#define MAXIMUM_COVERAGE
+#ifndef PAAL_MAXIMUM_COVERAGE_HPP
+#define PAAL_MAXIMUM_COVERAGE_HPP
 
 #include "paal/greedy/set_cover/budgeted_maximum_coverage.hpp"
 #include "paal/utils/functors.hpp"
@@ -58,4 +58,4 @@ auto maximum_coverage(
 }//!greedy
 }//!paal
 
-#endif /* MAXIMUM_COVERAGE */
+#endif /* PAAL_MAXIMUM_COVERAGE_HPP */

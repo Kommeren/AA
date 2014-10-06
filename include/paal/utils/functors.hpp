@@ -8,7 +8,7 @@
 /**
  * @file functors.hpp
  * @brief This file contains set of simple useful functors or functor adapters.
- * @author Piotr Wygocki, Robert Rosolek
+ * @author Piotr Wygocki, Robert Rosolek, Andrzej Pacuk
  * @version 1.0
  * @date 2013-02-01
  */
@@ -18,17 +18,16 @@
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
-#include <algorithm>
-#include <cassert>
-#include <tuple>
-#include <utility>
+#include "paal/utils/type_functions.hpp"
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/iterator_range.hpp>
-#include <boost/range/algorithm/max_element.hpp>
-#include <boost/range/numeric.hpp>
 
-#include "paal/utils/type_functions.hpp"
+#include <algorithm>
+#include <cassert>
+#include <cstddef>
+#include <tuple>
+#include <utility>
 
 namespace paal {
 namespace utils {
@@ -67,7 +66,7 @@ struct skip_functor {
  * @tparam T type of returned value
  * @tparam t return value
  */
-template <typename T, T t> struct return_something_functor {
+template <typename T, T t> struct return_constant_functor {
     /**
      * @brief operator
      *
@@ -86,13 +85,13 @@ template <typename T, T t> struct return_something_functor {
  *
  * @tparam T type of returned value
  */
-template <typename T> struct dynamic_return_something_functor {
+template <typename T> struct dynamic_return_constant_functor {
     /**
      * @brief constructor
      *
      * @param t
      */
-    dynamic_return_something_functor(T t) : m_t(t) {}
+    dynamic_return_constant_functor(T t) : m_t(t) {}
 
     /**
      * @brief operator
@@ -111,7 +110,7 @@ template <typename T> struct dynamic_return_something_functor {
 };
 
 /**
- * @brief make function for dynamic_return_something_functor
+ * @brief make function for dynamic_return_constant_functor
  *
  * @tparam T
  * @param t
@@ -119,8 +118,8 @@ template <typename T> struct dynamic_return_something_functor {
  * @return
  */
 template <typename T>
-auto make_dynamic_return_something_functor(T t) {
-    return dynamic_return_something_functor<T>(t);
+auto make_dynamic_return_constant_functor(T t) {
+    return dynamic_return_constant_functor<T>(t);
 }
 
 /**
@@ -220,22 +219,22 @@ template <class F> auto make_tuple_uncurry(F f) { return tuple_uncurry<F>(f); }
 /**
  * @brief functor return false
  */
-struct always_false : public return_something_functor<bool, false> {};
+struct always_false : public return_constant_functor<bool, false> {};
 
 /**
  * @brief functor return true
  */
-struct always_true : public return_something_functor<bool, true> {};
+struct always_true : public return_constant_functor<bool, true> {};
 
 /**
  * @brief functor returns 0
  */
-struct return_zero_functor : public return_something_functor<int, 0> {};
+struct return_zero_functor : public return_constant_functor<int, 0> {};
 
 /**
  * @brief functor returns 1
  */
-struct return_one_functor : public return_something_functor<int, 1> {};
+struct return_one_functor : public return_constant_functor<int, 1> {};
 
 /**
  * @brief functors calls assert(false).
@@ -980,50 +979,22 @@ auto make_xor_functor(FunctorLeft left, FunctorRight right) {
                                                   std::move(right));
 }
 
-/// combination of boost::accumulate and boost::adaptors::transformed
-template <
-   typename Range,
-   typename T,
-   typename Functor,
-   typename BinaryOperation = plus
->
-T accumulate_functor(
-   const Range& rng,
-   T init,
-   Functor f,
-   BinaryOperation bin_op = BinaryOperation{}
-) {
-   return boost::accumulate(
-      rng | boost::adaptors::transformed(make_assignable_functor(f)),
-      init,
-      bin_op
-   );
-}
-
-/**
- * @brief sum of functor values over the range elements
- *
- * @tparam Range
- * @tparam Functor
- * @param rng
- * @param f
- *
- * @return
- */
-template <typename Range, typename Functor>
-auto sum_functor(const Range& rng, Functor f) {
-   using T = pure_result_of_t<Functor(range_to_elem_t<Range>)>;
-   return accumulate_functor(rng, T(0), f);
-}
-
-
-/// combination of boost::accumulate and boost::adaptors::transformed
-template <typename Range, typename Functor>
-auto max_element_functor(const Range& rng, Functor f) {
-   return boost::max_element(
-      rng | boost::adaptors::transformed(make_assignable_functor(f))
-   );
-}
+/// functor for std::tuple::get<I>
+template <std::size_t I>
+struct tuple_get {
+    /**
+     * @brief operator()
+     *
+     * @tparam Tuple
+     * @return
+     */
+    template <typename Tuple>
+    //TODO change to decltype(auto), when it starts working
+    auto operator()(Tuple &&tuple) const ->
+            decltype(std::get<I>(std::forward<Tuple>(tuple))) {
+        return std::get<I>(std::forward<Tuple>(tuple));
+    }
+};
 
 } //! utils
 } //! paal

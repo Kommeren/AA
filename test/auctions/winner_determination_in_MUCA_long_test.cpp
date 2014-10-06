@@ -13,11 +13,11 @@
  * @date 2014-3-20
  */
 
-#include "test_utils/parse_file.hpp"
-#include "test_utils/winner_determination_in_MUCA_utils.hpp"
+#include "test_utils/winner_determination_in_MUCA_test_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_long_test.hpp"
 
 #include "paal/utils/functors.hpp"
+#include "paal/utils/parse_file.hpp"
 
 #include <boost/range/irange.hpp>
 #include <boost/test/unit_test.hpp>

@@ -6,8 +6,8 @@
  * @date 2013-08-01
  */
 
-#ifndef READ_ORLIB_SC_HPP
-#define READ_ORLIB_SC_HPP
+#ifndef PAAL_READ_ORLIB_SC_HPP
+#define PAAL_READ_ORLIB_SC_HPP
 
 #include <boost/range/irange.hpp>
 
@@ -35,5 +35,7 @@ read_ORLIB_SC(std::istream &ist) {
     }
     return std::make_pair(costs, sets);
 }
-}
-#endif /* READ_ORLIB_FC_HPP */
+
+} //! paal
+
+#endif /* PAAL_READ_ORLIB_SC_HPP */

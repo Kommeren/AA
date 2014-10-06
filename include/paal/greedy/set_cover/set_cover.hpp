@@ -5,12 +5,13 @@
  * @version 1.0
  * @date 2014-02-12
  */
-#ifndef SET_COVER
-#define SET_COVER
+#ifndef PAAL_SET_COVER_HPP
+#define PAAL_SET_COVER_HPP
 
 #include "paal/greedy/set_cover/budgeted_maximum_coverage.hpp"
-#include "paal/utils/type_functions.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/type_functions.hpp"
 
 #include <boost/function_output_iterator.hpp>
 
@@ -52,7 +53,7 @@ auto set_cover(SetRange && sets,
     ) {
     using set_cost=typename detail::set_range_cost_t<SetRange,GetCostOfSet>;
     //TODO use sum functor from r=Robert commit
-    auto cost_of_all_sets=utils::accumulate_functor(sets, set_cost{}, set_to_cost);
+    auto cost_of_all_sets=accumulate_functor(sets, set_cost{}, set_to_cost);
     set_cost cost_of_solution{};
     budgeted_maximum_coverage(sets,
         set_to_cost,
@@ -72,4 +73,4 @@ auto set_cover(SetRange && sets,
 }//!greedy
 }//!paal
 
-#endif /* SET_COVER */
+#endif /* PAAL_SET_COVER_HPP */

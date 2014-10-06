@@ -120,7 +120,7 @@ void boolean_functors() {
 void lift_operator_functor() {
     auto oper = [](int a, int b) { return a + b > 0; };
     return_zero_functor zero;
-    return_something_functor<int, 5> five;
+    return_constant_functor<int, 5> five;
 
     auto f = make_lift_binary_operator_functor(zero, five, oper);
 

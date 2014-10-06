@@ -1,0 +1,72 @@
+//=======================================================================
+// Copyright (c) 2014 Andrzej Pacuk
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
+/**
+ * @file lsh_nearest_neighbors_regression_example.cpp
+ * @brief
+ * @author Andrzej Pacuk
+ * @version 1.0
+ * @date 2014-10-06
+ */
+
+//! [LSH Nearest Neighbors Regression Example]
+#include "paal/regression/lsh_nearest_neighbors_regression.hpp"
+
+#include "paal/utils/hash_functions.hpp"
+
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/range/algorithm/copy.hpp>
+
+#include <iostream>
+#include <iterator>
+#include <vector>
+
+using point_t = boost::numeric::ublas::vector<int>;
+
+auto make_point(const std::initializer_list<int> &list) {
+    point_t point(list.size());
+    boost::copy(list, point.begin());
+    return point;
+};
+
+int main() {
+    const std::vector<point_t> train_points =
+            {make_point({0, 0}), make_point({0, 1}),
+             make_point({1, 0}), make_point({1, 1})};
+    const std::vector<double> train_results = {0.0, 0.4, 0.6, 1.0};
+    const std::vector<point_t> query_points =
+            {make_point({0, -1}), make_point({2, 1})};
+
+    const auto passes = 50;
+    const auto hash_functions_per_point = 10;
+    const auto dimensions = train_points.front().size();
+    const auto threads_count = 1;
+    //w_param should be essentially bigger than radius of expected test point neighborhood
+    const auto w_param = 3.0;
+
+    auto lsh_function_generator =
+        paal::hash::l_2_hash_function_generator<>{dimensions, w_param};
+    auto lsh_function_tuple_generator =
+        paal::make_hash_function_tuple_generator(
+            std::move(lsh_function_generator),
+            hash_functions_per_point);
+    auto model = paal::make_lsh_nearest_neighbors_regression(
+                    train_points, train_results,
+                    passes,
+                    std::move(lsh_function_tuple_generator),
+                    threads_count);
+
+    std::vector<double> results;
+    model.test(query_points, std::back_inserter(results), threads_count);
+
+    std::cout << "Solution:" << std::endl;
+    boost::copy(results, std::ostream_iterator<double>(std::cout, ","));
+
+    return 0;
+}
+//! [LSH Nearest Neighbors Regression Example]
+
