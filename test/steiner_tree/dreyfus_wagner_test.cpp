@@ -19,6 +19,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <cmath>
+
 using namespace paal;
 
 BOOST_AUTO_TEST_SUITE(dreyfus_wagner)
@@ -38,8 +40,8 @@ BOOST_AUTO_TEST_CASE(test_basic) {
 BOOST_AUTO_TEST_CASE(test_medium) {
     typedef sample_graphs_metrics SGM;
     auto gm = SGM::get_graph_metric_medium();
-    std::vector<int> terminals = { SGM::A, SGM::B, SGM::C, SGM::F, SGM::G,
-                                   SGM::H };
+    std::vector<int> terminals = { SGM::A, SGM::B, SGM::C,
+                                   SGM::F, SGM::G, SGM::H };
     std::vector<int> nonterminals = { SGM::D, SGM::E };
     auto dw = make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
@@ -48,19 +50,20 @@ BOOST_AUTO_TEST_CASE(test_medium) {
     BOOST_CHECK_EQUAL(dw.get_edges().size(), 5);
 }
 
-BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
+BOOST_AUTO_TEST_CASE(dreyfus_wagner_euclidean_metric_test) {
     using Points = std::vector<std::pair<int, int>>;
 
     data_structures::euclidean_metric<int> em;
     Points terminals, nonterminals;
-    std::tie(em, terminals, nonterminals) = sample_graphs_metrics::get_euclidean_steiner_sample();
+    std::tie(em, terminals, nonterminals) =
+        sample_graphs_metrics::get_euclidean_steiner_sample();
 
     auto dw = make_dreyfus_wagner(em, terminals, nonterminals);
     dw.solve();
 
     BOOST_CHECK_EQUAL(dw.get_steiner_elements().size(), std::size_t(1));
     BOOST_CHECK(*dw.get_steiner_elements().begin() == std::make_pair(1, 1));
-    BOOST_CHECK_EQUAL(dw.get_cost(), 4);
+    BOOST_CHECK_CLOSE(dw.get_cost(), 4 * std::sqrt(2), 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

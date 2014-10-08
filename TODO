@@ -1,3 +1,4 @@
+* add example to metrics
 * disable typedefs warning in doxygen
 * knapsack unbounded fptas is not realy fptas
   there is a problem with number of objects.

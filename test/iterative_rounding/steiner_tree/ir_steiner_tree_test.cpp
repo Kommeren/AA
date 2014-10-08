@@ -21,6 +21,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <cmath>
 
 using Vertex = int;
 using Terminals = std::vector<int>;
@@ -206,11 +207,11 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
     auto status = paal::ir::steiner_tree_iterative_rounding(em, terminals, steiner_vertices,
                 std::back_inserter(result), strategy_rand);
     BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
-    int cost = paal::ir::steiner_utils::count_cost(result, terminals, em);
+    auto cost = paal::ir::steiner_utils::count_cost(result, terminals, em);
 
     BOOST_CHECK_EQUAL(result.size(), std::size_t(1));
     BOOST_CHECK(result.front() == std::make_pair(1, 1));
-    BOOST_CHECK_EQUAL(cost, 4);
+    BOOST_CHECK_CLOSE(cost, 4 * std::sqrt(2), 1e-6);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

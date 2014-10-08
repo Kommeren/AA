@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(zelikowsky_test) {
     BOOST_CHECK_EQUAL(steiner.front(), SGM::E);
 }
 
-BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
+BOOST_AUTO_TEST_CASE(zelikowsky_euclidean_metric_test) {
     using EMetric = paal::data_structures::euclidean_metric<int>;
     using VoronoiT = paal::data_structures::voronoi<EMetric>;
     using FSet = typename VoronoiT::GeneratorsSet;
@@ -58,6 +58,5 @@ BOOST_AUTO_TEST_CASE(euclidean_metric_test) {
 
     paal::steiner_tree_zelikovsky11per6approximation(
         std::get<0>(test_case), voronoi, std::back_inserter(steiner));
-    BOOST_CHECK_EQUAL(steiner.size(), std::size_t(1));
-    BOOST_CHECK_EQUAL(steiner.front(), std::make_pair(1, 1));
+    BOOST_CHECK_EQUAL(steiner.size(), std::size_t(0));
 }
