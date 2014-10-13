@@ -19,6 +19,7 @@
 
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
+#include "paal/utils/indexed_range.hpp"
 
 namespace paal {
 namespace ir {
@@ -118,7 +119,6 @@ class ga_init {
             lp::linear_expression expr;
             for (auto m_idx : irange(problem.get_machines_cnt())) {
                 expr += col_idx[problem.idx(j_idx, m_idx)];
-                ++m_idx;
             }
             lp.add_row(std::move(expr) == 1.0);
         }
@@ -128,22 +128,17 @@ class ga_init {
     template <typename Problem, typename LP>
     void add_constraints_for_machines(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
-        std::size_t m_idx(0);
-        //TODO use indexed range
-        for (auto &&m : problem.get_machines()) {
-            auto T = problem.get_machine_available_time()(m);
-            std::size_t j_idx(0);
+        for (auto m : indexed_range(problem.get_machines())) {
+            auto T = problem.get_machine_available_time()(*m);
             lp::linear_expression expr;
 
-            for (auto &&j : problem.get_jobs()) {
-                auto t = problem.get_proceeding_time()(j, m);
-                auto x = col_idx[problem.idx(j_idx, m_idx)];
+            for (auto j : indexed_range(problem.get_jobs())) {
+                auto t = problem.get_proceeding_time()(*j, *m);
+                auto x = col_idx[problem.idx(j.index(), m.index())];
                 expr += x * t;
-                ++j_idx;
             }
             auto row = lp.add_row(std::move(expr) <= T);
             problem.get_machine_rows().insert(row);
-            ++m_idx;
         }
     }
 };

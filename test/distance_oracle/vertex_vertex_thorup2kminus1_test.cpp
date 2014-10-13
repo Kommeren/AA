@@ -18,6 +18,7 @@
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/indexed_range.hpp"
 
 #include <boost/graph/copy.hpp>
 #include <boost/property_map/property_map.hpp>
@@ -90,10 +91,9 @@ BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_listgraph_test ) {
 
     Map inner_map;
     IndexMap index_map(inner_map);
-    int vertex_counter = 0;
 
-    for (auto v: boost::make_iterator_range(vertices(g))) {
-        boost::put(index_map, v, vertex_counter++);
+    for (auto v: indexed_range(boost::make_iterator_range(vertices(g)))) {
+        boost::put(index_map, *v, v.index());
     }
 
     for (int k: {2,3,4,5}) {
