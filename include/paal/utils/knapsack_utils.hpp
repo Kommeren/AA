@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-07
  */
-#ifndef KNAPSACK_UTILS_HPP
-#define KNAPSACK_UTILS_HPP
+#ifndef PAAL_KNAPSACK_UTILS_HPP
+#define PAAL_KNAPSACK_UTILS_HPP
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/less_pointees.hpp"
@@ -168,4 +168,4 @@ make_knapsack_data(Objects &&objects, Size capacity, GetSize get_size,
 } //!detail
 
 }      //! paal
-#endif /* KNAPSACK_UTILS_HPP */
+#endif // PAAL_KNAPSACK_UTILS_HPP

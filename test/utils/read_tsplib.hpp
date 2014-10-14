@@ -6,8 +6,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 // Grzegorz Prusak
-#ifndef tsp_TSPLIB_h
-#define tsp_TSPLIB_h
+#ifndef PAAL_READ_TSPLIB_HPP
+#define PAAL_READ_TSPLIB_HPP
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 
@@ -232,4 +232,4 @@ struct TSPLIB_Directory {
 };
 }
 
-#endif
+#endif // PAAL_READ_TSPLIB_HPP

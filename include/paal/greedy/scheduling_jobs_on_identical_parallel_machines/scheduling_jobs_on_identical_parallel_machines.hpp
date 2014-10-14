@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-06
  */
-#ifndef SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
-#define SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES
+#ifndef PAAL_SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES_HPP
+#define PAAL_SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -85,4 +85,4 @@ void scheduling_jobs_on_identical_parallel_machines(int n_machines,
 } //!greedy
 } //!paal
 
-#endif /* SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES */
+#endif // PAAL_SCHEDULING_JOBS_ON_IDENTICAL_PARALLEL_MACHINES_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-02
  */
-#ifndef N_QUEENS_COMPONENETS_HPP
-#define N_QUEENS_COMPONENETS_HPP
+#ifndef PAAL_N_QUEENS_COMPONENTS_HPP
+#define PAAL_N_QUEENS_COMPONENTS_HPP
 
 #include "paal/data_structures/subset_iterator.hpp"
 
@@ -161,4 +161,4 @@ struct n_queens_gain {
 } //!local_search
 } //!paal
 
-#endif /* N_QUEENS_COMPONENETS_HPP */
+#endif // PAAL_N_QUEENS_COMPONENTS_HPP

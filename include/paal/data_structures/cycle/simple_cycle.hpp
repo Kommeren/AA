@@ -13,8 +13,8 @@
  * @date 2013-02-01
  */
 
-#ifndef SIMPLE_CYCLE_HPP
-#define SIMPLE_CYCLE_HPP
+#ifndef PAAL_SIMPLE_CYCLE_HPP
+#define PAAL_SIMPLE_CYCLE_HPP
 
 #include "paal/data_structures/bimap.hpp"
 
@@ -511,4 +511,4 @@ class Simplecycle_start_from_last_change : public simple_cycle<CycleEl, IdxT> {
 } // data_structures
 } // paal
 
-#endif /* SIMPLE_CYCLE_HPP */
+#endif // PAAL_SIMPLE_CYCLE_HPP

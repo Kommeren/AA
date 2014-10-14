@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-02
  */
-#ifndef N_QUEENS_SOLUTION_HPP
-#define N_QUEENS_SOLUTION_HPP
+#ifndef PAAL_N_QUEENS_SOLUTION_HPP
+#define PAAL_N_QUEENS_SOLUTION_HPP
 
 #include "paal/utils/irange.hpp"
 
@@ -198,4 +198,4 @@ template <typename NQueensPositionsVector> struct n_queens_solution_adapter {
 } //!local_search
 } //!paal
 
-#endif /* N_QUEENS_SOLUTION_HPP */
+#endif // PAAL_N_QUEENS_SOLUTION_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-07
  */
-#ifndef KNAPSACK_TWO_APP_HPP
-#define KNAPSACK_TWO_APP_HPP
+#ifndef PAAL_KNAPSACK_UNBOUNDED_TWO_APP_HPP
+#define PAAL_KNAPSACK_UNBOUNDED_TWO_APP_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -77,4 +77,4 @@ knapsack_unbounded_two_app(
             detail::unbounded_tag{});
 }
 } //! paal
-#endif /* KNAPSACK_TWO_APP_HPP */
+#endif // PAAL_KNAPSACK_UNBOUNDED_TWO_APP_HPP

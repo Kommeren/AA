@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-25
  */
-#ifndef FACILITY_LOCATION_SOLUTION_TRAITS_HPP
-#define FACILITY_LOCATION_SOLUTION_TRAITS_HPP
+#ifndef PAAL_FACILITY_LOCATION_SOLUTION_TRAITS_HPP
+#define PAAL_FACILITY_LOCATION_SOLUTION_TRAITS_HPP
 namespace paal {
 namespace data_structures {
 
@@ -21,4 +21,4 @@ template <typename facility_location_solution>
 class facility_location_solution_traits {};
 }
 }
-#endif /* FACILITY_LOCATION_SOLUTION_TRAITS_HPP */
+#endif // PAAL_FACILITY_LOCATION_SOLUTION_TRAITS_HPP

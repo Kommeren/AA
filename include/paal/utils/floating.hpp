@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-01
  */
-#ifndef UTILS_FLOATING_HPP
-#define UTILS_FLOATING_HPP
+#ifndef PAAL_FLOATING_HPP
+#define PAAL_FLOATING_HPP
 
 #include <iterator>
 #include <numeric>
@@ -119,4 +119,4 @@ public:
 } // utils
 } // paal
 
-#endif // UTILS_FLOATING_HPP
+#endif // PAAL_FLOATING_HPP

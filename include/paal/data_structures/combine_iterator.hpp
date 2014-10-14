@@ -20,8 +20,8 @@
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/range/empty.hpp>
 
-#ifndef COMBINE_ITERATOR_HPP
-#define COMBINE_ITERATOR_HPP
+#ifndef PAAL_COMBINE_ITERATOR_HPP
+#define PAAL_COMBINE_ITERATOR_HPP
 
 namespace paal {
 namespace data_structures {
@@ -295,4 +295,4 @@ make_combine_iterator(Joiner joiner, Ranges &&... ranges) {
 } // data_structures
 } // paal
 
-#endif // COMBINE_ITERATOR_HPP
+#endif // PAAL_COMBINE_ITERATOR_HPP

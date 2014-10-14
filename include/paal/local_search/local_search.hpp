@@ -13,8 +13,8 @@
  * @date 2013-02-01
  */
 
-#ifndef LOCAL_SEARCH_SINGLE_SOLUTION_HPP
-#define LOCAL_SEARCH_SINGLE_SOLUTION_HPP
+#ifndef PAAL_LOCAL_SEARCH_HPP
+#define PAAL_LOCAL_SEARCH_HPP
 
 #include "local_search_concepts.hpp"
 
@@ -308,4 +308,4 @@ bool best(Solution &solution, ContinueOnSuccess on_success,
 } // local_search
 } // paal
 
-#endif // LOCAL_SEARCH_SINGLE_SOLUTION_HPP
+#endif // PAAL_LOCAL_SEARCH_HPP

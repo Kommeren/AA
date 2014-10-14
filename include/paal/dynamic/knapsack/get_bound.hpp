@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-04
  */
-#ifndef GET_UPPER_BOUND_HPP
-#define GET_UPPER_BOUND_HPP
+#ifndef PAAL_GET_BOUND_HPP
+#define PAAL_GET_BOUND_HPP
 
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/greedy/knapsack/knapsack_greedy.hpp"
@@ -118,4 +118,4 @@ typename KnapsackData::value get_value_bound(KnapsackData knap_data,
 
 } //! detail
 } //! paal
-#endif /* GET_UPPER_BOUND_HPP */
+#endif // PAAL_GET_BOUND_HPP

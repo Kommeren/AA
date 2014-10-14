@@ -13,8 +13,8 @@
  * @version 1.1
  * @date 2013-09-12
  */
-#ifndef BIMAP_HPP
-#define BIMAP_HPP
+#ifndef PAAL_BIMAP_HPP
+#define PAAL_BIMAP_HPP
 
 #include "paal/data_structures/bimap_traits.hpp"
 #include "paal/utils/irange.hpp"
@@ -374,4 +374,4 @@ void rank(std::vector<T> const &m_id_to_t, std::vector<Idx> &m_t_to_id,
 
 } //! data_structures
 } //! paal
-#endif /* BIMAP_HPP */
+#endif // PAAL_BIMAP_HPP

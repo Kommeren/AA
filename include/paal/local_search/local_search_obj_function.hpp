@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-11
  */
-#ifndef LOCAL_SEARCH_OBJ_FUNCTION_HPP
-#define LOCAL_SEARCH_OBJ_FUNCTION_HPP
+#ifndef PAAL_LOCAL_SEARCH_OBJ_FUNCTION_HPP
+#define PAAL_LOCAL_SEARCH_OBJ_FUNCTION_HPP
 
 #include "local_search.hpp"
 #include "trivial_solution_commit.hpp"
@@ -153,4 +153,4 @@ bool obj_fun_best_improving(Solution &solution, Components comps) {
 } // local_search
 } // paal
 
-#endif /* LOCAL_SEARCH_OBJ_FUNCTION_HPP */
+#endif // PAAL_LOCAL_SEARCH_OBJ_FUNCTION_HPP

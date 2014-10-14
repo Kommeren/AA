@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-31
  */
-#ifndef SIMULATED_ANNEALING_HPP
-#define SIMULATED_ANNEALING_HPP
+#ifndef PAAL_SIMULATED_ANNEALING_HPP
+#define PAAL_SIMULATED_ANNEALING_HPP
 
 #include "paal/utils/fast_exp.hpp"
 #include "paal/local_search/search_traits.hpp"
@@ -467,4 +467,4 @@ auto make_simulated_annealing_commit_adaptor(Commit commit, Gain gain,
 } //!local_search
 } //!paal
 
-#endif /* SIMULATED_ANNEALING_HPP */
+#endif // PAAL_SIMULATED_ANNEALING_HPP

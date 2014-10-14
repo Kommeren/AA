@@ -14,8 +14,8 @@
  * @date 2013-06-06
  */
 
-#ifndef FRACTION_HPP
-#define FRACTION_HPP
+#ifndef PAAL_FRACTION_HPP
+#define PAAL_FRACTION_HPP
 
 #include "paal/utils/floating.hpp"
 
@@ -159,4 +159,4 @@ auto operator*(C c, const fraction<A, B>& f) -> fraction<decltype(c * f.num), B>
 } //!data_structures
 } //!paal
 
-#endif // FRACTION_HPP
+#endif // PAAL_FRACTION_HPP

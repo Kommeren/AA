@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-07
  */
-#ifndef KNAPSACK_0_1_TWO_APP_HPP
-#define KNAPSACK_0_1_TWO_APP_HPP
+#ifndef PAAL_KNAPSACK_0_1_TWO_APP_HPP
+#define PAAL_KNAPSACK_0_1_TWO_APP_HPP
 
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/utils/functors.hpp"
@@ -90,4 +90,4 @@ knapsack_0_1_two_app(
         detail::zero_one_tag());
 }
 }      //! paal
-#endif /* KNAPSACK_0_1_TWO_APP_HPP */
+#endif // PAAL_KNAPSACK_0_1_TWO_APP_HPP

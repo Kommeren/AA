@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-08
  */
-#ifndef SPLAY_CYCLE_HPP
-#define SPLAY_CYCLE_HPP
+#ifndef PAAL_SPLAY_CYCLE_HPP
+#define PAAL_SPLAY_CYCLE_HPP
 
 #include "paal/data_structures/splay_tree.hpp"
 #include "paal/data_structures/bimap.hpp"
@@ -108,4 +108,4 @@ public:
 
 } //! data_structures
 } //! paal
-#endif /* SPLAY_CYCLE_HPP */
+#endif // PAAL_SPLAY_CYCLE_HPP

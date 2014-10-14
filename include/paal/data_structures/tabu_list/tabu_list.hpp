@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-09
  */
-#ifndef TABU_LIST_HPP
-#define TABU_LIST_HPP
+#ifndef PAAL_TABU_LIST_HPP
+#define PAAL_TABU_LIST_HPP
 
 #include <boost/functional/hash.hpp>
 
@@ -132,4 +132,4 @@ class tabu_list_remember_solution_and_move
 } //!data_structures
 } //!paal
 
-#endif /* TABU_LIST_HPP */
+#endif // PAAL_TABU_LIST_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-03-10
  */
-#ifndef MAKE_TUPLE_HPP
-#define MAKE_TUPLE_HPP
+#ifndef PAAL_MAKE_TUPLE_HPP
+#define PAAL_MAKE_TUPLE_HPP
 
 namespace paal {
 /**
@@ -36,4 +36,4 @@ struct make_tuple {
 
 } //!paal
 
-#endif /* MAKE_TUPLE_HPP */
+#endif // PAAL_MAKE_TUPLE_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-08
  */
-#ifndef READ_KNAPSACK_HPP
-#define READ_KNAPSACK_HPP
+#ifndef PAAL_READ_KNAPSACK_HPP
+#define PAAL_READ_KNAPSACK_HPP
 
 #include "utils/parse_file.hpp"
 
@@ -64,4 +64,4 @@ inline void read(const std::string &testDir, int testId, int &capacity,
     });
 }
 
-#endif /* READ_KNAPSACK_HPP */
+#endif // PAAL_READ_KNAPSACK_HPP

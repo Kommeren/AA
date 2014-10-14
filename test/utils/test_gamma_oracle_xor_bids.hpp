@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-3-20
  */
-#ifndef TEST_GAMMA_ORACLE_XOR_BIDS
-#define TEST_GAMMA_ORACLE_XOR_BIDS
+#ifndef PAAL_TEST_GAMMA_ORACLE_XOR_BIDS_HPP
+#define PAAL_TEST_GAMMA_ORACLE_XOR_BIDS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/xor_bids.hpp"
@@ -136,4 +136,4 @@ decltype(paal::auctions::make_gamma_oracle_auction_components(
    );
 }
 
-#endif /* TEST_GAMMA_ORACLE_XOR_BIDS */
+#endif // PAAL_TEST_GAMMA_ORACLE_XOR_BIDS_HPP

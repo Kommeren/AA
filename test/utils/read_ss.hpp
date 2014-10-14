@@ -13,8 +13,8 @@
  * @date 2013-08-23
  */
 
-#ifndef READ_SS_HPP
-#define READ_SS_HPP
+#ifndef PAAL_READ_SS_HPP
+#define PAAL_READ_SS_HPP
 #include "utils/logger.hpp"
 
 #include <vector>
@@ -38,4 +38,4 @@ Words read_SS(std::istream &ist) {
 }
 }
 }      //!paal
-#endif /* READ_SS_HPP */
+#endif // PAAL_READ_SS_HPP

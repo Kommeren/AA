@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef TYPE_FUNCTIONS_HPP
-#define TYPE_FUNCTIONS_HPP
+#ifndef PAAL_TYPE_FUNCTIONS_HPP
+#define PAAL_TYPE_FUNCTIONS_HPP
 
 #include <boost/range.hpp>
 
@@ -61,4 +61,4 @@ using promote_with_double_t = puretype(std::declval<T>() + 0.0);
 
 } //!paal
 
-#endif // TYPE_FUNCTIONS_HPP
+#endif // PAAL_TYPE_FUNCTIONS_HPP

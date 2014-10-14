@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-10-3
  */
-#ifndef INDEXED_RANGE_HPP
-#define INDEXED_RANGE_HPP
+#ifndef PAAL_INDEXED_RANGE_HPP
+#define PAAL_INDEXED_RANGE_HPP
 
 #include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/counting_range.hpp>
@@ -27,4 +27,4 @@ auto indexed_range(Range && r, int start_index = 0) {
 
 } //! paal
 
-#endif /* INDEXED_RANGE_HPP */
+#endif // PAAL_INDEXED_RANGE_HPP

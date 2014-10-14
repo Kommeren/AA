@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-24
  */
-#ifndef COMPONENTS_SWAP_HPP
-#define COMPONENTS_SWAP_HPP
+#ifndef PAAL_COMPONENTS_REPLACE_HPP
+#define PAAL_COMPONENTS_REPLACE_HPP
 
 #include "paal/data_structures/components/components.hpp"
 
@@ -149,4 +149,4 @@ replace(NewType comp, detail::components<Names, Types> components) {
 } // data_structures
 } // paal
 
-#endif /* COMPONENTS_SWAP_HPP */
+#endif // PAAL_COMPONENTS_REPLACE_HPP

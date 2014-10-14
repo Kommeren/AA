@@ -13,6 +13,9 @@
  * @date 2013-02-01
  */
 
+#ifndef PAAL_FACILITY_LOCATION_HPP
+#define PAAL_FACILITY_LOCATION_HPP
+
 #include "facility_location_solution_adapter.hpp"
 #include "facility_location_add.hpp"
 #include "facility_location_remove.hpp"
@@ -109,3 +112,5 @@ bool facility_location_first_improving(facility_location_solution &fls,
 }
 } //! local_search
 } //! paal
+
+#endif // PAAL_FACILITY_LOCATION_HPP

@@ -13,8 +13,8 @@
   * @date 2014-04-28
   */
 
-#ifndef THORUP_2KMINUS1_HPP
-#define THORUP_2KMINUS1_HPP
+#ifndef PAAL_THORUP_2KMINUS1_HPP
+#define PAAL_THORUP_2KMINUS1_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
@@ -532,4 +532,4 @@ make_distance_oracle_thorup2kminus1approximation(
 
 } //paal
 
-#endif /* THORUP_2KMINUS1_HPP */
+#endif // PAAL_THORUP_2KMINUS1_HPP

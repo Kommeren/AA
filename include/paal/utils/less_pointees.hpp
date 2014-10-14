@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-29
  */
-#ifndef LESS_POINTEES_HPP
-#define LESS_POINTEES_HPP
+#ifndef PAAL_LESS_POINTEES_HPP
+#define PAAL_LESS_POINTEES_HPP
 namespace paal {
 
 // TODO add to boost
@@ -50,4 +50,4 @@ less_pointees_t<Comparator> make_less_pointees_t(Comparator compare) {
 }
 
 } //! paal
-#endif /* LESS_POINTEES_HPP */
+#endif // PAAL_LESS_POINTEES_HPP

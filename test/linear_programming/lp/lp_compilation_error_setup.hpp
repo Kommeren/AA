@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-04-29
  */
-#ifndef COMPILATION_ERROR_SETUP_HPP
-#define COMPILATION_ERROR_SETUP_HPP
+#ifndef PAAL_LP_COMPILATION_ERROR_SETUP_HPP
+#define PAAL_LP_COMPILATION_ERROR_SETUP_HPP
 
 #include "paal/lp/glp.hpp"
 
@@ -37,4 +37,4 @@ struct compilation_error_setup {
 };
 }
 
-#endif /* COMPILATION_ERROR_SETUP_HPP */
+#endif // PAAL_LP_COMPILATION_ERROR_SETUP_HPP

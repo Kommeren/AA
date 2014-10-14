@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-08
  */
-#ifndef FACILITY_LOCATION_REMOVE_HPP
-#define FACILITY_LOCATION_REMOVE_HPP
+#ifndef PAAL_FACILITY_LOCATION_REMOVE_HPP
+#define PAAL_FACILITY_LOCATION_REMOVE_HPP
 
 #include "paal/utils/type_functions.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
@@ -100,4 +100,4 @@ struct facility_locationget_moves_remove {
 } // local_search
 } // paal
 
-#endif /* FACILITY_LOCATION_REMOVE_HPP */
+#endif // PAAL_FACILITY_LOCATION_REMOVE_HPP

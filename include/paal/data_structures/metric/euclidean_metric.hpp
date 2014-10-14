@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-10-28
  */
-#ifndef EUCLIDEAN_METRIC_HPP
-#define EUCLIDEAN_METRIC_HPP
+#ifndef PAAL_EUCLIDEAN_METRIC_HPP
+#define PAAL_EUCLIDEAN_METRIC_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -41,4 +41,4 @@ struct metric_traits<euclidean_metric<T>>
 
 } // paal
 
-#endif /* EUCLIDEAN_METRIC_HPP */
+#endif // PAAL_EUCLIDEAN_METRIC_HPP

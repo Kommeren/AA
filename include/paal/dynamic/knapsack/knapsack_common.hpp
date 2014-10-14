@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-30
  */
-#ifndef KNAPSACK_COMMON_HPP
-#define KNAPSACK_COMMON_HPP
+#ifndef PAAL_KNAPSACK_COMMON_HPP
+#define PAAL_KNAPSACK_COMMON_HPP
 
 #include "paal/dynamic/knapsack/get_bound.hpp"
 
@@ -70,4 +70,4 @@ knapsack(KnapsackData knap_data, Is_0_1_Tag is_0_1_Tag,
 
 }      //! detail
 }      //! paal
-#endif /* KNAPSACK_COMMON_HPP */
+#endif // PAAL_KNAPSACK_COMMON_HPP

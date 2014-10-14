@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-06-05
  */
-#ifndef BOUNDED_DEGREE_MST_ORACLE_HPP
-#define BOUNDED_DEGREE_MST_ORACLE_HPP
+#ifndef PAAL_BOUNDED_DEGREE_MST_ORACLE_HPP
+#define PAAL_BOUNDED_DEGREE_MST_ORACLE_HPP
 
 #include "paal/iterative_rounding/min_cut.hpp"
 #include "paal/lp/lp_base.hpp"
@@ -207,4 +207,4 @@ class bdmst_violation_checker {
 
 } //! ir
 } //! paal
-#endif /* BOUNDED_DEGREE_MST_ORACLE_HPP */
+#endif // PAAL_BOUNDED_DEGREE_MST_ORACLE_HPP

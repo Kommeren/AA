@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-19
  */
-#ifndef SEARCH_TRAITS_HPP
-#define SEARCH_TRAITS_HPP
+#ifndef PAAL_SEARCH_TRAITS_HPP
+#define PAAL_SEARCH_TRAITS_HPP
 
 #include "paal/data_structures/components/component_traits.hpp"
 #include "paal/local_search/search_components.hpp"
@@ -91,4 +91,4 @@ using fitness_t = typename fitness_from_gain_and_get_moves<
 
 } //! local_search
 } //! paal
-#endif /* SEARCH_TRAITS_HPP */
+#endif // PAAL_SEARCH_TRAITS_HPP

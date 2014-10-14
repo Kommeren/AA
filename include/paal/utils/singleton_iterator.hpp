@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-02-27
  */
-#ifndef SINGLETON_ITERATOR_HPP
-#define SINGLETON_ITERATOR_HPP
+#ifndef PAAL_SINGLETON_ITERATOR_HPP
+#define PAAL_SINGLETON_ITERATOR_HPP
 
 #include <boost/iterator/iterator_facade.hpp>
 #include <boost/optional/optional.hpp>
@@ -112,4 +112,4 @@ auto make_singleton_range(Elem&& elem)
 } //!utils
 } //!paal
 
-#endif /* SINGLETON_ITERATOR_HPP */
+#endif // PAAL_SINGLETON_ITERATOR_HPP

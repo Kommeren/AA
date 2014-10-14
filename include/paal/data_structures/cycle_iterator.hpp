@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-11
  */
-#ifndef CYCLE_ITERATOR_HPP
-#define CYCLE_ITERATOR_HPP
+#ifndef PAAL_CYCLE_ITERATOR_HPP
+#define PAAL_CYCLE_ITERATOR_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -105,4 +105,4 @@ class cycle_iterator : public boost::iterator_facade<
 };
 }
 }
-#endif /* CYCLE_ITERATOR_HPP */
+#endif // PAAL_CYCLE_ITERATOR_HPP

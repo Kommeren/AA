@@ -13,8 +13,8 @@
  * @date 2014-04-02
  */
 
-#ifndef CONSTRAINTS_HPP
-#define CONSTRAINTS_HPP
+#ifndef PAAL_CONSTRAINTS_HPP
+#define PAAL_CONSTRAINTS_HPP
 
 #include "paal/lp/expressions.hpp"
 
@@ -242,4 +242,4 @@ inline double_bounded_expression operator==(const linear_expression &expr,
 } // lp
 } // paal
 
-#endif /* CONSTRAINTS_HPP */
+#endif // PAAL_CONSTRAINTS_HPP

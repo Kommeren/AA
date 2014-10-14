@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-04-02
  */
-#ifndef LP_BASE_HPP
-#define LP_BASE_HPP
+#ifndef PAAL_LP_BASE_HPP
+#define PAAL_LP_BASE_HPP
 
 #include "paal/lp/constraints.hpp"
 #include "paal/lp/ids.hpp"
@@ -337,4 +337,4 @@ template <typename LP> class lp_base : public LP {
 } // lp
 } // paal
 
-#endif /* LP_BASE_HPP */
+#endif // PAAL_LP_BASE_HPP

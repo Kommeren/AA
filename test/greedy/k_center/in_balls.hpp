@@ -13,8 +13,8 @@
  * @date 2014-01-29
  */
 
-#ifndef IN_BALLS_HPP
-#define IN_BALLS_HPP
+#ifndef PAAL_IN_BALLS_HPP
+#define PAAL_IN_BALLS_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -44,4 +44,4 @@ void in_balls(const IT &items, const CE &centers, const Metric &metric,
     }
 }
 } //! paal
-#endif /* IN_BALLS_HPP */
+#endif // PAAL_IN_BALLS_HPP

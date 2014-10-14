@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-08
  */
-#ifndef FACILITY_LOCATION_SWAP_HPP
-#define FACILITY_LOCATION_SWAP_HPP
+#ifndef PAAL_FACILITY_LOCATION_SWAP_HPP
+#define PAAL_FACILITY_LOCATION_SWAP_HPP
 
 #include "paal/data_structures/facility_location/facility_location_solution_traits.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -171,4 +171,4 @@ struct facility_locationget_moves_swap {
 } // local_search
 } // paal
 
-#endif /* FACILITY_LOCATION_SWAP_HPP */
+#endif // PAAL_FACILITY_LOCATION_SWAP_HPP

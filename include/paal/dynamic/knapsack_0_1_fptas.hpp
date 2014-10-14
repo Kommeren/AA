@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-04
  */
-#ifndef KNAPSACK_0_1_FPTAS_HPP
-#define KNAPSACK_0_1_FPTAS_HPP
+#ifndef PAAL_KNAPSACK_0_1_FPTAS_HPP
+#define PAAL_KNAPSACK_0_1_FPTAS_HPP
 
 #include "paal/dynamic/knapsack_0_1.hpp"
 #include "paal/dynamic/knapsack/knapsack_fptas_common.hpp"
@@ -84,4 +84,4 @@ knapsack_0_1_no_output_on_size_fptas(
 
 } // paal
 
-#endif /* KNAPSACK_0_1_FPTAS_HPP */
+#endif // PAAL_KNAPSACK_0_1_FPTAS_HPP

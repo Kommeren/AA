@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-10
  */
-#ifndef PREFIX_TREE_HPP
-#define PREFIX_TREE_HPP
+#ifndef PAAL_PREFIX_TREE_HPP
+#define PAAL_PREFIX_TREE_HPP
 
 #include <vector>
 namespace paal {
@@ -175,4 +175,4 @@ template <typename Letter> class prefix_tree {
 }      //!detail
 }      //!greedy
 }      //!paal
-#endif /*PREFIX_TREE_HPP*/
+#endif // PAAL_PREFIX_TREE_HPP

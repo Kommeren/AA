@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-13
  */
-#ifndef LOGGER_HPP
-#define LOGGER_HPP
+#ifndef PAAL_LOGGER_HPP
+#define PAAL_LOGGER_HPP
 
 #ifdef LOGGER_ON
 #include <iostream>
@@ -50,4 +50,4 @@ Stream &operator<<(Stream &o, const std::pair<V, W> &p) {
 #define LOG_COPY_RANGE_DEL(range, del)
 #endif
 
-#endif /* LOGGER_HPP */
+#endif // PAAL_LOGGER_HPP

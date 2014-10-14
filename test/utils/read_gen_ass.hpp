@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-05-07
  */
-#ifndef READ_GEN_ASS_HPP
-#define READ_GEN_ASS_HPP
+#ifndef PAAL_READ_GEN_ASS_HPP
+#define PAAL_READ_GEN_ASS_HPP
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/utils/irange.hpp"
@@ -51,4 +51,4 @@ void read_gen_ass(std::istream & is, M & costs, M & times,
     }
 }
 }
-#endif /* READ_GEN_ASS_HPP */
+#endif // PAAL_READ_GEN_ASS_HPP

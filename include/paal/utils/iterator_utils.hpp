@@ -19,8 +19,8 @@
 
 #include <functional>
 
-#ifndef ITERATOR_HELPERS_HPP
-#define ITERATOR_HELPERS_HPP
+#ifndef PAAL_ITERATOR_UTILS_HPP
+#define PAAL_ITERATOR_UTILS_HPP
 
 namespace paal {
 namespace utils {
@@ -60,4 +60,4 @@ struct iterator_with_excluded_element : public boost::filter_iterator<
 } // utils
 } // paal
 
-#endif // ITERATOR_HELPERS_HPP
+#endif // PAAL_ITERATOR_UTILS_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-02-24
  */
-#ifndef SEPARATION_ORACLES_HPP
-#define SEPARATION_ORACLES_HPP
+#ifndef PAAL_SEPARATION_ORACLES_HPP
+#define PAAL_SEPARATION_ORACLES_HPP
 
 #include <boost/range/distance.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -162,4 +162,4 @@ class random_violated_separation_oracle : public separation_oracle<ViolationChec
 
 } //! lp
 } //! paal
-#endif /* SEPARATION_ORACLES_HPP */
+#endif // PAAL_SEPARATION_ORACLES_HPP

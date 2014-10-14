@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-06-14
  */
-#ifndef LOG_VISITOR_HPP
-#define LOG_VISITOR_HPP
+#ifndef PAAL_LOG_VISITOR_HPP
+#define PAAL_LOG_VISITOR_HPP
 
 #include "paal/iterative_rounding/iterative_rounding.hpp"
 namespace paal {
@@ -37,4 +37,4 @@ struct log_visitor : public ir::trivial_visitor {
 
 } //!paal
 
-#endif /* LOG_VISITOR_HPP */
+#endif // PAAL_LOG_VISITOR_HPP

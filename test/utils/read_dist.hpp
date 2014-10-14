@@ -13,8 +13,8 @@
  * @date 2014-05-19
  */
 
-#ifndef READ_DIST_HPP
-#define READ_DIST_HPP
+#ifndef PAAL_READ_DIST_HPP
+#define PAAL_READ_DIST_HPP
 
 #include "paal/utils/irange.hpp"
 
@@ -46,4 +46,4 @@ Graph read_dist(std::istream& ist) {
 }
 } // paal
 
-#endif /* READ_DIST_HPP */
+#endif // PAAL_READ_DIST_HPP

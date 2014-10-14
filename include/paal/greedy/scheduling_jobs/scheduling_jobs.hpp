@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-11-19
  */
-#ifndef SCHEDULING_JOBS
-#define SCHEDULING_JOBS
+#ifndef PAAL_SCHEDULING_JOBS_HPP
+#define PAAL_SCHEDULING_JOBS_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -260,4 +260,4 @@ void schedule_randomized(const MachineIterator mfirst,
 } //!greedy
 } //!paal
 
-#endif /* SCHEDULING_JOBS */
+#endif // PAAL_SCHEDULING_JOBS_HPP

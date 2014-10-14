@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef METRIC_TO_BGL_HPP
-#define METRIC_TO_BGL_HPP
+#ifndef PAAL_METRIC_TO_BGL_HPP
+#define PAAL_METRIC_TO_BGL_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -96,4 +96,4 @@ typename adjacency_matrix<Metric>::type metric_to_bgl_with_index(
 
 } //!data_structures
 } //!paal
-#endif /* METRIC_TO_BGL_HPP */
+#endif // PAAL_METRIC_TO_BGL_HPP

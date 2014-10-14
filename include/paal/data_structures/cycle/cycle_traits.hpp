@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-26
  */
-#ifndef CYCLE_TRAITS_HPP
-#define CYCLE_TRAITS_HPP
+#ifndef PAAL_CYCLE_TRAITS_HPP
+#define PAAL_CYCLE_TRAITS_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -33,4 +33,4 @@ template <typename Cycle> struct cycle_traits {
 };
 }
 }
-#endif /* CYCLE_TRAITS_HPP */
+#endif // PAAL_CYCLE_TRAITS_HPP

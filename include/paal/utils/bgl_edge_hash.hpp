@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-12-19
  */
-#ifndef BGL_EDGE_HASH_HPP
-#define BGL_EDGE_HASH_HPP
+#ifndef PAAL_BGL_EDGE_HASH_HPP
+#define PAAL_BGL_EDGE_HASH_HPP
 
 #include <boost/functional/hash.hpp>
 #include <boost/graph/graph_traits.hpp>
@@ -70,4 +70,4 @@ struct edge_hash<Graph,
     }
 };
 }
-#endif /* BGL_EDGE_HASH_HPP */
+#endif // PAAL_BGL_EDGE_HASH_HPP

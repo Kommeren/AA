@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-30
  */
-#ifndef KNAPSACK_0_1_HPP
-#define KNAPSACK_0_1_HPP
+#ifndef PAAL_KNAPSACK_0_1_HPP
+#define PAAL_KNAPSACK_0_1_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/knapsack_utils.hpp"
@@ -312,4 +312,4 @@ knapsack_0_1_no_output(Objects &&objects,
 
 } // paal
 
-#endif /* KNAPSACK_0_1_HPP */
+#endif // PAAL_KNAPSACK_0_1_HPP

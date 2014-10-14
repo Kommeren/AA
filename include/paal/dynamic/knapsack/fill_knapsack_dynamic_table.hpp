@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-29
  */
-#ifndef FILL_KNAPSACK_DYNAMIC_TABLE_HPP
-#define FILL_KNAPSACK_DYNAMIC_TABLE_HPP
+#ifndef PAAL_FILL_KNAPSACK_DYNAMIC_TABLE_HPP
+#define PAAL_FILL_KNAPSACK_DYNAMIC_TABLE_HPP
 
 #include "paal/utils/knapsack_utils.hpp"
 
@@ -88,4 +88,4 @@ fill_knapsack_dynamic_table(ValueIterator valuesBegin, ValueIterator valuesEnd,
 }
 
 }      //! paal
-#endif /* FILL_KNAPSACK_DYNAMIC_TABLE_HPP */
+#endif // PAAL_FILL_KNAPSACK_DYNAMIC_TABLE_HPP

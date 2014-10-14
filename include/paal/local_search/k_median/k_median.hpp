@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-08
  */
-#ifndef K_MEDIAN_HPP
-#define K_MEDIAN_HPP
+#ifndef PAAL_K_MEDIAN_HPP
+#define PAAL_K_MEDIAN_HPP
 
 #include "paal/local_search/facility_location/facility_location_swap.hpp"
 #include "paal/local_search/facility_location/facility_location_solution_adapter.hpp"
@@ -36,4 +36,4 @@ using default_k_median_components =
 }
 }
 
-#endif /* K_MEDIAN_HPP */
+#endif // PAAL_K_MEDIAN_HPP

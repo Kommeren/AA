@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-28
  */
-#ifndef PROBLEM_TYPE_HPP
-#define PROBLEM_TYPE_HPP
+#ifndef PAAL_PROBLEM_TYPE_HPP
+#define PAAL_PROBLEM_TYPE_HPP
 
 namespace paal {
 namespace lp {
@@ -26,4 +26,4 @@ enum problem_type {
 };
 }
 }
-#endif /* PROBLEM_TYPE_HPP */
+#endif // PAAL_PROBLEM_TYPE_HPP

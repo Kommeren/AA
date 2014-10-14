@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-04
  */
-#ifndef METRIC_TRAITS_HPP
-#define METRIC_TRAITS_HPP
+#ifndef PAAL_METRIC_TRAITS_HPP
+#define PAAL_METRIC_TRAITS_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -44,4 +44,4 @@ template <typename Metric>
 struct metric_traits : public _metric_traits<Metric, int> {};
 }
 }
-#endif /* METRIC_TRAITS_HPP */
+#endif // PAAL_METRIC_TRAITS_HPP

@@ -13,8 +13,8 @@
  * @date 2014-02-19
  */
 
-#ifndef FAST_EXP_HPP
-#define FAST_EXP_HPP
+#ifndef PAAL_FAST_EXP_HPP
+#define PAAL_FAST_EXP_HPP
 
 #include <cstdint>
 #include <cmath>
@@ -50,4 +50,4 @@ inline float fast_exp(float p) {
 }
 } //!paal
 
-#endif /* FAST_EXP_HPP */
+#endif // PAAL_FAST_EXP_HPP

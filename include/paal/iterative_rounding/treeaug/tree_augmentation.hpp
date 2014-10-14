@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-06-20
  */
-#ifndef TREE_AUG_HPP
-#define TREE_AUG_HPP
+#ifndef PAAL_TREE_AUGMENTATION_HPP
+#define PAAL_TREE_AUGMENTATION_HPP
 
 
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -633,4 +633,4 @@ IRResult tree_augmentation_iterative_rounding(const Graph &g,
 } // ir
 } // paal
 
-#endif /* TREE_AUG_HPP */
+#endif // PAAL_TREE_AUGMENTATION_HPP

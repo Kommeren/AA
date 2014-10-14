@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-06-03
  */
-#ifndef BOUNDED_DEGREE_MST_HPP
-#define BOUNDED_DEGREE_MST_HPP
+#ifndef PAAL_BOUNDED_DEGREE_MST_HPP
+#define PAAL_BOUNDED_DEGREE_MST_HPP
 
 
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst_oracle.hpp"
@@ -622,4 +622,4 @@ IRResult bounded_degree_mst_iterative_rounding(
 
 } //! ir
 } //! paal
-#endif /* BOUNDED_DEGREE_MST_HPP */
+#endif // PAAL_BOUNDED_DEGREE_MST_HPP

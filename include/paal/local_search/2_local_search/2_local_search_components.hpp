@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-03-11
  */
-#ifndef TWO_LOCAL_SEARCH_COMPONENTS_HPP
-#define TWO_LOCAL_SEARCH_COMPONENTS_HPP
+#ifndef PAAL_2_LOCAL_SEARCH_COMPONENTS_HPP
+#define PAAL_2_LOCAL_SEARCH_COMPONENTS_HPP
 
 #include "paal/data_structures/subset_iterator.hpp"
 
@@ -161,4 +161,4 @@ class two_local_searchget_moves {
 } //!local_search
 } //!paal
 
-#endif /* TWO_LOCAL_SEARCH_COMPONENTS_HPP */
+#endif // PAAL_2_LOCAL_SEARCH_COMPONENTS_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-12-12
  */
-#ifndef PARSE_FILE_HPP
-#define PARSE_FILE_HPP
+#ifndef PAAL_PARSE_FILE_HPP
+#define PAAL_PARSE_FILE_HPP
 
 #include <fstream>
 #include <cassert>
@@ -39,4 +39,4 @@ template <typename Functor> void parse(const std::string &filename, Functor f) {
 }
 
 } //! paal
-#endif /* PARSE_FILE_HPP */
+#endif // PAAL_PARSE_FILE_HPP

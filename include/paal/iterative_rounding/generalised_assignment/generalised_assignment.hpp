@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-05-06
  */
-#ifndef GENERALISED_ASSIGNMENT_HPP
-#define GENERALISED_ASSIGNMENT_HPP
+#ifndef PAAL_GENERALISED_ASSIGNMENT_HPP
+#define PAAL_GENERALISED_ASSIGNMENT_HPP
 
 
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -373,4 +373,4 @@ IRResult generalised_assignment_iterative_rounding(
 
 } // ir
 } // paal
-#endif /* GENERALISED_ASSIGNMENT_HPP */
+#endif // PAAL_GENERALISED_ASSIGNMENT_HPP

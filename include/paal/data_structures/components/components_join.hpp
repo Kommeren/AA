@@ -13,8 +13,8 @@
  * @date 2014-06-15
  */
 
-#ifndef  components_join_INC
-#define  components_join_INC
+#ifndef  PAAL_COMPONENTS_JOIN_HPP
+#define  PAAL_COMPONENTS_JOIN_HPP
 
 #include "paal/data_structures/components/components.hpp"
 
@@ -142,4 +142,4 @@ struct join<
 } //!data_structures
 } //!paal
 
-#endif   /* components_join_INC */
+#endif   // PAAL_COMPONENTS_JOIN_HPP

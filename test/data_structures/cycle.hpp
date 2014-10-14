@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-11
  */
-#ifndef CYCLE_HPP
-#define CYCLE_HPP
+#ifndef PAAL_CYCLE_HPP
+#define PAAL_CYCLE_HPP
 
 #include "paal/data_structures/cycle/simple_cycle.hpp"
 
@@ -54,4 +54,4 @@ template <template <class> class Cycle> void swap_edges_4() {
     Cycle<std::string> sc(v.begin(), v.begin() + 4);
     check_swap(sc, "2", "3", "1", sol);
 }
-#endif /* CYCLE_HPP */
+#endif // PAAL_CYCLE_HPP

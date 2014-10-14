@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-23
  */
-#ifndef K_CENTER
-#define K_CENTER
+#ifndef PAAL_K_CENTER_HPP
+#define PAAL_K_CENTER_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include <vector>
@@ -70,4 +70,4 @@ auto kCenter(const Metric &metric, unsigned int numberOfClusters,
 } //!greedy
 } //!paal
 
-#endif /* K_CENTER */
+#endif // PAAL_K_CENTER_HPP

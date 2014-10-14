@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-09
  */
-#ifndef SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE
-#define SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE
+#ifndef PAAL_SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE_HPP
+#define PAAL_SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -99,4 +99,4 @@ auto scheduling_jobs_with_deadlines_on_a_single_machine(
 } //!greedy
 } //!paal
 
-#endif /* SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE */
+#endif // PAAL_SCHEDULING_JOBS_WITH_DEADLINES_ON_A_SINGLE_MACHINE_HPP

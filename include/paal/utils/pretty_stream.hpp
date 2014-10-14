@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-06-12
  */
-#ifndef PRITTY_STREAM_HPP
-#define PRITTY_STREAM_HPP
+#ifndef PAAL_PRETTY_STREAM_HPP
+#define PAAL_PRETTY_STREAM_HPP
 
 #include <cmath>
 #include <iostream>
@@ -136,4 +136,4 @@ pretty_stream<Stream> make_pretty_stream(Stream &s, double epsilon = 1e-9) {
 }
 
 }      //!paal
-#endif /* PRITTY_STREAM_HPP */
+#endif // PAAL_PRETTY_STREAM_HPP

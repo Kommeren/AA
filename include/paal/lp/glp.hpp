@@ -12,8 +12,8 @@
  * @version 2.0
  * @date 2014-05-19
  */
-#ifndef GLP_HPP
-#define GLP_HPP
+#ifndef PAAL_GLP_HPP
+#define PAAL_GLP_HPP
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/lp/constraints.hpp"
@@ -524,4 +524,4 @@ using glp = detail::lp_base<detail::glp_impl>;
 } // lp
 } // paal
 
-#endif /* GLP_HPP */
+#endif // PAAL_GLP_HPP

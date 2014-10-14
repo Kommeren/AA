@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-02-10
  */
-#ifndef ITERATOR_WITH_STOP_CONDITION_HPP
-#define ITERATOR_WITH_STOP_CONDITION_HPP
+#ifndef PAAL_ITERATOR_WITH_STOP_CONDITION_HPP
+#define PAAL_ITERATOR_WITH_STOP_CONDITION_HPP
 
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -168,4 +168,4 @@ make_enditerator_with_stop_condition(Iterator end,
 
 } //!paal
 
-#endif /* ITERATOR_WITH_STOP_CONDITION_HPP */
+#endif // PAAL_ITERATOR_WITH_STOP_CONDITION_HPP

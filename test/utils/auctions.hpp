@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-2-25
  */
-#ifndef TEST_AUCTIONS_UTILS
-#define TEST_AUCTIONS_UTILS
+#ifndef PAAL_AUCTIONS_HPP
+#define PAAL_AUCTIONS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
@@ -94,4 +94,4 @@ bool is_feasible(Auction&& auction, const Assignments& assignments)
    });
 }
 
-#endif /* TEST_AUCTIONS_UTILS */
+#endif // PAAL_AUCTIONS_HPP

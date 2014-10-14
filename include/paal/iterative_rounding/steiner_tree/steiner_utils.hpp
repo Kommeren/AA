@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-08-01
  */
-#ifndef STEINER_UTILS_HPP
-#define STEINER_UTILS_HPP
+#ifndef PAAL_STEINER_UTILS_HPP
+#define PAAL_STEINER_UTILS_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -61,4 +61,4 @@ class steiner_utils {
 } // ir
 } // paal
 
-#endif /* STEINER_UTILS_HPP */
+#endif // PAAL_STEINER_UTILS_HPP

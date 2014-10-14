@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-15
  */
-#ifndef BASIC_METRICS_HPP
-#define BASIC_METRICS_HPP
+#ifndef PAAL_BASIC_METRICS_HPP
+#define PAAL_BASIC_METRICS_HPP
 
 #include "metric_traits.hpp"
 
@@ -166,4 +166,4 @@ class array_metric : public rectangle_array_metric<DistanceTypeParam> {
 };
 }
 }
-#endif /* BASIC_METRICS_HPP */
+#endif // PAAL_BASIC_METRICS_HPP

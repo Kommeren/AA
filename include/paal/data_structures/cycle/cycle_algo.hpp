@@ -13,8 +13,8 @@
  * @date 2013-02-01
  */
 
-#ifndef CYCLE_ALGO
-#define CYCLE_ALGO
+#ifndef PAAL_CYCLE_ALGO_HPP
+#define PAAL_CYCLE_ALGO_HPP
 
 #include "paal/data_structures/cycle/cycle_traits.hpp"
 #include "paal/data_structures/vertex_to_edge_iterator.hpp"
@@ -69,4 +69,4 @@ void print_cycle(const Cycle &cm, Stream &o, const std::string &endl = "\n") {
 
 } //! paal
 
-#endif // CYCLE_ALGO
+#endif // PAAL_CYCLE_ALGO_HPP

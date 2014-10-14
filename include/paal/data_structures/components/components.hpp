@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-16
  */
-#ifndef COMPONENTS_HPP
-#define COMPONENTS_HPP
+#ifndef PAAL_COMPONENTS_HPP
+#define PAAL_COMPONENTS_HPP
 
 #include "types_vector.hpp"
 
@@ -532,4 +532,4 @@ template <typename... ComponentNamesWithDefaults> class components {
 
 } //! data_structures
 } //! paal
-#endif /* COMPONENTS_HPP */
+#endif // PAAL_COMPONENTS_HPP

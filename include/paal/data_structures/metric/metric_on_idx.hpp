@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-14
  */
-#ifndef METRIC_ON_IDX_HPP
-#define METRIC_ON_IDX_HPP
+#ifndef PAAL_METRIC_ON_IDX_HPP
+#define PAAL_METRIC_ON_IDX_HPP
 
 #include "paal/data_structures/bimap_traits.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
@@ -120,4 +120,4 @@ public _metric_traits<metric_on_idx<Metric, Bimap, read_values_tag>,
 
 } //! data_structures
 } //! paal
-#endif /* METRIC_ON_IDX_HPP */
+#endif // PAAL_METRIC_ON_IDX_HPP

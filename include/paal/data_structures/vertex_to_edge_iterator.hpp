@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-20
  */
-#ifndef VERTEX_TO_EDGE_ITERATOR_HPP
-#define VERTEX_TO_EDGE_ITERATOR_HPP
+#ifndef PAAL_VERTEX_TO_EDGE_ITERATOR_HPP
+#define PAAL_VERTEX_TO_EDGE_ITERATOR_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -167,4 +167,4 @@ make_vertex_to_edge_iterator(std::pair<vertex_iterator, vertex_iterator> r) {
 } // data_structures
 } // paal
 
-#endif /* VERTEX_TO_EDGE_ITERATOR_HPP */
+#endif // PAAL_VERTEX_TO_EDGE_ITERATOR_HPP

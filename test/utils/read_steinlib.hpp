@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-15
  */
-#ifndef READ_STEINLIB_HPP
-#define READ_STEINLIB_HPP
+#ifndef PAAL_READ_STEINLIB_HPP
+#define PAAL_READ_STEINLIB_HPP
 
 #include "utils/logger.hpp"
 
@@ -153,4 +153,4 @@ read_steinlib_tests(std::vector<steiner_tree_test_with_metric> &data) {
     }
 }
 }
-#endif /* READ_STEINLIB_HPP */
+#endif // PAAL_READ_STEINLIB_HPP

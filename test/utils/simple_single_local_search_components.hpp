@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-07
  */
-#ifndef SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
-#define SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
+#ifndef PAAL_SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
+#define PAAL_SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP
 
 #include "paal/local_search/local_search.hpp"
 #include <vector>
@@ -47,4 +47,4 @@ typedef paal::local_search::search_components<get_moves, gain, commit>
     search_comps;
 } // anonymous namespace
 
-#endif /* SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP */
+#endif // PAAL_SIMPLE_SINGLE_LOCAL_SEARCH_COMPONENTS_HPP

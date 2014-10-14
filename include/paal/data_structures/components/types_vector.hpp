@@ -20,8 +20,8 @@
  * @version 1.0
  * @date 2013-07-18
  */
-#ifndef TYPES_VECTOR_HPP
-#define TYPES_VECTOR_HPP
+#ifndef PAAL_TYPES_VECTOR_HPP
+#define PAAL_TYPES_VECTOR_HPP
 
 #include <type_traits>
 
@@ -156,4 +156,4 @@ struct replace_at_pos<0, NewType, TypesVector<TypesPrefix, TypesSufix...>> {
 } // data_structures
 } // paal
 
-#endif /* TYPES_VECTOR_HPP */
+#endif // PAAL_TYPES_VECTOR_HPP

@@ -20,8 +20,8 @@
 #include <boost/iterator/transform_iterator.hpp>
 #include <boost/range/iterator_range.hpp>
 
-#ifndef SUBSET_ITERATOR_HPP
-#define SUBSET_ITERATOR_HPP
+#ifndef PAAL_SUBSET_ITERATOR_HPP
+#define PAAL_SUBSET_ITERATOR_HPP
 
 namespace paal {
 namespace data_structures {
@@ -332,4 +332,4 @@ make_subsets_iterator_range(Iterator b, Iterator e, Joiner joiner = Joiner{}) {
 } // data_structures
 } // paal
 
-#endif // SUBSET_ITERATOR_HPP
+#endif // PAAL_SUBSET_ITERATOR_HPP

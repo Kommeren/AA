@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef GRAPH_METRICS_HPP
-#define GRAPH_METRICS_HPP
+#ifndef PAAL_GRAPH_METRICS_HPP
+#define PAAL_GRAPH_METRICS_HPP
 
 #include "basic_metrics.hpp"
 
@@ -141,4 +141,4 @@ struct graph_metric_traits<boost::adjacency_matrix<
 } //!data_structures
 } //!paal
 
-#endif // GRAPH_METRICS_HPP
+#endif // PAAL_GRAPH_METRICS_HPP

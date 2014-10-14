@@ -16,8 +16,8 @@
 /* Data files contains multiple edges
  * only last cost of edges that have same set Vertex) is used
  */
-#ifndef READ_ORLIB_KM_HPP
-#define READ_ORLIB_KM_HPP
+#ifndef PAAL_READ_ORLIB_KM_HPP
+#define PAAL_READ_ORLIB_KM_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -73,4 +73,4 @@ GraphMT read_orlib_KM(std::istream &ist, boost::integer_range<int> &fac,
     return data_structures::graph_metric<graph_t, int>(std::move(g));
 }
 }
-#endif /* READ_ORLIB_FC_HPP */
+#endif // PAAL_READ_ORLIB_KM_HPP

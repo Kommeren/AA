@@ -14,8 +14,8 @@
  * @date 2013-10-07
  */
 
-#ifndef KNAPSACK_GENERAL_HPP
-#define KNAPSACK_GENERAL_HPP
+#ifndef PAAL_KNAPSACK_GREEDY_HPP
+#define PAAL_KNAPSACK_GREEDY_HPP
 
 #include "paal/utils/knapsack_utils.hpp"
 
@@ -117,4 +117,4 @@ struct is_range_const {
 };
 } //! detail
 } //! paal
-#endif /* KNAPSACK_GENERAL_HPP */
+#endif // PAAL_KNAPSACK_GREEDY_HPP

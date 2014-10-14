@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-26
  */
-#ifndef CUSTOM_COMPONENTS_HPP
-#define CUSTOM_COMPONENTS_HPP
+#ifndef PAAL_CUSTOM_COMPONENTS_HPP
+#define PAAL_CUSTOM_COMPONENTS_HPP
 
 #include "paal/utils/functors.hpp"
 
@@ -407,4 +407,4 @@ make_record_solution_commit_adapter(Solution &s, Commit commit, Condition c) {
 } // local_search
 } // paal
 
-#endif /* CUSTOM_COMPONENTS_HPP */
+#endif // PAAL_CUSTOM_COMPONENTS_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-04
  */
-#ifndef KNAPSACK_FPTAS_COMMON_HPP
-#define KNAPSACK_FPTAS_COMMON_HPP
+#ifndef PAAL_KNAPSACK_FPTAS_COMMON_HPP
+#define PAAL_KNAPSACK_FPTAS_COMMON_HPP
 
 #include "paal/dynamic/knapsack/get_bound.hpp"
 
@@ -174,4 +174,4 @@ ReturnType knapsack_general_on_size_fptas_retrieve(double epsilon,
 } // detail
 } // paal
 
-#endif /* KNAPSACK_FPTAS_COMMON_HPP */
+#endif // PAAL_KNAPSACK_FPTAS_COMMON_HPP

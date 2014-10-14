@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-05-10
  */
-#ifndef IR_COMPONENTS_HPP
-#define IR_COMPONENTS_HPP
+#ifndef PAAL_IR_COMPONENTS_HPP
+#define PAAL_IR_COMPONENTS_HPP
 
 
 #include "paal/data_structures/components/components.hpp"
@@ -296,4 +296,4 @@ auto make_IRcomponents(Args &&... args)
 } // ir
 } // paal
 
-#endif /* IR_COMPONENTS_HPP */
+#endif // PAAL_IR_COMPONENTS_HPP

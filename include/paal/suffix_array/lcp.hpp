@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-29
  */
-#ifndef LCP_HPP
-#define LCP_HPP
+#ifndef PAAL_LCP_HPP
+#define PAAL_LCP_HPP
 
 #include <vector>
 
@@ -53,4 +53,4 @@ void lcp(std::vector<int> const &suffix_array, std::vector<int> const &rank,
 }
 } //!paal
 
-#endif /*LCP*/
+#endif // PAAL_LCP_HPP

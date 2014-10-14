@@ -13,8 +13,8 @@
  * @date 2013-02-01
  */
 
-#ifndef TWO_LOCAL_SEARCH_HPP
-#define TWO_LOCAL_SEARCH_HPP
+#ifndef PAAL_2_LOCAL_SEARCH_HPP
+#define PAAL_2_LOCAL_SEARCH_HPP
 
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/local_search.hpp"
@@ -134,4 +134,4 @@ bool tsp_first_improving(Cycle &cycle, components... comps) {
 } // local_search
 } // paal
 
-#endif // TWO_LOCAL_SEARCH_HPP
+#endif // PAAL_2_LOCAL_SEARCH_HPP

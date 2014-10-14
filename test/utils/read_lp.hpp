@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-04-03
  */
-#ifndef READ_LP_HPP
-#define READ_LP_HPP
+#ifndef PAAL_READ_LP_HPP
+#define PAAL_READ_LP_HPP
 
 #include "paal/lp/constraints.hpp"
 
@@ -190,4 +190,4 @@ inline void read_lp(std::istream &is, RowBounds &row_bounds,
     }
 }
 }
-#endif /* READ_LP_HPP */
+#endif // PAAL_READ_LP_HPP

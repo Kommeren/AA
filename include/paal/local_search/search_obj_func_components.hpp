@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-18
  */
-#ifndef SEARCH_OCJ_FUNC_COMPONENTS_HPP
-#define SEARCH_OCJ_FUNC_COMPONENTS_HPP
+#ifndef PAAL_SEARCH_OBJ_FUNC_COMPONENTS_HPP
+#define PAAL_SEARCH_OBJ_FUNC_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/local_search/search_components.hpp"
@@ -66,4 +66,4 @@ auto make_search_componentsObjFun(Args &&... args) {
 
 } //! local_search
 } //! paal
-#endif /* SEARCH_OCJ_FUNC_COMPONENTS_HPP */
+#endif // PAAL_SEARCH_OBJ_FUNC_COMPONENTS_HPP

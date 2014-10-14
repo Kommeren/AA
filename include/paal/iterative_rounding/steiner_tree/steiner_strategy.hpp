@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-01
  */
-#ifndef STEINER_STRATEGY_HPP
-#define STEINER_STRATEGY_HPP
+#ifndef PAAL_STEINER_STRATEGY_HPP
+#define PAAL_STEINER_STRATEGY_HPP
 
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/subset_iterator.hpp"
@@ -347,4 +347,4 @@ public:
 } // ir
 } // paal
 
-#endif /* STEINER_STRATEGY_HPP */
+#endif // PAAL_STEINER_STRATEGY_HPP

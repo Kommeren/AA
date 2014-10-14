@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-02
  */
-#ifndef N_QUEENS_LOCAL_SEARCH_HPP
-#define N_QUEENS_LOCAL_SEARCH_HPP
+#ifndef PAAL_N_QUEENS_LOCAL_SEARCH_HPP
+#define PAAL_N_QUEENS_LOCAL_SEARCH_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -85,4 +85,4 @@ void n_queens_solution_first_improving(NQueensPositionsVector &pos,
 } //!local_search
 } // !paal
 
-#endif /* N_QUEENS_LOCAL_SEARCH_HPP */
+#endif // PAAL_N_QUEENS_LOCAL_SEARCH_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-11-05
  */
-#ifndef KNAPSACK_TAGS_UTILS_HPP
-#define KNAPSACK_TAGS_UTILS_HPP
+#ifndef PAAL_KNAPSACK_TAGS_UTILS_HPP
+#define PAAL_KNAPSACK_TAGS_UTILS_HPP
 
 #include "paal/dynamic/knapsack/knapsack_fptas_common.hpp"
 #include "paal/dynamic/knapsack_unbounded_fptas.hpp"
@@ -126,4 +126,4 @@ detail_knapsack_fptas(double epsilon, Objects &objects,
     return ret;
 }
 
-#endif /* KNAPSACK_TAGS_UTILS_HPP */
+#endif // PAAL_KNAPSACK_TAGS_UTILS_HPP

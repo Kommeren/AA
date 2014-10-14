@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-05
  */
-#ifndef DREYFUS_WAGNER_HPP
-#define DREYFUS_WAGNER_HPP
+#ifndef PAAL_DREYFUS_WAGNER_HPP
+#define PAAL_DREYFUS_WAGNER_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/data_structures/metric/graph_metrics.hpp"
@@ -314,4 +314,4 @@ make_dreyfus_wagner(const Metric &metric, const Terminals &terminals,
 
 } // paal
 
-#endif /* DREYFUS_WAGNER_HPP */
+#endif // PAAL_DREYFUS_WAGNER_HPP

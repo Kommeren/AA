@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-06-10
  */
-#ifndef READ_BOUNDED_DEG_MST_HPP
-#define READ_BOUNDED_DEG_MST_HPP
+#ifndef PAAL_READ_BOUNDED_DEG_MST_HPP
+#define PAAL_READ_BOUNDED_DEG_MST_HPP
 
 #include <boost/graph/graph_traits.hpp>
 
@@ -60,4 +60,4 @@ inline void read_bdmst(std::istream & is, int vertices_num, int edges_num,
     is >> best_cost;
 }
 }
-#endif /* READ_BOUNDED_DEG_MST_HPP */
+#endif // PAAL_READ_BOUNDED_DEG_MST_HPP

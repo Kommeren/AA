@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-06
  */
-#ifndef VORONOI_TRAITS_HPP
-#define VORONOI_TRAITS_HPP
+#ifndef PAAL_VORONOI_TRAITS_HPP
+#define PAAL_VORONOI_TRAITS_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -43,4 +43,4 @@ template <typename V, typename Vertex> struct _voronoi_traits {
 template <typename V> struct voronoi_traits : public _voronoi_traits<V, int> {};
 }
 }
-#endif /* VORONOI_TRAITS_HPP */
+#endif // PAAL_VORONOI_TRAITS_HPP

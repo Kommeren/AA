@@ -13,6 +13,9 @@
  * @date 2013-07-24
  */
 
+#ifndef PAAL_ZELIKOVSKY_11_PER_6_HPP
+#define PAAL_ZELIKOVSKY_11_PER_6_HPP
+
 // hack for clang compilation (hash for boost tuple, boost::1_55)
 #include <boost/config.hpp>
 #undef BOOST_NO_CXX11_HDR_TUPLE
@@ -364,3 +367,5 @@ void steiner_tree_zelikovsky11per6approximation(const Metric &m,
 }
 
 } // paal
+
+#endif // PAAL_ZELIKOVSKY_11_PER_6_HPP

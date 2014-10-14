@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-11-19
  */
-#ifndef SCHEDULING_UTILS
-#define SCHEDULING_UTILS
+#ifndef PAAL_SCHEDULING_HPP
+#define PAAL_SCHEDULING_HPP
 
 #include "utils/logger.hpp"
 
@@ -68,4 +68,4 @@ double get_max_time(const Result &result, GetSpeed getSpeed) {
     return *boost::max_element(machineTime | boost::adaptors::map_values);
 }
 
-#endif /* SCHEDULING_JOBS_UTILS */
+#endif // PAAL_SCHEDULING_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-29
  */
-#ifndef SUFFIX_ARRAY_HPP
-#define SUFFIX_ARRAY_HPP
+#ifndef PAAL_SUFFIX_ARRAY_HPP
+#define PAAL_SUFFIX_ARRAY_HPP
 
 #include "paal/utils/irange.hpp"
 
@@ -232,4 +232,4 @@ void suffix_array(std::vector<Letter> &text, std::vector<int> &SA,
 }
 
 } //!paal
-#endif /*SUFFIX_ARRAY_HPP*/
+#endif // PAAL_SUFFIX_ARRAY_HPP

@@ -13,8 +13,8 @@
  * @date 2013-12-19
  */
 
-#ifndef MULTIWAY_CUT_HPP
-#define MULTIWAY_CUT_HPP
+#ifndef PAAL_MULTIWAY_CUT_HPP
+#define PAAL_MULTIWAY_CUT_HPP
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -294,4 +294,4 @@ auto multiway_cut(const Graph &graph, OutputIterator result,
 }
 
 }      //!paal
-#endif /* MULTIWAY_CUT_HPP */
+#endif // PAAL_MULTIWAY_CUT_HPP

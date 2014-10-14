@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-08-01
  */
-#ifndef STEINER_COMPONENT_HPP
-#define STEINER_COMPONENT_HPP
+#ifndef PAAL_STEINER_COMPONENT_HPP
+#define PAAL_STEINER_COMPONENT_HPP
 
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/steiner_tree/dreyfus_wagner.hpp"
@@ -136,4 +136,4 @@ public:
 } // ir
 } // paal
 
-#endif /* STEINER_COMPONENT_HPP */
+#endif // PAAL_STEINER_COMPONENT_HPP

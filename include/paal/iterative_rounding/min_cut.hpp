@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-03-05
  */
-#ifndef MIN_CUT_HPP
-#define MIN_CUT_HPP
+#ifndef PAAL_MIN_CUT_HPP
+#define PAAL_MIN_CUT_HPP
 
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/boykov_kolmogorov_max_flow.hpp>
@@ -172,4 +172,4 @@ private:
 
 } //! ir
 } //! paal
-#endif /* MIN_CUT_HPP */
+#endif // PAAL_MIN_CUT_HPP

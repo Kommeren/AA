@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-15
  */
-#ifndef TWO_LOCAL_SEARCH_LOGLNGER_HPP
-#define TWO_LOCAL_SEARCH_LOGLNGER_HPP
+#ifndef PAAL_2_LOCAL_SEARCH_LOGGER_HPP
+#define PAAL_2_LOCAL_SEARCH_LOGGER_HPP
 
 #include "utils/logger.hpp"
 
@@ -52,4 +52,4 @@ two_ls_logger<Matrix> make_two_ls_logger(Matrix &mtx, int actionsPerLog = 1) {
 
 } //! utils
 } //! paal
-#endif /* TWO_LOCAL_SEARCH_LOGLNGER_HPP */
+#endif // PAAL_2_LOCAL_SEARCH_LOGGER_HPP

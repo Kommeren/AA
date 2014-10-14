@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-10-01
  */
-#ifndef KNAPSACK_FPTAS_HPP
-#define KNAPSACK_FPTAS_HPP
+#ifndef PAAL_KNAPSACK_UNBOUNDED_FPTAS_HPP
+#define PAAL_KNAPSACK_UNBOUNDED_FPTAS_HPP
 
 #include "paal/dynamic/knapsack_unbounded.hpp"
 #include "paal/dynamic/knapsack/get_bound.hpp"
@@ -53,4 +53,4 @@ knapsack_unbounded_on_size_fptas(
 
 } //! paal
 
-#endif /* KNAPSACK_FPTAS_HPP */
+#endif // PAAL_KNAPSACK_UNBOUNDED_FPTAS_HPP

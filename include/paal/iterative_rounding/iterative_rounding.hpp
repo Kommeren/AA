@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-05-06
  */
-#ifndef ITERATIVE_ROUNDING_HPP
-#define ITERATIVE_ROUNDING_HPP
+#ifndef PAAL_ITERATIVE_ROUNDING_HPP
+#define PAAL_ITERATIVE_ROUNDING_HPP
 
 
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -329,4 +329,4 @@ IRResult solve_dependent_iterative_rounding(Problem & problem, IRcomponents comp
 } // ir
 } // paal
 
-#endif // ITERATIVE_ROUNDING_HPP
+#endif // PAAL_ITERATIVE_ROUNDING_HPP

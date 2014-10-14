@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-15
  */
-#ifndef FL_ALGO_HPP
-#define FL_ALGO_HPP
+#ifndef PAAL_FL_ALGO_HPP
+#define PAAL_FL_ALGO_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/functors.hpp"
@@ -106,4 +106,4 @@ get_km_cost(const Metric &m, const FLSolution &fls) {
 
 } //! simple_algo
 } //! paal
-#endif /* FL_ALGO_HPP */
+#endif // PAAL_FL_ALGO_HPP

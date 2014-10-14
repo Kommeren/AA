@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-01
  */
-#ifndef VORONOI_HPP
-#define VORONOI_HPP
+#ifndef PAAL_VORONOI_HPP
+#define PAAL_VORONOI_HPP
 
 #include "voronoi_traits.hpp"
 
@@ -303,4 +303,4 @@ struct voronoi_traits<voronoi<Metric>> : public _voronoi_traits<
 };
 };
 
-#endif // VORONOI_HPP
+#endif // PAAL_VORONOI_HPP

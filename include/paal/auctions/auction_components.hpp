@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-07
  */
-#ifndef AUCTION_COMPONENTS_HPP
-#define AUCTION_COMPONENTS_HPP
+#ifndef PAAL_AUCTION_COMPONENTS_HPP
+#define PAAL_AUCTION_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/data_structures/components/components_join.hpp"
@@ -134,4 +134,4 @@ namespace auctions {
 
 } //!auctions
 } //!paal
-#endif // AUCTION_COMPONENTS_HPP
+#endif // PAAL_AUCTION_COMPONENTS_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-01
  */
-#ifndef STEINER_COMPONENTS_HPP
-#define STEINER_COMPONENTS_HPP
+#ifndef PAAL_STEINER_COMPONENTS_HPP
+#define PAAL_STEINER_COMPONENTS_HPP
 
 #include "paal/iterative_rounding/steiner_tree/steiner_component.hpp"
 
@@ -81,4 +81,4 @@ template <typename Vertex, typename Dist> class steiner_components {
 } // ir
 } // paal
 
-#endif /* STEINER_COMPONENTS_HPP */
+#endif // PAAL_STEINER_COMPONENTS_HPP

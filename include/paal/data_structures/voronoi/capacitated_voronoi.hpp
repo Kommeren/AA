@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-20
  */
-#ifndef CAPACITATED_VORONOI_HPP
-#define CAPACITATED_VORONOI_HPP
+#ifndef PAAL_CAPACITATED_VORONOI_HPP
+#define PAAL_CAPACITATED_VORONOI_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
 #include "paal/utils/irange.hpp"
@@ -543,4 +543,4 @@ class capacitated_voronoi {
 
 } //! data_structures
 } //! paal
-#endif /* CAPACITATED_VORONOI_HPP */
+#endif // PAAL_CAPACITATED_VORONOI_HPP

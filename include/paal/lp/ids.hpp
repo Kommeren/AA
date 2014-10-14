@@ -13,8 +13,8 @@
  * @date 2013-07-24
  */
 
-#ifndef IDS_HPP
-#define IDS_HPP
+#ifndef PAAL_IDS_HPP
+#define PAAL_IDS_HPP
 
 #include <functional>
 
@@ -86,4 +86,4 @@ template <> struct hash<paal::lp::col_id> : public hash<paal::lp::Id> {};
 
 } // std
 
-#endif /* IDS_HPP */
+#endif // PAAL_IDS_HPP

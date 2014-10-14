@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-04-29
  */
-#ifndef INFINITY_HPP
-#define INFINITY_HPP
+#ifndef PAAL_INFINITY_HPP
+#define PAAL_INFINITY_HPP
 
 namespace paal {
 
@@ -113,4 +113,4 @@ using plus_infinity = detail::infinity<true>;
 
 } //!paal
 
-#endif /* INFINITY_HPP */
+#endif // PAAL_INFINITY_HPP

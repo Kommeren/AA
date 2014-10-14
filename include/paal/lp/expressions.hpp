@@ -13,8 +13,8 @@
  * @date 2014-04-02
  */
 
-#ifndef EXPRESSIONS_HPP
-#define EXPRESSIONS_HPP
+#ifndef PAAL_EXPRESSIONS_HPP
+#define PAAL_EXPRESSIONS_HPP
 
 #include "paal/lp/ids.hpp"
 #include "paal/utils/floating.hpp"
@@ -179,4 +179,4 @@ inline linear_expression operator-(const linear_expression &expr) {
 } // lp
 } // paal
 
-#endif /* EXPRESSIONS_HPP */
+#endif // PAAL_EXPRESSIONS_HPP

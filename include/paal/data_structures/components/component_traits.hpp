@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-22
  */
-#ifndef COMPONENT_TRAITS_HPP
-#define COMPONENT_TRAITS_HPP
+#ifndef PAAL_COMPONENT_TRAITS_HPP
+#define PAAL_COMPONENT_TRAITS_HPP
 #include "components.hpp"
 
 namespace paal {
@@ -28,4 +28,4 @@ struct component_traits<detail::components<Names, Types>> {
 };
 }
 }
-#endif /* COMPONENT_TRAITS_HPP */
+#endif // PAAL_COMPONENT_TRAITS_HPP

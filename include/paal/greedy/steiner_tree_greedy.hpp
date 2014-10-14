@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-11-27
  */
-#ifndef STEINER_TREE_GREEDY_HPP
-#define STEINER_TREE_GREEDY_HPP
+#ifndef PAAL_STEINER_TREE_GREEDY_HPP
+#define PAAL_STEINER_TREE_GREEDY_HPP
 
 #include <paal/utils/functors.hpp>
 
@@ -233,4 +233,4 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out) {
 
 } // paal
 
-#endif /* STEINER_TREE_GREEDY_HPP */
+#endif // PAAL_STEINER_TREE_GREEDY_HPP

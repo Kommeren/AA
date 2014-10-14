@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-06-24
  */
-#ifndef STEINER_NETWORK_HPP
-#define STEINER_NETWORK_HPP
+#ifndef PAAL_STEINER_NETWORK_HPP
+#define PAAL_STEINER_NETWORK_HPP
 
 
 #include "paal/iterative_rounding/ir_components.hpp"
@@ -526,4 +526,4 @@ IRResult steiner_network_iterative_rounding(const Graph &g,
 
 } //! ir
 } //! paal
-#endif /* STEINER_NETWORK_HPP */
+#endif // PAAL_STEINER_NETWORK_HPP

@@ -5,8 +5,8 @@
  * @version 1.0
  * @date 2014-10-3
  */
-#ifndef IRANGE_HPP
-#define IRANGE_HPP
+#ifndef PAAL_IRANGE_HPP
+#define PAAL_IRANGE_HPP
 
 #include <boost/range/irange.hpp>
 
@@ -24,4 +24,4 @@ auto irange(T end) {
 
 }
 
-#endif /* IRANGE_HPP */
+#endif // PAAL_IRANGE_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-08
  */
-#ifndef SINGLE_MINDED_AUCTIONS_HPP
-#define SINGLE_MINDED_AUCTIONS_HPP
+#ifndef PAAL_SINGLE_MINDED_AUCTIONS_HPP
+#define PAAL_SINGLE_MINDED_AUCTIONS_HPP
 
 #include "paal/auctions/xor_bids.hpp"
 #include "paal/utils/functors.hpp"
@@ -155,4 +155,4 @@ namespace auctions {
 
 } //!auctions
 } //!paal
-#endif /* SINGLE_MINDED_AUCTIONS_HPP */
+#endif // PAAL_SINGLE_MINDED_AUCTIONS_HPP

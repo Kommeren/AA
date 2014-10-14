@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-28
  */
-#ifndef CYCLE_CONCEPT_HPP
-#define CYCLE_CONCEPT_HPP
+#ifndef PAAL_CYCLE_CONCEPT_HPP
+#define PAAL_CYCLE_CONCEPT_HPP
 
 #include "paal/data_structures/cycle/cycle_traits.hpp"
 
@@ -41,4 +41,4 @@ template <typename X> class Cycle {
 }
 }
 
-#endif /* CYCLE_CONCEPT_HPP */
+#endif // PAAL_CYCLE_CONCEPT_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-1-7
  */
-#ifndef WINNER_DETERMINATION_IN_MUCAS
-#define WINNER_DETERMINATION_IN_MUCAS
+#ifndef PAAL_WINNER_DETERMINATION_IN_MULTI_UNIT_caS_HPP
+#define PAAL_WINNER_DETERMINATION_IN_MULTI_UNIT_caS_HPP
 
 #include "paal/auctions/auction_traits.hpp"
 #include "paal/auctions/auction_utils.hpp"
@@ -228,4 +228,4 @@ void determine_winners_in_gamma_oracle_auction(
 }//!auctions
 }//!paal
 
-#endif /* WINNER_DETERMINATION_IN_MUCAS */
+#endif // PAAL_WINNER_DETERMINATION_IN_MULTI_UNIT_caS_HPP

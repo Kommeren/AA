@@ -15,7 +15,7 @@
 
 #include "paal/auctions/winner_determination_in_multi_unit_CAs/winner_determination_in_multi_unit_CAs.hpp"
 #include "utils/auctions.hpp"
-#include "utils/winner_determination_in_multi_unit_CAs.hpp"
+#include "utils/test_winner_determination_in_multi_unit_CAs.hpp"
 
 #include <boost/test/unit_test.hpp>
 

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-26
  */
-#ifndef CYCLE_START_FROM_LAST_CHANGE_HPP
-#define CYCLE_START_FROM_LAST_CHANGE_HPP
+#ifndef PAAL_CYCLE_START_FROM_LAST_CHANGE_HPP
+#define PAAL_CYCLE_START_FROM_LAST_CHANGE_HPP
 
 #include "cycle_traits.hpp"
 
@@ -95,4 +95,4 @@ template <typename Cycle> class cycle_start_from_last_change {
 }
 }
 
-#endif /* CYCLE_START_FROM_LAST_CHANGE_HPP */
+#endif // PAAL_CYCLE_START_FROM_LAST_CHANGE_HPP

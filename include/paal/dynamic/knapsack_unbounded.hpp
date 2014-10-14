@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-20
  */
-#ifndef KNAPSACK_HPP
-#define KNAPSACK_HPP
+#ifndef PAAL_KNAPSACK_UNBOUNDED_HPP
+#define PAAL_KNAPSACK_UNBOUNDED_HPP
 
 #include "paal/dynamic/knapsack/fill_knapsack_dynamic_table.hpp"
 #include "paal/dynamic/knapsack/get_bound.hpp"
@@ -180,4 +180,4 @@ knapsack_unbounded(Objects && objects,
 
 } // paal
 
-#endif /* KNAPSACK_HPP */
+#endif // PAAL_KNAPSACK_UNBOUNDED_HPP

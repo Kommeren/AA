@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2013-06-24
  */
-#ifndef STEINER_NETWORK_ORACLE_HPP
-#define STEINER_NETWORK_ORACLE_HPP
+#ifndef PAAL_STEINER_NETWORK_ORACLE_HPP
+#define PAAL_STEINER_NETWORK_ORACLE_HPP
 
 #include "paal/iterative_rounding/min_cut.hpp"
 
@@ -178,4 +178,4 @@ class steiner_network_violation_checker {
 
 } //! ir
 } //! paal
-#endif /* STEINER_NETWORK_ORACLE_HPP */
+#endif // PAAL_STEINER_NETWORK_ORACLE_HPP

@@ -16,7 +16,7 @@
 #include "paal/utils/functors.hpp"
 #include "utils/logger.hpp"
 #include "utils/parse_file.hpp"
-#include "utils/winner_determination_in_multi_unit_CAs.hpp"
+#include "utils/test_winner_determination_in_multi_unit_CAs.hpp"
 #include "paal/utils/irange.hpp"
 
 #include <boost/test/unit_test.hpp>

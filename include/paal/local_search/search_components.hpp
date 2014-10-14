@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-18
  */
-#ifndef SEARCH_COMPONENTS_HPP
-#define SEARCH_COMPONENTS_HPP
+#ifndef PAAL_SEARCH_COMPONENTS_HPP
+#define PAAL_SEARCH_COMPONENTS_HPP
 
 #include "paal/data_structures/components/components.hpp"
 #include "paal/utils/functors.hpp"
@@ -70,4 +70,4 @@ auto make_search_components(Args &&... args) {
 
 } //! local_search
 } //! paal
-#endif /* SEARCH_COMPONENTS_HPP */
+#endif // PAAL_SEARCH_COMPONENTS_HPP

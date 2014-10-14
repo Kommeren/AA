@@ -13,8 +13,8 @@
  * @version 1.0
  * @date 2014-01-29
  */
-#ifndef TEST_RESULT_CHECK_HPP
-#define TEST_RESULT_CHECK_HPP
+#ifndef PAAL_TEST_RESULT_CHECK_HPP
+#define PAAL_TEST_RESULT_CHECK_HPP
 
 #include <boost/test/unit_test.hpp>
 
@@ -74,4 +74,4 @@ void check_result(
     BOOST_CHECK(comp(optimal, result + eps) || comp(optimal, result - eps));
 };
 
-#endif /* TEST_RESULT_CHECK_HPP */
+#endif // PAAL_TEST_RESULT_CHECK_HPP

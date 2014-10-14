@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-03-24
  */
-#ifndef AUCTION_TRAITS_HPP
-#define AUCTION_TRAITS_HPP
+#ifndef PAAL_AUCTION_TRAITS_HPP
+#define PAAL_AUCTION_TRAITS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/data_structures/fraction.hpp"
@@ -88,4 +88,4 @@ struct gamma_oracle_auction_traits: auction_traits<GammaOracleAuctionComponents>
 
 } //!auctions
 } //!paal
-#endif /* AUCTION_TRAITS_HPP */
+#endif // PAAL_AUCTION_TRAITS_HPP

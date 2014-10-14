@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-11
  */
-#ifndef COLLECTION_STARTS_FROM_LAST_CHANGE_HPP
-#define COLLECTION_STARTS_FROM_LAST_CHANGE_HPP
+#ifndef PAAL_COLLECTION_STARTS_FROM_LAST_CHANGE_HPP
+#define PAAL_COLLECTION_STARTS_FROM_LAST_CHANGE_HPP
 
 #include <boost/range/join.hpp>
 
@@ -106,4 +106,4 @@ class collection_starts_from_last_change {
 }
 }
 
-#endif /* COLLECTION_STARTS_FROM_LAST_CHANGE_HPP */
+#endif // PAAL_COLLECTION_STARTS_FROM_LAST_CHANGE_HPP

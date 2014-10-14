@@ -13,6 +13,9 @@
  * @date 2013-02-01
  */
 
+#ifndef PAAL_OBJECT_WITH_COPY_HPP
+#define PAAL_OBJECT_WITH_COPY_HPP
+
 namespace paal {
 namespace data_structures {
 
@@ -109,3 +112,5 @@ template <typename T> class object_with_copy {
 
 } // data_structures
 } // paal
+
+#endif // PAAL_OBJECT_WITH_COPY_HPP

@@ -6,14 +6,14 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 /**
- * @file winner_determination_in_multi_unit_CAs.hpp
+ * @file test_winner_determination_in_multi_unit_CAs.hpp
  * @brief
  * @author Robert Rosolek
  * @version 1.0
  * @date 2014-3-24
  */
-#ifndef WINNER_DETERMINATION_IN_MUCAS_UTILS
-#define WINNER_DETERMINATION_IN_MUCAS_UTILS
+#ifndef PAAL_TEST_WINNER_DETERMINATION_IN_MULTI_UNIT_CAS_HPP
+#define PAAL_TEST_WINNER_DETERMINATION_IN_MULTI_UNIT_CAS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
@@ -137,4 +137,4 @@ void check_determine_winners_in_gamma_oracle(
    );
 }
 
-#endif /* WINNER_DETERMINATION_IN_MUCAS_UTILS */
+#endif // PAAL_TEST_WINNER_DETERMINATION_IN_MULTI_UNIT_CAS_HPP

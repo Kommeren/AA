@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-22
  */
-#ifndef CONTRACT_BGL_ADJACENCY_MATRIX_HPP
-#define CONTRACT_BGL_ADJACENCY_MATRIX_HPP
+#ifndef PAAL_CONTRACT_BGL_ADJACENCY_MATRIX_HPP
+#define PAAL_CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -48,4 +48,4 @@ void contract(boost::adjacency_matrix<GraphArgs...> &amatrix,
 }
 }
 }
-#endif /* CONTRACT_BGL_ADJACENCY_MATRIX_HPP */
+#endif // PAAL_CONTRACT_BGL_ADJACENCY_MATRIX_HPP

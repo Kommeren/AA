@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-15
  */
-#ifndef READ_ORLIB_FC_HPP
-#define READ_ORLIB_FC_HPP
+#ifndef PAAL_READ_ORLIB_FL_HPP
+#define PAAL_READ_ORLIB_FL_HPP
 
 #include "utils/logger.hpp"
 
@@ -90,4 +90,4 @@ read_orlib_FL(std::istream &ist, std::vector<long long> &facCosts,
     return m;
 }
 }
-#endif /* READ_ORLIB_FC_HPP */
+#endif // PAAL_READ_ORLIB_FL_HPP

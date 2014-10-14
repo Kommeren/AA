@@ -13,8 +13,8 @@
  * @date 2014-06-12
  */
 
-#ifndef PRINT_COLLECTION_HPP
-#define PRINT_COLLECTION_HPP
+#ifndef PAAL_PRINT_COLLECTION_HPP
+#define PAAL_PRINT_COLLECTION_HPP
 
 #include <boost/range/empty.hpp>
 #include <boost/range.hpp>
@@ -45,4 +45,4 @@ void print_collection(Stream &o, Range &&r, const std::string &del) {
 
 } //!paal
 
-#endif /* PRINT_COLLECTION_HPP */
+#endif // PAAL_PRINT_COLLECTION_HPP

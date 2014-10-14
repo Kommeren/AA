@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-07-05
  */
-#ifndef PRUNE_RESTRICTIONS_TO_TREE_HPP
-#define PRUNE_RESTRICTIONS_TO_TREE_HPP
+#ifndef PAAL_PRUNE_RESTRICTIONS_TO_TREE_HPP
+#define PAAL_PRUNE_RESTRICTIONS_TO_TREE_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
@@ -65,4 +65,4 @@ RestrictionsVector prune_restrictions_to_tree(Restrictions res, int N) {
 }
 } //! paal
 
-#endif /* PRUNE_RESTRICTIONS_TO_TREE_HPP */
+#endif // PAAL_PRUNE_RESTRICTIONS_TO_TREE_HPP

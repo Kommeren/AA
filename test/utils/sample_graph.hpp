@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-04
  */
-#ifndef SAMPLE_GRAPH_HPP
-#define SAMPLE_GRAPH_HPP
+#ifndef PAAL_SAMPLE_GRAPH_HPP
+#define PAAL_SAMPLE_GRAPH_HPP
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/data_structures/metric/euclidean_metric.hpp"
@@ -260,4 +260,4 @@ struct sample_graphs_metrics {
     }
 };
 
-#endif // SAMPLE_GRAPH_HPP
+#endif // PAAL_SAMPLE_GRAPH_HPP

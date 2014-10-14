@@ -13,6 +13,9 @@
  * @date 2013-02-01
  */
 
+#ifndef PAAL_LOCAL_SEARCH_CONCEPTS_HPP
+#define PAAL_LOCAL_SEARCH_CONCEPTS_HPP
+
 #include "paal/local_search/search_components.hpp"
 #include "paal/local_search/search_traits.hpp"
 
@@ -76,3 +79,5 @@ template <typename X, typename Solution> class search_components {
 } // concepts
 } // local_search
 } // paal
+
+#endif // PAAL_LOCAL_SEARCH_CONCEPTS_HPP

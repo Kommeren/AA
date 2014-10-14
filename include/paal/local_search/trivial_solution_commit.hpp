@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-02-11
  */
-#ifndef TRIVIAL_COMMIT_HPP
-#define TRIVIAL_COMMIT_HPP
+#ifndef PAAL_TRIVIAL_SOLUTION_COMMIT_HPP
+#define PAAL_TRIVIAL_SOLUTION_COMMIT_HPP
 
 /**
  * @brief Used in case when update is actually the new solution
@@ -32,4 +32,4 @@ struct trivial_commit {
         return true;
     }
 };
-#endif /* TRIVIAL_COMMIT_HPP */
+#endif // PAAL_TRIVIAL_SOLUTION_COMMIT_HPP

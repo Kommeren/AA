@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-03-08
  */
-#ifndef K_MEDIAN_SOLUTION_HPP
-#define K_MEDIAN_SOLUTION_HPP
+#ifndef PAAL_K_MEDIAN_SOLUTION_HPP
+#define PAAL_K_MEDIAN_SOLUTION_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/data_structures/facility_location/facility_location_solution.hpp"
@@ -76,4 +76,4 @@ class facility_location_solution_traits<
 
 } // paal
 
-#endif /* K_MEDIAN_SOLUTION_HPP */
+#endif // PAAL_K_MEDIAN_SOLUTION_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-06-04
  */
-#ifndef LP_ROW_GENERATION_HPP
-#define LP_ROW_GENERATION_HPP
+#ifndef PAAL_LP_ROW_GENERATION_HPP
+#define PAAL_LP_ROW_GENERATION_HPP
 
 #include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
@@ -90,4 +90,4 @@ class row_generation_resolve_lp {
 } // lp
 } // paal
 
-#endif /* LP_ROW_GENERATION_HPP */
+#endif // PAAL_LP_ROW_GENERATION_HPP

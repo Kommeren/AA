@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-4-10
  */
-#ifndef AUCTIONS_UTILS
-#define AUCTIONS_UTILS
+#ifndef PAAL_AUCTION_UTILS_HPP
+#define PAAL_AUCTION_UTILS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
@@ -79,4 +79,4 @@ get_minimum_copies_num(Auction&& auction)
 
 } //!auctions
 } //!paal
-#endif /* AUCTIONS_UTILS */
+#endif // PAAL_AUCTION_UTILS_HPP

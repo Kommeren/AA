@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-08-29
  */
-#ifndef SHORTEST_SUPERSTRING_HPP
-#define SHORTEST_SUPERSTRING_HPP
+#ifndef PAAL_SHORTEST_SUPERSTRING_HPP
+#define PAAL_SHORTEST_SUPERSTRING_HPP
 
 
 #include "paal/suffix_array/lcp.hpp"
@@ -239,4 +239,4 @@ auto shortestSuperstring(const Words &words)->decltype(
 
 }      //!greedy
 }      //!paal
-#endif /*SHORTEST_SUPERSTRING_HPP*/
+#endif // PAAL_SHORTEST_SUPERSTRING_HPP

@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-01-21
  */
-#ifndef XOR_BIDS_HPP
-#define XOR_BIDS_HPP
+#ifndef PAAL_XOR_BIDS_HPP
+#define PAAL_XOR_BIDS_HPP
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/data_structures/fraction.hpp"
@@ -311,4 +311,4 @@ namespace auctions {
 
 } //!auctions
 } //!paal
-#endif /* XOR_BIDS_HPP */
+#endif // PAAL_XOR_BIDS_HPP

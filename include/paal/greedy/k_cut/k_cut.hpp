@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2013-09-25
  */
-#ifndef K_CUT_HPP
-#define K_CUT_HPP
+#ifndef PAAL_K_CUT_HPP
+#define PAAL_K_CUT_HPP
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
@@ -204,4 +204,4 @@ auto k_cut(const InGraph& graph, unsigned int number_of_parts, OutputIterator re
 } //!greedy
 } //!paal
 
-#endif /* K_CUT_HPP */
+#endif // PAAL_K_CUT_HPP

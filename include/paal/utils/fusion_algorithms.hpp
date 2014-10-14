@@ -12,8 +12,8 @@
  * @version 1.0
  * @date 2014-02-26
  */
-#ifndef STATIC_LAZY_JOIN_HPP
-#define STATIC_LAZY_JOIN_HPP
+#ifndef PAAL_FUSION_ALGORITHMS_HPP
+#define PAAL_FUSION_ALGORITHMS_HPP
 
 #include "paal/utils/type_functions.hpp"
 
@@ -148,4 +148,4 @@ class Satisfy {
 } //!data_structures
 } //!paal
 
-#endif /* STATIC_LAZY_JOIN_HPP */
+#endif // PAAL_FUSION_ALGORITHMS_HPP

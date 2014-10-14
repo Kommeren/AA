@@ -13,8 +13,8 @@
  * @date 2013-02-01
  */
 
-#ifndef BOOST_FUNCTORS_HPP
-#define BOOST_FUNCTORS_HPP
+#ifndef PAAL_FUNCTORS_HPP
+#define PAAL_FUNCTORS_HPP
 
 #define BOOST_RESULT_OF_USE_DECLTYPE
 
@@ -896,4 +896,4 @@ T accumulate_functor(const Range& rng, T init, Functor f, BinaryOperation bin_op
 
 } //! utils
 } //! paal
-#endif /* BOOST_FUNCTORS_HPP */
+#endif // PAAL_FUNCTORS_HPP
