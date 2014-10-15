@@ -12,11 +12,22 @@
 
 namespace paal {
 
+/**
+ * @brief irange
+ * @tparam T
+ * @param begin
+ * @param end
+ */
 template <typename T>
 auto irange(T begin, T end) {
     return boost::irange(begin, end);
 }
 
+/**
+ * @brief irange
+ * @tparam T
+ * @param end
+ */
 template <typename T>
 auto irange(T end) {
     return irange(T{}, end);

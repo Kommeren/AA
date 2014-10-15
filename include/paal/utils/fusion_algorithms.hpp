@@ -26,7 +26,7 @@ namespace data_structures {
  * @brief class for polymorphic join on boost fusion sequence
  */
 class polymorfic_fold {
-
+    ///Fold
     struct Fold {
         template <typename Functor, typename IterEnd,
                   typename AccumulatorFunctor, typename AccumulatorData>
@@ -78,13 +78,9 @@ class polymorfic_fold {
      *
      * @return
      */
-    template <typename Functor, typename AccumulatorFunctor,
-              typename AccumulatorData, typename Sequence>
+    template <typename Functor, typename AccumulatorFunctor, typename AccumulatorData, typename Sequence>
     auto operator()(Functor f, AccumulatorFunctor accumulatorFunctor,
-                    AccumulatorData accumulatorData, Sequence &seq) const
-        -> decltype(Fold {}(f, accumulatorFunctor, accumulatorData,
-                            boost::fusion::begin(seq),
-                            boost::fusion::end(seq))) {
+                    AccumulatorData accumulatorData, Sequence &seq) const{
         return Fold {}
         (f, accumulatorFunctor, accumulatorData, boost::fusion::begin(seq),
          boost::fusion::end(seq));

@@ -51,7 +51,8 @@ with retrieving solution whereas the second one without this procedure.
 Although retrieving solution does not increase
 the overall complexity, it is a costly procedure.
 
-\section Complexity The algorithms works in \f$O(min(Capacity, Opt)
+\section Complexity
+The algorithms works in \f$ O(min(Capacity, Opt)
 * NumberOfObjects)\f$ time and in \f$O(min(Capacity, Opt))\f$ memory, where Opt
 is the optimal value of the knapsack.
 

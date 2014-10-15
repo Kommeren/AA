@@ -103,8 +103,7 @@ using template aliasing (this is the preferred way):
 
 <pre>
     //inside library:
-    template <typename... Args> using DoStuffComponents = Components<Init,
-    Start, Stop>::type<Args...>;
+    template <typename... Args> using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
 
     //user:
     DoStuffComponents<InitImpl, BeginImpl, StopImpl> doStuffComponents;
@@ -140,8 +139,7 @@ There are several ways of constructing components:
 <li> By providing any object and a CopyTag. This tag indicates, that
     the passed object has  get<Name> member functions for some Names:
 <pre>
-    template <typename... Args> using DoStuffComponents = Components<Init,
-    Start, Stop>::type<Args...>;
+    template <typename... Args> using DoStuffComponents = Components<Init, Start, Stop>::type<Args...>;
     typedef DoStuffComponents<int, int, int> Big;
 
     template <typename... Args>

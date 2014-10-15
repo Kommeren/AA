@@ -318,11 +318,11 @@ struct simulated_annealing_gain_adaptor {
                 return m_delta > other.m_delta;
             }
         }
-
+        ///chosen
         bool chosen() const {
             return m_is_chosen;
         }
-
+        ///delta
         bool delta() const {
             return m_delta;
         }
