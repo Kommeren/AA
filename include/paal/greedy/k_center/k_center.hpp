@@ -16,6 +16,8 @@
 #define PAAL_K_CENTER_HPP
 
 #include "paal/data_structures/metric/metric_traits.hpp"
+#include "paal/utils/assign_updates.hpp"
+
 #include <vector>
 
 namespace paal {
@@ -37,10 +39,10 @@ namespace greedy {
  * @tparam ItemIterator
  */
 template <typename Metric, class OutputIterator, typename ItemIterator>
-auto kCenter(const Metric &metric, unsigned int numberOfClusters,
+typename data_structures::metric_traits<Metric>::DistanceType
+kCenter(const Metric &metric, unsigned int numberOfClusters,
              const ItemIterator iBegin, const ItemIterator iEnd,
-             OutputIterator result)
-    ->typename data_structures::metric_traits<Metric>::DistanceType {
+             OutputIterator result) {
 
     typedef typename data_structures::metric_traits<Metric>::DistanceType Dist;
     std::vector<Dist> distance_from_closest_center(
@@ -55,7 +57,7 @@ auto kCenter(const Metric &metric, unsigned int numberOfClusters,
         radius = std::numeric_limits<Dist>::min();
         auto it = distance_from_closest_center.begin();
         for (auto i = iBegin; i != iEnd; ++i) {
-            *it = std::min(*it, metric(*last_centre, *i));
+            assign_min(*it, metric(*last_centre, *i));
             if (*it > radius) {
                 farthest_centre = i;
                 radius = *it;

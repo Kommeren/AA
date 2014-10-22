@@ -56,8 +56,8 @@ int rand_cost() {
 }
 
 void generate_restrictions(RestrictionVec & res, int max_res) {
-    for (int i : boost::irange(0, int(res.size()))) {
-        for (int j : boost::irange(i+1, int(res.size()))) {
+    for (int i : paal::irange(res.size())) {
+        for (int j : paal::irange(i+1, int(res.size()))) {
             res[i][j] = res[j][i] = rand(2, max_res);
         }
     }
@@ -78,7 +78,7 @@ bool non_zero(const RestrictionVec &res) {
 }
 
 void dec(std::vector<int> &vec) {
-    for (auto &v : vec) v = std::max(0, v - 1);
+    for (auto &v : vec) v = std::max(v - 1, 0);
 }
 
 void add_edge_to_graph(Edges & edges, int u, int v, int & edge_num) {

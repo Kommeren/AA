@@ -18,9 +18,11 @@
 #include "utils/logger.hpp"
 
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/range/adaptor/map.hpp>
 #include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/algorithm/sort.hpp>
 #include <boost/test/unit_test.hpp>
 #include <boost/functional/hash.hpp>
 
@@ -36,7 +38,7 @@ std::vector<long long> generate_job_loads(Machines machines,
     for (const auto machine : machines) {
         for (Time left = time; left > 0;) {
             Time jobTime = rand() % ((long long)(time / minJobsOnMachine));
-            jobTime = std::min(jobTime, left);
+            paal::assign_min(jobTime, left);
             loads.push_back(jobTime * getSpeed(machine));
             left -= jobTime;
         }
@@ -50,8 +52,8 @@ void check_jobs(Result result, std::vector<Job> jobs) {
     for (const auto &it : result) {
         gotJobs.push_back(*it.second);
     }
-    std::sort(gotJobs.begin(), gotJobs.end());
-    std::sort(jobs.begin(), jobs.end());
+    boost::sort(gotJobs);
+    boost::sort(jobs);
     BOOST_CHECK(jobs == gotJobs);
 }
 

@@ -17,6 +17,7 @@
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/iterator/counting_iterator.hpp>
 
@@ -78,8 +79,7 @@ auto scheduling_jobs_with_deadlines_on_a_single_machine(
         active_jobs_iters.pop();
         Time start_time = std::max(start_idle, get_release_date(*job_iter));
         start_idle = start_time + get_time(*job_iter);
-        longest_delay =
-            std::max(longest_delay, start_idle - get_due_date(*job_iter));
+        assign_max(longest_delay, start_idle - get_due_date(*job_iter));
         *result = std::make_pair(job_iter, start_time);
         ++result;
     };

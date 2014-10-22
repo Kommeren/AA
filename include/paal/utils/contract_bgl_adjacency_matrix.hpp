@@ -16,6 +16,7 @@
 #define PAAL_CONTRACT_BGL_ADJACENCY_MATRIX_HPP
 
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/range/as_array.hpp>
@@ -35,8 +36,7 @@ void contract(boost::adjacency_matrix<GraphArgs...> &amatrix,
         MEdge f = edge(w, target(e, amatrix), amatrix).first;
         auto &we = weight_map[e];
         auto &wf = weight_map[f];
-        we = std::min(we, wf);
-        wf = we;
+        wf = we = std::min(we, wf);
 
         // TODO hide  checking
         auto teste = edge(target(e, amatrix), w, amatrix).first;

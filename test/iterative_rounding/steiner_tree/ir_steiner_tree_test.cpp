@@ -94,7 +94,7 @@ void run_multiple_seed_tests(Strategy& strategy) {
                 steiner_vertices, std::back_inserter(result), strategy);
         BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
-        best_cost = std::min(best_cost, cost);
+        paal::assign_min(best_cost, cost);
         BOOST_CHECK(cost >= 4);
     }
     // warning: randomized algorithm, approximation ratio could be violated

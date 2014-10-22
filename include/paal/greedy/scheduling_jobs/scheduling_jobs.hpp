@@ -21,6 +21,7 @@
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/sort.hpp>
@@ -104,9 +105,9 @@ typename Traits::frac_t calculate_bound(const MachineIterator mfirst,
 
         Frac candidate = getMax(machineID);
         if (machineID != 0) {
-            candidate = std::min(candidate, getMax(machineID - 1));
+            assign_min(candidate, getMax(machineID - 1));
         }
-        result = std::max(result, candidate);
+        assign_max(result, candidate);
     }
     return result;
 }

@@ -659,6 +659,22 @@ struct max {
     }
 };
 
+/// min
+struct min {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @param left
+     * @param right
+     */
+    template <typename T>
+    auto operator()(const T &left,
+                    const T &right) const->decltype(std::min(left, right)) {
+        return std::min(left, right);
+    }
+};
+
 //****************************** This is a set of functors representing standard
 // boolean operations
 // that is !, &&, ||. These are equivalent to standard std:: structs but are not

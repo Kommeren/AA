@@ -56,8 +56,7 @@ struct make_value_diff {
 };
 
 SolutionElement normalize(SolutionElement el) {
-    el = std::max(el, LOWER_BOUND);
-    return std::min(el, UPPER_BOUND);
+    return std::min(std::max(el, LOWER_BOUND), UPPER_BOUND);
 }
 
 struct get_moves {

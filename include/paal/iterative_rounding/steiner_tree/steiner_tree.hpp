@@ -29,6 +29,7 @@
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/lp/separation_oracles.hpp"
 #include "paal/utils/floating.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/range/join.hpp>
 #include <boost/range/algorithm/unique.hpp>
@@ -219,8 +220,8 @@ private:
             for (auto j_vertex: all_elements) {
                 auto i = get_idx(i_vertex);
                 auto j = get_idx(j_vertex);
-                Dist x = m_cost_map_idx(i, u) + m_cost_map_idx(w, j);
-                m_cost_map_idx(i, j) = std::min(m_cost_map_idx(i, j), x);
+                assign_min(m_cost_map_idx(i, j),
+                           m_cost_map_idx(i, u) + m_cost_map_idx(w, j));
             }
         }
     }

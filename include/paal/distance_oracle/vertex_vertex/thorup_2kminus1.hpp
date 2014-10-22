@@ -18,6 +18,7 @@
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/range/as_array.hpp>
 #include <boost/range/iterator_range.hpp>
@@ -91,7 +92,7 @@ class distance_oracle_thorup2kminus1approximation {
 
         for (int ind: irange(num_vertices(g))) {
             m_layer_num[ind] = std::min(k-1, (int)(log(dist(random_engine)) / logp));
-            max_layer_num = std::max(max_layer_num, m_layer_num[ind]);
+            assign_max(max_layer_num, m_layer_num[ind]);
         }
 
         return max_layer_num+1;

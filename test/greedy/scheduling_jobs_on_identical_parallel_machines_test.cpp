@@ -39,12 +39,9 @@ BOOST_AUTO_TEST_CASE(scheduling_jobs_on_identical_parallel_machines) {
         sum_of_machine[job_machine_pair.first] += *job_machine_pair.second;
     }
 
-    Time maximumLoad =
-        *std::max_element(sum_of_machine.begin(), sum_of_machine.end());
+    Time maximumLoad = *boost::max_element(sum_of_machine);
 
-    Time sum_all_loads =
-        std::accumulate(sum_of_machine.begin(), sum_of_machine.end(), 0.0);
+    Time sum_all_loads = boost::accumulate(sum_of_machine, 0.);
     // print result
-    check_result(maximumLoad, double(sum_all_loads) / NUMBER_OF_MACHINES,
-                 4.0 / 3.0);
+    check_result(maximumLoad, double(sum_all_loads) / NUMBER_OF_MACHINES, 4./3.);
 }

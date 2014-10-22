@@ -50,7 +50,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     const double UPPER_BOUND = 1.;
 
     // creating local search
-    const std::vector<double> neighb{ 0.1, -0.1, .01, -.01, .001, -.001 };
+    const std::vector<double> neighb{ .1, -.1, .01, -.01, .001, -.001 };
     std::vector<double> neighbCut(neighb.size());
     double G{ 1 };
 
@@ -62,8 +62,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     };
 
     auto normalize = [ = ](SolutionElement el) {
-        el = std::max(el, LOWER_BOUND);
-        return std::min(el, UPPER_BOUND);
+        return std::min(std::max(el, LOWER_BOUND), UPPER_BOUND);
     };
 
     auto getMoves = [&](Solution & s) {
@@ -78,7 +77,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
         vd.m_value = normalize(vd.m_value + vd.m_diff);
         auto valMove = f(s);
         vd.m_value = old;
-        return valMove - val - 0.000001;
+        return valMove - val - 1e-6;
     };
 
     auto commit = [&](Solution &, value_diff vd) {
@@ -87,7 +86,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     };
 
     auto ls = [ = ](Solution & x) {
-        x = { 0.3, 0.3, 0.3 };
+        x = { .3, .3, .3 };
         first_improving(
             x, local_search::make_search_components(getMoves, gain, commit));
     };
@@ -113,7 +112,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
         ls(x);
         auto newRes = f(x);
         G = old;
-        return best - newRes - 0.000001;
+        return best - newRes - 1e-6;
     };
 
     auto commitG = [&](double & s, double u) {

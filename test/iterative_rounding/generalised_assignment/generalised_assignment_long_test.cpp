@@ -20,6 +20,7 @@
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/iterative_rounding/generalised_assignment/generalised_assignment.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -47,7 +48,7 @@ void check_result(IRResult result, const Machines & machines,
     double approximation_ratio = 1.;
     for (int m : machines) {
         BOOST_CHECK(machines_load[m] <= 2 * machines_bounds[m]);
-        approximation_ratio = std::max(approximation_ratio, double(machines_load[m]) / double(machines_bounds[m]));
+        assign_max(approximation_ratio, double(machines_load[m]) / double(machines_bounds[m]));
     }
 
     for (int j : jobs) {

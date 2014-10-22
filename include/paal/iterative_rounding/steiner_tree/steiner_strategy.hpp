@@ -19,6 +19,7 @@
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
 #include "paal/utils/floating.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/filtered_graph.hpp>
@@ -324,7 +325,7 @@ public:
                             }
                             int cost = cost_map(e, terminals[k]);
                             assert(cost > 0);
-                            prob[k] = std::max(prob[k], 1.0 / cost);
+                            assign_max(prob[k], 1. / cost);
                         }
                     }
                     int selected = paal::utils::random_select<false>(

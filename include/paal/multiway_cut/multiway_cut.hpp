@@ -19,6 +19,7 @@
 #include "paal/lp/glp.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/assign_updates.hpp"
 
 #include <boost/bimap.hpp>
 #include <boost/graph/breadth_first_search.hpp>
@@ -181,7 +182,7 @@ auto multiway_cut_dispatch(const Graph &graph, OutputIterator result,
     Distribution dis(0, 1);
     int terminals = 0;
     for (auto vertex : boost::as_array(vertices(graph))) {
-        terminals = std::max(terminals, get(color_map, vertex));
+        assign_max(terminals, get(color_map, vertex));
     }
     detail::multiway_cut_lp<LP> multiway_cut_lp;
     multiway_cut_lp.init(graph, terminals, index_map, weight_map, color_map);
