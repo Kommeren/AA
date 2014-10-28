@@ -81,9 +81,7 @@ struct facility_location_gain_add {
      * @return
      */
     template <typename Solution, typename UnchosenElement>
-    auto operator()(Solution &s, UnchosenElement e)
-        ->typename data_structures::facility_location_solution_traits<
-              puretype(s.getfacility_location_solution())>::Dist {
+    auto operator()(Solution &s, UnchosenElement e) const {
         auto ret = s.add_facility_tentative(e);
         auto back = s.remove_facility_tentative(e);
         assert(ret == -back);

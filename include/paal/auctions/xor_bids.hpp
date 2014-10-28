@@ -369,7 +369,7 @@ namespace auctions {
          }
 
          template <class Result, class OutputIterator>
-         auto output(const Result& result, OutputIterator out) const -> puretype(result.second)
+         auto output(const Result& result, OutputIterator out) const
          {
             auto bid = result.first;
             auto frac = result.second;

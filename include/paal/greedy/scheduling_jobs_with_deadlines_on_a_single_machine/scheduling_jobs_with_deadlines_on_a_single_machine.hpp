@@ -20,6 +20,7 @@
 #include "paal/utils/assign_updates.hpp"
 
 #include <boost/iterator/counting_iterator.hpp>
+#include <boost/range/algorithm/sort.hpp>
 
 #include <queue>
 #include <vector>
@@ -54,7 +55,7 @@ template <class InputIterator, class OutputIterator, class GetTime,
 auto scheduling_jobs_with_deadlines_on_a_single_machine(
     const InputIterator first, const InputIterator last, GetTime get_time,
     GetReleaseDate get_release_date, GetDueDate get_due_date,
-    OutputIterator result) -> puretype(get_time(*first)) {
+    OutputIterator result) {
     using Time = puretype(get_time(*first));
     std::vector<InputIterator> jobs;
     std::copy(boost::make_counting_iterator(first),
@@ -70,7 +71,7 @@ auto scheduling_jobs_with_deadlines_on_a_single_machine(
 
     auto get_release_date_from_iterator =
         utils::make_lift_iterator_functor(get_release_date);
-    std::sort(jobs.begin(), jobs.end(),
+    boost::sort(jobs,
               utils::make_functor_to_comparator(get_release_date_from_iterator));
     Time start_idle = Time();
     Time longest_delay = Time();

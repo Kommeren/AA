@@ -30,7 +30,7 @@ namespace ir {
  */
 class steiner_network_violation_checker {
     using AuxVertex = min_cut_finder::Vertex;
-    using Violation = boost::optional<double>;
+    using Violation = double;
 
   public:
     using Candidate = std::pair<AuxVertex, AuxVertex>;

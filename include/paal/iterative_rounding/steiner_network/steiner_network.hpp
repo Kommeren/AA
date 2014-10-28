@@ -22,12 +22,10 @@
 #include "paal/iterative_rounding/steiner_network/prune_restrictions_to_tree.hpp"
 #include "paal/iterative_rounding/steiner_network/steiner_network_oracle.hpp"
 #include "paal/lp/lp_row_generation.hpp"
-#include "paal/lp/separation_oracles.hpp"
 
 #include <boost/graph/kruskal_min_spanning_tree.hpp>
 #include <boost/graph/named_function_params.hpp>
 #include <boost/range/as_array.hpp>
-
 
 namespace paal {
 namespace ir {
@@ -40,10 +38,6 @@ struct steiner_network_compare_traits {
 const double steiner_network_compare_traits::EPSILON = 1e-10;
 }
 
-template <template <typename> class OracleStrategy =
-              lp::random_violated_separation_oracle>
-using steiner_network_oracle =
-    OracleStrategy<steiner_network_violation_checker>;
 
 /**
  * @class steiner_network
@@ -57,9 +51,32 @@ using steiner_network_oracle =
  */
 template <typename Graph, typename Restrictions, typename CostMap,
           typename VertexIndex, typename ResultNetworkOutputIterator,
-          typename Oracle = steiner_network_oracle<>>
+          typename Oracle = paal::lp::random_violated_separation_oracle>
 class steiner_network {
-  public:
+    using edge = typename boost::graph_traits<Graph>::edge_descriptor;
+    using vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
+    using vertex_idx = decltype(get(std::declval<VertexIndex>(),
+                                   std::declval<VertexIndex>()));
+
+    using edge_map = std::unordered_map<lp::col_id, edge>;
+    using edge_list = std::vector<edge>;
+    using compare = utils::compare<double>;
+    using error_message = boost::optional<std::string>;
+
+    steiner_network_violation_checker m_violation_checker;
+    const Graph &m_g;
+    const Restrictions &m_restrictions;
+    CostMap m_cost_map;
+    VertexIndex m_index;
+    ResultNetworkOutputIterator m_result_network;
+    RestrictionsVector m_restrictions_vec;
+    Oracle m_oracle;
+
+    edge_map m_edge_map;
+    edge_list m_result_list;
+    compare m_compare;
+
+public:
 
     /**
      * Constructor.
@@ -67,45 +84,45 @@ class steiner_network {
     steiner_network(const Graph & g, const Restrictions & restrictions,
                     CostMap cost_map, VertexIndex vertex_index,
                     ResultNetworkOutputIterator result_network,
-                    Oracle oracle = Oracle()) :
+                    Oracle oracle = Oracle{}) :
             m_g(g), m_restrictions(restrictions),
             m_cost_map(cost_map), m_index(vertex_index), m_result_network(result_network),
             m_restrictions_vec(prune_restrictions_to_tree(m_restrictions, num_vertices(m_g))),
-            m_compare(steiner_network_compare_traits::EPSILON), m_oracle(oracle) {}
-
-    using Edge = typename boost::graph_traits<Graph>::edge_descriptor;
-    using Vertex = typename boost::graph_traits<Graph>::vertex_descriptor;
-    using VertexIdx =
-        decltype(get(std::declval<VertexIndex>(), std::declval<Vertex>()));
-
-    using EdgeMap = std::unordered_map<lp::col_id, Edge>;
-    using EdgeList = std::vector<Edge>;
-
-    using Compare = utils::compare<double>;
-    using ErrorMessage = boost::optional<std::string>;
+            m_oracle(oracle), m_compare(steiner_network_compare_traits::EPSILON) {}
 
     /**
      * Checks if the connectivity restrictions can be fulfilled.
      */
-    ErrorMessage check_input_validity() {
+    error_message check_input_validity() {
         steiner_network_violation_checker checker;
         if (!checker.check_if_solution_exists(*this)) {
-            return ErrorMessage{ "A Steiner network satisfying the "
+            return error_message{ "A Steiner network satisfying the "
                                  "restrictions does not exist." };
         } else {
-            return ErrorMessage{};
+            return error_message{};
         }
     }
 
     /**
-     * Returns the separation oracle.
+     * @brief
+     *
+     * @tparam LP
+     * @param lp
+     *
+     * @return
      */
-    Oracle &get_oracle() { return m_oracle; }
+    template <typename LP>
+    auto get_find_violation(LP & lp) {
+        using candidate = steiner_network_violation_checker::Candidate;
+        return m_oracle([&](){return m_violation_checker.get_violation_candidates(*this, lp);},
+                        [&](candidate c){return m_violation_checker.check_violation(c, *this);},
+                        [&](candidate c){return m_violation_checker.add_violated_constraint(c, *this, lp);});
+    }
 
     /**
      * Returns the map from LP column IDs to edges.
      */
-    const EdgeMap &get_edge_map() const { return m_edge_map; }
+    const edge_map &get_edge_map() const { return m_edge_map; }
 
     /**
      * Returns the input graph.
@@ -120,30 +137,35 @@ class steiner_network {
     /**
      * Returns the bigger of the two restrictions for a given vertex pair.
      */
-    auto get_max_restriction(VertexIdx u, VertexIdx v) const->decltype(
-        std::declval<Restrictions>()(0, 0)) {
+    // TODO when automatic return is used g++-4.8.2 crashes
+    auto get_max_restriction(vertex_idx u, vertex_idx v) const
+        -> decltype(std::declval<Restrictions>()(0, 0))
+    {
         return std::max(m_restrictions(u, v), m_restrictions(v, u));
     }
 
     /**
      * Returns the restrictions vector.
      */
-    const RestrictionsVector &get_restrictions_vec() const {
+    const RestrictionsVector &get_restrictions_vec() const
+    {
         return m_restrictions_vec;
     }
 
     /**
      * Returns the cost of an edge.
      */
-    auto get_cost(Edge e)->decltype(get(std::declval<CostMap>(), e)) {
+    // TODO when automatic return is used g++-4.8.2 crashes
+    auto get_cost(edge e) -> decltype(get(std::declval<CostMap>(), e))
+    {
         return get(m_cost_map, e);
     }
 
     /**
      * Binds a graph edge to a LP column.
      */
-    void bind_edge_to_col(Edge e, lp::col_id col) {
-        m_edge_map.insert(typename EdgeMap::value_type(col, e));
+    void bind_edge_to_col(edge e, lp::col_id col) {
+        m_edge_map.insert(typename edge_map::value_type(col, e));
     }
 
     /**
@@ -167,35 +189,21 @@ class steiner_network {
     /**
      * Returns the list of edges that are already added to the solution.
      */
-    const EdgeList &get_edges_in_solution() const { return m_result_list; }
+    const edge_list &get_edges_in_solution() const { return m_result_list; }
 
     /**
      * Returns the double comparison object.
      */
-    Compare get_compare() const { return m_compare; }
+    compare get_compare() const { return m_compare; }
 
   private:
 
-    Edge col_to_edge(lp::col_id col) {
+    edge col_to_edge(lp::col_id col) {
         auto i = m_edge_map.find(col);
         assert(i != m_edge_map.end());
         return i->second;
     }
 
-    const Graph &m_g;
-    const Restrictions &m_restrictions;
-    CostMap m_cost_map;
-    VertexIndex m_index;
-    ResultNetworkOutputIterator m_result_network;
-
-    RestrictionsVector m_restrictions_vec;
-
-    EdgeMap m_edge_map;
-    EdgeList m_result_list;
-
-    Compare m_compare;
-
-    Oracle m_oracle;
 };
 
 namespace detail {
@@ -216,14 +224,14 @@ namespace detail {
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_network_oracle<>,
+template <typename Oracle = lp::random_violated_separation_oracle,
     typename Graph, typename Restrictions, typename CostMap,
     typename VertexIndex, typename ResultNetworkOutputIterator>
 steiner_network<Graph, Restrictions, CostMap, VertexIndex, ResultNetworkOutputIterator, Oracle>
 make_steiner_network(const Graph & g, const Restrictions & restrictions,
                     CostMap cost_map, VertexIndex vertex_index,
                     ResultNetworkOutputIterator result_network,
-                    Oracle oracle = Oracle()) {
+                    Oracle oracle = Oracle{}) {
     return steiner_network<Graph, Restrictions, CostMap, VertexIndex,
                 ResultNetworkOutputIterator, Oracle>(
                                     g, restrictions, cost_map, vertex_index, result_network, oracle);
@@ -251,7 +259,7 @@ make_steiner_network(const Graph & g, const Restrictions & restrictions,
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_network_oracle<>,
+template <typename Oracle = lp::random_violated_separation_oracle,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator,
     typename P, typename T, typename R>
 auto
@@ -286,7 +294,7 @@ make_steiner_network(const Graph & g, const Restrictions & restrictions,
  *
  * @return steiner_network object
  */
-template <typename Oracle = steiner_network_oracle<>,
+template <typename Oracle = lp::random_violated_separation_oracle,
     typename Graph, typename Restrictions, typename ResultNetworkOutputIterator>
 auto
 make_steiner_network(const Graph & g, const Restrictions & restrictions,
@@ -298,8 +306,7 @@ make_steiner_network(const Graph & g, const Restrictions & restrictions,
 /**
  * Initialization of the IR Steiner Network algorithm.
  */
-class steiner_network_init {
-  public:
+struct steiner_network_init {
     /**
      * Initializes the LP: variables for edges.
      */
@@ -396,8 +403,8 @@ template <typename Init = steiner_network_init,
           typename RoundCondition = steiner_network_round_condition,
           typename RelaxContition = utils::always_false,
           typename SetSolution = steiner_network_set_solution,
-          typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-          typename ResolveLPToExtremePoint = lp::row_generation_resolve_lp>
+          typename SolveLPToExtremePoint = row_generation_solve_lp<>,
+          typename ResolveLPToExtremePoint = row_generation_solve_lp<>>
 using steiner_network_ir_components =
     IRcomponents<Init, RoundCondition, RelaxContition, SetSolution,
                  SolveLPToExtremePoint, ResolveLPToExtremePoint>;
@@ -426,7 +433,7 @@ namespace detail {
  *
  * @return solution status
  */
-template <typename Oracle = steiner_network_oracle<>, typename Graph,
+template <typename Oracle = lp::random_violated_separation_oracle, typename Graph,
           typename Restrictions, typename CostMap, typename VertexIndex,
           typename ResultNetworkOutputIterator,
           typename IRcomponents = steiner_network_ir_components<>,
@@ -468,7 +475,7 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = steiner_network_oracle<>, typename Graph,
+template <typename Oracle = lp::random_violated_separation_oracle, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
           typename IRcomponents = steiner_network_ir_components<>,
           typename Visitor = trivial_visitor, typename P, typename T,
@@ -508,7 +515,7 @@ IRResult steiner_network_iterative_rounding(
  *
  * @return solution status
  */
-template <typename Oracle = steiner_network_oracle<>, typename Graph,
+template <typename Oracle = lp::random_violated_separation_oracle, typename Graph,
           typename Restrictions, typename ResultNetworkOutputIterator,
           typename IRcomponents = steiner_network_ir_components<>,
           typename Visitor = trivial_visitor>

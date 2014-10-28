@@ -92,15 +92,14 @@ void check_result(const Graph & g, const ResultTree & tree,
     BOOST_CHECK(connected_components(tree_g, &component[0]) == 1);
 }
 
-template <template <typename> class Oracle, typename Bound>
+template <typename Oracle, typename Bound>
 void run_test(const Graph & g, const Cost & costs, const Bound & deg_bounds,
              const int vertices_num, const double best_cost) {
     namespace ir = paal::ir;
     {
         LOGLN("Unlimited relaxations");
         ResultTree tree;
-        auto result = ir::bounded_degree_mst_iterative_rounding<
-                        ir::bdmst_oracle<Oracle>>(
+        auto result = ir::bounded_degree_mst_iterative_rounding<Oracle>(
                             g, deg_bounds, std::inserter(tree, tree.end()));
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
         check_result(g, tree, costs, deg_bounds, vertices_num, best_cost, *(result.second));
@@ -111,8 +110,7 @@ void run_test(const Graph & g, const Cost & costs, const Bound & deg_bounds,
         ir::bdmst_ir_components<> comps;
         auto components = paal::data_structures::replace<ir::RelaxationsLimit>(
                             ir::relaxations_limit_condition(), comps);
-        auto result = ir::bounded_degree_mst_iterative_rounding<
-                        ir::bdmst_oracle<Oracle>>(
+        auto result = ir::bounded_degree_mst_iterative_rounding<Oracle>(
                             g, deg_bounds, std::inserter(tree, tree.end()), components);
         BOOST_CHECK(result.first == paal::lp::OPTIMAL);
         check_result(g, tree, costs, deg_bounds, vertices_num, best_cost, *(result.second));
@@ -148,7 +146,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
         // non-default heuristics
         if (vertices_num <= 80) {
             LOGLN("most violated");
-            run_test<paal::lp::most_violated_separation_oracle>(
+            run_test<paal::lp::max_violated_separation_oracle>(
                             g, costs, bounds, vertices_num, best_cost);
         }
 

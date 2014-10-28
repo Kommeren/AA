@@ -27,7 +27,6 @@
 #include "paal/iterative_rounding/steiner_tree/steiner_tree_oracle.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
 #include "paal/lp/lp_row_generation.hpp"
-#include "paal/lp/separation_oracles.hpp"
 #include "paal/utils/floating.hpp"
 #include "paal/utils/assign_updates.hpp"
 
@@ -49,9 +48,6 @@ struct steiner_tree_compare_traits {
 const double steiner_tree_compare_traits::EPSILON = 1e-10;
 }
 
-template <template <typename> class OracleStrategy =
-              lp::random_violated_separation_oracle>
-using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
 
 /**
  * @class steiner_tree
@@ -65,7 +61,7 @@ using steiner_tree_oracle = OracleStrategy<steiner_tree_violation_checker>;
  */
 template<typename OrigMetric, typename Terminals, typename Result,
     typename Strategy = steiner_tree_all_generator,
-    typename Oracle = steiner_tree_oracle<>>
+    typename Oracle = lp::random_violated_separation_oracle>
 class steiner_tree {
 public:
     using MT = data_structures::metric_traits<OrigMetric>;
@@ -97,6 +93,7 @@ private:
 
     std::unordered_map<int, lp::col_id> m_elements_map; // maps component_id ->
                                                         // col_id in LP
+    steiner_tree_violation_checker m_violation_checker;
 
     Oracle m_oracle;
 
@@ -117,9 +114,20 @@ public:
     }
 
     /**
-     * Returns the separation oracle.
+     * @brief
+     *
+     * @tparam LP
+     * @param lp
+     *
+     * @return
      */
-    Oracle &get_oracle() { return m_oracle; }
+    template <typename LP>
+    auto get_find_violation(LP & lp) {
+        using candidate = steiner_tree_violation_checker::Candidate;
+        return m_oracle([&](){return m_violation_checker.get_violation_candidates(*this, lp);},
+                        [&](candidate c){return m_violation_checker.check_violation(c, *this);},
+                        [&](candidate c){return m_violation_checker.add_violated_constraint(c, *this, lp);});
+    }
 
     /**
      * Generates all the components using specified strategy.
@@ -320,7 +328,7 @@ public:
 /**
  * Makes steiner_tree object. Just to avoid providing type names in template.
  */
-template<typename Oracle = steiner_tree_oracle<>,
+template<typename Oracle = lp::random_violated_separation_oracle,
         typename OrigMetric, typename Terminals, typename Result, typename Strategy>
 steiner_tree<OrigMetric, Terminals, Result, Strategy, Oracle> make_steiner_tree(
         const OrigMetric& metric, const Terminals& terminals,
@@ -334,8 +342,8 @@ template <typename Init = steiner_tree_init,
           typename RoundCondition = steiner_tree_round_condition,
           typename RelaxCondition = utils::always_false,
           typename SetSolution = steiner_tree_set_solution,
-          typename SolveLPToExtremePoint = lp::row_generation_solve_lp,
-          typename ResolveLPToExtremePoint = lp::row_generation_solve_lp,
+          typename SolveLPToExtremePoint = row_generation_solve_lp<>,
+          typename ResolveLPToExtremePoint = row_generation_solve_lp<>,
           typename StopCondition = steiner_tree_stop_condition>
 using steiner_tree_ir_components =
     IRcomponents<Init, RoundCondition, RelaxCondition, SetSolution,
@@ -360,9 +368,13 @@ using steiner_tree_ir_components =
  * @param oracle
  * @param visitor
  */
-template <typename Oracle = steiner_tree_oracle<>, typename Strategy = steiner_tree_all_generator,
-    typename OrigMetric, typename Terminals, typename Result,
-    typename IRcomponents = steiner_tree_ir_components<>, typename Visitor = trivial_visitor>
+template <typename Oracle = lp::random_violated_separation_oracle,
+          typename Strategy = steiner_tree_all_generator,
+          typename OrigMetric,
+          typename Terminals,
+          typename Result,
+          typename IRcomponents = steiner_tree_ir_components<>,
+          typename Visitor = trivial_visitor>
 lp::problem_type steiner_tree_iterative_rounding(const OrigMetric& metric, const Terminals& terminals,
         const Terminals& steiner_vertices, Result result, Strategy strategy = Strategy{},
         IRcomponents comps = IRcomponents{}, Oracle oracle = Oracle{},

@@ -112,11 +112,11 @@ public:
  * @tparam FacilityCost
  * @tparam voronoi
  */
-template <typename FacilityCost, typename voronoi>
+template <typename FacilityCost, typename Voronoi>
 class facility_location_solution_traits<
-    facility_location_solution<FacilityCost, voronoi>> {
-    typedef voronoi_traits<voronoi> VT;
-    typedef facility_location_solution<FacilityCost, voronoi> FLS;
+    facility_location_solution<FacilityCost, Voronoi>> {
+    typedef voronoi_traits<Voronoi> VT;
+    typedef facility_location_solution<FacilityCost, Voronoi> FLS;
 
   public:
     typedef typename VT::VertexType VertexType;

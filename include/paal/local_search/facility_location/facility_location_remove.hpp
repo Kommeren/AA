@@ -44,17 +44,10 @@ struct facility_location_gain_remove {
      * @return
      */
     template <typename Solution, typename ChosenElement>
-    auto operator()(Solution &s, ChosenElement e)
-        ->typename data_structures::facility_location_solution_traits<
-              puretype(s.getfacility_location_solution())>::Dist {
-
-        typename data_structures::facility_location_solution_traits<
-            puretype(s.getfacility_location_solution())>::Dist ret,
-            back;
-
-        ret = s.remove_facility_tentative(e);
+    auto operator()(Solution &s, ChosenElement e) {
+        auto ret = s.remove_facility_tentative(e);
         // TODO for capacitated version we should just restart copy
-        back = s.add_facility_tentative(e);
+        auto back = s.add_facility_tentative(e);
         assert(ret == -back);
         return -ret;
     }
@@ -92,7 +85,7 @@ struct facility_locationget_moves_remove {
      * @return
      */
     template <typename Solution>
-    auto operator()(const Solution &sol)->decltype(sol.getChosenCopy()) {
+    auto operator()(const Solution &sol) {
         return sol.getChosenCopy();
     }
 };

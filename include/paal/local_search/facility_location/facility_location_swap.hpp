@@ -104,17 +104,11 @@ struct facility_location_gain_swap {
      * @return
      */
     template <class Solution, class VertexType>
-    auto operator()(Solution &sol, const Swap<VertexType> &s)
-        ->typename data_structures::facility_location_solution_traits<
-              puretype(sol.getfacility_location_solution())>::Dist {
+    auto operator()(Solution &sol, const Swap<VertexType> &s) const {
 
-        typename data_structures::facility_location_solution_traits<
-            puretype(sol.getfacility_location_solution())>::Dist ret,
-            back;
-
-        ret = sol.add_facility_tentative(s.get_to());
+        auto ret = sol.add_facility_tentative(s.get_to());
         ret += sol.remove_facility_tentative(s.get_from());
-        back = sol.add_facility_tentative(s.get_from());
+        auto back = sol.add_facility_tentative(s.get_from());
         back += sol.remove_facility_tentative(s.get_to());
         assert(ret == -back);
         return -ret;
@@ -133,7 +127,7 @@ struct facility_location_commit_swap {
      * @param s
      */
     template <typename Solution, typename VertexType>
-    bool operator()(Solution &sol, const Swap<VertexType> &s) {
+    bool operator()(Solution &sol, const Swap<VertexType> &s) const {
         sol.add_facility(s.get_to());
         sol.remove_facility(s.get_from());
         return true;
@@ -147,20 +141,7 @@ struct facility_locationget_moves_swap {
 
     /// operator()
     template <typename Solution>
-    auto operator()(const Solution &s)
-        ->boost::iterator_range<data_structures::combine_iterator<
-              make_swap, puretype(s.getChosenCopy()),
-              puretype(s.getUnchosenCopy())>>
-
-        // this does NOT work on clang-3.4!!!
-        /*    std::pair<
-            decltype(data_structures::make_combine_iterator(make_swap{}
-                    , s.getUnchosenCopy()
-                    , s.getChosenCopy())),
-            decltype(data_structures::make_combine_iterator(make_swap{}
-                    , s.getUnchosenCopy()
-                    , s.getChosenCopy()))>*/
-        {
+    auto operator()(const Solution &s) const  {
         auto begin = data_structures::make_combine_iterator(
             make_swap{}, s.getChosenCopy(), s.getUnchosenCopy());
         decltype(begin) end;

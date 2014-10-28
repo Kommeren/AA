@@ -53,10 +53,44 @@ struct trivial_visitor {
     void relax_row(Problem &problem, LP &lp, lp::row_id row) {}
 };
 
+///default solve lp for row_generation,
+///at first call PRIMAL, and DUAL on the next calls
+template <typename Problem, typename LP>
+class default_solve_lp_in_row_generation {
+    bool m_first;
+    LP & m_lp;
+public:
+    ///constructor
+    default_solve_lp_in_row_generation(Problem &, LP & lp) : m_first(true), m_lp(lp) {}
+
+    ///operator()
+    lp::problem_type operator()()
+    {
+        if (m_first) {
+            m_first = false;
+            return m_lp.solve_simplex(lp::PRIMAL);
+        }
+        return m_lp.resolve_simplex(lp::DUAL);
+    }
+};
+
+/// default row_generation for lp,
+/// one can customize LP solving, by setting SolveLP
+template <template <class, class> class SolveLP = default_solve_lp_in_row_generation>
+struct row_generation_solve_lp {
+///operator()
+template <class Problem, class LP>
+    auto operator()(Problem & problem, LP & lp) {
+        return row_generation(problem.get_find_violation(lp), SolveLP<Problem, LP>(problem, lp));
+    }
+};
+
+
+
 namespace detail {
 
-/**
- * @brief This class solves an iterative rounding problem.
+    /**
+     * @brief This class solves an iterative rounding problem.
  *
  * @tparam Problem
  * @tparam IRcomponents

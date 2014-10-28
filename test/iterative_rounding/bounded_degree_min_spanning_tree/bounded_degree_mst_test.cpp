@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test) {
 
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(result_tree, result_tree.begin()),
-                    bdmst_ir_components<>{}, bdmst_oracle<>{},
+                    bdmst_ir_components<>{}, lp::random_violated_separation_oracle{},
                     log_visitor{});
 
     ON_LOG(for (auto const & e : result_tree) {
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_test_parameters) {
         ResultTree result_tree;
         bounded_degree_mst_iterative_rounding(g, bounds, boost::weight_map(cost),
                     std::inserter(result_tree, result_tree.begin()),
-                    bdmst_ir_components<>{}, bdmst_oracle<>{},
+                    bdmst_ir_components<>{}, paal::lp::random_violated_separation_oracle{},
                     log_visitor{});
 
         BOOST_CHECK_EQUAL(correct_bdmst.size(),result_tree.size());

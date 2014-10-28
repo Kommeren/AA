@@ -23,6 +23,11 @@
 
 namespace paal {
 
+//TODO, remove when appears in the standard
+/// short version of std::decay
+template <typename T>
+using decay_t = typename std::decay<T>::type;
+
 /// for given expression returns its type with removed const and reference
 #define puretype(t) typename std::decay<decltype(t)>::type
 

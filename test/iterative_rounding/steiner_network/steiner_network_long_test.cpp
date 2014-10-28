@@ -193,7 +193,7 @@ int generate_instance(Graph & g, RestrictionVec & res, int vertices_num,
     return vertices_num;
 }
 
-template <template <typename> class Oracle, typename Restrictions>
+template <typename Oracle, typename Restrictions>
 void run_single_test(const Graph &g, const Cost &costs,
                      const Restrictions &restrictions) {
     namespace ir = paal::ir;
@@ -201,8 +201,7 @@ void run_single_test(const Graph &g, const Cost &costs,
 
     using ResultNetwork = std::vector<Edge>;
     ResultNetwork result_network;
-    auto steiner_network(ir::make_steiner_network<
-                    ir::steiner_network_oracle<Oracle>>(g, restrictions,
+    auto steiner_network(ir::make_steiner_network<Oracle>(g, restrictions,
                             std::back_inserter(result_network)));
     auto invalid = steiner_network.check_input_validity();
     BOOST_CHECK(!invalid);
@@ -226,7 +225,7 @@ void run_test(const Graph & g, const Cost & costs, const Restrictions & restrict
     // non-default heuristics
     if (vertices_num <= 80) {
         LOGLN("most violated");
-        run_single_test<paal::lp::most_violated_separation_oracle>(
+        run_single_test<paal::lp::max_violated_separation_oracle>(
             g, costs, restrictions);
     }
 

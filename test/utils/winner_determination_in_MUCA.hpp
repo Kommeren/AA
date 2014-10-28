@@ -32,16 +32,7 @@
 #include <vector>
 
 template <class GammaOracleAuction>
-auto approximation_ratio(GammaOracleAuction&& auction)
--> puretype(
-      std::exp(1.0) *
-      (2 * auction.template get<paal::auctions::gamma>() + 1) *
-      std::pow(
-         paal::auctions::items_number(auction),
-         1.0 / paal::auctions::get_minimum_copies_num(auction)
-      )
-   )
-{
+auto approximation_ratio(GammaOracleAuction&& auction) {
    auto e = std::exp(1.0);
    auto m = paal::auctions::items_number(auction);
    auto b = paal::auctions::get_minimum_copies_num(auction);
@@ -136,9 +127,12 @@ void check_determine_winners_in_gamma_oracle(
    double lower_bound,
    Epsilon epsilon = 1e-8
 ) {
-   using Value =
-      puretype(get_value(*std::begin(get_bids(*std::begin(bidders)))));
-   using ItemVal = typename paal::range_to_elem_t<decltype(items)>;
+   using Value = paal::pure_result_of_t<
+                    GetValue(paal::range_to_ref_t<
+                            paal::pure_result_of_t<GetBids(paal::range_to_ref_t<paal::decay_t<Bidders>>)>
+                            >)
+                 >;
+   using ItemVal = paal::range_to_elem_t<paal::decay_t<Items>>;
 
    std::unordered_map<ItemVal, Value> map;
    check_determine_winners_in_gamma_oracle(

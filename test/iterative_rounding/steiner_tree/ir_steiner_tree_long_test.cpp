@@ -35,12 +35,12 @@ using Metric = GraphMT;
 
 static const double APPROXIMATION_RATIO = 1.39;
 
-template <template <typename> class OracleStrategy =
-        paal::lp::random_violated_separation_oracle, typename Strategy>
+template <typename OracleStrategy = paal::lp::random_violated_separation_oracle,
+          typename Strategy>
 void run_test(const steiner_tree_test_with_metric& test, const Strategy& strategy) {
     std::vector<int> result;
     auto status =
-        paal::ir::steiner_tree_iterative_rounding<steiner_tree_oracle<OracleStrategy>>(
+        paal::ir::steiner_tree_iterative_rounding<OracleStrategy>(
             test.metric, test.terminals, test.steiner_points,
             std::back_inserter(result), strategy);
     BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
         }
 
         LOGLN("most violated");
-        run_test<paal::lp::most_violated_separation_oracle>(test, strategy_rand);
+        run_test<paal::lp::max_violated_separation_oracle>(test, strategy_rand);
 
         LOGLN("first violated");
         run_test<paal::lp::first_violated_separation_oracle>(test, strategy_rand);

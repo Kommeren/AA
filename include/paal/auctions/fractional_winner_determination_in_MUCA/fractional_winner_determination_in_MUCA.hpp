@@ -19,14 +19,15 @@
 #include "paal/auctions/auction_traits.hpp"
 #include "paal/auctions/auction_utils.hpp"
 #include "paal/lp/glp.hpp"
+#include "paal/lp/lp_row_generation.hpp"
 #include "paal/utils/concepts.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/property_map.hpp"
-#include "paal/utils/rotate.hpp"
 
 #include <boost/concept/requires.hpp>
 #include <boost/property_map/property_map.hpp>
 #include <boost/range/combine.hpp>
+#include <boost/range/counting_range.hpp>
 
 #include <iterator>
 #include <random>
@@ -46,147 +47,8 @@ namespace detail {
       bid(Bidder bidder, BidId bid_id, Bundle bundle) :
          m_bidder(bidder), m_bid_id(bid_id), m_bundle(bundle) {}
    };
+}//! detail
 
-   template <class TryAddViolated, class SolveLp>
-   void row_generation(TryAddViolated try_add_violated, SolveLp solve_lp)
-   {
-      do solve_lp(); while (try_add_violated());
-   }
-
-   template<
-      class GetCandidates,
-      class HowViolated,
-      class AddViolated,
-      class CompareHow
-   >
-   class add_max_violated {
-      GetCandidates m_get_candidates;
-      HowViolated m_how_violated;
-      AddViolated m_add_violated;
-      CompareHow m_cmp;
-
-      public:
-         add_max_violated(GetCandidates get_candidates,
-               HowViolated how_violated, AddViolated add_violated)
-            : m_get_candidates(get_candidates), m_how_violated(how_violated),
-               m_add_violated(add_violated) {}
-
-         bool operator()() {
-            auto&& cands = m_get_candidates();
-            using how_violated_t = puretype(m_is_violated(*std::begin(cands)));
-            using cand_it_t = puretype(std::begin(cands));
-            boost::optional<std::pair<how_violated_t, cand_it_t>> most;
-            for (auto cand = std::begin(cands); cand != std::end(cands); ++cand)
-            {
-               const auto how = m_how_violated(*cand);
-               if (!how) continue;
-               if (!most || cmp(most->first, how))
-                  most = std::make_pair(std::move(how), cand);
-            }
-            if (!most) return false;
-            m_add_violated(*most->second);
-            return true;
-         }
-   };
-
-   struct max_violated_separation_oracle {
-      template <
-         class GetCandidates,
-         class IsViolated,
-         class AddViolated,
-         class CompareHow = utils::less
-      >
-      auto operator()(
-         GetCandidates get_candidates,
-         IsViolated is_violated,
-         AddViolated add_violated,
-         CompareHow compare_how = CompareHow{}
-      ) const {
-         return add_max_violated<GetCandidates, IsViolated, AddViolated,
-            CompareHow>(get_candidates, is_violated, add_violated, compare_how);
-      }
-   };
-
-   template <class GetCandidates, class TryAddViolated, class ReorderCandidates>
-   class add_first_violated {
-      GetCandidates m_get_candidates;
-      TryAddViolated m_try_add_violated;
-      ReorderCandidates m_reorder_candidates;
-
-      public:
-         add_first_violated(
-            GetCandidates get_candidates,
-            TryAddViolated try_add_violated,
-            ReorderCandidates reorder_candidates
-         ) : m_get_candidates(get_candidates),
-            m_try_add_violated(try_add_violated),
-            m_reorder_candidates(std::move(reorder_candidates)) {}
-
-         bool operator()() {
-            auto&& cands = m_get_candidates();
-            auto reordered =
-               m_reorder_candidates(std::forward<decltype(cands)>(cands));
-            for (auto c = std::begin(reordered); c != std::end(reordered); ++c)
-               if (m_try_add_violated(*c)) return true;
-            return false;
-         }
-   };
-
-   struct first_violated_separation_oracle {
-      template <
-         class GetCandidates,
-         class TryAddViolated,
-         class ReorderCandidates = utils::identity_functor
-      >
-      auto operator() (
-         GetCandidates get_candidates,
-         TryAddViolated try_add_violated,
-         ReorderCandidates reorder_candidates = ReorderCandidates{}
-      ) const {
-         return add_first_violated<GetCandidates, TryAddViolated,
-            ReorderCandidates>(get_candidates, try_add_violated,
-               reorder_candidates);
-      }
-   };
-
-   template <class URNG>
-   class random_rotate {
-      URNG m_g;
-      public:
-         random_rotate(URNG&& g)
-            : m_g(std::forward<URNG>(g)) {}
-         template <class ForwardRange>
-         auto operator()(const ForwardRange& rng)
-         {
-            const auto len = boost::distance(rng);
-            std::uniform_int_distribution<decltype(len)> d(0, len);
-            return utils::rotate(rng, d(m_g));
-         }
-   };
-
-   template <class URNG = std::default_random_engine>
-   auto make_random_rotate(URNG&& g = URNG{})
-   {
-      return random_rotate<URNG>(std::forward<URNG>(g));
-   }
-
-   struct random_violated_separation_oracle {
-      template <
-         class GetCandidates,
-         class TryAddViolated,
-         class URNG = std::default_random_engine
-      >
-      auto operator() (
-         GetCandidates get_candidates,
-         TryAddViolated try_add_violated,
-         URNG&& g = URNG{}
-      ) const {
-         return first_violated_separation_oracle{}(get_candidates,
-               try_add_violated, make_random_rotate(std::forward<URNG>(g)));
-      }
-   };
-
-}//!detail
 
 /**
  * @brief This is fractional determine winners in demand query auction and return
@@ -212,7 +74,7 @@ template <
    class DemandQueryAuction,
    class OutputIterator,
    class ItemToLpIdMap,
-   class SeparationOracle = detail::random_violated_separation_oracle
+   class SeparationOracle = paal::lp::random_violated_separation_oracle
 >
 BOOST_CONCEPT_REQUIRES(
 
@@ -258,6 +120,7 @@ fractional_determine_winners_in_demand_query_auction(
    using bundle_t = typename traits_t::items_t;
    using bidder_t = typename traits_t::bidder_t;
    using bid_t = detail::bid<bidder_t, lp::row_id, bundle_t>;
+   using result_t = typename traits_t::result_t;
 
    lp::glp dual;
    dual.set_optimization_type(lp::MINIMIZE);
@@ -285,15 +148,30 @@ fractional_determine_winners_in_demand_query_auction(
       item_to_id_func
    );
 
-   auto try_add_violated =
+   boost::optional<result_t> res;
+   boost::optional<bidder_t> last_bidder;
+
+   auto how_much_violated =
       utils::make_tuple_uncurry([&](bidder_t bidder, lp::col_id bidder_id)
    {
       //check if there is a violated constraint for bidder
-      auto res = auction.template call<demand_query>(bidder, get_price);
-      auto& items = res.first;
-      const auto util = res.second;
-      if (util <= dual.get_col_value(bidder_id) + epsilon)
-         return false;
+      last_bidder = bidder;
+      res = auction.template call<demand_query>(bidder, get_price);
+      const auto util = res->second;
+      const auto alpha = util - dual.get_col_value(bidder_id);
+      if (alpha > epsilon) return boost::optional<double>(alpha);
+      return boost::optional<double>{};
+   });
+
+   auto add_violated =
+      utils::make_tuple_uncurry([&](bidder_t bidder, lp::col_id bidder_id) {
+      assert(last_bidder);
+      if (bidder != *last_bidder) {
+        res = auction.template call<demand_query>(bidder, get_price);
+      }
+
+      auto& items = res->first;
+      const auto util = res->second;
 
       // add violated constraint
       const auto price = utils::sum_functor(items, get_price);
@@ -302,22 +180,22 @@ fractional_determine_winners_in_demand_query_auction(
             lp::linear_expression(bidder_id), item_to_id_func);
       const auto bid_id = dual.add_row(expr >= value);
       generated_bids.emplace_back(bidder, bid_id, std::move(items));
-      return true;
    });
 
    auto get_candidates = utils::make_dynamic_return_something_functor(
       boost::combine(auction.template get<bidders>(), bidder_to_id));
 
    // TODO check if max_violated strategy doesn't give better performance
-   auto find_violated = separation_oracle(get_candidates, try_add_violated);
+   auto find_violated = separation_oracle(get_candidates, how_much_violated, add_violated);
 
    auto solve_lp = [&]()
    {
       const auto res = dual.resolve_simplex(lp::DUAL);
       assert(res == lp::OPTIMAL);
+      return res;
    };
 
-   detail::row_generation(find_violated, solve_lp);
+   paal::lp::row_generation(find_violated, solve_lp);
 
    // emit results
    for (auto& bid: generated_bids) {

@@ -120,7 +120,7 @@ void check_fractional_determine_winners_in_demand_query_auction(
    double opt,
    double epsilon = 1e-8
 ) {
-   using ItemVal = puretype(*std::begin(items));
+   using ItemVal = paal::range_to_elem_t<Items>;
    using PriceMap = std::unordered_map<ItemVal, paal::lp::col_id>;
 
    PriceMap map;
