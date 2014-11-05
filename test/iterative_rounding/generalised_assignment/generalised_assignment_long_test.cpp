@@ -54,7 +54,7 @@ void check_result(IRResult result, const Machines & machines,
     for (int j : jobs) {
         BOOST_CHECK(jobs_to_machines.find(j) != jobs_to_machines.end());
     }
-    BOOST_CHECK(abs(std::round(*(result.second))-*(result.second)<0.000001));
+    BOOST_CHECK(std::abs(std::round(*(result.second))-*(result.second)) < 1e-6);
     int c = std::round(*(result.second));
     LOGLN("cost " << c);
     BOOST_CHECK(c <= opt);

@@ -164,7 +164,7 @@ class iterative_rounding  {
 
     /**
      * @brief Rounds the LP columns (independently) using the RoundCondition
-    * component.
+     * component.
      *
      * @return true iff at least one column was rounded
      */

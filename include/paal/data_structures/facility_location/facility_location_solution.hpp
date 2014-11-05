@@ -126,7 +126,8 @@ class facility_location_solution_traits<
     typedef puretype(std::declval<FLS>().get_unchosen_facilities())
         UnchosenFacilitiesSet;
 };
-};
-};
+
+} // !data_structures
+} // !paal
 
 #endif // PAAL_FACILITY_LOCATION_SOLUTION_HPP

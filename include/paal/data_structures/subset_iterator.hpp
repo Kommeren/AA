@@ -322,11 +322,28 @@ class subsets_iterator : public boost::iterator_facade<
  *
  * @return
  */
+//TODO change name to subset_range()
 template <int k, typename Iterator, typename Joiner = make_tuple>
 boost::iterator_range<subsets_iterator<k, Iterator, Joiner>>
 make_subsets_iterator_range(Iterator b, Iterator e, Joiner joiner = Joiner{}) {
     typedef subsets_iterator<k, Iterator, Joiner> SI;
     return boost::make_iterator_range(SI(b, e, joiner), SI(e, e, joiner));
+}
+
+/**
+ * @brief
+ *
+ * @tparam k
+ * @tparam Range
+ * @tparam Joiner
+ * @param range
+ * @param joiner
+ *
+ * @return
+ */
+template <int k, typename Range, typename Joiner = make_tuple>
+auto make_subsets_iterator_range(const Range & range, Joiner joiner = Joiner{}) {
+    return make_subsets_iterator_range<k>(std::begin(range), std::end(range), std::move(joiner));
 }
 
 } // data_structures

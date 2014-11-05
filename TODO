@@ -1,4 +1,4 @@
-
+* use boost::sub_range
 * add example to metrics
 
 * euclidean metric shouldn't be parametrized
