@@ -18,6 +18,7 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/assign_updates.hpp"
 
+#include <boost/functional/hash.hpp>
 #include <boost/graph/adjacency_matrix.hpp>
 #include <boost/range/as_array.hpp>
 

@@ -139,3 +139,15 @@
 [submodule "boost/heap"]
 	path = boost/heap
 	url = https://github.com/boostorg/heap.git
+[submodule "boost/align"]
+	path = boost/align
+	url = https://github.com/boostorg/align.git
+[submodule "boost/core"]
+	path = boost/core
+	url = https://github.com/boostorg/core.git
+[submodule "boost/throw_exception"]
+	path = boost/throw_exception
+	url = https://github.com/boostorg/throw_exception.git
+[submodule "boost/lexical_cast"]
+	path = boost/lexical_cast
+	url = https://github.com/boostorg/lexical_cast.git

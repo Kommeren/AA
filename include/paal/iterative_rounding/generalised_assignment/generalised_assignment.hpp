@@ -19,7 +19,8 @@
 
 #include "paal/iterative_rounding/ir_components.hpp"
 #include "paal/iterative_rounding/iterative_rounding.hpp"
-#include "paal/utils/indexed_range.hpp"
+
+#include <boost/range/adaptor/indexed.hpp>
 
 namespace paal {
 namespace ir {
@@ -128,12 +129,12 @@ class ga_init {
     template <typename Problem, typename LP>
     void add_constraints_for_machines(Problem &problem, LP &lp) {
         auto &col_idx = problem.get_col_idx();
-        for (auto m : indexed_range(problem.get_machines())) {
-            auto T = problem.get_machine_available_time()(*m);
+        for (auto m : problem.get_machines() | boost::adaptors::indexed()) {
+            auto T = problem.get_machine_available_time()(m.value());
             lp::linear_expression expr;
 
-            for (auto j : indexed_range(problem.get_jobs())) {
-                auto t = problem.get_proceeding_time()(*j, *m);
+            for (auto j : problem.get_jobs() | boost::adaptors::indexed()) {
+                auto t = problem.get_proceeding_time()(j.value(), m.value());
                 auto x = col_idx[problem.idx(j.index(), m.index())];
                 expr += x * t;
             }

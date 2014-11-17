@@ -20,10 +20,10 @@
 #include "paal/lp/ids.hpp"
 #include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
-#include "paal/utils/indexed_range.hpp"
 #include "paal/utils/irange.hpp"
 
 #include <boost/range/iterator_range.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 
 #include <glpk.h>
 
@@ -187,9 +187,9 @@ class glp_impl {
         auto elems = expr.get_elements();
         int expr_size = boost::distance(elems);
 
-        for (auto elem : indexed_range(elems, 1)) {
-            m_idx_cols_tmp[elem.index()] = get_col(elem->first);
-            m_val_cols_tmp[elem.index()] = elem->second;
+        for (auto elem : elems | boost::adaptors::indexed(1)) {
+            m_idx_cols_tmp[elem.index()] = get_col(elem.value().first);
+            m_val_cols_tmp[elem.index()] = elem.value().second;
         }
 
         glp_set_mat_row(m_lp, get_row(row), expr_size, &m_idx_cols_tmp[0],

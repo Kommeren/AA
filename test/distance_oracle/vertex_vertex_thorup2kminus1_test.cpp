@@ -19,10 +19,10 @@
 #include "test_utils/test_result_check.hpp"
 
 #include "paal/utils/irange.hpp"
-#include "paal/utils/indexed_range.hpp"
 
 #include <boost/graph/copy.hpp>
 #include <boost/property_map/property_map.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace paal;
@@ -93,8 +93,8 @@ BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_listgraph_test ) {
     Map inner_map;
     IndexMap index_map(inner_map);
 
-    for (auto v: indexed_range(boost::make_iterator_range(vertices(g)))) {
-        boost::put(index_map, *v, v.index());
+    for (auto v: boost::make_iterator_range(vertices(g)) | boost::adaptors::indexed()) {
+        boost::put(index_map, v.value(), v.index());
     }
 
     for (int k: {2,3,4,5}) {

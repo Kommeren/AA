@@ -11,12 +11,12 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
-#include "paal/utils/indexed_range.hpp"
 #include "paal/utils/algorithms/subset_backtrack.hpp"
 #include "paal/data_structures/fraction.hpp"
 
 #include <boost/heap/d_ary_heap.hpp>
 #include <boost/range/irange.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/algorithm/copy.hpp>
 #include <boost/range/algorithm/fill.hpp>
 #include <boost/range/algorithm/sort.hpp>
@@ -313,11 +313,11 @@ auto budgeted_maximum_coverage(
     std::vector<typename queue::handle_type> set_id_to_handle(nu_sets);
 
     // we fill sets_covering_element and setToWeightOfElements
-    for (auto set : indexed_range(sets)) {
+    for (auto set : sets | boost::adaptors::indexed()) {
         auto set_id = set.index();
         auto &set_data = initial_sets_data[set_id];
 
-        for (auto &&element : set_to_elements(*set)) {
+        for (auto &&element : set_to_elements(set.value())) {
             sets_covering_element[get_el_index(element)].push_back(set_id);
             set_data.m_weight_of_uncovered_elements += element_to_weight(element);
         }

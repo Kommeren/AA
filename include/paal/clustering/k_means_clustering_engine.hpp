@@ -11,9 +11,9 @@
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
-#include "paal/utils/indexed_range.hpp"
 
 #include <boost/range/combine.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 #include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/range/algorithm/for_each.hpp>
 
@@ -54,8 +54,8 @@ auto closest_to(Point && point, Centers && centers){
     using coor_t = range_to_elem_t<Point>;
     auto dist = std::numeric_limits<coor_t>::max();
     int new_center = 0;
-    for (auto center : indexed_range(centers)){
-        auto new_dist = distance_square(*center, point);
+    for (auto center : centers | boost::adaptors::indexed()){
+        auto new_dist = distance_square(center.value(), point);
 
         if (new_dist < dist) {
             dist = new_dist;
@@ -122,10 +122,10 @@ auto k_means(Points &&points, Centers & centers,
             cluster_points[closest_to(point)].push_back(point);
         }
 
-        for (auto point : indexed_range(cluster_points)) {
-            if(point->empty()) continue;
+        for (auto point : cluster_points | boost::adaptors::indexed()) {
+            if(point.value().empty()) continue;
             auto && old_center = centers[point.index()];
-            auto && new_center = centroid(*point);
+            auto && new_center = centroid(point.value());
             if (!c_equal(new_center, old_center)) {
                 visitor.move_center(old_center, new_center);
                 old_center = new_center;
