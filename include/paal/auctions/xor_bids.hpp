@@ -133,7 +133,7 @@ namespace auctions {
                };
                return utils::accumulate_functor(
                   m_get_bids(std::forward<Bidder>(bidder)) |
-                     boost::adaptors::filtered(utils::make_assignable_functor(is_contained)),
+                     boost::adaptors::filtered(is_contained),
                   Value(0),
                   m_get_value,
                   paal::utils::max()

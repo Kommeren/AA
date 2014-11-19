@@ -118,9 +118,6 @@
 [submodule "boost/numeric_conversion"]
 	path = boost/numeric_conversion
 	url = https://github.com/boostorg/numeric_conversion.git
-[submodule "boost/build"]
-	path = boost/build
-	url = https://github.com/boostorg/build.git
 [submodule "boost/timer"]
 	path = boost/timer
 	url = https://github.com/boostorg/timer.git

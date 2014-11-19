@@ -17,8 +17,8 @@
 
 #include "paal/lp/lp_base.hpp"
 #include "paal/lp/problem_type.hpp"
-
 #include "paal/utils/rotate.hpp"
+
 #include <boost/range/counting_range.hpp>
 
 namespace paal {

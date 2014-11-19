@@ -16,9 +16,7 @@
 #ifndef PAAL_ZELIKOVSKY_11_PER_6_HPP
 #define PAAL_ZELIKOVSKY_11_PER_6_HPP
 
-// hack for clang compilation (hash for boost tuple, boost::1_55)
 #include <boost/config.hpp>
-#undef BOOST_NO_CXX11_HDR_TUPLE
 
 #include "paal/utils/contract_bgl_adjacency_matrix.hpp"
 #include "paal/data_structures/subset_iterator.hpp"

@@ -88,10 +88,10 @@ typename adjacency_matrix<Metric>::type metric_to_bgl_with_index(
     using VertexType = typename MT::VertexType;
     idx = data_structures::bimap<VertexType>(vertices);
     auto idxMetric = data_structures::make_metric_on_idx(m, idx);
-    auto transLambda = [&](VertexType v) { return idx.get_idx(v); };
-    auto trans = utils::make_assignable_functor(transLambda);
+    auto get_idx = [&](VertexType v) { return idx.get_idx(v); };
 
-    return metric_to_bgl(idxMetric, vertices | boost::adaptors::transformed(trans));
+    return metric_to_bgl(idxMetric, vertices |
+                         boost::adaptors::transformed(get_idx));
 }
 
 } //!data_structures
