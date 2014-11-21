@@ -270,8 +270,7 @@ namespace concepts {
     * @return demand query components
     */
    template <typename... Args>
-   auto make_demand_query_auction_components(Args&&... args) ->
-      decltype(demand_query_components::make_components(std::forward<Args>(args)...))
+   auto make_demand_query_auction_components(Args&&... args)
    {
       auto res = demand_query_components::make_components(std::forward<Args>(args)...);
       BOOST_CONCEPT_ASSERT((concepts::demand_query_auction<decltype(res)>));

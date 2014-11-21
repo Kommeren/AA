@@ -13,9 +13,9 @@
  * @date 2014-06-10
  */
 
-#include "test_utils/fractional_winner_determination_in_MUCA.hpp"
+#include "test_utils/fractional_winner_determination_in_MUCA_utils.hpp"
 #include "test_utils/parse_file.hpp"
-#include "test_utils/winner_determination_in_MUCA.hpp"
+#include "test_utils/winner_determination_in_MUCA_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_long_test.hpp"
 
 #include "paal/lp/glp.hpp"

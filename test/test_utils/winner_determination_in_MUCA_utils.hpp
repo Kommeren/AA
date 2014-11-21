@@ -6,7 +6,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 /**
- * @file winner_determination_in_MUCA.hpp
+ * @file winner_determination_in_MUCA_utils.hpp
  * @brief
  * @author Robert Rosolek
  * @version 1.0
@@ -25,7 +25,10 @@
 #include "paal/auctions/xor_bids.hpp"
 #include "paal/auctions/winner_determination_in_MUCA/winner_determination_in_MUCA.hpp"
 #include "paal/utils/functors.hpp"
+#include "paal/utils/make.hpp"
 #include "paal/utils/type_functions.hpp"
+
+#include <boost/function_output_iterator.hpp>
 
 #include <cmath>
 #include <iterator>
@@ -87,11 +90,11 @@ void check_determine_winners_in_gamma_oracle(
    std::unordered_map<Bidder, Value> bidder_count;
    paal::auctions::determine_winners_in_gamma_oracle_auction(
       auction,
-      boost::make_function_output_iterator([&](std::pair<Bidder, ItemsBundle> p)
+      boost::iterators::make_function_output_iterator([&](std::pair<Bidder, ItemsBundle> p)
       {
          auto bidder = p.first;
          auto& items = p.second;
-         std::unordered_set<Item> item_set(std::begin(items), std::end(items));
+         auto item_set = paal::make_unordered_set(items);
          social_welfare += valuation.template call<paal::auctions::value_query>(bidder, item_set);
          for (auto item: items) {
             auto cnt = ++item_count[item];

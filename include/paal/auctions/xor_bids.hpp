@@ -266,15 +266,7 @@ namespace auctions {
       GetBids get_bids,
       GetValue get_value,
       GetItems get_items,
-      GetCopiesNum get_copies_num = GetCopiesNum{}
-   ) ->
-   decltype(make_demand_query_auction_components(
-      std::forward<Bidders>(bidders),
-      std::forward<Items>(items),
-      detail::xor_bids_demand_query<GetBids, GetValue, GetItems>(get_bids,
-         get_value, get_items),
-      get_copies_num
-   ))
+      GetCopiesNum get_copies_num = GetCopiesNum{})
    {
       BOOST_CONCEPT_ASSERT((concepts::xor_bids<Bidders, Items, GetBids,
                GetValue, GetItems, GetCopiesNum>));

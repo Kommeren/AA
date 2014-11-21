@@ -14,7 +14,7 @@
  */
 
 #include "test_utils/auctions.hpp"
-#include "test_utils/winner_determination_in_MUCA.hpp"
+#include "test_utils/winner_determination_in_MUCA_utils.hpp"
 
 #include "paal/auctions/winner_determination_in_MUCA/winner_determination_in_MUCA.hpp"
 

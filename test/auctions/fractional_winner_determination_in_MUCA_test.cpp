@@ -13,7 +13,7 @@
  * @date 2014-07-24
  */
 
-#include "test_utils/fractional_winner_determination_in_MUCA.hpp"
+#include "test_utils/fractional_winner_determination_in_MUCA_utils.hpp"
 
 #include "paal/auctions/fractional_winner_determination_in_MUCA/fractional_winner_determination_in_MUCA.hpp"
 #include "paal/auctions/xor_bids.hpp"

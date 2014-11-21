@@ -17,8 +17,9 @@
 
 #include <boost/graph/graph_traits.hpp>
 
-#include <string>
 #include <cassert>
+#include <string>
+#include <tuple>
 
 namespace paal {
 

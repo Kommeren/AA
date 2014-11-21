@@ -13,7 +13,6 @@
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 
-#include <boost/function_output_iterator.hpp>
 #include <boost/optional/optional.hpp>
 
 #include <iterator>
@@ -33,7 +32,7 @@ struct auction_traits {
    using bidders_universe_t =
       decltype(std::declval<Auction>().template get<bidders>());
    using bidder_iterator_t =
-      puretype(std::begin(std::declval<bidders_universe_t>()));
+       typename boost::range_iterator<bidders_universe_t>::type;
    using bidder_t = range_to_ref_t<bidders_universe_t>;
    using bidder_val_t = range_to_elem_t<bidders_universe_t>;
    using items_universe_t =
@@ -69,19 +68,19 @@ class value_query_auction_traits: public auction_traits<ValueQueryAuction> {
  * @tparam DemandQueryAuction
  */
 template <class DemandQueryAuction>
-struct demand_query_auction_traits: auction_traits<DemandQueryAuction> {
+struct demand_query_auction_traits : public auction_traits<DemandQueryAuction> {
 
-      using result_t = puretype(
-         std::declval<DemandQueryAuction>().template call<demand_query>(
-            std::declval<typename auction_traits<DemandQueryAuction>::bidder_t>(),
-            // this is a little tricky, in order to obtain the value type, we pass prices and threshold
-            // as double types, because value type needs to be able to operate with doubles anyway
-            utils::make_dynamic_return_something_functor(double(1.0)) // any functor with double operator()
-         )
-      );
+    using result_t = puretype(
+            std::declval<DemandQueryAuction>().template call<demand_query>(
+                std::declval<typename auction_traits<DemandQueryAuction>::bidder_t>(),
+                // this is a little tricky, in order to obtain the value type, we pass prices and threshold
+                // as double types, because value type needs to be able to operate with doubles anyway
+                utils::make_dynamic_return_something_functor(double(1.0)) // any functor with double operator()
+                )
+            );
 
-      using items_t = typename result_t::first_type;
-      using value_t = typename result_t::second_type;
+    using items_t = typename result_t::first_type;
+    using value_t = typename result_t::second_type;
 };
 
 /**

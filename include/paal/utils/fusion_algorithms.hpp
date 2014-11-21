@@ -19,6 +19,8 @@
 
 #include <boost/fusion/include/begin.hpp>
 
+#include <functional>
+
 namespace paal {
 namespace data_structures {
 
