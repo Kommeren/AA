@@ -10,6 +10,7 @@
 #include "test_utils/read_orlib_sc.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/set_cover_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/greedy/set_cover/set_cover.hpp"
 #include "paal/utils/functors.hpp"
@@ -27,7 +28,7 @@
 #include <vector>
 
 BOOST_AUTO_TEST_CASE(set_cover_long) {
-    const std::string testDir = "test/data/SC_ORLIB/";
+    const std::string testDir = get_test_dir("SC_ORLIB");
     paal::parse(testDir + "cases.txt",
                 [&](const std::string &fname, std::istream &is_test_cases) {
         LOGLN("TEST " << fname);

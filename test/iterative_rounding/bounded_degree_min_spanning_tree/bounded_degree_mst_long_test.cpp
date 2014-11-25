@@ -15,6 +15,7 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_bounded_deg_mst.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/iterative_rounding/bounded_degree_min_spanning_tree/bounded_degree_mst.hpp"
@@ -118,7 +119,7 @@ void run_test(const Graph & g, const Cost & costs, const Bound & deg_bounds,
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_long) {
-    std::string test_dir = "test/data/BOUNDED_DEGREE_MST/";
+    std::string test_dir = get_test_dir("BOUNDED_DEGREE_MST");
     paal::parse(test_dir + "bdmst.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         int vertices_num, edges_num;
         double best_cost;

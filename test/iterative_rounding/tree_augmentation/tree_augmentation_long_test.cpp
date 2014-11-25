@@ -15,6 +15,7 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -109,7 +110,7 @@ template <typename TA>
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
-    std::string test_dir = "test/data/TREEAUG/";
+    std::string test_dir = get_test_dir("TREEAUG");
     parse(test_dir + "tree_aug.txt", [&](const std::string & fname, std::istream &) {
         LOGLN(fname);
         std::string filename = test_dir + "cases/" + fname + ".lgf";

@@ -9,6 +9,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_two_dimensional_data.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/clustering/k_means_clustering.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -42,7 +43,7 @@ template <class Stream> struct print_svg_visitor : public paal::k_means_visitor 
 BOOST_AUTO_TEST_CASE(k_means_clustering_long_test) {
     using Point = std::vector<double>;
 
-    std::string testDir = "test/data/CLUSTERING/";
+    std::string testDir = get_test_dir("CLUSTERING");
     paal::parse(testDir + "index",
                 [&](const std::string &fname, std::istream &is_test_cases) {
 

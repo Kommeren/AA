@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_fl.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/local_search/facility_location/facility_location.hpp"
@@ -33,7 +34,7 @@ using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
-    std::string testDir = "test/data/FL_ORLIB/";
+    std::string testDir = get_test_dir("FL_ORLIB");
     parse(testDir + "uncapopt.txt",
           [&](const std::string & fname, std::istream & is_test_cases) {
         double optTemp;

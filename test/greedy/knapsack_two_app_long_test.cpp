@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_knapsack.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_unbounded_two_app.hpp"
@@ -30,7 +31,7 @@ using namespace paal;
 using namespace paal::utils;
 
 BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
-    std::string testDir = "test/data/KNAPSACK/";
+    std::string testDir = get_test_dir("KNAPSACK");
 
     parse(testDir + "cases.txt", [&](const std::string & line, std::istream &) {
         int testId = std::stoi(line);

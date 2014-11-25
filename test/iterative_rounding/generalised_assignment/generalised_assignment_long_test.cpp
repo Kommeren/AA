@@ -15,6 +15,7 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_gen_ass.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/data_structures/components/components_replace.hpp"
 #include "paal/data_structures/metric/basic_metrics.hpp"
@@ -62,7 +63,7 @@ void check_result(IRResult result, const Machines & machines,
 }
 
 BOOST_AUTO_TEST_CASE(generalised_assignment_long) {
-    std::string test_dir = "test/data/GENERALISED_ASSIGNMENT/";
+    std::string test_dir = get_test_dir("GENERALISED_ASSIGNMENT");
     parse(test_dir + "gapopt.txt", [&](const std::string & fname, std::istream & is_test_cases) {
         int opt;
         int number_of_cases;

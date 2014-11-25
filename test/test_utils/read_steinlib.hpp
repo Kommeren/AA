@@ -125,7 +125,7 @@ inline void read_line(std::istream &is, std::string &fname, int &OPT) {
 
 inline void
 read_steinlib_tests(std::vector<steiner_tree_test_with_metric> &data) {
-    std::string test_dir = "test/data/STEINLIB/";
+    std::string test_dir = PROJECT_DIR"test/data/STEINLIB/";
     std::ifstream is_test_cases(test_dir + "/index");
     assert(is_test_cases.good());
     while (is_test_cases.good()) {

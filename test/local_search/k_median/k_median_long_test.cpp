@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_km.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/local_search/k_median/k_median.hpp"
@@ -35,7 +36,7 @@ using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(KMedianLong) {
-    std::string testDir = "test/data/KM_ORLIB/";
+    std::string testDir = get_test_dir("KM_ORLIB");
     parse(testDir + "capopt.txt",
           [&](const std::string & fname, std::istream & is_test_cases) {
         double opt;

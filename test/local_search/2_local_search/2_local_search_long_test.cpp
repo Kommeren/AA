@@ -8,6 +8,7 @@
 #include "test_utils/read_tsplib.hpp"
 #include "test_utils/2_local_search_logger.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/local_search/2_local_search/2_local_search.hpp"
 #include "paal/data_structures/cycle/simple_cycle.hpp"
@@ -26,7 +27,7 @@ using std::vector;
 using namespace paal::local_search;
 using namespace paal;
 
-std::string path = "test/data/TSPLIB/symmetrical/";
+std::string path = get_test_dir("TSPLIB/symmetrical");
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
     read_tsplib::TSPLIB_Directory dir(path);

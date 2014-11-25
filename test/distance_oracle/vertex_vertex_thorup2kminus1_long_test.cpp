@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_dist.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -49,7 +50,8 @@ void perform_full_check(const Graph& g, const Oracle& oracle, double ratio) {
 }
 
 BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_long_test ) {
-    std::string testDir = "test/data/DISTANCE/";
+
+    std::string testDir = get_test_dir("DISTANCE");
 
     parse(testDir + "cases.txt", [&](const std::string  & fname, std::istream & is_test_cases) {
         LOGLN("TEST " << fname);

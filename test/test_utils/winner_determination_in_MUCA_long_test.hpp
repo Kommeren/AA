@@ -27,7 +27,7 @@ using Value = long double;
 using Bid = std::pair<Items, Value>;
 using Bids = std::vector<Bid>;
 
-const std::string test_dir = "test/data/MUCA/";
+const std::string test_dir = PROJECT_DIR"test/data/MUCA/";
 const std::string cases_file = "cases.txt";
 
 namespace {

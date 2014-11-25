@@ -15,6 +15,7 @@
 
 #include "test_utils/logger.hpp"
 #include "test_utils/read_lp.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -87,7 +88,7 @@ void run_test(RowBounds &row_bounds, ColBounds &col_bounds,
 BOOST_AUTO_TEST_SUITE(linear_programming_long)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_long, LP, lp_types) {
-    std::string testDir = "test/data/LP/";
+    std::string testDir = get_test_dir("LP");
     paal::parse(testDir + "cases.txt",
                 [&](const std::string & fname, std::istream & is_test_cases) {
         double best_cost;

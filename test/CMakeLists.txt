@@ -61,6 +61,9 @@ else()
         endif()
     endforeach()
 
+
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_DIR=\\\"${CMAKE_BINARY_DIR}/\\\"")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_DIR=\\\"${PROJECT_DIR}/\\\"")
     add_executable(all_small_tests ${short_tests})
     target_link_libraries(all_small_tests ${TEST_LIBS})
 

@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_orlib_fl.hpp"
 #include "test_utils/test_result_check.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
@@ -66,7 +67,7 @@ fl_logger<Metric, Cost> make_fl_logger(const Metric &m, const Cost &c) {
 
 template <typename Solve>
 void run_tests(const std::string &fname, Solve solve) {
-    std::string testDir = "test/data/CFL_ORLIB/";
+    std::string testDir = get_test_dir("CFL_ORLIB");
     std::ifstream is_test_cases(testDir + fname);
 
     assert(is_test_cases.good());
