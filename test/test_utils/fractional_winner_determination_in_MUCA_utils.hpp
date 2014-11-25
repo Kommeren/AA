@@ -88,19 +88,19 @@ void check_fractional_determine_winners_in_demand_query_auction(
     pa::fractional_determine_winners_in_demand_query_auction(
             auction,
             boost::iterators::make_function_output_iterator([&](Assignment a)
-                {
+            {
                 auto bidder = std::get<0>(a);
                 auto& items = std::get<1>(a);
                 auto frac = std::get<2>(a);
                 auto item_set = paal::make_unordered_set(items);
                 social_welfare += frac * valuation.template call<pa::value_query>(bidder, item_set);
                 for (auto const & item: items) {
-                auto cnt = item_count[item] += frac;
-                BOOST_CHECK_LE(cnt, get_copies_num(item) + eps);
+                    auto cnt = item_count[item] += frac;
+                    BOOST_CHECK_LE(cnt, get_copies_num(item) + eps);
                 }
                 auto cnt = bidder_count[bidder] += frac;
                 BOOST_CHECK_LE(cnt, 1 + eps);
-                }),
+            }),
             item_to_id,
             eps
             );
