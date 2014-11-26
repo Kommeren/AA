@@ -181,3 +181,6 @@
 [submodule "boost/filesystem"]
 	path = boost/filesystem
 	url = https://github.com/boostorg/filesystem.git
+[submodule "boost/numeric_bindings"]
+	path = boost/numeric_bindings
+	url = http://git.tiker.net/trees/boost-numeric-bindings.git

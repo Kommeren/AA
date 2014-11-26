@@ -64,10 +64,10 @@ foreach(test_src ${test_srcs})
 endforeach()
 
 add_executable(all_small_tests ${short_tests})
-target_link_libraries(all_small_tests ${TEST_LIBS} glpk boost_serialization boost_iostreams)
+target_link_libraries(all_small_tests ${TEST_LIBS} glpk lapack boost_serialization boost_iostreams)
 add_dependencies(all_small_tests bins)
 add_dependencies(tests all_small_tests)
 
 add_executable(all_long_tests ${long_tests})
-target_link_libraries(all_long_tests ${TEST_LIBS} glpk)
+target_link_libraries(all_long_tests ${TEST_LIBS} glpk lapack)
 add_dependencies(tests all_long_tests)

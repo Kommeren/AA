@@ -1,0 +1,62 @@
+/*! \page frequent_directions Frequent-directions
+
+\section def Problem definition.
+In the sketch problem we are given matrix \f$A\f$. Our goal is to find matrix
+\f$B\f$ which is significantly smaller than \f$A\f$ and approximates it well.
+
+\section Solution
+
+We solve the problem using frequent-directions algorithm.
+We start with zero matrix \f$B\f$. Rows from matrix \f$A\f$ replace all-zero
+valued rows of sketch \f$B\f$. If there is no zero valued row we nullify some
+of them in two steps:
+<ol>
+    <li> the sketch is rotated using its Singular Value Decomposition (SVD) such
+    that its rows are orthogonal and in descending magnitude order
+    <li> the least important rows are nullified so that \f$compress\_size\f$ of them
+    are nonzero and rest are set to zero
+</ol>
+Default \f$compress\_size\f$ is half of number of rows in sketch.
+
+Pseudocode:
+\f{eqnarray*}
+& & \\
+& & \color{blue}B \leftarrow all\ zeros\  matrix\ R^{\ l \times m}\\
+& & \textbf{for  } \color{red}i \in [\color{red}n] \textbf{  do}\\
+& & \hspace{1cm}Insert\ \color{blue}{A_i}\ into\ a\ zero\ valued\ row\ of\ \color{blue}B\\
+& & \hspace{1cm}\textbf{if  }\color{blue}B\ has\ no\ zero\ valued\ rows \textbf{  then}\\
+& & \hspace{2cm}[\color{blue}U, \color{blue}\Sigma, \color{blue}V] \leftarrow SVD(\color{blue}B)\\
+& & \hspace{2cm}\color{red}\delta \leftarrow \color{red}\sigma^2_{compress\_size}\\
+& & \hspace{2cm}\color{blue}{\hat{\Sigma}} \leftarrow \sqrt{max(\color{blue}\Sigma^2 - I_l\color{red}\delta,0)}\\
+& & \hspace{2cm}\color{blue}B \leftarrow \color{blue}{\hat{\Sigma}V}^T\\
+\f}
+
+\section Example
+\snippet frequent_directions_example.cpp Frequent Directions Example
+
+  example file is frequent_directions_example.cpp
+
+\section app_frequentdirections Approximation Ratio
+
+After adding all data and running compress phase at the end, we get:
+
+\f{eqnarray*}
+&0\preceq B^TB \preceq A^TA\\
+and&\\
+&\Vert A^TA - B^TB \Vert \leq \Vert A \Vert ^2_f / compress\_size\\
+\f}
+
+\section Complexity
+
+Complexity of the algorithm is
+\f$O(n*m*l / (1-\frac{compress\_size}{l}))\f$ where \f$n\f$ is number of rows in
+matrix \f$A\f$, \f$m\f$ is number of columns in matrix \f$A\f$, \f$l\f$ is number
+of rows in sketch \f$B\f$ and \f$compress\_size\f$ is number of nonzero rows after
+compress phase.
+
+
+\section References
+
+The algorithm analysis is described in \cite Liberty2013
+
+*/

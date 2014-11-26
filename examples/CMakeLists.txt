@@ -14,6 +14,8 @@ foreach(example_src ${example_srcs})
             OR ${example_src} MATCHES ".*linear_programming.*"
             OR ${example_src} MATCHES ".*fractional_winner_determination_in_MUCA*")
         target_link_libraries (${example_name} ${LIBS} glpk)
+    elseif(${example_src} MATCHES ".*frequent_directions.*")
+        target_link_libraries (${example_name} ${LIBS} lapack)
     else()
         target_link_libraries (${example_name} ${LIBS})
     endif()

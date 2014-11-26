@@ -43,6 +43,7 @@ file(GLOB BOOST_SUBS "${PAAL}/boost/*")
 foreach(dir ${BOOST_SUBS})
     include_directories("${dir}/include/")
 endforeach()
+include_directories("${BOOST_SUBS}/numeric_bindings/")
 
 include_directories (${PAAL}/include)
 

@@ -15,6 +15,7 @@
 #ifndef PAAL_LSH_FUNCTIONS_HPP
 #define PAAL_LSH_FUNCTIONS_HPP
 
+#include "paal/data_structures/ublas_traits.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
 
@@ -303,8 +304,7 @@ public:
      */
     template <typename Range>
     auto operator()(Range &&range) const {
-        static_assert(std::is_same<typename paal::decay_t<Range>::container_type::storage_category,
-                                 boost::numeric::ublas::sparse_tag>::value, "vector must be sparse");
+        static_assert(data_structures::is_sparse_row<Range>::value, "vector must be sparse");
         using iter_t = typename boost::range_iterator<Range>::type;
 
         auto perm_function = [&](iter_t it) {

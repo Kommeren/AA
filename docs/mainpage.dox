@@ -71,6 +71,10 @@
             <li> \ref k_means_clustering_engine
             <li> \ref k_means_clustering
             </ul>
+        <li> Sketch
+            <ul>
+            <li> \ref frequent_directions
+            </ul>
         </ul>
     <li> Concepts
         <ul>

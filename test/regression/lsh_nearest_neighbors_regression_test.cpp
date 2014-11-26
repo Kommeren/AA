@@ -14,6 +14,7 @@
  */
 #include "test_utils/logger.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/serialization.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/irange.hpp"
@@ -27,6 +28,7 @@
 #include <iterator>
 #include <vector>
 #include <utility>
+#include <string>
 
 namespace {
 
@@ -38,6 +40,8 @@ using point_sparse_coordinates_t = boost::numeric::ublas::compressed_vector<doub
 static result_t const EPSILON = 1e-9;
 static unsigned const default_passes = 50;
 static unsigned const default_hash_functions_per_row = 2;
+
+static const std::string TMP_FILE = "tmp.bin";
 
 struct jaccard_tag{};
 struct hamming_tag{};
@@ -269,35 +273,16 @@ BOOST_AUTO_TEST_CASE(update_changes_model) {
     LOGLN("end");
 }
 
-template <typename Model>
-void serialize(Model const &  model) {
-    auto fname = paal::system::get_temp_file_path("tmp.bin");
-
-    {
-        std::ofstream ofs(fname);
-        boost::archive::binary_oarchive oa(ofs);
-        oa << model;
-    }
-
-    Model model_test;
-    std::ifstream ifs(fname);
-    boost::archive::binary_iarchive ia(ifs);
-    ia >> model_test;
-
-    BOOST_CHECK(model == model_test);
-    paal::system::remove_tmp_path(fname);
-}
-
 BOOST_AUTO_TEST_CASE(serialization) {
     LOGLN("serialize");
-    serialize(make_model(hamming_tag{}, {{0, 1}, {2, 3}}, {0.0, 0.2}));
-    serialize(make_model(jaccard_tag{},
+    serialize_test(make_model(hamming_tag{}, {{0, 1}, {2, 3}}, {0.0, 0.2}), TMP_FILE);
+    serialize_test(make_model(jaccard_tag{},
                          make_jaccard_points({{0, 1}, {2, 3}}),
-                         {0.0, 0.2}));
+                         {0.0, 0.2}), TMP_FILE);
 
     point_sparse_coordinates_t p1{make_sparse({0.0, 1.0})}, p2{make_sparse({2.0, 3.0})};
-    serialize(make_lp<paal::lsh::l_1_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
-    serialize(make_lp<paal::lsh::l_2_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
+    serialize_test(make_lp<paal::lsh::l_1_hash_function_generator<>>({p1, p2}, {0.0, 0.2}), TMP_FILE);
+    serialize_test(make_lp<paal::lsh::l_2_hash_function_generator<>>({p1, p2}, {0.0, 0.2}), TMP_FILE);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
