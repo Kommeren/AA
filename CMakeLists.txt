@@ -1,9 +1,9 @@
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
 
 set(SOURCE_DIR ${PROJECT_DIR}/include)
-set(BIN_DIR ${PROJECT_DIR}/bin)
 set(TEST_DIR ${PROJECT_DIR}/test)
 set(EXAMPLE_DIR ${PROJECT_DIR}/examples)
+set(BIN_DIR ${PROJECT_DIR}/bin)
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -38,6 +38,7 @@ endforeach()
 
 include_directories (${SOURCE_DIR})
 
+add_subdirectory(bin)
 add_subdirectory(examples)
 add_subdirectory(test)
 

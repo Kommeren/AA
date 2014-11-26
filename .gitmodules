@@ -151,3 +151,18 @@
 [submodule "boost/ublas"]
 	path = boost/ublas
 	url = https://github.com/boostorg/ublas.git
+[submodule "boost/program_options"]
+	path = boost/program_options
+	url = https://github.com/boostorg/program_options.git
+[submodule "boost/any"]
+	path = boost/any
+	url = https://github.com/boostorg/any.git
+[submodule "boost/type_index"]
+	path = boost/type_index
+	url = https://github.com/boostorg/type_index.git
+[submodule "boost/function"]
+	path = boost/function
+	url = https://github.com/boostorg/function.git
+[submodule "boost/tokenizer"]
+	path = boost/tokenizer
+	url = https://github.com/boostorg/tokenizer.git
