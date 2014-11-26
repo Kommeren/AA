@@ -39,8 +39,8 @@ auto rotate(const ForwardRange& rng, range_to_diff_type_t<ForwardRange> n)
 {
    // TODO for some reason std::next doesn't compile under clang
    // for boost::zip range
-   //const auto mid = std::next(std::begin(rng), n);
-   const auto mid = std::begin(rng) + n;
+   //auto const mid = std::next(std::begin(rng), n);
+   auto const mid = std::begin(rng) + n;
    return boost::join(
       boost::make_iterator_range(mid, std::end(rng)),
       boost::make_iterator_range(std::begin(rng), mid)

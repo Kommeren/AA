@@ -290,7 +290,7 @@ class steiner_tree_round_condition {
         int selected =
             paal::utils::random_select(weights.begin(), weights.end()) -
             weights.begin();
-        const auto &comp = problem.get_components().find(selected);
+        auto const &comp = problem.get_components().find(selected);
         problem.add_to_solution(comp.get_steiner_elements());
         problem.update_graph(comp);
         steiner_tree_init()(problem, lp);

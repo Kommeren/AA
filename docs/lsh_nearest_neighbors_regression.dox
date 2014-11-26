@@ -50,6 +50,24 @@ All hash function generators are defined in file hash_functions.hpp .
 
 \section parameters_lsh_nn_regression Parameters
 
+There are two make functions contructing the lsh_nearest_neighbors_regression object.
+The more general one:
+<pre>
+auto make_lsh_nearest_neighbors_regression(
+             TrainPoints &&train_points, TrainResults &&train_results,
+             unsigned passes,
+             LshFunctionGenerator &&lsh_function_generator,
+             unsigned threads_count = hardware_concurrency);
+</pre>
+And special version which assumes that lsh_function is concatenation of several homogenous functions:
+<pre>
+auto make_lsh_nearest_neighbors_regression_tuple_hash(
+             TrainPoints &&train_points, TrainResults &&train_results,
+             unsigned passes,
+             FunctionGenerator &&function_generator,
+             unsigned hash_functions_per_point,
+             unsigned threads_count = hardware_concurrency);
+</pre>
 IN: TrainPoints &&train_points - range of train points
 (each train point is a range of its coordinates)
 

@@ -72,21 +72,21 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
     constexpr paal::utils::tuple_get<1> get_result{};
 
     using boost::adaptors::transformed;
-    const auto train_points_coordinates =
+    auto const train_points_coordinates =
         train_points | transformed(get_coordinates);
-    const auto train_points_results =
+    auto const train_points_results =
         train_points | transformed(get_result);
-    const auto test_points_coordinates =
+    auto const test_points_coordinates =
         test_points | transformed(get_coordinates);
-    const auto test_points_results =
+    auto const test_points_results =
         test_points | transformed(get_result);
 
-    auto model = paal::make_lsh_nearest_neighbors_regression(
+    auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
             train_points_coordinates,
             train_points_results,
             passes,
-            paal::make_hash_function_tuple_generator(
-                std::move(hash_function_generator), hash_funs_per_row));
+            std::move(hash_function_generator),
+            hash_funs_per_row);
 
     std::vector<ResultType> alg_results(test_points.size());
     model.test(test_points_coordinates, alg_results.begin());

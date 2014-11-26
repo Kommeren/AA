@@ -55,8 +55,8 @@ struct gamma_oracle_func {
          assert(bidder == "Rabbit");
 
          const Value baby_val = 2, val = 3;
-         const auto baby_price = get_price("baby carrot"), price = get_price("carrot");
-         const auto baby_frac = Frac(baby_price, baby_val - z),
+         auto const baby_price = get_price("baby carrot"), price = get_price("carrot");
+         auto const baby_frac = Frac(baby_price, baby_val - z),
             frac = Frac(price, val - z),
             both_frac = Frac(baby_price + price, baby_val + val - z);
 
@@ -83,7 +83,7 @@ struct gamma_oracle_func {
 int main()
 {
    //! [Gamma Oracle Auction Create Example]
-   const auto auction = pa::make_gamma_oracle_auction_components(
+   auto const auction = pa::make_gamma_oracle_auction_components(
       bidders, items, gamma_oracle_func(), gamma_val
    );
    //! [Gamma Oracle Auction Create Example]

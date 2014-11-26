@@ -59,7 +59,7 @@ void print_cycle(const Cycle &cm, Stream &o, const std::string &endl = "\n") {
         data_structures::make_vertex_to_edge_iterator(cm.vend(), cm.vend());
     typedef typename data_structures::cycle_traits<Cycle>::CycleElem El;
 
-    for (const auto &p :
+    for (auto const &p :
          boost::make_iterator_range(ebegin, eend)) {
         o << "(" << p.first << "," << p.second << ")->";
     }

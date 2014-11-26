@@ -224,10 +224,10 @@ namespace auctions {
             Res best = {Items{}, 0};
             auto&& bids = m_get_bids(std::forward<Bidder>(bidder));
             for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
-               const auto value = m_get_value(*bid);
-               const auto price =
+               auto const value = m_get_value(*bid);
+               auto const price =
                   sum_functor(m_get_items(*bid), get_price);
-               const auto util = value - price;
+               auto const util = value - price;
                if (util > best.second)
                   best = {m_get_items(*bid), util};
             }
@@ -327,11 +327,11 @@ namespace auctions {
             BestBid result{};
             auto&& bids = m_get_bids(std::forward<Bidder>(bidder));
             for (auto bid = std::begin(bids); bid != std::end(bids); ++bid) {
-               const auto value = m_get_value(*bid);
+               auto const value = m_get_value(*bid);
                if (value <= threshold) continue;
-               const auto price = sum_functor(m_get_items(*bid),
+               auto const price = sum_functor(m_get_items(*bid),
                      get_price);
-               const auto frac =
+               auto const frac =
                   data_structures::make_fraction(price, value - threshold);
                if (is_better(frac, result))
                   result = std::make_pair(bid, frac);
@@ -383,7 +383,7 @@ namespace auctions {
             boost::optional<std::pair<typename Traits::items_val, typename Traits::frac>>
             operator()(Bidder&& bidder, GetPrice get_price, Threshold threshold) const
             {
-               const auto best = minimum_frac(std::forward<Bidder>(bidder),
+               auto const best = minimum_frac(std::forward<Bidder>(bidder),
                      get_price, threshold);
                if (!best) return boost::none;
                return std::make_pair(m_get_items(*best->first), best->second);

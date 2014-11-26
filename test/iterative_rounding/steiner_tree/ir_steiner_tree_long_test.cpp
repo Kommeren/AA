@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(ir_steiner_tree_long_test) {
     read_steinlib_tests(data);
     paal::ir::steiner_tree_random_generator strategy_rand(50, 5);
     // First tests only
-    for (const auto &test : data | boost::adaptors::sliced(0, 10)) {
+    for (auto const &test : data | boost::adaptors::sliced(0, 10)) {
         LOG("TEST " << test.test_name << "\n");
         LOG("OPT " << test.optimal << "\n");
 

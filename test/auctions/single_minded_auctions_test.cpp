@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(testSingleMindedAuction)
       check_auction_bidders_and_items(auction, bidders, want_items);
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("apple"), 2);
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("knife"), 1);
-      const auto tests = {
+      auto const tests = {
          std::make_tuple("John", Items{}, 0.),
          std::make_tuple("John", Items{"apple", "knife"}, 0.),
          std::make_tuple("Bob", Items{"apple", "ball", "orange"}, 0.),

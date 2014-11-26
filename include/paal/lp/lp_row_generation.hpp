@@ -74,7 +74,7 @@ class add_max_violated {
          using cand_it_t = puretype(std::begin(cands));
          boost::optional<std::pair<how_violated_t, cand_it_t>> most;
          for (auto cand : boost::counting_range(cands)) {
-            const auto how = m_how_violated(*cand);
+            auto const how = m_how_violated(*cand);
             if (!how) continue;
             if (!most || m_cmp(most->first, how))
                most = std::make_pair(std::move(how), cand);
@@ -174,7 +174,7 @@ class random_rotate {
       template <class ForwardRange>
       auto operator()(const ForwardRange& rng)
       {
-         const auto len = boost::distance(rng);
+         auto const len = boost::distance(rng);
          std::uniform_int_distribution<decltype(len)> d(0, len);
          return utils::rotate(rng, d(m_g));
       }

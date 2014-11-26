@@ -25,7 +25,8 @@
 #include <iterator>
 #include <vector>
 
-using point_t = boost::numeric::ublas::vector<int>;
+using coordinate_t = int;
+using point_t = boost::numeric::ublas::vector<coordinate_t>;
 
 auto make_point(const std::initializer_list<int> &list) {
     point_t point(list.size());
@@ -41,23 +42,20 @@ int main() {
     const std::vector<point_t> query_points =
             {make_point({0, -1}), make_point({2, 1})};
 
-    const auto passes = 50;
-    const auto hash_functions_per_point = 10;
-    const auto dimensions = train_points.front().size();
-    const auto threads_count = 1;
+    auto const passes = 50;
+    auto const hash_functions_per_point = 10;
+    auto const dimensions = train_points.front().size();
+    auto const threads_count = 1;
     //w_param should be essentially bigger than radius of expected test point neighborhood
-    const auto w_param = 3.0;
+    auto const w_param = 3.0;
 
     auto lsh_function_generator =
         paal::hash::l_2_hash_function_generator<>{dimensions, w_param};
-    auto lsh_function_tuple_generator =
-        paal::make_hash_function_tuple_generator(
-            std::move(lsh_function_generator),
-            hash_functions_per_point);
-    auto model = paal::make_lsh_nearest_neighbors_regression(
+    auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                     train_points, train_results,
                     passes,
-                    std::move(lsh_function_tuple_generator),
+                    std::move(lsh_function_generator),
+                    hash_functions_per_point,
                     threads_count);
 
     std::vector<double> results;
@@ -65,6 +63,7 @@ int main() {
 
     std::cout << "Solution:" << std::endl;
     boost::copy(results, std::ostream_iterator<double>(std::cout, ","));
+    std::cout << std::endl;
 
     return 0;
 }

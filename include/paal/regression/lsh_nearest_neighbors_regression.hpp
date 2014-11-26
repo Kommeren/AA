@@ -40,13 +40,13 @@ namespace paal {
  *
  * @tparam FunctionGenerator
  */
-template <typename FunctionGenerator = hash::default_hash_function_generator>
+template <typename HashValue,
+          typename FunctionGenerator = hash::default_hash_function_generator>
 class hash_function_tuple_generator {
     using fun_t = pure_result_of_t<FunctionGenerator()>;
     using funs_t = std::vector<fun_t>;
     FunctionGenerator m_function_generator;
     unsigned m_hash_functions_per_point;
-
 public:
     /**
      * @brief
@@ -56,7 +56,7 @@ public:
      */
     hash_function_tuple_generator(FunctionGenerator function_generator,
                                   unsigned hash_functions_per_point) :
-        m_function_generator(std::move(function_generator)),
+        m_function_generator(std::forward<FunctionGenerator>(function_generator)),
         m_hash_functions_per_point(hash_functions_per_point) {
     }
 
@@ -65,6 +65,7 @@ public:
      */
     class hash_function_tuple {
         funs_t m_hash_funs;
+        mutable std::vector<HashValue> m_values;
 
     public:
 
@@ -74,6 +75,7 @@ public:
          * @param funs
          */
         hash_function_tuple(funs_t funs) : m_hash_funs(std::move(funs)) {
+            m_values.reserve(m_hash_funs.size());
         }
 
 
@@ -84,17 +86,19 @@ public:
          * @param point
          *
          * @return vector of hash functions results
+         * This value is returned by reference, because in usual case the caller
+         * is not going to store the result. When the program parameters are not tuned or
+         * in very special cases this might be potentially inefficient.
          */
         template <typename Point>
-        auto operator()(Point &&point) const {
-            using res_on_coordinate = pure_result_of_t<fun_t(Point)>;
-
-            std::vector<res_on_coordinate> res;
-            res.reserve(m_hash_funs.size());
-            boost::transform(m_hash_funs, std::back_inserter(res),
+        auto const & operator()(Point &&point) const {
+            m_values.clear();
+            //TODO, this function, in many cases (test for example) might actually return some transformation of point
+            //this can be done since std::unordered_map::find is more general now.
+            boost::transform(m_hash_funs, std::back_inserter(m_values),
                              [&](fun_t const &fun) { return fun(point); });
 
-            return res;
+            return m_values;
         }
     };
 
@@ -124,10 +128,10 @@ public:
  *
  * @return
  */
-template <typename FunctionGenerator>
+template <typename HashValue, typename FunctionGenerator>
 auto make_hash_function_tuple_generator(FunctionGenerator &&function_generator,
                                         unsigned hash_functions_per_point) {
-    return hash_function_tuple_generator<FunctionGenerator>(
+    return hash_function_tuple_generator<HashValue, FunctionGenerator>(
                 std::forward<FunctionGenerator>(function_generator),
                 hash_functions_per_point);
 }
@@ -146,7 +150,7 @@ auto make_hash_function_tuple_generator(FunctionGenerator &&function_generator,
  * @tparam HashForHashValue hash type to be used in hash maps
  */
 template <typename HashValue,
-          typename LshFunctionGenerator = hash_function_tuple_generator<>,
+          typename LshFunctionGenerator = hash_function_tuple_generator<HashValue>,
           //TODO default value here supposed to be std::hash
           typename HashForHashValue = range_hash<HashValue>>
 class lsh_nearest_neighbors_regression {
@@ -305,7 +309,8 @@ public:
 };
 
 /**
- * @brief
+ * @brief this is the most general version of the make_lsh_nearest_neighbors_regression,
+ *        It takes any hash function generator.
  *
  * @tparam TrainPoints
  * @tparam TrainResults
@@ -324,7 +329,7 @@ auto make_lsh_nearest_neighbors_regression(
              TrainPoints &&train_points, TrainResults &&train_results,
              unsigned passes,
              LshFunctionGenerator &&lsh_function_generator,
-             unsigned threads_count) {
+             unsigned threads_count = std::thread::hardware_concurrency()) {
     using lsh_fun = pure_result_of_t<LshFunctionGenerator()>;
     using hash_result = pure_result_of_t<lsh_fun(range_to_ref_t<TrainPoints>)>;
     return lsh_nearest_neighbors_regression<hash_result, LshFunctionGenerator>(
@@ -337,33 +342,43 @@ auto make_lsh_nearest_neighbors_regression(
 
 
 /**
- * @brief creates lsh_nearest_neighbors_regression model using maximal supported
- * number of concurrent threads
+ * @brief This is the special version  of make_lsh_nearest_neighbors_regression.
+ *        This version assumes that hash function is concatenation (tuple) of several hash functions.
+ *        In this function user provide Function generator for the inner  functions only.
+ *
+ *
  *
  * @tparam TrainPoints
  * @tparam TrainResults
- * @tparam LshFunctionGenerator
+ * @tparam FunctionGenerator
  * @param train_points
  * @param train_results
- * @param passes number of used LSH functions
- * @param lsh_function_generator functor generating proper LSH functions
  * @param passes
- * @param lsh_function_generator
+ * @param function_generator
+ * @param hash_functions_per_point
+ * @param threads_count
  *
- * @return lsh_nearest_neighbors_regression instance
+ * @return
  */
 template <typename TrainPoints, typename TrainResults,
-          typename LshFunctionGenerator>
-auto make_lsh_nearest_neighbors_regression(
+          typename FunctionGenerator>
+auto make_lsh_nearest_neighbors_regression_tuple_hash(
              TrainPoints &&train_points, TrainResults &&train_results,
              unsigned passes,
-             LshFunctionGenerator &&lsh_function_generator) {
+             FunctionGenerator &&function_generator,
+             unsigned hash_functions_per_point,
+             unsigned threads_count = std::thread::hardware_concurrency()) {
+    using lsh_fun = pure_result_of_t<FunctionGenerator()>;
+    using hash_result_single = pure_result_of_t<lsh_fun(range_to_ref_t<TrainPoints>)>;
+    auto tuple_lsh = paal::make_hash_function_tuple_generator<hash_result_single>(
+                    std::forward<FunctionGenerator>(function_generator),
+                    hash_functions_per_point);
     return make_lsh_nearest_neighbors_regression(
             std::forward<TrainPoints>(train_points),
             std::forward<TrainResults>(train_results),
             passes,
-            std::forward<LshFunctionGenerator>(lsh_function_generator),
-            std::thread::hardware_concurrency());
+            std::move(tuple_lsh),
+            threads_count);
 }
 
 } //! paal

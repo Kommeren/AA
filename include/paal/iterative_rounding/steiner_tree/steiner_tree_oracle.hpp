@@ -92,7 +92,7 @@ class steiner_tree_violation_checker {
             find_violation(violating_terminal);
         }
 
-        const auto &components = problem.get_components();
+        auto const &components = problem.get_components();
         lp::linear_expression expr;
         for (int i = 0; i < components.size(); ++i) {
             auto u = m_artif_vertices[i];
@@ -123,7 +123,7 @@ class steiner_tree_violation_checker {
         for (auto term : irange(problem.get_terminals().size())) {
             m_terminals_to_aux[term] = m_min_cut.add_vertex_to_graph();
         }
-        const auto &components = problem.get_components();
+        auto const &components = problem.get_components();
 
         for (int i = 0; i < components.size(); ++i) {
             AuxVertex new_v = m_min_cut.add_vertex_to_graph();
@@ -153,7 +153,7 @@ class steiner_tree_violation_checker {
      */
     template <typename Problem, typename LP>
     void update_auxiliary_digraph(Problem &problem, const LP &lp) {
-        const auto &components = problem.get_components();
+        auto const &components = problem.get_components();
         for (int i = 0; i < components.size(); ++i) {
             auto component_v = m_artif_vertices[i];
             int ver = components.find_version(i);

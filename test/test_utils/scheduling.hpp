@@ -35,7 +35,7 @@ std::vector<long long> generate_job_loads(Machines machines,
                                           double minJobsOnMachine, Time time,
                                           GetSpeed getSpeed) {
     std::vector<long long> loads;
-    for (const auto machine : machines) {
+    for (auto const machine : machines) {
         for (Time left = time; left > 0;) {
             Time jobTime = rand() % ((long long)(time / minJobsOnMachine));
             paal::assign_min(jobTime, left);
@@ -49,7 +49,7 @@ std::vector<long long> generate_job_loads(Machines machines,
 template <class Result, class Job>
 void check_jobs(Result result, std::vector<Job> jobs) {
     std::vector<Job> gotJobs;
-    for (const auto &it : result) {
+    for (auto const &it : result) {
         gotJobs.push_back(*it.second);
     }
     boost::sort(gotJobs);
@@ -62,7 +62,7 @@ double get_max_time(const Result &result, GetSpeed getSpeed) {
     typedef typename paal::range_to_elem_t<Result>::first_type MachineIter;
     typedef typename std::iterator_traits<MachineIter>::value_type Machine;
     std::unordered_map<Machine, double, boost::hash<Machine>> machineTime;
-    for (const auto &machineJobPair : result) {
+    for (auto const &machineJobPair : result) {
         Machine machine = *machineJobPair.first;
         auto load = *machineJobPair.second;
         machineTime[machine] += double(load) / getSpeed(machine);

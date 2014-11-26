@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(testXorBidsAuction)
       check_auction_bidders_and_items(auction, bidders, want_items);
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("apple"), 3);
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("knife"), 1);
-      const auto tests = {
+      auto const tests = {
          std::make_tuple("John", Items{"apple", "ball"}, 0.),
          std::make_tuple("John", Items{"apple", "knife"}, 1.7),
          std::make_tuple("John", Items{"knife", "orange", "lemon"}, 0.),
@@ -115,7 +115,7 @@ BOOST_AUTO_TEST_CASE(testXorBidsAuction)
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("sugar"), 3);
       BOOST_CHECK_EQUAL(auction.call<pa::get_copies_num>("knife"), 1);
 
-      const auto empty = std::make_pair(Items{}, 0);
+      auto const empty = std::make_pair(Items{}, 0);
       // TODO refactor these checks once C++14 polymorphic lambdas arrive
       BOOST_CHECK(check_demand_query<Item>(auction, "John", pu::return_one_functor(), empty));
       BOOST_CHECK(check_demand_query<Item>(

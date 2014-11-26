@@ -27,7 +27,7 @@ typedef int Machine;
 
 template <class Result> void print_result(const Result &result) {
     std::unordered_map<Machine, Time> machineTime;
-    for (const auto &machineJobpair : result) {
+    for (auto const &machineJobpair : result) {
         Machine machine = *machineJobpair.first;
         Job job = *machineJobpair.second;
         machineTime[machine] += job.first / machine;
@@ -35,7 +35,7 @@ template <class Result> void print_result(const Result &result) {
                   << std::endl;
     }
     Time max_time = 0;
-    for (const auto &it : machineTime) {
+    for (auto const &it : machineTime) {
         max_time = std::max(max_time, it.second);
     }
     std::cout << "Solution: " << max_time << std::endl;

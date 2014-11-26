@@ -54,7 +54,7 @@ template <typename Element> class subset_backtrack {
     */
     boost::iterator_range<typename std::vector<Element>::const_iterator>
     get_moves() const {
-        const auto moves_begin = current_tail().m_cur_pos + m_start_solving,
+        auto const moves_begin = current_tail().m_cur_pos + m_start_solving,
                    moves_end = current_tail().m_elems.cend();
         return boost::make_iterator_range(moves_begin, moves_end);
     };

@@ -12,7 +12,6 @@
  * @version 1.0
  * @date 2014-10-07
  */
-
 #include "test_utils/logger.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
@@ -41,14 +40,13 @@ auto make_hamming_model(const std::vector<point_coordinates_t> &train_points,
                         unsigned passes = default_passes,
                         unsigned hash_functions_per_row
                             = default_hash_functions_per_row) {
-    const auto dimensions = train_points.front().size();
-    return paal::make_lsh_nearest_neighbors_regression(
+    auto const dimensions = train_points.front().size();
+    return paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                 train_points,
                 train_results,
                 passes,
-                paal::make_hash_function_tuple_generator(
-                    paal::hash::hamming_hash_function_generator{dimensions},
-                    hash_functions_per_row));
+                paal::hash::hamming_hash_function_generator{dimensions},
+                hash_functions_per_row);
 }
 
 template<typename Model>
@@ -172,9 +170,13 @@ BOOST_AUTO_TEST_CASE(update_changes_model) {
     auto model = make_hamming_model({{0, 1}, {2, 3}},
                                     {0.0, 0.2});
     //point distant from train points
+    LOGLN("test");
     test(model, {{17, 18}}, {0.1});
+    LOGLN("update");
     update(model, {{4, 5}}, {0.4});
+    LOGLN("test");
     test(model, {{17, 18}}, {0.2});
+    LOGLN("end");
 }
 
 

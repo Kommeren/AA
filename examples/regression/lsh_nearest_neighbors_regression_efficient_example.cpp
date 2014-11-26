@@ -40,17 +40,16 @@ int main() {
     const std::vector<point_coordinates_t> query_points =
             {{0, -1}, {2, 1}};
 
-    const auto passes = 50;
-    const auto dimensions = std::get<0>(train_points.front()).size();
-    const auto hash_functions_per_point = 1;
+    auto const passes = 50;
+    auto const dimensions = std::get<0>(train_points.front()).size();
+    auto const hash_functions_per_point = 1;
 
-    auto model = paal::make_lsh_nearest_neighbors_regression(
+    auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
             train_points | boost::adaptors::transformed(get_coordinates),
             train_points | boost::adaptors::transformed(get_result),
             passes,
-            paal::make_hash_function_tuple_generator(
-                paal::hash::hamming_hash_function_generator{dimensions},
-                hash_functions_per_point));
+            paal::hash::hamming_hash_function_generator{dimensions},
+            hash_functions_per_point);
 
     std::vector<result_t> results;
     results.reserve(query_points.size());
@@ -58,6 +57,7 @@ int main() {
 
     std::cout << "Solution:" << std::endl;
     boost::copy(results, std::ostream_iterator<double>(std::cout, ","));
+    std::cout << std::endl;
 
     return 0;
 }

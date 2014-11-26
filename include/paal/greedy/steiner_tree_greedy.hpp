@@ -154,8 +154,8 @@ auto steiner_tree_greedy(const Graph &g, OutputIterator out,
     // creating terminal_graph
     TerminalGraph terminal_graph(N);
     for (auto w : boost::as_array(edges(g))) {
-        const auto &nearest_to_source = nearest_terminal_map[source(w, g)];
-        const auto &nearest_to_target = nearest_terminal_map[target(w, g)];
+        auto const &nearest_to_source = nearest_terminal_map[source(w, g)];
+        auto const &nearest_to_target = nearest_terminal_map[target(w, g)];
         if (nearest_to_source != nearest_to_target) {
             add_edge(nearest_to_source, nearest_to_target,
                      WeightProperty(distance[source(w, g)] +

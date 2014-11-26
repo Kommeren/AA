@@ -63,7 +63,8 @@ public:
     //TODO change to decltype(auto), when it starts working
     auto operator()(Range &&range) const ->
             range_to_elem_t<decltype(range)> {
-        assert(m_chosen_position < boost::size(range));
+        //TODO takes to long, use boost assert
+        //assert(m_chosen_position < boost::size(range));
         return range[m_chosen_position];
     }
 };
@@ -151,7 +152,8 @@ public:
         //TODO use concept check with VectorExpressionConcept<Range>,
         //when it works
 
-        assert(boost::size(m_r) == boost::size(range));
+        //TODO takes to long, use boost assert
+        //assert(boost::size(m_r) == boost::size(range));
 
         using boost::numeric::ublas::inner_prod;
         auto inner_product = inner_prod(m_r, range);

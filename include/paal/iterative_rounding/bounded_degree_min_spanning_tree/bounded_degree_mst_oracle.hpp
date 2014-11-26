@@ -76,8 +76,8 @@ class bdmst_violation_checker {
             find_violation(violating_pair.first, violating_pair.second);
         }
 
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
 
         lp::linear_expression expr;
         for (auto const &e : problem.get_edge_map().right) {
@@ -98,8 +98,8 @@ class bdmst_violation_checker {
      */
     template <typename Problem, typename LP>
     void fill_auxiliary_digraph(const Problem &problem, const LP &lp) {
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
         m_vertices_num = num_vertices(g);
         m_min_cut.init(m_vertices_num);
         m_src_to_v.resize(m_vertices_num);
@@ -134,8 +134,8 @@ class bdmst_violation_checker {
      */
     template <typename Problem>
     void initialize_candidates(const Problem &problem) {
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
         auto src = *(std::next(vertices(g).first, rand() % m_vertices_num));
         auto aux_src = get(index, src);
         m_candidate_list.clear();

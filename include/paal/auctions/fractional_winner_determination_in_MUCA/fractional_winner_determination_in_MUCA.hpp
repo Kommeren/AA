@@ -129,8 +129,8 @@ fractional_determine_winners_in_demand_query_auction(
    // add items variables to the dual
    auto&& items_ = auction.template get<items>();
    for (auto item = std::begin(items_); item != std::end(items_); ++item) {
-      const auto copies = auction.template call<get_copies_num>(*item);
-      const auto id = dual.add_column(copies, 0, lp::lp_traits::PLUS_INF, "");
+      auto const copies = auction.template call<get_copies_num>(*item);
+      auto const id = dual.add_column(copies, 0, lp::lp_traits::PLUS_INF, "");
       put(item_to_id, *item, id);
    }
 
@@ -158,8 +158,8 @@ fractional_determine_winners_in_demand_query_auction(
       //check if there is a violated constraint for bidder
       last_bidder = bidder;
       res = auction.template call<demand_query>(bidder, get_price);
-      const auto util = res->second;
-      const auto alpha = util - dual.get_col_value(bidder_id);
+      auto const util = res->second;
+      auto const alpha = util - dual.get_col_value(bidder_id);
       if (alpha > epsilon) return boost::optional<double>(alpha);
       return boost::optional<double>{};
    });
@@ -172,14 +172,14 @@ fractional_determine_winners_in_demand_query_auction(
       }
 
       auto& items = res->first;
-      const auto util = res->second;
+      auto const util = res->second;
 
       // add violated constraint
-      const auto price = sum_functor(items, get_price);
-      const auto value = util + price;
-      const auto expr = accumulate_functor(items,
+      auto const price = sum_functor(items, get_price);
+      auto const value = util + price;
+      auto const expr = accumulate_functor(items,
             lp::linear_expression(bidder_id), item_to_id_func);
-      const auto bid_id = dual.add_row(expr >= value);
+      auto const bid_id = dual.add_row(expr >= value);
       generated_bids.emplace_back(bidder, bid_id, std::move(items));
    });
 
@@ -191,7 +191,7 @@ fractional_determine_winners_in_demand_query_auction(
 
    auto solve_lp = [&]()
    {
-      const auto res = dual.resolve_simplex(lp::DUAL);
+      auto const res = dual.resolve_simplex(lp::DUAL);
       assert(res == lp::OPTIMAL);
       return res;
    };
@@ -200,7 +200,7 @@ fractional_determine_winners_in_demand_query_auction(
 
    // emit results
    for (auto& bid: generated_bids) {
-      const auto fraction = dual.get_row_dual_value(bid.m_bid_id);
+      auto const fraction = dual.get_row_dual_value(bid.m_bid_id);
       if (fraction <= epsilon) continue;
       *result = std::make_tuple(std::move(bid.m_bidder),
             std::move(bid.m_bundle), fraction);

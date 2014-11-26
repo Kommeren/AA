@@ -50,7 +50,7 @@ struct demand_query_func {
       assert(bidder == "Rabbit");
 
       const Value baby_val = 2, val = 3;
-      const auto baby_price = get_price("baby carrot"), price = get_price("carrot");
+      auto const baby_price = get_price("baby carrot"), price = get_price("carrot");
 
       const Value baby_util = baby_val - baby_price,
          util = val - price, both_util = baby_val + val - baby_price - price;
@@ -70,7 +70,7 @@ struct demand_query_func {
 
 int main() {
    //! [Demand Query Auction Create Example]
-   const auto auction = pa::make_demand_query_auction_components(
+   auto const auction = pa::make_demand_query_auction_components(
       bidders, items, demand_query_func()
    );
    //! [Demand Query Auction Create Example]

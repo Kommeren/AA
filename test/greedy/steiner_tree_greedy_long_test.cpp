@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_CASE(steiner_tree_greedy_test) {
     std::vector<paal::steiner_tree_test_with_metric> data;
     LOGLN("READING INPUT...");
     read_steinlib_tests(data);
-    for (const auto &test : data) {
+    for (auto const &test : data) {
         LOGLN("TEST " << test.test_name);
         LOGLN("OPT " << test.optimal);
 

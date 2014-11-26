@@ -125,7 +125,7 @@ determine_winners_in_gamma_oracle_auction(
          ++item
    ) {
       ++items_num;
-      const auto copies = auction.template call<get_copies_num>(*item);
+      auto const copies = auction.template call<get_copies_num>(*item);
       put(price, *item, 1.0 / copies);
    }
    Price price_sum = items_num;
@@ -136,9 +136,9 @@ determine_winners_in_gamma_oracle_auction(
    auto last_assigned_bidder_info = bidders_info_vec.end();
    BidderIter last_assigned_bidder;
    Value total_value = 0, last_value{};
-   const auto b = get_minimum_copies_num(auction);
-   const auto multiplier = std::exp(Value(b) + 1) * items_num;
-   const auto gamma_ = auction.template get<gamma>();
+   auto const b = get_minimum_copies_num(auction);
+   auto const multiplier = std::exp(Value(b) + 1) * items_num;
+   auto const gamma_ = auction.template get<gamma>();
    auto get_threshold = [=](const BidderInfo& b)
    {
       return (1 + 2 * gamma_) * b.m_best_items_val;
@@ -149,7 +149,7 @@ determine_winners_in_gamma_oracle_auction(
       auto bidder_info = bidders_info_vec.begin();
       auto bidder = std::begin(auction.template get<bidders>());
       for (; bidder_info != bidders_info_vec.end(); ++bidder_info, ++bidder) {
-         const auto threshold = get_threshold(*bidder_info);
+         auto const threshold = get_threshold(*bidder_info);
          auto result = auction.template call<gamma_oracle>(
             *bidder, utils::make_property_map_get(price), threshold
          );
@@ -164,9 +164,9 @@ determine_winners_in_gamma_oracle_auction(
       if (!best) break;
       auto& best_items = best->first;
       for (auto item = std::begin(best_items); item != std::end(best_items); ++item) {
-         const auto copies = auction.template call<get_copies_num>(*item);
-         const auto old_price = get(price, *item);
-         const auto new_price =
+         auto const copies = auction.template call<get_copies_num>(*item);
+         auto const old_price = get(price, *item);
+         auto const new_price =
             old_price * std::pow(multiplier, 1.0 / (copies+ 1));
          put(price, *item, new_price);
          price_sum += copies* (new_price - old_price);

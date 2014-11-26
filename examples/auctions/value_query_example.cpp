@@ -63,7 +63,7 @@ struct value_query_func {
 int main()
 {
    //! [Value Query Auction Create Example]
-   const auto auction = pa::make_value_query_auction_components(
+   auto const auction = pa::make_value_query_auction_components(
       bidders, items, value_query_func(), get_copies_num_func()
    );
    //! [Value Query Auction Create Example]

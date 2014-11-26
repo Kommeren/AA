@@ -40,8 +40,8 @@ class steiner_network_violation_checker {
      */
     template <typename Problem>
     bool check_if_solution_exists(Problem &problem) {
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
         for (auto e : boost::as_array(edges(g))) {
@@ -95,8 +95,8 @@ class steiner_network_violation_checker {
             find_violation(violation.first, violation.second, problem);
         }
 
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
         auto restriction =
             problem.get_max_restriction(violation.first, violation.second);
 
@@ -135,8 +135,8 @@ class steiner_network_violation_checker {
      */
     template <typename Problem, typename LP>
     void fill_auxiliary_digraph(Problem &problem, const LP &lp) {
-        const auto &g = problem.get_graph();
-        const auto &index = problem.get_index();
+        auto const &g = problem.get_graph();
+        auto const &index = problem.get_index();
         m_min_cut.init(num_vertices(g));
 
         for (auto const &e : problem.get_edge_map()) {
