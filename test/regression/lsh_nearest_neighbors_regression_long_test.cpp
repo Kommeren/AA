@@ -13,6 +13,7 @@
  * @date 2014-10-07
  */
 #include "test_utils/logger.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
@@ -81,12 +82,15 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
     auto const test_points_results =
         test_points | transformed(get_result);
 
+    const int thread_nr = 2;
+
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
             train_points_coordinates,
             train_points_results,
             passes,
             std::move(hash_function_generator),
-            hash_funs_per_row);
+            hash_funs_per_row,
+            thread_nr);
 
     std::vector<ResultType> alg_results(test_points.size());
     model.test(test_points_coordinates, alg_results.begin());
@@ -157,7 +161,7 @@ typedef boost::mpl::list<
     > test_vector_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(l1_l2_regression, VectorType, test_vector_types) {
-    std::string testDir = "test/data/LSH_REGRESSION/";
+    std::string testDir = get_test_dir("LSH_REGRESSION/");
 
     paal::parse(testDir + "cases.txt",
                 [&](const std::string &file_name, paal::utils::ignore_param) {

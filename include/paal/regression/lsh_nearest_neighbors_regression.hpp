@@ -15,6 +15,9 @@
 #ifndef PAAL_LSH_NEAREST_NEIGHBOURS_REGRESSION_HPP
 #define PAAL_LSH_NEAREST_NEIGHBOURS_REGRESSION_HPP
 
+#define BOOST_ERROR_CODE_HEADER_ONLY
+
+#include "paal/data_structures/thread_pool.hpp"
 #include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/hash.hpp"
 #include "paal/utils/hash_functions.hpp"
@@ -27,7 +30,6 @@
 
 #include <functional>
 #include <iterator>
-#include <thread>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
@@ -108,7 +110,7 @@ public:
      * @return hash_function_tuple of m_hash_functions_per_point hash functions
      */
     //TODO change to auto, when it starts working
-    hash_function_tuple operator()() {
+    hash_function_tuple operator()() const {
         funs_t hash_funs;
         hash_funs.reserve(m_hash_functions_per_point);
         std::generate_n(std::back_inserter(hash_funs),
@@ -180,14 +182,14 @@ public:
      * @param train_results
      * @param passes number of used LSH functions
      * @param lsh_function_generator functor generating proper LSH functions
-     * @param threads_count does not work yet (algoritm is currently only single threaded)
+     * @param threads_count
      */
     template <typename TrainPoints, typename TrainResults>
     lsh_nearest_neighbors_regression(
             TrainPoints &&train_points, TrainResults &&train_results,
             unsigned passes,
             LshFunctionGenerator &&lsh_function_generator,
-            unsigned threads_count) :
+            unsigned threads_count = std::thread::hardware_concurrency()) :
         m_lsh_function_generator(lsh_function_generator),
         m_hash_maps(passes) {
 
@@ -200,25 +202,6 @@ public:
                threads_count);
     }
 
-    /**
-     * @brief constructor using maximal supported number of concurrent threads
-     *
-     * @tparam TrainPoints
-     * @tparam TrainResults
-     * @param train_points
-     * @param train_results
-     * @param passes number of used LSH functions
-     * @param lsh_function_generator functor generating proper LSH functions
-     */
-    template <typename TrainPoints, typename TrainResults>
-    lsh_nearest_neighbors_regression(
-             TrainPoints &&train_points, TrainResults &&train_results,
-             unsigned passes,
-             LshFunctionGenerator &&lsh_function_generator
-             ) :
-        lsh_nearest_neighbors_regression(train_points, train_results, passes,
-                lsh_function_generator, std::thread::hardware_concurrency()) {
-    }
 
     /**
      * @brief trains model
@@ -227,56 +210,38 @@ public:
      * @tparam TrainResults
      * @param train_points
      * @param train_results
-     * @param threads_count does not work yet (algoritm is currently only single threaded)
+     * @param threads_count
      */
     template <typename TrainPoints, typename TrainResults>
     void update(TrainPoints &&train_points, TrainResults &&train_results,
-                unsigned threads_count) {
-        //TODO This is nice solution because train_points range is Single-Pass,
-        //it would be nice to keep this when threads are added
-        for (auto &&train_point_result : boost::combine(train_points, train_results)) {
-            auto const &point = boost::get<0>(train_point_result);
-            auto const &res = boost::get<1>(train_point_result);
-            m_avg.add_value(res);
+            unsigned threads_count = std::thread::hardware_concurrency()) {
 
-            for (auto &&map_and_fun : boost::combine(m_hash_maps, m_hashes)) {
-                auto &map = boost::get<0>(map_and_fun);
-                auto const &fun = boost::get<1>(map_and_fun);
-                map[fun(point)].add_value(res);
-            }
+        thread_pool threads(threads_count);
+
+        threads.post([&](){ compute_avg(train_results);});
+
+        for (auto &&map_and_fun : boost::combine(m_hash_maps, m_hashes)) {
+            auto &map = boost::get<0>(map_and_fun);
+            //fun is passed by value because of efficiency reasons
+            threads.post([&, fun = boost::get<1>(map_and_fun)]() {add_values(fun, map, train_points, train_results);});
         }
+        threads.run();
+
     }
 
     /**
-     * @brief trains model using maximal supported number of concurrent threads
-     *
-     * @tparam TrainPoints
-     * @tparam TrainResults
-     * @param train_points
-     * @param train_results
-     */
-    template <typename TrainPoints, typename TrainResults>
-    void update(TrainPoints &&train_points, TrainResults &&train_results) {
-        update(std::forward<TrainPoints>(train_points),
-               std::forward<TrainResults>(train_results),
-               std::thread::hardware_concurrency());
-    }
-
-    /**
-     * @brief queries model
+     * @brief queries model, does not heave threads_count parameter, because this is much more natural
+     * to do from outside of the function
      *
      * @tparam QueryPoints
      * @tparam OutputIterator
      * @param query_points
      * @param result
-     * @param threads_count does not work yet (algoritm is currently only single threaded)
      */
     template <typename QueryPoints, typename OutputIterator>
-    void test(QueryPoints &&query_points, OutputIterator result,
-              unsigned threads_count) const {
+    void test(QueryPoints &&query_points, OutputIterator result) const {
         assert(!m_avg.empty());
-        //TODO This is nice solution because query_points range is Single-Pass,
-        //it would be nice to keep this when threads are added
+
         for (auto &&query_point : query_points) {
             average_accumulator<> avg;
             for(auto && map_and_fun : boost::combine(m_hash_maps, m_hashes)) {
@@ -292,19 +257,29 @@ public:
         }
     }
 
+private:
 
     /**
-     * @brief queries model using maximal supported number of concurrent threads
-     *
-     * @tparam QueryPoints
-     * @tparam OutputIterator
-     * @param query_points
-     * @param result
+     * @brief adds values to one hash map
      */
-    template <typename QueryPoints, typename OutputIterator>
-    void test(QueryPoints &&query_points, OutputIterator result) const {
-        test(std::forward<QueryPoints>(query_points),
-              result, std::thread::hardware_concurrency());
+    template <typename Points, typename Results>
+    void add_values(lsh_fun_t fun, map_t & map, Points const & train_points, Results const & train_results) {
+        for (auto &&train_point_result : boost::combine(train_points, train_results)) {
+            auto const &point = boost::get<0>(train_point_result);
+            auto const &res = boost::get<1>(train_point_result);
+
+            map[fun(point)].add_value(res);
+        }
+    }
+
+    /**
+     * @brief
+     */
+    template <typename Results>
+    void compute_avg(Results const & train_results) {
+        for (auto && res :train_results) {
+            m_avg.add_value(res);
+        }
     }
 };
 
@@ -319,7 +294,7 @@ public:
  * @param train_results
  * @param passes number of used LSH functions
  * @param lsh_function_generator functor generating proper LSH functions
- * @param threads_count does not work yet (algoritm is currently only single threaded)
+ * @param threads_count
  *
  * @return lsh_nearest_neighbors_regression model
  */
@@ -345,8 +320,6 @@ auto make_lsh_nearest_neighbors_regression(
  * @brief This is the special version  of make_lsh_nearest_neighbors_regression.
  *        This version assumes that hash function is concatenation (tuple) of several hash functions.
  *        In this function user provide Function generator for the inner  functions only.
- *
- *
  *
  * @tparam TrainPoints
  * @tparam TrainResults

@@ -75,9 +75,9 @@ public:
 template <typename RandomEngine = std::default_random_engine,
           typename IntType = std::size_t>
 class random_projection_hash_function_generator {
-    RandomEngine m_generator;
-    typedef std::uniform_int_distribution<IntType> distribution_t;
-    distribution_t m_distribution;
+    mutable RandomEngine m_generator;
+    using distribution_t = std::uniform_int_distribution<IntType>;
+    mutable distribution_t m_distribution;
 
     static IntType convert_to_inclusive(IntType upper_bound) {
         assert(upper_bound > 0);
@@ -103,7 +103,7 @@ public:
      * @return new projection_hash_function
      */
     //TODO change to auto, when it starts working
-    projection_hash_function<IntType> operator()() {
+    projection_hash_function<IntType> operator()() const {
         return projection_hash_function<IntType>(m_distribution(m_generator));
     }
 };
@@ -171,9 +171,9 @@ template <typename FloatType = double,
 class l_p_hash_function_generator {
     std::size_t m_range_size;
     FloatType m_w;
-    RandomEngine m_generator;
-    Distribution m_r_distribution;
-    std::uniform_real_distribution<FloatType> m_b_distribution;
+    mutable RandomEngine m_generator;
+    mutable Distribution m_r_distribution;
+    mutable std::uniform_real_distribution<FloatType> m_b_distribution;
 
 public:
     /**
@@ -197,7 +197,7 @@ public:
      *
      * @return new l_p_hash_function
      */
-    l_p_hash_function<FloatType> operator()() {
+    l_p_hash_function<FloatType> operator()() const {
         typename l_p_hash_function<FloatType>::r_param_t r(m_range_size);
         boost::generate(r, [&]() {
             return m_r_distribution(m_generator);

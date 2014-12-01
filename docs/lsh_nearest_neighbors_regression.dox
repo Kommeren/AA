@@ -91,8 +91,7 @@ IN: LshFunctionGenerator &&lsh_function_generator - functor generating proper
 LSH functions. It is necessary to use hash functions from proper to data and
 metric LSH family.
 
-IN: unsigned threads_count - parameter does not work yet
-(algorithm currently works only in single threaded mode)
+IN: unsigned threads_count
 
 \section complexity Complexity
 

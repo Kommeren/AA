@@ -59,7 +59,7 @@ int main() {
                     threads_count);
 
     std::vector<double> results;
-    model.test(query_points, std::back_inserter(results), threads_count);
+    model.test(query_points, std::back_inserter(results));
 
     std::cout << "Solution:" << std::endl;
     boost::copy(results, std::ostream_iterator<double>(std::cout, ","));

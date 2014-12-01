@@ -57,7 +57,7 @@ int main() {
     auto const THREADS_COUNT = 2;
     auto const REPEAT_NR = 10;
 
-    for (auto i = 0; i < REPEAT_NR; ++i ) {
+    for (auto i = 0; i < REPEAT_NR; ++i) {
         auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                 train_points | boost::adaptors::transformed(get_coordinates),
                 train_points | boost::adaptors::transformed(get_result),

@@ -63,11 +63,10 @@ std::vector<double> classify(const std::vector<Row> &train_points,
         test_points | transformed(get_result);
 
     // TODO: model_in model_out
-    // TODO: Jak uzyc nthread?
-    auto model = paal::make_lsh_nearest_neighbors_regression(
+    // TODO: How to use nthread?
+    auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
             train_points_coordinates, train_points_results, passes,
-            paal::make_hash_function_tuple_generator(
-                std::move(function_generator), hash_funs_per_row));
+            std::move(function_generator), hash_funs_per_row);
 
     std::vector<double> alg_results(test_points.size());
     model.test(test_points_coordinates, alg_results.begin());
