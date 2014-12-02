@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_simple) {
     std::string expt = create_file("expect_1", "1");
     std::string result = temp + "simple_test_1.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result);
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " --dimensions=2");
     test_files_are_equal(result, expt);
 }
 
@@ -82,7 +82,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_test_formats) {
     std::string test = create_file("test_f", "0   2:1e-6 3:1.5 5:1. 8:.5\n 1 9:1");
     std::string result = temp + "result_test_f.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result);
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " --dimensions=9");
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
@@ -91,9 +91,9 @@ BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
     std::string expect = create_file("expect_l2", "0");
     std::string result = temp + "result_test_l2.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2");
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2" + " --dimensions=1");
     test_files_are_equal(result, expect);
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l1");
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l1" + " --dimensions=1");
     test_files_are_equal(result, expect);
 }
 
@@ -103,11 +103,11 @@ BOOST_AUTO_TEST_CASE(lsh_bin_w_option) {
 
     std::string result = temp + "result_w";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 1");
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 1" + " --dimensions=1");
     std::string expect05 = create_file("expect_w05", "0.5");
     test_files_are_equal(result, expect05);
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 10");
+    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 10" + " --dimensions=1");
     std::string expect0 = create_file("expect_w0", "0");
     test_files_are_equal(result, expect0);
 }
@@ -115,6 +115,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_w_option) {
 BOOST_AUTO_TEST_CASE(lsh_bin_bad_usage) {
     std::string example = create_file("example", "1 1:1");
 
+    call_fail(lsh_bin + " -d " + example + " -t " + example);
     call_fail(lsh_bin + " -d " + example + " -t /dev/null");
     call_fail(lsh_bin + " -t " + example + " /dev/null");
     call_fail(lsh_bin + " -d " + example + " /dev/null");

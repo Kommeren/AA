@@ -50,16 +50,104 @@ void resize_rows(RowsRange &&rows, RowRefExtractor row_ref_extractor,
 
 } //! detail
 
+
+/**
+ * @brief class that can read single svm row
+ *
+ * @tparam CoordinatesType
+ * @tparam ResultType
+ * @tparam FeatureIdType
+ */
+template <typename CoordinatesType,
+          typename ResultType = int,
+          typename FeatureIdType = std::size_t>
+class svm_row {
+    CoordinatesType m_coordinates;
+    ResultType m_result;
+
+public:
+    ///constructor
+    svm_row(FeatureIdType dimensions = 1) : m_coordinates(dimensions) {}
+
+    /**
+     * @brief reads svm row of format:
+     * line .=. result feature:value feature:value ... feature:value
+     * result .=. 1 | -1
+     * feature .=. positive integer
+     * value .=. float
+     *
+     * Results are converted to 0.0 and 1.0.
+     * Feature ids are substracted by 1 in order to begin with 0.
+     *
+     * @param input_stream
+     * @param row
+     *
+     * @return
+     */
+    friend std::istream &operator>>(std::istream &input_stream, svm_row &row) {
+        std::string line;
+        std::getline(input_stream, line);
+        std::stringstream row_stream(line);
+
+        int result;
+        row_stream >> result;
+        row.m_result = (result == 1) ? 1.0 : 0.0;
+
+        row.m_coordinates.clear();
+        while (row_stream.good()) {
+            FeatureIdType feature_id;
+            row_stream >> feature_id;
+
+            using coordinate_t = range_to_elem_t<CoordinatesType>;
+            coordinate_t coordinate;
+
+            row_stream.ignore(1, ':');
+            row_stream >> coordinate;
+
+            if (row.m_coordinates.size() < feature_id) {
+                row.m_coordinates.resize(feature_id);
+            }
+            assert(feature_id > 0);
+            row.m_coordinates[feature_id - 1] = coordinate;
+        }
+
+        return input_stream;
+    }
+
+    /// coordinates getter
+    CoordinatesType const &get_coordinates() const { return m_coordinates; }
+    /// result getter
+    ResultType const &get_result() const { return m_result; }
+};
+
+/**
+ * @brief reads up to max_points_to_read svm rows,
+ * updating max_feature_id on each row
+ *
+ * @tparam RowType
+ * @tparam ResultType
+ * @param input_stream
+ * @param max_feature_id
+ * @param points
+ * @param max_points_to_read
+ */
+template <typename RowType,
+          typename ResultType = int>
+void read_svm(std::istream &input_stream,
+              std::size_t &max_feature_id,
+              std::vector<std::tuple<RowType, ResultType>> &points,
+              std::size_t max_points_to_read) {
+    svm_row<RowType, ResultType> row{max_feature_id};
+    while ((max_points_to_read--) && (input_stream >> row)) {
+        assign_max(max_feature_id, row.get_coordinates().size());
+        points.emplace_back(row.get_coordinates(),
+                            row.get_result());
+    }
+}
+
+
 /**
  * @brief Function parses svm stream of format:
- * line .=. result feature:value feature:value ... feature:value
- * result .=. +1 | -1
- * feature .=. positive integer
- * value .=. float
- *
- * Empty lines or lines beginning with '#' are ignored.
- * Results are converted to 0.0 and 1.0.
- * Feature ids are substracted by 1 in order to begin with 0.
  *
  * @tparam RowType
  * @tparam ResultType
@@ -70,39 +158,15 @@ void resize_rows(RowsRange &&rows, RowRefExtractor row_ref_extractor,
  * tuple (RowType, result)
  */
 template <typename RowType,
-          typename ResultType = double>
+          typename ResultType = int>
 auto read_svm(std::istream &input_stream) {
-    using coordinate_t = range_to_elem_t<RowType>;
     using point_with_result_t = std::tuple<RowType, ResultType>;
 
-    unsigned max_feature_id = 0;
+    std::size_t max_feature_id = 0;
     std::vector<point_with_result_t> points;
-    paal::parse(input_stream,
-                [&](std::string &result_string, std::istream &input_stream) {
-        ResultType result = (std::stoi(result_string) == 1) ? 1.0 : 0.0;
-
-        std::string coordinates_line;
-        std::getline(input_stream, coordinates_line);
-        std::stringstream point_stream(coordinates_line);
-
-        RowType coordinates;
-        while (point_stream.good()) {
-            unsigned feature_id;
-            coordinate_t coordinate;
-            point_stream >> feature_id;
-
-            point_stream.ignore(1, ':');
-            point_stream >> coordinate;
-
-            assert(feature_id > 0);
-            assign_max(max_feature_id, feature_id);
-            if (coordinates.size() < feature_id) {
-                coordinates.resize(max_feature_id);
-            }
-            coordinates[feature_id - 1] = coordinate;
-        }
-        points.push_back(std::make_tuple(coordinates, result));
-    });
+    while (input_stream.good()) {
+        read_svm(input_stream, max_feature_id, points, 1);
+    }
     detail::resize_rows(points, utils::tuple_get<0>(), max_feature_id);
 
     return std::make_tuple(points, max_feature_id);

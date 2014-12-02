@@ -1,3 +1,17 @@
+//=======================================================================
+// Copyright (c) 2014 Karol Wegrzycki
+//
+// Distributed under the Boost Software License, Version 1.0. (See
+// accompanying file LICENSE_1_0.txt or copy at
+// http://www.boost.org/LICENSE_1_0.txt)
+//=======================================================================
+/**
+ * @file lsh-regression.cpp
+ * @brief lsh_regression binnary
+ * @author Karol Wegrzycki, Andrzej Pacuk
+ * @version 1.0
+ * @date 2014-11-19
+ */
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
@@ -7,20 +21,20 @@
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
-#include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/fill.hpp>
+#include <boost/range/algorithm/copy.hpp>
 #include <boost/range/empty.hpp>
 #include <boost/range/size.hpp>
 
 #include <iostream>
 #include <random>
 #include <string>
+#include <thread>
+#include <utility>
 
-
-
-using point_type = boost::numeric::ublas::mapped_vector<double>;
+using point_type = boost::numeric::ublas::compressed_vector<double>;
 using paal::utils::tuple_get;
 
 enum Metric {HAMMING, L1, L2};
@@ -40,36 +54,55 @@ std::istream& operator>>(std::istream& in, Metric& metr) {
     return in;
 }
 
-template <typename Row, typename LshFunction>
-std::vector<double> classify(const std::vector<Row> &train_points,
-              const std::vector<Row> &test_points,
-              std::size_t dimensions,
-              int hash_funs_per_row,
-              int passes,
-              LshFunction function_generator) {
+template <typename Row = point_type, typename LshFunction>
+std::vector<double> classify(std::istream &train_points_stream,
+                             std::istream &test_points_stream,
+                             std::size_t dimensions,
+                             unsigned hash_funs_per_row,
+                             unsigned passes,
+                             std::size_t row_buffer_size,
+                             unsigned nthread,
+                             LshFunction function_generator) {
 
-    assert(!boost::empty(train_points));
+    using point_with_result_t = std::tuple<Row, int>;
     constexpr paal::utils::tuple_get<0> get_coordinates{};
     constexpr paal::utils::tuple_get<1> get_result{};
     using boost::adaptors::transformed;
 
-    const auto train_points_coordinates =
-        train_points | transformed(get_coordinates);
-    const auto train_points_results =
-        train_points | transformed(get_result);
-    const auto test_points_coordinates =
-        test_points | transformed(get_coordinates);
-    const auto test_points_results =
-        test_points | transformed(get_result);
+    std::vector<point_with_result_t> points_buffer;
 
+    auto &empty_points_range = points_buffer;
     // TODO: model_in model_out
-    // TODO: How to use nthread?
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
-            train_points_coordinates, train_points_results, passes,
-            std::move(function_generator), hash_funs_per_row);
+            empty_points_range | transformed(get_coordinates),
+            empty_points_range | transformed(get_result),
+            passes,
+            std::move(function_generator), hash_funs_per_row, nthread);
 
-    std::vector<double> alg_results(test_points.size());
-    model.test(test_points_coordinates, alg_results.begin());
+    auto &train_points = points_buffer;
+    train_points.reserve(row_buffer_size);
+    while (train_points_stream.good()) {
+        train_points.clear();
+        paal::read_svm(train_points_stream, dimensions, train_points, row_buffer_size);
+
+        model.update(train_points | transformed(get_coordinates),
+                     train_points | transformed(get_result),
+                     nthread);
+    }
+
+    std::vector<double> alg_results, test_points_results;
+    auto &test_points = points_buffer;
+    test_points.reserve(row_buffer_size);
+    while (test_points_stream.good()) {
+        test_points.clear();
+        paal::read_svm(test_points_stream, dimensions, test_points, row_buffer_size);
+
+        model.test(test_points | transformed(get_coordinates),
+                   std::back_inserter(alg_results));
+        boost::copy(test_points | transformed(get_result),
+                    std::back_inserter(test_points_results));
+    }
+
 
     auto loss = paal::log_loss<double>(alg_results, test_points_results);
 
@@ -80,9 +113,11 @@ std::vector<double> classify(const std::vector<Row> &train_points,
 
 int main(int argc, char** argv)
 {
-    int passes;
-    int nthread;
-    int precision;
+    unsigned passes;
+    unsigned nthread;
+    std::size_t dimensions;
+    std::size_t row_buffer_size;
+    unsigned precision;
     int seed;
     double w;
     Metric metric;
@@ -109,14 +144,18 @@ int main(int argc, char** argv)
         // ("model_out", po::value<std::string>(), "Write the model to this file when everything is done")
         ("result_file,o", po::value<std::string>(), "path to the file with prediction " \
                   "(float for every test in test set)")
-        ("passes,i", po::value<int>(&passes)->default_value(3), "number of iteration (default value = 3)")
-        ("nthread,n", po::value<int>(&nthread), "number of threads (default = number of cores)")
+        ("dimensions", po::value<std::size_t>(&dimensions), "number of dimensions")
+        ("passes,i", po::value<unsigned>(&passes)->default_value(3), "number of iteration (default value = 3)")
+        ("nthread,n", po::value<unsigned>(&nthread)->default_value(std::thread::hardware_concurrency()),
+                 "number of threads (default = number of cores)")
         ("metric,m", po::value<Metric>(&metric), "Metric used for determining " \
                  "similarity bettwen objects - [HAMMING/L1/L2] (default = Hamming)")
-        ("precision,b", po::value<int>(&precision)->default_value(10), "Number " \
+        ("precision,b", po::value<unsigned>(&precision)->default_value(10), "Number " \
                  "of hashing function that are encoding the object")
         ("parm_w,w", po::value<double>(&w)->default_value(1000.), "Parameter w " \
                  "should be essentially bigger than radius of expected test point neighborhood")
+        ("row_buffer_size", po::value<std::size_t>(&row_buffer_size)->default_value(100000),
+                 "size of row buffer (default value = 100000)")
         ("seed", po::value<int>(&seed)->default_value(0), "Seed of random number generator, (default = random)")
     ;
 
@@ -135,6 +174,16 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    if (vm.count("dimensions") == 0) {
+        std::cerr << "Error: Parameter dimensions was not set"  << std::endl;
+        std::cerr << desc << std::endl;
+        return 1;
+    }
+
+    if (metric == HAMMING && vm.count("parm_w") > 0) {
+        std::cerr << "Warning: parameter w was set, but hamming metric is used, param w is discarted" << std::endl;
+    }
+
     //TODO:
     // if (vm.count("train_file") == 0 && vm.count("model_in") == 0) {
     //     std::cerr << "Error: If you don't set training file (train_file) you have to set "
@@ -146,32 +195,19 @@ int main(int argc, char** argv)
     std::ifstream train_file_stream(vm["train_file"].as<std::string>());
     std::ifstream test_file_stream(vm["test_file"].as<std::string>());
 
-    using std::get;
-    auto train_points = paal::read_svm<point_type>(train_file_stream);
-
-    auto test_points = paal::read_svm<point_type>(test_file_stream);
-    auto dimensions = std::max(get<1>(train_points), get<1>(test_points));
-    using paal::detail::resize_rows;
-    resize_rows(get<0>(train_points), tuple_get<0>(), dimensions);
-    resize_rows(get<0>(test_points), tuple_get<0>(), dimensions);
-
-    // TODO: Nie wiem jak to zrobic ladnie.
     std::vector<double> results;
     if (metric == L1) {
         auto l1 = paal::hash::l_1_hash_function_generator<>{dimensions, w, std::default_random_engine(seed)};
-        results = classify(get<0>(train_points), get<0>(test_points), dimensions, precision, passes, l1);
+        results = classify(train_file_stream, test_file_stream, dimensions, precision, passes, row_buffer_size, nthread, l1);
     } else if (metric == L2) {
         auto l2 = paal::hash::l_2_hash_function_generator<>{dimensions, w, std::default_random_engine(seed)};
-        results = classify(get<0>(train_points), get<0>(test_points), dimensions, precision, passes, l2);
+        results = classify(train_file_stream, test_file_stream, dimensions, precision, passes, row_buffer_size, nthread, l2);
     } else {
-        if (vm.count("param_w") > 0)
-            std::cerr << "Warning: parameter w was set, but hamming mettric is used, param w is discarted" << std::endl;
-
         auto ham = paal::hash::hamming_hash_function_generator(dimensions, std::default_random_engine(seed));
-        results = classify(get<0>(train_points), get<0>(test_points), dimensions, precision, passes, ham);
+        results = classify(train_file_stream, test_file_stream, dimensions, precision, passes, row_buffer_size, nthread, ham);
     }
 
-    //TODO: obsluga model_in model_out
+    //TODO: serve model_in model_out
     if (vm.count("result_file") > 0) {
         std::ofstream result_file;
         result_file.open(vm["result_file"].as<std::string>());
