@@ -6,7 +6,7 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 /**
- * @file lsh_nearest_neighbors_regression.hpp
+ * @file accumulate_functors.hpp
  * @brief
  * @author Piotr Wygocki, Robert Rosolek, Andrzej Pacuk
  * @version 1.0

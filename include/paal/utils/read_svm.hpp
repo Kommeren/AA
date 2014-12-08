@@ -71,13 +71,19 @@ public:
 
     /**
      * @brief reads svm row of format:
+     *
      * line .=. result feature:value feature:value ... feature:value
+     *
      * result .=. 1 | -1
+     *
      * feature .=. positive integer
+     *
      * value .=. float
      *
-     * Results are converted to 0.0 and 1.0.
+     * Results are converted to 0 and 1.
+     *
      * Feature ids are substracted by 1 in order to begin with 0.
+     *
      * This class should get as stream only row (If you'll give
      * stream it will read to many numbers!)
      *

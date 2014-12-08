@@ -30,23 +30,9 @@
         <p>The <strong>PAAL</strong> is an open source, a header-only, generic
         library consisting of approximation algorithms, data structures and
         several complete solutions for the various optimization problems. The
-        <strong>PAAL</strong> is implemented taking advantage of the new features of <em>C++</em>
-        introduced in the <em>C++14</em> standard, which in many cases simplify greatly
+        <strong>PAAL</strong> is implemented taking advantage of the new features of <code>C++</code>
+        introduced in the <code>C++14</code> standard, which in many cases simplify greatly
         creation of generic code.</p>
-
-        <h1>Installation</h1>
-
-        <p>There is no need to install anything because the
-        <strong>PAAL</strong> is header only. All you have to do is download
-        the library and include appropriate headers. Only, if you use linear
-        programming you must link your executable against <em>glpk</em>.  If
-        you'd like to alter the library, we encourage you to compile the unit
-        tests.</p>
-
-        <h1>Download</h1>
-
-        <p>In order to download repository please run the following command:</p>
-        <pre><code>git clone --recursive http://siekiera.mimuw.edu.pl:8082/paal</code></pre>
 
         <h1>General Design</h1>
 
@@ -60,7 +46,7 @@
         <p>Besides standalone algorithms, the library contains frameworks which
         supports solving general optimization methods like local search or
         iterative rounding. The functional arguments of these frameworks are
-        usually wrapped using <em>Components</em> class
+        usually wrapped using <code>Components</code> class
         (see <a href="http://paal.mimuw.edu.pl/docs/comps.html"> Components</a>),
         which allows to specify named arguments. In such case the algorithm
         is called as follows:</p>
@@ -70,18 +56,35 @@
         <p>For each concept our library delivers the default implementations
         of components.  Of course the user is allowed to replace each
         component.  Consider for example the local search framework, where the
-        user can can easily swap the implementation of the <em>GetMoves</em>
+        user can can easily swap the implementation of the <code>GetMoves</code>
         procedure to provide his own way of searching the neighborhood.  Also
         note that the same components, that are used by local search can be
         used in the simulated annealing algorithm.  Similarly, if the user
         wants to swap the metric implementation to use specific properties of
         his topology, this is not a problem at all!</p>
 
+        <h1>Download</h1>
+
+        <pre><code>git clone --recursive http://siekiera.mimuw.edu.pl:8082/paal</code></pre>
+
+        <h1>Build</h1>
+
+        <p><strong>PAAL</strong> is mainly a header only library.
+        If you use linear programming you must link your executable against <code>glpk</code>.</p>
+        <p>Some algorithms have additional binary programs, to build them run:</p>
+<pre><code>mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make</code></pre>
+
+        <p>In order to additionally build tests or examples add parameters
+        <code>-DWITH_TESTS=1</code> <code>-DWITH_EXAMPLES=1</code> parameters
+        to <code>cmake</code> call.</p>
+
         <h1>Platforms</h1>
 
-        <p>Currently the library compiles on the gcc 4.8.1 and clang 3.5.
-        Unfortunately, the library does not compile on the Microsoft Visual
-        Studio 2013 due to its poor support of <i>C++14</i>.</p>
+        <p>Currently the library compiles on the <code>gcc 4.8.1</code> and <code>clang 3.5</code>.
+        On the <code>Visual Studio 2015 preview</code> only binaries are guarantied to compile.</p>
 
         <h1>License</h1>
 

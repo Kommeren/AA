@@ -380,7 +380,7 @@ auto make_lsh_nearest_neighbors_regression(
 /**
  * @brief This is the special version  of make_lsh_nearest_neighbors_regression.
  *        This version assumes that hash function is concatenation (tuple) of several hash functions.
- *        In this function user provide Function generator for the inner  functions only.
+ *        In this function user provide Function generator for the inner functions only.
  *
  * @tparam TrainPoints
  * @tparam TrainResults
