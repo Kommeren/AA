@@ -38,7 +38,16 @@ endforeach()
 
 include_directories (${SOURCE_DIR})
 
-add_subdirectory(bin)
-add_subdirectory(examples)
-add_subdirectory(test)
+if(${COMPILATION_ERROR_TESTS})
+    add_subdirectory(test)
+else()
+    add_subdirectory(bin)
 
+    if(${WITH_TESTS})
+        add_subdirectory(test)
+    endif()
+
+    if(${WITH_EXAMPLES})
+        add_subdirectory(examples)
+    endif()
+endif()

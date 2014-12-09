@@ -147,7 +147,7 @@ Similarly, if the user wants to swap the metric implementation to use specific
 properties of his topology, this is not a problem at all! <br>
 
  \section Platforms
- Currently the library compiles on the gcc 4.8.1 and clang 3.4. Unfortunately, the library does not
+ Currently the library compiles on the gcc 4.8.1 and clang 3.5. Unfortunately, the library does not
  compile on the Microsoft Visual Studio 2013 due to its poor support of C++14.
 
  \section License

@@ -1,19 +1,21 @@
 
 include_directories (${PROJECT_DIR})
-file(GLOB_RECURSE example_bins "${EXAMPLE_DIR}/*.cpp")
+file(GLOB_RECURSE example_srcs "${EXAMPLE_DIR}/*.cpp")
+add_custom_target(examples)
 
 #adding examples
-if(${COMPILATION_ERROR_TESTS})
-    # no examples
-else()
-    foreach(t ${example_bins})
-        get_filename_component(n ${t} NAME_WE)
-        message("adding example " : ${n})
-        add_executable(${n} ${t})
-        if(${t} MATCHES ".*iterative_rounding.*" OR ${t} MATCHES ".*linear_programming.*" OR ${t} MATCHES ".*fractional_winner_determination_in_MUCA*")
-            target_link_libraries (${n} ${LIBS} glpk)
-        else()
-            target_link_libraries (${n} ${LIBS})
-        endif()
-    endforeach()
-endif()
+foreach(example_src ${example_srcs})
+    get_filename_component(example_name ${example_src} NAME_WE)
+    message("adding example " : ${example_name})
+    add_executable(${example_name} ${example_src})
+
+    if(${example_src} MATCHES ".*iterative_rounding.*"
+            OR ${example_src} MATCHES ".*linear_programming.*"
+            OR ${example_src} MATCHES ".*fractional_winner_determination_in_MUCA*")
+        target_link_libraries (${example_name} ${LIBS} glpk)
+    else()
+        target_link_libraries (${example_name} ${LIBS})
+    endif()
+
+    add_dependencies(examples ${example_name})
+endforeach()
