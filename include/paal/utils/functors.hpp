@@ -569,6 +569,24 @@ struct equal_to {
     }
 };
 
+/// TODO equivalent to c++14 equal_to<>, remove when appears
+struct equal_to_unspecified {
+    /**
+     * @brief operator()
+     *
+     * @tparam T
+     * @tparam U
+     * @param t
+     * @param u
+     *
+     * @return
+     */
+    template <class T, class U>
+    auto operator()(T &&t, U &&u) const->decltype(t == u) {
+        return t == u;
+    }
+};
+
 /**
  * @brief not_equal_to functor
  */

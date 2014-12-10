@@ -81,7 +81,6 @@ struct edge_hash<Graph,
  *
  * @tparam Range
  */
-template <typename Range>
 struct range_hash {
 
     /**
@@ -91,7 +90,8 @@ struct range_hash {
      *
      * @return
      */
-    std::size_t operator()(const Range &range) const {
+    template <typename Range>
+    std::size_t operator()(Range && range) const {
         return boost::hash_range(std::begin(range), std::end(range));
     }
 };
