@@ -17,6 +17,7 @@
 
 #include "paal/utils/type_functions.hpp"
 
+#include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/generate.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/size.hpp>
@@ -41,6 +42,15 @@ class projection_hash_function {
     IntType m_chosen_position;
 
 public:
+    ///serialize
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_chosen_position;
+    }
+
+    ///default constructor
+    projection_hash_function() = default;
+
     /**
      * @brief constructor
      *
@@ -49,6 +59,11 @@ public:
      */
     projection_hash_function(IntType chosen_position) :
             m_chosen_position(chosen_position) {
+    }
+
+    ///operator==
+    bool operator==(projection_hash_function const & other) const {
+        return m_chosen_position == other.m_chosen_position;
     }
 
     /**
@@ -126,6 +141,15 @@ private:
     FloatType m_w;
 
 public:
+
+    ///serialize
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_r;
+        ar & m_b;
+        ar & m_w;
+    }
+
     /**
      * @brief constructor
      *
@@ -137,6 +161,16 @@ public:
     l_p_hash_function(r_param_t r,
                       FloatType b, FloatType w) :
             m_r(std::move(r)), m_b(b), m_w(w) {
+    }
+
+    ///default constructor
+    l_p_hash_function() = default;
+
+    ///operator==
+    bool operator==(l_p_hash_function const & other) const {
+        return boost::equal(m_r, other.m_r) &&
+               m_b == other.m_b &&
+               m_w == other.m_w;
     }
 
     /**

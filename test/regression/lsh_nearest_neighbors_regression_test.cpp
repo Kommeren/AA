@@ -13,12 +13,15 @@
  * @date 2014-10-07
  */
 #include "test_utils/logger.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
-
 #include "paal/utils/hash_functions.hpp"
 #include "paal/utils/irange.hpp"
 
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/test/unit_test.hpp>
 
 #include <iterator>
@@ -30,6 +33,7 @@ namespace {
 using coordinate_t = int;
 using result_t = double;
 using point_coordinates_t = std::vector<coordinate_t>;
+using point_coordinates_l_p_t = boost::numeric::ublas::compressed_vector<double>;
 
 static const result_t EPSILON = 1e-9;
 static const unsigned default_passes = 50;
@@ -46,6 +50,22 @@ auto make_hamming_model(const std::vector<point_coordinates_t> &train_points,
                 train_results,
                 passes,
                 paal::hash::hamming_hash_function_generator{dimensions},
+                hash_functions_per_row);
+}
+
+template <typename HashFunctionGenerator>
+auto make_lp(const std::vector<point_coordinates_l_p_t> &train_points,
+             const std::vector<result_t> &train_results,
+             unsigned passes = default_passes,
+             unsigned hash_functions_per_row
+                 = default_hash_functions_per_row) {
+    auto const dimensions = train_points.front().size();
+    const int W = 2;
+    return paal::make_lsh_nearest_neighbors_regression_tuple_hash(
+                train_points,
+                train_results,
+                passes,
+                HashFunctionGenerator{dimensions, W},
                 hash_functions_per_row);
 }
 
@@ -178,7 +198,37 @@ BOOST_AUTO_TEST_CASE(update_changes_model) {
     test(model, {{17, 18}}, {0.2});
     LOGLN("end");
 }
-
-
 BOOST_AUTO_TEST_SUITE_END()
+
+template <typename Model>
+void serialize(Model const &  model) {
+    auto fname = get_temp_dir() + "/tmp.bin";
+
+    {
+        std::ofstream ofs(fname);
+        boost::archive::binary_oarchive oa(ofs);
+        oa << model;
+    }
+
+    Model model_test;
+    std::ifstream ifs(fname);
+    boost::archive::binary_iarchive ia(ifs);
+    ia >> model_test;
+
+    BOOST_CHECK(model == model_test);
+    //TODO use boost filesystem remove
+    std::system((std::string("rm -f ") + fname).c_str());
+}
+
+BOOST_AUTO_TEST_CASE(serialization) {
+    LOGLN("serialize");
+    serialize(make_hamming_model({{0, 1}, {2, 3}}, {0.0, 0.2}));
+    point_coordinates_l_p_t p1{2}, p2{2};
+    p1(0) = 0.; p1(1) = 1.;
+    p2(0) = 2.; p2(1) = 3.;
+    serialize(make_lp<paal::hash::l_1_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
+    serialize(make_lp<paal::hash::l_2_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
+}
+
+
 

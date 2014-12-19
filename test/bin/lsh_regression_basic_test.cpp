@@ -13,6 +13,7 @@
  * @date 2014-11-19
  */
 
+#include "test_utils/logger.hpp"
 #include "test_utils/get_test_dir.hpp"
 
 #include <boost/test/unit_test.hpp>
@@ -30,7 +31,7 @@ std::string temp = get_temp_dir();
 
 }
 
-BOOST_AUTO_TEST_SUITE(lsh_regression_bin_simple_tests_with_files)
+BOOST_AUTO_TEST_SUITE(lsh_regression_bin_tests)
 
 
 std::string exec(std::string cmd) {
@@ -47,6 +48,7 @@ std::string exec(std::string cmd) {
 }
 
 inline void call(std::string command) {
+    LOGLN("CALL: " << command);
     std::string result = exec(command);
     BOOST_CHECK_EQUAL(result, "0");
 }
@@ -123,6 +125,26 @@ BOOST_AUTO_TEST_CASE(lsh_bin_bad_usage) {
     call_fail(lsh_bin);
 
     call(lsh_bin + " --help");
+}
+
+BOOST_AUTO_TEST_CASE(lsh_bin_serialization) {
+    std::string example = create_file("example", "1 1:1");
+    std::string test = create_file("test", "0 1:3");
+    std::string model(temp + "model.1"),
+                model2(temp + "model.2"),
+                res(temp + "res.txt");
+
+    call(lsh_bin + " --model_out " + model + " -d " + example + " --dimensions=1");
+    call(lsh_bin + " --model_in " + model + " -o " + res + " -t " + test);
+    std::string expect = create_file("expect", "1");
+    test_files_are_equal(res, expect);
+
+    std::string example2 = create_file("example2", "1 1:1\n0 1:1\n0 1:1");
+
+    call(lsh_bin + " --model_in " + model + " --model_out " + model2 + " -d " + example2);
+    call(lsh_bin + " --model_in " + model2 + " -o " + res + " -t " + test);
+    std::string expect2 = create_file("expect2", "0.5");
+    test_files_are_equal(res, expect2);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

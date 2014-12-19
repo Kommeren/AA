@@ -22,12 +22,14 @@
 #include "paal/utils/hash.hpp"
 #include "paal/utils/hash_functions.hpp"
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/unordered_map_serialization.hpp"
 
 #include <boost/range/algorithm/transform.hpp>
 #include <boost/range/combine.hpp>
 #include <boost/range/empty.hpp>
 #include <boost/range/size.hpp>
 #include <boost/unordered_map.hpp>
+#include <boost/serialization/vector.hpp>
 
 #include <functional>
 #include <iterator>
@@ -40,7 +42,7 @@ namespace paal {
 namespace detail {struct lightweight_tag{};}
 
 /**
- * @brief functor represting tuple of hash functions
+ * @brief functor representing tuple of hash functions
  */
 template <typename Funs>
 class hash_function_tuple {
@@ -60,10 +62,23 @@ class hash_function_tuple {
         };
 
 public:
+    ///serialize
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_hash_funs;
+    }
+
+    //default constructor
+    hash_function_tuple() = default;
 
     ///constructor
     hash_function_tuple(Funs funs)
         : m_hash_funs(std::move(funs)) {}
+
+    ///operator==
+    bool operator==(hash_function_tuple const & other) const {
+        return m_hash_funs == other.m_hash_funs;
+    }
 
     ///operator()(), returns vector of hash values
     template <typename Point>
@@ -173,26 +188,35 @@ namespace detail {
  * @tparam HashForHashValue hash type to be used in hash maps
  */
 template <typename HashValue,
-          typename LshFunctionGenerator = hash_function_tuple_generator<HashValue>,
+          typename LshFun,
           //TODO default value here supposed to be std::hash
           typename HashForHashValue = range_hash>
 class lsh_nearest_neighbors_regression {
-    LshFunctionGenerator m_lsh_function_generator;
 
     //TODO template param QueryResultType
     using res_accu_t = average_accumulator<>;
     using map_t = boost::unordered_map<HashValue, res_accu_t, HashForHashValue>;
-    using lsh_fun_t = pure_result_of_t<LshFunctionGenerator()>;
 
     ///hash maps containing average result for each hash key
     std::vector<map_t> m_hash_maps;
     ///hash functions
-    std::vector<lsh_fun_t> m_hashes;
+    std::vector<LshFun> m_hashes;
 
     ///average result of all train points
     average_accumulator<> m_avg;
 
 public:
+
+    ///serialization
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version){
+        ar & m_hash_maps;
+        ar & m_hashes;
+        ar & m_avg;
+    }
+
+    ///default constructor
+    lsh_nearest_neighbors_regression() = default;
 
     /**
      * @brief initializes model and trains model using train points and results
@@ -205,13 +229,12 @@ public:
      * @param lsh_function_generator functor generating proper LSH functions
      * @param threads_count
      */
-    template <typename TrainPoints, typename TrainResults>
+    template <typename TrainPoints, typename TrainResults, typename LshFunctionGenerator>
     lsh_nearest_neighbors_regression(
             TrainPoints &&train_points, TrainResults &&train_results,
             unsigned passes,
             LshFunctionGenerator &&lsh_function_generator,
             unsigned threads_count = std::thread::hardware_concurrency()) :
-        m_lsh_function_generator(lsh_function_generator),
         m_hash_maps(passes) {
 
         m_hashes.reserve(passes);
@@ -221,6 +244,13 @@ public:
         update(std::forward<TrainPoints>(train_points),
                std::forward<TrainResults>(train_results),
                threads_count);
+    }
+
+    ///operator==
+    bool operator==(lsh_nearest_neighbors_regression const & other) const {
+        return m_avg == other.m_avg &&
+               m_hashes == other.m_hashes &&
+               m_hash_maps == other.m_hash_maps;
     }
 
 
@@ -282,7 +312,7 @@ private:
 
     ///adds values to one hash map
     template <typename Points, typename Results>
-    void add_values(lsh_fun_t fun, map_t & map, Points && train_points, Results && train_results) {
+    void add_values(LshFun fun, map_t & map, Points && train_points, Results && train_results) {
         for (auto &&train_point_result : boost::combine(train_points, train_results)) {
             auto && point = boost::get<0>(train_point_result);
             auto && res = boost::get<1>(train_point_result);
@@ -331,14 +361,14 @@ auto make_lsh_nearest_neighbors_regression(
              unsigned passes,
              LshFunctionGenerator &&lsh_function_generator,
              unsigned threads_count = std::thread::hardware_concurrency()) {
-    using lsh_fun = const pure_result_of_t<LshFunctionGenerator()>;
+    using lsh_fun = pure_result_of_t<LshFunctionGenerator()>;
     using hash_result = typename std::remove_reference<
         typename std::result_of<lsh_fun(
                 range_to_ref_t<TrainPoints>
                 )>::type
         >::type;
 
-    return lsh_nearest_neighbors_regression<hash_result, LshFunctionGenerator>(
+    return lsh_nearest_neighbors_regression<hash_result, lsh_fun>(
             std::forward<TrainPoints>(train_points),
             std::forward<TrainResults>(train_results),
             passes,

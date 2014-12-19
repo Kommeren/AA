@@ -1,6 +1,7 @@
 add_custom_target(tests)
 
 #adding unit_test boost library
+# files taken from boost build - it does not compile if one take all of the *.cpp files
 set(UNIT_TEST_FNAMES compiler_log_formatter debug exception_safety
                      execution_monitor framework interaction_based
                      logged_expectations plain_report_formatter
@@ -24,7 +25,7 @@ link_directories(${TEST_DIR})
 include_directories (${TEST_DIR})
 
 #we have to link against unit_test lib
-set(TEST_LIBS ${LIBS} unit_test  glpk)
+set(TEST_LIBS ${LIBS} unit_test)
 
 #compilation error tests
 if(${COMPILATION_ERROR_TESTS})
@@ -38,8 +39,6 @@ if(${COMPILATION_ERROR_TESTS})
             if(${test_src} MATCHES ".*iterative_rounding.*"
                     OR ${test_src} MATCHES ".*linear_programming.*")
                 target_link_libraries (${test_name} ${TEST_LIBS} glpk)
-            else()
-                target_link_libraries (${test_name} ${TEST_LIBS})
             endif()
 
             add_dependencies(tests ${test_name})
@@ -62,6 +61,8 @@ else()
                     OR ${test_src} MATCHES ".*linear_programming.*"
                     OR ${test_src} MATCHES ".*fractional_winner_determination_in_MUCA*")
                 target_link_libraries (${test_name} ${TEST_LIBS} glpk)
+            elseif(${test_src} MATCHES ".*lsh.*" )
+                target_link_libraries (${test_name} ${TEST_LIBS} boost_serialization)
             else()
                 target_link_libraries (${test_name} ${TEST_LIBS})
             endif()
@@ -72,11 +73,11 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_DIR=\\\"${CMAKE_BINARY_DIR}/\\\"")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_DIR=\\\"${PROJECT_DIR}/\\\"")
     add_executable(all_small_tests ${short_tests})
-    target_link_libraries(all_small_tests ${TEST_LIBS})
+    target_link_libraries(all_small_tests ${TEST_LIBS} glpk boost_serialization)
     add_dependencies(all_small_tests bins)
     add_dependencies(tests all_small_tests)
 
     add_executable(all_long_tests ${long_tests})
-    target_link_libraries(all_long_tests ${TEST_LIBS})
+    target_link_libraries(all_long_tests ${TEST_LIBS} glpk)
     add_dependencies(tests all_long_tests)
 endif()

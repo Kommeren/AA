@@ -63,6 +63,13 @@ class average_accumulator {
     CounterType m_cnt;
 
 public:
+    ///serialize
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_accumulated_value;
+        ar & m_cnt;
+    }
+
     /**
      * @brief
      *
@@ -72,6 +79,12 @@ public:
     average_accumulator(ValueType value = ValueType{},
                         CounterType cnt = CounterType{}) :
         m_accumulated_value(value), m_cnt(cnt) {
+    }
+
+    ///operator==
+    bool operator==(average_accumulator other) const {
+        return m_accumulated_value == other.m_accumulated_value &&
+               m_cnt == other.m_cnt;
     }
 
     /**
