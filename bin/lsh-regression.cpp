@@ -12,16 +12,21 @@
  * @version 1.0
  * @date 2014-11-19
  */
+
+#include "paal/data_structures/mapped_file.hpp"
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
 #include "paal/utils/log_loss.hpp"
 #include "paal/utils/parse_file.hpp"
 #include "paal/utils/read_svm.hpp"
+#include "paal/utils/singleton_iterator.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>
+#include <boost/function_output_iterator.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
 #include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/program_options.hpp>
 #include <boost/range/adaptor/transformed.hpp>
@@ -32,6 +37,7 @@
 
 #include <iostream>
 #include <random>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>
@@ -85,7 +91,7 @@ auto get_function_generator(ham_tag, params p) {
 }
 
 template <typename Row = point_type, typename LshFunctionTag>
-auto m_main(po::variables_map vm,
+void m_main(po::variables_map vm,
             params p,
             LshFunctionTag tag) {
     using lsh_fun = paal::pure_result_of_t<
@@ -98,9 +104,9 @@ auto m_main(po::variables_map vm,
         >::type;
     using model_t = paal::lsh_nearest_neighbors_regression<hash_result, lsh_fun>;
     using point_with_result_t = std::tuple<Row, int>;
+    using boost::adaptors::transformed;
     constexpr paal::utils::tuple_get<0> get_coordinates{};
     constexpr paal::utils::tuple_get<1> get_result{};
-    using boost::adaptors::transformed;
     std::vector<point_with_result_t> points_buffer;
 
     model_t model;
@@ -136,28 +142,41 @@ auto m_main(po::variables_map vm,
     }
 
     if (vm.count("test_file")) {
-        std::ifstream test_file_stream(vm["test_file"].as<std::string>());
-        std::vector<double> alg_results, test_points_results;
-        std::vector<point_with_result_t> test_points;
-        test_points.reserve(p.m_row_buffer_size);
-        while (test_file_stream.good()) {
-            test_points.clear();
-            paal::read_svm(test_file_stream, p.m_dimensions, test_points, p.m_row_buffer_size);
+        // Our algorithm returns range<tuple<Prediction,RealValue>>
+        constexpr paal::utils::tuple_get<0> get_prediction{};
+        constexpr paal::utils::tuple_get<1> get_real_value{};
+        std::string const test_path = vm["test_file"].as<std::string>();
 
-            model.test(test_points | transformed(get_coordinates),
-                    std::back_inserter(alg_results));
-            boost::copy(test_points | transformed(get_result),
-                    std::back_inserter(test_points_results));
-        }
+        // Lambda - for given line return tuple<LshPrediction,RealValue>>
+        auto line_tester = [&](std::string const & line) {
+            double test_result;
 
-        auto loss = paal::log_loss<double>(alg_results, test_points_results);
+            std::stringstream row_stream(line);
+            paal::svm_row<Row, int> row{p.m_dimensions};
+            row_stream >> row;
 
-        std::cout << "LogLoss on test set = " << loss << std::endl;
+            auto test_point_iterator = paal::utils::make_singleton_range(row.get_coordinates());
+            auto output_iterator = boost::make_function_output_iterator([&](double x){test_result = x;});
+
+            model.test(test_point_iterator, output_iterator);
+
+            return std::make_tuple(test_result,row.get_result());
+        };
+
+        // compute results using n threads and our lambda
+        auto test_results = paal::data_structures::for_each_line(line_tester, test_path, p.m_nthread);
+
+        auto loss = paal::log_loss<double>(test_results | transformed(get_prediction),
+                                           test_results | transformed(get_real_value));
+
+        std::cout << "logloss on test set = " << loss << std::endl;
 
         if (vm.count("result_file") > 0) {
             std::ofstream result_file(vm["result_file"].as<std::string>());
 
-            for (auto d: alg_results) result_file << d << "\n";
+            for (auto d: test_results | transformed(get_prediction)) {
+                result_file << d << "\n";
+            }
         }
     }
 

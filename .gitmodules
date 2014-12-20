@@ -175,3 +175,6 @@
 [submodule "boost/spirit"]
 	path = boost/spirit
 	url = https://github.com/boostorg/spirit.git
+[submodule "boost/iostreams"]
+	path = boost/iostreams
+	url = https://github.com/boostorg/iostreams.git

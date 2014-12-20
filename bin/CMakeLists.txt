@@ -7,7 +7,6 @@ add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
 file(GLOB_RECURSE boost_program_options "${PROJECT_DIR}/boost/program_options/src/*.cpp")
 add_library(boost_program_options SHARED ${boost_program_options})
 
-
 # files taken from boost build - it does not compile if one take all of the *.cpp files
 set(SERIALIZATION_FNAMES basic_archive basic_iarchive basic_iserializer basic_oarchive
     basic_oserializer basic_pointer_iserializer basic_pointer_oserializer
@@ -25,11 +24,15 @@ endforeach()
 add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
 add_library(boost_serialization SHARED ${SERIALIZATION_BINS})
 
+# Boost mapped file shared library
+file(GLOB_RECURSE boost_iostreams "${PROJECT_DIR}/boost/iostreams/src/mapped_file.cpp")
+add_library(boost_iostreams SHARED ${boost_iostreams})
+
 foreach(bin_src ${bin_srcs})
     get_filename_component(bin_name ${bin_src} NAME_WE)
     message("adding binary" : ${bin_name})
     add_executable(${bin_name} ${bin_src})
-    target_link_libraries (${bin_name} ${LIBS} boost_program_options boost_serialization)
+    target_link_libraries (${bin_name} ${LIBS} boost_program_options boost_serialization boost_iostreams)
 
     add_dependencies(bins ${bin_name})
 endforeach()

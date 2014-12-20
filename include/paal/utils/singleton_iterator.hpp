@@ -48,7 +48,8 @@ class singleton_iterator : public boost::iterator_facade<
     void increment() { m_elem = boost::none; }
 
     bool equal(const singleton_iterator &other) const {
-        return m_elem == other.m_elem;
+        // This doesn't need Elem to have (==) operator.
+        return (!m_elem && !other.m_elem) || (m_elem && other.m_elem);
     }
 
     Elem dereference() const { return m_elem.get(); }

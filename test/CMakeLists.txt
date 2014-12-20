@@ -73,7 +73,7 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_DIR=\\\"${CMAKE_BINARY_DIR}/\\\"")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_DIR=\\\"${PROJECT_DIR}/\\\"")
     add_executable(all_small_tests ${short_tests})
-    target_link_libraries(all_small_tests ${TEST_LIBS} glpk boost_serialization)
+    target_link_libraries(all_small_tests ${TEST_LIBS} glpk boost_serialization boost_iostreams)
     add_dependencies(all_small_tests bins)
     add_dependencies(tests all_small_tests)
 

@@ -78,16 +78,15 @@ public:
      *
      * Results are converted to 0.0 and 1.0.
      * Feature ids are substracted by 1 in order to begin with 0.
+     * This class should get as stream only row (If you'll give
+     * stream it will read to many numbers!)
      *
-     * @param input_stream
-     * @param row
+     * @param row_stream - it should contain only one line!
+     * @param row - created row from scratch
      *
-     * @return
+     * @return should return empty stream
      */
-    friend std::istream &operator>>(std::istream &input_stream, svm_row &row) {
-        std::string line;
-        std::getline(input_stream, line);
-        std::stringstream row_stream(line);
+    friend std::istream &operator>>(std::istream &row_stream, svm_row &row) {
 
         int result;
         row_stream >> result;
@@ -111,7 +110,7 @@ public:
             row.m_coordinates[feature_id - 1] = coordinate;
         }
 
-        return input_stream;
+        return row_stream;
     }
 
     /// coordinates getter
@@ -138,7 +137,10 @@ void read_svm(std::istream &input_stream,
               std::vector<std::tuple<RowType, ResultType>> &points,
               std::size_t max_points_to_read) {
     svm_row<RowType, ResultType> row{max_feature_id};
-    while ((max_points_to_read--) && (input_stream >> row)) {
+    std::string line;
+    while ((max_points_to_read--) && std::getline(input_stream, line)) {
+        std::stringstream row_stream(line);
+        row_stream >> row;
         assign_max(max_feature_id, row.get_coordinates().size());
         points.emplace_back(row.get_coordinates(),
                             row.get_result());

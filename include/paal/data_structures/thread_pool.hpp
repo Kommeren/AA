@@ -8,6 +8,9 @@
 #ifndef PAAL_THREAD_POOL_HPP
 #define PAAL_THREAD_POOL_HPP
 
+#define BOOST_ERROR_CODE_HEADER_ONLY
+#define BOOST_SYSTEM_NO_DEPRECATED
+
 #include <boost/asio/io_service.hpp>
 
 #include <cassert>

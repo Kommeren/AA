@@ -15,8 +15,6 @@
 #ifndef PAAL_LSH_NEAREST_NEIGHBOURS_REGRESSION_HPP
 #define PAAL_LSH_NEAREST_NEIGHBOURS_REGRESSION_HPP
 
-#define BOOST_ERROR_CODE_HEADER_ONLY
-
 #include "paal/data_structures/thread_pool.hpp"
 #include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/hash.hpp"
