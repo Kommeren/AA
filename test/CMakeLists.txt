@@ -12,17 +12,17 @@ set(UNIT_TEST_FNAMES compiler_log_formatter debug exception_safety
                      xml_log_formatter xml_report_formatter)
 
 foreach(name ${UNIT_TEST_FNAMES})
-    SET(unit_test_srcs ${unit_test_srcs}  ${PROJECT_DIR}/boost/test/src/${name}.cpp)
+    SET(unit_test_srcs ${unit_test_srcs}  ${PAAL}/boost/test/src/${name}.cpp)
 endforeach()
 
 ADD_DEFINITIONS(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
 add_library(unit_test SHARED ${unit_test_srcs})
 
 #adding tests
-file(GLOB_RECURSE test_srcs "${TEST_DIR}/*.cpp")
-link_directories(${TEST_DIR})
+file(GLOB_RECURSE test_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+link_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-include_directories (${TEST_DIR})
+include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 
 #we have to link against unit_test lib
 set(TEST_LIBS ${LIBS} unit_test)
@@ -71,7 +71,7 @@ else()
 
 
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DBUILD_DIR=\\\"${CMAKE_BINARY_DIR}/\\\"")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_DIR=\\\"${PROJECT_DIR}/\\\"")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPROJECT_DIR=\\\"${PAAL}/\\\"")
     add_executable(all_small_tests ${short_tests})
     target_link_libraries(all_small_tests ${TEST_LIBS} glpk boost_serialization boost_iostreams)
     add_dependencies(all_small_tests bins)

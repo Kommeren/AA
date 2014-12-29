@@ -1,9 +1,5 @@
-set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
+set(PAAL ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(SOURCE_DIR ${PROJECT_DIR}/include)
-set(TEST_DIR ${PROJECT_DIR}/test)
-set(EXAMPLE_DIR ${PROJECT_DIR}/examples)
-set(BIN_DIR ${PROJECT_DIR}/bin)
 cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
@@ -30,13 +26,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -pthread -Wall -fno-strict-al
 set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe -g")
 
-file(GLOB BOOST_SUBS "${PROJECT_DIR}/boost/*")
+file(GLOB BOOST_SUBS "${PAAL}/boost/*")
 
 foreach(dir ${BOOST_SUBS})
     include_directories("${dir}/include/")
 endforeach()
 
-include_directories (${SOURCE_DIR})
+include_directories (${PAAL}/include)
 
 if(${COMPILATION_ERROR_TESTS})
     add_subdirectory(test)
@@ -49,5 +45,19 @@ else()
 
     if(${WITH_EXAMPLES})
         add_subdirectory(examples)
+    endif()
+endif()
+
+
+if(NOT CMAKE_BUILD_TYPE)
+    message("BUILD TYPE = NORMAL -  NEITHER RELEASE OR DEBUG IS SET")
+else()
+    string(TOLOWER ${CMAKE_BUILD_TYPE} BUILD_TYPE_LOWERCASE)
+    if (BUILD_TYPE_LOWERCASE MATCHES release)
+        message("BUILD TYPE = RELEASE")
+    elseif(BUILD_TYPE_LOWERCASE MATCHES debug)
+        message("BUILD TYPE = DEBUG")
+    else()
+        message(WARNING "BUILD TYPE = UNKNOWN")
     endif()
 endif()

@@ -1,6 +1,6 @@
 
-include_directories (${PROJECT_DIR})
-file(GLOB_RECURSE example_srcs "${EXAMPLE_DIR}/*.cpp")
+include_directories (${PAAL})
+file(GLOB_RECURSE example_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_custom_target(examples)
 
 #adding examples

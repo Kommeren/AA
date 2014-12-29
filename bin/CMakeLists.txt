@@ -1,10 +1,9 @@
-
-include_directories (${PROJECT_DIR})
-file(GLOB_RECURSE bin_srcs "${BIN_DIR}/*.cpp")
+include_directories (${PAAL})
+file(GLOB_RECURSE bin_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_custom_target(bins)
 
 add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
-file(GLOB_RECURSE boost_program_options "${PROJECT_DIR}/boost/program_options/src/*.cpp")
+file(GLOB_RECURSE boost_program_options "${PAAL}/boost/program_options/src/*.cpp")
 add_library(boost_program_options SHARED ${boost_program_options})
 
 # files taken from boost build - it does not compile if one take all of the *.cpp files
@@ -18,14 +17,14 @@ set(SERIALIZATION_FNAMES basic_archive basic_iarchive basic_iserializer basic_oa
     xml_archive_exception)
 
 foreach(name ${SERIALIZATION_FNAMES})
-    SET(SERIALIZATION_BINS ${SERIALIZATION_BINS} ${PROJECT_DIR}/boost/serialization/src/${name}.cpp)
+    SET(SERIALIZATION_BINS ${SERIALIZATION_BINS} ${PAAL}/boost/serialization/src/${name}.cpp)
 endforeach()
 
 add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
 add_library(boost_serialization SHARED ${SERIALIZATION_BINS})
 
 # Boost mapped file shared library
-file(GLOB_RECURSE boost_iostreams "${PROJECT_DIR}/boost/iostreams/src/mapped_file.cpp")
+file(GLOB_RECURSE boost_iostreams "${PAAL}/boost/iostreams/src/mapped_file.cpp")
 add_library(boost_iostreams SHARED ${boost_iostreams})
 
 foreach(bin_src ${bin_srcs})
