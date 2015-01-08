@@ -20,6 +20,7 @@
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/numeric.hpp>
 
 namespace paal {
@@ -50,9 +51,17 @@ auto sum_functor(const Range& rng, Functor f) {
 
 /// combination of boost::max_element and boost::adaptors::transformed
 template <typename Range, typename Functor>
-auto max_element_functor(const Range& rng, Functor f) {
+auto max_element_functor(Range&& rng, Functor f) {
     return boost::max_element(
-        rng | boost::adaptors::transformed(utils::make_assignable_functor(f))
+        std::forward<Range>(rng) | boost::adaptors::transformed(utils::make_assignable_functor(f))
+    );
+}
+
+/// combination of boost::min_element and boost::adaptors::transformed
+template <typename Range, typename Functor>
+auto min_element_functor(Range&& rng, Functor f) {
+    return boost::min_element(
+        std::forward<Range>(rng) | boost::adaptors::transformed(utils::make_assignable_functor(f))
     );
 }
 

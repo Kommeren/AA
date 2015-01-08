@@ -15,6 +15,7 @@
 #ifndef PAAL_GET_BOUND_HPP
 #define PAAL_GET_BOUND_HPP
 
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/knapsack_utils.hpp"
 #include "paal/greedy/knapsack/knapsack_greedy.hpp"
 
@@ -63,12 +64,8 @@ typename KnapsackData::value get_density_based_value_upper_bound(KnapsackData kn
     auto not_zeros = knap_data.get_objects() | boost::adaptors::filtered(not_zero_size);
     auto zeros     = knap_data.get_objects() | boost::adaptors::filtered(zeroSize     );
 
-    auto maxElement = density(
-        *boost::max_element(not_zeros, utils::make_functor_to_comparator(density)));
-    return knap_data.get_capacity() * maxElement +
-           boost::accumulate(zeros, Size{}, [ = ](Size s, ObjectRef o) {
-        return s + knap_data.get_value(o);
-    });
+    auto maxElement = *max_element_functor(not_zeros, density);
+    return knap_data.get_capacity() * maxElement + sum_functor(zeros, knap_data.get_value());
 }
 
 //non-arithmetic size, upper bound
@@ -93,9 +90,8 @@ typename KnapsackData::value get_value_bound(
 template <typename KnapsackData, typename Is_0_1_Tag>
 typename KnapsackData::value get_value_bound(KnapsackData knap_data,
                       Nonarithmetic_size_tag, Is_0_1_Tag, lower_tag) {
-    //computes lower bound as  value of the most valuable element
-    return *boost::max_element(knap_data.get_objects(),
-                             utils::make_functor_to_comparator(knap_data.get_value()));
+    //computes lower bound as value of the most valuable element
+    return *max_element_functor(knap_data.get_objects(), knap_data.get_value()).base();
 }
 
 //arithmetic size, lower bound

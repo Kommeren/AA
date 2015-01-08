@@ -17,6 +17,7 @@
 #ifndef PAAL_KNAPSACK_GREEDY_HPP
 #define PAAL_KNAPSACK_GREEDY_HPP
 
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/knapsack_utils.hpp"
 
 #include <boost/iterator/counting_iterator.hpp>
@@ -94,15 +95,12 @@ typename KnapsackData::return_type knapsack_general_two_app(
 
     // finding the biggest set elements with the greatest density
     // this is actually small optimization compare to original algorithm
-    auto largest = boost::max_element(objects,
-        utils::make_functor_to_comparator(knapsack_data.get_value()));
+    // note that largest is transformed iterator!
+    auto largest = max_element_functor(objects, knapsack_data.get_value());
 
-
-    auto largest_val = knapsack_data.get_value(*largest);
-
-    if (largest_val > std::get<0>(greedyFill)) {
-        knapsack_data.out(*largest);
-        return std::make_pair(largest_val, knapsack_data.get_size(*largest));
+    if (*largest > std::get<0>(greedyFill)) {
+        knapsack_data.out(*largest.base());
+        return std::make_pair(*largest, knapsack_data.get_size(*largest.base()));
     } else {
         greedy_to_output(std::get<2>(greedyFill), knapsack_data.get_output_iter(), is_0_1_Tag);
         return std::make_pair(std::get<0>(greedyFill), std::get<1>(greedyFill));

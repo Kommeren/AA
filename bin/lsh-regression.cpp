@@ -79,15 +79,15 @@ struct params {
 };
 
 auto get_function_generator(l1_tag, params p) {
-    return paal::hash::l_1_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
+    return paal::lsh::l_1_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
 }
 
 auto get_function_generator(l2_tag, params p) {
-    return paal::hash::l_2_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
+    return paal::lsh::l_2_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
 }
 
 auto get_function_generator(ham_tag, params p) {
-    return paal::hash::hamming_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
+    return paal::lsh::hamming_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
 }
 
 template <typename Row = point_type, typename LshFunctionTag>

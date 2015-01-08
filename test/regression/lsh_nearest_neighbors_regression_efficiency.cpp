@@ -62,7 +62,7 @@ int main() {
                 train_points | boost::adaptors::transformed(get_coordinates),
                 train_points | boost::adaptors::transformed(get_result),
                 PASSES,
-                paal::hash::hamming_hash_function_generator{dimensions},
+                paal::lsh::hamming_hash_function_generator{dimensions},
                 HASH_FUNCTIONS_PER_POINT, THREADS_COUNT);
 
         std::vector<result_t> results;

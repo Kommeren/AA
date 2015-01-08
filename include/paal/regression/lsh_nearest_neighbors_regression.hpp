@@ -16,9 +16,9 @@
 #define PAAL_LSH_NEAREST_NEIGHBOURS_REGRESSION_HPP
 
 #include "paal/data_structures/thread_pool.hpp"
+#include "paal/regression/lsh_functions.hpp"
 #include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/hash.hpp"
-#include "paal/utils/hash_functions.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/unordered_map_serialization.hpp"
 
@@ -38,6 +38,8 @@
 namespace paal {
 
 namespace detail {struct lightweight_tag{};}
+
+using default_hash_function_generator = lsh::hamming_hash_function_generator;
 
 /**
  * @brief functor representing tuple of hash functions
@@ -104,7 +106,7 @@ public:
  *
  * @tparam FunctionGenerator
  */
-template <typename FunctionGenerator = hash::default_hash_function_generator>
+template <typename FunctionGenerator = default_hash_function_generator>
 class hash_function_tuple_generator {
     using fun_t = pure_result_of_t<FunctionGenerator()>;
     using funs_t = std::vector<fun_t>;

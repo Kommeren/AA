@@ -17,7 +17,7 @@
 
 #include "paal/auctions/auction_components.hpp"
 #include "paal/auctions/auction_traits.hpp"
-#include "paal/utils/functors.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/min_element.hpp>
@@ -36,9 +36,7 @@ namespace auctions {
  * @tparam Auction
  */
 template <class Auction>
-auto items_number(Auction&& auction) ->
-decltype(boost::distance(auction.template get<items>()))
-{
+auto items_number(Auction&& auction) {
    return boost::distance(auction.template get<items>());
 }
 
@@ -49,9 +47,7 @@ decltype(boost::distance(auction.template get<items>()))
  * @tparam Auction
  */
 template <class Auction>
-auto bidders_number(Auction&& auction) ->
-decltype(boost::distance(auction.template get<bidders>()))
-{
+auto bidders_number(Auction&& auction) {
    return boost::distance(auction.template get<bidders>());
 }
 
@@ -71,9 +67,7 @@ get_minimum_copies_num(Auction&& auction)
    {
       return auction.template call<get_copies_num>(std::forward<item>(i));
    };
-   return *boost::min_element(auction.template get<items>() |
-      boost::adaptors::transformed(utils::make_assignable_functor(get_copies_num_func))
-   );
+   return *min_element_functor(auction.template get<items>(), get_copies_num_func);
 }
 
 } //!auctions

@@ -90,7 +90,7 @@ public:
 
         int result;
         row_stream >> result;
-        row.m_result = (result == 1) ? 1.0 : 0.0;
+        row.m_result = (result == 1) ? 1 : 0;
 
         row.m_coordinates.clear();
         while (row_stream.good()) {

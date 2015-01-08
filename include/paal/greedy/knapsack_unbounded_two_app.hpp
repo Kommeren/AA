@@ -15,7 +15,7 @@
 #ifndef PAAL_KNAPSACK_UNBOUNDED_TWO_APP_HPP
 #define PAAL_KNAPSACK_UNBOUNDED_TWO_APP_HPP
 
-#include "paal/utils/functors.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/utils/type_functions.hpp"
 #include "paal/greedy/knapsack/knapsack_greedy.hpp"
 
@@ -37,8 +37,8 @@ std::tuple<Value, Size,
 get_greedy_fill(KnapsackData knap_data, unbounded_tag) {
 
     auto density = knap_data.get_density();
-    auto compare = utils::make_functor_to_comparator(density);
-    auto most_dense_iter = boost::max_element(knap_data.get_objects(), compare);
+    auto most_dense_iter = max_element_functor(
+            knap_data.get_objects(), density).base();
 
     unsigned nr = knap_data.get_capacity() / knap_data.get_size(*most_dense_iter);
     Value value_sum = Value(nr) * knap_data.get_value(*most_dense_iter);

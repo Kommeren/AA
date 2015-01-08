@@ -118,9 +118,9 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
                   " hash_funs_per_row: " << hash_funs_per_row <<
                   " w_param: " << w_param);
 
-            using l_1_hash_gen = paal::hash::l_1_hash_function_generator<>;
-            using l_2_hash_gen = paal::hash::l_2_hash_function_generator<>;
-            using hamming_gen = paal::hash::hamming_hash_function_generator;
+            using l_1_hash_gen = paal::lsh::l_1_hash_function_generator<>;
+            using l_2_hash_gen = paal::lsh::l_2_hash_function_generator<>;
+            using hamming_gen = paal::lsh::hamming_hash_function_generator;
 
             LOGLN("Checking l_1:");
             if (beats_average(train_points, test_points,

@@ -15,6 +15,7 @@
 #ifndef PAAL_KNAPSACK_FPTAS_COMMON_HPP
 #define PAAL_KNAPSACK_FPTAS_COMMON_HPP
 
+#include "paal/utils/accumulate_functors.hpp"
 #include "paal/dynamic/knapsack/get_bound.hpp"
 
 namespace paal {
@@ -43,8 +44,7 @@ template <typename Objects, typename Functor>
 boost::optional<double> get_multiplier(Objects &&objects, double epsilon,
                                        double lowerBound, Functor f,
                                        detail::unbounded_tag) {
-    double minF =
-        f(*boost::min_element(objects, utils::make_functor_to_comparator(f)));
+    double minF = *min_element_functor(objects, f);
     double n = int(double(lowerBound) * (1. + epsilon) / minF +
                    1.); // maximal number of elements in the found solution
     auto ret = n / (epsilon * lowerBound);

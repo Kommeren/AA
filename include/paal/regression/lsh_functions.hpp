@@ -1,24 +1,31 @@
 //=======================================================================
-// Copyright (c) 2014 Andrzej Pacuk
+// Copyright (c) 2014 Andrzej Pacuk, Piotr Wygocki
 //
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 /**
- * @file hash_functions.hpp
+ * @file lsh_functions.hpp
  * @brief
- * @author Andrzej Pacuk
+ * @author Andrzej Pacuk, Piotr Wygocki
  * @version 1.0
  * @date 2014-10-07
  */
-#ifndef PAAL_HASH_FUNCTIONS_HPP
-#define PAAL_HASH_FUNCTIONS_HPP
+#ifndef PAAL_LSH_FUNCTIONS_HPP
+#define PAAL_LSH_FUNCTIONS_HPP
 
 #include "paal/utils/type_functions.hpp"
+#include "paal/utils/accumulate_functors.hpp"
 
+#include <boost/range/adaptor/indexed.hpp>
+#include <boost/range/adaptor/filtered.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/generate.hpp>
+#include <boost/range/algorithm/max_element.hpp>
+#include <boost/range/algorithm/min_element.hpp>
+#include <boost/range/algorithm_ext/iota.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/size.hpp>
 #include <boost/numeric/ublas/vector.hpp>
@@ -32,7 +39,7 @@
 
 namespace paal {
 
-namespace hash {
+namespace lsh {
 
 /**
  * @brief simple hash function
@@ -125,7 +132,6 @@ public:
 
 using hamming_hash_function_generator =
     random_projection_hash_function_generator<>;
-using default_hash_function_generator = hamming_hash_function_generator;
 
 /**
  */
@@ -255,9 +261,86 @@ template <typename FloatType = double,
 using l_2_hash_function_generator =
     l_p_hash_function_generator<FloatType, RandomEngine>;
 
-} //! hash
+///min-wise independent permutations locality sensitive hashing (Jaccard)
+class min_hash_function {
+    //permutation
+    std::vector<int> m_perm;
+
+public:
+
+    ///serialize
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        ar & m_perm;
+    }
+
+    ///constructor
+    template <typename RandomEngine>
+    min_hash_function(std::size_t n, RandomEngine && rng) : m_perm(n)  {
+        boost::iota(m_perm, 0);
+        std::shuffle(m_perm.begin(), m_perm.end(), rng);
+    }
+
+    ///default constructor
+    min_hash_function() = default;
+
+    ///operator==
+    bool operator==(min_hash_function const & other) const {
+        return boost::equal(m_perm, other.m_perm);
+    }
+
+    ///this version was assuming that one indicates that an element is in the set
+    /*template <typename Range>
+    auto operator()(Range &&range) const {
+        using indexed_val = boost::range::index_value<range_to_ref_t<Range>>;
+        using namespace boost::adaptors;
+        assert(boost::distance(range) <= m_perm.size());
+        auto is_one = [](indexed_val a){return a.value() == 1;};
+        auto perm = [&](indexed_val a){
+            if(a.index() >= m_perm.size()) {
+                std::cout << "LIPTON " << a.index() << " " << m_perm.size() << std::endl;
+            }
+
+            assert(a.index() < m_perm.size());return m_perm[a.index()];};
+        return *boost::min_element(
+                          range
+                        | indexed()
+                        | filtered(utils::make_assignable_functor(is_one))
+                        | transformed(utils::make_assignable_functor(perm)));
+    }*/
+
+    ///operator()
+    template <typename Range>
+    auto operator()(Range &&range) const {
+        assert(*boost::max_element(range) < m_perm.size());
+        return *min_element_functor(
+                    range, [&](range_to_ref_t<Range> a){ return m_perm[a]; });
+    }
+};
+
+//TODO add to binary and documentation when needed
+///Factory class for min_hash_function
+template <typename RandomEngine = std::default_random_engine>
+class min_hash_function_generator {
+    std::size_t m_range_size;
+    mutable RandomEngine m_generator;
+
+public:
+    ///constructor
+    min_hash_function_generator(std::size_t range_size,
+                                RandomEngine random_engine = RandomEngine{}) :
+            m_range_size(range_size),
+            m_generator(std::move(random_engine)) { }
+
+    ///operator()
+    min_hash_function operator()() const {
+        return min_hash_function(m_range_size, m_generator);
+    }
+};
+
+} //! lsh
 
 } //! paal
 
-#endif // PAAL_HASH_FUNCTIONS_HPP
+#endif // PAAL_LSH_FUNCTIONS_HPP
 

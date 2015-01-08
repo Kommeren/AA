@@ -16,7 +16,6 @@
 #include "test_utils/get_test_dir.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
-#include "paal/utils/hash_functions.hpp"
 #include "paal/utils/irange.hpp"
 
 #include <boost/archive/binary_iarchive.hpp>
@@ -39,17 +38,35 @@ static const result_t EPSILON = 1e-9;
 static const unsigned default_passes = 50;
 static const unsigned default_hash_functions_per_row = 2;
 
-auto make_hamming_model(const std::vector<point_coordinates_t> &train_points,
-                        const std::vector<result_t> &train_results,
-                        unsigned passes = default_passes,
-                        unsigned hash_functions_per_row
-                            = default_hash_functions_per_row) {
+struct min_tag{};
+struct hamming_tag{};
+
+auto make_model(hamming_tag, const std::vector<point_coordinates_t> &train_points,
+                const std::vector<result_t> &train_results,
+                unsigned passes = default_passes,
+                unsigned hash_functions_per_row
+                    = default_hash_functions_per_row) {
     auto const dimensions = train_points.front().size();
     return paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                 train_points,
                 train_results,
                 passes,
-                paal::hash::hamming_hash_function_generator{dimensions},
+                paal::lsh::hamming_hash_function_generator{dimensions},
+                hash_functions_per_row);
+}
+
+auto make_model(min_tag, const std::vector<point_coordinates_t> &train_points,
+                const std::vector<result_t> &train_results,
+                unsigned passes = default_passes,
+                unsigned hash_functions_per_row
+                    = default_hash_functions_per_row) {
+    unsigned const max_value = *paal::max_element_functor(train_points,
+            [](point_coordinates_t const & p){return *boost::max_element(p);});
+    return paal::make_lsh_nearest_neighbors_regression_tuple_hash(
+                train_points,
+                train_results,
+                passes,
+                paal::lsh::min_hash_function_generator<>{max_value + 1},
                 hash_functions_per_row);
 }
 
@@ -97,6 +114,19 @@ void test(Model &&model,
 }
 
 
+template <typename HashFunctionTag>
+void check_hamming_min(HashFunctionTag tag, const std::vector<point_coordinates_t> &train_points,
+                   const std::vector<result_t> &train_results,
+                   const std::vector<point_coordinates_t> &query_points,
+                   const std::vector<result_t> &expected_results,
+                   unsigned passes = default_passes,
+                   unsigned hash_functions_per_row
+                       = default_hash_functions_per_row) {
+    auto model = make_model(tag, train_points, train_results,
+                                    passes, hash_functions_per_row);
+    test(std::move(model), query_points, expected_results);
+}
+
 void check_hamming(const std::vector<point_coordinates_t> &train_points,
                    const std::vector<result_t> &train_results,
                    const std::vector<point_coordinates_t> &query_points,
@@ -104,9 +134,8 @@ void check_hamming(const std::vector<point_coordinates_t> &train_points,
                    unsigned passes = default_passes,
                    unsigned hash_functions_per_row
                        = default_hash_functions_per_row) {
-    auto model = make_hamming_model(train_points, train_results,
-                                    passes, hash_functions_per_row);
-    test(std::move(model), query_points, expected_results);
+    check_hamming_min(hamming_tag{}, train_points, train_results, query_points,
+            expected_results, passes, hash_functions_per_row);
 }
 
 } //! unnamed
@@ -159,6 +188,16 @@ BOOST_AUTO_TEST_CASE(two_descent_values_ints_results) {
                   {0, 1});
 }
 
+BOOST_AUTO_TEST_CASE(two_descent_values_ints_results_min) {
+    LOGLN("two_descent_values_ints_results min hashing");
+    check_hamming_min(min_tag{},
+                {{0, 1}, {1}, {0}, {2, 3}, {2}, {3}},
+                {0, 0, 0, 1, 1, 1},
+                {{0, 1}, {3 , 2}},
+                {0, 1});
+}
+
+
 BOOST_AUTO_TEST_CASE(no_neighbors_return_average) {
     LOGLN("no_neighbors_return_average");
     check_hamming({{0, 0}, {3, -1}, {0, 2}, {4, 1}, {5, 1}, {2, 5}},
@@ -187,7 +226,7 @@ BOOST_AUTO_TEST_CASE(no_hit_return_average) {
 
 BOOST_AUTO_TEST_CASE(update_changes_model) {
     LOGLN("update_changes_model");
-    auto model = make_hamming_model({{0, 1}, {2, 3}},
+    auto model = make_model(hamming_tag{}, {{0, 1}, {2, 3}},
                                     {0.0, 0.2});
     //point distant from train points
     LOGLN("test");
@@ -222,12 +261,13 @@ void serialize(Model const &  model) {
 
 BOOST_AUTO_TEST_CASE(serialization) {
     LOGLN("serialize");
-    serialize(make_hamming_model({{0, 1}, {2, 3}}, {0.0, 0.2}));
+    serialize(make_model(hamming_tag{}, {{0, 1}, {2, 3}}, {0.0, 0.2}));
+    serialize(make_model(min_tag{}, {{0, 1}, {2, 3}}, {0.0, 0.2}));
     point_coordinates_l_p_t p1{2}, p2{2};
     p1(0) = 0.; p1(1) = 1.;
     p2(0) = 2.; p2(1) = 3.;
-    serialize(make_lp<paal::hash::l_1_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
-    serialize(make_lp<paal::hash::l_2_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
+    serialize(make_lp<paal::lsh::l_1_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
+    serialize(make_lp<paal::lsh::l_2_hash_function_generator<>>({p1, p2}, {0.0, 0.2}));
 }
 
 

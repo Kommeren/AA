@@ -16,8 +16,6 @@
 //! [LSH Nearest Neighbors Regression Example]
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 
-#include "paal/utils/hash_functions.hpp"
-
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/range/algorithm/copy.hpp>
 
@@ -50,7 +48,7 @@ int main() {
     auto const w_param = 3.0;
 
     auto lsh_function_generator =
-        paal::hash::l_2_hash_function_generator<>{dimensions, w_param};
+        paal::lsh::l_2_hash_function_generator<>{dimensions, w_param};
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                     train_points, train_results,
                     passes,
