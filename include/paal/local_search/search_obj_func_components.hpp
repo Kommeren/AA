@@ -40,8 +40,7 @@ struct Commit;
  *        This usually this class is not used. See search_componentsObjFun
  * class.
  */
-typedef data_structures::components<get_moves, ObjFunction, Commit>
-    componentsObjFun;
+using components_obj_fun = data_structures::components<get_moves, ObjFunction, Commit>;
 
 /**
  * @brief search_componentsObjFun alias to components.
@@ -49,7 +48,7 @@ typedef data_structures::components<get_moves, ObjFunction, Commit>
  * @tparam Args
  */
 template <typename... Args>
-using search_componentsObjFun = typename componentsObjFun::type<Args...>;
+using search_components_obj_fun = typename components_obj_fun::type<Args...>;
 
 /**
  * @brief make function for search_componentsObjFun
@@ -60,8 +59,8 @@ using search_componentsObjFun = typename componentsObjFun::type<Args...>;
  * @return
  */
 template <typename... Args>
-auto make_search_componentsObjFun(Args &&... args) {
-    return componentsObjFun::make_components(std::forward<Args>(args)...);
+auto make_search_components_obj_fun(Args &&... args) {
+    return components_obj_fun::make_components(std::forward<Args>(args)...);
 }
 
 } //! local_search

@@ -51,7 +51,7 @@ struct SU {
 
 BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     // creating local search
-    typedef ls::search_componentsObjFun<NG, F, SU> search_comps;
+    typedef ls::search_components_obj_fun<NG, F, SU> search_comps;
     ON_LOG(F f);
 
     // printing
@@ -77,5 +77,13 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
 
     s = 0;
     ls::obj_fun_best_improving(s, search_comps{});
+    BOOST_CHECK_EQUAL(s, 6);
+
+    s = 0;
+    ls::obj_fun_first_improving(s, search_comps{}, search_comps{});
+    BOOST_CHECK_EQUAL(s, 6);
+
+    s = 0;
+    ls::obj_fun_best_improving(s, search_comps{}, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 }
