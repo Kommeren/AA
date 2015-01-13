@@ -35,6 +35,7 @@
 #include <boost/range/empty.hpp>
 #include <boost/range/size.hpp>
 
+#include <cstdlib>
 #include <iostream>
 #include <random>
 #include <sstream>
@@ -46,7 +47,7 @@ using point_type = boost::numeric::ublas::compressed_vector<double>;
 using paal::utils::tuple_get;
 namespace po = boost::program_options;
 
-enum Metric {NONE, HAMMING, L1, L2};
+enum Metric {HAMMING, L1, L2};
 
 struct l1_tag{};
 struct l2_tag{};
@@ -88,6 +89,39 @@ auto get_function_generator(l2_tag, params p) {
 
 auto get_function_generator(ham_tag, params p) {
     return paal::lsh::hamming_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
+}
+
+/// prints message (specialization for empty message)
+auto print_message(std::ostream &output_stream) {
+    output_stream << std::endl;
+}
+
+/// prints message
+template <typename Arg, typename ...Args>
+auto print_message(std::ostream &output_stream, Arg &&arg, Args... args) {
+    output_stream << arg;
+    print_message(output_stream, std::forward<Args>(args)...);
+}
+
+/// prints info message
+template <typename Arg, typename ...Args>
+auto info(Arg &&arg, Args... args) {
+    print_message(std::cout, std::forward<Arg>(arg), std::forward<Args>(args)...);
+}
+
+/// prints warning message
+template <typename Arg, typename ...Args>
+auto warning(Arg &&arg, Args... args) {
+    static const std::string message_prefix = "Warning: ";
+    print_message(std::cerr, message_prefix, std::forward<Arg>(arg), std::forward<Args>(args)...);
+}
+
+/// prints error message
+template <typename Arg, typename ...Args>
+auto error(Arg &&arg, Args... args) {
+    static const std::string message_prefix = "Error: ";
+    print_message(std::cerr, message_prefix, std::forward<Arg>(arg), std::forward<Args>(args)...);
+    std::exit(EXIT_FAILURE);
 }
 
 template <typename Row = point_type, typename LshFunctionTag>
@@ -169,7 +203,7 @@ void m_main(po::variables_map vm,
         auto loss = paal::log_loss<double>(test_results | transformed(get_prediction),
                                            test_results | transformed(get_real_value));
 
-        std::cout << "logloss on test set = " << loss << std::endl;
+        info("logloss on test set = ", loss, ", likelihood = ", paal::likelihood_from_log_loss(loss));
 
         if (vm.count("result_file") > 0) {
             std::ofstream result_file(vm["result_file"].as<std::string>());
@@ -216,7 +250,7 @@ int main(int argc, char** argv)
         ("passes,i", po::value<unsigned>(&p.m_passes)->default_value(3), "number of iteration (default value = 3)")
         ("nthread,n", po::value<unsigned>(&p.m_nthread)->default_value(std::thread::hardware_concurrency()),
                  "number of threads (default = number of cores)")
-        ("metric,m", po::value<Metric>(&p.m_metric), "Metric used for determining " \
+        ("metric,m", po::value<Metric>(&p.m_metric)->default_value(HAMMING), "Metric used for determining " \
                  "similarity between objects - [HAMMING/L1/L2] (default = Hamming)")
         ("precision,b", po::value<unsigned>(&p.m_precision)->default_value(10), "Number " \
                  "of hashing function that are encoding the object")
@@ -231,29 +265,29 @@ int main(int argc, char** argv)
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
+    auto param_is_set_explicitly = [&vm] (const std::string &param_name) {
+        return vm.count(param_name) > 0 && !vm[param_name].defaulted();
+    };
+
     if (vm.count("help")) {
-        std::cout << desc << "\n";
+        info(desc);
         return EXIT_SUCCESS;
     }
 
+    auto error_with_usage = [&] (const std::string &message) {
+        error(message, "\n", desc);
+    };
+
     if (vm.count("train_file") == 0 && vm.count("test_file") == 0) {
-        std::cerr << "Error: Neither train_file nor test_file were set"  << std::endl;
-        std::cerr << desc << std::endl;
-        return EXIT_FAILURE;
+        error_with_usage("Neither train_file nor test_file were set");
     }
 
     if (vm.count("dimensions") == 0 && vm.count("model_in") == 0) {
-        std::cerr << "Error: Parameter dimensions was not set"  << std::endl;
-        std::cerr << desc << std::endl;
-        return EXIT_FAILURE;
+        error_with_usage("Parameter dimensions was not set");
     }
 
-
     if (vm.count("train_file") == 0 && vm.count("model_in") == 0) {
-        std::cerr << "Error: If you don't set training file (train_file) you have to set "
-             << "input model (model_in)"  << std::endl;
-        std::cerr << desc << std::endl;
-        return EXIT_FAILURE;
+        error_with_usage("If you don't set training file (train_file) you have to set input model (model_in)");
     }
 
     if (vm.count("model_in")) {
@@ -262,18 +296,17 @@ int main(int argc, char** argv)
         boost::archive::binary_iarchive ia(ifs);
 
         ia >> m;
-        assert(m != NONE);
 
-        if (p.m_metric != NONE) {
+        if (param_is_set_explicitly("metric")) {
             if (p.m_metric == m) {
-                std::cerr << "Warning: if input model is specified one does not have to specify the metric"  << std::endl;
+                warning("if input model is specified one does not have to specify the metric");
             } else {
-                std::cerr << "Warning: the specified metric is ignored, because it differs from the input model metric"  << std::endl;
+                warning("the specified metric is ignored, because it differs from the input model metric");
             }
         }
         auto ignored = [&](std::string const & param, std::string const & param_display) {
-            if (vm.count(param) > 0) {
-                std::cerr << "Warning: parameter " + param_display + " was set, but model_in is used, param " + param_display + " is discarded" << std::endl;
+            if (param_is_set_explicitly(param)) {
+                warning("parameter ", param_display, " was set, but model_in is used, param ", param_display, " is discarded");
             }
         };
         ignored("parm_w", "w");
@@ -283,9 +316,8 @@ int main(int argc, char** argv)
 
         p.m_metric = m;
     } else {
-        if (p.m_metric == NONE) p.m_metric = HAMMING;
-        if (p.m_metric == HAMMING && vm.count("parm_w") > 0) {
-            std::cerr << "Warning: parameter w was set, but hamming metric is used, param w is discarded" << std::endl;
+        if (p.m_metric == HAMMING && param_is_set_explicitly("parm_w")) {
+            warning("parameter w was set, but hamming metric is used, param w is discarded");
         }
     }
 

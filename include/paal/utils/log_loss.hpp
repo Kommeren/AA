@@ -58,6 +58,19 @@ FloatType log_loss(Probs &&probs, TestResults &&test_results) {
  * @brief
  *
  * @tparam FloatType
+ * @param log_loss
+ *
+ * @return
+ */
+template<typename FloatType>
+FloatType likelihood_from_log_loss(FloatType log_loss) {
+    return std::exp(-log_loss);
+}
+
+/**
+ * @brief
+ *
+ * @tparam FloatType
  * @tparam Probs
  * @tparam TestResults
  *
@@ -67,8 +80,8 @@ FloatType log_loss(Probs &&probs, TestResults &&test_results) {
 template<typename FloatType = double,
          typename Probs, typename TestResults>
 FloatType likelihood(Probs &&probs, TestResults &&test_results) {
-    return std::exp(-log_loss<FloatType>(std::forward<Probs>(probs),
-                            std::forward<TestResults>(test_results)));
+    return likelihood_from_log_loss(log_loss<FloatType>(std::forward<Probs>(probs),
+                                    std::forward<TestResults>(test_results)));
 }
 
 } //! paal
