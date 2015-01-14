@@ -32,50 +32,40 @@ bool log_action(int s) {
     LOGLN("f(" << s << ") \t" << f(s) << " after " << ++i);
     return true;
 }
-;
 
 } // anonymous namespace
 BOOST_AUTO_TEST_SUITE(local_search)
 
-BOOST_AUTO_TEST_CASE(local_search_first_improving_test) {
+BOOST_AUTO_TEST_CASE(local_test) {
     // printing
     int solution(0);
     LOGLN("f(" << solution << ") \t" << f(solution));
     utils::always_false nop;
 
-    // search
+    // first_improving
     BOOST_CHECK(ls::local_search(solution, ls::first_improving_strategy{},
                                  log_action, nop, search_comps()));
     BOOST_CHECK_EQUAL(solution, 6);
-}
 
-BOOST_AUTO_TEST_CASE(local_search_best_improving_test) {
-    // printing
-    int s(0);
-    LOGLN("f(" << s << ") \t" << f(s));
-    ON_LOG(i = 0);
-    utils::always_false nop;
 
-    // search
-    BOOST_CHECK(ls::local_search(s, ls::best_improving_strategy{}, log_action,
+    solution = 0;
+    // best improving
+    BOOST_CHECK(ls::local_search(solution, ls::best_improving_strategy{}, log_action,
                                  nop, search_comps()));
-    BOOST_CHECK_EQUAL(s, 6);
-}
+    BOOST_CHECK_EQUAL(solution, 6);
 
-BOOST_AUTO_TEST_CASE(local_search_best_test) {
-    // printing
-    int s(0);
-    LOGLN("f(" << s << ") \t" << f(s));
-    ON_LOG(i = 0);
+    solution = 0;
 
+    //best
     auto stop_after_five_iterations = paal::utils::make_not_functor(
         paal::local_search::stop_condition_count_limit{ 5 });
     auto on_success =
         paal::utils::make_and_functor(log_action, stop_after_five_iterations);
 
     // search
-    BOOST_CHECK(ls::best(s, on_success, search_comps{}));
-    BOOST_CHECK_EQUAL(s, 6);
+    BOOST_CHECK(ls::best(solution, on_success, search_comps{}));
+    BOOST_CHECK_EQUAL(solution, 6);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

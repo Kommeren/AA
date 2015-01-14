@@ -12,11 +12,11 @@
  * @version 1.0
  * @date 2013-02-11
  */
-
 #include "test_utils/logger.hpp"
 
 #include "paal/local_search/search_obj_func_components.hpp"
 #include "paal/local_search/local_search_obj_function.hpp"
+#include "paal/data_structures/components/components_replace.hpp"
 
 #include <boost/test/unit_test.hpp>
 
@@ -28,7 +28,7 @@ namespace ls = paal::local_search;
 using namespace paal;
 
 struct F {
-    int operator()(int x) { return -x * x + 12 * x - 27; }
+    int operator()(int x) const { return -x * x + 12 * x - 27; }
 };
 
 class NG {
@@ -37,7 +37,7 @@ class NG {
 
   public:
 
-    NG() : neighb{ 10, -10, 1, -1 } {}
+    NG() : neighb{ 1, -1, 10, -10 } {}
 
     Neighb &operator()(int x) const { return neighb; }
 };
@@ -66,8 +66,13 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
         return true;
     };
 
-    // search
     ls::local_search_obj_fun(s, ls::first_improving_strategy{}, logger,
+                             utils::always_false{}, search_comps{});
+    BOOST_CHECK_EQUAL(s, 6);
+
+    ON_LOG(i = 0);
+    s = 0;
+    ls::local_search_obj_fun(s, ls::best_improving_strategy{}, logger,
                              utils::always_false{}, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
 
@@ -86,4 +91,26 @@ BOOST_AUTO_TEST_CASE(local_search_obj_fun_test) {
     s = 0;
     ls::obj_fun_best_improving(s, search_comps{}, search_comps{});
     BOOST_CHECK_EQUAL(s, 6);
+
+    search_comps sc{};
+
+    int iter = -1;
+
+    auto sc_0_after_round = paal::data_structures::replace<ls::ObjFunction>([&iter, sc](int & s){
+                    return ++iter > static_cast<int>(sc.call<ls::GetMoves>(s).size()) ? -10000 : sc.call<ls::ObjFunction>(s);
+                },
+                sc
+            );
+
+    s = 0;
+    LOGLN("first improving 4 checks");
+    ls::obj_fun_first_improving(s, sc_0_after_round);
+    BOOST_CHECK_EQUAL(s, 4);
+
+    iter = -1;
+    s = 0;
+    LOGLN("best improving 4 checks");
+    ls::obj_fun_best_improving(s, sc_0_after_round);
+    BOOST_CHECK_EQUAL(s, 10);
+
 }

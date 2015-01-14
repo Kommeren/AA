@@ -93,7 +93,7 @@ struct first_improving_strategy {
 };
 
 /**
- * @brief functor used in fold on StaticLazyJoin in order to find the most
+ * @brief functor used in fold in order to find the most
  * improving move.
  */
 struct max_functor {

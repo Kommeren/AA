@@ -23,9 +23,9 @@ namespace paal {
 namespace local_search {
 
 /**
- * @brief Name for get_moves component
+ * @brief Name for GetMoves component
  */
-struct get_moves;
+struct GetMoves;
 /**
  * @brief Name for ObjFunction component
  */
@@ -40,7 +40,7 @@ struct Commit;
  *        This usually this class is not used. See search_componentsObjFun
  * class.
  */
-using components_obj_fun = data_structures::components<get_moves, ObjFunction, Commit>;
+using components_obj_fun = data_structures::components<GetMoves, ObjFunction, Commit>;
 
 /**
  * @brief search_componentsObjFun alias to components.
