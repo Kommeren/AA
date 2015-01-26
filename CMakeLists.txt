@@ -1,3 +1,5 @@
+#Author Piotr Wygocki
+
 set(PAAL ${CMAKE_CURRENT_SOURCE_DIR})
 
 cmake_minimum_required(VERSION 2.8)
@@ -9,6 +11,7 @@ if(${USE_CLANG_AND_DIST})
     set(USE_CLANG 1)
 endif()
 
+
 if(${USE_CLANG})
     if(NOT USE_CLANG_AND_DIST)
         SET (CMAKE_CXX_COMPILER  "clang++")
@@ -18,13 +21,22 @@ if(${USE_CLANG})
     ADD_DEFINITIONS("-stdlib=libc++")
     set(LIBS c++)
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+    if(UNIX)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-local-typedefs")
+    endif()
 endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -pthread -Wall -fno-strict-aliasing")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe -g")
+if(UNIX)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -pthread -Wall -fno-strict-aliasing")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -ggdb -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -pipe -g")
+else()
+    add_definitions( "/W3 /D_CRT_SECURE_NO_WARNINGS /wd4521 /wd4522" )
+    # TODO fix paths to glpk on windows
+    include_directories ("C:/Program Files (x86)/GnuWin32/include")
+    link_directories ("C:/Program Files (x86)/GnuWin32/lib")
+endif()
 
 file(GLOB BOOST_SUBS "${PAAL}/boost/*")
 
@@ -33,6 +45,7 @@ foreach(dir ${BOOST_SUBS})
 endforeach()
 
 include_directories (${PAAL}/include)
+
 
 if(${COMPILATION_ERROR_TESTS})
     add_subdirectory(test)

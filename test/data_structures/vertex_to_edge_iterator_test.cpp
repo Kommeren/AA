@@ -20,7 +20,7 @@ using std::vector;
 using namespace paal::data_structures;
 
 struct T {
-    typedef typename vector<string>::iterator iter;
+    typedef vector<string>::iterator iter;
     typedef std::pair<string, string> P;
 };
 

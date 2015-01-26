@@ -1,3 +1,4 @@
+#Author Piotr Wygocki
 
 include_directories (${PAAL})
 file(GLOB_RECURSE example_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")

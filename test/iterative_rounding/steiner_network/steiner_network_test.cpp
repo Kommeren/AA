@@ -66,7 +66,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_test) {
         g, restrictions, std::back_inserter(result_network));
 
     print_result(result_network);
-    BOOST_CHECK_EQUAL(result_network.size(), 4);
+    BOOST_CHECK_EQUAL(result_network.size(), 4u);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_list) {
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(steiner_network_list) {
     std::vector<EdgeT> result_network;
     steiner_network_iterative_rounding(
         g, restrictions, std::back_inserter(result_network));
-    BOOST_CHECK_EQUAL(result_network.size(), 4);
+    BOOST_CHECK_EQUAL(result_network.size(), 4u);
 }
 
 BOOST_AUTO_TEST_CASE(steiner_network_test_properties) {

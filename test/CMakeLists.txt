@@ -1,3 +1,5 @@
+#Author Piotr Wygocki
+
 add_custom_target(tests)
 
 #adding unit_test boost library

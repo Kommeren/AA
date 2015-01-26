@@ -25,7 +25,7 @@
 
 BOOST_AUTO_TEST_CASE(KCenter) {
     // performance test
-    const int NUM_CENTERS = 1000;
+    std::size_t const NUM_CENTERS = 1000;
     const int NUM_ITEMS = 1000 * 1000;
     const int P1 = 15469313;
     const int P2 = 10554857;

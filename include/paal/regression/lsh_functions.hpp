@@ -312,7 +312,7 @@ public:
     ///operator()
     template <typename Range>
     auto operator()(Range &&range) const {
-        assert(*boost::max_element(range) < m_perm.size());
+        assert(*boost::max_element(range) < static_cast<int>(m_perm.size()));
         return *min_element_functor(
                     range, [&](range_to_ref_t<Range> a){ return m_perm[a]; });
     }

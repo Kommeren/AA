@@ -24,14 +24,13 @@ template <typename KnapsackData, typename Is_0_1_Tag,
           typename RetrieveSolution = retrieve_solution_tag,
           typename Value = typename KnapsackData::value,
           typename Size = typename KnapsackData::size>
-std::pair<Value, Size>
-knapsack_check_integrality(KnapsackData knap_data, Is_0_1_Tag is_0_1_Tag,
+typename KnapsackData::return_type knapsack_check_integrality(KnapsackData knap_data, Is_0_1_Tag is_0_1_Tag,
                            RetrieveSolution retrieve_solutionTag =
                                RetrieveSolution{}) {
 
     return knapsack(std::move(knap_data), is_0_1_Tag,
-                    detail::GetIntegralTag<Size, Value>{},
-                    retrieve_solutionTag);
+                detail::GetIntegralTag<Size, Value>{},
+                retrieve_solutionTag);
 }
 
 // this overloads is for nonintegral SizeType and ValueType
@@ -41,8 +40,8 @@ template <typename KnapsackData,
           typename RetrieveSolution, typename Is_0_1_Tag,
           typename = typename std::enable_if<std::is_same<
               non_integral_value_and_size_tag, IntegralTag>::value>::type>
-typename KnapsackData::return_type
-knapsack(KnapsackData, Is_0_1_Tag is_0_1_Tag, IntegralTag,
+
+typename KnapsackData::return_type knapsack(KnapsackData, Is_0_1_Tag is_0_1_Tag, IntegralTag,
          RetrieveSolution retrieve_solution) {
     // trick to avoid checking assert on template definition parse
     static_assert(
@@ -55,8 +54,7 @@ knapsack(KnapsackData, Is_0_1_Tag is_0_1_Tag, IntegralTag,
  *  overload for integral Size and Value case
  */
 template <typename KnapsackData, typename Is_0_1_Tag, typename RetrieveSolution>
-typename KnapsackData::return_type
-knapsack(KnapsackData knap_data, Is_0_1_Tag is_0_1_Tag,
+typename KnapsackData::return_type knapsack(KnapsackData knap_data, Is_0_1_Tag is_0_1_Tag,
          integral_value_and_size_tag, RetrieveSolution retrieve_solutionTag) {
     if (get_value_bound(knap_data, is_0_1_Tag, upper_tag{}) >
         knap_data.get_capacity()) {

@@ -46,7 +46,7 @@ template <typename Metric, typename Bimap, typename Strategy = read_indexes_tag>
     }
 
     template <typename Vertex>
-    auto read(Vertex && v) const -> decltype(this->read(v, Strategy())) {
+        auto read(Vertex && v) const -> decltype(this->read(v, Strategy())) {
         return read(v, Strategy{});
     }
 
@@ -70,7 +70,7 @@ template <typename Metric, typename Bimap, typename Strategy = read_indexes_tag>
      * @return
      */
     template <typename Vertex>
-    auto operator()(const Vertex & i, const Vertex & j) -> decltype(m_metric(this->read(i), this->read(j))) {
+    auto operator()(const Vertex & i, const Vertex & j) {
         return m_metric(read(i), read(j));
     }
 
@@ -83,7 +83,7 @@ template <typename Metric, typename Bimap, typename Strategy = read_indexes_tag>
      * @return
      */
     template <typename Vertex>
-    auto operator()(const Vertex & i, const Vertex & j) const ->  decltype(m_metric(this->read(i), this->read(j))){
+    auto operator()(const Vertex & i, const Vertex & j) const {
         return m_metric(read(i), read(j));
     }
 };

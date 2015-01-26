@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(KCut) {
             cost_cut_verification += weight(edge);
     }
     BOOST_CHECK_EQUAL(cost_cut, cost_cut_verification);
-	LOGLN("Number of parts: " << parts);
+    LOGLN("Number of parts: " << parts);
     //estimate aproximation ratio
     check_result_compare_to_bound(cost_cut_verification, cost_cut_oncomponents,
                     2.0 - 2.0 / double(parts), paal::utils::less_equal(),

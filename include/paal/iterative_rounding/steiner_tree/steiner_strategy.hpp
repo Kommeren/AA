@@ -171,10 +171,10 @@ private:
         }
     }
 
-    void merge_vertices(int trg, int src) {
+    void merge_vertices(Vertex trg, Vertex src) {
         for (auto v : boost::as_array(adjacent_vertices(src,
                 m_terminals_graph))) {
-            if (trg != v) {
+            if (trg != static_cast<Vertex>(v)) {
                 add_edge(trg, v, m_terminals_graph);
             }
         }
@@ -328,7 +328,7 @@ public:
                             assign_max(prob[k], 1. / cost);
                         }
                     }
-                    int selected = paal::utils::random_select<false>(
+                    std::size_t selected = paal::utils::random_select<false>(
                                        prob.begin(), prob.end()) -
                                    prob.begin();
                     if (selected == prob.size()) break;

@@ -26,7 +26,7 @@ namespace detail {
 
 template <typename SizeType, typename ValueType>
 using GetIntegralTag = typename std::conditional<
-    std::is_integral<SizeType>::value &&std::is_integral<ValueType>::value,
+    std::is_integral<SizeType>::value && std::is_integral<ValueType>::value,
     integral_value_and_size_tag,
     typename std::conditional<
         std::is_integral<SizeType>::value, integral_size_tag,

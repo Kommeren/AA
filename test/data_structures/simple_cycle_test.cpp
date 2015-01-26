@@ -29,19 +29,18 @@ struct types {
 };
 
 class check_size {
+    simple_cycle<string> m_cm;
+    std::size_t m_size;
+
   public:
     check_size(simple_cycle<string> cm, std::size_t size)
         : m_cm(std::move(cm)), m_size(size) {}
     void operator()(const string &s) {
         auto re = m_cm.get_edge_range(s);
         auto rv = m_cm.get_vertices_range(s);
-        BOOST_CHECK_EQUAL(m_size, boost::distance(re));
-        BOOST_CHECK_EQUAL(m_size, boost::distance(rv));
+        BOOST_CHECK_EQUAL(m_size, static_cast<std::size_t>(boost::distance(re)));
+        BOOST_CHECK_EQUAL(m_size, static_cast<std::size_t>(boost::distance(rv)));
     }
-
-  private:
-    simple_cycle<string> m_cm;
-    std::size_t m_size;
 };
 
 class check_all_sizes : public types {

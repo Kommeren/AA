@@ -163,8 +163,8 @@ fraction<A, B> make_fraction(A a, B b)
  * @return
  */
 template<class A, class B, class C>
-auto operator*(C c, const fraction<A, B>& f) -> fraction<decltype(c * f.num), B>
-{
+auto operator*(C c, const fraction<A, B>& f) {
+
     return make_fraction(c * f.num, f.den);
 }
 

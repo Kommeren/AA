@@ -24,7 +24,7 @@ int main() {
     typedef sample_graphs_metrics SGM;
     auto g = SGM::get_graph_steiner();
     auto index = get(boost::vertex_index, g);
-    typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
+    typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::set<Edge> steinerEdges;
     std::vector<int> color(num_vertices(g));
     {

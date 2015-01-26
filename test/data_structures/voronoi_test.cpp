@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationvoronoiutionWithClientAssignmentsTest) {
     auto gm = SGM::get_graph_metric_small();
 
     typedef voronoi<decltype(gm)> voronoi;
-    typedef typename voronoi::GeneratorsSet FSet;
+    typedef voronoi::GeneratorsSet FSet;
     voronoi vor(FSet{}, FSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
 
     vor.add_generator(SGM::A);
@@ -37,8 +37,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
 
     typedef voronoi<decltype(gm)> voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(GSet{ SGM::A, SGM::B },
                 VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
 
@@ -63,8 +63,8 @@ BOOST_AUTO_TEST_CASE(test_2) {
 
     typedef voronoi<decltype(gm)> voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(GSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E },
                 VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
     rem_add(vor, SGM::A);
@@ -81,8 +81,8 @@ BOOST_AUTO_TEST_CASE(test_make_voronoi) {
 
     typedef voronoi<decltype(gm)> voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(GSet{ SGM::A, SGM::B },
                 VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm);
 

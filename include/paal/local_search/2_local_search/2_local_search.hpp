@@ -77,9 +77,7 @@ auto make_two_local_search_components(Gain ch, GetMoves gm = GetMoves{}) {
  * @param m metric
  */
 template <typename Metric>
-decltype(make_two_local_search_components(
-    gain_two_opt<Metric>(std::declval<Metric>())))
-    get_default_two_local_components(const Metric &m) {
+auto get_default_two_local_components(const Metric &m) {
     return make_two_local_search_components(gain_two_opt<Metric>(m));
 }
 

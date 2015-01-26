@@ -29,8 +29,8 @@ int main() {
     // sample voronoi
     typedef paal::data_structures::voronoi<Metric> voronoiT;
     typedef paal::data_structures::voronoi_traits<voronoiT> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoiT voronoi(GSet{ SGM::A, SGM::B, SGM::C, SGM::D }, VSet{ SGM::E },
                      gm);
 

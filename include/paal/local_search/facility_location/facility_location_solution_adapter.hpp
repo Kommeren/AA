@@ -48,7 +48,7 @@ class facility_location_solution_adapter {
     template <typename Collection, typename Range
                 = const typename boost::iterator_range<typename Collection::const_iterator>::type>
     auto get_cycledCopy(const Collection &col, std::size_t index) const
-        -> boost::joined_range<Range, Range> {
+            -> boost::joined_range<Range, Range>  {
         return boost::join(
             boost::make_iterator_range(col.begin() + index, col.end()),
             boost::make_iterator_range(col.begin(), col.begin() + index));
@@ -166,9 +166,8 @@ public:
      *
      * @return
      */
-    auto getUnchosenCopy() const->decltype(
-        std::declval<facility_location_solution_adapter>().get_cycledCopy(
-            m_unchosen_copy, m_last_used_unchosen)) {
+    auto getUnchosenCopy() const -> decltype(this->get_cycledCopy(
+         m_unchosen_copy, m_last_used_unchosen)) {
         return get_cycledCopy(m_unchosen_copy, m_last_used_unchosen);
     }
 
@@ -179,9 +178,8 @@ public:
      *
      * @return
      */
-    auto getChosenCopy() const->decltype(
-        std::declval<facility_location_solution_adapter>().get_cycledCopy(
-            m_chosen_copy, m_last_used_chosen)) {
+    auto getChosenCopy() const -> decltype(this->get_cycledCopy(
+                m_chosen_copy, m_last_used_chosen)){
         return get_cycledCopy(m_chosen_copy, m_last_used_chosen);
     }
 };

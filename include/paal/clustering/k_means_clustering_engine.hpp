@@ -37,7 +37,7 @@ auto distance_square(RangeLeft && lrange, RangeRight && rrange) {
     //TODO change to sum_functors when generic lambdas appears
     decltype(*std::begin(lrange) * *std::begin(rrange)) dist{};
     for (auto point_pair : boost::combine(lrange, rrange)) {
-        auto diff = (boost::get<0>(point_pair) - boost::get<1>(point_pair));
+        auto diff = boost::get<0>(point_pair) - boost::get<1>(point_pair);
         dist += diff * diff;
     }
     return dist;

@@ -26,7 +26,7 @@ template <typename T> void print_tuple3(T t) {
     LOGLN(std::get<0>(t) << "," << std::get<1>(t) << "," << std::get<2>(t));
 }
 
-typedef typename std::vector<int>::iterator It;
+typedef std::vector<int>::iterator It;
 vector<int> v{ 1, 2, 3, 4, 5, 6, 7 };
 
 BOOST_AUTO_TEST_CASE(subset_iterator_engine_test) {

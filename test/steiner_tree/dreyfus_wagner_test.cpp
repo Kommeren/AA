@@ -33,8 +33,8 @@ BOOST_AUTO_TEST_CASE(test_basic) {
     auto dw = make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
     BOOST_CHECK_EQUAL(dw.get_cost(), 4);
-    BOOST_CHECK_EQUAL(int(dw.get_steiner_elements().size()), 1);
-    BOOST_CHECK_EQUAL(dw.get_edges().size(), 4);
+    BOOST_CHECK_EQUAL(dw.get_steiner_elements().size(), 1u);
+    BOOST_CHECK_EQUAL(dw.get_edges().size(), 4u);
 }
 
 BOOST_AUTO_TEST_CASE(test_medium) {
@@ -46,8 +46,8 @@ BOOST_AUTO_TEST_CASE(test_medium) {
     auto dw = make_dreyfus_wagner(gm, terminals, nonterminals);
     dw.solve();
     BOOST_CHECK_EQUAL(dw.get_cost(), 15);
-    BOOST_CHECK_EQUAL(dw.get_steiner_elements().size(), 0);
-    BOOST_CHECK_EQUAL(dw.get_edges().size(), 5);
+    BOOST_CHECK_EQUAL(dw.get_steiner_elements().size(), 0u);
+    BOOST_CHECK_EQUAL(dw.get_edges().size(), 5u);
 }
 
 BOOST_AUTO_TEST_CASE(dreyfus_wagner_euclidean_metric_test) {

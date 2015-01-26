@@ -165,12 +165,12 @@ void example_replacing_struct_without_default_constructors() {
 void example_create_using_make() {
     // constructing objects providing names for objects
     typedef Comps<int, double, float> SomeComps;
-    SomeComps someComps = SomeComps::make<names::A, names::C>(1, 2);
+    auto someComps = SomeComps::make<names::A, names::C>(1, 2.f);
     assert(someComps.get<names::A>() == 1);
-    assert(someComps.get<names::C>() == 2);
+    assert(someComps.get<names::C>() == 2.f);
 
-    SomeComps someComps2 = SomeComps::make<names::C, names::A>(1, 2);
-    assert(someComps2.get<names::C>() == 1);
+    auto someComps2 = SomeComps::make<names::C, names::A>(1.f, 2);
+    assert(someComps2.get<names::C>() == 1.f);
     assert(someComps2.get<names::A>() == 2);
 }
 
@@ -178,7 +178,7 @@ void example_create_using_copy_tag() {
     typedef Comps<int, double, float> SomeComps;
     SomeComps someComps(CompsToReplace<int, int>(1, 2), ds::copy_tag());
     assert(someComps.get<names::A>() == 1);
-    assert(someComps.get<names::B>() == 2);
+    assert(someComps.get<names::B>() == 2.);
 }
 
 void example_references() {

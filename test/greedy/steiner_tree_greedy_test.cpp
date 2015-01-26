@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(steiner_tree_test_Parameters) {
     LOGLN("steiner_tree_test_Parameters");
     typedef sample_graphs_metrics SGM;
     auto g = SGM::get_graph_steiner();
-    typedef typename boost::graph_traits<decltype(g)>::edge_descriptor Edge;
+    typedef boost::graph_traits<decltype(g)>::edge_descriptor Edge;
     std::vector<Edge> steiner_edges;
     std::vector<int> color(num_vertices(g));
     {

@@ -157,7 +157,7 @@ BOOST_AUTO_TEST_CASE(bounded_degree_mst_list) {
     std::vector<EdgeT> result_tree;
     bounded_degree_mst_iterative_rounding(g, bounds,
                     std::inserter(result_tree, result_tree.begin()));
-    BOOST_CHECK_EQUAL(result_tree.size(), 5);
+    BOOST_CHECK_EQUAL(result_tree.size(), 5u);
 }
 
 BOOST_AUTO_TEST_CASE(bounded_degree_mst_invalid_test) {

@@ -174,14 +174,14 @@ private:
     /// then best found solution.
     bool greedy_prune(const SetData & set_data) {
         return (m_budget - m_cost_of_solution) * set_data.m_weight_of_uncovered_elements <=
-                set_data.m_cost * (m_weight_of_bests_solution - m_weight_of_covered_elements);
+                static_cast<Budget>(set_data.m_cost * (m_weight_of_bests_solution - m_weight_of_covered_elements));
     }
 
     ///this function is ALWAYS called from select_set, thats why we set set_data.m_is_processed!
     bool can_select(SetData & set_data) {
         if (set_data.m_is_processed) return false;
         set_data.m_is_processed = true;
-        return m_cost_of_solution + set_data.m_cost <= m_budget &&
+        return static_cast<Budget>(m_cost_of_solution + set_data.m_cost) <= m_budget &&
             set_data.m_weight_of_uncovered_elements!= ElementWeight{};
     }
 
@@ -325,7 +325,7 @@ auto budgeted_maximum_coverage(
                     we will do it anyway */
             set_cost cost_of_set = set_data.m_cost;
             if (set_data.m_weight_of_uncovered_elements >= weight_of_bests_solution &&
-                cost_of_set <= budget) {
+                static_cast<Budget>(cost_of_set) <= budget) {
                 weight_of_bests_solution = set_data.m_weight_of_uncovered_elements;
                 best_solution[0] = set_id;
                 cost_of_best_solution = cost_of_set;

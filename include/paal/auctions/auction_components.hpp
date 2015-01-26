@@ -153,8 +153,7 @@ namespace concepts {
                   demand_query_result_items_t>));
          using demand_query_result_value_t = puretype(res.second);
          static_assert(std::is_arithmetic<demand_query_result_value_t>::value,
-            "second member of the result from demand query oracle is not "
-               "arithmetic!");
+            "second member of the result from demand query oracle is not arithmetic!");
       }
    };
 

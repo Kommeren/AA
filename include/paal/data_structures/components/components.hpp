@@ -41,36 +41,21 @@ struct copy_tag {};
 // This namespace block contains implementation of the main class
 // components<Names,Types> and needed meta functions
 namespace detail {
-/**
- * @brief wraps type to constructible type
- *
- * @tparam T
- */
+
+///wraps type to constructible type
 template <typename T> struct wrap_to_constructable {
     typedef T type;
 };
 
-/**
- * @brief If Name is kth on Names list, returns kth Type.
- *
- * @tparam Name
- * @tparam Names
- * @tparam Types
- */
+
+///If Name is kth on Names list, returns kth Type.
 template <typename Name, typename Names, typename Types> struct type_for_name {
     typedef typename remove_n_first<1, Names>::type NewNames;
     typedef typename remove_n_first<1, Types>::type NewTypes;
     typedef typename type_for_name<Name, NewNames, NewTypes>::type type;
 };
 
-/**
- * @brief Specialization when found
- *
- * @tparam Name
- * @tparam Type
- * @tparam NamesRest
- * @tparam TypesRest
- */
+///Specialization when found
 template <typename Name, typename Type, typename... NamesRest,
           typename... TypesRest>
 struct type_for_name<Name, TypesVector<Name, NamesRest...>,
@@ -78,12 +63,8 @@ struct type_for_name<Name, TypesVector<Name, NamesRest...>,
     typedef Type type;
 };
 
-/**
- * @brief SFINAE check if the given type has get<Name>() member function.
- *
- * @tparam T
- * @tparam Name
- */
+
+///SFINAE check if the given type has get<Name>() member function.
 template <typename T, typename Name> class has_template_get {
   private:
     /**
@@ -162,31 +143,37 @@ class components<TypesVector<Name, NamesRest...>,
   public:
     using base::get;
 
-    /// default constructor
+    /// constructor
     // we do not use  = default, cause we'd like to value initialize POD's.
     components() : base{}, m_component{} {};
 
-    // default copy constructor
-    components(const components &) = default;
+    //  copy constructor
+    components(components const & other)
+        : base(static_cast<base const &>(other)), m_component(other.get<Name>()) {}
 
-    // doesn't work on clang 3.2 // change in the standard
+    // doesn't work on clang 3.2 // change in the standard and visual studio 2015 preview
     // components(components &) = default;
     // constructor taking nonconst lvalue reference
-    components(components &comps)
-        : base(static_cast<base &>(comps)), m_component(comps.get<Name>()) {}
+    components(components &other)
+        : base(static_cast<base &>(other)), m_component(other.get<Name>()) {}
 
-    // default move constructor
+    //  move constructor
     components(components &&) = default;
 
-    // default assignemnt operator
-    components &operator=(const components &) = default;
+    // assignment operator
+    components &operator=(components const & other) {
+
+        static_cast<base &>(*this) = static_cast<base &>(other);
+        m_component = other.get<Name>();
+        return *this;
+    }
 
     // doesn't work on clang 3.2 // change in the standard
     // components& operator=(components &) = default;
-    // assignemnt operator taking nonconst lvalue reference
-    components &operator=(components &comps) {
-        static_cast<base &>(*this) = static_cast<base &>(comps);
-        m_component = comps.get<Name>();
+    // assignment operator taking nonconst lvalue reference
+    components &operator=(components &other) {
+        static_cast<base &>(*this) = static_cast<base &>(other);
+        m_component = other.get<Name>();
         return *this;
     }
 

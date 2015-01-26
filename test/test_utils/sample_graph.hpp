@@ -133,9 +133,9 @@ struct sample_graphs_metrics {
     }
 
     static Graph two_points_steiner() {
-        const int num_nodes = 2;
-        Edge edge_array[] = {};
-        int weights[] = {};
+        int const  num_nodes = 2;
+        Edge * edge_array = nullptr;
+        int * weights = nullptr;
         Graph g(edge_array, edge_array, weights, num_nodes);
         auto color = get(boost::vertex_color, g);
         put(color, A, 1);

@@ -44,37 +44,38 @@ const int gamma_val = 2;
 struct gamma_oracle_func {
       template <class GetPrice, class Threshold>
       boost::optional<std::pair<Items, Frac>>
-      operator()(Bidder bidder, GetPrice get_price, Threshold z) const
-      {
-         if (bidder == "Pooh Bear") {
-            const Value val = 10;
-            if (val <= z) return boost::none;
-            return std::make_pair(Items{"honey"}, Frac(get_price("honey"), val - z));
-         }
+      operator()(Bidder bidder, GetPrice get_price, Threshold z) const {
 
-         assert(bidder == "Rabbit");
+          if (bidder == "Pooh Bear") {
+              const Value val = 10;
+              if (val <= z) return boost::none;
+              return std::make_pair(Items{"honey"}, Frac(get_price("honey"), val - z));
+          }
 
-         const Value baby_val = 2, val = 3;
-         auto const baby_price = get_price("baby carrot"), price = get_price("carrot");
-         auto const baby_frac = Frac(baby_price, baby_val - z),
-            frac = Frac(price, val - z),
-            both_frac = Frac(baby_price + price, baby_val + val - z);
+          assert(bidder == "Rabbit");
 
-         auto check = [=](Frac candidate, Frac other1, Frac other2) {
+          const Value baby_val = 2, val = 3;
+          auto const baby_price = get_price("baby carrot");
+          auto const price = get_price("carrot");
+          auto const baby_frac = Frac(baby_price, baby_val - z),
+          frac = Frac(price, val - z),
+          both_frac = Frac(baby_price + price, baby_val + val - z);
+
+          auto check = [=](Frac candidate, Frac other1, Frac other2) {
             if (candidate.den <= 0) return false;
             auto check_single = [=](Frac candidate, Frac other) {
-               return other.den <= 0 || candidate <= gamma_val * other;
+                 return other.den <= 0 || candidate <= gamma_val * other;
             };
             return check_single(candidate, other1) && check_single(candidate, other2);
-         };
+          };
 
-         if (check(baby_frac, frac, both_frac))
-            return std::make_pair(Items{"baby carrot"}, baby_frac);
-         if (check(frac, baby_frac, both_frac))
-            return std::make_pair(Items{"carrot"}, frac);
-         if (check(both_frac, baby_frac, frac))
-            return std::make_pair(Items{"baby carrot", "carrot"}, both_frac);
-         return boost::none;
+          if (check(baby_frac, frac, both_frac))
+              return std::make_pair(Items{"baby carrot"}, baby_frac);
+          if (check(frac, baby_frac, both_frac))
+              return std::make_pair(Items{"carrot"}, frac);
+          if (check(both_frac, baby_frac, frac))
+              return std::make_pair(Items{"baby carrot", "carrot"}, both_frac);
+          return boost::none;
       }
 };
 

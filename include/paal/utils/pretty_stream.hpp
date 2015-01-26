@@ -30,7 +30,7 @@ namespace paal {
  * @return
  */
 inline std::string pretty_to_string(double x, double epsilon = 1e-9) {
-    int r = std::round(x);
+    auto r = static_cast<int>(std::round(x));
     if (utils::compare<double>{
         epsilon
     }.e(x, r)) {

@@ -228,10 +228,10 @@ class eraseable_bimap : public bimap<T, Idx> {
      * @param t
      */
     void erase(const T &t) {
-        auto i = m_t_to_id.find(t);
-        assert(i != m_t_to_id.end());
-        Idx idx = i->second;
-        m_t_to_id.erase(i);
+        auto iter = m_t_to_id.find(t);
+        assert(iter != m_t_to_id.end());
+        Idx idx = iter->second;
+        m_t_to_id.erase(iter);
         m_id_to_t.erase(m_id_to_t.begin() + idx);
 
         for (int i : irange(idx, Idx(m_id_to_t.size()))) {

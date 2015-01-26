@@ -23,8 +23,8 @@
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_CASE(KCenter) {
-    const int NUM_CENTERS = 3;
-    const int NUM_ITEMS = 6;
+    std::size_t const NUM_CENTERS = 3;
+    std::size_t const NUM_ITEMS = 6;
     const double OPTIMAL = 1;
     const double APPROXIMATION_RATIO = 2;
     auto metric = [](int a, int b) { return 0.1 + abs(a - b) * 0.9; };

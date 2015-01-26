@@ -42,9 +42,8 @@ struct get_moves : concepts_base<X, Solution, SearchComponents> {
         auto b = std::begin(i);
         auto e = std::end(i);
         for (auto x = b; x != e; ++x) {
-            const typename concepts_base<X, Solution, SearchComponents>::Move &
-                u = *x;
-            boost::ignore_unused_variable_warning(u);
+            typename concepts_base<X, Solution, SearchComponents>::Move const & uu = *x;
+            boost::ignore_unused_variable_warning(uu);
         }
     }
 };

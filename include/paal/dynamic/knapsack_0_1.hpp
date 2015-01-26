@@ -209,8 +209,7 @@ void retrieve_solution(const Knapsack &knapsack, ValueType maxValue,
  *  overload for integral Size case
  */
 template <typename KnapsackData, typename retrieve_solution_tag>
-typename KnapsackData::return_type
-knapsack(KnapsackData knap_data, zero_one_tag, integral_size_tag,
+auto knapsack(KnapsackData knap_data, zero_one_tag, integral_size_tag,
          retrieve_solution_tag retrieve_solutionTag) {
     using Value = typename KnapsackData::value;
 
@@ -230,8 +229,7 @@ knapsack(KnapsackData knap_data, zero_one_tag, integral_size_tag,
  *  overload for integral Value case
  */
 template <typename KnapsackData, typename retrieve_solution_tag>
-typename KnapsackData::return_type
-knapsack(KnapsackData knap_data, zero_one_tag, integral_value_tag,
+auto knapsack(KnapsackData knap_data, zero_one_tag, integral_value_tag,
          retrieve_solution_tag retrieve_solutionTag) {
     using Value = typename KnapsackData::value;
     using Size = typename KnapsackData::size;
@@ -267,9 +265,7 @@ knapsack(KnapsackData knap_data, zero_one_tag, integral_value_tag,
  */
 template <typename Objects, typename OutputIterator, typename ObjectSizeFunctor,
           typename ObjectValueFunctor = utils::return_one_functor>
-typename detail::knapsack_base<Objects, ObjectSizeFunctor,
-                               ObjectValueFunctor>::return_type
-knapsack_0_1(Objects &&objects,
+auto knapsack_0_1(Objects &&objects,
              detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>
                  capacity, // capacity is of size type
              OutputIterator out, ObjectSizeFunctor size,
@@ -296,9 +292,7 @@ knapsack_0_1(Objects &&objects,
  */
 template <typename Objects, typename ObjectSizeFunctor,
           typename ObjectValueFunctor = utils::return_one_functor>
-typename detail::knapsack_base<Objects, ObjectSizeFunctor,
-                               ObjectValueFunctor>::return_type
-knapsack_0_1_no_output(Objects &&objects,
+auto knapsack_0_1_no_output(Objects &&objects,
                        detail::FunctorOnRangePValue<ObjectSizeFunctor, Objects>
                            capacity, // capacity is of size type
                        ObjectSizeFunctor size,

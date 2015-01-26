@@ -30,9 +30,9 @@ int main() {
     typedef paal::data_structures::voronoi<decltype(gm)> VorType;
     typedef paal::data_structures::k_median_solution<VorType> Sol;
     typedef paal::data_structures::voronoi_traits<VorType> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
-    typedef typename Sol::UnchosenFacilitiesSet USet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
+    typedef Sol::UnchosenFacilitiesSet USet;
 
     // create voronoi and solution
     VorType voronoi(GSet{ SGM::B, SGM::D },

@@ -86,7 +86,7 @@ BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_general_test ) {
 BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_listgraph_test ) {
     SGM::ListGraph g = SGM::get_list_graph_medium();
 
-    using VD = typename boost::graph_traits<SGM::ListGraph>::vertex_descriptor;
+    using VD = boost::graph_traits<SGM::ListGraph>::vertex_descriptor;
     using Map = std::map<VD, int>;
     using IndexMap = boost::associative_property_map<Map>;
 

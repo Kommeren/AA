@@ -35,6 +35,7 @@ BOOST_AUTO_TEST_SUITE(lsh_regression_bin_tests)
 
 
 std::string exec(std::string cmd) {
+    //TODO this is system specific function (not part of a standard) it should be removed
     FILE* pipe = popen((cmd + " >/dev/null 2>&1; echo -n $?").c_str(), "r");
     if (!pipe) return "ERROR";
     char buffer[128];

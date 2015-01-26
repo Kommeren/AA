@@ -25,12 +25,11 @@ using namespace paal;
 int f(int x) { return -x * x + 12 * x - 27; }
 
 struct get_moves {
-    typedef typename std::vector<int>::const_iterator Iter;
     const std::vector<int> neighb;
 
   public:
 
-    get_moves() : neighb{ 10, -10, 1, -1 } {}
+    get_moves() : neighb({ 10, -10, 1, -1 }) {}
 
     const std::vector<int> &operator()(int x) const { return neighb; }
 };

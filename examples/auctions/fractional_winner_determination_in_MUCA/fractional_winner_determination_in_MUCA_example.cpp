@@ -71,11 +71,11 @@ int main()
       boost::make_function_output_iterator([&](Assignment a)
       {
          auto bidder = std::get<0>(a);
-         auto& items = std::get<1>(a);
+         auto& cur_items = std::get<1>(a);
          auto fraction = std::get<2>(a);
-         social_welfare += fraction * valuation.call<paal::auctions::value_query>(bidder, items);
+         social_welfare += fraction * valuation.call<paal::auctions::value_query>(bidder, cur_items);
          std::cout << bidder << " got a fraction " << fraction << " of bundle: ";
-         boost::copy(items, std::ostream_iterator<Item>(std::cout, ", "));
+         boost::copy(cur_items, std::ostream_iterator<Item>(std::cout, ", "));
          std::cout << std::endl;
       })
    );

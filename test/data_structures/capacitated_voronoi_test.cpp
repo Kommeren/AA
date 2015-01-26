@@ -32,8 +32,8 @@ BOOST_AUTO_TEST_CASE(GeneratorLocationvoronoiutionWithClientAssignmentsTest) {
 
     typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)>
         voronoi;
-    typedef typename voronoi::Generators GSet;
-    typedef typename voronoi::Vertices VSet;
+    typedef voronoi::Generators GSet;
+    typedef voronoi::Vertices VSet;
     voronoi vor(GSet{}, VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm,
                 fcap, cdem);
 
@@ -58,8 +58,8 @@ BOOST_AUTO_TEST_CASE(test_1) {
     typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)>
         voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(GSet{ SGM::A, SGM::B },
                 VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm, fcap, cdem);
 
@@ -95,8 +95,8 @@ BOOST_AUTO_TEST_CASE(test_2) {
     typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)>
         voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(
         GSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H },
         VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H },
@@ -114,8 +114,8 @@ BOOST_AUTO_TEST_CASE(test_3) {
     typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)>
         voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(GSet{ SGM::A /*, SGM::B*/ /*, SGM::C, SGM::D, SGM::E*/ },
                 VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E }, gm, fcap, cdem);
 
@@ -134,8 +134,8 @@ BOOST_AUTO_TEST_CASE(test_4) {
     typedef capacitated_voronoi<decltype(gm), decltype(fcap), decltype(cdem)>
         voronoi;
     typedef paal::data_structures::voronoi_traits<voronoi> VT;
-    typedef typename VT::GeneratorsSet GSet;
-    typedef typename VT::VerticesSet VSet;
+    typedef VT::GeneratorsSet GSet;
+    typedef VT::VerticesSet VSet;
     voronoi vor(
         GSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H },
         VSet{ SGM::A, SGM::B, SGM::C, SGM::D, SGM::E, SGM::F, SGM::G, SGM::H },

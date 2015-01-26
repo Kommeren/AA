@@ -224,11 +224,11 @@ void determine_winners_in_gamma_oracle_auction(
    using Value = promote_with_double_t<typename Traits::value_t>;
    using ItemVal = typename Traits::item_val_t;
 
-   std::unordered_map<ItemVal, Value> map;
+   std::unordered_map<ItemVal, Value> umap;
    return determine_winners_in_gamma_oracle_auction(
       std::forward<GammaOracleAuction>(auction),
       result,
-      boost::make_assoc_property_map(map),
+      boost::make_assoc_property_map(umap),
       epsilon
    );
 }

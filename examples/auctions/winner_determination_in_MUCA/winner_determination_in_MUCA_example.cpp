@@ -80,10 +80,10 @@ int main()
       boost::make_function_output_iterator([&](std::pair<Bidder, Items> p)
       {
          auto bidder = p.first;
-         auto& items = p.second;
-         social_welfare += valuation.call<paal::auctions::value_query>(bidder, items);
+         auto& cur_items = p.second;
+         social_welfare += valuation.call<paal::auctions::value_query>(bidder, cur_items);
          std::cout << bidder << " got bundle: ";
-         boost::copy(items, std::ostream_iterator<Item>(std::cout, ", "));
+         boost::copy(cur_items, std::ostream_iterator<Item>(std::cout, ", "));
          std::cout << std::endl;
       })
    );

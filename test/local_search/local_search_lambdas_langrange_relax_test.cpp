@@ -31,6 +31,7 @@ using namespace paal;
 
 struct value_diff {
     value_diff(double &value, double diff) : m_value(value), m_diff(diff) {}
+
     double &m_value;
     double m_diff;
 };
@@ -132,7 +133,7 @@ BOOST_AUTO_TEST_CASE(local_search_multi_lamdas_first_improving_test) {
     LOGLN("G = " << G);
     G = 0;
     LOG("f(");
-    LOG_COPY_DEL(x.begin(), x.end(), ",");
+    LOG_COPY_RANGE_DEL(x, ",");
     // TODO it would be interesting how G depends on starting point ( (0.3, 0.3,
     // 0.3) now)
     LOGLN(") = \t" << f(x));
