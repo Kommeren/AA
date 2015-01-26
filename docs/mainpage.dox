@@ -1,9 +1,15 @@
 /*! \mainpage This is the Practical Approximation Algorithms Library.
+
+  \htmlonly
+        <IFRAME style="float: right" src="https://docs.google.com/forms/d/1jEE8B6HBps-TxL4L1E5cs1ib2JWzJC_j3k3jy1tYH88/viewform?embedded=true" width="560" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading...</IFRAME>
+  \endhtmlonly
+
   \image html LOGO-ERC.jpg
   \image html FP7-ide-RGB.jpg
 
 <!-- Not very nice solution...-->
   \n   \n   \n   \n   \n
+
 
   \section Introduction
 
