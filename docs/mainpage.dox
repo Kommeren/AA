@@ -1,35 +1,10 @@
 /*! \mainpage This is the Practical Approximation Algorithms Library.
 
-  \htmlonly
-        <IFRAME style="float: right" src="https://docs.google.com/forms/d/1jEE8B6HBps-TxL4L1E5cs1ib2JWzJC_j3k3jy1tYH88/viewform?embedded=true" width="560" height="800" frameborder="0" marginheight="0" marginwidth="0">Loading...</IFRAME>
-  \endhtmlonly
-
   \image html LOGO-ERC.jpg
   \image html FP7-ide-RGB.jpg
 
 <!-- Not very nice solution...-->
   \n   \n   \n   \n   \n
-
-
-  \section Introduction
-
-   The PAAL is an open source, a header-only, generic library consisting of
-   approximation algorithms, data structures and several complete solutions
-   for the various optimization problems.  The PAAL is implemented taking
-   advantage of the new features of C++ introduced in the C++14 standard,
-   which in many cases simplify greatly creation of generic code.
-
-  \section Installation
-   There is no need to install anything because the PAAL is header only.
-   All you have to do is download the library and include appropriate headers.
-   Only, if you use linear programming you must link your executable against glpk.
-
-   If you'd like to alter the library, we encourage you to compile the unit tests.
-
-  \section get_repo Download
-    In order to download repository please run the following command:
-
-    <B>    git clone -\-recursive http://siekiera.mimuw.edu.pl:8082/paal </B>
 
   \section Contents
     The library consists of several sublibraries
@@ -123,48 +98,5 @@
 
         </ul>
     </ul>
-
-  \section general_design General Design
-
-  The algorithms are written as template functions in STL-style.  The major
-  change is, that we support ranges instead of iterators.  Usually algorithms
-  can be customized or extended, as they support many different arguments.
-  Besides, the algorithms, the library contains many useful data-structures.
-  Our data structures introduce useful and interesting higher level concepts,
-  e.g., Metric or Cycle.
-
-
-  Besides standalone algorithms, the library contains frameworks which supports
-  solving general optimization methods like local search or iterative rounding.
- The functional arguments of these frameworks are usually wrapped
- using Components class (see \ref comps), which allows to specify named arguments.
- In such case the algorithm is called as follows:
- <pre>
-    algorithm(ProblemDescription, Components)
- </pre>
- For each concept our library delivers the default implementations of components. <br>
- Of course the user is allowed to replace each component. <br>
-
-Consider for example the local search framework, where the user can can easily
-swap the implementation of the GetMoves procedure to provide his own way of
-searching the neighborhood.  <br> Also note that the same components, that are
-used by local search can be used in the simulated annealing algorithm. <br>
-Similarly, if the user wants to swap the metric implementation to use specific
-properties of his topology, this is not a problem at all! <br>
-
- \section Platforms
- Currently the library compiles on the gcc 4.8.1 and clang 3.5. Unfortunately, the library does not
- compile on the Microsoft Visual Studio 2013 due to its poor support of C++14.
-
- \section License
-
- The library is released under
- <a href="http://www.boost.org/LICENSE_1_0.txt"> Boost Software License</a>,
- which encourages both commercial and
- non-commercial use.
-
- \section Contact
- In case of any questions / suggestions / pull requests
- / contribution please contact Piotr Wygocki (wygos at mimuw.edu.pl).
 
  */
