@@ -164,11 +164,14 @@ void m_main(po::variables_map vm,
 
     if (vm.count("model_in")) {
         Metric metric;
+        std::size_t dimensions;
         std::ifstream ifs(vm["model_in"].as<std::string>());
         boost::archive::binary_iarchive ia(ifs);
         ia >> metric;
+        ia >> dimensions;
         ia >> model;
         assert(metric == p.m_metric);
+        assert(dimensions == p.m_dimensions);
     } else {
         model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
                         points_buffer | transformed(get_coordinates),
@@ -177,6 +180,11 @@ void m_main(po::variables_map vm,
                         get_function_generator(tag, p) , p.m_precision, p.m_nthread);
     }
 
+    auto ignore_bad_row = [&](std::string const &bad_line) {
+        warning("following line will be ignored cause of bad format (typically more columns than passed dimensions): ", bad_line);
+        return true;
+    };
+
     if (vm.count("train_file")) {
         std::ifstream train_file_stream(vm["train_file"].as<std::string>());
 
@@ -184,7 +192,7 @@ void m_main(po::variables_map vm,
         points_buffer.reserve(p.m_row_buffer_size);
         while (train_file_stream.good()) {
             points_buffer.clear();
-            paal::read_svm(train_file_stream, p.m_dimensions, points_buffer, p.m_row_buffer_size);
+            paal::read_svm(train_file_stream, p.m_dimensions, points_buffer, p.m_row_buffer_size, ignore_bad_row);
 
             model.update(points_buffer | transformed(get_coordinates),
                          points_buffer | transformed(get_result),
@@ -200,11 +208,16 @@ void m_main(po::variables_map vm,
 
         // Lambda - for given line return tuple<LshPrediction,RealValue>>
         auto line_tester = [&](std::string const & line) {
-            double test_result;
+            double test_result{};
 
             std::stringstream row_stream(line);
-            paal::svm_row<Row, int> row{p.m_dimensions};
-            row_stream >> row;
+            using result_t = int;
+            paal::detail::svm_row<Row, result_t> row{p.m_dimensions};
+            if (!(row_stream >> row)) {
+                ignore_bad_row(line);
+                // prediction equal = result, should have the same impact on global result as ignoring the row
+                return std::make_tuple(test_result, static_cast<result_t>(test_result));
+            }
 
             auto test_point_iterator = paal::utils::make_singleton_range(row.get_coordinates());
             auto output_iterator = boost::make_function_output_iterator([&](double x){test_result = x;});
@@ -235,6 +248,7 @@ void m_main(po::variables_map vm,
         std::ofstream ofs(vm["model_out"].as<std::string>());
         boost::archive::binary_oarchive oa(ofs);
         oa << p.m_metric;
+        oa << p.m_dimensions;
         oa << model;
     }
 }
@@ -322,18 +336,25 @@ int main(int argc, char** argv)
 
     if (vm.count("model_in")) {
         Metric m;
+        std::size_t dimensions;
         std::ifstream ifs(vm["model_in"].as<std::string>());
         boost::archive::binary_iarchive ia(ifs);
 
         ia >> m;
+        ia >> dimensions;
 
-        if (param_is_set_explicitly("metric")) {
-            if (p.m_metric == m) {
-                warning("if input model is specified one does not have to specify the metric");
-            } else {
-                warning("the specified metric is ignored, because it differs from the input model metric");
+        auto ignore_serializable_param = [&](std::string const &param_name, bool param_is_equal_to_serialized) {
+            if (param_is_set_explicitly(param_name)) {
+                if (param_is_equal_to_serialized) {
+                    warning("if input model is specified one does not have to specify param ", param_name);
+                } else {
+                    warning("the specified param ", param_name, " is ignored, because it differs from the input model param ", param_name);
+                }
             }
-        }
+        };
+        ignore_serializable_param("metric", m == p.m_metric);
+        ignore_serializable_param("dimensions", dimensions == p.m_dimensions);
+
         auto ignored = [&](std::string const & param, std::string const & param_display) {
             if (param_is_set_explicitly(param)) {
                 warning("parameter ", param_display, " was set, but model_in is used, param ", param_display, " is discarded");
@@ -345,6 +366,7 @@ int main(int argc, char** argv)
         ignored("passes", "passes");
 
         p.m_metric = m;
+        p.m_dimensions = dimensions;
     } else {
         if (p.m_metric == HAMMING && param_is_set_explicitly("parm_w")) {
             warning("parameter w was set, but hamming metric is used, param w is discarded");

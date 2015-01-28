@@ -12,7 +12,6 @@
  * @version 1.0
  * @date 2014-11-19
  */
-
 #include "test_utils/logger.hpp"
 #include "test_utils/get_test_dir.hpp"
 
@@ -71,8 +70,8 @@ std::string create_file(std::string file_name, std::string text) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_simple) {
-    std::string train = create_file("train_1", "1 1:1\n0 2:1");
-    std::string test = create_file("test_1", "1 1:1");
+    std::string train = create_file("train_1", "1 0:1\n0 1:1");
+    std::string test = create_file("test_1", "1 0:1");
     std::string expt = create_file("expect_1", "1");
     std::string result = temp + "simple_test_1.svm";
 
@@ -81,16 +80,16 @@ BOOST_AUTO_TEST_CASE(lsh_bin_simple) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_test_formats) {
-    std::string train = create_file("train_f", "  0   2:1e-6 3:1.5 5:1. 8:.5\n1\n0");
-    std::string test = create_file("test_f", "0   2:1e-6 3:1.5 5:1. 8:.5\n 1 9:1");
+    std::string train = create_file("train_f", "  0   1:1e-6 2:1.5 4:1. 7:.5\n1\n0");
+    std::string test = create_file("test_f", "0   1:1e-6 2:1.5 4:1. 7:.5\n 1 8:1");
     std::string result = temp + "result_test_f.svm";
 
     call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " --dimensions=9");
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
-    std::string train = create_file("train_l2", "0 1:1\n 1 1:10000\n 0 1:5");
-    std::string test = create_file("test_l2", "0 1:3");
+    std::string train = create_file("train_l2", "0 0:1\n 1 0:10000\n 0 0:5");
+    std::string test = create_file("test_l2", "0 0:3");
     std::string expect = create_file("expect_l2", "0");
     std::string result = temp + "result_test_l2.svm";
 
@@ -101,8 +100,8 @@ BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_w_option) {
-    std::string train = create_file("train_w", "0 1:1\n 1 1:10000");
-    std::string test = create_file("test_w", "0 1:2");
+    std::string train = create_file("train_w", "0 0:1\n 1 0:10000");
+    std::string test = create_file("test_w", "0 0:2");
 
     std::string result = temp + "result_w";
 
@@ -116,7 +115,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_w_option) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_bad_usage) {
-    std::string example = create_file("example", "1 1:1");
+    std::string example = create_file("example", "1 0:1");
 
     call_fail(lsh_bin + " -d " + example + " -t " + example);
     call_fail(lsh_bin + " -d " + example + " -t /dev/null");
@@ -129,8 +128,8 @@ BOOST_AUTO_TEST_CASE(lsh_bin_bad_usage) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_serialization) {
-    std::string example = create_file("example", "1 1:1");
-    std::string test = create_file("test", "0 1:3");
+    std::string example = create_file("example", "1 0:1");
+    std::string test = create_file("test", "0 0:3");
     std::string model(temp + "model.1"),
                 model2(temp + "model.2"),
                 res(temp + "res.txt");
@@ -140,7 +139,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_serialization) {
     std::string expect = create_file("expect", "1");
     test_files_are_equal(res, expect);
 
-    std::string example2 = create_file("example2", "1 1:1\n0 1:1\n0 1:1");
+    std::string example2 = create_file("example2", "1 0:1\n0 0:1\n0 0:1");
 
     call(lsh_bin + " --model_in " + model + " --model_out " + model2 + " -d " + example2);
     call(lsh_bin + " --model_in " + model2 + " -o " + res + " -t " + test);

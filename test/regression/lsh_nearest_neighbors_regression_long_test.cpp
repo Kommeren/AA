@@ -170,6 +170,7 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(l1_l2_regression, VectorType, test_vector_types) {
         std::ifstream train_file_stream(train_file_path);
         std::ifstream test_file_stream(train_file_path + ".t");
 
+        LOGLN("Reading data");
         auto train_points = paal::read_svm<VectorType>(train_file_stream);
         auto test_points = paal::read_svm<VectorType>(test_file_stream);
 
@@ -177,7 +178,6 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(l1_l2_regression, VectorType, test_vector_types) {
         using paal::utils::tuple_get;
         auto dimensions = std::max(get<1>(train_points), get<1>(test_points));
 
-        LOGLN("Reading data");
         using paal::detail::resize_rows;
         resize_rows(get<0>(train_points), tuple_get<0>(), dimensions);
         resize_rows(get<0>(test_points), tuple_get<0>(), dimensions);

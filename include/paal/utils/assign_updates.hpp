@@ -5,8 +5,10 @@
  * @version 1.0
  * @date 2014-10-22
  */
-#ifndef PAAL_LITERALS_HPP
-#define PAAL_LITERALS_HPP
+#ifndef PAAL_ASSIGN_UPDATES_HPP
+#define PAAL_ASSIGN_UPDATES_HPP
+
+#include <algorithm>
 
 namespace paal {
 
@@ -27,4 +29,4 @@ void assign_min(T & t, const T & u) {
 
 } // ! paal
 
-#endif // PAAL_LITERALS_HPP
+#endif // PAAL_ASSIGN_UPDATES_HPP
