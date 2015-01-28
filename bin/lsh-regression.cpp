@@ -43,11 +43,14 @@
 #include <thread>
 #include <utility>
 
-using point_type = boost::numeric::ublas::compressed_vector<double>;
+using point_type_sparse = boost::numeric::ublas::compressed_vector<double>;
+using point_type_dense =  boost::numeric::ublas::vector<double>;
+
 using paal::utils::tuple_get;
 namespace po = boost::program_options;
 
 enum Metric {HAMMING, L1, L2};
+enum Vector_type {SPARSE, DENSE};
 
 struct l1_tag{};
 struct l2_tag{};
@@ -68,6 +71,19 @@ std::istream& operator>>(std::istream& in, Metric& metr) {
     return in;
 }
 
+std::istream& operator>>(std::istream& in, Vector_type & vec_type) {
+    std::string token;
+    in >> token;
+    boost::algorithm::to_lower(token);
+    if (token == "dense")
+        vec_type = DENSE;
+    else if (token == "sparse")
+        vec_type = SPARSE;
+    else
+        assert(0 && "couldn't conclude metric name");
+    return in;
+}
+
 struct params {
     unsigned m_passes;
     unsigned m_nthread;
@@ -76,6 +92,7 @@ struct params {
     unsigned m_precision;
     int m_seed;
     double m_w;
+    Vector_type m_dense;
     Metric m_metric;
 };
 
@@ -124,7 +141,7 @@ auto error(Arg &&arg, Args... args) {
     std::exit(EXIT_FAILURE);
 }
 
-template <typename Row = point_type, typename LshFunctionTag>
+template <typename Row = point_type_sparse, typename LshFunctionTag>
 void m_main(po::variables_map vm,
             params p,
             LshFunctionTag tag) {
@@ -134,7 +151,7 @@ void m_main(po::variables_map vm,
                                                            >()
                                           >;
     using hash_result = typename std::remove_reference<
-        typename std::result_of<lsh_fun(point_type)>::type
+        typename std::result_of<lsh_fun(Row)>::type
         >::type;
     using model_t = paal::lsh_nearest_neighbors_regression<hash_result, lsh_fun>;
     using point_with_result_t = std::tuple<Row, int>;
@@ -222,6 +239,17 @@ void m_main(po::variables_map vm,
     }
 }
 
+template <typename LshFunctionTag>
+void choose_vector_type_main(po::variables_map vm,
+            params p,
+            LshFunctionTag tag) {
+    if (p.m_dense == DENSE) {
+        m_main<point_type_dense>(vm,p,tag);
+    } else if( p.m_dense == SPARSE) {
+        m_main<point_type_sparse>(vm,p,tag);
+    }
+}
+
 int main(int argc, char** argv)
 {
     params p{};
@@ -250,6 +278,8 @@ int main(int argc, char** argv)
         ("passes,i", po::value<unsigned>(&p.m_passes)->default_value(3), "number of iteration (default value = 3)")
         ("nthread,n", po::value<unsigned>(&p.m_nthread)->default_value(std::thread::hardware_concurrency()),
                  "number of threads (default = number of cores)")
+        ("dense", po::value<Vector_type>(&p.m_dense)->default_value(SPARSE), "Dense/Sparse - Allows to use dense\
+                  array representation (It might significantly speed up program for dense data)")
         ("metric,m", po::value<Metric>(&p.m_metric)->default_value(HAMMING), "Metric used for determining " \
                  "similarity between objects - [HAMMING/L1/L2] (default = Hamming)")
         ("precision,b", po::value<unsigned>(&p.m_precision)->default_value(10), "Number " \
@@ -322,13 +352,13 @@ int main(int argc, char** argv)
     }
 
     switch (p.m_metric) {
-        case L1: m_main(vm, p, l1_tag{});
+        case L1: choose_vector_type_main(vm, p, l1_tag{});
             break;
 
-        case L2: m_main(vm, p, l2_tag{});
+        case L2: choose_vector_type_main(vm, p, l2_tag{});
             break;
 
-        case HAMMING: m_main(vm, p, ham_tag{});
+        case HAMMING: choose_vector_type_main(vm, p, ham_tag{});
             break;
 
         default:
