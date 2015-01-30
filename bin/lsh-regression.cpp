@@ -17,7 +17,7 @@
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
 #include "paal/utils/irange.hpp"
-#include "paal/utils/log_loss.hpp"
+#include "paal/utils/performance_measures.hpp"
 #include "paal/utils/parse_file.hpp"
 #include "paal/utils/read_svm.hpp"
 #include "paal/utils/singleton_iterator.hpp"

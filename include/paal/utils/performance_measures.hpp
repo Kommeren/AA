@@ -6,14 +6,14 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 //=======================================================================
 /**
- * @file log_loss.hpp
+ * @file performance_measures.hpp
  * @brief
  * @author Andrzej Pacuk
  * @version 1.0
  * @date 2014-10-22
  */
-#ifndef PALL_LOG_LOSS_HPP
-#define PALL_LOG_LOSS_HPP
+#ifndef PALL_PERFORMANCE_MEASURES_HPP
+#define PALL_PERFORMANCE_MEASURES_HPP
 
 #include <boost/range/combine.hpp>
 #include <boost/range/empty.hpp>
@@ -84,7 +84,33 @@ FloatType likelihood(Probs &&probs, TestResults &&test_results) {
                                     std::forward<TestResults>(test_results)));
 }
 
+/**
+ * @brief
+ *
+ * @tparam FloatType
+ * @tparam Probs
+ * @tparam TestResults
+ *
+ * @param probs
+ * @param test_results
+ */
+template<typename FloatType = double,
+typename Probs, typename TestResults>
+FloatType mean_absolute_error(Probs &&probs, TestResults &&test_results) {
+    assert(boost::size(probs) == boost::size(test_results));
+    assert(!boost::empty(probs));
+
+    FloatType loss{};
+    for(auto prob_result : boost::combine(probs, test_results)) {
+        FloatType prob, result;
+        boost::tie(prob, result) = prob_result;
+        loss += std::abs(prob - result);
+    }
+
+    return loss / boost::size(probs);
+}
+
 } //! paal
 
-#endif /* PALL_LOG_LOSS_HPP */
+#endif /* PALL_PERFORMANCE_MEASURES_HPP */
 
