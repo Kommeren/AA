@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+  <head>
+    <title>PAAL Ideas</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Practical Approximation Algorithms Library written in C++">
+    <meta name="keywords" content="C++,Approximation,Algorithms,MIMUW,Library,Boost,Glpk,Linear Programming,Iterative Rounding,Local Search, Knapsack Problem,Data Mining,Combinatorial Auctions,LSH,Hashing,University of Warsaw">
+    <meta name="author" content="MIM UW">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <img class="floating" src="paal_logo.png" alt="PAAL logo"/>
+        <h1>PAAL</h1>
+        <p>Practical Approximation Algorithms Library</p>
+
+        </br>
+
+        <p class="view"><a href="http://paal.mimuw.edu.pl/docs/index.html">View Documentation<small>Examples and Proofs</small></a></p>
+        <p class="view"><a href="http://paal.mimuw.edu.pl/paal.zip">Download<small>Windows/Linux sources</small></a></p>
+
+      </header>
+      <section>
+        <h1>GSoC Ideas List 2015</h1>
+
+        <h2>More Linear Programing Solvers</h2>
+        <b>Brief explanation:</b>
+
+            <p>Currently, we provide an interface for creating, modifying and
+            (re)solving LP instances. As the underlying implementation we use
+            the GLPK (GNU Linear Programming Kit) library. Your work would be
+            to add support for more sophisticated solvers:
+
+            <ul>
+                <li><a  href="http://gurobi.com"
+                        target="_blank">Gurobi</a></li>
+                <li><a
+                        href="http://www.ibm.com/software/integration/optimization/cplex-optimization-studio/"
+                        target="_blank">CPLEX</a></li>
+            </ul>
+            Subsequently, we plan to add support for <i>Integer Programming</i> into our framework.
+            As hard as it sounds this
+            task is relatively easy and we strongly believe, that it's more
+            about coding than implementing complex algorithms this time. Except
+            of having fun you will also learn how to use <i>LP</i> solvers and
+            a lot about <i>discrete optimization</i>. For more information 
+
+            <a href="http://paal.mimuw.edu.pl/docs/linear_programming.html" target="_blank">see</a>
+
+            .
+            </p>
+
+        <b>Expected results:</b>
+
+            <p>Interface for <i>Integer Programming</i> and support for other
+            solvers, and documentation</p>
+            
+
+        <b>Knowledge prerequisite:</b> 
+            <p>C++14, Doxygen</p>
+
+        <b>Mentor:</b>
+            <p>Piotr Wygocki</p>
+
+        <h2>Guillotine Problem Approximation</h2>
+        <b>Brief explanation:</b>
+
+            <p>Recently our area of studies moved to family of
+            
+            <a href="https://en.wikipedia.org/wiki/Bin_packing_problem"
+               target="_blank">multidimensional Bin Packing Problems</a>
+
+           , especially since  we have come across new real world data from industry.
+            It becomes clear that previous researchers focused on
+            different problems, especially when it comes to
+
+            <a href="https://en.wikipedia.org/wiki/Guillotine_problem"
+               target="_blank">2D guillotine problems</a>
+            
+            . Recently, we developed novel approach, that relaxes certain constraints
+            in this problem. We've created several prototypes that are using technique called
+
+            <a href="https://en.wikipedia.org/wiki/Mixed_integer_programming"
+                target="_blank">mixed integer programming</a>
+
+            . We strongly believe that generic solution could save tons of materials in industry,
+            hence we'd like to develop library solution for this problems. During this
+            task you will have a lot of fun learning discrete optimization.</p>
+
+        <b>Expected results:</b>
+
+            <p>Library code that implements heuristic/exact algorithm for solving
+            <i>Guillotine Problem</i>.</p>
+
+        <b>Knowledge prerequisite:</b> 
+            <p>C, C++, Linear Programming, Deep algorithmic knowledge, Discrete Optimization and a lot of communication.</p>
+        <b>Mentor:</b>
+            <p>Piotr Wygocki</p>
+
+        <h2>Biddings for Python and Java</h2>
+        <b>Brief explanation:</b>
+
+            <p>The more people are using our Library the better. We belief that
+            most of the people are not familiar with the newest C++, hence we want
+            to facilitate using it for majority of programmers. This task aims
+            to create interface similar to <i>numpy</i> or <i>scipy</i>,
+            but we want to ensure that this biddings will be created
+            automatically. We will not insist on any particular technology, but we
+            require genuine generic solution and we will put pressure on creation of a comprehensive documentation.  
+            This task will require deep knowledge of
+            <i>C++14</i> and frequent communication.</p>
+
+        <b>Expected results:</b>
+            <p>Interface for using <b>PAAL</b>, in Python and Java.</p>
+
+        <b>Knowledge prerequisite:</b> 
+            <p>C, C++, Python, Java</p>
+
+        <b>Mentor:</b>
+            <p>Andrzej Pacuk</p>
+
+        <h2>Recursive Neural Network</h2>
+            <b>Brief explanation:</b>
+
+            <p>Recursive neural networks are recent holy grail of machine learning.
+            Problem with it though, is it's inefficiency. 
+            Recently we have come into possession of <i>Intel Xeon Phi</i>
+            and we do believe that implementation on this
+            particular architecture will significantly increase it's speed and
+            efficiency. Our goal is to create small machine learning tool program, that
+            will assist programmers on <a href="http://kaggle.com"
+            target="_blank">Kaggle</a> competitions, like <a href="http://hunch.net/~vw/" target="_blank">Vowpal Wabbit</a></p>
+
+        <b>Expected results:</b>
+            <p>Programming library for the newest <i>Intel Xeon Phi</i> cards.</p>
+        <b>Knowledge prerequisite:</b> 
+            <p>C, C++, Linux, OpenMP</p>
+        <b>Mentor:</b>
+            <p>Andrzej Pacuk</p>
+
+      </section>
+
+      <footer>
+
+        <img class="floating" src="http://paal.mimuw.edu.pl/docs/FP7-ide-RGB.jpg" alt="FP7 Logo"/>
+        <img class="floating" src="http://paal.mimuw.edu.pl/docs/LOGO-ERC.jpg" alt="ERC Logo"/>
+
+      </footer>
+
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+  </body>
+  <!-- Template created with  -->
+  <!-- https://github.com/orderedlist/minimal -->
+</html>
