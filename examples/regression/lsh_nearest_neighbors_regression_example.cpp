@@ -33,16 +33,16 @@ auto make_point(const std::initializer_list<int> &list) {
 };
 
 int main() {
-    const std::vector<point_t> train_points =
+    const std::vector<point_t> training_points =
             {make_point({0, 0}), make_point({0, 1}),
              make_point({1, 0}), make_point({1, 1})};
-    const std::vector<double> train_results = {0.0, 0.4, 0.6, 1.0};
-    const std::vector<point_t> query_points =
+    const std::vector<double> training_results = {0.0, 0.4, 0.6, 1.0};
+    const std::vector<point_t> test_points =
             {make_point({0, -1}), make_point({2, 1})};
 
     auto const passes = 50;
     auto const hash_functions_per_point = 10;
-    auto const dimensions = train_points.front().size();
+    auto const dimensions = training_points.front().size();
     auto const threads_count = 1;
     //w_param should be essentially bigger than radius of expected test point neighborhood
     auto const w_param = 3.0;
@@ -50,14 +50,14 @@ int main() {
     auto lsh_function_generator =
         paal::lsh::l_2_hash_function_generator<>{dimensions, w_param};
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
-                    train_points, train_results,
+                    training_points, training_results,
                     passes,
                     std::move(lsh_function_generator),
                     hash_functions_per_point,
                     threads_count);
 
     std::vector<double> results;
-    model.test(query_points, std::back_inserter(results));
+    model.test(test_points, std::back_inserter(results));
 
     std::cout << "Solution:" << std::endl;
     boost::copy(results, std::ostream_iterator<double>(std::cout, ","));

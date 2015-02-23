@@ -29,31 +29,31 @@ int main() {
     using coordinate_t = int;
     using result_t = double;
     using point_coordinates_t = std::vector<coordinate_t>;
-    using train_point_t = std::tuple<point_coordinates_t, result_t>;
+    using training_point_t = std::tuple<point_coordinates_t, result_t>;
 
     constexpr paal::utils::tuple_get<0> get_coordinates{};
     constexpr paal::utils::tuple_get<1> get_result{};
 
-    const std::vector<train_point_t> train_points = {
-            train_point_t{{0, 0}, 0.0}, train_point_t{{0, 1}, 0.4},
-            train_point_t{{1, 0}, 0.6}, train_point_t{{1, 1}, 1.0}};
-    const std::vector<point_coordinates_t> query_points =
+    const std::vector<training_point_t> training_points = {
+            training_point_t{{0, 0}, 0.0}, training_point_t{{0, 1}, 0.4},
+            training_point_t{{1, 0}, 0.6}, training_point_t{{1, 1}, 1.0}};
+    const std::vector<point_coordinates_t> test_points =
             {{0, -1}, {2, 1}};
 
     auto const passes = 50;
-    auto const dimensions = std::get<0>(train_points.front()).size();
+    auto const dimensions = std::get<0>(training_points.front()).size();
     auto const hash_functions_per_point = 1;
 
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
-            train_points | boost::adaptors::transformed(get_coordinates),
-            train_points | boost::adaptors::transformed(get_result),
+            training_points | boost::adaptors::transformed(get_coordinates),
+            training_points | boost::adaptors::transformed(get_result),
             passes,
             paal::lsh::hamming_hash_function_generator{dimensions},
             hash_functions_per_point);
 
     std::vector<result_t> results;
-    results.reserve(query_points.size());
-    model.test(query_points, std::back_inserter(results));
+    results.reserve(test_points.size());
+    model.test(test_points, std::back_inserter(results));
 
     std::cout << "Solution:" << std::endl;
     boost::copy(results, std::ostream_iterator<double>(std::cout, ","));

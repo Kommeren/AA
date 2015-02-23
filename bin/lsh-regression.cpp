@@ -185,14 +185,13 @@ void m_main(po::variables_map vm,
         return true;
     };
 
-    if (vm.count("train_file")) {
-        std::ifstream train_file_stream(vm["train_file"].as<std::string>());
-
+    if (vm.count("training_file")) {
+        std::ifstream training_file_stream(vm["training_file"].as<std::string>());
 
         points_buffer.reserve(p.m_row_buffer_size);
-        while (train_file_stream.good()) {
+        while (training_file_stream.good()) {
             points_buffer.clear();
-            paal::read_svm(train_file_stream, p.m_dimensions, points_buffer, p.m_row_buffer_size, ignore_bad_row);
+            paal::read_svm(training_file_stream, p.m_dimensions, points_buffer, p.m_row_buffer_size, ignore_bad_row);
 
             model.update(points_buffer | transformed(get_coordinates),
                          points_buffer | transformed(get_result),
@@ -271,18 +270,18 @@ int main(int argc, char** argv)
     po::options_description desc("LSH nearest neighbors regression - \n"\
             "suite for fast machine learning KNN algorithm which is using "\
             "locality sensitive hashing functions\n\nUsage:\n"\
-            "This command will train on train file and output the predictions in test_file:\n"
-            "\tlsh-regression --train_file path_to_train_file --test_file path_to_test_file\n\n"\
+            "This command will train on training file and output the predictions in test_file:\n"
+            "\tlsh-regression --training_file path_to_training_file --test_file path_to_test_file\n\n"\
             "If you want to use L1 metric, with 7 passes and 10 threads, and save model\n"\
             "you can use following command:\n"
-            "\tlsh-regression -d train.svm -i 7 -n 10 -m L1 --model_out model.lsh\n\n"\
+            "\tlsh-regression -d training.svm -i 7 -n 10 -m L1 --model_out model.lsh\n\n"\
             "Then if you want to use this model to make a prediction to result_file:\n"\
             "\tlsh-regression -t test.svm --model_in model.lsh -o results.txt\n\n"
             "Options description");
 
     desc.add_options()
         ("help,h", "help message")
-        ("train_file,d", po::value<std::string>(), "training file path (in SVM format)")
+        ("training_file,d", po::value<std::string>(), "training file path (in SVM format)")
         ("test_file,t", po::value<std::string>(), "test file path (in SVM format, it doesn't matter what label says)")
         ("model_in", po::value<std::string>(), "path to model, before doing any training or testing")
         ("model_out", po::value<std::string>(), "Write the model to this file when everything is done")
@@ -322,16 +321,16 @@ int main(int argc, char** argv)
         error(message, "\n", desc);
     };
 
-    if (vm.count("train_file") == 0 && vm.count("test_file") == 0) {
-        error_with_usage("Neither train_file nor test_file were set");
+    if (vm.count("training_file") == 0 && vm.count("test_file") == 0) {
+        error_with_usage("Neither training_file nor test_file were set");
     }
 
     if (vm.count("dimensions") == 0 && vm.count("model_in") == 0) {
         error_with_usage("Parameter dimensions was not set");
     }
 
-    if (vm.count("train_file") == 0 && vm.count("model_in") == 0) {
-        error_with_usage("If you don't set training file (train_file) you have to set input model (model_in)");
+    if (vm.count("training_file") == 0 && vm.count("model_in") == 0) {
+        error_with_usage("If you don't set training file (training_file) you have to set input model (model_in)");
     }
 
     if (vm.count("model_in")) {

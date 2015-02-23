@@ -2,20 +2,19 @@
 
 \section def Problem definition
 
-In Locality-sensitive hashing (LSH) method we are given two sets of points from
+In Locality-Sensitive Hashing (LSH) method we are given two sets of points from
 multidimensional feature space with some metric:
 <ol>
-    <li>train points, each with target value given.
-    <li>query points, for which we want to predict target values.
+    <li>set of training points - each with given category;
+    <li>set of test points - for which we want to predict the category.
 </ol>
 
-Predicted value for each query points is calculated as average of values of
-its nearest neighbour points from the train points set.
+In our LSH method the predicted values for each of test points are calculated as averages of values for their nearest neighbour points from the set of training points.
 
-The set of nearest neighbors of point \f$x\f$ is approximated by set of
-train points \f$y\f$ such that \f$g(y)=g(x)\f$ for some hash function \f$g\f$.
+The set of nearest neighbors of a point \f$x\f$ is approximated by set of
+training points \f$y\f$ such that \f$g(y)=g(x)\f$ for some hash function \f$g\f$.
 For this method to work it is essential to use many hash functions from LSH
-functions family that is constructed for a given metric.
+functions family that is tuned for a given metric.
 LSH functions ensure much higher probability of collision for close points
 than for distant ones.
 
@@ -23,25 +22,25 @@ than for distant ones.
 
 This solution is a simplification of algorithm presented in \cite Indyk2008.
 
-For integer parameter \f$k\f$ we first generate a set of LSH
+For integer parameter \f$k\f$, we first generate a set of LSH
 functions \f$h_i (1 \leq i \leq k)\f$.
 
-Next for each train point \f$t\f$ we update the hash map \f$m\f$ which maps keys
-\f$ g(t) = (h_1(t), \ldots, h_k(t))\f$ to average target values of train points
+Next for each training point \f$t\f$ we update the hash map \f$m\f$ which maps keys
+\f$ g(t) = (h_1(t), \ldots, h_k(t))\f$ to average categories of training points
 with the same key.
 
-Then for each query point \f$q\f$ the predicted target value is \f$m[g(q)]\f$.
+Then for each test point \f$q\f$ the predicted category is \f$m[g(q)]\f$.
 
-We repeat all previous steps \f$L\f$ times and for each query point \f$q\f$
-the final target value is an average of nonempty predicted target values from all
-iterations (or average target value of all train points if \f$q\f$ hash key
+We repeat all previous steps \f$L\f$ times and for each test point \f$q\f$
+the final category is an average of nonempty predicted categories from all
+iterations (or average category of all training points if \f$q\f$ hash key
 was not present in the hash map in all iterations).
 
 \section lsh_functions LSH functions
 
 Basing on \cite Indyk2008 we implemented LSH function families for Hamming,
-Euclidean(\f$l_2\f$) and Manhattan(\f$l_1\f$) distance.
-All hash function generators are defined in file lsh_functions.hpp .
+Euclidean(\f$l_2\f$) and Manhattan(\f$l_1\f$) distances.
+All hash function generators are defined in file lsh_functions.hpp.
 
 \section example Example
 \snippet lsh_nearest_neighbors_regression_example.cpp LSH Nearest Neighbors Regression Example
@@ -53,49 +52,48 @@ There are two make functions constructing the lsh_nearest_neighbors_regression m
 The more general one:
 <pre>
 auto make_lsh_nearest_neighbors_regression(
-             TrainPoints &&train_points, TrainResults &&train_results,
+             TrainingPoints &&training_points, TrainingResults &&training_results,
              unsigned passes,
              LshFunctionGenerator &&lsh_function_generator,
              unsigned threads_count = hardware_concurrency);
 </pre>
-And special version which assumes that lsh_function is concatenation of several homogeneous functions:
+And the special version which assumes that lsh_function is a concatenation of several homogeneous functions:
 <pre>
 auto make_lsh_nearest_neighbors_regression_tuple_hash(
-             TrainPoints &&train_points, TrainResults &&train_results,
+             TrainingPoints &&training_points, TrainingResults &&training_results,
              unsigned passes,
              FunctionGenerator &&function_generator,
              unsigned hash_functions_per_point,
              unsigned threads_count = hardware_concurrency);
 </pre>
-The model can be updated with additional train points by using method:
+The model can be updated with additional training points by using the following method:
 <pre>
-void update(TrainPoints &&train_points, TrainResults &&train_results,
+void update(TrainingPoints &&training_points, TrainingResults &&training_results,
             unsigned threads_count = hardware_concurrency);
 </pre>
-Then the model can be tested with the test points by using method:
+The model can be tested with the test points by using the following method:
 <pre>
-void test(QueryPoints &&query_points, OutputIterator result) const;
+void test(TestPoints &&test_points, OutputIterator result) const;
 </pre>
 
 \section parameters_lsh_nn_regression Parameters
 
-IN: TrainPoints &&train_points - range of train points
-(each train point is a range of its coordinates)
+IN: TrainingPoints &&training_points - range of training points
+(each training point is a range of its coordinates)
 
-IN: TrainResults &&train_results - range of train points target values
+IN: TrainingResults &&training_results - range of training points categories
 
-IN: QueryPoints &&query_points - range of query points
-(each query point is a range of its coordinates)
+IN: TestPoints &&test_points - range of test points
+(each test point is a range of its coordinates)
 
-OUT: OutputIterator &&result - output iterator for query points predicted target
-values
+OUT: OutputIterator &&result - output iterator for the predicted categories for the test points
 
 IN: unsigned passes - number of algorithm iterations (parameter \f$L\f$),
-more iterations gives more accurate results
+more iterations give more accurate results
 
 IN: unsigned hash_functions_per_point - number of hash functions used by
-a single hash key (parameter \f$k\f$). Value has to be accurate: too small
-increases probability of hash key collisions for distant points and too big
+a single hash key (parameter \f$k\f$). Value has to be accurate: to small one
+increases probability of hash key collisions for distant points and to big one
 decreases probability of hash key collisions for near points.
 
 IN: LshFunctionGenerator &&lsh_function_generator - functor generating LSH functions.
@@ -104,28 +102,28 @@ IN: unsigned threads_count
 
 \section binary Binary
 
-The solution has additional binary program \em lsh-regression which supports:
+The solution can be used as a binary program \em lsh-regression which supports:
 <ul>
-    <li> reading both train and test data from files
-    <li> writing predicted results of test data to file and computing \em logloss measure on test data,
+    <li> reading both training and test data from files,
+    <li> writing predicted results for the test data to a file and computing \em logloss measure on the test data,
     <li> configurable data buffer size/reading file using  \em mmap in order to control memory usage,
     <li> svm file format, for details see paal::svm_row::operator>>(),
     <li> sparse/dense data points representation,
-    <li> serializing model to file and reading serialized model from file,
+    <li> serialization of the model to a file and reading the serialized model from a file,
 </ul>
-For details of usage, please run binary program with \em \-\-help option.
+For more details on usage, please run the binary program with \em \-\-help option.
 
 \section complexity Complexity
 
-Total time complexity is \f$O(L(m+n)kh)\f$, where
+The total time complexity is \f$O(L(m+n)kh)\f$, where
 \f$L\f$ is the number of iterations,
-\f$m\f$ and \f$n\f$ are numbers of train and test points respectively,
-\f$k\f$ is the number of hash functions used by single hash key,
+\f$m\f$ and \f$n\f$ are numbers of training and test points respectively,
+\f$k\f$ is the number of hash functions used by a single hash key,
 \f$h\f$ is the time complexity of a single application of one LSH function.
 
 The space complexity is \f$O(n+k+s)\f$, where \f$s\f$ is the maximal size needed
 by the hash map, which is proportional to the number of different hash keys of all
-train points for a single hash function \f$g\f$.
+training points for a single hash function \f$g\f$.
 
 \section ref References
 

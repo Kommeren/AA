@@ -70,46 +70,46 @@ std::string create_file(std::string file_name, std::string text) {
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_simple) {
-    std::string train = create_file("train_1", "1 0:1\n0 1:1");
+    std::string training = create_file("training_1", "1 0:1\n0 1:1");
     std::string test = create_file("test_1", "1 0:1");
     std::string expt = create_file("expect_1", "1");
     std::string result = temp + "simple_test_1.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " --dimensions=2");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " --dimensions=2");
     test_files_are_equal(result, expt);
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_test_formats) {
-    std::string train = create_file("train_f", "  0   1:1e-6 2:1.5 4:1. 7:.5\n1\n0");
+    std::string training = create_file("training_f", "  0   1:1e-6 2:1.5 4:1. 7:.5\n1\n0");
     std::string test = create_file("test_f", "0   1:1e-6 2:1.5 4:1. 7:.5\n 1 8:1");
     std::string result = temp + "result_test_f.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " --dimensions=9");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " --dimensions=9");
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
-    std::string train = create_file("train_l2", "0 0:1\n 1 0:10000\n 0 0:5");
+    std::string training = create_file("training_l2", "0 0:1\n 1 0:10000\n 0 1:5");
     std::string test = create_file("test_l2", "0 0:3");
     std::string expect = create_file("expect_l2", "0");
     std::string result = temp + "result_test_l2.svm";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l2" + " --dimensions=1");
     test_files_are_equal(result, expect);
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l1" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l1" + " --dimensions=1");
     test_files_are_equal(result, expect);
 }
 
 BOOST_AUTO_TEST_CASE(lsh_bin_w_option) {
-    std::string train = create_file("train_w", "0 0:1\n 1 0:10000");
+    std::string training = create_file("training_w", "0 0:1\n 1 0:10000");
     std::string test = create_file("test_w", "0 0:2");
 
     std::string result = temp + "result_w";
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 1" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l2 -w 1" + " --dimensions=1");
     std::string expect05 = create_file("expect_w05", "0.5");
     test_files_are_equal(result, expect05);
 
-    call(lsh_bin + " -d " + train + " -t " + test + " -o " + result + " -m l2 -w 10" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l2 -w 10" + " --dimensions=1");
     std::string expect0 = create_file("expect_w0", "0");
     test_files_are_equal(result, expect0);
 }

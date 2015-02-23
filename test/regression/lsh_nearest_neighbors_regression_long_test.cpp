@@ -43,40 +43,40 @@
 namespace {
 
 template<typename FloatType = double,
-         typename TrainResults, typename TestResults>
-FloatType train_avg_const_result_log_loss(TrainResults &&train_results,
+         typename TrainingResults, typename TestResults>
+FloatType training_avg_const_result_log_loss(TrainingResults &&training_results,
                                           TestResults &&test_results) {
-    assert(!boost::empty(train_results));
+    assert(!boost::empty(training_results));
     assert(!boost::empty(test_results));
 
-    FloatType train_avg = boost::accumulate(train_results, FloatType{}) /
-        boost::size(train_results);
-    assert(0.0 < train_avg);
-    assert(train_avg < 1.0);
+    FloatType training_avg = boost::accumulate(training_results, FloatType{}) /
+        boost::size(training_results);
+    assert(0.0 < training_avg);
+    assert(training_avg < 1.0);
 
     auto avg_const_iterator = paal::irange(boost::size(test_results)) |
         boost::adaptors::transformed(
-                paal::utils::make_dynamic_return_constant_functor(train_avg));
+                paal::utils::make_dynamic_return_constant_functor(training_avg));
     return paal::log_loss<FloatType>(avg_const_iterator, test_results);
 }
 
 template <typename ResultType = double,
           typename PointWithResultType,
           typename HashFunctionGenerator>
-bool beats_average(const std::vector<PointWithResultType> &train_points,
+bool beats_average(const std::vector<PointWithResultType> &training_points,
                    const std::vector<PointWithResultType> &test_points,
                    unsigned passes,
                    unsigned hash_funs_per_row,
                    HashFunctionGenerator hash_function_generator) {
-    assert(!boost::empty(train_points));
+    assert(!boost::empty(training_points));
     constexpr paal::utils::tuple_get<0> get_coordinates{};
     constexpr paal::utils::tuple_get<1> get_result{};
 
     using boost::adaptors::transformed;
-    auto const train_points_coordinates =
-        train_points | transformed(get_coordinates);
-    auto const train_points_results =
-        train_points | transformed(get_result);
+    auto const training_points_coordinates =
+        training_points | transformed(get_coordinates);
+    auto const training_points_results =
+        training_points | transformed(get_result);
     auto const test_points_coordinates =
         test_points | transformed(get_coordinates);
     auto const test_points_results =
@@ -85,8 +85,8 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
     const int thread_nr = 2;
 
     auto model = paal::make_lsh_nearest_neighbors_regression_tuple_hash(
-            train_points_coordinates,
-            train_points_results,
+            training_points_coordinates,
+            training_points_results,
             passes,
             std::move(hash_function_generator),
             hash_funs_per_row,
@@ -97,7 +97,7 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
 
     auto alg_results_log_loss = paal::log_loss<ResultType>(alg_results,
                                                            test_points_results);
-    auto benchmark = train_avg_const_result_log_loss(train_points_results,
+    auto benchmark = training_avg_const_result_log_loss(training_points_results,
                                                      test_points_results);
     auto benchmark_ratio = 1.0 - 1e-5;
     LOGLN("log loss: " << alg_results_log_loss << " benchmark: " << benchmark);
@@ -106,13 +106,13 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
 
 template <typename ResultType = double,
           typename PointWithResultType>
-bool beats_average(const std::vector<PointWithResultType> &train_points,
+bool beats_average(const std::vector<PointWithResultType> &training_points,
                    const std::vector<PointWithResultType> &test_points,
                    std::size_t dimensions) {
     for (auto passes : {100, 500, 1000}) {
         std::size_t max_hash_funs = std::ceil(std::sqrt(dimensions));
         for (auto hash_funs_per_row : paal::irange(1ul, max_hash_funs)) {
-            //TODO compute w_param based on train_points
+            //TODO compute w_param based on training_points
             auto w_param = 10000.0;
             LOGLN("passes: " << passes <<
                   " hash_funs_per_row: " << hash_funs_per_row <<
@@ -123,21 +123,21 @@ bool beats_average(const std::vector<PointWithResultType> &train_points,
             using hamming_gen = paal::lsh::hamming_hash_function_generator;
 
             LOGLN("Checking l_1:");
-            if (beats_average(train_points, test_points,
+            if (beats_average(training_points, test_points,
                               passes, hash_funs_per_row,
                               l_1_hash_gen{dimensions, w_param})) {
                 return true;
             }
 
             LOGLN("Checking l_2:");
-            if (beats_average(train_points, test_points,
+            if (beats_average(training_points, test_points,
                               passes, hash_funs_per_row,
                               l_2_hash_gen{dimensions, w_param})) {
                 return true;
             }
 
             LOGLN("Checking Hamming:");
-            if (beats_average(train_points, test_points,
+            if (beats_average(training_points, test_points,
                               passes, hash_funs_per_row,
                               hamming_gen{dimensions})) {
                 return true;
@@ -166,23 +166,22 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(l1_l2_regression, VectorType, test_vector_types) {
     paal::parse(testDir + "cases.txt",
                 [&](const std::string &file_name, paal::utils::ignore_param) {
         LOGLN("TEST " << file_name);
-        std::string train_file_path = testDir + "cases/" + file_name;
-        std::ifstream train_file_stream(train_file_path);
-        std::ifstream test_file_stream(train_file_path + ".t");
+        std::string training_file_path = testDir + "cases/" + file_name;
+        std::ifstream training_file_stream(training_file_path);
+        std::ifstream test_file_stream(training_file_path + ".t");
 
-        LOGLN("Reading data");
-        auto train_points = paal::read_svm<VectorType>(train_file_stream);
+        auto training_points = paal::read_svm<VectorType>(training_file_stream);
         auto test_points = paal::read_svm<VectorType>(test_file_stream);
 
         using std::get;
         using paal::utils::tuple_get;
-        auto dimensions = std::max(get<1>(train_points), get<1>(test_points));
+        auto dimensions = std::max(get<1>(training_points), get<1>(test_points));
 
         using paal::detail::resize_rows;
-        resize_rows(get<0>(train_points), tuple_get<0>(), dimensions);
+        resize_rows(get<0>(training_points), tuple_get<0>(), dimensions);
         resize_rows(get<0>(test_points), tuple_get<0>(), dimensions);
 
-        BOOST_CHECK_MESSAGE(beats_average(get<0>(train_points),
+        BOOST_CHECK_MESSAGE(beats_average(get<0>(training_points),
                                           get<0>(test_points),
                                           dimensions),
                             "Failed to beat average for case:" << file_name);

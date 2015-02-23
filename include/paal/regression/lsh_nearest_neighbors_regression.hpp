@@ -175,8 +175,8 @@ namespace detail {
 } //! detail
 
 /**
- * @brief For each query point counts average result of train points with hash
- * equal to query point's hash, basing on Locality-sensitve hashing.
+ * @brief For each test point counts average result of training points with hash
+ * equal to test point's hash, basing on Locality-sensitve hashing.
  *
  * Example: <br>
    \snippet lsh_nearest_neighbors_regression_example.cpp LSH Nearest Neighbors Regression Example
@@ -193,7 +193,7 @@ template <typename HashValue,
           typename HashForHashValue = range_hash>
 class lsh_nearest_neighbors_regression {
 
-    //TODO template param QueryResultType
+    //TODO template param TestResultType
     using res_accu_t = average_accumulator<>;
     using map_t = boost::unordered_map<HashValue, res_accu_t, HashForHashValue>;
 
@@ -202,7 +202,7 @@ class lsh_nearest_neighbors_regression {
     ///hash functions
     std::vector<LshFun> m_hashes;
 
-    ///average result of all train points
+    ///average result of all training points
     average_accumulator<> m_avg;
 
 public:
@@ -219,19 +219,19 @@ public:
     lsh_nearest_neighbors_regression() = default;
 
     /**
-     * @brief initializes model and trains model using train points and results
+     * @brief initializes model and trainings model using training points and results
      *
-     * @tparam TrainPoints
-     * @tparam TrainResults
-     * @param train_points
-     * @param train_results
+     * @tparam TrainingPoints
+     * @tparam TrainingResults
+     * @param training_points
+     * @param training_results
      * @param passes number of used LSH functions
      * @param lsh_function_generator functor generating proper LSH functions
      * @param threads_count
      */
-    template <typename TrainPoints, typename TrainResults, typename LshFunctionGenerator>
+    template <typename TrainingPoints, typename TrainingResults, typename LshFunctionGenerator>
     lsh_nearest_neighbors_regression(
-            TrainPoints &&train_points, TrainResults &&train_results,
+            TrainingPoints &&training_points, TrainingResults &&training_results,
             unsigned passes,
             LshFunctionGenerator &&lsh_function_generator,
             unsigned threads_count = std::thread::hardware_concurrency()) :
@@ -241,8 +241,8 @@ public:
         std::generate_n(std::back_inserter(m_hashes), passes,
                     std::ref(lsh_function_generator));
 
-        update(std::forward<TrainPoints>(train_points),
-               std::forward<TrainResults>(train_results),
+        update(std::forward<TrainingPoints>(training_points),
+               std::forward<TrainingResults>(training_results),
                threads_count);
     }
 
@@ -255,26 +255,26 @@ public:
 
 
     /**
-     * @brief trains model
+     * @brief trainings model
      *
-     * @tparam TrainPoints
-     * @tparam TrainResults
-     * @param train_points
-     * @param train_results
+     * @tparam TrainingPoints
+     * @tparam TrainingResults
+     * @param training_points
+     * @param training_results
      * @param threads_count
      */
-    template <typename TrainPoints, typename TrainResults>
-    void update(TrainPoints &&train_points, TrainResults &&train_results,
+    template <typename TrainingPoints, typename TrainingResults>
+    void update(TrainingPoints &&training_points, TrainingResults &&training_results,
             unsigned threads_count = std::thread::hardware_concurrency()) {
 
         thread_pool threads(threads_count);
 
-        threads.post([&](){ compute_avg(train_results);});
+        threads.post([&](){ compute_avg(training_results);});
 
         for (auto &&map_and_fun : boost::combine(m_hash_maps, m_hashes)) {
             auto &map = boost::get<0>(map_and_fun);
             //fun is passed by value because of efficiency reasons
-            threads.post([&, fun = boost::get<1>(map_and_fun)]() {add_values(fun, map, train_points, train_results);});
+            threads.post([&, fun = boost::get<1>(map_and_fun)]() {add_values(fun, map, training_points, training_results);});
         }
         threads.run();
     }
@@ -283,21 +283,21 @@ public:
      * @brief queries model, does not heave threads_count parameter, because this is much more natural
      * to do from outside of the function
      *
-     * @tparam QueryPoints
+     * @tparam TestPoints
      * @tparam OutputIterator
-     * @param query_points
+     * @param test_points
      * @param result
      */
-    template <typename QueryPoints, typename OutputIterator>
-    void test(QueryPoints &&query_points, OutputIterator result) const {
+    template <typename TestPoints, typename OutputIterator>
+    void test(TestPoints &&test_points, OutputIterator result) const {
         assert(!m_avg.empty());
 
-        for (auto &&query_point : query_points) {
+        for (auto &&test_point : test_points) {
             average_accumulator<> avg;
             for(auto && map_and_fun : boost::combine(m_hash_maps, m_hashes)) {
                 auto const &map = boost::get<0>(map_and_fun);
                 auto const &fun = boost::get<1>(map_and_fun);
-                auto got = map.find(detail::call(fun, query_point, detail::lightweight_tag{}),
+                auto got = map.find(detail::call(fun, test_point, detail::lightweight_tag{}),
                                     HashForHashValue{}, utils::equal_to_unspecified{});
                 if (got != map.end()) {
                     avg.add_value(got->second.get_average_unsafe());
@@ -312,10 +312,10 @@ private:
 
     ///adds values to one hash map
     template <typename Points, typename Results>
-    void add_values(LshFun fun, map_t & map, Points && train_points, Results && train_results) {
-        for (auto &&train_point_result : boost::combine(train_points, train_results)) {
-            auto && point = boost::get<0>(train_point_result);
-            auto && res = boost::get<1>(train_point_result);
+    void add_values(LshFun fun, map_t & map, Points && training_points, Results && training_results) {
+        for (auto &&training_point_result : boost::combine(training_points, training_results)) {
+            auto && point = boost::get<0>(training_point_result);
+            auto && res = boost::get<1>(training_point_result);
 
             //the return value of this call might be impossible to store in the map
             auto got = map.find(call(fun, point, detail::lightweight_tag{}),
@@ -331,8 +331,8 @@ private:
 
     ///computes average
     template <typename Results>
-    void compute_avg(Results const & train_results) {
-        for (auto && res :train_results) {
+    void compute_avg(Results const & training_results) {
+        for (auto && res :training_results) {
             m_avg.add_value(res);
         }
     }
@@ -342,11 +342,11 @@ private:
  * @brief this is the most general version of the make_lsh_nearest_neighbors_regression,
  *        It takes any hash function generator.
  *
- * @tparam TrainPoints
- * @tparam TrainResults
+ * @tparam TrainingPoints
+ * @tparam TrainingResults
  * @tparam LshFunctionGenerator
- * @param train_points
- * @param train_results
+ * @param training_points
+ * @param training_results
  * @param passes number of used LSH functions
  * @param lsh_function_generator functor generating proper LSH functions
  * @param threads_count
@@ -354,23 +354,23 @@ private:
  * @return lsh_nearest_neighbors_regression model
  */
 
-template <typename TrainPoints, typename TrainResults,
+template <typename TrainingPoints, typename TrainingResults,
           typename LshFunctionGenerator>
 auto make_lsh_nearest_neighbors_regression(
-             TrainPoints &&train_points, TrainResults &&train_results,
+             TrainingPoints &&training_points, TrainingResults &&training_results,
              unsigned passes,
              LshFunctionGenerator &&lsh_function_generator,
              unsigned threads_count = std::thread::hardware_concurrency()) {
     using lsh_fun = pure_result_of_t<LshFunctionGenerator()>;
     using hash_result = typename std::remove_reference<
         typename std::result_of<lsh_fun(
-                range_to_ref_t<TrainPoints>
+                range_to_ref_t<TrainingPoints>
                 )>::type
         >::type;
 
     return lsh_nearest_neighbors_regression<hash_result, lsh_fun>(
-            std::forward<TrainPoints>(train_points),
-            std::forward<TrainResults>(train_results),
+            std::forward<TrainingPoints>(training_points),
+            std::forward<TrainingResults>(training_results),
             passes,
             std::forward<LshFunctionGenerator>(lsh_function_generator),
             threads_count);
@@ -382,11 +382,11 @@ auto make_lsh_nearest_neighbors_regression(
  *        This version assumes that hash function is concatenation (tuple) of several hash functions.
  *        In this function user provide Function generator for the inner functions only.
  *
- * @tparam TrainPoints
- * @tparam TrainResults
+ * @tparam TrainingPoints
+ * @tparam TrainingResults
  * @tparam FunctionGenerator
- * @param train_points
- * @param train_results
+ * @param training_points
+ * @param training_results
  * @param passes
  * @param function_generator
  * @param hash_functions_per_point
@@ -394,10 +394,10 @@ auto make_lsh_nearest_neighbors_regression(
  *
  * @return
  */
-template <typename TrainPoints, typename TrainResults,
+template <typename TrainingPoints, typename TrainingResults,
           typename FunctionGenerator>
 auto make_lsh_nearest_neighbors_regression_tuple_hash(
-             TrainPoints &&train_points, TrainResults &&train_results,
+             TrainingPoints &&training_points, TrainingResults &&training_results,
              unsigned passes,
              FunctionGenerator &&function_generator,
              unsigned hash_functions_per_point,
@@ -407,8 +407,8 @@ auto make_lsh_nearest_neighbors_regression_tuple_hash(
                     std::forward<FunctionGenerator>(function_generator),
                     hash_functions_per_point);
     return make_lsh_nearest_neighbors_regression(
-            std::forward<TrainPoints>(train_points),
-            std::forward<TrainResults>(train_results),
+            std::forward<TrainingPoints>(training_points),
+            std::forward<TrainingResults>(training_results),
             passes,
             std::move(tuple_lsh),
             threads_count);
