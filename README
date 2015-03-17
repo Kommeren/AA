@@ -17,6 +17,3 @@ In order to run automatic tests run from paal root directory:
 
 ./<build directory>/test/all_small_tests
 ./<build directory>/test/all_long_tests
-./test/run_compilation_error_tests.sh <build directory>
-
-Before running the compilation error test script, you first have to run cmake with option -DCOMPILATION_ERROR_TESTS=1 in the <build directory>.

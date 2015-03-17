@@ -46,21 +46,15 @@ endforeach()
 
 include_directories (${PAAL}/include)
 
+add_subdirectory(bin)
 
-if(${COMPILATION_ERROR_TESTS})
+if(${WITH_TESTS})
     add_subdirectory(test)
-else()
-    add_subdirectory(bin)
-
-    if(${WITH_TESTS})
-        add_subdirectory(test)
-    endif()
-
-    if(${WITH_EXAMPLES})
-        add_subdirectory(examples)
-    endif()
 endif()
 
+if(${WITH_EXAMPLES})
+    add_subdirectory(examples)
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
     message("BUILD TYPE = NORMAL -  NEITHER RELEASE OR DEBUG IS SET")
