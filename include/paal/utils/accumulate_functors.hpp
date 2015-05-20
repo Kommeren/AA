@@ -51,18 +51,20 @@ auto sum_functor(const Range& rng, Functor f) {
 
 /// combination of boost::max_element and boost::adaptors::transformed
 template <typename Range, typename Functor>
-auto max_element_functor(Range&& rng, Functor f) {
-    return boost::max_element(
-        std::forward<Range>(rng) | boost::adaptors::transformed(utils::make_assignable_functor(f))
-    );
+auto max_element_functor(Range&& range, Functor f) {
+    auto unsafe_to_return_iterator = boost::max_element(
+            std::forward<Range>(range) |
+            boost::adaptors::transformed(utils::make_assignable_functor(f)));
+    return boost::make_transform_iterator(unsafe_to_return_iterator.base(), f);
 }
 
 /// combination of boost::min_element and boost::adaptors::transformed
 template <typename Range, typename Functor>
-auto min_element_functor(Range&& rng, Functor f) {
-    return boost::min_element(
-        std::forward<Range>(rng) | boost::adaptors::transformed(utils::make_assignable_functor(f))
-    );
+auto min_element_functor(Range&& range, Functor f) {
+    auto unsafe_to_return_iterator = boost::min_element(
+            std::forward<Range>(range) |
+            boost::adaptors::transformed(utils::make_assignable_functor(f)));
+    return boost::make_transform_iterator(unsafe_to_return_iterator.base(), f);
 }
 
 /// helper class facilitating counting average
