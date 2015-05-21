@@ -19,7 +19,7 @@
 #include <vector>
 
 namespace {
-int f(int x) { return -x * x + 12 * x - 27; }
+inline int f(int x) { return -x * x + 12 * x - 27; }
 
 struct get_moves {
     typedef const std::vector<int> Neighb;

@@ -18,31 +18,41 @@
 #ifndef PAAL_SYSTEM_HPP
 #define PAAL_SYSTEM_HPP
 
-#include "test_utils/get_test_dir.hpp"
+#define BOOST_ERROR_CODE_HEADER_ONLY
+#define BOOST_SYSTEM_NO_DEPRECATED
 
-#include <string>
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/filesystem.hpp>
+
+#include <cassert>
 #include <cstdlib>
+#include <string>
 
 namespace paal {
 namespace system {
 
-//TODO move functions from test/bin here
-
-std::string temp = get_temp_dir();
-
-/**
- * @brief Function for creating the file with specified text
- *
- * @param file_name of created file
- * @param text of creaated file
- *
- * @return std::string which contains path to the created file.
- */
-std::string create_file(std::string file_name, std::string text) {
-    // TODO use boost filesystem
-    std::system(("echo \"" + text + "\" > " + temp + file_name).c_str());
-    return temp + file_name;
+/// Function fixes path separators to native and creates path
+inline std::string build_path(std::string const &prefix, std::string const &suffix) {
+    boost::filesystem::path res{prefix};
+    res.append(suffix);
+    return res.make_preferred().native();
 }
+
+/// Creates directory
+inline void create_directory(std::string const &path) {
+    bool created = boost::filesystem::create_directory(boost::filesystem::path(path));
+    assert(created);
+}
+
+/// Execs command
+inline int exec(std::string const &cmd, bool discard_output = true) {
+    //TODO OS portable
+    std::string const redirections = " >/dev/null 2>&1";
+    std::string optional_redirections = discard_output ? redirections : "";
+
+    return std::system((cmd + optional_redirections).c_str());
+}
+
 
 } //! system
 

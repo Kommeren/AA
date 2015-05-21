@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/iterative_rounding/treeaug/tree_augmentation.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -110,17 +111,14 @@ template <typename TA>
 }
 
 BOOST_AUTO_TEST_CASE(tree_augmentation_long) {
-    std::string test_dir = get_test_dir("TREEAUG");
-    parse(test_dir + "tree_aug.txt", [&](const std::string & fname, std::istream &) {
-        LOGLN(fname);
-        std::string filename = test_dir + "cases/" + fname + ".lgf";
-        std::ifstream ifs(filename);
+    std::string test_dir = paal::system::get_test_data_dir("TREEAUG");
+    using paal::system::build_path;
 
-        if (!ifs) {
-            std::cerr << "File " << filename << " could not be opened."
-                      << std::endl;
-            return;
-        }
+    parse(build_path(test_dir, "tree_aug.txt"), [&](const std::string & fname, std::istream &) {
+        LOGLN(fname);
+        std::string filename = build_path(test_dir, "cases/" + fname + ".lgf");
+        std::ifstream ifs(filename);
+        assert(ifs.good());
 
         Graph g;
         Cost cost = get(edge_weight, g);

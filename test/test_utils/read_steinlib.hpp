@@ -15,7 +15,9 @@
 #ifndef PAAL_READ_STEINLIB_HPP
 #define PAAL_READ_STEINLIB_HPP
 
+#include "test_utils/get_test_dir.hpp"
 #include "test_utils/logger.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/utils/irange.hpp"
@@ -110,7 +112,7 @@ inline Graph read_steinlib(std::istream &is, std::vector<int> &terminals,
     auto color = get(boost::vertex_color, g);
     for (int i : paal::irange(T)) {
         terminals[i] = read_int(is, "T") - 1;
-        steiner_points.erase(boost::find(steiner_points, terminals[i]));
+        steiner_points.erase(boost::range::find(steiner_points, terminals[i]));
         put(color, terminals[i], 1);
     }
     return g;
@@ -125,15 +127,18 @@ inline void read_line(std::istream &is, std::string &fname, int &OPT) {
 
 inline void
 read_steinlib_tests(std::vector<steiner_tree_test_with_metric> &data) {
-    std::string test_dir = PROJECT_DIR"test/data/STEINLIB/";
-    std::ifstream is_test_cases(test_dir + "/index");
+    using paal::system::get_test_data_dir;
+    using paal::system::build_path;
+
+    std::string test_dir = get_test_data_dir("STEINLIB");
+    std::ifstream is_test_cases(build_path(test_dir, "index"));
     assert(is_test_cases.good());
     while (is_test_cases.good()) {
         std::string fname;
         int opt;
         read_line(is_test_cases, fname, opt);
         if (fname == ".stp") return;
-        std::ifstream ifs(test_dir + "/I080/" + fname);
+        std::ifstream ifs(build_path(test_dir, "I080/" + fname));
         assert(ifs.good());
 
         std::vector<int> terminals;

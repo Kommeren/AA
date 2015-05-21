@@ -27,7 +27,7 @@ using std::vector;
 using namespace paal::local_search;
 using namespace paal;
 
-std::string path = get_test_dir("TSPLIB/symmetrical");
+std::string path = paal::system::get_test_data_dir("TSPLIB/symmetrical");
 
 BOOST_AUTO_TEST_CASE(TSPLIB) {
     read_tsplib::TSPLIB_Directory dir(path);
@@ -73,7 +73,7 @@ BOOST_AUTO_TEST_CASE(TSPLIB) {
 
 BOOST_AUTO_TEST_CASE(TSPLIB_long) {
     const string indexFName = "index.long";
-    read_tsplib::TSPLIB_Directory dir(path + "/long/", indexFName);
+    read_tsplib::TSPLIB_Directory dir(paal::system::build_path(path + "/long/" + indexFName));
     read_tsplib::TSPLIB_Matrix mtx;
     std::string fname;
     float opt;

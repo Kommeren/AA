@@ -11,14 +11,18 @@
 
 #include <boost/range/irange.hpp>
 
+#include <cassert>
 #include <vector>
 #include <utility>
 #include <istream>
 
 namespace paal {
 
+inline
 std::pair<std::vector<int>, std::vector<std::vector<int>>>
 read_ORLIB_SC(std::istream &ist) {
+    assert(ist.good());
+
     int number_of_elements, number_of_set, cov, setI_id;
     ist >> number_of_elements >> number_of_set;
     std::vector<std::vector<int>> sets(number_of_set);

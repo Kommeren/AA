@@ -26,6 +26,7 @@
 #include "paal/data_structures/metric/graph_metrics.hpp"
 #include "paal/utils/irange.hpp"
 
+#include <cassert>
 #include <type_traits>
 #include <unordered_map>
 namespace paal {
@@ -36,8 +37,10 @@ typedef boost::adjacency_list<
 typedef std::pair<int, int> Edge;
 typedef paal::data_structures::graph_metric<graph_t, int> GraphMT;
 
-GraphMT read_orlib_KM(std::istream &ist, boost::integer_range<int> &fac,
+inline GraphMT read_orlib_KM(std::istream &ist, boost::integer_range<int> &fac,
                       boost::integer_range<int> &clients) {
+    assert(ist.good());
+
     int V, nE, K;
     ist >> V >> nE >> K;
 

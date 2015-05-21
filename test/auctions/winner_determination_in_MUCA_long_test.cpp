@@ -15,6 +15,7 @@
 
 #include "test_utils/winner_determination_in_MUCA_test_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_long_test.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/utils/functors.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -35,7 +36,7 @@ BOOST_AUTO_TEST_CASE(testDetermineWinnersLong)
    std::default_random_engine generator(7);
    std::uniform_real_distribution<Value> distribution(1.0, 2.0);
 
-   paal::parse(test_dir + cases_file, [&](std::string test_name, paal::utils::ignore_param) {
+   paal::parse(paal::system::build_path(test_dir, cases_file), [&](std::string test_name, paal::utils::ignore_param) {
       Value lower_bound;
       std::vector<Bids> bids;
       std::vector<int> item_count;

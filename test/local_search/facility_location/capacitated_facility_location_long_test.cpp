@@ -17,6 +17,7 @@
 #include "test_utils/read_orlib_fl.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/local_search/facility_location/facility_location.hpp"
 #include "paal/data_structures/voronoi/capacitated_voronoi.hpp"
@@ -67,8 +68,9 @@ fl_logger<Metric, Cost> make_fl_logger(const Metric &m, const Cost &c) {
 
 template <typename Solve>
 void run_tests(const std::string &fname, Solve solve) {
-    std::string testDir = get_test_dir("CFL_ORLIB");
-    std::ifstream is_test_cases(testDir + fname);
+    std::string test_dir = paal::system::get_test_data_dir("CFL_ORLIB");
+    using paal::system::build_path;
+    std::ifstream is_test_cases(build_path(test_dir, fname));
 
     assert(is_test_cases.good());
     while (is_test_cases.good()) {
@@ -81,7 +83,7 @@ void run_tests(const std::string &fname, Solve solve) {
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) << "OPT " << opt);
 
-        std::ifstream ifs(testDir + "/cases/" + fname + ".txt");
+        std::ifstream ifs(build_path(test_dir, "cases/" + fname + ".txt"));
         assert(ifs.good());
         std::vector<long long> facCost;
         std::vector<int> facCap;

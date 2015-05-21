@@ -16,6 +16,7 @@
 #include "test_utils/logger.hpp"
 #include "test_utils/read_lp.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -88,15 +89,17 @@ void run_test(RowBounds &row_bounds, ColBounds &col_bounds,
 BOOST_AUTO_TEST_SUITE(linear_programming_long)
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(linear_programming_long, LP, lp_types) {
-    std::string testDir = get_test_dir("LP");
-    paal::parse(testDir + "cases.txt",
+    std::string test_dir = paal::system::get_test_data_dir("LP");
+    using paal::system::build_path;
+    paal::parse(build_path(test_dir, "cases.txt"),
                 [&](const std::string & fname, std::istream & is_test_cases) {
         double best_cost;
         int rows_num, cols_num, non_zeros;
         is_test_cases >> best_cost >> rows_num >> cols_num >> non_zeros;
 
         LOGLN(fname);
-        std::ifstream ifs(testDir + "/cases/" + fname + ".mps");
+        std::ifstream ifs(build_path(test_dir, "/cases/" + fname + ".mps"));
+        assert(ifs.good());
 
         std::unordered_map<std::string, std::pair<double, double>> row_bounds;
         std::unordered_map<std::string, std::pair<double, double>> col_bounds;

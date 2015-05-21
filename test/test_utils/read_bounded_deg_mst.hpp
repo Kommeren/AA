@@ -35,6 +35,8 @@ void add_edge_to_graph(Graph &g, Cost &cost, int u, int v, double c) {
 template <typename Graph, typename Cost, typename Bounds>
 inline void read_bdmst(std::istream & is, int vertices_num, int edges_num,
                 Graph & g, Cost & costs, Bounds & deg_bounds, double & best_cost) {
+    assert(is.good());
+
     std::string s;
     int u, v, b;
     double c;

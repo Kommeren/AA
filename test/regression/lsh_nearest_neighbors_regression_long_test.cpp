@@ -14,6 +14,7 @@
  */
 #include "test_utils/logger.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
@@ -161,14 +162,17 @@ typedef boost::mpl::list<
     > test_vector_types;
 
 BOOST_AUTO_TEST_CASE_TEMPLATE(l1_l2_regression, VectorType, test_vector_types) {
-    std::string testDir = get_test_dir("LSH_REGRESSION/");
+    std::string test_dir = paal::system::get_test_data_dir("LSH_REGRESSION/");
+    using paal::system::build_path;
 
-    paal::parse(testDir + "cases.txt",
+    paal::parse(build_path(test_dir, "cases.txt"),
                 [&](const std::string &file_name, paal::utils::ignore_param) {
         LOGLN("TEST " << file_name);
-        std::string training_file_path = testDir + "cases/" + file_name;
+        std::string training_file_path = build_path(test_dir, "cases/"+ file_name);
         std::ifstream training_file_stream(training_file_path);
+        assert(training_file_stream.good());
         std::ifstream test_file_stream(training_file_path + ".t");
+        assert(test_file_stream.good());
 
         auto training_points = paal::read_svm<VectorType>(training_file_stream);
         auto test_points = paal::read_svm<VectorType>(test_file_stream);

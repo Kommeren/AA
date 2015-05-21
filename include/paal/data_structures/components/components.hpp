@@ -15,7 +15,7 @@
 #ifndef PAAL_COMPONENTS_HPP
 #define PAAL_COMPONENTS_HPP
 
-#include "types_vector.hpp"
+#include "paal/data_structures/components/types_vector.hpp"
 
 #include <utility>
 #include <iostream>

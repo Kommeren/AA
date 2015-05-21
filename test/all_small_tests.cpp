@@ -16,6 +16,7 @@
 #define BOOST_TEST_MODULE all_small_tests
 
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/lp/glp.hpp"
 
@@ -25,20 +26,19 @@
 #include <iomanip>
 #include <stdlib.h>
 
-
 namespace {
 struct Config {
     Config() {
         std::cout << std::setprecision(20);
 
-        std::string const tmp = get_temp_dir();
-        std::system(("rm -fr " + tmp).c_str());
-        std::system(("mkdir -v -p " + tmp).c_str());
+        std::string const tmp = paal::system::get_static_temp_dir();
+        paal::system::create_directory(tmp);
+        std::cout << "Created temp tests directory: " + tmp << std::endl;
     }
 
     ~Config() {
-        std::string tmp = get_temp_dir();
-        std::system(("rm -fr " + tmp).c_str());
+        std::string tmp = paal::system::get_static_temp_dir();
+        paal::system::remove_tmp_path(tmp);
 
         paal::lp::glp::free_env();
     }

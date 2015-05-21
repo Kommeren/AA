@@ -241,7 +241,7 @@ BOOST_AUTO_TEST_SUITE_END()
 
 template <typename Model>
 void serialize(Model const &  model) {
-    auto fname = get_temp_dir() + "/tmp.bin";
+    auto fname = paal::system::get_temp_file_path("tmp.bin");
 
     {
         std::ofstream ofs(fname);
@@ -255,8 +255,7 @@ void serialize(Model const &  model) {
     ia >> model_test;
 
     BOOST_CHECK(model == model_test);
-    //TODO use boost filesystem remove
-    std::system((std::string("rm -f ") + fname).c_str());
+    paal::system::remove_tmp_path(fname);
 }
 
 BOOST_AUTO_TEST_CASE(serialization) {

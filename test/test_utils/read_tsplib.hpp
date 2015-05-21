@@ -9,6 +9,8 @@
 #ifndef PAAL_READ_TSPLIB_HPP
 #define PAAL_READ_TSPLIB_HPP
 
+#include "test_utils/system.hpp"
+
 #include "paal/data_structures/metric/basic_metrics.hpp"
 
 #include <cassert>
@@ -93,15 +95,15 @@ struct TSPLIB_Directory {
     std::string dir;
     std::ifstream index;
     TSPLIB_Directory(const std::string &_dir,
-                     const std::string &indexFName = "/index")
-        : dir(_dir), index(dir + indexFName) {
+                     const std::string &indexFName = "index")
+        : dir(_dir), index(paal::system::build_path(dir, indexFName)) {
         assert(index);
     }
 
     bool get_graph(std::string &fname, float &opt) {
         std::string header;
         if (get_header(index, header) >> opt) {
-            fname = dir + "/" + header + ".tsp";
+            fname = paal::system::build_path(dir, header + ".tsp");
             return true;
         }
         return false;

@@ -15,7 +15,7 @@
  * @date 2014-12-22
  */
 
-#include "test_utils/system.hpp"
+#include "test_utils/get_test_dir.hpp"
 
 #include "paal/data_structures/mapped_file.hpp"
 #include "paal/utils/irange.hpp"
@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_SUITE(mapped_file_tests)
 
 
 BOOST_AUTO_TEST_CASE(for_each_line_temporary_test) {
-    std::string input_file = paal::system::create_file("mapped_temp_test1", "1\n2\n3\n4");
+    std::string input_file = paal::system::create_tmp_file("mapped_temp_test1", "1\n2\n3\n4");
 
     auto add_one = [](std::string const & line) { return std::to_string(stoi(line)+1);};
     std::vector<std::string> expected_results {"2","3","4","5"};

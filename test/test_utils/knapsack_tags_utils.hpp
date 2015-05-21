@@ -23,17 +23,17 @@ namespace pd = paal::detail;
 
 template <typename T> std::string to_string(T) { return ""; }
 
-std::string to_string(pd::integral_value_and_size_tag) {
+inline std::string to_string(pd::integral_value_and_size_tag) {
     return "value and size";
 }
 
-std::string to_string(pd::integral_value_tag) { return "value"; }
+inline std::string to_string(pd::integral_value_tag) { return "value"; }
 
-std::string to_string(pd::integral_size_tag) { return "size"; }
+inline std::string to_string(pd::integral_size_tag) { return "size"; }
 
-std::string to_string(pd::no_retrieve_solution_tag) { return "without output"; }
+inline std::string to_string(pd::no_retrieve_solution_tag) { return "without output"; }
 
-std::string to_string(pd::zero_one_tag) { return "0/1"; }
+inline std::string to_string(pd::zero_one_tag) { return "0/1"; }
 
 template <typename MaxValue> void print_max_value(MaxValue maxValue) {
     LOGLN("Max value " << maxValue.first << ", Total size " << maxValue.second);

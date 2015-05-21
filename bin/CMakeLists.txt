@@ -3,6 +3,7 @@ file(GLOB_RECURSE bin_srcs "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_custom_target(bins)
 
 add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
+
 file(GLOB_RECURSE boost_program_options "${PAAL}/boost/program_options/src/*.cpp")
 add_library(boost_program_options SHARED ${boost_program_options})
 
@@ -19,8 +20,6 @@ set(SERIALIZATION_FNAMES basic_archive basic_iarchive basic_iserializer basic_oa
 foreach(name ${SERIALIZATION_FNAMES})
     SET(SERIALIZATION_BINS ${SERIALIZATION_BINS} ${PAAL}/boost/serialization/src/${name}.cpp)
 endforeach()
-
-add_definitions(-DBOOST_ALL_DYN_LINK=1 -DBOOST_ALL_NO_LIB=1)
 add_library(boost_serialization SHARED ${SERIALIZATION_BINS})
 
 # Boost mapped file shared library

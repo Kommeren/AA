@@ -178,3 +178,6 @@
 [submodule "boost/iostreams"]
 	path = boost/iostreams
 	url = https://github.com/boostorg/iostreams.git
+[submodule "boost/filesystem"]
+	path = boost/filesystem
+	url = https://github.com/boostorg/filesystem.git

@@ -17,6 +17,7 @@
 
 #include "paal/lp/constraints.hpp"
 
+#include <cassert>
 #include <string>
 
 namespace paal {
@@ -168,6 +169,7 @@ template <typename RowBounds, typename ColBounds, typename CostCoefs,
 inline void read_lp(std::istream &is, RowBounds &row_bounds,
                     ColBounds &col_bounds, CostCoefs &cost_coefs,
                     Coefficients &coefficients) {
+    assert(is.good());
 
     int MAX_LINE = 256;
     char buf[MAX_LINE];

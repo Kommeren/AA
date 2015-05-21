@@ -17,6 +17,7 @@
 #include "test_utils/read_dist.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/distance_oracle/vertex_vertex/thorup_2kminus1.hpp"
 #include "paal/utils/parse_file.hpp"
@@ -51,12 +52,15 @@ void perform_full_check(const Graph& g, const Oracle& oracle, double ratio) {
 
 BOOST_AUTO_TEST_CASE( vv_thorup2kminus1_long_test ) {
 
-    std::string testDir = get_test_dir("DISTANCE");
+    std::string test_dir = paal::system::get_test_data_dir("DISTANCE");
+    using paal::system::build_path;
 
-    parse(testDir + "cases.txt", [&](const std::string  & fname, std::istream & is_test_cases) {
+    parse(build_path(test_dir, "cases.txt"), [&](const std::string  & fname, std::istream & is_test_cases) {
         LOGLN("TEST " << fname);
 
-        std::ifstream ifs(testDir + "cases/" + fname + ".in");
+        std::ifstream ifs(build_path(test_dir, "cases/" + fname + ".in"));
+        assert(ifs.good());
+
         Graph g = read_dist(ifs);
 
         for (int k: {2,3}) {

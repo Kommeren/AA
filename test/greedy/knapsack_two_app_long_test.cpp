@@ -17,6 +17,7 @@
 #include "test_utils/read_knapsack.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/greedy/knapsack_0_1_two_app.hpp"
 #include "paal/greedy/knapsack_unbounded_two_app.hpp"
@@ -31,9 +32,10 @@ using namespace paal;
 using namespace paal::utils;
 
 BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
-    std::string testDir = get_test_dir("KNAPSACK");
+    std::string test_dir = paal::system::get_test_data_dir("KNAPSACK");
+    using paal::system::build_path;
 
-    parse(testDir + "cases.txt", [&](const std::string & line, std::istream &) {
+    parse(build_path(test_dir, "cases.txt"), [&](const std::string & line, std::istream &) {
         int testId = std::stoi(line);
         LOGLN("test >>>>>>>>>>>>>>>>>>>>>>>>>>>> " << testId);
 
@@ -45,7 +47,7 @@ BOOST_AUTO_TEST_CASE(KnapsackTwoAppLong) {
         auto value = [](std::pair<int, int> object) { return object.second; }
         ;
 
-        read(testDir + "cases/", testId, capacity, sizes_values, optimal);
+        read(build_path(test_dir, "cases/"), testId, capacity, sizes_values, optimal);
         LOGLN("capacity " << capacity);
         //      LOGLN("size - value pairs ");
         //        LOG_COPY_RANGE_DEL(sizes_values, " ");

@@ -17,6 +17,7 @@
 #include "test_utils/read_ss.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/greedy/shortest_superstring/shortest_superstring.hpp"
 #include "paal/utils/floating.hpp"
@@ -32,15 +33,18 @@
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(shortest_superstringLong) {
-    std::string testDir = get_test_dir("SS");
-    parse(testDir + "capopt.txt",
+    std::string test_dir = paal::system::get_test_data_dir("SS");
+    using paal::system::build_path;
+    parse(build_path(test_dir, "capopt.txt"),
           [&](const std::string & fname, std::istream & is_test_cases) {
         int opt;
         is_test_cases >> opt;
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) << "OPT " << opt);
 
-        std::ifstream ifs(testDir + "/cases/" + fname + ".in");
+        std::ifstream ifs(build_path(test_dir, "/cases/" + fname + ".in"));
+        assert(ifs.good());
+
         auto words = read_SS(ifs);
 
         for (auto word: words) {

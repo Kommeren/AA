@@ -16,6 +16,7 @@
 #include "test_utils/fractional_winner_determination_in_MUCA_test_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_test_utils.hpp"
 #include "test_utils/winner_determination_in_MUCA_long_test.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/lp/glp.hpp"
 #include "paal/utils/functors.hpp"
@@ -30,7 +31,7 @@
 BOOST_AUTO_TEST_CASE(testFracDetermineWinnersLong)
 {
 
-   paal::parse(test_dir + cases_file, [](std::string test_name, paal::utils::ignore_param) {
+   paal::parse(paal::system::build_path(test_dir, cases_file), [](std::string test_name, paal::utils::ignore_param) {
       Value opt;
       std::vector<Bids> bids;
       std::vector<int> item_count;

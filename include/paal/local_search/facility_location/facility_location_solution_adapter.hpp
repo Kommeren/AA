@@ -107,7 +107,7 @@ public:
      */
     Dist add_facility(VertexType v) {
         auto ret = add_facility_tentative(v);
-        auto elemIter = boost::find(m_unchosen_copy, v);
+        auto elemIter = boost::range::find(m_unchosen_copy, v);
         assert(elemIter != m_unchosen_copy.end());
         elemIter = m_unchosen_copy.erase(elemIter);
         m_last_used_unchosen = elemIter - m_unchosen_copy.begin();
@@ -136,7 +136,7 @@ public:
     Dist remove_facility(VertexType v) {
         auto ret = remove_facility_tentative(v);
         m_unchosen_copy.push_back(v);
-        auto elemIter = boost::find(m_chosen_copy, v);
+        auto elemIter = boost::range::find(m_chosen_copy, v);
         assert(elemIter != m_chosen_copy.end());
         elemIter = m_chosen_copy.erase(elemIter);
         m_last_used_chosen = elemIter - m_chosen_copy.begin();

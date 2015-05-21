@@ -17,6 +17,7 @@
 #include "test_utils/read_orlib_fl.hpp"
 #include "test_utils/test_result_check.hpp"
 #include "test_utils/get_test_dir.hpp"
+#include "test_utils/system.hpp"
 
 #include "paal/data_structures/facility_location/fl_algo.hpp"
 #include "paal/local_search/facility_location/facility_location.hpp"
@@ -34,8 +35,9 @@ using namespace paal::local_search;
 using namespace paal;
 
 BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
-    std::string testDir = get_test_dir("FL_ORLIB");
-    parse(testDir + "uncapopt.txt",
+    std::string test_dir = paal::system::get_test_data_dir("FL_ORLIB");
+    using paal::system::build_path;
+    parse(build_path(test_dir, "uncapopt.txt"),
           [&](const std::string & fname, std::istream & is_test_cases) {
         double optTemp;
         is_test_cases >> optTemp;
@@ -44,7 +46,8 @@ BOOST_AUTO_TEST_CASE(FacilityLocationLong) {
         LOGLN("TEST " << fname);
         LOGLN(std::setprecision(20) << "OPT " << opt);
 
-        std::ifstream ifs(testDir + "/cases/" + fname);
+        std::ifstream ifs(build_path(test_dir, "cases/" + fname));
+        assert(ifs.good());
         std::vector<long long> facCost;
         std::vector<int> facCap;
         std::vector<int> demands;

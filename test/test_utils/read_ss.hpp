@@ -17,18 +17,19 @@
 #define PAAL_READ_SS_HPP
 #include "test_utils/logger.hpp"
 
+#include <cassert>
 #include <vector>
 #include <string>
 #include <istream>
 
 namespace paal {
-namespace {
-typedef std::vector<std::string> Words;
 
-Words read_SS(std::istream &ist) {
+inline auto read_SS(std::istream &ist) {
+    assert(ist.good());
+
     int n;
     ist >> n;
-    Words m_words;
+    std::vector<std::string> m_words;
     while (n--) {
         std::string word;
         ist >> word;
@@ -36,6 +37,6 @@ Words read_SS(std::istream &ist) {
     }
     return m_words;
 }
-}
+
 }      //!paal
 #endif // PAAL_READ_SS_HPP

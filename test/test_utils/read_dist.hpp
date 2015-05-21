@@ -20,6 +20,8 @@
 
 #include <boost/graph/adjacency_list.hpp>
 
+#include <cassert>
+
 namespace paal {
 namespace {
 
@@ -32,6 +34,8 @@ typedef  boost::adjacency_list<
     Graph;
 
 Graph read_dist(std::istream& ist) {
+    assert(ist.good());
+
     int n, m; ist >> n >> m;
     std::vector< std::pair<int, int> > edges(m);
     std::vector< int > edgeWeights(m);

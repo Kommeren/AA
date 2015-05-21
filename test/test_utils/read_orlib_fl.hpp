@@ -20,6 +20,7 @@
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/utils/irange.hpp"
 
+#include <cassert>
 #include <type_traits>
 
 namespace paal {
@@ -57,6 +58,8 @@ read_orlib_FL(std::istream &ist, std::vector<long long> &facCosts,
               std::vector<int> &facCap, std::vector<int> &demands,
               boost::integer_range<int> &fac,
               boost::integer_range<int> &clients) {
+    assert(ist.good());
+
     int N, F;
     ist >> F >> N;
 

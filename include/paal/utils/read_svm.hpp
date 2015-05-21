@@ -21,6 +21,7 @@
 #include "paal/utils/type_functions.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <istream>
 #include <ios>
 #include <string>
@@ -207,6 +208,8 @@ void read_svm(std::istream &input_stream,
               std::vector<std::tuple<RowType, ResultType>> &points,
               std::size_t max_points_to_read,
               ShouldIgnoreBadRow &&should_ignore_bad_row = ShouldIgnoreBadRow{}) {
+    assert(input_stream.good());
+
     detail::svm_row<RowType, ResultType> row{max_dimensions};
     std::string line;
     while ((max_points_to_read--) && std::getline(input_stream, line)) {
@@ -233,6 +236,8 @@ void read_svm(std::istream &input_stream,
 template <typename RowType,
           typename ResultType = int>
 auto read_svm(std::istream &input_stream) {
+    assert(input_stream.good());
+
     using point_with_result_t = std::tuple<RowType, ResultType>;
 
     std::size_t max_dimensions = 0;

@@ -18,14 +18,18 @@
 #include "paal/data_structures/metric/basic_metrics.hpp"
 #include "paal/utils/irange.hpp"
 
+#include <cassert>
+
 namespace paal {
 
 using M = data_structures::rectangle_array_metric<int>;
 
-void read_gen_ass(std::istream & is, M & costs, M & times,
+inline void read_gen_ass(std::istream & is, M & costs, M & times,
                  std::vector<int> & machines_bounds,
                  boost::integer_range<int> & machines,
                  boost::integer_range<int> & jobs) {
+    assert(is.good());
+
     int machines_cnt, jobs_cnt;
     is >> machines_cnt >> jobs_cnt;
     machines = paal::irange(machines_cnt);

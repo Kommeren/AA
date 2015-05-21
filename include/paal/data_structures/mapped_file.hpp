@@ -18,6 +18,9 @@
 #ifndef PAAL_MAPPED_FILE_HPP
 #define PAAL_MAPPED_FILE_HPP
 
+#define BOOST_ERROR_CODE_HEADER_ONLY
+#define BOOST_SYSTEM_NO_DEPRECATED
+
 #include "paal/utils/type_functions.hpp"
 #include "paal/utils/irange.hpp"
 

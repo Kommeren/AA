@@ -8,6 +8,7 @@
 #ifndef PAAL_READ_TWO_DIMENSIONAL_DATA_HPP
 #define PAAL_READ_TWO_DIMENSIONAL_DATA_HPP
 
+#include <cassert>
 #include <vector>
 #include <istream>
 
@@ -15,6 +16,8 @@ namespace paal {
 
 template <typename Point = std::vector<double>>
 auto read_two_dimensional_data(std::istream &ist) {
+    assert(ist.good());
+
     int n;
     bool special = false;
     ist >> n;
