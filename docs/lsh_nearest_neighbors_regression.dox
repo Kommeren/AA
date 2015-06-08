@@ -107,7 +107,7 @@ The solution can be used as a binary program \em lsh-regression which supports:
     <li> reading both training and test data from files,
     <li> writing predicted results for the test data to a file and computing \em logloss measure on the test data,
     <li> configurable data buffer size/reading file using  \em mmap in order to control memory usage,
-    <li> svm file format, for details see paal::svm_row::operator>>(),
+    <li> svm file format, for details see paal::detail::svm_row::operator>>(),
     <li> sparse/dense data points representation,
     <li> serialization of the model to a file and reading the serialized model from a file,
 </ul>
