@@ -27,14 +27,16 @@
 #include "paal/iterative_rounding/steiner_tree/steiner_tree_oracle.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
 #include "paal/lp/lp_row_generation.hpp"
-#include "paal/utils/floating.hpp"
 #include "paal/utils/assign_updates.hpp"
+#include "paal/utils/floating.hpp"
 
 #include <boost/range/join.hpp>
 #include <boost/range/algorithm/unique.hpp>
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/copy.hpp>
+#include <boost/range/algorithm/find.hpp>
 
+#include <random>
 #include <vector>
 
 namespace paal {
@@ -188,11 +190,13 @@ public:
      * Merges a component into its sink.
      */
     void update_graph(const steiner_component<Vertex, Dist>& selected) {
-        const std::vector<Vertex>& v = selected.get_terminals();
-        auto all_elements_except_first = boost::make_iterator_range(++v.begin(), v.end());
-        for (auto e : all_elements_except_first) {
-            merge_vertices(v[0], e);
-            auto ii = std::find(m_terminals.begin(), m_terminals.end(), e);
+        auto const & all_terminals = selected.get_terminals();
+        auto all_terminals_except_first = boost::make_iterator_range(++all_terminals.begin(), all_terminals.end());
+        assert(!boost::empty(all_terminals));
+        auto const & sink = all_terminals.front();
+        for (auto t : all_terminals_except_first) {
+            merge_vertices(sink, t);
+            auto ii = boost::range::find(m_terminals, t);
             assert(ii != m_terminals.end());
             m_terminals.erase(ii);
         }
@@ -240,8 +244,7 @@ private:
 /**
  * Initialization of the IR Steiner Tree algorithm.
  */
-class steiner_tree_init {
-  public:
+struct steiner_tree_init {
     /**
      * Initializes LP.
      */
@@ -272,8 +275,9 @@ class steiner_tree_init {
  * Round Condition: step of iterative-randomized rounding algorithm.
  */
 class steiner_tree_round_condition {
+    std::default_random_engine m_rng;
   public:
-    steiner_tree_round_condition() {}
+    steiner_tree_round_condition(std::default_random_engine = std::default_random_engine{}) {}
 
     /**
      * Selects one component according to probability, adds it to solution and
@@ -281,15 +285,15 @@ class steiner_tree_round_condition {
      */
     template <typename Problem, typename LP>
     void operator()(Problem &problem, LP &lp) {
+        auto size = problem.get_components().size();
         std::vector<double> weights;
-        weights.reserve(problem.get_components().size());
-        for (int i = 0; i < problem.get_components().size(); ++i) {
+        weights.reserve(size);
+        for (auto i : paal::irange(size)) {
             lp::col_id cId = problem.find_column_lp(i);
             weights.push_back(lp.get_col_value(cId));
         }
-        int selected =
-            paal::utils::random_select(weights.begin(), weights.end()) -
-            weights.begin();
+
+        auto selected = utils::discrete_distribution(weights)(m_rng);
         auto const &comp = problem.get_components().find(selected);
         problem.add_to_solution(comp.get_steiner_elements());
         problem.update_graph(comp);
@@ -300,11 +304,8 @@ class steiner_tree_round_condition {
 /**
  * Stop Condition: step of iterative-randomized rounding algorithm.
  */
-class steiner_tree_stop_condition {
-public:
-    /**
-     * Checks if the IR algorithm should terminate.
-     */
+struct steiner_tree_stop_condition {
+    ///Checks if the IR algorithm should terminate.
     template<typename Problem, typename LP>
     bool operator()(Problem& problem, LP &) {
         return problem.get_terminals().size() < 2;
@@ -314,8 +315,7 @@ public:
 /**
  * Set Solution component.
  */
-class steiner_tree_set_solution {
-public:
+struct steiner_tree_set_solution {
     /**
      * Removes duplicates from selected Steiner vertices list.
      */
@@ -351,22 +351,6 @@ using steiner_tree_ir_components =
 
 /**
  * @brief Solves the Steiner Tree problem using Iterative Rounding.
- *
- * @tparam Oracle
- * @tparam Strategy
- * @tparam OrigMetric
- * @tparam Terminals
- * @tparam Result
- * @tparam IRComponents
- * @tparam Visitor
- * @param metric
- * @param terminals
- * @param steiner_vertices
- * @param result
- * @param strategy
- * @param comps
- * @param oracle
- * @param visitor
  */
 template <typename Oracle = lp::random_violated_separation_oracle,
           typename Strategy = steiner_tree_all_generator,

@@ -42,8 +42,8 @@ void example_default_constructor_and_basic_usage() {
     assert(comps.get<names::A>() == 0); // zero initialization is guaranteed
 
     // setter
-    comps.set<names::A>(7);
-    assert(comps.get<names::A>() == 7);
+    comps.set<names::C>(7);
+    assert(comps.get<names::C>() == 7);
 
     const MyComps &constAlias = comps;
     // const version of get

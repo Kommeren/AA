@@ -24,9 +24,13 @@
 #include <boost/graph/connected_components.hpp>
 #include <boost/graph/filtered_graph.hpp>
 #include <boost/range/as_array.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
+#include <boost/range/algorithm/sort.hpp>
+#include <boost/range/algorithm/unique.hpp>
 
-#include <vector>
+#include <random>
 #include <unordered_set>
+#include <vector>
 
 
 namespace paal {
@@ -292,9 +296,10 @@ public:
  * with probability dependent on distance from vertices already selected.
  */
 class steiner_tree_smart_generator {
+    std::default_random_engine m_rng;
 public:
     /// Constructor.
-    steiner_tree_smart_generator(int N = 100, int K = 3) :
+    steiner_tree_smart_generator(int N = 100, int K = 3, std::default_random_engine rng = std::default_random_engine{}) :
             m_iterations(N), m_component_max_size(K) {
     }
 
@@ -328,12 +333,12 @@ public:
                             assign_max(prob[k], 1. / cost);
                         }
                     }
-                    std::size_t selected = paal::utils::random_select<false>(
-                                       prob.begin(), prob.end()) -
-                                   prob.begin();
+                    auto selected = utils::discrete_distribution(prob)(m_rng);
                     if (selected == prob.size()) break;
                     elements.push_back(terminals[selected]);
                 }
+                boost::erase(elements, boost::unique<boost::return_found_end>(boost::sort(elements)));
+
                 steiner_component<Vertex, Dist> c(cost_map, elements, steiner_vertices);
                 components.add(std::move(c));
             }

@@ -7,7 +7,6 @@
 //=======================================================================
 /**
  * @file floating.hpp
- * @brief
  * @author Maciej Andrejczuk, Piotr Wygocki
  * @version 1.0
  * @date 2013-09-01
@@ -15,8 +14,6 @@
 #ifndef PAAL_FLOATING_HPP
 #define PAAL_FLOATING_HPP
 
-#include <iterator>
-#include <numeric>
 #include <limits>
 #include <cmath>
 #include <random>
@@ -24,96 +21,43 @@
 namespace paal {
 namespace utils {
 
-/**
- * Selects one element according to probability.
- */
-template <bool FailIfEmpty = true, typename InputIterator>
-static InputIterator random_select(InputIterator iBegin, InputIterator iEnd) {
-    typedef typename std::iterator_traits<InputIterator>::value_type Dist;
-    Dist total = std::accumulate(iBegin, iEnd, Dist{});
-    Dist r = total * (rand() / (double(RAND_MAX) + 1));
-    total = Dist();
-    InputIterator selected = iBegin;
-    while (selected != iEnd) {
-        if (total <= r && total + *selected > r) {
-            break;
-        }
-        total += *selected;
-        selected++;
-    }
-    assert(selected != iEnd || !FailIfEmpty);
-    return selected;
+///discrete_distribution from range
+template <typename Range>
+inline auto discrete_distribution(Range && range) {
+    return std::discrete_distribution<>(std::begin(range), std::end(range));
 }
 
 
 ///Class for comparing floating point
 template <typename T>
 class compare {
+    T const m_epsilon;
 public:
     ///constructor
     compare(T epsilon = std::numeric_limits<T>::epsilon()): m_epsilon(epsilon) {}
 
-    /**
-     * @brief equals
-     *
-     * @param a
-     * @param b
-     *
-     * @return
-     */
+    ///equals
     bool e(T a, T b) const {
         return std::abs(a - b) < m_epsilon;
         // return abs(a -b ) < m_epsilon; //this line breaks
         // generalised_assignment_long_test TODO investigate
     }
 
-    /**
-     * @brief greater
-     *
-     * @param a
-     * @param b
-     *
-     * @return
-     */
+    /// greater
     bool g(T a, T b) const { return a > b + m_epsilon; }
 
-    /**
-     * @brief greater equals
-     *
-     * @param a
-     * @param b
-     *
-     * @return
-     */
+    /// greater equals
     bool ge(T a, T b) const { return a >= b - m_epsilon; }
 
-    /**
-     * @brief less equals
-     *
-     * @param a
-     * @param b
-     *
-     * @return
-     */
+    /// less equals
     bool le(T a, T b) const { return a <= b + m_epsilon; }
 
-    /**
-     * @brief get_epsilon used in comparison
-     *
-     * @return
-     */
+    /// get_epsilon used in comparison
     double get_epsilon() const { return m_epsilon; }
 
-    /**
-     * @brief returns default epsilon equals the smallest possible difference on
-    * doubles
-     *
-     * @return
-     */
-    static T default_epsilon() { return std::numeric_limits<T>::epsilon(); }
 
-  private:
-    const T m_epsilon;
+    /// returns default epsilon equals the smallest possible difference on doubles
+    static T default_epsilon() { return std::numeric_limits<T>::epsilon(); }
 };
 
 } // utils

@@ -131,11 +131,7 @@ class components<TypesVector<Name, NamesRest...>,
     typedef TypesVector<Name, NamesRest...> Names;
     typedef TypesVector<Type, TypesRest...> Types;
 
-    /**
-     * @brief Evaluates to valid type iff componentsName == Name
-     *
-     * @tparam ComponentName
-     */
+    ///Evaluates to valid type iff componentsName == Name
     template <typename ComponentName>
     using is_my_name =
         typename std::enable_if<std::is_same<ComponentName, Name>::value>::type;
@@ -288,7 +284,7 @@ class components<TypesVector<Name, NamesRest...>,
     template <typename ComponentName>
     void
     set(const typename type_for_name<ComponentName, Names, Types>::type comp) {
-        get<ComponentName>() = std::move(comp);
+        this->get<ComponentName>() = std::move(comp);
     }
 
     /**

@@ -12,7 +12,6 @@
  * @version 1.0
  * @date 2013-02-04
  */
-
 #include "test_utils/sample_graph.hpp"
 #include "test_utils/logger.hpp"
 #include "test_utils/test_result_check.hpp"
@@ -76,8 +75,6 @@ BOOST_AUTO_TEST_CASE(test_all_generator) {
 
 template <typename Strategy>
 void run_multiple_seed_tests(Strategy& strategy) {
-    srand(0);
-
     Terminals terminals, steiner_vertices;
     std::vector<Vertex> result;
 
@@ -87,12 +84,14 @@ void run_multiple_seed_tests(Strategy& strategy) {
         sample_graphs_metrics::get_graph_steiner_vertices();
 
     int best_cost = std::numeric_limits<int>::max();
-    for (int i : paal::irange(5)) {
-        srand(i);
+    for (unsigned long i : paal::irange(5)) {
+        std::default_random_engine rng{i};
         LOGLN("small graph, seed " << i);
         result.clear();
+        paal::ir::steiner_tree_ir_components<> comps{};
+        comps.set<paal::ir::RoundCondition>(paal::ir::steiner_tree_round_condition{rng});
         auto status = paal::ir::steiner_tree_iterative_rounding(metrics, terminals,
-                steiner_vertices, std::back_inserter(result), strategy);
+                steiner_vertices, std::back_inserter(result), strategy, comps);
         BOOST_CHECK_EQUAL(status, paal::lp::OPTIMAL);
         int cost = paal::ir::steiner_utils::count_cost(result, terminals, metrics);
         paal::assign_min(best_cost, cost);
