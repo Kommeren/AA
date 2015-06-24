@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(lsh_bin_simple) {
     std::string expt = create_tmp_file("expect_1", "1");
     std::string result = get_temp_file_path("simple_test_1.svm");
 
-    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " --dimensions=2");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " --dimensions=1");
     test_files_are_equal(result, expt);
 }
 
@@ -82,9 +82,9 @@ BOOST_AUTO_TEST_CASE(lsh_bin_test_metrics) {
     std::string expect = create_tmp_file("expect_l2", "0");
     std::string result = get_temp_file_path("result_test_l2.svm");
 
-    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l2" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l2" + " --dimensions=2");
     test_files_are_equal(result, expect);
-    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l1" + " --dimensions=1");
+    call(lsh_bin + " -d " + training + " -t " + test + " -o " + result + " -m l1" + " --dimensions=2");
     test_files_are_equal(result, expect);
 }
 

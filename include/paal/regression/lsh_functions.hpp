@@ -15,26 +15,28 @@
 #ifndef PAAL_LSH_FUNCTIONS_HPP
 #define PAAL_LSH_FUNCTIONS_HPP
 
+#include "paal/utils/functors.hpp"
 #include "paal/utils/type_functions.hpp"
-#include "paal/utils/accumulate_functors.hpp"
 
-#include <boost/range/adaptor/indexed.hpp>
-#include <boost/range/adaptor/filtered.hpp>
-#include <boost/range/adaptor/transformed.hpp>
 #include <boost/range/algorithm/equal.hpp>
 #include <boost/range/algorithm/generate.hpp>
-#include <boost/range/algorithm/max_element.hpp>
 #include <boost/range/algorithm/min_element.hpp>
 #include <boost/range/algorithm_ext/iota.hpp>
+#include <boost/range/counting_range.hpp>
+#include <boost/range/empty.hpp>
+#include <boost/range/iterator.hpp>
 #include <boost/range/numeric.hpp>
 #include <boost/range/size.hpp>
+#include <boost/range/adaptor/transformed.hpp>
 #include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/vector_sparse.hpp>
 #include <boost/numeric/ublas/vector_expression.hpp>
 
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <random>
+#include <type_traits>
 #include <utility>
 
 namespace paal {
@@ -264,7 +266,7 @@ using l_2_hash_function_generator =
 ///min-wise independent permutations locality sensitive hashing (Jaccard)
 class min_hash_function {
     //permutation
-    std::vector<int> m_perm;
+    std::vector<std::size_t> m_perm;
 
 public:
 
@@ -276,7 +278,8 @@ public:
 
     ///constructor
     template <typename RandomEngine>
-    min_hash_function(std::size_t n, RandomEngine && rng) : m_perm(n)  {
+    min_hash_function(std::size_t set_element_upper_bound, RandomEngine && rng)
+            : m_perm(set_element_upper_bound)  {
         boost::iota(m_perm, 0);
         std::shuffle(m_perm.begin(), m_perm.end(), rng);
     }
@@ -289,36 +292,35 @@ public:
         return boost::equal(m_perm, other.m_perm);
     }
 
-    ///this version was assuming that one indicates that an element is in the set
-    /*template <typename Range>
-    auto operator()(Range &&range) const {
-        using indexed_val = boost::range::index_value<range_to_ref_t<Range>>;
-        using namespace boost::adaptors;
-        assert(boost::distance(range) <= m_perm.size());
-        auto is_one = [](indexed_val a){return a.value() == 1;};
-        auto perm = [&](indexed_val a){
-            if(a.index() >= m_perm.size()) {
-                std::cout << "LIPTON " << a.index() << " " << m_perm.size() << std::endl;
-            }
-
-            assert(a.index() < m_perm.size());return m_perm[a.index()];};
-        return *boost::min_element(
-                          range
-                        | indexed()
-                        | filtered(utils::make_assignable_functor(is_one))
-                        | transformed(utils::make_assignable_functor(perm)));
-    }*/
-
-    ///operator()
+    /**
+     * @brief operator()
+     *
+     * @tparam Range
+     * @param range forward range modeling boost uBLAS sparse VectorExpression concept,
+     * set is represented as set of indexes of range elements
+     *
+     * @return
+     */
     template <typename Range>
     auto operator()(Range &&range) const {
-        assert(*boost::max_element(range) < static_cast<int>(m_perm.size()));
-        return *min_element_functor(
-                    range, [&](range_to_ref_t<Range> a){ return m_perm[a]; });
+        static_assert(std::is_same<typename paal::decay_t<Range>::container_type::storage_category,
+                                 boost::numeric::ublas::sparse_tag>::value, "vector must be sparse");
+        using iter_t = typename boost::range_iterator<Range>::type;
+
+        auto perm_function = [&](iter_t it) {
+            auto set_elem = it.index();
+            assert(set_elem < m_perm.size());
+            return m_perm[set_elem];
+        };
+        auto perm_range =
+                boost::counting_range(range)
+                | boost::adaptors::transformed(utils::make_assignable_functor(perm_function));
+
+        assert(!boost::empty(perm_range));
+        return *boost::min_element(perm_range);
     }
 };
 
-//TODO add to binary and documentation when needed
 ///Factory class for min_hash_function
 template <typename RandomEngine = std::default_random_engine>
 class min_hash_function_generator {
@@ -337,6 +339,8 @@ public:
         return min_hash_function(m_range_size, m_generator);
     }
 };
+using jaccard_hash_function_generator =
+    min_hash_function_generator<>;
 
 } //! lsh
 

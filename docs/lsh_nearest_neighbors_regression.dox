@@ -39,8 +39,9 @@ was not present in the hash map in all iterations).
 \section lsh_functions LSH functions
 
 Basing on \cite Indyk2008 we implemented LSH function families for Hamming,
-Euclidean(\f$l_2\f$) and Manhattan(\f$l_1\f$) distances.
-All hash function generators are defined in file lsh_functions.hpp.
+Euclidean(\f$l_2\f$), Manhattan(\f$l_1\f$) and Jaccard (via min-wise
+independent permutations) distances.  All hash function generators are defined
+in file lsh_functions.hpp.
 
 \section example Example
 \snippet lsh_nearest_neighbors_regression_example.cpp LSH Nearest Neighbors Regression Example

@@ -16,9 +16,7 @@
 #include "paal/data_structures/mapped_file.hpp"
 #include "paal/regression/lsh_nearest_neighbors_regression.hpp"
 #include "paal/utils/functors.hpp"
-#include "paal/utils/irange.hpp"
 #include "paal/utils/performance_measures.hpp"
-#include "paal/utils/parse_file.hpp"
 #include "paal/utils/read_svm.hpp"
 #include "paal/utils/singleton_iterator.hpp"
 
@@ -49,12 +47,13 @@ using point_type_dense =  boost::numeric::ublas::vector<double>;
 using paal::utils::tuple_get;
 namespace po = boost::program_options;
 
-enum Metric {HAMMING, L1, L2};
+enum Metric {HAMMING, L1, L2, JACCARD};
 enum Vector_type {SPARSE, DENSE};
 
 struct l1_tag{};
 struct l2_tag{};
 struct ham_tag{};
+struct jaccard_tag{};
 
 std::istream& operator>>(std::istream& in, Metric& metr) {
     std::string token;
@@ -66,6 +65,8 @@ std::istream& operator>>(std::istream& in, Metric& metr) {
         metr = L1;
     else if (token == "l2")
         metr = L2;
+    else if (token == "jaccard")
+        metr = JACCARD;
     else
         assert(0 && "couldn't conclude metric name");
     return in;
@@ -80,7 +81,7 @@ std::istream& operator>>(std::istream& in, Vector_type & vec_type) {
     else if (token == "sparse")
         vec_type = SPARSE;
     else
-        assert(0 && "couldn't conclude metric name");
+        assert(0 && "couldn't conclude sparse/dense representation");
     return in;
 }
 
@@ -96,17 +97,22 @@ struct params {
     Metric m_metric;
 };
 
-auto get_function_generator(l1_tag, params p) {
+auto get_function_generator(l1_tag, params const &p) {
     return paal::lsh::l_1_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
 }
 
-auto get_function_generator(l2_tag, params p) {
+auto get_function_generator(l2_tag, params const &p) {
     return paal::lsh::l_2_hash_function_generator<>{p.m_dimensions, p.m_w, std::default_random_engine(p.m_seed)};
 }
 
-auto get_function_generator(ham_tag, params p) {
+auto get_function_generator(ham_tag, params const &p) {
     return paal::lsh::hamming_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
 }
+
+auto get_function_generator(jaccard_tag, params const &p) {
+    return paal::lsh::jaccard_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
+}
+
 
 /// prints message (specialization for empty message)
 auto print_message(std::ostream &output_stream) {
@@ -142,8 +148,8 @@ auto error(Arg &&arg, Args... args) {
 }
 
 template <typename Row = point_type_sparse, typename LshFunctionTag>
-void m_main(po::variables_map vm,
-            params p,
+void m_main(po::variables_map const &vm,
+            params const &p,
             LshFunctionTag tag) {
     using lsh_fun = paal::pure_result_of_t<
                         paal::hash_function_tuple_generator<
@@ -187,11 +193,15 @@ void m_main(po::variables_map vm,
 
     if (vm.count("training_file")) {
         std::ifstream training_file_stream(vm["training_file"].as<std::string>());
+        if (!training_file_stream.good()) {
+            error("training file does not exist or is empty!");
+        }
 
         points_buffer.reserve(p.m_row_buffer_size);
         while (training_file_stream.good()) {
             points_buffer.clear();
-            paal::read_svm(training_file_stream, p.m_dimensions, points_buffer, p.m_row_buffer_size, ignore_bad_row);
+            auto dimensions = p.m_dimensions;
+            paal::read_svm(training_file_stream, dimensions, points_buffer, p.m_row_buffer_size, ignore_bad_row);
 
             model.update(points_buffer | transformed(get_coordinates),
                          points_buffer | transformed(get_result),
@@ -253,14 +263,21 @@ void m_main(po::variables_map vm,
 }
 
 template <typename LshFunctionTag>
-void choose_vector_type_main(po::variables_map vm,
-            params p,
+void choose_vector_type_main(po::variables_map const &vm,
+            params const &p,
             LshFunctionTag tag) {
     if (p.m_dense == DENSE) {
         m_main<point_type_dense>(vm,p,tag);
     } else if( p.m_dense == SPARSE) {
         m_main<point_type_sparse>(vm,p,tag);
     }
+}
+
+void choose_vector_type_main(po::variables_map const &vm,
+            params const &p,
+            jaccard_tag tag) {
+    assert(p.m_dense == SPARSE && "Jaccard metric supports only sparse rows representation.");
+    m_main<point_type_sparse>(vm,p,tag);
 }
 
 int main(int argc, char** argv)
@@ -271,10 +288,10 @@ int main(int argc, char** argv)
             "suite for fast machine learning KNN algorithm which is using "\
             "locality sensitive hashing functions\n\nUsage:\n"\
             "This command will train on training file and output the predictions in test_file:\n"
-            "\tlsh-regression --training_file path_to_training_file --test_file path_to_test_file\n\n"\
+            "\tlsh-regression --training_file path_to_training_file --test_file path_to_test_file --dimensions number_of_dimensions\n\n"\
             "If you want to use L1 metric, with 7 passes and 10 threads, and save model\n"\
             "you can use following command:\n"
-            "\tlsh-regression -d training.svm -i 7 -n 10 -m L1 --model_out model.lsh\n\n"\
+            "\tlsh-regression -d training.svm -i 7 -n 10 -m L1 --dimensions number_of_dimensions --model_out model.lsh\n\n"\
             "Then if you want to use this model to make a prediction to result_file:\n"\
             "\tlsh-regression -t test.svm --model_in model.lsh -o results.txt\n\n"
             "Options description");
@@ -294,7 +311,7 @@ int main(int argc, char** argv)
         ("dense", po::value<Vector_type>(&p.m_dense)->default_value(SPARSE), "Dense/Sparse - Allows to use dense\
                   array representation (It might significantly speed up program for dense data)")
         ("metric,m", po::value<Metric>(&p.m_metric)->default_value(HAMMING), "Metric used for determining " \
-                 "similarity between objects - [HAMMING/L1/L2] (default = Hamming)")
+                 "similarity between objects - [HAMMING/L1/L2/JACCARD] (default = Hamming)")
         ("precision,b", po::value<unsigned>(&p.m_precision)->default_value(10), "Number " \
                  "of hashing function that are encoding the object")
         ("parm_w,w", po::value<double>(&p.m_w)->default_value(1000.), "Parameter w " \
@@ -380,6 +397,9 @@ int main(int argc, char** argv)
             break;
 
         case HAMMING: choose_vector_type_main(vm, p, ham_tag{});
+            break;
+
+        case JACCARD: choose_vector_type_main(vm, p, jaccard_tag{});
             break;
 
         default:
