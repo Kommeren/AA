@@ -28,8 +28,8 @@
 #include "paal/iterative_rounding/steiner_tree/steiner_utils.hpp"
 #include "paal/lp/lp_row_generation.hpp"
 #include "paal/utils/assign_updates.hpp"
-#include "paal/utils/floating.hpp"
 
+#include <boost/random/discrete_distribution.hpp>
 #include <boost/range/join.hpp>
 #include <boost/range/algorithm/unique.hpp>
 #include <boost/range/algorithm/sort.hpp>
@@ -293,7 +293,7 @@ class steiner_tree_round_condition {
             weights.push_back(lp.get_col_value(cId));
         }
 
-        auto selected = utils::discrete_distribution(weights)(m_rng);
+        auto selected = boost::random::discrete_distribution<>(weights)(m_rng);
         auto const &comp = problem.get_components().find(selected);
         problem.add_to_solution(comp.get_steiner_elements());
         problem.update_graph(comp);

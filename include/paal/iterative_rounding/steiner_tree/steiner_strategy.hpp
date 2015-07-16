@@ -18,7 +18,6 @@
 #include "paal/data_structures/bimap.hpp"
 #include "paal/data_structures/subset_iterator.hpp"
 #include "paal/iterative_rounding/steiner_tree/steiner_components.hpp"
-#include "paal/utils/floating.hpp"
 #include "paal/utils/assign_updates.hpp"
 
 #include <boost/graph/connected_components.hpp>
@@ -27,6 +26,7 @@
 #include <boost/range/algorithm_ext/erase.hpp>
 #include <boost/range/algorithm/sort.hpp>
 #include <boost/range/algorithm/unique.hpp>
+#include <boost/random/discrete_distribution.hpp>
 
 #include <random>
 #include <unordered_set>
@@ -333,7 +333,7 @@ public:
                             assign_max(prob[k], 1. / cost);
                         }
                     }
-                    auto selected = utils::discrete_distribution(prob)(m_rng);
+                    auto selected = boost::random::discrete_distribution<>(prob)(m_rng);
                     if (selected == prob.size()) break;
                     elements.push_back(terminals[selected]);
                 }

@@ -184,3 +184,6 @@
 [submodule "boost/numeric_bindings"]
 	path = boost/numeric_bindings
 	url = http://git.tiker.net/trees/boost-numeric-bindings.git
+[submodule "boost/random"]
+	path = boost/random
+	url = https://github.com/boostorg/random.git

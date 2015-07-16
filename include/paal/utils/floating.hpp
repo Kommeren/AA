@@ -21,13 +21,6 @@
 namespace paal {
 namespace utils {
 
-///discrete_distribution from range
-template <typename Range>
-inline auto discrete_distribution(Range && range) {
-    return std::discrete_distribution<>(std::begin(range), std::end(range));
-}
-
-
 ///Class for comparing floating point
 template <typename T>
 class compare {
