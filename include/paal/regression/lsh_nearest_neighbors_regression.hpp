@@ -68,7 +68,7 @@ public:
         ar & m_hash_funs;
     }
 
-    //default constructor
+    //default constructor, only for serialization purpose
     hash_function_tuple() = default;
 
     ///constructor
@@ -215,7 +215,7 @@ public:
         ar & m_avg;
     }
 
-    ///default constructor
+    ///default constructor, only for serialization purpose
     lsh_nearest_neighbors_regression() = default;
 
     /**

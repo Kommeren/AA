@@ -85,17 +85,16 @@ void copy_row_to_matrix(InputRow &&input_row, DestRow &dest_matrix_row) {
  *  \snippet frequent_directions_example.cpp Frequent Directions Example
  *
  * complete example is frequent_directions_example.cpp
- * @tparam T
  * @tparam Matrix
  */
-template <typename T,
-          typename Matrix = boost::numeric::ublas::matrix<T>>
+template <typename Matrix>
 class frequent_directions {
     Matrix m_sketch;
     std::size_t m_actual_size;
     std::size_t m_compress_size;
 
     using matrix_types = data_structures::matrix_type_traits<Matrix>;
+    using coordinate_t = typename matrix_types::coordinate_t;
 
 public:
     ///serialize
@@ -109,28 +108,17 @@ public:
     /**
      * @brief Creates sketch.
      *
-     * Default compress_size is half of number of rows in sketch matrix
-     *
-     * @param matrix sketch matrix where data is stored
-     */
-    frequent_directions(Matrix &&matrix)
-      : frequent_directions(std::forward<Matrix>(matrix),
-                            matrix_types::num_rows(matrix) / 2) {}
-
-    /**
-     * @brief Creates sketch.
-     *
      * @param matrix sketch matrix where data is stored
      * @param compress_size number of nonzero rows after compress phase
      */
-    frequent_directions(Matrix &&matrix, std::size_t const compress_size)
-      : m_sketch(matrix), m_actual_size(0),
-        m_compress_size(std::min(compress_size, matrix_types::num_columns(matrix))) {
+    frequent_directions(Matrix matrix, std::size_t const compress_size)
+      : m_sketch(std::move(matrix)), m_actual_size(0),
+        m_compress_size(std::min(compress_size, matrix_types::num_columns(m_sketch))) {
           assert(m_compress_size >= 0);
           assert(m_compress_size < matrix_types::num_rows(m_sketch));
     }
 
-    ///default constructor
+    ///default constructor, only for serialization purpose
     frequent_directions() : m_actual_size(0), m_compress_size(0) {}
 
     ///operator==
@@ -143,8 +131,9 @@ public:
     ///Adds new data in matrix form.
     template <typename MatrixData>
     void update(MatrixData&& matrix) {
-        for (auto row = matrix.begin1(); row != matrix.end1(); ++row)
+        for (auto row = matrix.begin1(); row != matrix.end1(); ++row) {
             update_row(std::move(row));
+        }
     }
 
     ///Adds one new row.
@@ -162,7 +151,7 @@ public:
     ///Adds new rows.
     template <typename RowRange>
     void update_range(RowRange&& row_range) {
-        for(auto row : row_range)
+        for(auto const & row : row_range)
             update_row(row);
     }
 
@@ -182,10 +171,10 @@ public:
         typename matrix_types::matrix_column_major_t sketch{std::move(m_sketch)};
         boost::numeric::bindings::lapack::gesvd(sketch, sigma, u, vt);
 
-        T const delta = m_compress_size < min_dimension ? sigma[m_compress_size] * sigma[m_compress_size] : T{};
+        coordinate_t const delta = m_compress_size < min_dimension ? sigma[m_compress_size] * sigma[m_compress_size] : coordinate_t{};
 
         for (auto &sigma_i : sigma) {
-            sigma_i = std::sqrt(std::max(sigma_i * sigma_i - delta, T{}));
+            sigma_i = std::sqrt(std::max(sigma_i * sigma_i - delta, coordinate_t{}));
         }
 
         typename matrix_types::matrix_diagonal_t s_diagonal{rows_count, min_dimension, 0, 0, std::move(sigma.data())};
@@ -203,6 +192,34 @@ public:
       return std::make_pair(std::cref(m_sketch), m_actual_size);
     }
 };
+
+
+///make for frequent_directions
+template <typename Matrix>
+auto make_frequent_directions(Matrix matrix) {
+    std::size_t const compress_size = data_structures::matrix_type_traits<Matrix>::num_rows(matrix) / 2;
+    return frequent_directions<Matrix>{std::move(matrix), compress_size};
+}
+
+///make for frequent_directions with compress_size
+template <typename Matrix>
+auto make_frequent_directions(Matrix matrix, std::size_t const compress_size) {
+    return frequent_directions<Matrix>{std::move(matrix), compress_size};
+}
+
+///make for frequent_directions using default matrix
+template <typename CoordinateType>
+auto make_frequent_directions(std::size_t rows_count, std::size_t columns_count) {
+    boost::numeric::ublas::matrix<CoordinateType> matrix{rows_count, columns_count, CoordinateType{}};
+    return frequent_directions<boost::numeric::ublas::matrix<CoordinateType>>{std::move(matrix), rows_count / 2};
+}
+
+///make for frequent_directions using default matrix and compress_size
+template <typename CoordinateType>
+auto make_frequent_directions(std::size_t rows_count, std::size_t columns_count, std::size_t const compress_size) {
+    boost::numeric::ublas::matrix<CoordinateType> matrix{rows_count, columns_count, CoordinateType{}};
+    return frequent_directions<boost::numeric::ublas::matrix<CoordinateType>>{std::move(matrix), compress_size};
+}
 
 } // paal
 

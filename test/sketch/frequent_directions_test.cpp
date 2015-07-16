@@ -66,8 +66,7 @@ auto generate_data_matrix() {
 BOOST_AUTO_TEST_SUITE(frequent_directions)
 
 BOOST_AUTO_TEST_CASE(update) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     auto data_matrix = generate_data_matrix();
 
     fd_sketch.update(data_matrix);
@@ -78,8 +77,7 @@ BOOST_AUTO_TEST_CASE(update) {
 }
 
 BOOST_AUTO_TEST_CASE(update_row) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     auto data_matrix = generate_data_matrix();
 
     for (auto i : paal::irange(data_matrix.size1()))
@@ -94,8 +92,7 @@ BOOST_AUTO_TEST_CASE(update_row) {
 }
 
 BOOST_AUTO_TEST_CASE(zero_rows) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     auto data_matrix = generate_data_matrix();
 
     fd_sketch.update(std::move(data_matrix));
@@ -112,8 +109,7 @@ BOOST_AUTO_TEST_CASE(zero_rows) {
 }
 
 BOOST_AUTO_TEST_CASE(result_matrix) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     auto data_matrix = generate_data_matrix();
 
     fd_sketch.update(std::move(data_matrix));
@@ -133,7 +129,7 @@ BOOST_AUTO_TEST_CASE(result_matrix) {
 
 BOOST_AUTO_TEST_CASE(sparse) {
     matrix_t matrix(sketch_size, columns_count, 0);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions(std::move(matrix));
     boost::numeric::ublas::mapped_matrix<coordinate_t> data_matrix(rows_count, columns_count);
     for (auto i : paal::irange(rows_count)) {
         data_matrix(i, i % columns_count) = i + 1;
@@ -147,8 +143,7 @@ BOOST_AUTO_TEST_CASE(sparse) {
 }
 
 BOOST_AUTO_TEST_CASE(zero_matrix) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     matrix_t data_matrix(rows_count, columns_count, 0);
 
     fd_sketch.update(data_matrix);
@@ -160,8 +155,20 @@ BOOST_AUTO_TEST_CASE(zero_matrix) {
 
 BOOST_AUTO_TEST_CASE(compress_size) {
     for(auto compress_size : compress_sizes) {
+        auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count, compress_size);
+        auto data_matrix = generate_data_matrix();
+
+        fd_sketch.update(data_matrix);
+        fd_sketch.compress();
+
+        auto sketch = fd_sketch.get_sketch().first;
+        check_frequent_directions(std::move(data_matrix), std::move(sketch),
+                EPS, coordinate_t(compress_size));
+    }
+
+    for(auto compress_size : compress_sizes) {
         matrix_t matrix(sketch_size, columns_count);
-        paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix), compress_size);
+        auto fd_sketch = paal::make_frequent_directions(std::move(matrix), compress_size);
         auto data_matrix = generate_data_matrix();
 
         fd_sketch.update(data_matrix);
@@ -174,8 +181,7 @@ BOOST_AUTO_TEST_CASE(compress_size) {
 }
 
 BOOST_AUTO_TEST_CASE(serialization) {
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
     auto data_matrix = generate_data_matrix();
 
     fd_sketch.update(std::move(data_matrix));

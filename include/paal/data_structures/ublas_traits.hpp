@@ -45,6 +45,7 @@ struct matrix_type_traits {};
 /// Specialization matrix_type_traits for ublas matrix.
 template <typename T>
 struct matrix_type_traits<boost::numeric::ublas::matrix<T>> {
+    using coordinate_t = T;
     using matrix_row_t = boost::numeric::ublas::matrix_row<boost::numeric::ublas::matrix<T>>;
     using vector_t = boost::numeric::ublas::vector<T>;
     using matrix_column_major_t = boost::numeric::ublas::matrix<T, boost::numeric::ublas::column_major>;

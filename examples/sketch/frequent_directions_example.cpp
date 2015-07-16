@@ -32,8 +32,7 @@ int main() {
     std::size_t const columns_count = 3;
     std::size_t const sketch_size = 4;
 
-    matrix_t matrix(sketch_size, columns_count);
-    paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+    auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
 
     matrix_t data(rows_count, columns_count);
     for (auto i : paal::irange(rows_count)) {

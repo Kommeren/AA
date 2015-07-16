@@ -31,7 +31,6 @@
 #include <string>
 
 using coordinate_t = double;
-using matrix_t = boost::numeric::ublas::matrix<coordinate_t>;
 using distribution_t = std::uniform_int_distribution<std::size_t>;
 
 namespace {
@@ -40,7 +39,7 @@ namespace {
 }
 
 auto generate_random_matrix(std::size_t rows_count, std::size_t columns_count) {
-    matrix_t matrix(rows_count, columns_count);
+    boost::numeric::ublas::matrix<coordinate_t> matrix(rows_count, columns_count);
 
     std::uniform_real_distribution<coordinate_t> distribution(0,1);
 
@@ -69,8 +68,7 @@ BOOST_AUTO_TEST_CASE(frequent_directions_random) {
         distribution_t sketch_size_distribution(min_sketch_size, rows_count/10);
         auto sketch_size = sketch_size_distribution(generator);
 
-        matrix_t matrix(sketch_size, columns_count, 0);
-        paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+        auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, columns_count);
         auto data = generate_random_matrix(rows_count, columns_count);
         fd_sketch.update(std::move(data));
         fd_sketch.compress();
@@ -94,8 +92,7 @@ BOOST_AUTO_TEST_CASE(frequent_directions_long) {
 
         int sketch_size;
         is_test_cases >> sketch_size;
-        matrix_t matrix(sketch_size, data.size2());
-        paal::frequent_directions<coordinate_t> fd_sketch(std::move(matrix));
+        auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, data.size2());
         fd_sketch.update(data);
         fd_sketch.compress();
 
