@@ -32,14 +32,37 @@ namespace paal {
  */
 template <typename Range, typename Stream>
 void print_collection(Stream &o, Range &&r, const std::string &del) {
-    if (boost::empty(r)) {
-        return;
-    }
     auto b = std::begin(r);
     auto e = std::end(r);
+    if (b == e) {
+        return;
+    }
     o << *b;
     for (auto &&x : boost::make_iterator_range(++b, e)) {
         o << del << x;
+    }
+}
+
+/**
+ * @brief prints matrix with delimiters
+ *
+ * @tparam Matrix
+ * @tparam Stream
+ * @param o
+ * @param m
+ * @param del
+ */
+template <typename Matrix, typename Stream>
+void print_matrix(Stream &o, Matrix &&m, const std::string &del) {
+    auto b = m.begin1();
+    auto e = m.end1();
+    if (b == e) {
+        return;
+    }
+    print_collection(o, b, del);
+    for (++b ;b != e; ++b) {
+        o << std::endl;
+        print_collection(o, b, del);
     }
 }
 

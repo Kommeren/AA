@@ -19,6 +19,7 @@
 #include "paal/utils/performance_measures.hpp"
 #include "paal/utils/read_svm.hpp"
 #include "paal/utils/singleton_iterator.hpp"
+#include "paal/utils/system_message.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/archive/binary_iarchive.hpp>
@@ -45,6 +46,7 @@ using point_type_sparse = boost::numeric::ublas::compressed_vector<double>;
 using point_type_dense =  boost::numeric::ublas::vector<double>;
 
 using paal::utils::tuple_get;
+namespace utils = paal::utils;
 namespace po = boost::program_options;
 
 enum Metric {HAMMING, L1, L2, JACCARD};
@@ -113,40 +115,6 @@ auto get_function_generator(jaccard_tag, params const &p) {
     return paal::lsh::jaccard_hash_function_generator(p.m_dimensions, std::default_random_engine(p.m_seed));
 }
 
-
-/// prints message (specialization for empty message)
-auto print_message(std::ostream &output_stream) {
-    output_stream << std::endl;
-}
-
-/// prints message
-template <typename Arg, typename ...Args>
-auto print_message(std::ostream &output_stream, Arg &&arg, Args... args) {
-    output_stream << arg;
-    print_message(output_stream, std::forward<Args>(args)...);
-}
-
-/// prints info message
-template <typename Arg, typename ...Args>
-auto info(Arg &&arg, Args... args) {
-    print_message(std::cout, std::forward<Arg>(arg), std::forward<Args>(args)...);
-}
-
-/// prints warning message
-template <typename Arg, typename ...Args>
-auto warning(Arg &&arg, Args... args) {
-    static const std::string message_prefix = "Warning: ";
-    print_message(std::cerr, message_prefix, std::forward<Arg>(arg), std::forward<Args>(args)...);
-}
-
-/// prints error message
-template <typename Arg, typename ...Args>
-auto error(Arg &&arg, Args... args) {
-    static const std::string message_prefix = "Error: ";
-    print_message(std::cerr, message_prefix, std::forward<Arg>(arg), std::forward<Args>(args)...);
-    std::exit(EXIT_FAILURE);
-}
-
 template <typename Row = point_type_sparse, typename LshFunctionTag>
 void m_main(po::variables_map const &vm,
             params const &p,
@@ -187,14 +155,14 @@ void m_main(po::variables_map const &vm,
     }
 
     auto ignore_bad_row = [&](std::string const &bad_line) {
-        warning("following line will be ignored cause of bad format (typically more columns than passed dimensions): ", bad_line);
+        utils::warning("following line will be ignored cause of bad format (typically more columns than passed dimensions): ", bad_line);
         return true;
     };
 
     if (vm.count("training_file")) {
         std::ifstream training_file_stream(vm["training_file"].as<std::string>());
         if (!training_file_stream.good()) {
-            error("training file does not exist or is empty!");
+            utils::failure("training file does not exist or is empty!");
         }
 
         points_buffer.reserve(p.m_row_buffer_size);
@@ -242,7 +210,7 @@ void m_main(po::variables_map const &vm,
         auto loss = paal::log_loss<double>(test_results | transformed(get_prediction),
                                            test_results | transformed(get_real_value));
 
-        info("logloss on test set = ", loss, ", likelihood = ", paal::likelihood_from_log_loss(loss));
+        utils::info("logloss on test set = ", loss, ", likelihood = ", paal::likelihood_from_log_loss(loss));
 
         if (vm.count("result_file") > 0) {
             std::ofstream result_file(vm["result_file"].as<std::string>());
@@ -330,12 +298,12 @@ int main(int argc, char** argv)
     };
 
     if (vm.count("help")) {
-        info(desc);
+        utils::info(desc);
         return EXIT_SUCCESS;
     }
 
     auto error_with_usage = [&] (const std::string &message) {
-        error(message, "\n", desc);
+        utils::failure(message, "\n", desc);
     };
 
     if (vm.count("training_file") == 0 && vm.count("test_file") == 0) {
@@ -362,9 +330,9 @@ int main(int argc, char** argv)
         auto ignore_serializable_param = [&](std::string const &param_name, bool param_is_equal_to_serialized) {
             if (param_is_set_explicitly(param_name)) {
                 if (param_is_equal_to_serialized) {
-                    warning("if input model is specified one does not have to specify param ", param_name);
+                    utils::warning("if input model is specified one does not have to specify param ", param_name);
                 } else {
-                    warning("the specified param ", param_name, " is ignored, because it differs from the input model param ", param_name);
+                    utils::warning("the specified param ", param_name, " is ignored, because it differs from the input model param ", param_name);
                 }
             }
         };
@@ -373,7 +341,7 @@ int main(int argc, char** argv)
 
         auto ignored = [&](std::string const & param, std::string const & param_display) {
             if (param_is_set_explicitly(param)) {
-                warning("parameter ", param_display, " was set, but model_in is used, param ", param_display, " is discarded");
+                utils::warning("parameter ", param_display, " was set, but model_in is used, param ", param_display, " is discarded");
             }
         };
         ignored("parm_w", "w");
@@ -385,7 +353,7 @@ int main(int argc, char** argv)
         p.m_dimensions = dimensions;
     } else {
         if (p.m_metric == HAMMING && param_is_set_explicitly("parm_w")) {
-            warning("parameter w was set, but hamming metric is used, param w is discarded");
+            utils::warning("parameter w was set, but hamming metric is used, param w is discarded");
         }
     }
 

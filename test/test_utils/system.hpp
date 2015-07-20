@@ -45,10 +45,13 @@ inline void create_directory(std::string const &path) {
 }
 
 /// Execs command
-inline int exec(std::string const &cmd, bool discard_output = true) {
+inline int exec(std::string const &cmd,
+                bool discard_output = true,
+                std::string const &stdout = "/dev/null",
+                std::string const &stderr = "/dev/null") {
     //TODO OS portable
     std::string const redirections = " >/dev/null 2>&1";
-    std::string optional_redirections = discard_output ? redirections : "";
+    std::string optional_redirections = discard_output ? redirections : " >" + stdout + " 2>" + stderr;
 
     return std::system((cmd + optional_redirections).c_str());
 }

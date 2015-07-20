@@ -36,6 +36,54 @@ Pseudocode:
 
   example file is frequent_directions_example.cpp
 
+\section functions_frequent_directions Main functions and methods
+
+There are four make functions constructing the frequent_directions model.
+First two with user matrix as sketch:
+<pre>
+auto make_frequent_directions(Matrix matrix);
+auto make_frequent_directions(Matrix matrix, size_t const compress_size);
+</pre>
+And other which creates matrix of given sizes:
+<pre>
+auto make_frequent_directions(size_t rows_count, size_t columns_count);
+auto make_frequent_directions(size_t rows_count, size_t columns_count, size_t const compress_size);
+</pre>
+The model can be updated with additional data by using following methods:
+<pre>
+void update(MatrixData&& matrix);
+void update_row(InputRow&& input_row);
+void update_range(RowRange&& row_range);
+</pre>
+
+\section parameters_frequent_directions Parameters
+
+IN: Matrix matrix - starting sketch matrix
+
+IN: size_t compress_size
+
+IN: size_t rows_count - numer of rows in a sketch
+
+IN: size_t columns_count - number of columns in a sketch
+
+IN: MatrixData &&matrix - data to update sketch in matrix form
+
+IN: InputRow &&input_row - single row to update
+
+IN: RowRange &&row_range - range of rows to update
+
+\section binary_frequent_directions Binary
+
+The solution can be used as a binary program \em frequent-directions which supports:
+<ul>
+    <li> reading data from a file or standard input,
+    <li> writing sketch to a file or standard output,
+    <li> configurable data buffer size in order to control memory usage,
+    <li> configurable \f$compress\_size\f$,
+    <li> serialization of the model to a file and reading the serialized model from a file.
+</ul>
+For more details on usage, please run the binary program with \em \-\-help option.
+
 \section app_frequentdirections Approximation Ratio
 
 After adding all data and running compress phase at the end, we get:

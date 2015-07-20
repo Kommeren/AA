@@ -16,8 +16,8 @@
 //! [Frequent Directions Example]
 #include "paal/sketch/frequent_directions.hpp"
 #include "paal/utils/irange.hpp"
+#include "paal/utils/print_collection.hpp"
 
-#include <boost/numeric/ublas/io.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/numeric/ublas/matrix_proxy.hpp>
 
@@ -61,7 +61,9 @@ int main() {
     boost::numeric::ublas::matrix_range<matrix_t> sketch_range (sketch,
          boost::numeric::ublas::range(0, actual_size),
          boost::numeric::ublas::range(0, columns_count));
-    std::cout << "Sketch data:" << std::endl << sketch_range << std::endl;
+    std::cout << "Sketch data:" << std::endl;
+    paal::print_matrix(std::cout, sketch_range, " ");
+    std::cout << std::endl;
 
     return 0;
 }

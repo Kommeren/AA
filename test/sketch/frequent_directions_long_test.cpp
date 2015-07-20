@@ -14,13 +14,13 @@
  */
 
 #include "test_utils/get_test_dir.hpp"
-#include "test_utils/read_matrix.hpp"
 #include "test_utils/sketch_accuracy_check.hpp"
 #include "test_utils/system.hpp"
 
 #include "paal/sketch/frequent_directions.hpp"
 #include "paal/utils/irange.hpp"
 #include "paal/utils/parse_file.hpp"
+#include "paal/utils/read_rows.hpp"
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/test/unit_test.hpp>
@@ -32,14 +32,18 @@
 
 using coordinate_t = double;
 using distribution_t = std::uniform_int_distribution<std::size_t>;
+using matrix_t = boost::numeric::ublas::matrix<coordinate_t>;
+using row_t = std::vector<coordinate_t>;
+using vector_row_t = std::vector<row_t>;
 
 namespace {
     std::default_random_engine generator;
-    coordinate_t EPS = 1e-8;
+    std::size_t MAX_ROWS = 2000;
+    coordinate_t EPS = 1e-7;
 }
 
 auto generate_random_matrix(std::size_t rows_count, std::size_t columns_count) {
-    boost::numeric::ublas::matrix<coordinate_t> matrix(rows_count, columns_count);
+    matrix_t matrix(rows_count, columns_count);
 
     std::uniform_real_distribution<coordinate_t> distribution(0,1);
 
@@ -47,6 +51,18 @@ auto generate_random_matrix(std::size_t rows_count, std::size_t columns_count) {
         for (auto j : paal::irange(columns_count)) {
             matrix(i,j) = distribution(generator);
         }
+    }
+
+    return matrix;
+}
+
+auto generate_matrix_from_row_buffer(vector_row_t const &row_buffer) {
+    matrix_t matrix(boost::size(row_buffer), boost::size(row_buffer.front()));
+
+    auto row = row_buffer.begin();
+    auto row_matrix = matrix.begin1();
+    for (; row != row_buffer.end() && row_matrix != matrix.end1(); ++row, ++row_matrix) {
+        std::copy(row->begin(), row->end(), row_matrix.begin());
     }
 
     return matrix;
@@ -88,9 +104,13 @@ BOOST_AUTO_TEST_CASE(frequent_directions_long) {
         std::ifstream ifs(build_path(test_dir, "/cases/" + fname + ".txt"));
         assert(ifs.good());
 
-        auto data = paal::read_matrix(ifs);
+        std::vector<std::vector<coordinate_t>> row_buffer;
+        row_buffer.reserve(MAX_ROWS);
+        paal::read_rows_first_row_size<coordinate_t>(ifs, row_buffer, MAX_ROWS);
 
-        int sketch_size;
+        auto data = generate_matrix_from_row_buffer(row_buffer);
+
+        std::size_t sketch_size;
         is_test_cases >> sketch_size;
         auto fd_sketch = paal::make_frequent_directions<coordinate_t>(sketch_size, data.size2());
         fd_sketch.update(data);
