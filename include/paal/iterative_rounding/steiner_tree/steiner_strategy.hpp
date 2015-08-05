@@ -333,7 +333,7 @@ public:
                             assign_max(prob[k], 1. / cost);
                         }
                     }
-                    auto selected = boost::random::discrete_distribution<>(prob)(m_rng);
+                    auto selected = boost::random::discrete_distribution<std::size_t>(prob)(m_rng);
                     if (selected == prob.size()) break;
                     elements.push_back(terminals[selected]);
                 }

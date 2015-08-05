@@ -24,6 +24,7 @@
 #include <boost/numeric/ublas/matrix_expression.hpp>
 
 #include <boost/range/algorithm/copy.hpp>
+#include <boost/range/distance.hpp>
 #include <boost/range/size.hpp>
 
 #include <utility>
@@ -48,7 +49,7 @@ void copy_row_to_matrix(InputRow &&input_row, DestRow &dest_matrix_row,
                         std::false_type /* is_row_of_sparse_matrix*/,
                         std::false_type /* rows_are_assignable */) {
     //boost::size does not compile on ublas structures
-    assert(boost::size(dest_matrix_row) ==
+    assert(boost::distance(dest_matrix_row) ==
            std::distance(std::begin(input_row),
                          std::end(input_row)));
     std::copy(std::begin(input_row),

@@ -5,10 +5,10 @@ For more details about cmake please see:
 http://www.cmake.org/
 
 The project was tested with cmake version 2.8.9.
-The minimal version of g++ is 4.8.1.
+The minimal version of g++ is 4.8.4.
 The minimal version of clang++ is 3.5.
 The minimal version of  Visual Studio is 2015 preview (only binaries are guarantied to compile here)
-The minimal version of boost is 1.57.
+The minimal version of boost is 1.58.
 
 In order to build automatic documentation run doxygen in the paal root directory.
 The minimal doxygen version is 1.8.3.
