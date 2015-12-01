@@ -23,8 +23,9 @@ endforeach()
 add_library(boost_serialization SHARED ${SERIALIZATION_BINS})
 
 # Boost mapped file shared library
-file(GLOB_RECURSE boost_iostreams "${PAAL}/boost/iostreams/src/mapped_file.cpp")
+file(GLOB_RECURSE boost_iostreams "${PAAL}/boost/iostreams/src/*.cpp")
 add_library(boost_iostreams SHARED ${boost_iostreams})
+target_link_libraries(boost_iostreams bz2 z)
 
 foreach(bin_src ${bin_srcs})
     get_filename_component(bin_name ${bin_src} NAME_WE)
