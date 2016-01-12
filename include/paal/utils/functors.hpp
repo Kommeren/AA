@@ -332,7 +332,7 @@ template <typename Array> class array_to_functor {
      * @param offset
      */
     array_to_functor(const Array &array, int offset = 0)
-        : m_array(&array), m_offset(offset) {}
+        : m_array(array), m_offset(offset) {}
 
     /// Value type
     typedef decltype(std::declval<const Array>()[0]) Value;
@@ -344,10 +344,10 @@ template <typename Array> class array_to_functor {
      *
      * @return
      */
-    Value operator()(int a) const { return (*m_array)[a + m_offset]; }
+    Value operator()(int a) const { return m_array.get()[a + m_offset]; }
 
   private:
-    const Array *m_array;
+    std::reference_wrapper<const Array> m_array;
     int m_offset;
 };
 
@@ -380,7 +380,7 @@ template <typename Functor> struct assignable_functor {
      *
      * @param f
      */
-    assignable_functor(Functor &f) : m_f(&f) {}
+    assignable_functor(Functor const &f) : m_f(f) {}
     assignable_functor() = default;
 
     /**
@@ -402,11 +402,11 @@ template <typename Functor> struct assignable_functor {
     template <typename... Args>
     auto operator()(Args &&... args) const->decltype(
         std::declval<Functor>()(std::forward<Args>(args)...)) {
-        return (*m_f)(std::forward<Args>(args)...);
+        return m_f.get()(std::forward<Args>(args)...);
     }
 
   private:
-    const Functor *m_f;
+    std::reference_wrapper<const Functor> m_f;
 };
 
 /**
