@@ -6,16 +6,7 @@ cmake_minimum_required(VERSION 2.8)
 
 SET(CMAKE_COLOR_MAKEFILE ON)
 
-if(${USE_CLANG_AND_DIST})
-    SET (CMAKE_CXX_COMPILER  "/usr/lib/distcc/clang++")
-    set(USE_CLANG 1)
-endif()
-
-
-if(${USE_CLANG})
-    if(NOT USE_CLANG_AND_DIST)
-        SET (CMAKE_CXX_COMPILER  "clang++")
-    endif()
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-tautological-constant-out-of-range-compare")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-gnu")
     ADD_DEFINITIONS("-stdlib=libc++")
